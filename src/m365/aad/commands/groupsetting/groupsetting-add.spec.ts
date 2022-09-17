@@ -62,7 +62,7 @@ describe(commands.GROUPSETTING_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds group setting using default template setting values', (done) => {
+  it('adds group setting using default template setting values', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettingTemplates/62375ab9-6b52-47ed-826b-58e47e0e304b`) {
         return Promise.resolve({
@@ -142,23 +142,16 @@ describe(commands.GROUPSETTING_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          displayName: null,
-          id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
-          templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
-          values: [{ "name": "UsageGuidelinesUrl", "value": "" }, { "name": "ClassificationList", "value": "" }, { "name": "DefaultClassification", "value": "" }, { "name": "CustomBlockedWordsList", "value": "" }, { "name": "EnableMSStandardBlockedWords", "value": "false" }, { "name": "ClassificationDescriptions", "value": "" }, { "name": "PrefixSuffixNamingRequirement", "value": "" }, { "name": "AllowGuestsToBeGroupOwner", "value": "false" }, { "name": "AllowGuestsToAccessGroups", "value": "true" }, { "name": "GuestUsageGuidelinesUrl", "value": "" }, { "name": "GroupCreationAllowedGroupId", "value": "" }, { "name": "AllowToAddGuests", "value": "true" }, { "name": "EnableGroupCreation", "value": "true" }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } });
+    assert(loggerLogSpy.calledWith({
+      displayName: null,
+      id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
+      templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
+      values: [{ "name": "UsageGuidelinesUrl", "value": "" }, { "name": "ClassificationList", "value": "" }, { "name": "DefaultClassification", "value": "" }, { "name": "CustomBlockedWordsList", "value": "" }, { "name": "EnableMSStandardBlockedWords", "value": "false" }, { "name": "ClassificationDescriptions", "value": "" }, { "name": "PrefixSuffixNamingRequirement", "value": "" }, { "name": "AllowGuestsToBeGroupOwner", "value": "false" }, { "name": "AllowGuestsToAccessGroups", "value": "true" }, { "name": "GuestUsageGuidelinesUrl", "value": "" }, { "name": "GroupCreationAllowedGroupId", "value": "" }, { "name": "AllowToAddGuests", "value": "true" }, { "name": "EnableGroupCreation", "value": "true" }]
+    }));
   });
 
-  it('adds group setting using default template setting values (debug)', (done) => {
+  it('adds group setting using default template setting values (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettingTemplates/62375ab9-6b52-47ed-826b-58e47e0e304b`) {
         return Promise.resolve({
@@ -238,23 +231,16 @@ describe(commands.GROUPSETTING_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          displayName: null,
-          id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
-          templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
-          values: [{ "name": "UsageGuidelinesUrl", "value": "" }, { "name": "ClassificationList", "value": "" }, { "name": "DefaultClassification", "value": "" }, { "name": "CustomBlockedWordsList", "value": "" }, { "name": "EnableMSStandardBlockedWords", "value": "false" }, { "name": "ClassificationDescriptions", "value": "" }, { "name": "PrefixSuffixNamingRequirement", "value": "" }, { "name": "AllowGuestsToBeGroupOwner", "value": "false" }, { "name": "AllowGuestsToAccessGroups", "value": "true" }, { "name": "GuestUsageGuidelinesUrl", "value": "" }, { "name": "GroupCreationAllowedGroupId", "value": "" }, { "name": "AllowToAddGuests", "value": "true" }, { "name": "EnableGroupCreation", "value": "true" }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } });
+    assert(loggerLogSpy.calledWith({
+      displayName: null,
+      id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
+      templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
+      values: [{ "name": "UsageGuidelinesUrl", "value": "" }, { "name": "ClassificationList", "value": "" }, { "name": "DefaultClassification", "value": "" }, { "name": "CustomBlockedWordsList", "value": "" }, { "name": "EnableMSStandardBlockedWords", "value": "false" }, { "name": "ClassificationDescriptions", "value": "" }, { "name": "PrefixSuffixNamingRequirement", "value": "" }, { "name": "AllowGuestsToBeGroupOwner", "value": "false" }, { "name": "AllowGuestsToAccessGroups", "value": "true" }, { "name": "GuestUsageGuidelinesUrl", "value": "" }, { "name": "GroupCreationAllowedGroupId", "value": "" }, { "name": "AllowToAddGuests", "value": "true" }, { "name": "EnableGroupCreation", "value": "true" }]
+    }));
   });
 
-  it('adds group setting using the specified values', (done) => {
+  it('adds group setting using the specified values', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettingTemplates/62375ab9-6b52-47ed-826b-58e47e0e304b`) {
         return Promise.resolve({
@@ -334,23 +320,16 @@ describe(commands.GROUPSETTING_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          displayName: null,
-          id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
-          templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
-          values: [{ "name": "UsageGuidelinesUrl", "value": "https://contoso.sharepoint.com/sites/compliance" }, { "name": "ClassificationList", "value": "HBI, MBI, LBI, GDPR" }, { "name": "DefaultClassification", "value": "MBI" }, { "name": "CustomBlockedWordsList", "value": "" }, { "name": "EnableMSStandardBlockedWords", "value": "false" }, { "name": "ClassificationDescriptions", "value": "" }, { "name": "PrefixSuffixNamingRequirement", "value": "" }, { "name": "AllowGuestsToBeGroupOwner", "value": "false" }, { "name": "AllowGuestsToAccessGroups", "value": "true" }, { "name": "GuestUsageGuidelinesUrl", "value": "" }, { "name": "GroupCreationAllowedGroupId", "value": "" }, { "name": "AllowToAddGuests", "value": "true" }, { "name": "EnableGroupCreation", "value": "true" }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } });
+    assert(loggerLogSpy.calledWith({
+      displayName: null,
+      id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
+      templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
+      values: [{ "name": "UsageGuidelinesUrl", "value": "https://contoso.sharepoint.com/sites/compliance" }, { "name": "ClassificationList", "value": "HBI, MBI, LBI, GDPR" }, { "name": "DefaultClassification", "value": "MBI" }, { "name": "CustomBlockedWordsList", "value": "" }, { "name": "EnableMSStandardBlockedWords", "value": "false" }, { "name": "ClassificationDescriptions", "value": "" }, { "name": "PrefixSuffixNamingRequirement", "value": "" }, { "name": "AllowGuestsToBeGroupOwner", "value": "false" }, { "name": "AllowGuestsToAccessGroups", "value": "true" }, { "name": "GuestUsageGuidelinesUrl", "value": "" }, { "name": "GroupCreationAllowedGroupId", "value": "" }, { "name": "AllowToAddGuests", "value": "true" }, { "name": "EnableGroupCreation", "value": "true" }]
+    }));
   });
 
-  it('ignores global options when creating request data', (done) => {
+  it('ignores global options when creating request data', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettingTemplates/62375ab9-6b52-47ed-826b-58e47e0e304b`) {
         return Promise.resolve({
@@ -430,38 +409,31 @@ describe(commands.GROUPSETTING_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, verbose: true, output: "text", templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } }, () => {
-      try {
-        assert.deepEqual(postStub.firstCall.args[0].data, {
-          templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
-          values: [
-            {
-              name: 'UsageGuidelinesUrl',
-              value: 'https://contoso.sharepoint.com/sites/compliance'
-            },
-            { name: 'ClassificationList', value: 'HBI, MBI, LBI, GDPR' },
-            { name: 'DefaultClassification', value: 'MBI' },
-            { name: 'CustomBlockedWordsList', value: '' },
-            { name: 'EnableMSStandardBlockedWords', value: 'false' },
-            { name: 'ClassificationDescriptions', value: '' },
-            { name: 'PrefixSuffixNamingRequirement', value: '' },
-            { name: 'AllowGuestsToBeGroupOwner', value: 'false' },
-            { name: 'AllowGuestsToAccessGroups', value: 'true' },
-            { name: 'GuestUsageGuidelinesUrl', value: '' },
-            { name: 'GroupCreationAllowedGroupId', value: '' },
-            { name: 'AllowToAddGuests', value: 'true' },
-            { name: 'EnableGroupCreation', value: 'true' }
-          ]
-        });
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
+    await command.action(logger, { options: { debug: true, verbose: true, output: "text", templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } });
+    assert.deepEqual(postStub.firstCall.args[0].data, {
+      templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
+      values: [
+        {
+          name: 'UsageGuidelinesUrl',
+          value: 'https://contoso.sharepoint.com/sites/compliance'
+        },
+        { name: 'ClassificationList', value: 'HBI, MBI, LBI, GDPR' },
+        { name: 'DefaultClassification', value: 'MBI' },
+        { name: 'CustomBlockedWordsList', value: '' },
+        { name: 'EnableMSStandardBlockedWords', value: 'false' },
+        { name: 'ClassificationDescriptions', value: '' },
+        { name: 'PrefixSuffixNamingRequirement', value: '' },
+        { name: 'AllowGuestsToBeGroupOwner', value: 'false' },
+        { name: 'AllowGuestsToAccessGroups', value: 'true' },
+        { name: 'GuestUsageGuidelinesUrl', value: '' },
+        { name: 'GroupCreationAllowedGroupId', value: '' },
+        { name: 'AllowToAddGuests', value: 'true' },
+        { name: 'EnableGroupCreation', value: 'true' }
+      ]
     });
   });
 
-  it('handles error when no template with the specified id found', (done) => {
+  it('handles error when no template with the specified id found', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -477,18 +449,11 @@ describe(commands.GROUPSETTING_ADD, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } } as any),
+      new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`));
   });
 
-  it('handles error when group setting already exists', (done) => {
+  it('handles error when group setting already exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettingTemplates/62375ab9-6b52-47ed-826b-58e47e0e304b`) {
         return Promise.resolve({
@@ -513,15 +478,8 @@ describe(commands.GROUPSETTING_ADD, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } } as any),
+      new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`));
   });
 
   it('fails validation if the templateId is not a valid GUID', async () => {

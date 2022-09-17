@@ -49,104 +49,70 @@ describe(commands.LOGOUT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('logs out from Microsoft 365 when logged in', (done) => {
+  it('logs out from Microsoft 365 when logged in', async () => {
     auth.service.connected = true;
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(!auth.service.connected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(!auth.service.connected);
   });
 
-  it('logs out from Microsoft 365 when not logged in', (done) => {
+  it('logs out from Microsoft 365 when not logged in', async () => {
     auth.service.connected = false;
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(!auth.service.connected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(!auth.service.connected);
   });
 
-  it('clears persisted connection info when logging out', (done) => {
+  it('clears persisted connection info when logging out', async () => {
     auth.service.connected = true;
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(authClearConnectionInfoStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(authClearConnectionInfoStub.called);
   });
 
-  it('correctly handles error while clearing persisted connection info', (done) => {
+  it('correctly handles error while clearing persisted connection info', async () => {
     sinonUtil.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(logoutSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          auth.clearConnectionInfo,
-          auth.service.logout
-        ]);
-      }
-    });
+    
+    try {
+      await command.action(logger, { options: { debug: false } });
+      assert(logoutSpy.called);
+    }
+    finally {
+      sinonUtil.restore([
+        auth.clearConnectionInfo,
+        auth.service.logout
+      ]);
+    }
   });
 
-  it('correctly handles error while clearing persisted connection info (debug)', (done) => {
+  it('correctly handles error while clearing persisted connection info (debug)', async () => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(logoutSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          auth.clearConnectionInfo,
-          auth.service.logout
-        ]);
-      }
-    });
+    
+    try {
+      await command.action(logger, { options: { debug: true } });
+      assert(logoutSpy.called);
+    }
+    finally {
+      sinonUtil.restore([
+        auth.clearConnectionInfo,
+        auth.service.logout
+      ]);
+    }
   });
 
-  it('correctly handles error when restoring auth information', (done) => {
+  it('correctly handles error when restoring auth information', async () => {
     sinonUtil.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          auth.clearConnectionInfo
-        ]);
-      }
-    });
+    
+    try {
+      await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    }
+    finally {
+      sinonUtil.restore([
+        auth.clearConnectionInfo
+      ]);
+    }
   });
 });

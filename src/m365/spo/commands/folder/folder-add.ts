@@ -52,7 +52,7 @@ class SpoFolderAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Adding folder to site ${args.options.webUrl}...`);
     }
@@ -71,12 +71,13 @@ class SpoFolderAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .post<FolderProperties>(requestOptions)
-      .then((folder: FolderProperties): void => {
-        logger.log(folder);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const folder = await request.post<FolderProperties>(requestOptions);
+      logger.log(folder);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

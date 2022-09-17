@@ -60,7 +60,7 @@ describe(commands.LIST_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('sets specified title for list', (done) => {
+  it('sets specified title for list', async () => {
     const expected = 'List 1';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -72,18 +72,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified baseTemplate for list', (done) => {
+  it('sets specified baseTemplate for list', async () => {
     const expected = 100;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -95,18 +88,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified description for list', (done) => {
+  it('sets specified description for list', async () => {
     const expected = 'List 1 description';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -118,18 +104,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', description: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', description: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified templateFeatureId for list', (done) => {
+  it('sets specified templateFeatureId for list', async () => {
     const expected = '00bfea71-de22-43b2-a848-c05709900100';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -141,18 +120,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified schemaXml for list', (done) => {
+  it('sets specified schemaXml for list', async () => {
     const expected = `<List Title=\'List 1' ID='BE9CE88C-EF3A-4A61-9A8E-F8C038442227'></List>`;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -164,18 +136,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', schemaXml: expected, templateFeatureId: '00bfea71-de22-43b2-a848-c05709900100', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', schemaXml: expected, templateFeatureId: '00bfea71-de22-43b2-a848-c05709900100', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified allowDeletion for list', (done) => {
+  it('sets specified allowDeletion for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -187,18 +152,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified allowEveryoneViewItems for list', (done) => {
+  it('sets specified allowEveryoneViewItems for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -210,18 +168,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified allowMultiResponses for list', (done) => {
+  it('sets specified allowMultiResponses for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -233,18 +184,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified contentTypesEnabled for list', (done) => {
+  it('sets specified contentTypesEnabled for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -256,18 +200,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified crawlNonDefaultViews for list', (done) => {
+  it('sets specified crawlNonDefaultViews for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -279,18 +216,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified defaultContentApprovalWorkflowId for list', (done) => {
+  it('sets specified defaultContentApprovalWorkflowId for list', async () => {
     const expected = '00bfea71-de22-43b2-a848-c05709900100';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -302,18 +232,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified defaultDisplayFormUrl for list', (done) => {
+  it('sets specified defaultDisplayFormUrl for list', async () => {
     const expected = '/sites/project-x/List%201/view.aspx';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -325,18 +248,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified defaultEditFormUrl for list', (done) => {
+  it('sets specified defaultEditFormUrl for list', async () => {
     const expected = '/sites/project-x/List%201/edit.aspx';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -348,18 +264,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified direction for list', (done) => {
+  it('sets specified direction for list', async () => {
     const expected = 'LTR';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -371,18 +280,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified disableGridEditing for list', (done) => {
+  it('sets specified disableGridEditing for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -394,18 +296,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified draftVersionVisibility for list', (done) => {
+  it('sets specified draftVersionVisibility for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -417,18 +312,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified emailAlias for list', (done) => {
+  it('sets specified emailAlias for list', async () => {
     const expected = 'yourname@contoso.onmicrosoft.com';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -440,18 +328,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableAssignToEmail for list', (done) => {
+  it('sets specified enableAssignToEmail for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -463,18 +344,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableAttachments for list', (done) => {
+  it('sets specified enableAttachments for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -486,18 +360,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableDeployWithDependentList for list', (done) => {
+  it('sets specified enableDeployWithDependentList for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -509,18 +376,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableFolderCreation for list', (done) => {
+  it('sets specified enableFolderCreation for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -532,18 +392,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableMinorVersions for list', (done) => {
+  it('sets specified enableMinorVersions for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -555,18 +408,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableModeration for list', (done) => {
+  it('sets specified enableModeration for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -578,18 +424,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enablePeopleSelector for list', (done) => {
+  it('sets specified enablePeopleSelector for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -601,18 +440,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableResourceSelector for list', (done) => {
+  it('sets specified enableResourceSelector for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -624,18 +456,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableSchemaCaching for list', (done) => {
+  it('sets specified enableSchemaCaching for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -647,18 +472,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableSyndication for list', (done) => {
+  it('sets specified enableSyndication for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -670,18 +488,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableThrottling for list', (done) => {
+  it('sets specified enableThrottling for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -693,18 +504,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableVersioning for list', (done) => {
+  it('sets specified enableVersioning for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -716,18 +520,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enforceDataValidation for list', (done) => {
+  it('sets specified enforceDataValidation for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -739,18 +536,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified excludeFromOfflineClient for list', (done) => {
+  it('sets specified excludeFromOfflineClient for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -762,18 +552,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified fetchPropertyBagForListView for list', (done) => {
+  it('sets specified fetchPropertyBagForListView for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -785,18 +568,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified followable for list', (done) => {
+  it('sets specified followable for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -808,18 +584,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified forceCheckout for list', (done) => {
+  it('sets specified forceCheckout for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -831,18 +600,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified forceDefaultContentType for list', (done) => {
+  it('sets specified forceDefaultContentType for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -854,18 +616,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified hidden for list', (done) => {
+  it('sets specified hidden for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -877,18 +632,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified includedInMyFilesScope for list', (done) => {
+  it('sets specified includedInMyFilesScope for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -900,18 +648,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified irmEnabled for list', (done) => {
+  it('sets specified irmEnabled for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -923,18 +664,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified irmExpire for list', (done) => {
+  it('sets specified irmExpire for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -946,18 +680,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified irmReject for list', (done) => {
+  it('sets specified irmReject for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -969,18 +696,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified isApplicationList for list', (done) => {
+  it('sets specified isApplicationList for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -992,18 +712,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified listExperienceOptions for list', (done) => {
+  it('sets specified listExperienceOptions for list', async () => {
     const expected = 'NewExperience';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1015,18 +728,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified majorVersionLimit for list', (done) => {
+  it('sets specified majorVersionLimit for list', async () => {
     const expected = 34;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1038,18 +744,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified majorWithMinorVersionsLimit for list', (done) => {
+  it('sets specified majorWithMinorVersionsLimit for list', async () => {
     const expected = 20;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1061,18 +760,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified multipleDataList for list', (done) => {
+  it('sets specified multipleDataList for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1084,18 +776,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified navigateForFormsPages for list', (done) => {
+  it('sets specified navigateForFormsPages for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1107,18 +792,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified needUpdateSiteClientTag for list', (done) => {
+  it('sets specified needUpdateSiteClientTag for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1130,18 +808,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified noCrawl for list', (done) => {
+  it('sets specified noCrawl for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1153,18 +824,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified onQuickLaunch for list', (done) => {
+  it('sets specified onQuickLaunch for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1176,18 +840,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified ordered for list', (done) => {
+  it('sets specified ordered for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1199,18 +856,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified parserDisabled for list', (done) => {
+  it('sets specified parserDisabled for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1222,18 +872,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified readOnlyUI for list', (done) => {
+  it('sets specified readOnlyUI for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1245,18 +888,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified readSecurity for list', (done) => {
+  it('sets specified readSecurity for list', async () => {
     const expected = 2;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1268,18 +904,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified requestAccessEnabled for list', (done) => {
+  it('sets specified requestAccessEnabled for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1291,18 +920,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified restrictUserUpdates for list', (done) => {
+  it('sets specified restrictUserUpdates for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1314,18 +936,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified sendToLocationName for list', (done) => {
+  it('sets specified sendToLocationName for list', async () => {
     const expected = 'SendToLocation';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1337,18 +952,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified sendToLocationUrl for list', (done) => {
+  it('sets specified sendToLocationUrl for list', async () => {
     const expected = '/sites/project-x/SendToLocation.aspx';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1360,18 +968,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified showUser for list', (done) => {
+  it('sets specified showUser for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1383,18 +984,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified useFormsForDisplay for list', (done) => {
+  it('sets specified useFormsForDisplay for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1406,18 +1000,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified validationFormula for list', (done) => {
+  it('sets specified validationFormula for list', async () => {
     const expected = `IF(fieldName=true);'truetest':'falsetest'`;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1429,18 +1016,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified validationMessage for list', (done) => {
+  it('sets specified validationMessage for list', async () => {
     const expected = 'Error on field x';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1452,18 +1032,11 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified writeSecurity for list', (done) => {
+  it('sets specified writeSecurity for list', async () => {
     const expected = 4;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1475,31 +1048,17 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {
@@ -2097,7 +1656,7 @@ describe(commands.LIST_ADD, () => {
     assert(actual === true);
   });
 
-  it('returns listInstance object when list is added with correct values', (done) => {
+  it('returns listInstance object when list is added with correct values', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         return Promise.resolve(
@@ -2159,66 +1718,58 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          AllowContentTypes: true,
-          BaseTemplate: 100,
-          BaseType: 1,
-          ContentTypesEnabled: false,
-          CrawlNonDefaultViews: false,
-          Created: null,
-          CurrentChangeToken: null,
-          CustomActionElements: null,
-          DefaultContentApprovalWorkflowId: '00000000-0000-0000-0000-000000000000',
-          DefaultItemOpenUseListSetting: false,
-          Description: '',
-          Direction: 'none',
-          DocumentTemplateUrl: null,
-          DraftVersionVisibility: 0,
-          EnableAttachments: false,
-          EnableFolderCreation: true,
-          EnableMinorVersions: false,
-          EnableModeration: false,
-          EnableVersioning: false,
-          EntityTypeName: 'Documents',
-          ExemptFromBlockDownloadOfNonViewableFiles: false,
-          FileSavePostProcessingEnabled: false,
-          ForceCheckout: false,
-          HasExternalDataSource: false,
-          Hidden: false,
-          Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
-          ImagePath: null,
-          ImageUrl: null,
-          IrmEnabled: false,
-          IrmExpire: false,
-          IrmReject: false,
-          IsApplicationList: false,
-          IsCatalog: false,
-          IsPrivate: false,
-          ItemCount: 69,
-          LastItemDeletedDate: null,
-          LastItemModifiedDate: null,
-          LastItemUserModifiedDate: null,
-          ListExperienceOptions: 0,
-          ListItemEntityTypeFullName: null,
-          MajorVersionLimit: 0,
-          MajorWithMinorVersionsLimit: 0,
-          MultipleDataList: false,
-          NoCrawl: false,
-          ParentWebPath: null,
-          ParentWebUrl: null,
-          ParserDisabled: false,
-          ServerTemplateCanCreateFolders: true,
-          TemplateFeatureId: null,
-          Title: 'List 1'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await command.action(logger, { options: { debug: true, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert(loggerLogSpy.calledWith({
+      AllowContentTypes: true,
+      BaseTemplate: 100,
+      BaseType: 1,
+      ContentTypesEnabled: false,
+      CrawlNonDefaultViews: false,
+      Created: null,
+      CurrentChangeToken: null,
+      CustomActionElements: null,
+      DefaultContentApprovalWorkflowId: '00000000-0000-0000-0000-000000000000',
+      DefaultItemOpenUseListSetting: false,
+      Description: '',
+      Direction: 'none',
+      DocumentTemplateUrl: null,
+      DraftVersionVisibility: 0,
+      EnableAttachments: false,
+      EnableFolderCreation: true,
+      EnableMinorVersions: false,
+      EnableModeration: false,
+      EnableVersioning: false,
+      EntityTypeName: 'Documents',
+      ExemptFromBlockDownloadOfNonViewableFiles: false,
+      FileSavePostProcessingEnabled: false,
+      ForceCheckout: false,
+      HasExternalDataSource: false,
+      Hidden: false,
+      Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
+      ImagePath: null,
+      ImageUrl: null,
+      IrmEnabled: false,
+      IrmExpire: false,
+      IrmReject: false,
+      IsApplicationList: false,
+      IsCatalog: false,
+      IsPrivate: false,
+      ItemCount: 69,
+      LastItemDeletedDate: null,
+      LastItemModifiedDate: null,
+      LastItemUserModifiedDate: null,
+      ListExperienceOptions: 0,
+      ListItemEntityTypeFullName: null,
+      MajorVersionLimit: 0,
+      MajorWithMinorVersionsLimit: 0,
+      MultipleDataList: false,
+      NoCrawl: false,
+      ParentWebPath: null,
+      ParentWebUrl: null,
+      ParserDisabled: false,
+      ServerTemplateCanCreateFolders: true,
+      TemplateFeatureId: null,
+      Title: 'List 1'
+    }));
   });
 });

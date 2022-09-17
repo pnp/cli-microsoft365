@@ -63,7 +63,7 @@ describe(commands.GROUP_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Title', 'LoginName', 'IsHiddenInUI', 'PrincipalType']);
   });
 
-  it('retrieves all groups with', (done) => {
+  it('retrieves all groups with', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups') > -1) {
         return Promise.resolve(
@@ -84,30 +84,23 @@ describe(commands.GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          Id: 15,
-          Title: "Contoso Members",
-          LoginName: "Contoso Members",
-          "Description": "SharePoint Contoso",
-          IsHiddenInUI: false,
-          PrincipalType: 8
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([{
+      Id: 15,
+      Title: "Contoso Members",
+      LoginName: "Contoso Members",
+      "Description": "SharePoint Contoso",
+      IsHiddenInUI: false,
+      PrincipalType: 8
+    }]));
   });
 
-  it('command correctly handles group list reject request', (done) => {
+  it('command correctly handles group list reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups') > -1) {
@@ -117,20 +110,12 @@ describe(commands.GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
   it('supports specifying URL', () => {

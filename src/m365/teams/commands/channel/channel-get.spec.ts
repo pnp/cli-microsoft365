@@ -193,7 +193,7 @@ describe(commands.CHANNEL_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails to get channel information due to wrong channel id', (done) => {
+  it('fails to get channel information due to wrong channel id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/39958f28-eefb-4006-8f83-13b6ac2a4a7f/channels/19%3A493665404ebd4a18adb8a980a31b4986%40thread.skype`) {
         return Promise.reject({
@@ -210,24 +210,13 @@ describe(commands.CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
-        channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Failed to execute Skype backend request GetThreadS2SRequest.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
+      channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype' } } as any), new CommandError('Failed to execute Skype backend request GetThreadS2SRequest.'));
   });
 
-  it('fails when team name does not exist', (done) => {
+  it('fails when team name does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -260,25 +249,14 @@ describe(commands.CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamName: 'Team Name',
-        channelName: 'Channel Name',
-        tabName: 'Tab Name'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      teamName: 'Team Name',
+      channelName: 'Channel Name',
+      tabName: 'Tab Name' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('fails to get channel when channel does not exist', (done) => {
+  it('fails to get channel when channel does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/channels?$filter=displayName eq '`) > -1) {
         return Promise.resolve({ value: [] });
@@ -286,25 +264,14 @@ describe(commands.CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: 'Channel Name',
-        tabName: 'Tab Name'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelName: 'Channel Name',
+      tabName: 'Tab Name' } } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
-  it('should get channel information for the Microsoft Teams team by id', (done) => {
+  it('should get channel information for the Microsoft Teams team by id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/39958f28-eefb-4006-8f83-13b6ac2a4a7f/channels/19%3A493665404ebd4a18adb8a980a31b4986%40thread.skype`) {
         return Promise.resolve({
@@ -318,28 +285,21 @@ describe(commands.CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
         channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
-        assert.strictEqual(call.args[0].displayName, 'channel1');
-        assert.strictEqual(call.args[0].description, null);
-        assert.strictEqual(call.args[0].email, '');
-        assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/channel1?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
+    assert.strictEqual(call.args[0].displayName, 'channel1');
+    assert.strictEqual(call.args[0].description, null);
+    assert.strictEqual(call.args[0].email, '');
+    assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/channel1?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
   });
 
-  it('should get primary channel information for the Microsoft Teams team by id', (done) => {
+  it('should get primary channel information for the Microsoft Teams team by id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/39958f28-eefb-4006-8f83-13b6ac2a4a7f/primaryChannel`) {
         return Promise.resolve({
@@ -353,28 +313,21 @@ describe(commands.CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
         primary: true
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
-        assert.strictEqual(call.args[0].displayName, 'General');
-        assert.strictEqual(call.args[0].description, null);
-        assert.strictEqual(call.args[0].email, '');
-        assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/general?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
+    assert.strictEqual(call.args[0].displayName, 'General');
+    assert.strictEqual(call.args[0].description, null);
+    assert.strictEqual(call.args[0].email, '');
+    assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/general?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
   });
 
-  it('should get channel information for the Microsoft Teams team by name', (done) => {
+  it('should get channel information for the Microsoft Teams team by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -429,28 +382,21 @@ describe(commands.CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamName: 'Team Name',
         channelName: 'Channel Name'
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
-        assert.strictEqual(call.args[0].displayName, 'Channel Name');
-        assert.strictEqual(call.args[0].description, null);
-        assert.strictEqual(call.args[0].email, '');
-        assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/channel1?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
+    assert.strictEqual(call.args[0].displayName, 'Channel Name');
+    assert.strictEqual(call.args[0].description, null);
+    assert.strictEqual(call.args[0].email, '');
+    assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/channel1?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
   });
 
-  it('should get primary channel information for the Microsoft Teams team by name', (done) => {
+  it('should get primary channel information for the Microsoft Teams team by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -505,28 +451,21 @@ describe(commands.CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamName: 'Team Name',
         primary: true
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
-        assert.strictEqual(call.args[0].displayName, 'General');
-        assert.strictEqual(call.args[0].description, null);
-        assert.strictEqual(call.args[0].email, '');
-        assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/general?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
+    assert.strictEqual(call.args[0].displayName, 'General');
+    assert.strictEqual(call.args[0].description, null);
+    assert.strictEqual(call.args[0].email, '');
+    assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/general?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
   });
 
-  it('should get channel information for the Microsoft Teams team (debug)', (done) => {
+  it('should get channel information for the Microsoft Teams team (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/39958f28-eefb-4006-8f83-13b6ac2a4a7f/channels/19%3A493665404ebd4a18adb8a980a31b4986%40thread.skype`) {
         return Promise.resolve({
@@ -540,22 +479,15 @@ describe(commands.CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
         channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.getCall(loggerLogSpy.callCount - 2);
-        assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.getCall(loggerLogSpy.callCount - 2);
+    assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
   });
 
   it('supports debug mode', () => {

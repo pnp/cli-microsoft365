@@ -38,9 +38,9 @@ describe(commands.WEB_REMOVE, () => {
     };
     requests = [];
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: true };
     });
   });
 
@@ -97,25 +97,25 @@ describe(commands.WEB_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('should prompt before deleting subsite when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/subsite' } }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
+  it('should prompt before deleting subsite when confirmation argument not passed', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if ((opts.url as string).indexOf('_api/web') > -1) {
+        return Promise.resolve(true);
       }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
+      return Promise.reject('Invalid request');
     });
+    
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/subsite' } });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
 
-  it('deletes web successfully without prompting with confirmation argument', (done) => {
+  it('deletes web successfully without prompting with confirmation argument', async () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -125,32 +125,25 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         confirm: true
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web`) > -1 &&
-          r.headers['X-HTTP-Method'] === 'DELETE' &&
-          r.headers['accept'] === 'application/json;odata=nometadata') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web`) > -1 &&
+        r.headers['X-HTTP-Method'] === 'DELETE' &&
+        r.headers['accept'] === 'application/json;odata=nometadata') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
 
   });
 
-  it('deletes web successfully when prompt confirmed', (done) => {
+  it('deletes web successfully when prompt confirmed', async () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -161,33 +154,27 @@ describe(commands.WEB_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    
+    await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite"
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web`) > -1 &&
-          r.headers['X-HTTP-Method'] === 'DELETE' &&
-          r.headers['accept'] === 'application/json;odata=nometadata') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web`) > -1 &&
+        r.headers['X-HTTP-Method'] === 'DELETE' &&
+        r.headers['accept'] === 'application/json;odata=nometadata') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('deletes web successfully without prompting with confirmation argument (verbose)', (done) => {
+  it('deletes web successfully without prompting with confirmation argument (verbose)', async () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -197,32 +184,25 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
         confirm: true
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web`) > -1 &&
-          r.headers['X-HTTP-Method'] === 'DELETE' &&
-          r.headers['accept'] === 'application/json;odata=nometadata') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web`) > -1 &&
+        r.headers['X-HTTP-Method'] === 'DELETE' &&
+        r.headers['accept'] === 'application/json;odata=nometadata') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('deletes web successfully without prompting with confirmation argument (debug)', (done) => {
+  it('deletes web successfully without prompting with confirmation argument (debug)', async () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -232,32 +212,25 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
         confirm: true
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web`) > -1 &&
-          r.headers['X-HTTP-Method'] === 'DELETE' &&
-          r.headers['accept'] === 'application/json;odata=nometadata') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web`) > -1 &&
+        r.headers['X-HTTP-Method'] === 'DELETE' &&
+        r.headers['accept'] === 'application/json;odata=nometadata') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('handles error when deleting web', (done) => {
+  it('handles error when deleting web', async () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -267,19 +240,8 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        webUrl: "https://contoso.sharepoint.com/subsite",
-        confirm: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      webUrl: "https://contoso.sharepoint.com/subsite",
+      confirm: true } } as any), new CommandError('An error has occurred'));
   });
 });

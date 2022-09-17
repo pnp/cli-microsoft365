@@ -83,7 +83,7 @@ class SpoGroupGetCommand extends SpoCommand {
     this.optionSets.push(['id', 'name', 'associatedGroup']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information for group in site at ${args.options.webUrl}...`);
     }
@@ -119,13 +119,13 @@ class SpoGroupGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((groupInstance): void => {
-        logger.log(groupInstance);
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const groupInstance = await request.get(requestOptions);
+      logger.log(groupInstance);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

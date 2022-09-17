@@ -78,21 +78,24 @@ class AadUserSetCommand extends GraphCommand {
     this.optionSets.push(['objectId', 'userPrincipalName']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const manifest: any = this.mapRequestBody(args.options);
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const manifest: any = this.mapRequestBody(args.options);
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.objectId ? args.options.objectId : args.options.userPrincipalName as string)}`,
-      headers: {
-        accept: 'application/json'
-      },
-      responseType: 'json',
-      data: manifest
-    };
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.objectId ? args.options.objectId : args.options.userPrincipalName as string)}`,
+        headers: {
+          accept: 'application/json'
+        },
+        responseType: 'json',
+        data: manifest
+      };
 
-    request
-      .patch(requestOptions)
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.patch(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private mapRequestBody(options: Options): any {

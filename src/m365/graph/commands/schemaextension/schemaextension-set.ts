@@ -94,7 +94,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Updating schema extension with id '${args.options.id}'...`);
     }
@@ -158,15 +158,16 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .patch(requestOptions)
-      .then((): void => {
-        if (this.debug) {
-          logger.logToStderr("Schema extension successfully updated.");
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.patch(requestOptions);
+      
+      if (this.debug) {
+        logger.logToStderr("Schema extension successfully updated.");
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private validateProperties(propertiesString: string): boolean | string {

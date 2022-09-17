@@ -240,7 +240,7 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('logs deprecation warning when option id is specified', (done) => {
+  it('logs deprecation warning when option id is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -249,18 +249,11 @@ describe(commands.LISTITEM_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead.`)));
   });
 
-  it('logs deprecation warning when option title is specified', (done) => {
+  it('logs deprecation warning when option title is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -269,18 +262,11 @@ describe(commands.LISTITEM_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead.`)));
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested, and debug mode enabled', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested, and debug mode enabled', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -290,18 +276,11 @@ describe(commands.LISTITEM_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(returnArrayLength, expectedArrayLength);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(returnArrayLength, expectedArrayLength);
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a list of fields and a filter specified', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a list of fields and a filter specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -315,18 +294,11 @@ describe(commands.LISTITEM_LIST, () => {
       fields: "Title,ID"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(returnArrayLength, expectedArrayLength);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(returnArrayLength, expectedArrayLength);
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, a page number specified, a list of fields and a filter specified', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, a page number specified, a list of fields and a filter specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -341,18 +313,11 @@ describe(commands.LISTITEM_LIST, () => {
       fields: "Title,ID"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(returnArrayLength, expectedArrayLength);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(returnArrayLength, expectedArrayLength);
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a pageNumber is specified', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a pageNumber is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -366,18 +331,11 @@ describe(commands.LISTITEM_LIST, () => {
       fields: "Title,ID"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(returnArrayLength, expectedArrayLength);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(returnArrayLength, expectedArrayLength);
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with no output type specified, and a list of fields specified', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with no output type specified, and a list of fields specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -388,18 +346,11 @@ describe(commands.LISTITEM_LIST, () => {
       fields: "Title,ID"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(returnArrayLength, expectedArrayLength);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(returnArrayLength, expectedArrayLength);
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with no output type specified, a list of fields with lookup field specified', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with no output type specified, a list of fields with lookup field specified', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if ((opts.url as string).indexOf('&$expand=') > -1) {
         return Promise.resolve({
@@ -429,29 +380,22 @@ describe(commands.LISTITEM_LIST, () => {
       fields: "Title,Modified,Company/Title"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.deepStrictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
-          {
-            "Modified": "2018-08-15T13:43:12Z",
-            "Title": "Example item 1",
-            "Company": { "Title": "Contoso" }
-          },
-          {
-            "Modified": "2018-08-15T13:44:10Z",
-            "Title": "Example item 2",
-            "Company": { "Title": "Fabrikam" }
-          }
-        ]));
-        done();
+    await command.action(logger, { options: options } as any);
+    assert.deepStrictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+      {
+        "Modified": "2018-08-15T13:43:12Z",
+        "Title": "Example item 1",
+        "Company": { "Title": "Contoso" }
+      },
+      {
+        "Modified": "2018-08-15T13:44:10Z",
+        "Title": "Example item 2",
+        "Company": { "Title": "Fabrikam" }
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with an output type of text, and no fields specified', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with an output type of text, and no fields specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -462,18 +406,11 @@ describe(commands.LISTITEM_LIST, () => {
       output: "text"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(returnArrayLength, expectedArrayLength);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(returnArrayLength, expectedArrayLength);
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with a camlQuery specified, and output set to json, and debug mode is enabled', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with a camlQuery specified, and output set to json, and debug mode is enabled', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -485,18 +422,11 @@ describe(commands.LISTITEM_LIST, () => {
       output: "json"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(returnArrayLength, expectedArrayLength);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(returnArrayLength, expectedArrayLength);
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with a camlQuery specified, and debug mode is disabled', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with a camlQuery specified, and debug mode is disabled', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -507,18 +437,11 @@ describe(commands.LISTITEM_LIST, () => {
       camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(returnArrayLength, expectedArrayLength);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(returnArrayLength, expectedArrayLength);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
@@ -529,14 +452,7 @@ describe(commands.LISTITEM_LIST, () => {
       camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('An error has occurred'));
   });
 });

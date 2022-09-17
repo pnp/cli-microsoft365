@@ -16,8 +16,6 @@ interface Options extends GlobalOptions {
 }
 
 class SpoSiteDesignGetCommand extends SpoCommand {
-  private spoUrl: string = "";
-
   public get name(): string {
     return commands.SITEDESIGN_GET;
   }
@@ -74,13 +72,13 @@ class SpoSiteDesignGetCommand extends SpoCommand {
     );
   }
 
-  private getSiteDesignId(args: CommandArgs): Promise<string> {
+  private getSiteDesignId(args: CommandArgs, spoUrl: string): Promise<string> {
     if (args.options.id) {
       return Promise.resolve(args.options.id);
     }
 
     const requestOptions: any = {
-      url: `${this.spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`,
+      url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -104,30 +102,26 @@ class SpoSiteDesignGetCommand extends SpoCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((_spoUrl: string): Promise<string> => {
-        this.spoUrl = _spoUrl;
-        return this.getSiteDesignId(args);
-      })
-      .then((siteDesignId: string): Promise<string> => {
-        const requestOptions: any = {
-          url: `${this.spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignMetadata`,
-          headers: {
-            'content-type': 'application/json;charset=utf-8',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: { id: siteDesignId },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const siteDesignId: string = await this.getSiteDesignId(args, spoUrl);
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignMetadata`,
+        headers: {
+          'content-type': 'application/json;charset=utf-8',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: { id: siteDesignId },
+        responseType: 'json'
+      };
 
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res = await request.post(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

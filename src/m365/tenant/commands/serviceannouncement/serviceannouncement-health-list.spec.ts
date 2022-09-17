@@ -162,7 +162,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly returns list', (done) => {
+  it('correctly returns list', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews`) {
         return Promise.resolve(
@@ -177,18 +177,11 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
 
     const options: any = {};
 
-    command.action(logger, { options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(serviceHealthResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options } as any);
+    assert(loggerLogSpy.calledWith(serviceHealthResponse));
   });
 
-  it('correctly returns list as csv with issues flag', (done) => {
+  it('correctly returns list as csv with issues flag', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews`) {
         return Promise.resolve(
@@ -206,18 +199,11 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
       output: "csv"
     };
 
-    command.action(logger, { options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(serviceHealthResponseCSV));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options } as any);
+    assert(loggerLogSpy.calledWith(serviceHealthResponseCSV));
   });
 
-  it('correctly returns list with issues', (done) => {
+  it('correctly returns list with issues', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews?$expand=issues`) {
         return Promise.resolve(
@@ -234,18 +220,11 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
       issues: true
     };
 
-    command.action(logger, { options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(serviceHealthIssuesResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options } as any);
+    assert(loggerLogSpy.calledWith(serviceHealthIssuesResponse));
   });
 
-  it('fails when serviceAnnouncement endpoint fails', (done) => {
+  it('fails when serviceAnnouncement endpoint fails', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews`) {
         return Promise.resolve({});
@@ -254,32 +233,14 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    const options: any = {};
-
-    command.action(logger, { options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "Error fetching service health");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Error fetching service health'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

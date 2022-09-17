@@ -45,32 +45,18 @@ describe(commands.CONFIG_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it(`gets value of the specified property`, (done) => {
+  it(`gets value of the specified property`, async () => {
     const config = Cli.getInstance().config;
     sinon.stub(config, 'get').callsFake(_ => 'json');
-    command.action(logger, { options: { key: settingsNames.output } }, () => {
-      try {
-        assert(loggerSpy.calledWith('json'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.output } });
+    assert(loggerSpy.calledWith('json'));
   });
 
-  it(`returns undefined if the specified setting is not configured`, (done) => {
+  it(`returns undefined if the specified setting is not configured`, async () => {
     const config = Cli.getInstance().config;
     sinon.stub(config, 'get').callsFake(_ => undefined);
-    command.action(logger, { options: { key: settingsNames.output } }, () => {
-      try {
-        assert(loggerSpy.calledWith(undefined));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.output } });
+    assert(loggerSpy.calledWith(undefined));
   });
 
   it('supports specifying key', () => {

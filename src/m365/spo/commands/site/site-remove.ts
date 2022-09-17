@@ -78,90 +78,79 @@ class SpoSiteRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeSite = (): void => {
-      this.dots = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeSite: () => Promise<void> = async (): Promise<void> => {
+      try {
+        this.dots = '';
+        if (args.options.fromRecycleBin) {
+          await this.deleteSiteWithoutGroup(logger, args);
+        }
+        else {
+          const groupId = await this.getSiteGroupId(args.options.url, logger);
+          if (groupId === '00000000-0000-0000-0000-000000000000') {
+            if (this.debug) {
+              logger.logToStderr('Site is not groupified. Going ahead with the conventional site deletion options');
+            }
 
-      if (args.options.fromRecycleBin) {
-        this
-          .deleteSiteWithoutGroup(logger, args)
-          .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
+            await this.deleteSiteWithoutGroup(logger, args);
+          }
+          else {
+            if (this.debug) {
+              logger.logToStderr(`Site attached to group ${groupId}. Initiating group delete operation via Graph API`);
+            }
+
+            try {
+              const group = await aadGroup.getGroupById(groupId);
+              if (args.options.skipRecycleBin || args.options.wait) {
+                logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'skipRecycleBin' and 'wait' will not be applicable.`));
+              }
+
+              await this.deleteGroup(group.id, logger);
+              await this.deleteSite(args.options.url, args.options.wait, logger);
+            }
+            catch (err: any) {
+              if (this.verbose) {
+                logger.logToStderr(`Site group doesn't exist. Searching in the Microsoft 365 deleted groups.`);
+              }
+
+              const deletedGroups = await this.isSiteGroupDeleted(groupId);
+              if (deletedGroups.value.length === 0) {
+                if (this.verbose) {
+                  logger.logToStderr("Site group doesn't exist anymore. Deleting the site.");
+                }
+
+                if (args.options.wait) {
+                  logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameter 'wait' will not be applicable.`));
+                }
+
+                await this.deleteOrphanedSite(logger, args.options.url);
+              }
+              else {
+                throw `Site group still exists in the deleted groups. The site won't be removed.`;
+              }
+            }
+          }
+        }
       }
-      else {
-        this
-          .getSiteGroupId(args.options.url, logger)
-          .then((groupId: string) => {
-            if (groupId === '00000000-0000-0000-0000-000000000000') {
-              if (this.debug) {
-                logger.logToStderr('Site is not groupified. Going ahead with the conventional site deletion options');
-              }
-
-              return this.deleteSiteWithoutGroup(logger, args);
-            }
-            else {
-              if (this.debug) {
-                logger.logToStderr(`Site attached to group ${groupId}. Initiating group delete operation via Graph API`);
-              }
-
-              return aadGroup
-                .getGroupById(groupId)
-                .then((group) => {
-                  if (args.options.skipRecycleBin || args.options.wait) {
-                    logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'skipRecycleBin' and 'wait' will not be applicable.`));
-                  }
-
-                  return this.deleteGroup(group.id, logger);
-                })
-                .catch(() => {
-                  if (this.verbose) {
-                    logger.logToStderr(`Site group doesn't exist. Searching in the Microsoft 365 deleted groups.`);
-                  }
-
-                  return this
-                    .isSiteGroupDeleted(groupId)
-                    .then((deletedGroups: { value: { id: string }[] }): Promise<void> => {
-                      if (deletedGroups.value.length === 0) {
-                        if (this.verbose) {
-                          logger.logToStderr("Site group doesn't exist anymore. Deleting the site.");
-                        }
-
-                        if (args.options.wait) {
-                          logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameter 'wait' will not be applicable.`));
-                        }
-
-                        return Promise.resolve();
-                      }
-                      else {
-                        return Promise.reject(`Site group still exists in the deleted groups. The site won't be removed.`);
-                      }
-                    })
-                    .then(_ => this.deleteOrphanedSite(logger, args.options.url))
-                    .catch((err) => Promise.reject(err));
-                })
-                .then(_ => this.deleteSite(args.options.url, args.options.wait, logger));
-            }
-          })
-          .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      catch (err: any) {
+        this.handleRejectedPromise(err);
       }
     };
 
     if (args.options.confirm) {
-      removeSite();
+      await removeSite();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the site ${args.options.url}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeSite();
-        }
       });
+
+      if (result.continue) {
+        await removeSite();
+      }
     }
   }
 

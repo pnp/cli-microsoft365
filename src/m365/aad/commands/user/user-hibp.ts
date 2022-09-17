@@ -66,31 +66,28 @@ class AadUserHibpCommand extends AnonymousCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const requestOptions: any = {
-      url: `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(args.options.userName)}${(args.options.domain ? `?domain=${encodeURIComponent(args.options.domain)}` : '')}`,
-      headers: {
-        'accept': 'application/json',
-        'hibp-api-key': args.options.apiKey,
-        'x-anonymous': true
-      },
-      responseType: 'json'
-    };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const requestOptions: any = {
+        url: `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(args.options.userName)}${(args.options.domain ? `?domain=${encodeURIComponent(args.options.domain)}` : '')}`,
+        headers: {
+          'accept': 'application/json',
+          'hibp-api-key': args.options.apiKey,
+          'x-anonymous': true
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      })
-      .catch((err: any): void => {
-        if ((err && err.response !== undefined && err.response.status === 404) && (this.debug || this.verbose)) {
-          logger.log('No pwnage found');
-          cb();
-          return;
-        }
-        return this.handleRejectedODataJsonPromise(err, logger, cb);
-      });
+      const res = await request.get(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      if ((err && err.response !== undefined && err.response.status === 404) && (this.debug || this.verbose)) {
+        logger.log('No pwnage found');
+        return;
+      }
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

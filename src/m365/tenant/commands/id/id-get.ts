@@ -1,8 +1,6 @@
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command, {
-  CommandError
-} from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils';
@@ -48,7 +46,7 @@ class TenantIdGetCommand extends Command {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let domainName: string | undefined = args.options.domainName;
     if (!domainName) {
       const userName: string = accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
@@ -65,20 +63,20 @@ class TenantIdGetCommand extends Command {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        if (res.error) {
-          cb(new CommandError(res.error_description));
-          return;
-        }
+    try {
+      const res: any = await request.get(requestOptions);
 
-        if (res.token_endpoint) {
-          logger.log(res.token_endpoint.split('/')[3]);
-        }
+      if (res.error) {
+        throw res.error_description;
+      }
 
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      if (res.token_endpoint) {
+        logger.log(res.token_endpoint.split('/')[3]);
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

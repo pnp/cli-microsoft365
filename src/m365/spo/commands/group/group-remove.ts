@@ -82,15 +82,14 @@ class SpoGroupRemoveCommand extends SpoCommand {
     this.optionSets.push(['id', 'name']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeGroup: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeGroup: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing group in web at ${args.options.webUrl}...`);
       }
 
-      let groupId: number | undefined;
-
-      ((): Promise<any> => {
+      try {
+        let groupId: number | undefined;
         if (args.options.name) {
           const requestOptions: any = {
             url: `${args.options.webUrl}/_api/web/sitegroups/GetByName('${args.options.name}')?$select=Id`,
@@ -99,14 +98,11 @@ class SpoGroupRemoveCommand extends SpoCommand {
             },
             responseType: 'json'
           };
-          return request.get(requestOptions);
+          const group = await request.get<{ Id: number }>(requestOptions);
+          groupId = group.Id;
         }
-
-        groupId = args.options.id;
-        return Promise.resolve(undefined as any);
-      })().then((res?: { Id: number }) => {
-        if (res && res.Id) {
-          groupId = res.Id;
+        else {
+          groupId = args.options.id;
         }
 
         const requestUrl = `${args.options.webUrl}/_api/web/sitegroups/RemoveById(${groupId})`;
@@ -120,30 +116,28 @@ class SpoGroupRemoveCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        return request.post(requestOptions);
-      }).then((): void => {
+        await request.post(requestOptions);
         // REST post call doesn't return anything
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeGroup();
+      await removeGroup();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the group ${args.options.id || args.options.name} from web ${args.options.webUrl}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeGroup();
-        }
       });
+
+      if (result.continue) {
+        await removeGroup();
+      }
     }
   }
 }

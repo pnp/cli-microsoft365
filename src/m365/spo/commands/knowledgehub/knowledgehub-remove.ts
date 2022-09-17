@@ -1,11 +1,8 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -49,64 +46,56 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let spoAdminUrl: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeKnowledgehub: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+        const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
-    const removeKnowledgehub = (): void => {
-      spo
-        .getSpoAdminUrl(logger, this.debug)
-        .then((_spoAdminUrl: string): Promise<ContextInfo> => {
-          spoAdminUrl = _spoAdminUrl;
-          return spo.getRequestDigest(spoAdminUrl);
-        })
-        .then((res: ContextInfo): Promise<string> => {
-          if (this.verbose) {
-            logger.logToStderr(`Removing Knowledge Hub Site settings from your tenant`);
-          }
+        if (this.verbose) {
+          logger.logToStderr(`Removing Knowledge Hub Site settings from your tenant`);
+        }
 
-          const requestOptions: any = {
-            url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': res.FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="29" ObjectPathId="28"/><Method Name="RemoveKnowledgeHubSite" Id="30" ObjectPathId="28"/></Actions><ObjectPaths><Constructor Id="28" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`
-          };
+        const requestOptions: any = {
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': reqDigest.FormDigestValue
+          },
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="29" ObjectPathId="28"/><Method Name="RemoveKnowledgeHubSite" Id="30" ObjectPathId="28"/></Actions><ObjectPaths><Constructor Id="28" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`
+        };
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            cb(new CommandError(response.ErrorInfo.ErrorMessage));
-          }
-          else {
-            logger.log(json[json.length - 1]);
-            cb();
-          }
-        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        const res = await request.post<string>(requestOptions);
+
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          throw response.ErrorInfo.ErrorMessage;
+        }
+        
+        logger.log(json[json.length - 1]);
+      }
+      catch (err: any) {
+        this.handleRejectedPromise(err);
+      }
     };
 
     if (args.options.confirm) {
       if (this.debug) {
         logger.logToStderr('Confirmation bypassed by entering confirm option. Removing Knowledge Hub Site setting...');
       }
-      removeKnowledgehub();
+      await removeKnowledgehub();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove Knowledge Hub Site from your tenant?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeKnowledgehub();
-        }
       });
+
+      if (result.continue) {
+        await removeKnowledgehub();
+      }
     }
   }
 }

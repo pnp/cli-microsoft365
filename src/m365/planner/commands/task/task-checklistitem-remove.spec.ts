@@ -58,9 +58,9 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     };
     promptOptions = undefined;
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: true });
+      return { continue: true };
     });
   });
 
@@ -90,33 +90,27 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removal when confirm option not passed', (done) => {
+  it('prompts before removal when confirm option not passed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         taskId: validTaskId,
         id: validId
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
   it('passes validation when valid options specified', async () => {
@@ -129,7 +123,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly deletes checklist item', (done) => {
+  it('correctly deletes checklist item', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details?$select=checklist`) {
         return Promise.resolve({
@@ -145,24 +139,42 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
       }
       return Promise.reject('Invalid Request');
     });
-    command.action(logger, {
+
+    await command.action(logger, {
       options: {
         taskId: validTaskId,
         id: validId,
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
+    });
+  });
+
+  it('successfully remove checklist item with confirmation prompt', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details?$select=checklist`) {
+        return Promise.resolve({
+          "@odata.etag": "TestEtag",
+          checklist: responseChecklistWithId
+        });
       }
-      catch (e) {
-        done(e);
+      return Promise.reject('Invalid Request');
+    });
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve();
+      }
+      return Promise.reject('Invalid Request');
+    });
+
+    await command.action(logger, {
+      options: {
+        taskId: validTaskId,
+        id: validId
       }
     });
   });
 
-  it('fails validation when checklist item does not exists', (done) => {
+  it('fails when checklist item does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details?$select=checklist`) {
         return Promise.resolve({
@@ -174,35 +186,19 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         taskId: validTaskId,
         id: validId
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified checklist item with id ${validId} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified checklist item with id ${validId} does not exist`));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

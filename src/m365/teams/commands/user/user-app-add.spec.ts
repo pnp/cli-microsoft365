@@ -12,7 +12,6 @@ const command: Command = require('./user-app-add');
 describe(commands.USER_APP_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -35,7 +34,6 @@ describe(commands.USER_APP_ADD, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -91,7 +89,7 @@ describe(commands.USER_APP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('adds app from the catalog for the specified user', (done) => {
+  it('adds app from the catalog for the specified user', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
@@ -101,41 +99,22 @@ describe(commands.USER_APP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('correctly handles error while installing teams app', (done) => {
+  it('correctly handles error while installing teams app', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
-
-    command.action(logger, {
-      options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: {
+      userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+      appId: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

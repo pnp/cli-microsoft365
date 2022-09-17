@@ -1,8 +1,5 @@
 import type * as ACData from 'adaptivecards-templating';
 import { Logger } from '../../../cli';
-import {
-  CommandError
-} from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
 import AnonymousCommand from '../../base/AnonymousCommand';
@@ -112,7 +109,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
     return true;
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const unknownOptions = this.getUnknownOptions(args.options);
     const unknownOptionNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     const card: any = this.getCard(args, unknownOptionNames, unknownOptions);
@@ -133,28 +130,29 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
       responseType: 'json'
     };
 
-    request
-      .post<string | number | undefined>(requestOptions)
-      .then((res: string | number | undefined): void => {
-        if (res) {
-          // when sending card to Teams succeeds, the body contains 1 which we
-          // can safely ignore
-          if (typeof res === 'string') {
-            // when sending the webhook to Teams fails, the response is 200
-            // but the body contains a string similar to 'Webhook message delivery
-            // failed with error: Microsoft Teams endpoint returned HTTP error 400
-            // with ContextId MS-CV=Qn6afVIGzEq...' which we should treat as
-            // a failure
-            if (res.indexOf('failed') > -1) {
-              return cb(new CommandError(res));
-            }
+    try {
+      const res = await request.post<string | number | undefined>(requestOptions);
 
-            logger.log(res);
+      if (res) {
+        // when sending card to Teams succeeds, the body contains 1 which we
+        // can safely ignore
+        if (typeof res === 'string') {
+          // when sending the webhook to Teams fails, the response is 200
+          // but the body contains a string similar to 'Webhook message delivery
+          // failed with error: Microsoft Teams endpoint returned HTTP error 400
+          // with ContextId MS-CV=Qn6afVIGzEq...' which we should treat as
+          // a failure
+          if (res.indexOf('failed') > -1) {
+            throw res;
           }
-        }
 
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+          logger.log(res);
+        }
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getCard(args: CommandArgs, unknownOptionNames: string[], unknownOptions: any): any {

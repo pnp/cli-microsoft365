@@ -67,7 +67,7 @@ describe(commands.FIELD_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates site column using XML with the default options', (done) => {
+  it('creates site column using XML with the default options', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -121,57 +121,50 @@ describe(commands.FIELD_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "AutoIndexed": false,
-          "CanBeDeleted": true,
-          "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
-          "ClientSideComponentProperties": null,
-          "CustomFormatter": null,
-          "DefaultFormula": null,
-          "DefaultValue": "[today]",
-          "Description": "",
-          "Direction": "none",
-          "EnforceUniqueValues": false,
-          "EntityPropertyName": "PnPAlertStartDateTime",
-          "Filterable": true,
-          "FromBaseType": false,
-          "Group": "PnP Columns",
-          "Hidden": false,
-          "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
-          "Indexed": false,
-          "InternalName": "PnPAlertStartDateTime",
-          "JSLink": "clienttemplates.js",
-          "PinnedToFiltersPane": false,
-          "ReadOnlyField": false,
-          "Required": false,
-          "SchemaXml": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"1\"><Default>[today]</Default></Field>",
-          "Scope": "/sites/portal",
-          "Sealed": false,
-          "ShowInFiltersPane": 0,
-          "Sortable": true,
-          "StaticName": "PnPAlertStartDateTime",
-          "Title": "Start date-time",
-          "FieldTypeKind": 4,
-          "TypeAsString": "DateTime",
-          "TypeDisplayName": "Date and Time",
-          "TypeShortDescription": "Date and Time",
-          "ValidationFormula": null,
-          "ValidationMessage": null,
-          "DateTimeCalendarType": 0,
-          "DisplayFormat": 1,
-          "FriendlyDisplayFormat": 1
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>' } });
+    assert(loggerLogSpy.calledWith({
+      "AutoIndexed": false,
+      "CanBeDeleted": true,
+      "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
+      "ClientSideComponentProperties": null,
+      "CustomFormatter": null,
+      "DefaultFormula": null,
+      "DefaultValue": "[today]",
+      "Description": "",
+      "Direction": "none",
+      "EnforceUniqueValues": false,
+      "EntityPropertyName": "PnPAlertStartDateTime",
+      "Filterable": true,
+      "FromBaseType": false,
+      "Group": "PnP Columns",
+      "Hidden": false,
+      "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
+      "Indexed": false,
+      "InternalName": "PnPAlertStartDateTime",
+      "JSLink": "clienttemplates.js",
+      "PinnedToFiltersPane": false,
+      "ReadOnlyField": false,
+      "Required": false,
+      "SchemaXml": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"1\"><Default>[today]</Default></Field>",
+      "Scope": "/sites/portal",
+      "Sealed": false,
+      "ShowInFiltersPane": 0,
+      "Sortable": true,
+      "StaticName": "PnPAlertStartDateTime",
+      "Title": "Start date-time",
+      "FieldTypeKind": 4,
+      "TypeAsString": "DateTime",
+      "TypeDisplayName": "Date and Time",
+      "TypeShortDescription": "Date and Time",
+      "ValidationFormula": null,
+      "ValidationMessage": null,
+      "DateTimeCalendarType": 0,
+      "DisplayFormat": 1,
+      "FriendlyDisplayFormat": 1
+    }));
   });
 
-  it('creates list column using XML with the DefaultValue option (debug)', (done) => {
+  it('creates list column using XML with the DefaultValue option (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Events')/fields/CreateFieldAsXml`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -225,57 +218,50 @@ describe(commands.FIELD_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Events', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>', options: 'DefaultValue' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "AutoIndexed": false,
-          "CanBeDeleted": true,
-          "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
-          "ClientSideComponentProperties": null,
-          "CustomFormatter": null,
-          "DefaultFormula": null,
-          "DefaultValue": "[today]",
-          "Description": "",
-          "Direction": "none",
-          "EnforceUniqueValues": false,
-          "EntityPropertyName": "PnPAlertStartDateTime",
-          "Filterable": true,
-          "FromBaseType": false,
-          "Group": "PnP Columns",
-          "Hidden": false,
-          "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
-          "Indexed": false,
-          "InternalName": "PnPAlertStartDateTime",
-          "JSLink": "clienttemplates.js",
-          "PinnedToFiltersPane": false,
-          "ReadOnlyField": false,
-          "Required": false,
-          "SchemaXml": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"1\"><Default>[today]</Default></Field>",
-          "Scope": "/sites/portal",
-          "Sealed": false,
-          "ShowInFiltersPane": 0,
-          "Sortable": true,
-          "StaticName": "PnPAlertStartDateTime",
-          "Title": "Start date-time",
-          "FieldTypeKind": 4,
-          "TypeAsString": "DateTime",
-          "TypeDisplayName": "Date and Time",
-          "TypeShortDescription": "Date and Time",
-          "ValidationFormula": null,
-          "ValidationMessage": null,
-          "DateTimeCalendarType": 0,
-          "DisplayFormat": 1,
-          "FriendlyDisplayFormat": 1
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Events', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>', options: 'DefaultValue' } });
+    assert(loggerLogSpy.calledWith({
+      "AutoIndexed": false,
+      "CanBeDeleted": true,
+      "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
+      "ClientSideComponentProperties": null,
+      "CustomFormatter": null,
+      "DefaultFormula": null,
+      "DefaultValue": "[today]",
+      "Description": "",
+      "Direction": "none",
+      "EnforceUniqueValues": false,
+      "EntityPropertyName": "PnPAlertStartDateTime",
+      "Filterable": true,
+      "FromBaseType": false,
+      "Group": "PnP Columns",
+      "Hidden": false,
+      "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
+      "Indexed": false,
+      "InternalName": "PnPAlertStartDateTime",
+      "JSLink": "clienttemplates.js",
+      "PinnedToFiltersPane": false,
+      "ReadOnlyField": false,
+      "Required": false,
+      "SchemaXml": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"1\"><Default>[today]</Default></Field>",
+      "Scope": "/sites/portal",
+      "Sealed": false,
+      "ShowInFiltersPane": 0,
+      "Sortable": true,
+      "StaticName": "PnPAlertStartDateTime",
+      "Title": "Start date-time",
+      "FieldTypeKind": 4,
+      "TypeAsString": "DateTime",
+      "TypeDisplayName": "Date and Time",
+      "TypeShortDescription": "Date and Time",
+      "ValidationFormula": null,
+      "ValidationMessage": null,
+      "DateTimeCalendarType": 0,
+      "DisplayFormat": 1,
+      "FriendlyDisplayFormat": 1
+    }));
   });
 
-  it('creates site column using XML with the AddToAllContentTypes, AddFieldToDefaultView, AddFieldCheckDisplayName options', (done) => {
+  it('creates site column using XML with the AddToAllContentTypes, AddFieldToDefaultView, AddFieldCheckDisplayName options', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -329,57 +315,50 @@ describe(commands.FIELD_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>', options: 'AddToAllContentTypes, AddFieldToDefaultView, AddFieldCheckDisplayName' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "AutoIndexed": false,
-          "CanBeDeleted": true,
-          "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
-          "ClientSideComponentProperties": null,
-          "CustomFormatter": null,
-          "DefaultFormula": null,
-          "DefaultValue": "[today]",
-          "Description": "",
-          "Direction": "none",
-          "EnforceUniqueValues": false,
-          "EntityPropertyName": "PnPAlertStartDateTime",
-          "Filterable": true,
-          "FromBaseType": false,
-          "Group": "PnP Columns",
-          "Hidden": false,
-          "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
-          "Indexed": false,
-          "InternalName": "PnPAlertStartDateTime",
-          "JSLink": "clienttemplates.js",
-          "PinnedToFiltersPane": false,
-          "ReadOnlyField": false,
-          "Required": false,
-          "SchemaXml": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"1\"><Default>[today]</Default></Field>",
-          "Scope": "/sites/portal",
-          "Sealed": false,
-          "ShowInFiltersPane": 0,
-          "Sortable": true,
-          "StaticName": "PnPAlertStartDateTime",
-          "Title": "Start date-time",
-          "FieldTypeKind": 4,
-          "TypeAsString": "DateTime",
-          "TypeDisplayName": "Date and Time",
-          "TypeShortDescription": "Date and Time",
-          "ValidationFormula": null,
-          "ValidationMessage": null,
-          "DateTimeCalendarType": 0,
-          "DisplayFormat": 1,
-          "FriendlyDisplayFormat": 1
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>', options: 'AddToAllContentTypes, AddFieldToDefaultView, AddFieldCheckDisplayName' } });
+    assert(loggerLogSpy.calledWith({
+      "AutoIndexed": false,
+      "CanBeDeleted": true,
+      "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
+      "ClientSideComponentProperties": null,
+      "CustomFormatter": null,
+      "DefaultFormula": null,
+      "DefaultValue": "[today]",
+      "Description": "",
+      "Direction": "none",
+      "EnforceUniqueValues": false,
+      "EntityPropertyName": "PnPAlertStartDateTime",
+      "Filterable": true,
+      "FromBaseType": false,
+      "Group": "PnP Columns",
+      "Hidden": false,
+      "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
+      "Indexed": false,
+      "InternalName": "PnPAlertStartDateTime",
+      "JSLink": "clienttemplates.js",
+      "PinnedToFiltersPane": false,
+      "ReadOnlyField": false,
+      "Required": false,
+      "SchemaXml": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"1\"><Default>[today]</Default></Field>",
+      "Scope": "/sites/portal",
+      "Sealed": false,
+      "ShowInFiltersPane": 0,
+      "Sortable": true,
+      "StaticName": "PnPAlertStartDateTime",
+      "Title": "Start date-time",
+      "FieldTypeKind": 4,
+      "TypeAsString": "DateTime",
+      "TypeDisplayName": "Date and Time",
+      "TypeShortDescription": "Date and Time",
+      "ValidationFormula": null,
+      "ValidationMessage": null,
+      "DateTimeCalendarType": 0,
+      "DisplayFormat": 1,
+      "FriendlyDisplayFormat": 1
+    }));
   });
 
-  it('creates site column using XML with the AddToDefaultContentType, AddFieldInternalNameHint options', (done) => {
+  it('creates site column using XML with the AddToDefaultContentType, AddFieldInternalNameHint options', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -433,57 +412,50 @@ describe(commands.FIELD_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>', options: 'AddToDefaultContentType, AddFieldInternalNameHint' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "AutoIndexed": false,
-          "CanBeDeleted": true,
-          "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
-          "ClientSideComponentProperties": null,
-          "CustomFormatter": null,
-          "DefaultFormula": null,
-          "DefaultValue": "[today]",
-          "Description": "",
-          "Direction": "none",
-          "EnforceUniqueValues": false,
-          "EntityPropertyName": "PnPAlertStartDateTime",
-          "Filterable": true,
-          "FromBaseType": false,
-          "Group": "PnP Columns",
-          "Hidden": false,
-          "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
-          "Indexed": false,
-          "InternalName": "PnPAlertStartDateTime",
-          "JSLink": "clienttemplates.js",
-          "PinnedToFiltersPane": false,
-          "ReadOnlyField": false,
-          "Required": false,
-          "SchemaXml": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"1\"><Default>[today]</Default></Field>",
-          "Scope": "/sites/portal",
-          "Sealed": false,
-          "ShowInFiltersPane": 0,
-          "Sortable": true,
-          "StaticName": "PnPAlertStartDateTime",
-          "Title": "Start date-time",
-          "FieldTypeKind": 4,
-          "TypeAsString": "DateTime",
-          "TypeDisplayName": "Date and Time",
-          "TypeShortDescription": "Date and Time",
-          "ValidationFormula": null,
-          "ValidationMessage": null,
-          "DateTimeCalendarType": 0,
-          "DisplayFormat": 1,
-          "FriendlyDisplayFormat": 1
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>', options: 'AddToDefaultContentType, AddFieldInternalNameHint' } });
+    assert(loggerLogSpy.calledWith({
+      "AutoIndexed": false,
+      "CanBeDeleted": true,
+      "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
+      "ClientSideComponentProperties": null,
+      "CustomFormatter": null,
+      "DefaultFormula": null,
+      "DefaultValue": "[today]",
+      "Description": "",
+      "Direction": "none",
+      "EnforceUniqueValues": false,
+      "EntityPropertyName": "PnPAlertStartDateTime",
+      "Filterable": true,
+      "FromBaseType": false,
+      "Group": "PnP Columns",
+      "Hidden": false,
+      "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
+      "Indexed": false,
+      "InternalName": "PnPAlertStartDateTime",
+      "JSLink": "clienttemplates.js",
+      "PinnedToFiltersPane": false,
+      "ReadOnlyField": false,
+      "Required": false,
+      "SchemaXml": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"1\"><Default>[today]</Default></Field>",
+      "Scope": "/sites/portal",
+      "Sealed": false,
+      "ShowInFiltersPane": 0,
+      "Sortable": true,
+      "StaticName": "PnPAlertStartDateTime",
+      "Title": "Start date-time",
+      "FieldTypeKind": 4,
+      "TypeAsString": "DateTime",
+      "TypeDisplayName": "Date and Time",
+      "TypeShortDescription": "Date and Time",
+      "ValidationFormula": null,
+      "ValidationMessage": null,
+      "DateTimeCalendarType": 0,
+      "DisplayFormat": 1,
+      "FriendlyDisplayFormat": 1
+    }));
   });
 
-  it('creates site column using XML with the AddToNoContentType option', (done) => {
+  it('creates site column using XML with the AddToNoContentType option', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/fields/CreateFieldAsXml`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -537,70 +509,56 @@ describe(commands.FIELD_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>', options: 'AddToNoContentType' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "AutoIndexed": false,
-          "CanBeDeleted": true,
-          "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
-          "ClientSideComponentProperties": null,
-          "CustomFormatter": null,
-          "DefaultFormula": null,
-          "DefaultValue": "[today]",
-          "Description": "",
-          "Direction": "none",
-          "EnforceUniqueValues": false,
-          "EntityPropertyName": "PnPAlertStartDateTime",
-          "Filterable": true,
-          "FromBaseType": false,
-          "Group": "PnP Columns",
-          "Hidden": false,
-          "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
-          "Indexed": false,
-          "InternalName": "PnPAlertStartDateTime",
-          "JSLink": "clienttemplates.js",
-          "PinnedToFiltersPane": false,
-          "ReadOnlyField": false,
-          "Required": false,
-          "SchemaXml": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"1\"><Default>[today]</Default></Field>",
-          "Scope": "/sites/portal",
-          "Sealed": false,
-          "ShowInFiltersPane": 0,
-          "Sortable": true,
-          "StaticName": "PnPAlertStartDateTime",
-          "Title": "Start date-time",
-          "FieldTypeKind": 4,
-          "TypeAsString": "DateTime",
-          "TypeDisplayName": "Date and Time",
-          "TypeShortDescription": "Date and Time",
-          "ValidationFormula": null,
-          "ValidationMessage": null,
-          "DateTimeCalendarType": 0,
-          "DisplayFormat": 1,
-          "FriendlyDisplayFormat": 1
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>', options: 'AddToNoContentType' } });
+    assert(loggerLogSpy.calledWith({
+      "AutoIndexed": false,
+      "CanBeDeleted": true,
+      "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
+      "ClientSideComponentProperties": null,
+      "CustomFormatter": null,
+      "DefaultFormula": null,
+      "DefaultValue": "[today]",
+      "Description": "",
+      "Direction": "none",
+      "EnforceUniqueValues": false,
+      "EntityPropertyName": "PnPAlertStartDateTime",
+      "Filterable": true,
+      "FromBaseType": false,
+      "Group": "PnP Columns",
+      "Hidden": false,
+      "Id": "5ee2dd25-d941-455a-9bdb-7f2c54aed11b",
+      "Indexed": false,
+      "InternalName": "PnPAlertStartDateTime",
+      "JSLink": "clienttemplates.js",
+      "PinnedToFiltersPane": false,
+      "ReadOnlyField": false,
+      "Required": false,
+      "SchemaXml": "<Field Type=\"DateTime\" DisplayName=\"Start date-time\" Required=\"FALSE\" EnforceUniqueValues=\"FALSE\" Indexed=\"FALSE\" Format=\"DateTime\" Group=\"PnP Columns\" FriendlyDisplayFormat=\"Disabled\" ID=\"{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}\" SourceID=\"{4f118c69-66e0-497c-96ff-d7855ce0713d}\" StaticName=\"PnPAlertStartDateTime\" Name=\"PnPAlertStartDateTime\" Version=\"1\"><Default>[today]</Default></Field>",
+      "Scope": "/sites/portal",
+      "Sealed": false,
+      "ShowInFiltersPane": 0,
+      "Sortable": true,
+      "StaticName": "PnPAlertStartDateTime",
+      "Title": "Start date-time",
+      "FieldTypeKind": 4,
+      "TypeAsString": "DateTime",
+      "TypeDisplayName": "Date and Time",
+      "TypeShortDescription": "Date and Time",
+      "ValidationFormula": null,
+      "ValidationMessage": null,
+      "DateTimeCalendarType": 0,
+      "DisplayFormat": 1,
+      "FriendlyDisplayFormat": 1
+    }));
   });
 
-  it('correctly handles a random API error', (done) => {
+  it('correctly handles a random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>', options: 'AddToNoContentType' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', xml: '<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>', options: 'AddToNoContentType' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

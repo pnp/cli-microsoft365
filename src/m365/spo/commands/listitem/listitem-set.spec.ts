@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
@@ -219,7 +219,7 @@ describe(commands.LISTITEM_SET, () => {
     assert(actual);
   });
 
-  it('fails to update a list item when \'fail me\' values are used', (done) => {
+  it('fails to update a list item when \'fail me\' values are used', async () => {
     actualId = 0;
 
     sinon.stub(request, 'get').callsFake(getFakes);
@@ -233,19 +233,11 @@ describe(commands.LISTITEM_SET, () => {
       Title: "fail updating me"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(actualId, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Item didn't update successfully"));
+    assert.strictEqual(actualId, 0);
   });
 
-  it('returns listItemInstance object when list item is updated with correct values', (done) => {
+  it('returns listItemInstance object when list item is updated with correct values', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -259,18 +251,11 @@ describe(commands.LISTITEM_SET, () => {
       Title: expectedTitle
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(actualId, expectedId);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(actualId, expectedId);
   });
 
-  it('attempts to update the listitem with the contenttype of \'Item\' when content type option \'Item\' is specified', (done) => {
+  it('attempts to update the listitem with the contenttype of \'Item\' when content type option \'Item\' is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -283,19 +268,11 @@ describe(commands.LISTITEM_SET, () => {
       Title: expectedTitle
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(expectedContentType === actualContentType);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await command.action(logger, { options: options } as any);
+    assert(expectedContentType === actualContentType);
   });
 
-  it('attempts to update the listitem with the contenttype of \'Item\' when content type option 0x01 is specified', (done) => {
+  it('attempts to update the listitem with the contenttype of \'Item\' when content type option 0x01 is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -308,19 +285,11 @@ describe(commands.LISTITEM_SET, () => {
       Title: expectedTitle
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(expectedContentType === actualContentType);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await command.action(logger, { options: options } as any);
+    assert(expectedContentType === actualContentType);
   });
 
-  it('fails to update the listitem when the specified contentType doesn\'t exist in the target list', (done) => {
+  it('fails to update the listitem when the specified contentType doesn\'t exist in the target list', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -333,20 +302,11 @@ describe(commands.LISTITEM_SET, () => {
       Title: expectedTitle
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(expectedContentType === actualContentType);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Specified content type 'Unexpected content type' doesn't exist on the target list"));
   });
 
 
-  it('successfully updates the listitem when the systemUpdate parameter is specified', (done) => {
+  it('successfully updates the listitem when the systemUpdate parameter is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -361,18 +321,11 @@ describe(commands.LISTITEM_SET, () => {
       systemUpdate: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(actualId, expectedId);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(actualId, expectedId);
   });
 
-  it('fails to get _ObjecttIdentity_ when the systemUpdate parameter is specified', (done) => {
+  it('fails to get _ObjecttIdentity_ when the systemUpdate parameter is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -387,18 +340,10 @@ describe(commands.LISTITEM_SET, () => {
       systemUpdate: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(actualId !== expectedId);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Failed request"));
   });
 
-  it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request and systemUpdate parameter is specified', (done) => {
+  it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request and systemUpdate parameter is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -413,19 +358,11 @@ describe(commands.LISTITEM_SET, () => {
       systemUpdate: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(actualId !== expectedId);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await assert.rejects(command.action(logger, { options:options } as any), new CommandError('ClientSvc unknown error'));
+    assert(actualId !== expectedId);
   });
 
-  it('fails to update the list item when systemUpdate parameter is specified', (done) => {
+  it('fails to update the list item when systemUpdate parameter is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -441,18 +378,11 @@ describe(commands.LISTITEM_SET, () => {
       systemUpdate: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(actualId !== expectedId);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Error occurred in systemUpdate operation - ErrorMessage": "systemUpdate error"}'));
+    assert(actualId !== expectedId);
   });
 
-  it('should ignore global options when creating request data', (done) => {
+  it('should ignore global options when creating request data', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     const postStubs = sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -469,14 +399,7 @@ describe(commands.LISTITEM_SET, () => {
       systemUpdate: false
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.deepEqual(postStubs.firstCall.args[0].data, { formValues: [{ FieldName: 'Title', FieldValue: 'List Item 1' }] });
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.deepEqual(postStubs.firstCall.args[0].data, { formValues: [{ FieldName: 'Title', FieldValue: 'List Item 1' }] });
   });
 });

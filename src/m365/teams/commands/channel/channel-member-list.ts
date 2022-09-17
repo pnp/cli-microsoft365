@@ -114,33 +114,29 @@ class TeamsChannelMemberListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.showDeprecationWarning(logger, commands.CONVERSATIONMEMBER_LIST, commands.CHANNEL_MEMBER_LIST);
 
-    this
-      .getTeamId(args)
-      .then((teamId: string): Promise<string> => {
-        this.teamId = teamId;
-        return this.getChannelId(args);
-      })
-      .then((channelId: string): Promise<ConversationMember[]> => {
-        const endpoint = `${this.resource}/v1.0/teams/${this.teamId}/channels/${channelId}/members`;
-        return odata.getAllItems<ConversationMember>(endpoint);
-      })
-      .then((memberships): void => {
-        if (args.options.role) {
-          if (args.options.role === 'member') {
-            // Members have no role value
-            memberships = memberships.filter(i => i.roles!.length === 0);
-          }
-          else {
-            memberships = memberships.filter(i => i.roles!.indexOf(args.options.role!) !== -1);
-          }
+    try {
+      this.teamId = await this.getTeamId(args);
+      const channelId: string = await this.getChannelId(args);
+      const endpoint = `${this.resource}/v1.0/teams/${this.teamId}/channels/${channelId}/members`;
+      let memberships = await odata.getAllItems<ConversationMember>(endpoint);
+      if (args.options.role) {
+        if (args.options.role === 'member') {
+          // Members have no role value
+          memberships = memberships.filter(i => i.roles!.length === 0);
         }
+        else {
+          memberships = memberships.filter(i => i.roles!.indexOf(args.options.role!) !== -1);
+        }
+      }
 
-        logger.log(memberships);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(memberships);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {

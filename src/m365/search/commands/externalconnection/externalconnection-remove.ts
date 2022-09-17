@@ -81,42 +81,39 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeExternalConnection: () => void = (): void => {
-      this
-        .getExternalConnectionId(args)
-        .then((externalConnectionId: string): Promise<void> => {
-          const requestOptions: any = {
-            url: `${this.resource}/v1.0/external/connections/${encodeURIComponent(externalConnectionId)}`,
-            headers: {
-              accept: 'application/json;odata.metadata=none'
-            },
-            responseType: 'json'
-          };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeExternalConnection: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const externalConnectionId: string = await this.getExternalConnectionId(args);
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/external/connections/${encodeURIComponent(externalConnectionId)}`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
 
-          return request
-            .delete(requestOptions);
-        })
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        await request.delete(requestOptions);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeExternalConnection();
+      await removeExternalConnection();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the external connection '${args.options.id || args.options.name}'?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeExternalConnection();
-        }
       });
+      
+      if (result.continue) {
+        await removeExternalConnection();
+      }
     }
   }
 }

@@ -81,27 +81,19 @@ describe(commands.EXTERNALCONNECTION_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'state']);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('An error has occurred'));
   });
 
-  it('retrieves list of external connections defined in the Microsoft Search', (done) => {
+  it('retrieves list of external connections defined in the Microsoft Search', async () => {
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
         return Promise.resolve(externalConnections);
@@ -110,15 +102,8 @@ describe(commands.EXTERNALCONNECTION_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(externalConnections.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } } as any);
+    assert(loggerLogSpy.calledWith(externalConnections.value));
   });
 
   it('supports debug mode', () => {

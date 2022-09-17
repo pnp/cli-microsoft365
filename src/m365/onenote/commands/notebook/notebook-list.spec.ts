@@ -98,7 +98,7 @@ describe(commands.NOTEBOOK_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('lists Microsoft OneNote notebooks for the currently logged in user (debug)', (done) => {
+  it('lists Microsoft OneNote notebooks for the currently logged in user (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/onenote/notebooks`) {
         return Promise.resolve({
@@ -122,31 +122,24 @@ describe(commands.NOTEBOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-            "createdDateTime": "2021-11-15T10:27:22Z",
-            "displayName": "Meeting Notes",
-            "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-          },
-          {
-            "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-            "createdDateTime": "2020-01-13T17:52:03Z",
-            "displayName": "My Notebook",
-            "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
+        "createdDateTime": "2021-11-15T10:27:22Z",
+        "displayName": "Meeting Notes",
+        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
+      },
+      {
+        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
+        "createdDateTime": "2020-01-13T17:52:03Z",
+        "displayName": "My Notebook",
+        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists Microsoft OneNote notebooks for user by id', (done) => {
+  it('lists Microsoft OneNote notebooks for user by id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/2609af39-7775-4f94-a3dc-0dd67657e900/onenote/notebooks`) {
         return Promise.resolve({
@@ -170,31 +163,24 @@ describe(commands.NOTEBOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { userId: '2609af39-7775-4f94-a3dc-0dd67657e900' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-            "createdDateTime": "2021-11-15T10:27:22Z",
-            "displayName": "Meeting Notes",
-            "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-          },
-          {
-            "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-            "createdDateTime": "2020-01-13T17:52:03Z",
-            "displayName": "My Notebook",
-            "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { userId: '2609af39-7775-4f94-a3dc-0dd67657e900' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
+        "createdDateTime": "2021-11-15T10:27:22Z",
+        "displayName": "Meeting Notes",
+        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
+      },
+      {
+        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
+        "createdDateTime": "2020-01-13T17:52:03Z",
+        "displayName": "My Notebook",
+        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists Microsoft OneNote notebooks in group by id', (done) => {
+  it('lists Microsoft OneNote notebooks in group by id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks`) {
         return Promise.resolve({
@@ -218,31 +204,24 @@ describe(commands.NOTEBOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-            "createdDateTime": "2021-11-15T10:27:22Z",
-            "displayName": "Meeting Notes",
-            "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-          },
-          {
-            "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-            "createdDateTime": "2020-01-13T17:52:03Z",
-            "displayName": "My Notebook",
-            "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
+        "createdDateTime": "2021-11-15T10:27:22Z",
+        "displayName": "Meeting Notes",
+        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
+      },
+      {
+        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
+        "createdDateTime": "2020-01-13T17:52:03Z",
+        "displayName": "My Notebook",
+        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('handles error when retrieving Microsoft OneNote notebooks in group by name', (done) => {
+  it('handles error when retrieving Microsoft OneNote notebooks in group by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.reject('An error has occurred');
@@ -251,18 +230,10 @@ describe(commands.NOTEBOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { groupName: 'MyGroup' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { groupName: 'MyGroup' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('lists Microsoft OneNote notebooks in group by name', (done) => {
+  it('lists Microsoft OneNote notebooks in group by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -298,31 +269,24 @@ describe(commands.NOTEBOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { groupName: 'MyGroup' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-            "createdDateTime": "2021-11-15T10:27:22Z",
-            "displayName": "Meeting Notes",
-            "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-          },
-          {
-            "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-            "createdDateTime": "2020-01-13T17:52:03Z",
-            "displayName": "My Notebook",
-            "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { groupName: 'MyGroup' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
+        "createdDateTime": "2021-11-15T10:27:22Z",
+        "displayName": "Meeting Notes",
+        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
+      },
+      {
+        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
+        "createdDateTime": "2020-01-13T17:52:03Z",
+        "displayName": "My Notebook",
+        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('handles error when retrieving Microsoft OneNote notebooks for site', (done) => {
+  it('handles error when retrieving Microsoft OneNote notebooks for site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/sites/`) > -1) {
         return Promise.reject('An error has occurred');
@@ -331,18 +295,10 @@ describe(commands.NOTEBOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('lists Microsoft OneNote notebooks for site', (done) => {
+  it('lists Microsoft OneNote notebooks for site', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -381,31 +337,24 @@ describe(commands.NOTEBOOK_LIST, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-            "createdDateTime": "2021-11-15T10:27:22Z",
-            "displayName": "Meeting Notes",
-            "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-          },
-          {
-            "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-            "createdDateTime": "2020-01-13T17:52:03Z",
-            "displayName": "My Notebook",
-            "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
+        "createdDateTime": "2021-11-15T10:27:22Z",
+        "displayName": "Meeting Notes",
+        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
+      },
+      {
+        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
+        "createdDateTime": "2020-01-13T17:52:03Z",
+        "displayName": "My Notebook",
+        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists Microsoft OneNote notebooks for user by name', (done) => {
+  it('lists Microsoft OneNote notebooks for user by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/user1@contoso.onmicrosoft.com/onenote/notebooks`) {
         return Promise.resolve({
@@ -429,28 +378,21 @@ describe(commands.NOTEBOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { userName: 'user1@contoso.onmicrosoft.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-            "createdDateTime": "2021-11-15T10:27:22Z",
-            "displayName": "Meeting Notes",
-            "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-          },
-          {
-            "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-            "createdDateTime": "2020-01-13T17:52:03Z",
-            "displayName": "My Notebook",
-            "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { userName: 'user1@contoso.onmicrosoft.com' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
+        "createdDateTime": "2021-11-15T10:27:22Z",
+        "displayName": "Meeting Notes",
+        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
+      },
+      {
+        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
+        "createdDateTime": "2020-01-13T17:52:03Z",
+        "displayName": "My Notebook",
+        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
   it('supports debug mode', () => {

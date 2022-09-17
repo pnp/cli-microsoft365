@@ -142,26 +142,23 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
     return request.get(requestOptions);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this
-      .getSpoSiteId(args)
-      .then((siteId: string): Promise<{ value: SitePermission[] }> => {
-        this.siteId = siteId;
-        return this.getPermissions();
-      })
-      .then((res: { value: SitePermission[] }) => {
-        let permissions: SitePermission[] = res.value;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      this.siteId = await this.getSpoSiteId(args);
+      const permRes: { value: SitePermission[] } = await this.getPermissions();
+      let permissions: SitePermission[] = permRes.value;
 
-        if (args.options.appId || args.options.appDisplayName) {
-          permissions = this.getFilteredPermissions(args, res.value);
-        }
+      if (args.options.appId || args.options.appDisplayName) {
+        permissions = this.getFilteredPermissions(args, permRes.value);
+      }
 
-        return Promise.all(permissions.map(g => this.getApplicationPermission(g.id)));
-      })
-      .then((res: SitePermission[]): void => {
-        logger.log(this.getTransposed(res));
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res: SitePermission[] = await Promise.all(permissions.map(g => this.getApplicationPermission(g.id)));
+      logger.log(this.getTransposed(res));
+
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

@@ -93,34 +93,35 @@ class AadO365GroupUserAddCommand extends GraphCommand {
     this.optionSets.push(['groupId', 'teamId']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
+      let requestOptions: any = {
+        url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get<{ value: string; }>(requestOptions)
-      .then((res: { value: string; }): Promise<void> => {
-        const endpoint: string = `${this.resource}/v1.0/groups/${providedGroupId}/${((typeof args.options.role !== 'undefined') ? args.options.role : '').toLowerCase() === 'owner' ? 'owners' : 'members'}/$ref`;
+      const res = await request.get<{ value: string; }>(requestOptions);
+      const endpoint: string = `${this.resource}/v1.0/groups/${providedGroupId}/${((typeof args.options.role !== 'undefined') ? args.options.role : '').toLowerCase() === 'owner' ? 'owners' : 'members'}/$ref`;
 
-        const requestOptions: any = {
-          url: endpoint,
-          headers: {
-            'accept': 'application/json;odata.metadata=none'
-          },
-          responseType: 'json',
-          data: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + res.value }
-        };
+      requestOptions = {
+        url: endpoint,
+        headers: {
+          'accept': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + res.value }
+      };
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

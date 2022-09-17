@@ -81,7 +81,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds an external connection', (done: any) => {
+  it('adds an external connection', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
         return Promise.resolve(externalConnectionAddResponse);
@@ -94,18 +94,11 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       name: 'Test Connection for CLI',
       description: 'Test connection that will not do anything'
     };
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponse);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponse);
   });
 
-  it('adds an external connection with authorized app id', (done: any) => {
+  it('adds an external connection with authorized app id', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
         return Promise.resolve(externalConnectionAddResponse);
@@ -119,18 +112,11 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       description: 'Test connection that will not do anything',
       authorizedAppIds: '00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'
     };
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
   });
 
-  it('adds an external connection with authorised app IDs', (done: any) => {
+  it('adds an external connection with authorised app IDs', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
         return Promise.resolve(externalConnectionAddResponseWithAppIDs);
@@ -144,18 +130,11 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       description: 'Test connection that will not do anything',
       authorizedAppIds: '00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'
     };
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -169,15 +148,8 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),
+      new CommandError(`An error has occurred`));
   });
 
   it('fails validation if id is less than 3 characters', async () => {

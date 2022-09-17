@@ -501,7 +501,7 @@ describe(commands.TASK_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when ownerGroupName not found', (done) => {
+  it('fails validation when ownerGroupName not found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
@@ -510,44 +510,28 @@ describe(commands.TASK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group 'foo' does not exist.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified group 'foo' does not exist.`));
   });
 
-  it('fails validation when using app only access token', (done) => {
+  it('fails validation when using app only access token', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         bucketId: 'FtzysDykv0-9s9toWiZhdskAD67z',
         planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('This command does not support application permissions.'));
   });
 
-  it('fails validation when bucketName not found', (done) => {
+  it('fails validation when bucketName not found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
@@ -580,91 +564,54 @@ describe(commands.TASK_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         bucketName: 'foo',
         planTitle: 'My Planner Plan',
         ownerGroupName: 'My Planner Group'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified bucket does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified bucket does not exist`));
   });
 
-  it('lists planner tasks of the current logged in user', (done) => {
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('lists planner tasks of the current logged in user', async () => {
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.called);
   });
 
-  it('correctly lists planner tasks with planTitle and ownerGroupId', (done) => {
+  it('correctly lists planner tasks with planTitle and ownerGroupId', async () => {
     const options: any = {
       debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
 
-    command.action(logger, { options: options } as any, () => {
-
-      try {
-        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
-  it('correctly lists planner tasks with planTitle and ownerGroupName', (done) => {
+  it('correctly lists planner tasks with planTitle and ownerGroupName', async () => {
     const options: any = {
       debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
-  it('correctly lists planner tasks with bucketId', (done) => {
+  it('correctly lists planner tasks with bucketId', async () => {
     const options: any = {
       debug: false,
       bucketId: 'FtzysDykv0-9s9toWiZhdskAD67z'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
-  it('correctly lists planner tasks with bucketName and planId', (done) => {
+  it('correctly lists planner tasks with bucketName and planId', async () => {
 
     const options: any = {
       debug: false,
@@ -672,18 +619,11 @@ describe(commands.TASK_LIST, () => {
       planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
-  it('correctly lists planner tasks with bucketName, planTitle, and ownerGroupId', (done) => {
+  it('correctly lists planner tasks with bucketName, planTitle, and ownerGroupId', async () => {
     const options: any = {
       debug: false,
       bucketName: 'Planner Bucket A',
@@ -691,18 +631,11 @@ describe(commands.TASK_LIST, () => {
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
-  it('correctly lists planner tasks with bucketName, planTitle, and ownerGroupName', (done) => {
+  it('correctly lists planner tasks with bucketName, planTitle, and ownerGroupName', async () => {
     const options: any = {
       debug: false,
       bucketName: 'Planner Bucket A',
@@ -710,18 +643,11 @@ describe(commands.TASK_LIST, () => {
       ownerGroupName: 'My Planner Group'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
-  it('correctly lists planner tasks with bucketName, deprecated planName, and ownerGroupName', (done) => {
+  it('correctly lists planner tasks with bucketName, deprecated planName, and ownerGroupName', async () => {
     const options: any = {
       debug: false,
       bucketName: 'Planner Bucket A',
@@ -730,30 +656,15 @@ describe(commands.TASK_LIST, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

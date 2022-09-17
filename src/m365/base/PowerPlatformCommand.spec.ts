@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import { Logger } from '../../cli';
 import PowerPlatformCommand from './PowerPlatformCommand';
 
 class MockCommand extends PowerPlatformCommand {
@@ -11,8 +10,7 @@ class MockCommand extends PowerPlatformCommand {
     return 'Mock command';
   }
 
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
-    cb();
+  public async commandAction(): Promise<void> {
   }
 
   public commandHelp(): void {

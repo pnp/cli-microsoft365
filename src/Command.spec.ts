@@ -45,10 +45,8 @@ class MockCommand1 extends Command {
     this.validators.push(() => Promise.resolve(true));
   }
 
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     this.showDeprecationWarning(logger, 'mc1', this.name);
-
-    cb();
   }
 
   public trackUnknownOptionsPublic(telemetryProps: any, options: any) {
@@ -69,15 +67,15 @@ class MockCommand2 extends Command {
     return 'Mock command 2 description';
   }
 
-  public commandAction(): void {
+  public async commandAction(): Promise<void> {
   }
 
   public commandHelp(args: any, log: (message: string) => void): void {
     log('MockCommand2 help');
   }
 
-  public handlePromiseError(response: any, logger: Logger, callback: (err?: any) => void): void {
-    this.handleRejectedODataJsonPromise(response, logger, callback);
+  public handlePromiseError(response: any): void {
+    this.handleRejectedODataJsonPromise(response);
   }
 }
 
@@ -103,7 +101,7 @@ class MockCommand3 extends Command {
     );
   }
 
-  public commandAction(): void {
+  public async commandAction(): Promise<void> {
   }
 
   public commandHelp(): void {
@@ -120,7 +118,7 @@ class MockCommand4 extends Command {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: any): Promise<void> {
     throw 'Exception';
   }
 }
@@ -182,141 +180,114 @@ describe('Command', () => {
 
   it('displays error message when it\'s serialized in the error property', () => {
     const mock = new MockCommand2();
-    mock.handlePromiseError({
+    assert.throws(() => mock.handlePromiseError({
       error: JSON.stringify({
         error: {
           message: 'An error has occurred'
         }
       })
-    }, logger, (err?: any) => {
-      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-    });
+    }), new CommandError('An error has occurred'));
   });
 
   it('displays the raw error message when the serialized value from the error property is not an error object', () => {
-    const mock = new MockCommand2();
-    mock.handlePromiseError({
-      error: JSON.stringify({
-        error: {
-          id: '123'
-        }
-      })
-    }, logger, (err?: any) => {
+    try {
+      const mock = new MockCommand2();
+      mock.handlePromiseError({
+        error: JSON.stringify({
+          error: {
+            id: '123'
+          }
+        })
+      });
+      assert.fail('No exception was thrown.');
+    }
+    catch (err: any) {
       assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(JSON.stringify({
         error: {
           id: '123'
         }
       }))));
-    });
+    }
   });
 
   it('displays the raw error message when the serialized value from the error property is not a JSON object', () => {
-    const mock = new MockCommand2();
-    mock.handlePromiseError({
-      error: 'abc'
-    }, logger, (err?: any) => {
+    try {
+      const mock = new MockCommand2();
+      mock.handlePromiseError({
+        error: 'abc'
+      });
+      assert.fail('No exception was thrown.');
+    }
+    catch (err: any) {
       assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
-    });
+    }
   });
 
   it('displays error message coming from ADALJS', () => {
-    const mock = new MockCommand2();
-    mock.handlePromiseError({
-      error: { error_description: 'abc' }
-    }, logger, (err?: any) => {
+    try {
+      const mock = new MockCommand2();
+      mock.handlePromiseError({
+        error: { error_description: 'abc' }
+      });
+      assert.fail('No exception was thrown.');
+    }
+    catch (err: any) {
       assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
-    });
+    }
   });
 
-  it('shows deprecation warning when command executed using the deprecated name', () => {
-    cli.currentCommandName = 'mc1';
-    const mock = new MockCommand1();
-    mock.commandAction(logger, {}, (): void => {
+  it('shows deprecation warning when command executed using the deprecated name', async () => {
+    try {
+      cli.currentCommandName = 'mc1';
+      const mock = new MockCommand1();
+      await mock.commandAction(logger);
       assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)));
-    });
+    }
+    catch (err: any) {
+      assert.fail(err);
+    }
   });
 
-  it('logs command name in the telemetry when command name used', (done) => {
+  it('logs command name in the telemetry when command name used', async() => {
     const mock = new MockCommand1();
-    mock.action(logger, { options: {} }, () => {
-      try {
-        assert.strictEqual(telemetry.name, 'mock-command');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await mock.action(logger, { options: {} });
+
+    assert.strictEqual(telemetry.name, 'mock-command');
   });
 
-  it('logs command alias in the telemetry when command alias used', (done) => {
+  it('logs command alias in the telemetry when command alias used', async () => {
     cli.currentCommandName = 'mc1';
     const mock = new MockCommand1();
-    mock.action(logger, { options: {} }, () => {
-      try {
-        assert.strictEqual(telemetry.name, 'mc1');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await mock.action(logger, { options: {} });
+
+    assert.strictEqual(telemetry.name, 'mc1');
   });
 
-  it('logs empty command name in telemetry when command called using something else than name or alias', (done) => {
+  it('logs empty command name in telemetry when command called using something else than name or alias', async () => {
     cli.currentCommandName = 'foo';
     const mock = new MockCommand1();
-    mock.action(logger, { options: {} }, () => {
-      try {
-        assert.strictEqual(telemetry.name, '');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await mock.action(logger, { options: {} });
+
+    assert.strictEqual(telemetry.name, '');
   });
 
-  it('correctly handles error when instance of error returned from the promise', (done) => {
+  it('correctly handles error when instance of error returned from the promise', () => {
     const cmd = new MockCommand3();
-    (cmd as any).handleRejectedODataPromise(new Error('An error has occurred'), undefined, (msg: any): void => {
-      try {
-        assert.strictEqual(JSON.stringify(msg), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert.throws(() => (cmd as any).handleRejectedODataPromise(new Error('An error has occurred')), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles graph response (code) from the promise', (done) => {
+  it('correctly handles graph response (code) from the promise', () => {
     const errorMessage = "forbidden-message";
     const errorCode = "Access Denied";
     const cmd = new MockCommand3();
-    (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage, code: errorCode } } }, undefined, (msg: any): void => {
-      try {
-        assert.strictEqual(JSON.stringify(msg), JSON.stringify(new CommandError(errorCode + " - " + errorMessage)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert.throws(() => (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage, code: errorCode } } }),
+      new CommandError(errorCode + " - " + errorMessage));
   });
 
-  it('correctly handles graph response error (without code) from the promise', (done) => {
+  it('correctly handles graph response error (without code) from the promise', () => {
     const errorMessage = "forbidden-message";
     const cmd = new MockCommand3();
-    (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage } } }, undefined, (msg: any): void => {
-      try {
-        assert.strictEqual(JSON.stringify(msg), JSON.stringify(new CommandError(errorMessage)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert.throws(() => (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage } } }), new CommandError(errorMessage));
   });
 
   it('tracks the use of unknown options in telemetry', () => {
@@ -348,16 +319,8 @@ describe('Command', () => {
     assert.strictEqual(JSON.stringify(actual), expected);
   });
 
-  it('catches exception thrown by commandAction', (done) => {
+  it('catches exception thrown by commandAction', async() => {
     const command = new MockCommand4();
-    command.action(logger, { options: {} }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Exception')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError('Exception'));
   });
 });

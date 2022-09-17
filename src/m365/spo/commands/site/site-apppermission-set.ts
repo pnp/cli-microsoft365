@@ -147,32 +147,28 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this
-      .getSpoSiteId(args)
-      .then((siteId: string): Promise<string> => {
-        this.siteId = siteId;
-        return this.getPermission(args);
-      })
-      .then((sitePermissionId: string) => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/sites/${this.siteId}/permissions/${sitePermissionId}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata=nometadata'
-          },
-          data: {
-            roles: [args.options.permission]
-          },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      this.siteId = await this.getSpoSiteId(args);
+      const sitePermissionId: string = await this.getPermission(args);
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/sites/${this.siteId}/permissions/${sitePermissionId}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json;odata=nometadata'
+        },
+        data: {
+          roles: [args.options.permission]
+        },
+        responseType: 'json'
+      };
 
-        return request.patch(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res = await request.patch(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

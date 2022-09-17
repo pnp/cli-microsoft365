@@ -131,7 +131,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly returns service health', (done) => {
+  it('correctly returns service health', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews/Exchange Online`) {
         return Promise.resolve(serviceHealthResponse);
@@ -144,19 +144,12 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
       serviceName: "Exchange Online"
     };
 
-    command.action(logger, {options} as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(serviceHealthResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, {options} as any);
+    assert(loggerLogSpy.calledWith(serviceHealthResponse));
   });
 
   
-  it('correctly returns service health as csv with issues flag', (done) => {
+  it('correctly returns service health as csv with issues flag', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews/Exchange Online`) {
         return Promise.resolve(serviceHealthResponseCSV);
@@ -171,18 +164,11 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
       output: "csv"
     };
 
-    command.action(logger, {options} as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(serviceHealthResponseCSV));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, {options} as any);
+    assert(loggerLogSpy.calledWith(serviceHealthResponseCSV));
   });
 
-  it('correctly returns service health with issues', (done) => {
+  it('correctly returns service health with issues', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews/Exchange Online?$expand=issues`) {
         return Promise.resolve(serviceHealthIssueResponse);
@@ -196,30 +182,15 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
       issues: true
     };
 
-    command.action(logger, {options} as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(serviceHealthIssueResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, {options} as any);
+    assert(loggerLogSpy.calledWith(serviceHealthIssueResponse));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

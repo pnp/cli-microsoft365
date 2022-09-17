@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -100,7 +100,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
     assert(false);
   });
 
-  it('adds role definition to web with name, description and right', (done) => {
+  it('adds role definition to web with name, description and right', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/roledefinitions') {
         return Promise.resolve();
@@ -108,7 +108,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -116,18 +116,10 @@ describe(commands.ROLEDEFINITION_ADD, () => {
         description: 'test',
         rights: 'FullMask'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('adds role definition to web with name', (done) => {
+  it('adds role definition to web with name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/roledefinitions') {
         return Promise.resolve();
@@ -135,20 +127,30 @@ describe(commands.ROLEDEFINITION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         name: 'test'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+  });
+
+  it('handles reject request correctly', async () => {
+    const err = 'request rejected';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/roledefinitions') > -1) {
+        return Promise.reject(err);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        name: 'test'
+      }
+    }), new CommandError(err));
   });
 });

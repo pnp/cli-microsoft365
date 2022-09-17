@@ -74,7 +74,7 @@ describe(commands.TERM_SET_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Name']);
   });
 
-  it('lists taxonomy term sets from the term group specified using id (debug)', (done) => {
+  it('lists taxonomy term sets from the term group specified using id (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -125,57 +125,50 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "_ObjectType_": "SP.Taxonomy.TermSet",
-          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
-          "CreatedDate": "2018-09-13T11:52:53.337Z",
-          "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
-          "LastModifiedDate": "2018-09-13T12:13:46.883Z",
-          "Name": "PnP-CollabFooter-SharedLinks",
-          "CustomProperties": {
-            "_Sys_Nav_IsNavigationTermSet": "True"
-          },
-          "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f",
-          "IsAvailableForTagging": true,
-          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
-          "Contact": "",
-          "Description": "",
-          "IsOpenForTermCreation": false,
-          "Names": {
-            "1033": "PnP-CollabFooter-SharedLinks"
-          },
-          "Stakeholders": []
-        },
-        {
-          "_ObjectType_": "SP.Taxonomy.TermSet",
-          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7",
-          "CreatedDate": "2018-09-13T11:52:55.147Z",
-          "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb",
-          "LastModifiedDate": "2018-09-13T12:13:47.383Z",
-          "Name": "PnP-Organizations",
-          "CustomProperties": {},
-          "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602",
-          "IsAvailableForTagging": true,
-          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
-          "Contact": "",
-          "Description": "",
-          "IsOpenForTermCreation": false,
-          "Names": {
-            "1033": "PnP-Organizations"
-          },
-          "Stakeholders": []
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } });
+    assert(loggerLogSpy.calledWith([{
+      "_ObjectType_": "SP.Taxonomy.TermSet",
+      "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
+      "CreatedDate": "2018-09-13T11:52:53.337Z",
+      "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
+      "LastModifiedDate": "2018-09-13T12:13:46.883Z",
+      "Name": "PnP-CollabFooter-SharedLinks",
+      "CustomProperties": {
+        "_Sys_Nav_IsNavigationTermSet": "True"
+      },
+      "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f",
+      "IsAvailableForTagging": true,
+      "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+      "Contact": "",
+      "Description": "",
+      "IsOpenForTermCreation": false,
+      "Names": {
+        "1033": "PnP-CollabFooter-SharedLinks"
+      },
+      "Stakeholders": []
+    },
+    {
+      "_ObjectType_": "SP.Taxonomy.TermSet",
+      "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7",
+      "CreatedDate": "2018-09-13T11:52:55.147Z",
+      "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb",
+      "LastModifiedDate": "2018-09-13T12:13:47.383Z",
+      "Name": "PnP-Organizations",
+      "CustomProperties": {},
+      "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602",
+      "IsAvailableForTagging": true,
+      "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+      "Contact": "",
+      "Description": "",
+      "IsOpenForTermCreation": false,
+      "Names": {
+        "1033": "PnP-Organizations"
+      },
+      "Stakeholders": []
+    }]));
   });
 
-  it('lists taxonomy term sets from the term group specified using name', (done) => {
+  it('lists taxonomy term sets from the term group specified using name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -226,57 +219,50 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, termGroupName: 'PnPTermSets' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "_ObjectType_": "SP.Taxonomy.TermSet",
-          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
-          "CreatedDate": "2018-09-13T11:52:53.337Z",
-          "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
-          "LastModifiedDate": "2018-09-13T12:13:46.883Z",
-          "Name": "PnP-CollabFooter-SharedLinks",
-          "CustomProperties": {
-            "_Sys_Nav_IsNavigationTermSet": "True"
-          },
-          "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f",
-          "IsAvailableForTagging": true,
-          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
-          "Contact": "",
-          "Description": "",
-          "IsOpenForTermCreation": false,
-          "Names": {
-            "1033": "PnP-CollabFooter-SharedLinks"
-          },
-          "Stakeholders": []
-        },
-        {
-          "_ObjectType_": "SP.Taxonomy.TermSet",
-          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7",
-          "CreatedDate": "2018-09-13T11:52:55.147Z",
-          "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb",
-          "LastModifiedDate": "2018-09-13T12:13:47.383Z",
-          "Name": "PnP-Organizations",
-          "CustomProperties": {},
-          "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602",
-          "IsAvailableForTagging": true,
-          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
-          "Contact": "",
-          "Description": "",
-          "IsOpenForTermCreation": false,
-          "Names": {
-            "1033": "PnP-Organizations"
-          },
-          "Stakeholders": []
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, termGroupName: 'PnPTermSets' } });
+    assert(loggerLogSpy.calledWith([{
+      "_ObjectType_": "SP.Taxonomy.TermSet",
+      "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
+      "CreatedDate": "2018-09-13T11:52:53.337Z",
+      "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
+      "LastModifiedDate": "2018-09-13T12:13:46.883Z",
+      "Name": "PnP-CollabFooter-SharedLinks",
+      "CustomProperties": {
+        "_Sys_Nav_IsNavigationTermSet": "True"
+      },
+      "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f",
+      "IsAvailableForTagging": true,
+      "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+      "Contact": "",
+      "Description": "",
+      "IsOpenForTermCreation": false,
+      "Names": {
+        "1033": "PnP-CollabFooter-SharedLinks"
+      },
+      "Stakeholders": []
+    },
+    {
+      "_ObjectType_": "SP.Taxonomy.TermSet",
+      "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7",
+      "CreatedDate": "2018-09-13T11:52:55.147Z",
+      "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb",
+      "LastModifiedDate": "2018-09-13T12:13:47.383Z",
+      "Name": "PnP-Organizations",
+      "CustomProperties": {},
+      "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602",
+      "IsAvailableForTagging": true,
+      "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+      "Contact": "",
+      "Description": "",
+      "IsOpenForTermCreation": false,
+      "Names": {
+        "1033": "PnP-Organizations"
+      },
+      "Stakeholders": []
+    }]));
   });
 
-  it('escapes XML in term group name', (done) => {
+  it('escapes XML in term group name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -327,57 +313,50 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, termGroupName: 'PnPTermSets>' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "_ObjectType_": "SP.Taxonomy.TermSet",
-          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
-          "CreatedDate": "2018-09-13T11:52:53.337Z",
-          "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
-          "LastModifiedDate": "2018-09-13T12:13:46.883Z",
-          "Name": "PnP-CollabFooter-SharedLinks",
-          "CustomProperties": {
-            "_Sys_Nav_IsNavigationTermSet": "True"
-          },
-          "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f",
-          "IsAvailableForTagging": true,
-          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
-          "Contact": "",
-          "Description": "",
-          "IsOpenForTermCreation": false,
-          "Names": {
-            "1033": "PnP-CollabFooter-SharedLinks"
-          },
-          "Stakeholders": []
-        },
-        {
-          "_ObjectType_": "SP.Taxonomy.TermSet",
-          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7",
-          "CreatedDate": "2018-09-13T11:52:55.147Z",
-          "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb",
-          "LastModifiedDate": "2018-09-13T12:13:47.383Z",
-          "Name": "PnP-Organizations",
-          "CustomProperties": {},
-          "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602",
-          "IsAvailableForTagging": true,
-          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
-          "Contact": "",
-          "Description": "",
-          "IsOpenForTermCreation": false,
-          "Names": {
-            "1033": "PnP-Organizations"
-          },
-          "Stakeholders": []
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, termGroupName: 'PnPTermSets>' } });
+    assert(loggerLogSpy.calledWith([{
+      "_ObjectType_": "SP.Taxonomy.TermSet",
+      "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
+      "CreatedDate": "2018-09-13T11:52:53.337Z",
+      "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
+      "LastModifiedDate": "2018-09-13T12:13:46.883Z",
+      "Name": "PnP-CollabFooter-SharedLinks",
+      "CustomProperties": {
+        "_Sys_Nav_IsNavigationTermSet": "True"
+      },
+      "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f",
+      "IsAvailableForTagging": true,
+      "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+      "Contact": "",
+      "Description": "",
+      "IsOpenForTermCreation": false,
+      "Names": {
+        "1033": "PnP-CollabFooter-SharedLinks"
+      },
+      "Stakeholders": []
+    },
+    {
+      "_ObjectType_": "SP.Taxonomy.TermSet",
+      "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7",
+      "CreatedDate": "2018-09-13T11:52:55.147Z",
+      "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb",
+      "LastModifiedDate": "2018-09-13T12:13:47.383Z",
+      "Name": "PnP-Organizations",
+      "CustomProperties": {},
+      "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602",
+      "IsAvailableForTagging": true,
+      "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+      "Contact": "",
+      "Description": "",
+      "IsOpenForTermCreation": false,
+      "Names": {
+        "1033": "PnP-Organizations"
+      },
+      "Stakeholders": []
+    }]));
   });
 
-  it('lists taxonomy term sets with all properties when output is JSON', (done) => {
+  it('lists taxonomy term sets with all properties when output is JSON', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -428,18 +407,11 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { output: 'json', termGroupName: 'PnPTermSets' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{ "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "2018-09-13T11:52:53.337Z", "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed", "LastModifiedDate": "2018-09-13T12:13:46.883Z", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": { "_Sys_Nav_IsNavigationTermSet": "True" }, "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": { "1033": "PnP-CollabFooter-SharedLinks" }, "Stakeholders": [] }, { "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "2018-09-13T11:52:55.147Z", "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb", "LastModifiedDate": "2018-09-13T12:13:47.383Z", "Name": "PnP-Organizations", "CustomProperties": {}, "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": { "1033": "PnP-Organizations" }, "Stakeholders": [] }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { output: 'json', termGroupName: 'PnPTermSets' } });
+    assert(loggerLogSpy.calledWith([{ "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "2018-09-13T11:52:53.337Z", "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed", "LastModifiedDate": "2018-09-13T12:13:46.883Z", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": { "_Sys_Nav_IsNavigationTermSet": "True" }, "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": { "1033": "PnP-CollabFooter-SharedLinks" }, "Stakeholders": [] }, { "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "2018-09-13T11:52:55.147Z", "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb", "LastModifiedDate": "2018-09-13T12:13:47.383Z", "Name": "PnP-Organizations", "CustomProperties": {}, "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": { "1033": "PnP-Organizations" }, "Stakeholders": [] }]));
   });
 
-  it('correctly handles no term sets found', (done) => {
+  it('correctly handles no term sets found', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -482,18 +454,10 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } });
   });
 
-  it('correctly handles error when retrieving taxonomy term sets', (done) => {
+  it('correctly handles error when retrieving taxonomy term sets', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -503,18 +467,11 @@ describe(commands.TERM_SET_LIST, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('File Not Found.'));
   });
 
-  it('correctly handles error when the specified term group id doesn\'t exist', (done) => {
+  it('correctly handles error when the specified term group id doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -524,18 +481,11 @@ describe(commands.TERM_SET_LIST, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
-  it('correctly handles error when the specified term group name doesn\'t exist', (done) => {
+  it('correctly handles error when the specified term group name doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -545,15 +495,8 @@ describe(commands.TERM_SET_LIST, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false, termGroupName: 'PnPTermSets' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false, termGroupName: 'PnPTermSets' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('fails validation when neither id nor name specified', async () => {
@@ -592,20 +535,10 @@ describe(commands.TERM_SET_LIST, () => {
     assert(containsOption);
   });
 
-  it('handles promise rejection', (done) => {
+  it('handles promise rejection', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
-    
-    command.action(logger, {
-      options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getRequestDigest error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('getRequestDigest error'));
   });
 });

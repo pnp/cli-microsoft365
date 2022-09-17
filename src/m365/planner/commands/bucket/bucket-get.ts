@@ -132,7 +132,7 @@ class PlannerBucketGetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {    
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 
@@ -140,17 +140,18 @@ class PlannerBucketGetCommand extends GraphCommand {
     }
 
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
-    this
-      .getBucketId(args)
-      .then((bucketId: string) => this.getBucketById(bucketId))
-      .then((bucket: PlannerBucket) => {
-        logger.log(bucket);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const bucketId = await this.getBucketId(args);
+      const bucket = await this.getBucketById(bucketId);
+      logger.log(bucket);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getBucketId(args: CommandArgs): Promise<string> {

@@ -16,15 +16,16 @@ class PpManagementAppListCommand extends PowerPlatformCommand {
     return 'Lists management applications for Power Platform';
   }
 
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     const endpoint = `${this.resource}/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01`;
 
-    odata
-      .getAllItems<ManagementApp>(endpoint)
-      .then((managementApps): void => {
-        logger.log(managementApps);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const managementApps = await odata.getAllItems<ManagementApp>(endpoint);
+      logger.log(managementApps);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

@@ -62,41 +62,41 @@ class AadGroupSettingRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeGroupSetting: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeGroupSetting: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing group setting: ${args.options.id}...`);
       }
 
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/groupSettings/${args.options.id}`,
-        headers: {
-          'accept': 'application/json;odata.metadata=none'
-        }
-      };
+      try {
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/groupSettings/${args.options.id}`,
+          headers: {
+            'accept': 'application/json;odata.metadata=none'
+          }
+        };
 
-      request
-        .delete(requestOptions)
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        await request.delete(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeGroupSetting();
+      await removeGroupSetting();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the group setting ${args.options.id}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeGroupSetting();
-        }
       });
+
+      if (result.continue) {
+        await removeGroupSetting();
+      }
     }
   }
 }

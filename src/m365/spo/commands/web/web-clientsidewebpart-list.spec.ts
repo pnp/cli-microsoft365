@@ -92,7 +92,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('handles error when calling client side webparts', (done) => {
+  it('handles error when calling client side webparts', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetClientSideWebParts') > -1) {
         return Promise.reject("Error");
@@ -100,24 +100,13 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       return Promise.resolve('abc');
     });
 
-    command.action(logger, {
-      options: {
-        output: 'json',
-        debug: false,
-        webUrl: 'https://contoso.sharepoint.com'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      output: 'json',
+      debug: false,
+      webUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError('Error'));
   });
 
-  it('handles no client side webparts', (done) => {
+  it('handles no client side webparts', async () => {
     const clientsideWebPartRsp = {
       value: [
         {
@@ -146,26 +135,17 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       return Promise.resolve('abc');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
 
-  it('handles no client side webparts (debug)', (done) => {
+  it('handles no client side webparts (debug)', async () => {
     const clientsideWebPartRsp = {
       value: [
         {
@@ -194,25 +174,17 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       return Promise.resolve('abc');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-
-      try {
-        assert(loggerLogToStderrSpy.calledWith("No client-side web parts available for this site"));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.calledWith("No client-side web parts available for this site"));
   });
 
-  it('retrieves the list of clientside components of ComponentType : 1', (done) => {
+  it('retrieves the list of clientside components of ComponentType : 1', async () => {
     const clientsideWebPartRsp = {
       value: [
         {
@@ -241,41 +213,33 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       return Promise.resolve('abc');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-
-      try {
-        const expectedClientSideWebparts: any[] = [];
-
-        clientsideWebPartRsp.value.forEach(
-          component => {
-            if (component.ComponentType === 1) {
-              expectedClientSideWebparts.push(
-                {
-                  Id: component.Id,
-
-                  Name: component.Name,
-                  Title: JSON.parse(component.Manifest).preconfiguredEntries[0].title.default
-                }
-              );
-            }
-          }
-        );
-        assert(loggerLogSpy.calledWith(expectedClientSideWebparts));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const expectedClientSideWebparts: any[] = [];
+
+    clientsideWebPartRsp.value.forEach(
+      component => {
+        if (component.ComponentType === 1) {
+          expectedClientSideWebparts.push(
+            {
+              Id: component.Id,
+
+              Name: component.Name,
+              Title: JSON.parse(component.Manifest).preconfiguredEntries[0].title.default
+            }
+          );
+        }
+      }
+    );
+    assert(loggerLogSpy.calledWith(expectedClientSideWebparts));
   });
 
-  it('retrieves the list of clientside components of ComponentType : 1 and removes curly brackets from the Id', (done) => {
+  it('retrieves the list of clientside components of ComponentType : 1 and removes curly brackets from the Id', async () => {
     const clientsideWebPartRsp = {
       value: [
         {
@@ -304,36 +268,28 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       return Promise.resolve('abc');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-
-      try {
-        const expectedClientSideWebparts: any[] = [];
-
-        clientsideWebPartRsp.value.forEach(
-          component => {
-            if (component.ComponentType === 1) {
-              expectedClientSideWebparts.push(
-                {
-                  Id: component.Id.replace("{", "").replace("}", ""),
-                  Name: component.Name,
-                  Title: JSON.parse(component.Manifest).preconfiguredEntries[0].title.default
-                }
-              );
-            }
-          }
-        );
-        assert(loggerLogSpy.calledWith(expectedClientSideWebparts));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const expectedClientSideWebparts: any[] = [];
+
+    clientsideWebPartRsp.value.forEach(
+      component => {
+        if (component.ComponentType === 1) {
+          expectedClientSideWebparts.push(
+            {
+              Id: component.Id.replace("{", "").replace("}", ""),
+              Name: component.Name,
+              Title: JSON.parse(component.Manifest).preconfiguredEntries[0].title.default
+            }
+          );
+        }
+      }
+    );
+    assert(loggerLogSpy.calledWith(expectedClientSideWebparts));
   });
 }); 

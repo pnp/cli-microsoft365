@@ -72,7 +72,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('denies the specified permission request (debug)', (done) => {
+  it('denies the specified permission request (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -93,18 +93,11 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('denies the specified permission request', (done) => {
+  it('denies the specified permission request', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -125,18 +118,11 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles error when denying permission request', (done) => {
+  it('correctly handles error when denying permission request', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -146,28 +132,14 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false, requestId: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('A permission request with the ID f0feaecf-24be-402b-a080-3a55738ec56a could not be found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, requestId: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
+      new CommandError('A permission request with the ID f0feaecf-24be-402b-a080-3a55738ec56a could not be found.'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    command.action(logger, { options: { debug: false, requestId: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, requestId: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

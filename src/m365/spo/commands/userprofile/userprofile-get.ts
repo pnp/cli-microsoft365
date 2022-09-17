@@ -49,31 +49,29 @@ class SpoUserProfileGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((spoUrl: string): Promise<{ UserProfileProperties: { Key: string; Value: string }[] }> => {
-        const userName: string = `i:0#.f|membership|${args.options.userName}`;
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor(accountName=@v)?@v='${encodeURIComponent(`${userName}`)}'`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-        return request.get<{ UserProfileProperties: { Key: string; Value: string }[] }>(requestOptions);
-      })
-      .then((res: { UserProfileProperties: { Key: string; Value: string }[] }): void => {
-        // in text mode, reformat properties for readability
-        if (!args.options.output ||
-          args.options.output === 'text') {
-          res.UserProfileProperties = JSON.stringify(res.UserProfileProperties) as any;
-        }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const userName: string = `i:0#.f|membership|${args.options.userName}`;
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor(accountName=@v)?@v='${encodeURIComponent(`${userName}`)}'`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-        logger.log(res);
+      const res: { UserProfileProperties: { Key: string; Value: string }[]} = await request.get<{ UserProfileProperties: { Key: string; Value: string }[] }>(requestOptions);
+      if (!args.options.output ||
+        args.options.output === 'text') {
+        res.UserProfileProperties = JSON.stringify(res.UserProfileProperties) as any;
+      }
 
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 module.exports = new SpoUserProfileGetCommand();

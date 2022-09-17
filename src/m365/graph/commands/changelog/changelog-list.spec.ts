@@ -132,57 +132,52 @@ describe(commands.CHANGELOG_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['category', 'title', 'description']);
   });
 
-  it('fails validation if versions contains an invalid value.', (done) => {
+  it('fails validation if versions contains an invalid value.', async () => {
     const actual = command.validate({
       options: {
         versions: 'invalid'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if changeType is an invalid value.', (done) => {
+  it('fails validation if changeType is an invalid value.', async () => {
     const actual = command.validate({
       options: {
         changeType: 'invalid'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if services contains an invalid value.', (done) => {
+  it('fails validation if services contains an invalid value.', async () => {
     const actual = command.validate({
       options: {
         services: 'invalid'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if startDate is invalid ISO date.', (done) => {
+  it('fails validation if startDate is invalid ISO date.', async () => {
     const actual = command.validate({
       options: {
         startDate: 'invalid'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if endDate is invalid ISO date.', (done) => {
+  it('fails validation if endDate is invalid ISO date.', async () => {
     const actual = command.validate({
       options: {
         endDate: 'invalid'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if endDate is earlier than startDate.', (done) => {
+  it('fails validation if endDate is earlier than startDate.', async () => {
     const actual = command.validate({
       options: {
         endDate: '2018-11-01',
@@ -190,7 +185,6 @@ describe(commands.CHANGELOG_LIST, () => {
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
   it('passes validation when valid versions specified', async () => {
@@ -238,7 +232,7 @@ describe(commands.CHANGELOG_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('retrieves changelog list', (done) => {
+  it('retrieves changelog list', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://developer.microsoft.com/en-us/graph/changelog/rss') {
         return Promise.resolve(validRSSResponse);
@@ -247,20 +241,13 @@ describe(commands.CHANGELOG_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(validChangelog));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(validChangelog));
   });
 
-  it('retrieves changelog list as text', (done) => {
+  it('retrieves changelog list as text', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://developer.microsoft.com/en-us/graph/changelog/rss') {
         return Promise.resolve(validRSSResponse);
@@ -269,20 +256,13 @@ describe(commands.CHANGELOG_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {output: 'text' }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(validChangelogText));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(validChangelogText));
   });
 
-  it('retrieves changelog list based on changeType', (done) => {
+  it('retrieves changelog list based on changeType', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://developer.microsoft.com/en-us/graph/changelog/rss/?filterBy=Addition') {
         return Promise.resolve(validRSSResponse);
@@ -291,22 +271,15 @@ describe(commands.CHANGELOG_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { 
         changeType: validChangeType
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(validChangelog));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(validChangelog));
   });
 
-  it('retrieves changelog list based on versions, services, startDate and endDate', (done) => {
+  it('retrieves changelog list based on versions, services, startDate and endDate', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://developer.microsoft.com/en-us/graph/changelog/rss') {
         return Promise.resolve(validRSSResponse);
@@ -315,22 +288,15 @@ describe(commands.CHANGELOG_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { 
         versions: validVersions,
         services: validServices,
         startDate: validStartDate,
         endDate: validEndDate
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(validChangelog));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(validChangelog));
   });
 
   it('supports debug mode', () => {
@@ -344,18 +310,10 @@ describe(commands.CHANGELOG_LIST, () => {
     assert(containsOption);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 });

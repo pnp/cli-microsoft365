@@ -82,74 +82,70 @@ class TeamsChannelRemoveCommand extends GraphCommand {
     this.optionSets.push(['channelId', 'channelName']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const removeChannel: () => void = (): void => {
-      if (args.options.channelName) {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName)}'`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeChannel: () => Promise<void> = async (): Promise<void> => {
+      try {
+        if (args.options.channelName) {
+          const requestOptions: any = {
+            url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName)}'`,
+            headers: {
+              accept: 'application/json;odata.metadata=none'
+            },
+            responseType: 'json'
+          };
+  
+          const res: { value: Channel[] } = await request.get<{ value: Channel[] }>(requestOptions);
+          const channelItem: Channel | undefined = res.value[0];
 
-        request
-          .get<{ value: Channel[] }>(requestOptions)
-          .then((res: { value: Channel[] }): Promise<void> => {
-            const channelItem: Channel | undefined = res.value[0];
+          if (!channelItem) {
+            return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
+          }
 
-            if (!channelItem) {
-              return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
-            }
+          const channelId: string = res.value[0].id;
 
-            const channelId: string = res.value[0].id;
+          const requestOptionsDelete: any = {
+            url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(channelId)}`,
+            headers: {
+              accept: 'application/json;odata.metadata=none'
+            },
+            responseType: 'json'
+          };
 
-            const requestOptions: any = {
-              url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(channelId)}`,
-              headers: {
-                accept: 'application/json;odata.metadata=none'
-              },
-              responseType: 'json'
-            };
-
-            return request.delete(requestOptions);
-          })
-          .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+          await request.delete(requestOptionsDelete);
+        }
+  
+        if (args.options.channelId) {
+          const requestOptions: any = {
+            url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}`,
+            headers: {
+              accept: 'application/json;odata.metadata=none'
+            },
+            responseType: 'json'
+          };
+  
+          await request.delete(requestOptions);
+        }
       }
-
-      if (args.options.channelId) {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        request
-          .delete(requestOptions)
-          .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
       }
     };
 
     if (args.options.confirm) {
-      removeChannel();
+      await removeChannel();
     }
     else {
       const channelName = args.options.channelName ? args.options.channelName : args.options.channelId;
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the channel ${channelName} from team ${args.options.teamId}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeChannel();
-        }
       });
+      
+      if (result.continue) {
+        await removeChannel();
+      }
     }
   }
 }

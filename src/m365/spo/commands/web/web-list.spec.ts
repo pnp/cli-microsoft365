@@ -64,7 +64,7 @@ describe(commands.WEB_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Title', 'Url', 'Id']);
   });
 
-  it('retrieves all webs', (done) => {
+  it('retrieves all webs', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/webs') > -1) {
         return Promise.resolve(
@@ -109,57 +109,50 @@ describe(commands.WEB_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "AllowRssFeeds": false,
-          "AlternateCssUrl": null,
-          "AppInstanceId": "00000000-0000-0000-0000-000000000000",
-          "Configuration": 0,
-          "Created": null,
-          "CurrentChangeToken": null,
-          "CustomMasterUrl": null,
-          "Description": null,
-          "DesignPackageId": null,
-          "DocumentLibraryCalloutOfficeWebAppPreviewersDisabled": false,
-          "EnableMinimalDownload": false,
-          "HorizontalQuickLaunch": false,
-          "Id": "d8d179c7-f459-4f90-b592-14b08e84accb",
-          "IsMultilingual": false,
-          "Language": 1033,
-          "LastItemModifiedDate": null,
-          "LastItemUserModifiedDate": null,
-          "MasterUrl": null,
-          "NoCrawl": false,
-          "OverwriteTranslationsOnChange": false,
-          "ResourcePath": null,
-          "QuickLaunchEnabled": false,
-          "RecycleBinEnabled": false,
-          "ServerRelativeUrl": null,
-          "SiteLogoUrl": null,
-          "SyndicationEnabled": false,
-          "Title": "Subsite",
-          "TreeViewEnabled": false,
-          "UIVersion": 15,
-          "UIVersionConfigurationEnabled": false,
-          "Url": "https://Contoso.sharepoint.com/Subsite",
-          "WebTemplate": "STS"
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([{
+      "AllowRssFeeds": false,
+      "AlternateCssUrl": null,
+      "AppInstanceId": "00000000-0000-0000-0000-000000000000",
+      "Configuration": 0,
+      "Created": null,
+      "CurrentChangeToken": null,
+      "CustomMasterUrl": null,
+      "Description": null,
+      "DesignPackageId": null,
+      "DocumentLibraryCalloutOfficeWebAppPreviewersDisabled": false,
+      "EnableMinimalDownload": false,
+      "HorizontalQuickLaunch": false,
+      "Id": "d8d179c7-f459-4f90-b592-14b08e84accb",
+      "IsMultilingual": false,
+      "Language": 1033,
+      "LastItemModifiedDate": null,
+      "LastItemUserModifiedDate": null,
+      "MasterUrl": null,
+      "NoCrawl": false,
+      "OverwriteTranslationsOnChange": false,
+      "ResourcePath": null,
+      "QuickLaunchEnabled": false,
+      "RecycleBinEnabled": false,
+      "ServerRelativeUrl": null,
+      "SiteLogoUrl": null,
+      "SyndicationEnabled": false,
+      "Title": "Subsite",
+      "TreeViewEnabled": false,
+      "UIVersion": 15,
+      "UIVersionConfigurationEnabled": false,
+      "Url": "https://Contoso.sharepoint.com/Subsite",
+      "WebTemplate": "STS"
+    }]));
   });
 
-  it('command correctly handles web list reject request', (done) => {
+  it('command correctly handles web list reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/webs') > -1) {
@@ -169,49 +162,30 @@ describe(commands.WEB_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
-      }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      webUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError(err));
   });
 
-  it('uses correct API url when output json option is passed', (done) => {
+  it('uses correct API url when output json option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       logger.log('Test Url:');
       logger.log(opts.url);
-      if ((opts.url as string).indexOf('select123=') > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/webs') {
         return Promise.resolve('Correct Url1');
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-
-      try {
-        assert('Correct Url');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert('Correct Url');
   });
 
   it('supports debug mode', () => {

@@ -38,42 +38,42 @@ class AadOAuth2GrantRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeOauth2Grant: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeOauth2Grant: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing OAuth2 permissions...`);
       }
 
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}`,
-        headers: {
-          'accept': 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      request
-        .delete(requestOptions)
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      try {
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}`,
+          headers: {
+            'accept': 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
+  
+        await request.delete(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeOauth2Grant();
+      await removeOauth2Grant();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the OAuth2 permissions for ${args.options.grantId}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeOauth2Grant();
-        }
       });
+
+      if (result.continue) {
+        await removeOauth2Grant();
+      }
     }
   }
 }

@@ -37,9 +37,9 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -66,57 +66,43 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing content type from list when confirmation argument not passed (listId)', (done) => {
-    command.action(logger, {
+  it('prompts before removing content type from list when confirmation argument not passed (listId)', async () => {
+    await command.action(logger, {
       options: {
         debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A'
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('prompts before removing content type from list when confirmation argument not passed (listTitle)', (done) => {
-    command.action(logger, {
+  it('prompts before removing content type from list when confirmation argument not passed (listTitle)', async () => {
+    await command.action(logger, {
       options: {
         debug: false,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A'
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('aborts removing content type from list when prompt not confirmed', (done) => {
+  it('aborts removing content type from list when prompt not confirmed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -132,28 +118,21 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, {
       options: {
         debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A'
       }
-    }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(requests.length === 0);
   });
 
-  it('removes content type from list when listId option is passed and prompt confirmed (debug)', (done) => {
+  it('removes content type from list when listId option is passed and prompt confirmed (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -169,42 +148,35 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
     const listId: string = 'dfddade1-4729-428d-881e-7fedf3cae50d';
     const contentTypeId: string = '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         listId: listId,
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: contentTypeId
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists(guid'${encodeURIComponent(listId)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0 &&
-          r.headers['X-HTTP-Method'] === 'DELETE' &&
-          r.headers['If-Match'] === '*') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/lists(guid'${encodeURIComponent(listId)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0 &&
+        r.headers['X-HTTP-Method'] === 'DELETE' &&
+        r.headers['If-Match'] === '*') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes content type from list when listTitle option is passed and prompt confirmed (debug)', (done) => {
+  it('removes content type from list when listTitle option is passed and prompt confirmed (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -220,42 +192,35 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
     const listTitle: string = 'Documents';
     const contentTypeId: string = '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         listTitle: listTitle,
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: contentTypeId
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists/GetByTitle('${encodeURIComponent(listTitle)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0 &&
-          r.headers['X-HTTP-Method'] === 'DELETE' &&
-          r.headers['If-Match'] === '*') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/lists/GetByTitle('${encodeURIComponent(listTitle)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0 &&
+        r.headers['X-HTTP-Method'] === 'DELETE' &&
+        r.headers['If-Match'] === '*') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes content type from list when listId option is passed and prompt confirmed', (done) => {
+  it('removes content type from list when listId option is passed and prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -271,42 +236,35 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
     const listId: string = 'dfddade1-4729-428d-881e-7fedf3cae50d';
     const contentTypeId: string = '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         listId: listId,
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: contentTypeId
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists(guid'${encodeURIComponent(listId)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0 &&
-          r.headers['X-HTTP-Method'] === 'DELETE' &&
-          r.headers['If-Match'] === '*') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/lists(guid'${encodeURIComponent(listId)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0 &&
+        r.headers['X-HTTP-Method'] === 'DELETE' &&
+        r.headers['If-Match'] === '*') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes content type from list when listTitle option is passed and prompt confirmed', (done) => {
+  it('removes content type from list when listTitle option is passed and prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -322,42 +280,35 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
     const listTitle: string = 'Documents';
     const contentTypeId: string = '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         listTitle: listTitle,
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: contentTypeId
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists/GetByTitle('${encodeURIComponent(listTitle)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0 &&
-          r.headers['X-HTTP-Method'] === 'DELETE' &&
-          r.headers['If-Match'] === '*') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/lists/GetByTitle('${encodeURIComponent(listTitle)}')/ContentTypes('${encodeURIComponent(contentTypeId)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0 &&
+        r.headers['X-HTTP-Method'] === 'DELETE' &&
+        r.headers['If-Match'] === '*') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('command correctly handles list get reject request', (done) => {
+  it('command correctly handles list get reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
@@ -370,7 +321,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     const listTitle: string = 'Documents';
     const contentTypeId: string = '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A';
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         listTitle: listTitle,
@@ -378,18 +329,10 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         contentTypeId: contentTypeId,
         confirm: true
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('uses correct API url when listTitle option is passed', (done) => {
+  it('uses correct API url when listTitle option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.resolve();
@@ -401,7 +344,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     const listTitle: string = 'Documents';
     const contentTypeId: string = '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         listTitle: listTitle,
@@ -409,18 +352,10 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         contentTypeId: contentTypeId,
         confirm: true
       }
-    }, () => {
-      try {
-        assert(1 === 1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('uses correct API url when listId option is passed', (done) => {
+  it('uses correct API url when listId option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve();
@@ -432,21 +367,13 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     const listId: string = 'dfddade1-4729-428d-881e-7fedf3cae50d';
     const contentTypeId: string = '0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         listId: listId,
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: contentTypeId,
         confirm: true
-      }
-    }, () => {
-      try {
-        assert(1 === 1);
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });

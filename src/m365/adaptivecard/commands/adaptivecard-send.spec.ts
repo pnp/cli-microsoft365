@@ -59,7 +59,7 @@ describe(commands.SEND, () => {
   });
 
   describe('send card to Teams', () => {
-    it('sends card with just title', (done) => {
+    it('sends card with just title', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -87,24 +87,17 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends card with just title (debug)', (done) => {
+    it('sends card with just title (debug)', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -132,24 +125,17 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+
+      await command.action(logger, {
         options: {
           debug: true,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends card with just description', (done) => {
+    it('sends card with just description', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -176,24 +162,17 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           description: 'New release of CLI for Microsoft 365'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends card with title and description', (done) => {
+    it('sends card with title and description', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -226,25 +205,17 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4',
           description: 'New release of CLI for Microsoft 365'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends card with title, description and image', (done) => {
+    it('sends card with title, description and image', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -282,7 +253,7 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
@@ -290,18 +261,10 @@ describe(commands.SEND, () => {
           description: 'New release of CLI for Microsoft 365',
           imageUrl: 'https://contoso.com/image.gif'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends card with title, description and action', (done) => {
+    it('sends card with title, description and action', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -341,7 +304,7 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
@@ -349,18 +312,10 @@ describe(commands.SEND, () => {
           description: 'New release of CLI for Microsoft 365',
           actionUrl: 'https://aka.ms/cli-m365'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends card with title, description, image and action', (done) => {
+    it('sends card with title, description, image and action', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -405,7 +360,7 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
@@ -414,18 +369,10 @@ describe(commands.SEND, () => {
           imageUrl: 'https://contoso.com/image.gif',
           actionUrl: 'https://aka.ms/cli-m365'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends card with title, description, action and unknown options', (done) => {
+    it('sends card with title, description, action and unknown options', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -478,7 +425,7 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
@@ -488,18 +435,10 @@ describe(commands.SEND, () => {
           Version: 'v3.4.0',
           ReleaseNotes: 'https://pnp.github.io/cli-microsoft365/about/release-notes/#v340'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends custom card without any data', (done) => {
+    it('sends custom card without any data', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -549,24 +488,16 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           card: '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${title}"},{"type":"TextBlock","text":"${description}","wrap":true},{"type":"FactSet","facts":[{"$data":"${properties}","title":"${key}:","value":"${value}"}]}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"${viewUrl}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err)}`);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends custom card with just title merged', (done) => {
+    it('sends custom card with just title merged', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -615,25 +546,17 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           card: '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${title}"},{"type":"TextBlock","text":"${description}","wrap":true},{"type":"FactSet","facts":[{"$data":"${properties}","title":"${key}:","value":"${value}"}]}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"${viewUrl}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}',
           title: 'CLI for Microsoft 365 v3.4'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends custom card with all known options merged', (done) => {
+    it('sends custom card with all known options merged', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -682,7 +605,7 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
@@ -692,18 +615,10 @@ describe(commands.SEND, () => {
           imageUrl: 'https://contoso.com/image.gif',
           actionUrl: 'https://aka.ms/cli-m365'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends custom card with unknown option merged', (done) => {
+    it('sends custom card with unknown option merged', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -752,25 +667,17 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           card: '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${Title}"},{"type":"TextBlock","text":"${description}","wrap":true},{"type":"FactSet","facts":[{"$data":"${properties}","title":"${key}:","value":"${value}"}]}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"${viewUrl}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}',
           Title: 'CLI for Microsoft 365 v3.4'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('sends custom card with cardData', (done) => {
+    it('sends custom card with cardData', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -831,46 +738,30 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           card: '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${title}"},{"type":"TextBlock","text":"${description}","wrap":true},{"type":"FactSet","facts":[{"$data":"${properties}","title":"${key}:","value":"${value}"}]}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"${viewUrl}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}',
           cardData: '{"title":"Publish Adaptive Card Schema","description":"Now that we have defined the main rules and features of the format, we need to produce a schema and publish it to GitHub. The schema will be the starting point of our reference documentation.","creator":{"name":"Matt Hidinger","profileImage":"https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg"},"createdUtc":"2017-02-14T06:08:39Z","viewUrl":"https://adaptivecards.io","properties":[{"key":"Board","value":"Adaptive Cards"},{"key":"List","value":"Backlog"},{"key":"Assigned to","value":"Matt Hidinger"},{"key":"Due date","value":"Not set"}]}'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
       });
     });
 
-    it('correctly handles error when sending card to Teams', (done) => {
+    it('correctly handles error when sending card to Teams', async () => {
       sinon.stub(request, 'post').callsFake(_ => Promise.resolve('Webhook message delivery failed with error: Microsoft Teams endpoint returned HTTP error 400 with ContextId MS-CV=Qn6afVIGzEq'));
-      command.action(logger, {
+      await assert.rejects(command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4'
         }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Webhook message delivery failed with error: Microsoft Teams endpoint returned HTTP error 400 with ContextId MS-CV=Qn6afVIGzEq')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+      }), new CommandError('Webhook message delivery failed with error: Microsoft Teams endpoint returned HTTP error 400 with ContextId MS-CV=Qn6afVIGzEq'));
     });
   });
 
   describe('send card to a URL', () => {
-    it('sends card with just title', (done) => {
+    it('sends card with just title', async () => {
       sinon.stub(request, 'post').callsFake(opts => {
         if (JSON.stringify(opts.data) === JSON.stringify({
           "type": "message",
@@ -898,19 +789,11 @@ describe(commands.SEND, () => {
 
         return Promise.reject(`Invalid data: ${JSON.stringify(opts.data)}`);
       });
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4'
-        }
-      }, (err?: any) => {
-        try {
-          assert.strictEqual(typeof err, 'undefined');
-          done();
-        }
-        catch (e) {
-          done(e);
         }
       });
     });

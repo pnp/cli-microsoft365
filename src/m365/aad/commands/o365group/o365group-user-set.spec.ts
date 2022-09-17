@@ -138,7 +138,7 @@ describe(commands.O365GROUP_USER_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('shows error when the specified user is not present in specified O365 Group', (done) => {
+  it('shows error when the specified user is not present in specified O365 Group', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -154,18 +154,11 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'notpresent.karl.matteson@contoso.onmicrosoft.com', role: 'Member' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("The specified user does not belong to the given Microsoft 365 Group. Please use the 'o365group user add' command to add new users.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'notpresent.karl.matteson@contoso.onmicrosoft.com', role: 'Member' } } as any),
+      new CommandError("The specified user does not belong to the given Microsoft 365 Group. Please use the 'o365group user add' command to add new users."));
   });
 
-  it('shows error when the specified user is not present in specified Microsoft Teams team', (done) => {
+  it('shows error when the specified user is not present in specified Microsoft Teams team', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -181,18 +174,11 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'notpresent.karl.matteson@contoso.onmicrosoft.com', role: 'Member' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("The specified user does not belong to the given Microsoft Teams team. Please use the 'graph teams user add' command to add new users.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'notpresent.karl.matteson@contoso.onmicrosoft.com', role: 'Member' } } as any),
+      new CommandError("The specified user does not belong to the given Microsoft Teams team. Please use the 'graph teams user add' command to add new users."));
   });
 
-  it('shows error when the specified user is already a member in specified O365 Group', (done) => {
+  it('shows error when the specified user is already a member in specified O365 Group', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -208,18 +194,11 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Member' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already a member in the specified Microsoft 365 group, and thus cannot be demoted.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Member' } } as any),
+      new CommandError('The specified user is already a member in the specified Microsoft 365 group, and thus cannot be demoted.'));
   });
 
-  it('shows error when the specified user is already a member in specified Microsoft Teams team', (done) => {
+  it('shows error when the specified user is already a member in specified Microsoft Teams team', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -235,18 +214,11 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Member' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already a member in the specified Microsoft Teams team, and thus cannot be demoted.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Member' } } as any),
+      new CommandError('The specified user is already a member in the specified Microsoft Teams team, and thus cannot be demoted.'));
   });
 
-  it('shows error when the specified user is already a owner in specified Microsoft 365 Group', (done) => {
+  it('shows error when the specified user is already a owner in specified Microsoft 365 Group', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -262,18 +234,11 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Owner' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already an owner in the specified Microsoft 365 group, and thus cannot be promoted.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Owner' } } as any),
+      new CommandError('The specified user is already an owner in the specified Microsoft 365 group, and thus cannot be promoted.'));
   });
 
-  it('shows error when the specified user is already a owner in specified Microsoft Teams team', (done) => {
+  it('shows error when the specified user is already a owner in specified Microsoft Teams team', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -289,18 +254,11 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Owner' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The specified user is already an owner in the specified Microsoft Teams team, and thus cannot be promoted.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Owner' } } as any),
+      new CommandError('The specified user is already an owner in the specified Microsoft Teams team, and thus cannot be promoted.'));
   });
 
-  it('correctly promotes specified member to owner in specified Microsoft 365 Group', (done) => {
+  it('correctly promotes specified member to owner in specified Microsoft 365 Group', async () => {
     let promoteMemberIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -328,19 +286,12 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } } as any, () => {
-      try {
-        assert(promoteMemberIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } } as any);
+    assert(promoteMemberIssued);
   });
 
 
-  it('correctly promotes specified member to owner in specified Microsoft Teams team (debug)', (done) => {
+  it('correctly promotes specified member to owner in specified Microsoft Teams team (debug)', async () => {
     let promoteMemberIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -368,19 +319,12 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } } as any, () => {
-      try {
-        assert(promoteMemberIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } } as any);
+    assert(promoteMemberIssued);
   });
 
 
-  it('correctly demote specified owner to member in specified Microsoft 365 Group', (done) => {
+  it('correctly demote specified owner to member in specified Microsoft 365 Group', async () => {
     let demoteOwnerIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -407,18 +351,11 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } } as any, () => {
-      try {
-        assert(demoteOwnerIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } } as any);
+    assert(demoteOwnerIssued);
   });
 
-  it('correctly demote specified owner to member in specified Microsoft 365 Group (debug)', (done) => {
+  it('correctly demote specified owner to member in specified Microsoft 365 Group (debug)', async () => {
     let demoteOwnerIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -445,15 +382,8 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');      
     });
 
-    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } } as any, () => {
-      try {
-        assert(demoteOwnerIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } } as any);
+    assert(demoteOwnerIssued);
   });
 
   it('supports debug mode', () => {

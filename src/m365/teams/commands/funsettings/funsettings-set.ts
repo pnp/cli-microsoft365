@@ -105,32 +105,35 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const data: any = {
-      funSettings: {}
-    };
-    TeamsFunSettingsSetCommand.booleanProps.forEach(p => {
-      if (typeof (args.options as any)[p] !== 'undefined') {
-        data.funSettings[p] = (args.options as any)[p] === 'true';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const data: any = {
+        funSettings: {}
+      };
+      TeamsFunSettingsSetCommand.booleanProps.forEach(p => {
+        if (typeof (args.options as any)[p] !== 'undefined') {
+          data.funSettings[p] = (args.options as any)[p] === 'true';
+        }
+      });
+  
+      if (args.options.giphyContentRating) {
+        data.funSettings.giphyContentRating = args.options.giphyContentRating;
       }
-    });
-
-    if (args.options.giphyContentRating) {
-      data.funSettings.giphyContentRating = args.options.giphyContentRating;
+  
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        data: data,
+        responseType: 'json'
+      };
+  
+      await request.patch(requestOptions);          
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
-
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      data: data,
-      responseType: 'json'
-    };
-
-    request
-      .patch(requestOptions)
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

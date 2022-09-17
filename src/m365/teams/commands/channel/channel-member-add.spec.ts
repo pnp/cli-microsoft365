@@ -371,107 +371,67 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     assert(containsOption);
   });
 
-  it('adds conversation members using teamName, channelId, and userId', (done) => {
-    command.action(logger, {
+  it('adds conversation members using teamName, channelId, and userId', async () => {
+    await command.action(logger, {
       options: {
         teamName: "Human Resources",
         channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
         userId: "admin@contoso.com",
         owner: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('adds conversation members using teamId, channelName, and userId', (done) => {
-    command.action(logger, {
+  it('adds conversation members using teamId, channelName, and userId', async () => {
+    await command.action(logger, {
       options: {
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
         channelName: "Private Channel",
         userId: "admin@contoso.com",
         owner: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('adds conversation members using teamName, channelName, and userId', (done) => {
-    command.action(logger, {
+  it('adds conversation members using teamName, channelName, and userId', async () => {
+    await command.action(logger, {
       options: {
         teamName: "Human Resources",
         channelName: "Private Channel",
         userId: "admin@contoso.com",
         owner: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('adds conversation members using teamName, channelId, and userDisplayName', (done) => {
-    command.action(logger, {
+  it('adds conversation members using teamName, channelId, and userDisplayName', async () => {
+    await command.action(logger, {
       options: {
         teamName: "Human Resources",
         channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
         userDisplayName: "Admin",
         owner: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('adds conversation members using teamId, channelName, and userDisplayName', (done) => {
-    command.action(logger, {
+  it('adds conversation members using teamId, channelName, and userDisplayName', async () => {
+    await command.action(logger, {
       options: {
         teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
         channelName: "Private Channel",
         userDisplayName: "Admin",
         owner: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('adds conversation members using teamName, channelName, and userDisplayName', (done) => {
+  it('adds conversation members using teamName, channelName, and userDisplayName', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}/members`) {
@@ -481,25 +441,17 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamName: "Human Resources",
         channelName: "Private Channel",
         userDisplayName: "Admin"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('fails adding conversation members with invalid channelName', (done) => {
+  it('fails adding conversation members with invalid channelName', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
@@ -517,25 +469,12 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
-        channelName: "Other Private Channel"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`The specified channel 'Other Private Channel' does not exist in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
+      channelName: "Other Private Channel" } } as any), new CommandError(`The specified channel 'Other Private Channel' does not exist in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`));
   });
 
-  it('fails to get channel when channel does is not private', (done) => {
+  it('fails to get channel when channel does is not private', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
@@ -556,25 +495,12 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
-        channelName: "Other Channel"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`The specified channel is not a private channel`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
+      channelName: "Other Channel" } } as any), new CommandError('The specified channel is not a private channel'));
   });
 
-  it('fails when group has no team', (done) => {
+  it('fails when group has no team', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
@@ -593,23 +519,12 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        teamName: 'Team Name',
-        channelName: "Other Channel"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamName: 'Team Name',
+      channelName: "Other Channel" } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('fails adding conversation members with multiple userDisplayNames', (done) => {
+  it('fails adding conversation members with multiple userDisplayNames', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=displayName eq '${encodeURIComponent('Admin')}'`) {
@@ -623,28 +538,15 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
-        channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
-        userDisplayName: "Admin"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`Multiple users with display name 'Admin' found. Please disambiguate:${os.EOL}${[
-            '- 4cb2b035-ad76-406c-bdc4-6c72ad403a22',
-            '- 662c9a98-1e96-44d2-b5ef-4933004200f8'].join(os.EOL)}`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
+      channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
+      userDisplayName: "Admin" } } as any), new CommandError(`Multiple users with display name 'Admin' found. Please disambiguate:${os.EOL}${[
+      '- 4cb2b035-ad76-406c-bdc4-6c72ad403a22',
+      '- 662c9a98-1e96-44d2-b5ef-4933004200f8'].join(os.EOL)}`));
   });
 
-  it('fails adding conversation members when no users are found', (done) => {
+  it('fails adding conversation members when no users are found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=displayName eq '${encodeURIComponent('Admin')}'`) {
@@ -658,46 +560,22 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
-        channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
-        userDisplayName: "Admin"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`The specified user 'Admin' does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
+      channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
+      userDisplayName: "Admin" } } as any), new CommandError("The specified user 'Admin' does not exist"));
   });
 
-  it('correctly handles error when adding conversation members', (done) => {
+  it('correctly handles error when adding conversation members', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
-        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
-        userDisplayName: "Admin"
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+      channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
+      userDisplayName: "Admin" } } as any), new CommandError('An error has occurred'));
   });
 });

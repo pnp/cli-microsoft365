@@ -90,88 +90,76 @@ class SpoSiteRenameCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let spoAdminUrl: string = "";
-    const options = args.options;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const options = args.options;
+      const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      
+      const reqDigest = await spo.getRequestDigest(spoAdminUrl);
+      this.context = reqDigest;
+      if (this.verbose) {
+        logger.logToStderr(`Scheduling rename job...`);
+      }
 
-    spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
-        spoAdminUrl = _spoAdminUrl;
+      let optionsBitmask = 0;
+      if (options.suppressMarketplaceAppCheck) {
+        optionsBitmask = optionsBitmask | 8;
+      }
 
-        return spo.getRequestDigest(spoAdminUrl);
-      })
-      .then((res: FormDigestInfo): Promise<SiteRenameJob> => {
-        this.context = res;
-        if (this.verbose) {
-          logger.logToStderr(`Scheduling rename job...`);
-        }
+      if (options.suppressWorkflow2013Check) {
+        optionsBitmask = optionsBitmask | 16;
+      }
 
-        let optionsBitmask = 0;
-        if (options.suppressMarketplaceAppCheck) {
-          optionsBitmask = optionsBitmask | 8;
-        }
+      const requestOptions = {
+        "SourceSiteUrl": options.siteUrl,
+        "TargetSiteUrl": options.newSiteUrl,
+        "TargetSiteTitle": options.newSiteTitle || null,
+        "Option": optionsBitmask,
+        "Reserve": null,
+        "SkipGestures": null,
+        "OperationId": "00000000-0000-0000-0000-000000000000"
+      };
 
-        if (options.suppressWorkflow2013Check) {
-          optionsBitmask = optionsBitmask | 16;
-        }
+      const postData: any = {
+        url: `${spoAdminUrl}/_api/SiteRenameJobs?api-version=1.4.7`,
+        headers: {
+          'X-RequestDigest': this.context.FormDigestValue,
+          'Content-Type': 'application/json'
+        },
+        responseType: 'json',
+        data: requestOptions
+      };
 
-        const requestOptions = {
-          "SourceSiteUrl": options.siteUrl,
-          "TargetSiteUrl": options.newSiteUrl,
-          "TargetSiteTitle": options.newSiteTitle || null,
-          "Option": optionsBitmask,
-          "Reserve": null,
-          "SkipGestures": null,
-          "OperationId": "00000000-0000-0000-0000-000000000000"
-        };
+      const res = await request.post<SiteRenameJob>(postData);
 
-        const postData: any = {
-          url: `${spoAdminUrl}/_api/SiteRenameJobs?api-version=1.4.7`,
-          headers: {
-            'X-RequestDigest': this.context.FormDigestValue,
-            'Content-Type': 'application/json'
-          },
-          responseType: 'json',
-          data: requestOptions
-        };
+      if (options.verbose) {
+        logger.logToStderr(res);
+      }
 
-        return request.post(postData);
-      })
-      .then((res: SiteRenameJob): Promise<void> => {
-        if (options.verbose) {
-          logger.logToStderr(res);
-        }
+      this.operationData = res;
 
-        this.operationData = res;
+      if (this.operationData.JobState && this.operationData.JobState === "Error") {
+        throw this.operationData.ErrorDescription;
+      }
 
-        if (this.operationData.JobState && this.operationData.JobState === "Error") {
-          return Promise.reject(this.operationData.ErrorDescription);
-        }
-
-        const isComplete: boolean = this.operationData.JobState === "Success";
-        if (!options.wait || isComplete) {
-          return Promise.resolve();
-        }
-
-        return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-          this.waitForRenameCompletion(
-            this,
-            true,
-            spoAdminUrl,
-            options.siteUrl,
-            resolve,
-            reject,
-            0
-          );
-        });
-      }).then((): void => {
-        logger.log(this.operationData);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const isComplete: boolean = this.operationData.JobState === "Success";
+      if (options.wait && !isComplete) {
+        await this.waitForRenameCompletion(
+          this,
+          true,
+          spoAdminUrl,
+          options.siteUrl,
+          0
+        );
+      }
+      logger.log(this.operationData);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
-  protected waitForRenameCompletion(command: SpoSiteRenameCommand, isVerbose: boolean, spoAdminUrl: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, iteration: number): void {
+  protected async waitForRenameCompletion(command: SpoSiteRenameCommand, isVerbose: boolean, spoAdminUrl: string, siteUrl: string, iteration: number): Promise<void> {
     iteration++;
 
     const requestOptions: any = {
@@ -182,28 +170,23 @@ class SpoSiteRenameCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: SiteRenameJob[] }>(requestOptions)
-      .then((res: { value: SiteRenameJob[] }): void => {
-        this.operationData = res.value[0];
+    const res = await request.get<{ value: SiteRenameJob[] }>(requestOptions);
+    this.operationData = res.value[0];
 
-        if (this.operationData.ErrorDescription) {
-          reject(this.operationData.ErrorDescription);
-          return;
-        }
+    if (this.operationData.ErrorDescription) {
+      throw this.operationData.ErrorDescription;
+    }
 
-        if (this.operationData.JobState === "Success") {
-          resolve();
-          return;
-        }
+    if (this.operationData.JobState === "Success") {
+      return;
+    }
 
-        setTimeout(() => {
-          command.waitForRenameCompletion(command, isVerbose, spoAdminUrl, siteUrl, resolve, reject, iteration);
-        }, SpoSiteRenameCommand.checkIntervalInMs);
-      })
-      .catch((ex: any) => {
-        reject(ex);
-      });
+    await this.sleep(SpoSiteRenameCommand.checkIntervalInMs);
+    await command.waitForRenameCompletion(command, isVerbose, spoAdminUrl, siteUrl, iteration);
+  }
+
+  protected sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
 

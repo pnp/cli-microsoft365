@@ -77,30 +77,27 @@ class AadPolicyListCommand extends GraphCommand {
     return ['id', 'displayName', 'isOrganizationDefault'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const policyType: string = args.options.policyType ? args.options.policyType.toLowerCase() : 'all';
 
-    if (policyType && policyType !== "all") {
-      this
-        .getPolicies(policyType)
-        .then((policies?: any): void => {
-          logger.log(policies);
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
-    else {
-      const policyTypes: string[] = Object.keys(policyEndPoints);
-      Promise
-        .all(policyTypes.map(policyType => this.getPolicies(policyType)))
-        .then((results: any[]) => {
-          let allPolicies: any = [];
-          results.forEach((policies: any) => {
-            allPolicies = allPolicies.concat(policies);
-          });
+    try {
+      if (policyType && policyType !== "all") {
+        const policies = await this.getPolicies(policyType);
+        logger.log(policies);
+      }
+      else {
+        const policyTypes: string[] = Object.keys(policyEndPoints);
+        const results = await Promise.all(policyTypes.map(policyType => this.getPolicies(policyType)));
+        let allPolicies: any = [];
+        results.forEach((policies: any) => {
+          allPolicies = allPolicies.concat(policies);
+        });
 
-          logger.log(allPolicies);
-          cb();
-        }, err => this.handleRejectedODataJsonPromise(err, logger, cb));
+        logger.log(allPolicies);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 

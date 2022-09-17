@@ -39,25 +39,28 @@ class AadOAuth2GrantSetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Updating OAuth2 permissions...`);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}`,
-      headers: {
-        'content-type': 'application/json'
-      },
-      responseType: 'json',
-      data: {
-        "scope": args.options.scope
-      }
-    };
+    try {
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}`,
+        headers: {
+          'content-type': 'application/json'
+        },
+        responseType: 'json',
+        data: {
+          "scope": args.options.scope
+        }
+      };
 
-    request
-      .patch(requestOptions)
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      await request.patch(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

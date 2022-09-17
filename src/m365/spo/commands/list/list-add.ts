@@ -576,7 +576,7 @@ class SpoListAddCommand extends SpoCommand {
     ]));
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Creating list in site at ${args.options.webUrl}...`);
     }
@@ -593,13 +593,13 @@ class SpoListAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .post<ListInstance>(requestOptions)
-      .then((listInstance: ListInstance): void => {
-        logger.log(listInstance);
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const listInstance = await request.post<ListInstance>(requestOptions);
+      logger.log(listInstance);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private mapRequestBody(options: Options): any {

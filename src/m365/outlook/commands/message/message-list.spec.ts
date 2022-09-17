@@ -394,7 +394,7 @@ describe(commands.MESSAGE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['subject', 'receivedDateTime']);
   });
 
-  it('lists messages from the folder with name specified using well-known-name', (done) => {
+  it('lists messages from the folder with name specified using well-known-name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
         return Promise.resolve(emailResponse);
@@ -403,18 +403,11 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, folderName: 'inbox' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(emailOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, folderName: 'inbox' } });
+    assert(loggerLogSpy.calledWith(emailOutput));
   });
 
-  it('lists messages from the folder with name specified using well-known-name (debug)', (done) => {
+  it('lists messages from the folder with name specified using well-known-name (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
         return Promise.resolve(emailResponse);
@@ -423,18 +416,11 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, folderName: 'inbox' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(emailOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, folderName: 'inbox' } });
+    assert(loggerLogSpy.calledWith(emailOutput));
   });
 
-  it('lists messages from the folder with id specified using well-known-name', (done) => {
+  it('lists messages from the folder with id specified using well-known-name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
         return Promise.resolve(emailResponse);
@@ -443,18 +429,11 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, folderId: 'inbox' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(emailOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, folderId: 'inbox' } });
+    assert(loggerLogSpy.calledWith(emailOutput));
   });
 
-  it('lists messages from the folder with the specified name', (done) => {
+  it('lists messages from the folder with the specified name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=50`) {
         return Promise.resolve(emailResponse);
@@ -472,18 +451,11 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, folderName: 'Inbox' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(emailOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, folderName: 'Inbox' } });
+    assert(loggerLogSpy.calledWith(emailOutput));
   });
 
-  it('lists messages from the folder with the specified id', (done) => {
+  it('lists messages from the folder with the specified id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=/messages?$top=50`) {
         return Promise.resolve(emailResponse);
@@ -492,18 +464,11 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(emailOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } });
+    assert(loggerLogSpy.calledWith(emailOutput));
   });
 
-  it('returns error when the folder with the specified name does not exist', (done) => {
+  it('returns error when the folder with the specified name does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders?$filter=displayName eq 'Imbox'&$select=id`) {
         return Promise.resolve({
@@ -514,18 +479,11 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, folderName: 'Imbox' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Folder with name 'Imbox' not found`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, folderName: 'Imbox' } } as any),
+      new CommandError(`Folder with name 'Imbox' not found`));
   });
 
-  it('returns error when multiple folders with the specified name found ', (done) => {
+  it('returns error when multiple folders with the specified name found ', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders?$filter=displayName eq 'Archives'&$select=id`) {
         return Promise.resolve({
@@ -543,18 +501,11 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, folderName: 'Archives' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple folders with name 'Archives' found. Please disambiguate:${os.EOL}${['- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', '- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB='].join(os.EOL)}`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, folderName: 'Archives' } } as any),
+      new CommandError(`Multiple folders with name 'Archives' found. Please disambiguate:${os.EOL}${['- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', '- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB='].join(os.EOL)}`));
   });
 
-  it('returs all message properties in JSON output mode', (done) => {
+  it('returs all message properties in JSON output mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$top=50`) {
         return Promise.resolve(emailResponse);
@@ -563,29 +514,15 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, folderName: 'inbox', output: 'json' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(emailResponse.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, folderName: 'inbox', output: 'json' } });
+    assert(loggerLogSpy.calledWith(emailResponse.value));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('fails validation if neither folderId nor folderName are specified', async () => {

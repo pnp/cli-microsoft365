@@ -59,94 +59,96 @@ class AadSiteClassificationEnableCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groupSettingTemplates`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      let requestOptions: any = {
+        url: `${this.resource}/v1.0/groupSettingTemplates`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get<{ value: DirectorySetting[]; }>(requestOptions)
-      .then((res: { value: DirectorySetting[]; }): Promise<void> => {
-        const unifiedGroupSetting: DirectorySetting[] = res.value.filter((directorySetting: DirectorySetting): boolean => {
-          return directorySetting.displayName === 'Group.Unified';
-        });
+      const res = await request.get<{ value: DirectorySetting[]; }>(requestOptions);
 
-        if (!unifiedGroupSetting ||
-          unifiedGroupSetting.length === 0) {
-          return Promise.reject("Missing DirectorySettingTemplate for \"Group.Unified\"");
-        }
+      const unifiedGroupSetting: DirectorySetting[] = res.value.filter((directorySetting: DirectorySetting): boolean => {
+        return directorySetting.displayName === 'Group.Unified';
+      });
 
-        const updatedDirSettings: UpdateDirectorySetting = new UpdateDirectorySetting();
-        updatedDirSettings.templateId = unifiedGroupSetting[0].id;
+      if (!unifiedGroupSetting ||
+        unifiedGroupSetting.length === 0) {
+        throw "Missing DirectorySettingTemplate for \"Group.Unified\"";
+      }
 
-        unifiedGroupSetting[0].values.forEach((directorySetting: DirectorySettingValue) => {
-          switch (directorySetting.name) {
-            case "ClassificationList":
+      const updatedDirSettings: UpdateDirectorySetting = new UpdateDirectorySetting();
+      updatedDirSettings.templateId = unifiedGroupSetting[0].id;
+
+      unifiedGroupSetting[0].values.forEach((directorySetting: DirectorySettingValue) => {
+        switch (directorySetting.name) {
+          case "ClassificationList":
+            updatedDirSettings.values.push({
+              "name": directorySetting.name,
+              "value": args.options.classifications as string
+            });
+            break;
+          case "DefaultClassification":
+            updatedDirSettings.values.push({
+              "name": directorySetting.name,
+              "value": args.options.defaultClassification as string
+            });
+            break;
+          case "UsageGuidelinesUrl":
+            if (args.options.usageGuidelinesUrl) {
               updatedDirSettings.values.push({
                 "name": directorySetting.name,
-                "value": args.options.classifications as string
+                "value": args.options.usageGuidelinesUrl as string
               });
-              break;
-            case "DefaultClassification":
-              updatedDirSettings.values.push({
-                "name": directorySetting.name,
-                "value": args.options.defaultClassification as string
-              });
-              break;
-            case "UsageGuidelinesUrl":
-              if (args.options.usageGuidelinesUrl) {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": args.options.usageGuidelinesUrl as string
-                });
-              }
-              else {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": directorySetting.defaultValue as string
-                });
-              }
-              break;
-            case "GuestUsageGuidelinesUrl":
-              if (args.options.guestUsageGuidelinesUrl) {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": args.options.guestUsageGuidelinesUrl as string
-                });
-              }
-              else {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": directorySetting.defaultValue as string
-                });
-              }
-              break;
-            default:
+            }
+            else {
               updatedDirSettings.values.push({
                 "name": directorySetting.name,
                 "value": directorySetting.defaultValue as string
               });
-              break;
-          }
-        });
+            }
+            break;
+          case "GuestUsageGuidelinesUrl":
+            if (args.options.guestUsageGuidelinesUrl) {
+              updatedDirSettings.values.push({
+                "name": directorySetting.name,
+                "value": args.options.guestUsageGuidelinesUrl as string
+              });
+            }
+            else {
+              updatedDirSettings.values.push({
+                "name": directorySetting.name,
+                "value": directorySetting.defaultValue as string
+              });
+            }
+            break;
+          default:
+            updatedDirSettings.values.push({
+              "name": directorySetting.name,
+              "value": directorySetting.defaultValue as string
+            });
+            break;
+        }
+      });
 
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/groupSettings`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json'
-          },
-          responseType: 'json',
-          data: updatedDirSettings
-        };
+      requestOptions = {
+        url: `${this.resource}/v1.0/groupSettings`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json'
+        },
+        responseType: 'json',
+        data: updatedDirSettings
+      };
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

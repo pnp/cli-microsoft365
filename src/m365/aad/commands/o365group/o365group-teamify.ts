@@ -98,37 +98,38 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const data: any = {
-      "memberSettings": {
-        "allowCreatePrivateChannels": true,
-        "allowCreateUpdateChannels": true
-      },
-      "messagingSettings": {
-        "allowUserEditMessages": true,
-        "allowUserDeleteMessages": true
-      },
-      "funSettings": {
-        "allowGiphy": true,
-        "giphyContentRating": "strict"
-      }
-    };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const data: any = {
+        "memberSettings": {
+          "allowCreatePrivateChannels": true,
+          "allowCreateUpdateChannels": true
+        },
+        "messagingSettings": {
+          "allowUserEditMessages": true,
+          "allowUserDeleteMessages": true
+        },
+        "funSettings": {
+          "allowGiphy": true,
+          "giphyContentRating": "strict"
+        }
+      };
 
-    this
-      .getGroupId(args)
-      .then((groupId: string): Promise<string> => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/groups/${encodeURIComponent(groupId)}/team`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          data: data,
-          responseType: 'json'
-        };
+      const groupId = await this.getGroupId(args);
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/groups/${encodeURIComponent(groupId)}/team`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        data: data,
+        responseType: 'json'
+      };
 
-        return request.put(requestOptions);
-      })
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.put(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

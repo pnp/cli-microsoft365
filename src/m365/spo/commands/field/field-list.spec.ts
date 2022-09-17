@@ -120,7 +120,7 @@ describe(commands.FIELD_LIST, () => {
     assert(containsOption);
   });
 
-  it('correctly handles list not found', (done) => {
+  it('correctly handles list not found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields`) > -1) {
         return Promise.reject({
@@ -139,18 +139,11 @@ describe(commands.FIELD_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("List 'Documents' does not exist at site with URL 'https://contoso.sharepoint.com/sites/portal'.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents' } } as any),
+      new CommandError("List 'Documents' does not exist at site with URL 'https://contoso.sharepoint.com/sites/portal'."));
   });
 
-  it('retrieves all site columns', (done) => {
+  it('retrieves all site columns', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/fields`) > -1) {
         return Promise.resolve({
@@ -202,61 +195,54 @@ describe(commands.FIELD_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "AutoIndexed": false,
-            "CanBeDeleted": true,
-            "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
-            "ClientSideComponentProperties": null,
-            "ClientValidationFormula": null,
-            "ClientValidationMessage": null,
-            "CustomFormatter": null,
-            "DefaultFormula": null,
-            "DefaultValue": null,
-            "Description": "",
-            "Direction": "none",
-            "EnforceUniqueValues": false,
-            "EntityPropertyName": "fieldname",
-            "FieldTypeKind": 2,
-            "Filterable": true,
-            "FromBaseType": false,
-            "Group": "Core Contact and Calendar Columns",
-            "Hidden": false,
-            "Id": "3c0e9e00-8fcc-479f-9d8d-3447cda34c5b",
-            "IndexStatus": 0,
-            "Indexed": false,
-            "InternalName": "fieldname",
-            "IsModern": false,
-            "JSLink": "clienttemplates.js",
-            "MaxLength": 255,
-            "PinnedToFiltersPane": false,
-            "ReadOnlyField": false,
-            "Required": false,
-            "SchemaXml": "<Field ID=\"{3C0E9E00-8FCC-479f-9D8D-3447CDA34C5B}\" Name=\"fieldname\" StaticName=\"fieldname\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" DisplayName=\"Field Name\" Group=\"Core Contact and Calendar Columns\" Type=\"Text\" Sealed=\"TRUE\" AllowDeletion=\"TRUE\" />",
-            "Scope": "/sites/portal",
-            "Sealed": true,
-            "ShowInFiltersPane": 0,
-            "Sortable": true,
-            "StaticName": "fieldname",
-            "Title": "Field Name",
-            "TypeAsString": "Text",
-            "TypeDisplayName": "Single line of text",
-            "TypeShortDescription": "Single line of text",
-            "ValidationFormula": null,
-            "ValidationMessage": null
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "AutoIndexed": false,
+        "CanBeDeleted": true,
+        "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
+        "ClientSideComponentProperties": null,
+        "ClientValidationFormula": null,
+        "ClientValidationMessage": null,
+        "CustomFormatter": null,
+        "DefaultFormula": null,
+        "DefaultValue": null,
+        "Description": "",
+        "Direction": "none",
+        "EnforceUniqueValues": false,
+        "EntityPropertyName": "fieldname",
+        "FieldTypeKind": 2,
+        "Filterable": true,
+        "FromBaseType": false,
+        "Group": "Core Contact and Calendar Columns",
+        "Hidden": false,
+        "Id": "3c0e9e00-8fcc-479f-9d8d-3447cda34c5b",
+        "IndexStatus": 0,
+        "Indexed": false,
+        "InternalName": "fieldname",
+        "IsModern": false,
+        "JSLink": "clienttemplates.js",
+        "MaxLength": 255,
+        "PinnedToFiltersPane": false,
+        "ReadOnlyField": false,
+        "Required": false,
+        "SchemaXml": "<Field ID=\"{3C0E9E00-8FCC-479f-9D8D-3447CDA34C5B}\" Name=\"fieldname\" StaticName=\"fieldname\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" DisplayName=\"Field Name\" Group=\"Core Contact and Calendar Columns\" Type=\"Text\" Sealed=\"TRUE\" AllowDeletion=\"TRUE\" />",
+        "Scope": "/sites/portal",
+        "Sealed": true,
+        "ShowInFiltersPane": 0,
+        "Sortable": true,
+        "StaticName": "fieldname",
+        "Title": "Field Name",
+        "TypeAsString": "Text",
+        "TypeDisplayName": "Single line of text",
+        "TypeShortDescription": "Single line of text",
+        "ValidationFormula": null,
+        "ValidationMessage": null
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('retrieves all list columns from list queried by title', (done) => {
+  it('retrieves all list columns from list queried by title', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields`) > -1) {
         return Promise.resolve(
@@ -310,61 +296,54 @@ describe(commands.FIELD_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "AutoIndexed": false,
-            "CanBeDeleted": true,
-            "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
-            "ClientSideComponentProperties": null,
-            "ClientValidationFormula": null,
-            "ClientValidationMessage": null,
-            "CustomFormatter": null,
-            "DefaultFormula": null,
-            "DefaultValue": null,
-            "Description": "",
-            "Direction": "none",
-            "EnforceUniqueValues": false,
-            "EntityPropertyName": "fieldname",
-            "FieldTypeKind": 2,
-            "Filterable": true,
-            "FromBaseType": false,
-            "Group": "Core Contact and Calendar Columns",
-            "Hidden": false,
-            "Id": "3c0e9e00-8fcc-479f-9d8d-3447cda34c5b",
-            "IndexStatus": 0,
-            "Indexed": false,
-            "InternalName": "fieldname",
-            "IsModern": false,
-            "JSLink": "clienttemplates.js",
-            "MaxLength": 255,
-            "PinnedToFiltersPane": false,
-            "ReadOnlyField": false,
-            "Required": false,
-            "SchemaXml": "<Field ID=\"{3C0E9E00-8FCC-479f-9D8D-3447CDA34C5B}\" Name=\"fieldname\" StaticName=\"fieldname\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" DisplayName=\"Field Name\" Group=\"Core Contact and Calendar Columns\" Type=\"Text\" Sealed=\"TRUE\" AllowDeletion=\"TRUE\" />",
-            "Scope": "/sites/portal/Documents",
-            "Sealed": true,
-            "ShowInFiltersPane": 0,
-            "Sortable": true,
-            "StaticName": "fieldname",
-            "Title": "Field Name",
-            "TypeAsString": "Text",
-            "TypeDisplayName": "Single line of text",
-            "TypeShortDescription": "Single line of text",
-            "ValidationFormula": null,
-            "ValidationMessage": null
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "AutoIndexed": false,
+        "CanBeDeleted": true,
+        "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
+        "ClientSideComponentProperties": null,
+        "ClientValidationFormula": null,
+        "ClientValidationMessage": null,
+        "CustomFormatter": null,
+        "DefaultFormula": null,
+        "DefaultValue": null,
+        "Description": "",
+        "Direction": "none",
+        "EnforceUniqueValues": false,
+        "EntityPropertyName": "fieldname",
+        "FieldTypeKind": 2,
+        "Filterable": true,
+        "FromBaseType": false,
+        "Group": "Core Contact and Calendar Columns",
+        "Hidden": false,
+        "Id": "3c0e9e00-8fcc-479f-9d8d-3447cda34c5b",
+        "IndexStatus": 0,
+        "Indexed": false,
+        "InternalName": "fieldname",
+        "IsModern": false,
+        "JSLink": "clienttemplates.js",
+        "MaxLength": 255,
+        "PinnedToFiltersPane": false,
+        "ReadOnlyField": false,
+        "Required": false,
+        "SchemaXml": "<Field ID=\"{3C0E9E00-8FCC-479f-9D8D-3447CDA34C5B}\" Name=\"fieldname\" StaticName=\"fieldname\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" DisplayName=\"Field Name\" Group=\"Core Contact and Calendar Columns\" Type=\"Text\" Sealed=\"TRUE\" AllowDeletion=\"TRUE\" />",
+        "Scope": "/sites/portal/Documents",
+        "Sealed": true,
+        "ShowInFiltersPane": 0,
+        "Sortable": true,
+        "StaticName": "fieldname",
+        "Title": "Field Name",
+        "TypeAsString": "Text",
+        "TypeDisplayName": "Single line of text",
+        "TypeShortDescription": "Single line of text",
+        "ValidationFormula": null,
+        "ValidationMessage": null
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('retrieves all list columns from list queried by url', (done) => {
+  it('retrieves all list columns from list queried by url', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/GetList('%2Fsites%2Fportal%2Ftest')/fields`) > -1) {
         return Promise.resolve(
@@ -418,61 +397,54 @@ describe(commands.FIELD_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listUrl: 'test' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "AutoIndexed": false,
-            "CanBeDeleted": true,
-            "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
-            "ClientSideComponentProperties": null,
-            "ClientValidationFormula": null,
-            "ClientValidationMessage": null,
-            "CustomFormatter": null,
-            "DefaultFormula": null,
-            "DefaultValue": null,
-            "Description": "",
-            "Direction": "none",
-            "EnforceUniqueValues": false,
-            "EntityPropertyName": "fieldname",
-            "FieldTypeKind": 2,
-            "Filterable": true,
-            "FromBaseType": false,
-            "Group": "Core Contact and Calendar Columns",
-            "Hidden": false,
-            "Id": "3c0e9e00-8fcc-479f-9d8d-3447cda34c5b",
-            "IndexStatus": 0,
-            "Indexed": false,
-            "InternalName": "fieldname",
-            "IsModern": false,
-            "JSLink": "clienttemplates.js",
-            "MaxLength": 255,
-            "PinnedToFiltersPane": false,
-            "ReadOnlyField": false,
-            "Required": false,
-            "SchemaXml": "<Field ID=\"{3C0E9E00-8FCC-479f-9D8D-3447CDA34C5B}\" Name=\"fieldname\" StaticName=\"fieldname\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" DisplayName=\"Field Name\" Group=\"Core Contact and Calendar Columns\" Type=\"Text\" Sealed=\"TRUE\" AllowDeletion=\"TRUE\" />",
-            "Scope": "/sites/portal/Documents",
-            "Sealed": true,
-            "ShowInFiltersPane": 0,
-            "Sortable": true,
-            "StaticName": "fieldname",
-            "Title": "Field Name",
-            "TypeAsString": "Text",
-            "TypeDisplayName": "Single line of text",
-            "TypeShortDescription": "Single line of text",
-            "ValidationFormula": null,
-            "ValidationMessage": null
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listUrl: 'test' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "AutoIndexed": false,
+        "CanBeDeleted": true,
+        "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
+        "ClientSideComponentProperties": null,
+        "ClientValidationFormula": null,
+        "ClientValidationMessage": null,
+        "CustomFormatter": null,
+        "DefaultFormula": null,
+        "DefaultValue": null,
+        "Description": "",
+        "Direction": "none",
+        "EnforceUniqueValues": false,
+        "EntityPropertyName": "fieldname",
+        "FieldTypeKind": 2,
+        "Filterable": true,
+        "FromBaseType": false,
+        "Group": "Core Contact and Calendar Columns",
+        "Hidden": false,
+        "Id": "3c0e9e00-8fcc-479f-9d8d-3447cda34c5b",
+        "IndexStatus": 0,
+        "Indexed": false,
+        "InternalName": "fieldname",
+        "IsModern": false,
+        "JSLink": "clienttemplates.js",
+        "MaxLength": 255,
+        "PinnedToFiltersPane": false,
+        "ReadOnlyField": false,
+        "Required": false,
+        "SchemaXml": "<Field ID=\"{3C0E9E00-8FCC-479f-9D8D-3447CDA34C5B}\" Name=\"fieldname\" StaticName=\"fieldname\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" DisplayName=\"Field Name\" Group=\"Core Contact and Calendar Columns\" Type=\"Text\" Sealed=\"TRUE\" AllowDeletion=\"TRUE\" />",
+        "Scope": "/sites/portal/Documents",
+        "Sealed": true,
+        "ShowInFiltersPane": 0,
+        "Sortable": true,
+        "StaticName": "fieldname",
+        "Title": "Field Name",
+        "TypeAsString": "Text",
+        "TypeDisplayName": "Single line of text",
+        "TypeShortDescription": "Single line of text",
+        "ValidationFormula": null,
+        "ValidationMessage": null
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('retrieves all list columns from list queried by id', (done) => {
+  it('retrieves all list columns from list queried by id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists(guid'3c0e9e00-8fcc-479f-9d8d-3447cda34c5b')/fields`) > -1) {
         return Promise.resolve(
@@ -526,57 +498,50 @@ describe(commands.FIELD_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listId: '3c0e9e00-8fcc-479f-9d8d-3447cda34c5b' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "AutoIndexed": false,
-            "CanBeDeleted": true,
-            "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
-            "ClientSideComponentProperties": null,
-            "ClientValidationFormula": null,
-            "ClientValidationMessage": null,
-            "CustomFormatter": null,
-            "DefaultFormula": null,
-            "DefaultValue": null,
-            "Description": "",
-            "Direction": "none",
-            "EnforceUniqueValues": false,
-            "EntityPropertyName": "fieldname",
-            "FieldTypeKind": 2,
-            "Filterable": true,
-            "FromBaseType": false,
-            "Group": "Core Contact and Calendar Columns",
-            "Hidden": false,
-            "Id": "3c0e9e00-8fcc-479f-9d8d-3447cda34c5b",
-            "IndexStatus": 0,
-            "Indexed": false,
-            "InternalName": "fieldname",
-            "IsModern": false,
-            "JSLink": "clienttemplates.js",
-            "MaxLength": 255,
-            "PinnedToFiltersPane": false,
-            "ReadOnlyField": false,
-            "Required": false,
-            "SchemaXml": "<Field ID=\"{3C0E9E00-8FCC-479f-9D8D-3447CDA34C5B}\" Name=\"fieldname\" StaticName=\"fieldname\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" DisplayName=\"Field Name\" Group=\"Core Contact and Calendar Columns\" Type=\"Text\" Sealed=\"TRUE\" AllowDeletion=\"TRUE\" />",
-            "Scope": "/sites/portal/Documents",
-            "Sealed": true,
-            "ShowInFiltersPane": 0,
-            "Sortable": true,
-            "StaticName": "fieldname",
-            "Title": "Field Name",
-            "TypeAsString": "Text",
-            "TypeDisplayName": "Single line of text",
-            "TypeShortDescription": "Single line of text",
-            "ValidationFormula": null,
-            "ValidationMessage": null
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listId: '3c0e9e00-8fcc-479f-9d8d-3447cda34c5b' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "AutoIndexed": false,
+        "CanBeDeleted": true,
+        "ClientSideComponentId": "00000000-0000-0000-0000-000000000000",
+        "ClientSideComponentProperties": null,
+        "ClientValidationFormula": null,
+        "ClientValidationMessage": null,
+        "CustomFormatter": null,
+        "DefaultFormula": null,
+        "DefaultValue": null,
+        "Description": "",
+        "Direction": "none",
+        "EnforceUniqueValues": false,
+        "EntityPropertyName": "fieldname",
+        "FieldTypeKind": 2,
+        "Filterable": true,
+        "FromBaseType": false,
+        "Group": "Core Contact and Calendar Columns",
+        "Hidden": false,
+        "Id": "3c0e9e00-8fcc-479f-9d8d-3447cda34c5b",
+        "IndexStatus": 0,
+        "Indexed": false,
+        "InternalName": "fieldname",
+        "IsModern": false,
+        "JSLink": "clienttemplates.js",
+        "MaxLength": 255,
+        "PinnedToFiltersPane": false,
+        "ReadOnlyField": false,
+        "Required": false,
+        "SchemaXml": "<Field ID=\"{3C0E9E00-8FCC-479f-9D8D-3447CDA34C5B}\" Name=\"fieldname\" StaticName=\"fieldname\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" DisplayName=\"Field Name\" Group=\"Core Contact and Calendar Columns\" Type=\"Text\" Sealed=\"TRUE\" AllowDeletion=\"TRUE\" />",
+        "Scope": "/sites/portal/Documents",
+        "Sealed": true,
+        "ShowInFiltersPane": 0,
+        "Sortable": true,
+        "StaticName": "fieldname",
+        "Title": "Field Name",
+        "TypeAsString": "Text",
+        "TypeDisplayName": "Single line of text",
+        "TypeShortDescription": "Single line of text",
+        "ValidationFormula": null,
+        "ValidationMessage": null
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 });

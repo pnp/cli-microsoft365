@@ -83,7 +83,7 @@ class SpoMailSendCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const params: any = {
       properties: {
         __metadata: { "type": "SP.Utilities.EmailProperties" },
@@ -131,9 +131,12 @@ class SpoMailSendCommand extends SpoCommand {
       data: params
     };
 
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+    try {
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

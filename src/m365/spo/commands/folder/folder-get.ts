@@ -49,7 +49,7 @@ class SpoFolderGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving folder from site ${args.options.webUrl}...`);
     }
@@ -64,20 +64,17 @@ class SpoFolderGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<FolderProperties>(requestOptions)
-      .then((folder: FolderProperties): void => {
-        logger.log(folder);
+    try {
+      const folder = await request.get<FolderProperties>(requestOptions);
+      logger.log(folder);
+    }
+    catch (err: any) {
+      if (err.statusCode && err.statusCode === 500) {
+        throw new CommandError('Please check the folder URL. Folder might not exist on the specified URL');
+      }
 
-        cb();
-      }, (err: any): void => {
-        if (err.statusCode && err.statusCode === 500) {
-          cb(new CommandError('Please check the folder URL. Folder might not exist on the specified URL'));
-          return;
-        }
-
-        this.handleRejectedODataJsonPromise(err, logger, cb);
-      });
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

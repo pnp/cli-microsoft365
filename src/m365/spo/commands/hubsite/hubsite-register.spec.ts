@@ -67,7 +67,7 @@ describe(commands.HUBSITE_REGISTER, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('registers site as a hub site', (done) => {
+  it('registers site as a hub site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/site/RegisterHubSite`) > -1) {
         return Promise.resolve({
@@ -85,27 +85,20 @@ describe(commands.HUBSITE_REGISTER, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",
-          "LogoUrl": "http://contoso.com/logo.png",
-          "SiteId": "255a50b2-527f-4413-8485-57f4c17a24d1",
-          "SiteUrl": "https://contoso.sharepoint.com/sites/sales",
-          "Targets": null,
-          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-          "Title": "Test site"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",
+      "LogoUrl": "http://contoso.com/logo.png",
+      "SiteId": "255a50b2-527f-4413-8485-57f4c17a24d1",
+      "SiteUrl": "https://contoso.sharepoint.com/sites/sales",
+      "Targets": null,
+      "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+      "Title": "Test site"
+    }));
   });
 
-  it('registers site as a hub site (debug)', (done) => {
+  it('registers site as a hub site (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/site/RegisterHubSite`) > -1) {
         return Promise.resolve({
@@ -123,27 +116,20 @@ describe(commands.HUBSITE_REGISTER, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/sales' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",
-          "LogoUrl": "http://contoso.com/logo.png",
-          "SiteId": "255a50b2-527f-4413-8485-57f4c17a24d1",
-          "SiteUrl": "https://contoso.sharepoint.com/sites/sales",
-          "Targets": null,
-          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-          "Title": "Test site"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/sales' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",
+      "LogoUrl": "http://contoso.com/logo.png",
+      "SiteId": "255a50b2-527f-4413-8485-57f4c17a24d1",
+      "SiteUrl": "https://contoso.sharepoint.com/sites/sales",
+      "Targets": null,
+      "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+      "Title": "Test site"
+    }));
   });
 
-  it('correctly handles error when trying to register site which already is a hub site as a hub site', (done) => {
+  it('correctly handles error when trying to register site which already is a hub site as a hub site', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
@@ -158,15 +144,8 @@ describe(commands.HUBSITE_REGISTER, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This site is already a HubSite.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales' } } as any),
+      new CommandError('This site is already a HubSite.'));
   });
 
   it('supports debug mode', () => {

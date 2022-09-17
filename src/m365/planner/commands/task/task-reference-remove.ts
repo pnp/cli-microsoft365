@@ -72,51 +72,47 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
-      this.removeReference(logger, args, cb);
+      await this.removeReference(logger, args);
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the reference from the Planner task?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          this.removeReference(logger, args, cb);
-        }
       });
+
+      if (result.continue) {
+        await this.removeReference(logger, args);
+      }
     }
   }
 
-  private removeReference(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this
-      .getTaskDetailsEtagAndUrl(args.options)
-      .then(({ etag, url }) => {
-        const requestOptionsTaskDetails: any = {
-          url: `${this.resource}/v1.0/planner/tasks/${args.options.taskId}/details`,
-          headers: {
-            'accept': 'application/json;odata.metadata=none',
-            'If-Match': etag,
-            'Prefer': 'return=representation'
-          },
-          responseType: 'json',
-          data: {
-            references: {
-              [formatting.openTypesEncoder(url)]: null
-            }
+  private async removeReference(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const { etag, url } = await this.getTaskDetailsEtagAndUrl(args.options);
+      const requestOptionsTaskDetails: any = {
+        url: `${this.resource}/v1.0/planner/tasks/${args.options.taskId}/details`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none',
+          'If-Match': etag,
+          'Prefer': 'return=representation'
+        },
+        responseType: 'json',
+        data: {
+          references: {
+            [formatting.openTypesEncoder(url)]: null
           }
-        };
+        }
+      };
 
-        return request.patch(requestOptionsTaskDetails);
-      })
-      .then((): void => {
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.patch(requestOptionsTaskDetails);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getTaskDetailsEtagAndUrl(options: Options): Promise<{ etag: string, url: string }> {

@@ -1,8 +1,6 @@
 import * as chalk from 'chalk';
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, {
-  CommandErrorWithOutput
-} from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
@@ -142,83 +140,91 @@ class SpoSiteEnsureCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getWeb(args, logger)
-      .then((getWebOutput: CommandOutput): Promise<CommandOutput> => {
-        if (this.debug) {
-          logger.logToStderr(getWebOutput.stderr);
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const res = await this.ensureSite(logger, args);
+
+      if (this.debug) {
+        logger.logToStderr(res.stderr);
+      }
+
+      logger.log(res.stdout);
+
+      if (this.verbose) {
+        logger.logToStderr(chalk.green('DONE'));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private async ensureSite(logger: Logger, args: CommandArgs): Promise<CommandOutput> {
+    let getWebOutput: CommandOutput;
+    try {
+      getWebOutput = await this.getWeb(args, logger);
+    }
+    catch (err: any) {
+      if (this.debug) {
+        logger.logToStderr(err.stderr);
+      }
+
+      if (err.error.message !== '404 FILE NOT FOUND') {
+        throw err;
+      }
+
+      if (this.verbose) {
+        logger.logToStderr(`No site found at ${args.options.url}`);
+      }
+
+      return this.createSite(args, logger);
+    }
+
+    if (this.debug) {
+      logger.logToStderr(getWebOutput.stderr);
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Site found at ${args.options.url}. Checking if site matches conditions...`);
+    }
+
+    const web: {
+      Configuration: number;
+      WebTemplate: string;
+    } = JSON.parse(getWebOutput.stdout);
+
+    if (args.options.type) {
+      // type was specified so we need to check if the existing site matches
+      // it. If not, we throw an error and stop
+      // Determine the type of site to match
+      let expectedWebTemplate: string | undefined;
+      switch (args.options.type) {
+        case 'TeamSite':
+          expectedWebTemplate = 'GROUP#0';
+          break;
+        case 'CommunicationSite':
+          expectedWebTemplate = 'SITEPAGEPUBLISHING#0';
+          break;
+        case 'ClassicSite':
+          expectedWebTemplate = args.options.webTemplate;
+          break;
+        default:
+          throw `${args.options.type} is not a valid site type. Allowed types are TeamSite,CommunicationSite,ClassicSite`;
+      }
+
+      if (expectedWebTemplate) {
+        const currentWebTemplate = `${web.WebTemplate}#${web.Configuration}`;
+        if (expectedWebTemplate !== currentWebTemplate) {
+          throw `Expected web template ${expectedWebTemplate} but site found at ${args.options.url} is based on ${currentWebTemplate}`;
         }
+      }
+    }
 
-        if (this.verbose) {
-          logger.logToStderr(`Site found at ${args.options.url}. Checking if site matches conditions...`);
-        }
+    if (this.verbose) {
+      logger.logToStderr(`Site matches conditions. Updating...`);
+    }
 
-        const web: {
-          Configuration: number;
-          WebTemplate: string;
-        } = JSON.parse(getWebOutput.stdout);
-
-        if (args.options.type) {
-          // type was specified so we need to check if the existing site matches
-          // it. If not, we throw an error and stop
-          // Determine the type of site to match
-          let expectedWebTemplate: string | undefined;
-          switch (args.options.type) {
-            case 'TeamSite':
-              expectedWebTemplate = 'GROUP#0';
-              break;
-            case 'CommunicationSite':
-              expectedWebTemplate = 'SITEPAGEPUBLISHING#0';
-              break;
-            case 'ClassicSite':
-              expectedWebTemplate = args.options.webTemplate;
-              break;
-            default:
-              return Promise.reject(`${args.options.type} is not a valid site type. Allowed types are TeamSite,CommunicationSite,ClassicSite`);
-          }
-
-          if (expectedWebTemplate) {
-            const currentWebTemplate = `${web.WebTemplate}#${web.Configuration}`;
-            if (expectedWebTemplate !== currentWebTemplate) {
-              return Promise.reject(`Expected web template ${expectedWebTemplate} but site found at ${args.options.url} is based on ${currentWebTemplate}`);
-            }
-          }
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(`Site matches conditions. Updating...`);
-        }
-
-        return this.updateSite(args, logger);
-      }, (err: CommandErrorWithOutput): Promise<CommandOutput> => {
-        if (this.debug) {
-          logger.logToStderr(err.stderr);
-        }
-
-        if (err.error.message !== '404 FILE NOT FOUND') {
-          return Promise.reject(err);
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(`No site found at ${args.options.url}`);
-        }
-
-        return this.createSite(args, logger);
-      })
-      .then((res: CommandOutput): void => {
-        if (this.debug) {
-          logger.logToStderr(res.stderr);
-        }
-
-        logger.log(res.stdout);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    return this.updateSite(args, logger);
   }
 
   private getWeb(args: CommandArgs, logger: Logger): Promise<CommandOutput> {

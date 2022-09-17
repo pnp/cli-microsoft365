@@ -70,7 +70,7 @@ class SpoPageCopyCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let { webUrl } = args.options;
     const { targetUrl, overwrite } = args.options;
     webUrl = this.removeTrailingSlash(webUrl);
@@ -95,43 +95,41 @@ class SpoPageCopyCommand extends SpoCommand {
       logger.logToStderr(`Creating page copy...`);
     }
 
-    const requestOptions: any = {
-      url: `${webUrl}/_api/SP.MoveCopyUtil.CopyFileByPath()`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      data: {
-        srcPath: { DecodedUrl: `${webUrl}/sitepages/${sourceFullName}` },
-        destPath: { DecodedUrl: `${targetSiteUrl}/sitepages/${targetFullName}` },
-        options: { ResetAuthorAndCreatedOnCopy: true, ShouldBypassSharedLocks: true },
-        overwrite: !!overwrite
-      },
-      responseType: 'json'
-    };
+    try {
+      let requestOptions: any = {
+        url: `${webUrl}/_api/SP.MoveCopyUtil.CopyFileByPath()`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        data: {
+          srcPath: { DecodedUrl: `${webUrl}/sitepages/${sourceFullName}` },
+          destPath: { DecodedUrl: `${targetSiteUrl}/sitepages/${targetFullName}` },
+          options: { ResetAuthorAndCreatedOnCopy: true, ShouldBypassSharedLocks: true },
+          overwrite: !!overwrite
+        },
+        responseType: 'json'
+      };
 
-    request
-      .post(requestOptions)
-      .then((): Promise<ClientSidePageProperties> => {
-        const requestOptions: any = {
-          url: `${targetSiteUrl}/_api/sitepages/pages/GetByUrl('sitepages/${targetFullName}')`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+      await request.post(requestOptions);
 
-        return request.get<ClientSidePageProperties>(requestOptions);
-      })
-      .then((res: ClientSidePageProperties): void => {
-        logger.log(res);
+      requestOptions = {
+        url: `${targetSiteUrl}/_api/sitepages/pages/GetByUrl('sitepages/${targetFullName}')`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
+      const res = await request.get<ClientSidePageProperties>(requestOptions);
+      logger.log(res);
 
-        cb();
-      })
-      .catch(err => this.handleRejectedODataJsonPromise(err, logger, cb));
+      if (this.verbose) {
+        logger.logToStderr(chalk.green('DONE'));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getTargetSiteUrl(webUrl: string, targetFullName: string): { siteUrl: string, pageName: string } {

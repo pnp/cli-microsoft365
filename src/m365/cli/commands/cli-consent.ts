@@ -58,7 +58,7 @@ class CliConsentCommand extends AnonymousCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let scope = '';
     switch (args.options.service) {
       case 'yammer':
@@ -67,12 +67,11 @@ class CliConsentCommand extends AnonymousCommand {
     }
 
     logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${config.tenant}/oauth2/v2.0/authorize?client_id=${config.cliAadAppId}&response_type=code&scope=${encodeURIComponent(scope)}`);
-    cb();
   }
 
-  public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async action(logger: Logger, args: CommandArgs): Promise<void> {
     this.initAction(args, logger);
-    this.commandAction(logger, args, cb);
+    await this.commandAction(logger, args);
   }
 }
 

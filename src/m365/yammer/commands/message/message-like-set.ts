@@ -72,8 +72,8 @@ class YammerMessageLikeSetCommand extends YammerCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const executeLikeAction: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const executeLikeAction: () => Promise<void> = async (): Promise<void> => {
       const endpoint = `${this.resource}/v1/messages/liked_by/current.json`;
       const requestOptions: any = {
         url: endpoint,
@@ -87,44 +87,40 @@ class YammerMessageLikeSetCommand extends YammerCommand {
         }
       };
 
-      if (args.options.enable !== 'false') {
-        request
-          .post(requestOptions)
-          .then((): void => cb(),
-            (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-      }
-      else {
-        request
-          .delete(requestOptions)
-          .then((): void => cb(),
-            (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        if (args.options.enable !== 'false') {
+          await request.post(requestOptions);
+        }
+        else {
+          await request.delete(requestOptions);
+        }        
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
       }
     };
 
     if (args.options.enable === 'false') {
       if (args.options.confirm) {
-        executeLikeAction();
+        await executeLikeAction();
       }
       else {
         const messagePrompt = `Are you sure you want to unlike message ${args.options.id}?`;
 
-        Cli.prompt({
+        const result = await Cli.prompt<{ continue: boolean }>({
           type: 'confirm',
           name: 'continue',
           default: false,
           message: messagePrompt
-        }, (result: { continue: boolean }): void => {
-          if (!result.continue) {
-            cb();
-          }
-          else {
-            executeLikeAction();
-          }
         });
+        
+        if (result.continue) {
+          await executeLikeAction();
+        }
       }
     }
     else {
-      executeLikeAction();
+      await executeLikeAction();
     }
   }
 }

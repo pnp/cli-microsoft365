@@ -60,7 +60,7 @@ describe(commands.FILE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves files from a folder when --recursive option is not supplied and output option is json', (done) => {
+  it('retrieves files from a folder when --recursive option is not supplied and output option is json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
         return Promise.resolve(
@@ -104,47 +104,40 @@ describe(commands.FILE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared Documents'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          CheckInComment: "",
-          CheckOutType: 2,
-          ContentTag: "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
-          CustomizedPageStatus: 0,
-          ETag: "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
-          Exists: true,
-          IrmEnabled: false,
-          Length: "331673",
-          Level: 1,
-          LinkingUri: "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-          LinkingUrl: "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-          MajorVersion: 3,
-          MinorVersion: 0,
-          Name: "Test.docx",
-          ServerRelativeUrl: "/sites/project-x/Shared documents/Test.docx",
-          TimeCreated: "2018-02-05T08:42:36Z",
-          TimeLastModified: "2018-02-05T08:44:03Z",
-          Title: "",
-          UIVersion: 1536,
-          UIVersionLabel: "3.0",
-          UniqueId: "f09c4efe-b8c0-4e89-a166-03418661b89b"
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([{
+      CheckInComment: "",
+      CheckOutType: 2,
+      ContentTag: "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
+      CustomizedPageStatus: 0,
+      ETag: "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
+      Exists: true,
+      IrmEnabled: false,
+      Length: "331673",
+      Level: 1,
+      LinkingUri: "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
+      LinkingUrl: "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
+      MajorVersion: 3,
+      MinorVersion: 0,
+      Name: "Test.docx",
+      ServerRelativeUrl: "/sites/project-x/Shared documents/Test.docx",
+      TimeCreated: "2018-02-05T08:42:36Z",
+      TimeLastModified: "2018-02-05T08:44:03Z",
+      Title: "",
+      UIVersion: 1536,
+      UIVersionLabel: "3.0",
+      UniqueId: "f09c4efe-b8c0-4e89-a166-03418661b89b"
+    }]));
   });
 
-  it('retrieves files from a folder when --recursive option is not supplied and output option is text', (done) => {
+  it('retrieves files from a folder when --recursive option is not supplied and output option is text', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
         return Promise.resolve(
@@ -172,32 +165,25 @@ describe(commands.FILE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared Documents'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [{
-            UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
-            Name: 'Test.docx',
-            ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx'
-          }]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [{
+        UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
+        Name: 'Test.docx',
+        ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx'
+      }]
+    ));
   });
 
   // Test for --recursive option. Uses onCall() method on stub to simulate recursion
-  it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is json', (done) => {
+  it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is json', async () => {
 
     const requestStub = sinon.stub(request, 'get');
 
@@ -306,7 +292,7 @@ describe(commands.FILE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: false,
@@ -314,66 +300,59 @@ describe(commands.FILE_LIST, () => {
         folder: 'Shared Documents',
         recursive: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [{
-            "CheckInComment": "",
-            "CheckOutType": 2,
-            "ContentTag": "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
-            "CustomizedPageStatus": 0,
-            "ETag": "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
-            "Exists": true,
-            "IrmEnabled": false,
-            "Length": "331673",
-            "Level": 1,
-            "LinkingUri": "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-            "LinkingUrl": "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-            "MajorVersion": 3,
-            "MinorVersion": 0,
-            "Name": "Test.docx",
-            "ServerRelativeUrl": "/sites/project-x/Shared documents/Test.docx",
-            "TimeCreated": "2018-02-05T08:42:36Z",
-            "TimeLastModified": "2018-02-05T08:44:03Z",
-            "Title": "",
-            "UIVersion": 1536,
-            "UIVersionLabel": "3.0",
-            "UniqueId": "f09c4efe-b8c0-4e89-a166-03418661b89b"
-          },
-          {
-            "CheckInComment": "",
-            "CheckOutType": 2,
-            "ContentTag": "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
-            "CustomizedPageStatus": 0,
-            "ETag": "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
-            "Exists": true,
-            "IrmEnabled": false,
-            "Length": "331673",
-            "Level": 1,
-            "LinkingUri": "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-            "LinkingUrl": "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-            "MajorVersion": 3,
-            "MinorVersion": 0,
-            "Name": "Test.docx",
-            "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level1-Test.docx",
-            "TimeCreated": "2018-02-05T08:42:36Z",
-            "TimeLastModified": "2018-02-05T08:44:03Z",
-            "Title": "",
-            "UIVersion": 1536,
-            "UIVersionLabel": "3.0",
-            "UniqueId": "1d0cae03-5ea7-438d-b4ad-3cbd62d52e46"
-          }]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [{
+        "CheckInComment": "",
+        "CheckOutType": 2,
+        "ContentTag": "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
+        "CustomizedPageStatus": 0,
+        "ETag": "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
+        "Exists": true,
+        "IrmEnabled": false,
+        "Length": "331673",
+        "Level": 1,
+        "LinkingUri": "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
+        "LinkingUrl": "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
+        "MajorVersion": 3,
+        "MinorVersion": 0,
+        "Name": "Test.docx",
+        "ServerRelativeUrl": "/sites/project-x/Shared documents/Test.docx",
+        "TimeCreated": "2018-02-05T08:42:36Z",
+        "TimeLastModified": "2018-02-05T08:44:03Z",
+        "Title": "",
+        "UIVersion": 1536,
+        "UIVersionLabel": "3.0",
+        "UniqueId": "f09c4efe-b8c0-4e89-a166-03418661b89b"
+      },
+      {
+        "CheckInComment": "",
+        "CheckOutType": 2,
+        "ContentTag": "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
+        "CustomizedPageStatus": 0,
+        "ETag": "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
+        "Exists": true,
+        "IrmEnabled": false,
+        "Length": "331673",
+        "Level": 1,
+        "LinkingUri": "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
+        "LinkingUrl": "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
+        "MajorVersion": 3,
+        "MinorVersion": 0,
+        "Name": "Test.docx",
+        "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level1-Test.docx",
+        "TimeCreated": "2018-02-05T08:42:36Z",
+        "TimeLastModified": "2018-02-05T08:44:03Z",
+        "Title": "",
+        "UIVersion": 1536,
+        "UIVersionLabel": "3.0",
+        "UniqueId": "1d0cae03-5ea7-438d-b4ad-3cbd62d52e46"
+      }]
+    ));
   });
 
   // Test for --recursive option. Uses onCall() method on stub to simulate recursion
-  it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is text', (done) => {
+  it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is text', async () => {
     const requestStub = sinon.stub(request, 'get');
 
     // Represents the first call which returns files and a folder
@@ -489,7 +468,7 @@ describe(commands.FILE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
@@ -497,34 +476,27 @@ describe(commands.FILE_LIST, () => {
         folder: 'Shared Documents',
         recursive: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [{
-            UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
-            Name: 'Test.docx',
-            ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx'
-          },
-          {
-            UniqueId: '1d0cae03-5ea7-438d-b4ad-3cbd62d52e46',
-            Name: 'Level1-Test.docx',
-            ServerRelativeUrl: '/sites/project-x/Shared documents/Level1-Folder/Level1-Test.docx'
-          },
-          {
-            "UniqueId": "f65deb00-4d0e-44cc-a9db-027d54039b4d",
-            "Name": "Level2-Test.docx",
-            "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level2-Folder/Level2-Test.docx"
-          }]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [{
+        UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
+        Name: 'Test.docx',
+        ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx'
+      },
+      {
+        UniqueId: '1d0cae03-5ea7-438d-b4ad-3cbd62d52e46',
+        Name: 'Level1-Test.docx',
+        ServerRelativeUrl: '/sites/project-x/Shared documents/Level1-Folder/Level1-Test.docx'
+      },
+      {
+        "UniqueId": "f65deb00-4d0e-44cc-a9db-027d54039b4d",
+        "Name": "Level2-Test.docx",
+        "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level2-Folder/Level2-Test.docx"
+      }]
+    ));
   });
 
-  it('properly escapes single quotes in folder name', (done) => {
+  it('properly escapes single quotes in folder name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativeUrl('Shared%20Documents%2FFo''lde''r')`) > -1) {
         return Promise.resolve(
@@ -552,31 +524,24 @@ describe(commands.FILE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: `Shared Documents/Fo'lde'r`
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [{
-            UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
-            Name: 'Test.docx',
-            ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx'
-          }]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [{
+        UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
+        Name: 'Test.docx',
+        ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx'
+      }]
+    ));
   });
 
-  it('command correctly handles files list reject request', (done) => {
+  it('command correctly handles files list reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
@@ -586,48 +551,57 @@ describe(commands.FILE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('uses correct API url when output json option is passed', (done) => {
+  it('uses correct API url when output json option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('select123=') > -1) {
         return Promise.resolve('Correct Url1');
       }
 
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
+        return Promise.resolve(
+          {
+            "Files": [
+              {
+                "UniqueId": "f65deb00-4d0e-44cc-a9db-027d54039b4d",
+                "Name": "Level2-Test.docx",
+                "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level2-Folder/Level2-Test.docx"
+              }
+            ],
+            "Folders": [],
+            "Exists": true,
+            "IsWOPIEnabled": false,
+            "ItemCount": 3,
+            "Name": "Level2-Folder",
+            "ProgID": null,
+            "ServerRelativeUrl": "/sites/project-x/Shared Documents/Level1-Folder/Level2-Folder",
+            "TimeCreated": "2021-05-22T08:58:37Z",
+            "TimeLastModified": "2021-05-22T09:00:33Z",
+            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
+            "WelcomePage": ""
+          }
+        );
+      }
+
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         folder: 'Shared Documents'
       }
-    }, () => {
-      try {
-        assert('Correct Url');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
-
+    assert('Correct Url');
   });
 
   it('supports debug mode', () => {

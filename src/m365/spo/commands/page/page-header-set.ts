@@ -150,7 +150,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     return ['imageUrl'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const noPageHeader: PageHeader = {
       "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
       "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -252,116 +252,107 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       logger.logToStderr(`Retrieving information about the page...`);
     }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=IsPageCheckedOutToCurrentUser,Title`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
+    try {
+      let requestOptions: any = {
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=IsPageCheckedOutToCurrentUser,Title`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get<{ IsPageCheckedOutToCurrentUser: boolean, Title: string; }>(requestOptions)
-      .then((res: { IsPageCheckedOutToCurrentUser: boolean, Title: string; }): Promise<ClientSidePageProperties | null> => {
-        title = res.Title;
+      const page = await request.get<{ IsPageCheckedOutToCurrentUser: boolean, Title: string; }>(requestOptions);
+      title = page.Title;
 
-        if (res.IsPageCheckedOutToCurrentUser) {
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$expand=ListItemAllFields`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
+      let pageData: ClientSidePageProperties;
+      if (page.IsPageCheckedOutToCurrentUser) {
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$expand=ListItemAllFields`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        pageData = await request.get<ClientSidePageProperties>(requestOptions);
+      }
+      else {
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        pageData = await request.post<ClientSidePageProperties>(requestOptions);
+      }
+
+      switch (args.options.type) {
+        case 'None':
+          header = noPageHeader;
+          break;
+        case 'Default':
+          header = defaultPageHeader;
+          break;
+        case 'Custom':
+          header = customPageHeader;
+          break;
+        default:
+          header = defaultPageHeader;
+      }
+
+      if (pageData) {
+        canvasContent = pageData.CanvasContent1;
+        authorByline = authorByline.length > 0 ? authorByline : pageData.AuthorByline;
+        bannerImageUrl = pageData.BannerImageUrl;
+        description = pageData.Description;
+        title = pageData.Title;
+        topicHeader = topicHeader || pageData.TopicHeader || "";
+      }
+
+      header.properties.title = title;
+      header.properties.textAlignment = args.options.textAlignment as any || 'Left';
+      header.properties.showTopicHeader = args.options.showTopicHeader || false;
+      header.properties.topicHeader = args.options.topicHeader || '';
+      header.properties.showPublishDate = args.options.showPublishDate || false;
+
+      if (args.options.type !== 'None') {
+        header.properties.layoutType = args.options.layout as any || 'FullWidthImage';
+      }
+
+      if (args.options.type === 'Custom') {
+        header.serverProcessedContent.imageSources = {
+          imageSource: args.options.imageUrl || ''
+        };
+        const properties: CustomPageHeaderProperties = header.properties as CustomPageHeaderProperties;
+        properties.altText = args.options.altText || '';
+        properties.translateX = args.options.translateX || 0;
+        properties.translateY = args.options.translateY || 0;
+        header.properties = properties;
+
+        if (!args.options.imageUrl) {
+          (header.serverProcessedContent as CustomPageHeaderServerProcessedContent).customMetadata = {
+            imageSource: {
+              siteId: '',
+              webId: '',
+              listId: '',
+              uniqueId: ''
+            }
           };
-
-          return request.get<ClientSidePageProperties>(requestOptions);
+          properties.listId = '';
+          properties.siteId = '';
+          properties.uniqueId = '';
+          properties.webId = '';
+          header.properties = properties;
         }
         else {
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-
-          return request.post<ClientSidePageProperties>(requestOptions);
-        }
-      })
-      .then((pageData: ClientSidePageProperties | null): Promise<any[] | void> => {
-        switch (args.options.type) {
-          case 'None':
-            header = noPageHeader;
-            break;
-          case 'Default':
-            header = defaultPageHeader;
-            break;
-          case 'Custom':
-            header = customPageHeader;
-            break;
-          default:
-            header = defaultPageHeader;
-        }
-
-        if (pageData) {
-          canvasContent = pageData.CanvasContent1;
-          authorByline = authorByline.length > 0 ? authorByline : pageData.AuthorByline;
-          bannerImageUrl = pageData.BannerImageUrl;
-          description = pageData.Description;
-          title = pageData.Title;
-          topicHeader = topicHeader || pageData.TopicHeader || "";
-        }
-
-        header.properties.title = title;
-        header.properties.textAlignment = args.options.textAlignment as any || 'Left';
-        header.properties.showTopicHeader = args.options.showTopicHeader || false;
-        header.properties.topicHeader = args.options.topicHeader || '';
-        header.properties.showPublishDate = args.options.showPublishDate || false;
-
-        if (args.options.type !== 'None') {
-          header.properties.layoutType = args.options.layout as any || 'FullWidthImage';
-        }
-
-        if (args.options.type === 'Custom') {
-          header.serverProcessedContent.imageSources = {
-            imageSource: args.options.imageUrl || ''
-          };
-          const properties: CustomPageHeaderProperties = header.properties as CustomPageHeaderProperties;
-          properties.altText = args.options.altText || '';
-          properties.translateX = args.options.translateX || 0;
-          properties.translateY = args.options.translateY || 0;
-          header.properties = properties;
-
-          if (!args.options.imageUrl) {
-            (header.serverProcessedContent as CustomPageHeaderServerProcessedContent).customMetadata = {
-              imageSource: {
-                siteId: '',
-                webId: '',
-                listId: '',
-                uniqueId: ''
-              }
-            };
-            properties.listId = '';
-            properties.siteId = '';
-            properties.uniqueId = '';
-            properties.webId = '';
-            header.properties = properties;
-
-            return Promise.resolve();
-          }
-
-          return Promise.all([
+          const res = await Promise.all([
             this.getSiteId(args.options.webUrl, this.verbose, logger),
             this.getWebId(args.options.webUrl, this.verbose, logger),
             this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, this.verbose, logger)
           ]);
-        }
-        else {
-          return Promise.resolve();
-        }
-      })
-      .then((res: void | any[]): Promise<void> => {
-        if (res) {
+
           (header.serverProcessedContent as CustomPageHeaderServerProcessedContent).customMetadata = {
             imageSource: {
               siteId: res[0].Id,
@@ -377,45 +368,48 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           properties.webId = res[1].Id;
           header.properties = properties;
         }
+      }
+      
+      const requestBody: any = {
+        LayoutWebpartsContent: JSON.stringify([header])
+      };
 
-        const pageData: any = {
-          LayoutWebpartsContent: JSON.stringify([header])
-        };
+      if (title) {
+        requestBody.Title = title;
+      }
+      if (topicHeader) {
+        requestBody.TopicHeader = topicHeader;
+      }
+      if (description) {
+        requestBody.Description = description;
+      }
+      if (authorByline) {
+        requestBody.AuthorByline = authorByline;
+      }
+      if (bannerImageUrl) {
+        requestBody.BannerImageUrl = bannerImageUrl;
+      }
+      if (canvasContent) {
+        requestBody.CanvasContent1 = canvasContent;
+      }
 
-        if (title) {
-          pageData.Title = title;
-        }
-        if (topicHeader) {
-          pageData.TopicHeader = topicHeader;
-        }
-        if (description) {
-          pageData.Description = description;
-        }
-        if (authorByline) {
-          pageData.AuthorByline = authorByline;
-        }
-        if (bannerImageUrl) {
-          pageData.BannerImageUrl = bannerImageUrl;
-        }
-        if (canvasContent) {
-          pageData.CanvasContent1 = canvasContent;
-        }
+      requestOptions = {
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/SavePageAsDraft`,
+        headers: {
+          'X-HTTP-Method': 'MERGE',
+          'IF-MATCH': '*',
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: requestBody,
+        responseType: 'json'
+      };
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/SavePageAsDraft`,
-          headers: {
-            'X-HTTP-Method': 'MERGE',
-            'IF-MATCH': '*',
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: pageData,
-          responseType: 'json'
-        };
-
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      return request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getSiteId(siteUrl: string, verbose: boolean, logger: Logger): Promise<any> {

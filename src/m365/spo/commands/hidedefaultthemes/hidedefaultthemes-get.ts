@@ -1,13 +1,8 @@
 import { Logger } from '../../../../cli';
-import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-
-interface CommandArgs {
-  options: GlobalOptions;
-}
 
 class SpoHideDefaultThemesGetCommand extends SpoCommand {
   public get name(): string {
@@ -18,29 +13,28 @@ class SpoHideDefaultThemesGetCommand extends SpoCommand {
     return 'Gets the current value of the HideDefaultThemes setting';
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((spoAdminUrl: string): Promise<any> => {
-        if (this.verbose) {
-          logger.logToStderr(`Getting the current value of the HideDefaultThemes setting...`);
-        }
+  public async commandAction(logger: Logger): Promise<void> {
+    try {
+      const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
 
-        const requestOptions: any = {
-          url: `${spoAdminUrl}/_api/thememanager/GetHideDefaultThemes`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+      if (this.verbose) {
+        logger.logToStderr(`Getting the current value of the HideDefaultThemes setting...`);
+      }
 
-        return request.post(requestOptions);
-      })
-      .then((rawRes: any): void => {
-        logger.log(rawRes.value);
+      const requestOptions: any = {
+        url: `${spoAdminUrl}/_api/thememanager/GetHideDefaultThemes`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res = await request.post<any>(requestOptions);
+      logger.log(res.value);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

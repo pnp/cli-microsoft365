@@ -122,7 +122,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('Get information about the specific column of a modern page', (done) => {
+  it('Get information about the specific column of a modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -131,24 +131,17 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          {
-            "order": 1,
-            "factor": 6,
-            "controls": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd (undefined)"
-          }
-        ));
-        done();
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } });
+    assert(loggerLogSpy.calledWith(
+      {
+        "order": 1,
+        "factor": 6,
+        "controls": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd (undefined)"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ));
   });
 
-  it('Get information about the specific column of a modern page - no sections available', (done) => {
+  it('Get information about the specific column of a modern page - no sections available', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
@@ -215,18 +208,11 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('Get information about the specific column of a modern page - no columns available', (done) => {
+  it('Get information about the specific column of a modern page - no columns available', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
@@ -293,18 +279,11 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 5 } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 5 } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('Get information about the specific column of a modern page (debug)', (done) => {
+  it('Get information about the specific column of a modern page (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -313,23 +292,16 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          {
-            "order": 1,
-            "factor": 6,
-            "controls": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd (undefined)"
-          }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } });
+    assert(loggerLogSpy.calledWith(
+      {
+        "order": 1,
+        "factor": 6,
+        "controls": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd (undefined)"
+      }));
   });
 
-  it('Get information about the specific column of a modern page when the specified page name doesn\'t contain extension', (done) => {
+  it('Get information about the specific column of a modern page when the specified page name doesn\'t contain extension', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -338,24 +310,17 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', section: 1, column: 1 } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          {
-            "order": 1,
-            "factor": 6,
-            "controls": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd (undefined)"
-          }
-        ));
-        done();
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', section: 1, column: 1 } });
+    assert(loggerLogSpy.calledWith(
+      {
+        "order": 1,
+        "factor": 6,
+        "controls": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd (undefined)"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ));
   });
 
-  it('Get information about the specific column of a modern page in json output mode', (done) => {
+  it('Get information about the specific column of a modern page in json output mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -364,24 +329,17 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json', section: 1, column: 1 } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
-          "factor": 6,
-          "order": 1,
-          "dataVersion": "1.0",
-          "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
-          "controls": [{ "controlType": 4, "dataVersion": "1.0", "order": 1, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "controlData": { "controlType": 4, "displayMode": 2, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 6 }, "editorType": "CKEditor" }, "_text": "<p>asd</p>" }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json', section: 1, column: 1 } });
+    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
+      "factor": 6,
+      "order": 1,
+      "dataVersion": "1.0",
+      "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;",
+      "controls": [{ "controlType": 4, "dataVersion": "1.0", "order": 1, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "controlData": { "controlType": 4, "displayMode": 2, "id": "ccaa96dc-4d16-4940-bf0d-7b179628a8fd", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 6 }, "editorType": "CKEditor" }, "_text": "<p>asd</p>" }]
+    }));
   });
 
-  it('shows error when the specified page is a classic page', (done) => {
+  it('shows error when the specified page is a classic page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
@@ -444,18 +402,10 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Page home.aspx is not a modern page.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } } as any), new CommandError('Page home.aspx is not a modern page.'));
   });
 
-  it('correctly handles page not found', (done) => {
+  it('correctly handles page not found', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -470,31 +420,15 @@ describe(commands.PAGE_COLUMN_GET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } } as any), new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
   });
 
-  it('correctly handles OData error when retrieving pages', (done) => {
+  it('correctly handles OData error when retrieving pages', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

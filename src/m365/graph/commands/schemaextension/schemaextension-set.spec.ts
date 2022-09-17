@@ -61,7 +61,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates schema extension', (done) => {
+  it('updates schema extension', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/schemaExtensions/ext6kguklm2_TestSchemaExtension`) {
         return Promise.resolve({
@@ -88,7 +88,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: 'ext6kguklm2_TestSchemaExtension',
@@ -98,18 +98,11 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         status: 'Available',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
       }
-    }, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(log.length, 0);
   });
 
-  it('updates schema extension (debug)', (done) => {
+  it('updates schema extension (debug)', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/schemaExtensions/ext6kguklm2_TestSchemaExtension`) {
         return Promise.resolve();
@@ -118,7 +111,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         id: 'ext6kguklm2_TestSchemaExtension',
@@ -128,18 +121,11 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         status: 'Available',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith("Schema extension successfully updated."));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.calledWith("Schema extension successfully updated."));
   });
 
-  it('updates schema extension (verbose)', (done) => {
+  it('updates schema extension (verbose)', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/schemaExtensions/ext6kguklm2_TestSchemaExtension`) {
         return Promise.resolve();
@@ -148,7 +134,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         debug: false,
@@ -157,23 +143,16 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
         status: 'Available'
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('handles error correctly', (done) => {
+  it('handles error correctly', async () => {
     sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -182,15 +161,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the owner is not a valid GUID', async () => {

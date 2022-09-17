@@ -99,135 +99,84 @@ describe(commands.OPEN, () => {
     assert(containsOption);
   });
 
-  it('shows message with url when the app specified with the appId is found', (done) => {
+  it('shows message with url when the app specified with the appId is found', async () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         appId: appId
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(`Use a web browser to open the page https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(`Use a web browser to open the page https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
 
-  it('shows message with url when the app specified with the appId is found (verbose)', (done) => {
+  it('shows message with url when the app specified with the appId is found (verbose)', async () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         verbose: true,
         appId: appId
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(`Use a web browser to open the page https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(`Use a web browser to open the page https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
   
-  it('shows message with preview-url when the app specified with the appId is found', (done) => {
+  it('shows message with preview-url when the app specified with the appId is found', async () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         appId: appId,
         preview: true
       }
-    }, (err?: any) => {
-      try {        
-        assert(loggerLogSpy.calledWith(`Use a web browser to open the page https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(`Use a web browser to open the page https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
 
-  it('shows message with url when the app specified with the appId is found (using autoOpenInBrowser)', (done) => {
+  it('shows message with url when the app specified with the appId is found (using autoOpenInBrowser)', async () => {
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         appId: appId
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
 
-  it('shows message with preview-url when the app specified with the appId is found (using autoOpenInBrowser)', (done) => {
+  it('shows message with preview-url when the app specified with the appId is found (using autoOpenInBrowser)', async () => {
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         appId: appId,
         preview: true
       }
-    }, (err?: any) => {
-      try {        
-        assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
 
-  it('throws error when open in browser fails', (done) => {
+  it('throws error when open in browser fails', async () => {
     openStub.restore();
     openStub = sinon.stub(command as any, '_open').callsFake(() => Promise.reject("An error occurred"));
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         appId: appId,
         preview: true
       }
-    }, (err?: any) => {
-      try {        
-        assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError("An error occurred"))
-        );
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError("An error occurred"));
+    assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://preview.portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
 });

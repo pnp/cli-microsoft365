@@ -65,7 +65,7 @@ describe(commands.DOCTOR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves scopes in the diagnostic information about the current environment', (done) => {
+  it('retrieves scopes in the diagnostic information about the current environment', async () => {
     const jwt = JSON.stringify({
       scp: 'AllSites.FullControl AppCatalog.ReadWrite.All'
     });
@@ -85,29 +85,22 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'DeviceCode',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: [],
-          scopes: ['AllSites.FullControl', 'AppCatalog.ReadWrite.All']
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'DeviceCode',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: [],
+      scopes: ['AllSites.FullControl', 'AppCatalog.ReadWrite.All']
+    }));
   });
 
-  it('retrieves scopes from multiple access tokens in the diagnostic information about the current environment', (done) => {
+  it('retrieves scopes from multiple access tokens in the diagnostic information about the current environment', async () => {
     const jwt1 = JSON.stringify({
       scp: 'AllSites.FullControl AppCatalog.ReadWrite.All'
     });
@@ -134,29 +127,22 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'DeviceCode',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: [],
-          scopes: ['AllSites.FullControl', 'AppCatalog.ReadWrite.All', 'TermStore.Read.All']
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'DeviceCode',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: [],
+      scopes: ['AllSites.FullControl', 'AppCatalog.ReadWrite.All', 'TermStore.Read.All']
+    }));
   });
 
-  it('retrieves roles in the diagnostic information about the current environment', (done) => {
+  it('retrieves roles in the diagnostic information about the current environment', async () => {
     const jwt = JSON.stringify({
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
@@ -176,29 +162,22 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'DeviceCode',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-          scopes: []
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'DeviceCode',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
+      scopes: []
+    }));
   });
 
-  it('retrieves roles from multiple access tokens in the diagnostic information about the current environment', (done) => {
+  it('retrieves roles from multiple access tokens in the diagnostic information about the current environment', async () => {
     const jwt1 = JSON.stringify({
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
@@ -225,29 +204,22 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'DeviceCode',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: ['Sites.Read.All', 'Files.ReadWrite.All', 'TermStore.Read.All'],
-          scopes: []
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'DeviceCode',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: ['Sites.Read.All', 'Files.ReadWrite.All', 'TermStore.Read.All'],
+      scopes: []
+    }));
   });
 
-  it('retrieves roles and scopes in the diagnostic information about the current environment', (done) => {
+  it('retrieves roles and scopes in the diagnostic information about the current environment', async () => {
     const jwt = JSON.stringify({
       roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
       scp: 'Sites.Read.All Files.ReadWrite.All'
@@ -268,29 +240,22 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'DeviceCode',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-          scopes: ['Sites.Read.All', 'Files.ReadWrite.All']
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'DeviceCode',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
+      scopes: ['Sites.Read.All', 'Files.ReadWrite.All']
+    }));
   });
 
-  it('retrieves diagnostic information about the current environment when there are no roles or scopes available', (done) => {
+  it('retrieves diagnostic information about the current environment when there are no roles or scopes available', async () => {
     const jwt = JSON.stringify({
       roles: [],
       scp: ''
@@ -312,29 +277,22 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'DeviceCode',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: [],
-          scopes: []
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'DeviceCode',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: [],
+      scopes: []
+    }));
   });
 
-  it('retrieves diagnostic information about the current environment with auth type Certificate', (done) => {
+  it('retrieves diagnostic information about the current environment with auth type Certificate', async () => {
     const jwt = JSON.stringify({
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
@@ -354,29 +312,22 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'Certificate',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-          scopes: []
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'Certificate',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
+      scopes: []
+    }));
   });
 
-  it('retrieves tenant information as single when TenantID is a GUID', (done) => {
+  it('retrieves tenant information as single when TenantID is a GUID', async () => {
     const jwt = JSON.stringify({
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
@@ -396,29 +347,22 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'Certificate',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'single',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-          scopes: []
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'Certificate',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'single',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
+      scopes: []
+    }));
   });
 
-  it('retrieves diagnostic information about the current environment (debug)', (done) => {
+  it('retrieves diagnostic information about the current environment (debug)', async () => {
     const jwt = JSON.stringify({
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
@@ -438,29 +382,22 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'Certificate',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-          scopes: []
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'Certificate',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
+      scopes: []
+    }));
   });
 
-  it('retrieves diagnostic information of the current environment when executing in docker', (done) => {
+  it('retrieves diagnostic information of the current environment when executing in docker', async () => {
     const jwt = JSON.stringify({
       roles: ['Sites.Read.All', 'Files.ReadWrite.All']
     });
@@ -480,29 +417,22 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': 'docker' });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'Certificate',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: 'docker',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
-          scopes: []
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'Certificate',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: 'docker',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
+      scopes: []
+    }));
   });
 
-  it('returns empty roles and scopes in diagnostic information when access token is empty', (done) => {
+  it('returns empty roles and scopes in diagnostic information when access token is empty', async () => {
     sinon.stub(auth.service, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': '' }
     });
@@ -516,30 +446,23 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'Certificate',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: [],
-          scopes: []
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'Certificate',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: [],
+      scopes: []
+    }));
   });
 
 
-  it('returns empty roles and scopes in diagnostic information when access token is invalid', (done) => {
+  it('returns empty roles and scopes in diagnostic information when access token is invalid', async () => {
     sinon.stub(auth.service, 'accessTokens').value({
       'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': 'a.b.c.d' }
     });
@@ -553,29 +476,22 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'Certificate',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {},
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: [],
-          scopes: []
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'Certificate',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {},
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: [],
+      scopes: []
+    }));
   });
 
-  it('retrieves CLI Configuration in the diagnostic information about the current environment', (done) => {
+  it('retrieves CLI Configuration in the diagnostic information about the current environment', async () => {
     const jwt = JSON.stringify({
       scp: 'AllSites.FullControl AppCatalog.ReadWrite.All'
     });
@@ -597,28 +513,21 @@ describe(commands.DOCTOR, () => {
     sinonUtil.restore(Cli.getInstance().config.all);
     sinon.stub(Cli.getInstance().config, 'all').value({ "showHelpOnFailure": false });
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          authMode: 'DeviceCode',
-          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
-          cliAadAppTenant: 'common',
-          cliEnvironment: '',
-          cliVersion: '3.11.0',
-          cliConfig: {
-            "showHelpOnFailure": false
-          },
-          nodeVersion: 'v14.17.0',
-          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
-          roles: [],
-          scopes: ['AllSites.FullControl', 'AppCatalog.ReadWrite.All']
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith({
+      authMode: 'DeviceCode',
+      cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      cliAadAppTenant: 'common',
+      cliEnvironment: '',
+      cliVersion: '3.11.0',
+      cliConfig: {
+        "showHelpOnFailure": false
+      },
+      nodeVersion: 'v14.17.0',
+      os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+      roles: [],
+      scopes: ['AllSites.FullControl', 'AppCatalog.ReadWrite.All']
+    }));
   });
 
   it('supports debug mode', () => {

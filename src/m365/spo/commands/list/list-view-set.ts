@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, formatting, spo, validation } from '../../../../utils';
+import { formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -100,30 +100,32 @@ class SpoListViewSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const baseRestUrl: string = `${args.options.webUrl}/_api/web/lists`;
     const listRestUrl: string = args.options.listId ?
       `(guid'${formatting.encodeQueryParameter(args.options.listId)}')`
       : `/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
     const viewRestUrl: string = `/views/${(args.options.viewId ? `getById('${formatting.encodeQueryParameter(args.options.viewId)}')` : `getByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`)}`;
 
-    spo
-      .getRequestDigest(args.options.webUrl)
-      .then((res: ContextInfo): Promise<void> => {
-        const requestOptions: any = {
-          url: `${baseRestUrl}${listRestUrl}${viewRestUrl}`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue,
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json',
-          data: this.getPayload(args.options)
-        };
+    try {
+      const res = await spo.getRequestDigest(args.options.webUrl);
 
-        return request.patch(requestOptions);
-      })
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      const requestOptions: any = {
+        url: `${baseRestUrl}${listRestUrl}${viewRestUrl}`,
+        headers: {
+          'X-RequestDigest': res.FormDigestValue,
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json',
+        data: this.getPayload(args.options)
+      };
+
+      await request.patch(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getPayload(options: any): any {

@@ -116,11 +116,11 @@ class PlannerPlanGetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.showDeprecationWarning(logger, commands.PLAN_DETAILS_GET, commands.PLAN_GET);
 
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }    
     
@@ -132,26 +132,24 @@ class PlannerPlanGetCommand extends GraphCommand {
       args.options.title = args.options.planTitle;
     }
 
-    if (args.options.id) {
-      planner
-        .getPlanById(args.options.id)
-        .then(plan => this.getPlanDetails(plan))
-        .then((res: any): void => {
-          logger.log(res);
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      if (args.options.id) {
+        const plan = await planner.getPlanById(args.options.id);
+        const result = await this.getPlanDetails(plan);
+        logger.log(result);
+      }
+      else {
+        const groupId = await this.getGroupId(args);
+        const plan = await planner.getPlanByTitle(args.options.title!, groupId);
+        const result = await this.getPlanDetails(plan);
+  
+        if (result) {
+          logger.log(result);
+        }
+      }
     }
-    else {
-      this
-        .getGroupId(args)
-        .then(groupId => planner.getPlanByTitle(args.options.title!, groupId))
-        .then(plan => this.getPlanDetails(plan))
-        .then((res: any): void => {
-          if (res) {
-            logger.log(res);
-          }
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 

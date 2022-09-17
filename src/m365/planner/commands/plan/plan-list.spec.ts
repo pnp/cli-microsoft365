@@ -114,7 +114,7 @@ describe(commands.PLAN_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly list planner plans with given ownerGroupId', (done) => {
+  it('correctly list planner plans with given ownerGroupId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=ID') > -1) {
         return Promise.resolve({
@@ -205,33 +205,26 @@ describe(commands.PLAN_LIST, () => {
       ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "createdDateTime": "2021-03-10T17:39:43.1045549Z",
-          "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-          "title": "My Planner Plan",
-          "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
-          "createdBy": {
-            "user": {
-              "displayName": null,
-              "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
-            },
-            "application": {
-              "displayName": null,
-              "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
-            }
-          }
-        }]));
-        done();
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith([{
+      "createdDateTime": "2021-03-10T17:39:43.1045549Z",
+      "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
+      "title": "My Planner Plan",
+      "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
+      "createdBy": {
+        "user": {
+          "displayName": null,
+          "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
+        },
+        "application": {
+          "displayName": null,
+          "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
+        }
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    }]));
   });
 
-  it('correctly list planner plans with given ownerGroupName', (done) => {
+  it('correctly list planner plans with given ownerGroupName', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
         return Promise.resolve({
@@ -322,52 +315,37 @@ describe(commands.PLAN_LIST, () => {
       ownerGroupName: 'spridermvp'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "createdDateTime": "2021-03-10T17:39:43.1045549Z",
-          "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-          "title": "My Planner Plan",
-          "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
-          "createdBy": {
-            "user": {
-              "displayName": null,
-              "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
-            },
-            "application": {
-              "displayName": null,
-              "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
-            }
-          }
-        }]));
-        done();
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith([{
+      "createdDateTime": "2021-03-10T17:39:43.1045549Z",
+      "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
+      "title": "My Planner Plan",
+      "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
+      "createdBy": {
+        "user": {
+          "displayName": null,
+          "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
+        },
+        "application": {
+          "displayName": null,
+          "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
+        }
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    }]));
   });
 
-  it('fails validation when using app only access token', (done) => {
+  it('fails validation when using app only access token', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('This command does not support application permissions.'));
   });
 
-  it('correctly handles no plan found with given ownerGroupId', (done) => {
+  it('correctly handles no plan found with given ownerGroupId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=ID') > -1) {
         return Promise.resolve({
@@ -441,31 +419,16 @@ describe(commands.PLAN_LIST, () => {
       ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject("An error has occurred.");
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError("An error has occurred."));
   });
 
   it('supports debug mode', () => {

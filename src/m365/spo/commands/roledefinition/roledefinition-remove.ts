@@ -67,8 +67,8 @@ class SpoRoleDefinitionRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeRoleDefinition: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeRoleDefinition: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing role definition from site ${args.options.webUrl}...`);
       }
@@ -84,28 +84,28 @@ class SpoRoleDefinitionRemoveCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      request
-        .delete(requestOptions)
-        .then((): void => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        await request.delete(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeRoleDefinition();
+      await removeRoleDefinition();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the role definition with id ${args.options.id} from site ${args.options.webUrl}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeRoleDefinition();
-        }
       });
+
+      if (result.continue) {
+        await removeRoleDefinition();
+      }
     }
   }
 }

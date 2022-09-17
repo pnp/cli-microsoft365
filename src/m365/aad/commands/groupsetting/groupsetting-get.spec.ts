@@ -60,7 +60,7 @@ describe(commands.GROUPSETTING_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves information about the specified Group Setting', (done) => {
+  it('retrieves information about the specified Group Setting', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
         return Promise.resolve({
@@ -79,28 +79,21 @@ describe(commands.GROUPSETTING_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "displayName": "Group Setting",
-          "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
-          "templateId": "bb4f86e1-a598-4101-affc-97c6b136a753",
-          "values": [
-            {
-              "name": "Name1",
-              "value": "Value1"
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    assert(loggerLogSpy.calledWith({
+      "displayName": "Group Setting",
+      "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+      "templateId": "bb4f86e1-a598-4101-affc-97c6b136a753",
+      "values": [
+        {
+          "name": "Name1",
+          "value": "Value1"
+        }
+      ]
+    }));
   });
 
-  it('retrieves information about the specified Group Setting (debug)', (done) => {
+  it('retrieves information about the specified Group Setting (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
         return Promise.resolve({
@@ -119,28 +112,21 @@ describe(commands.GROUPSETTING_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "displayName": "Group Setting",
-          "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
-          "templateId": "bb4f86e1-a598-4101-affc-97c6b136a753",
-          "values": [
-            {
-              "name": "Name1",
-              "value": "Value1"
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    assert(loggerLogSpy.calledWith({
+      "displayName": "Group Setting",
+      "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+      "templateId": "bb4f86e1-a598-4101-affc-97c6b136a753",
+      "values": [
+        {
+          "name": "Name1",
+          "value": "Value1"
+        }
+      ]
+    }));
   });
 
-  it('correctly handles no group setting found', (done) => {
+  it('correctly handles no group setting found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/1caf7dcd-7e83-4c3a-94f7-932a1299c843`) {
         return Promise.reject({
@@ -160,15 +146,8 @@ describe(commands.GROUPSETTING_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c843' does not exist or one of its queried reference-property objects are not present.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843' } } as any),
+      new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c843' does not exist or one of its queried reference-property objects are not present.`));
   });
 
   it('fails validation if the id is not a valid GUID', async () => {

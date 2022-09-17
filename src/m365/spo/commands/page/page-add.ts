@@ -2,10 +2,9 @@ import { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, spo, urlUtil, validation } from '../../../../utils';
+import { spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSidePageProperties } from './ClientSidePageProperties';
 import { Page, supportedPageLayouts, supportedPromoteAs } from './Page';
 
 interface CommandArgs {
@@ -119,7 +118,7 @@ class SpoPageAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const resource = Auth.getResourceFromUrl(args.options.webUrl);
     let requestDigest: string = '';
     let itemId: string = '';
@@ -133,83 +132,75 @@ class SpoPageAddCommand extends SpoCommand {
     let pageId: number | null = null;
     const pageDescription: string = args.options.description || "";
 
-    spo
-      .getRequestDigest(args.options.webUrl)
-      .then((res: ContextInfo): Promise<{ UniqueId: string }> => {
-        requestDigest = res.FormDigestValue;
+    try {
+      const reqDigest = await spo.getRequestDigest(args.options.webUrl);
+      requestDigest = reqDigest.FormDigestValue;
 
-        if (!pageName.endsWith('.aspx')) {
-          pageName += '.aspx';
-        }
+      if (!pageName.endsWith('.aspx')) {
+        pageName += '.aspx';
+      }
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfolderbyserverrelativeurl('${serverRelativeSiteUrl}/sitepages')/files/AddTemplateFile`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: {
-            urlOfFile: `${serverRelativeSiteUrl}/sitepages/${pageName}`,
-            templateFileType: 3
-          },
-          responseType: 'json'
+      let requestOptions: any = {
+        url: `${args.options.webUrl}/_api/web/getfolderbyserverrelativeurl('${serverRelativeSiteUrl}/sitepages')/files/AddTemplateFile`,
+        headers: {
+          'X-RequestDigest': requestDigest,
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: {
+          urlOfFile: `${serverRelativeSiteUrl}/sitepages/${pageName}`,
+          templateFileType: 3
+        },
+        responseType: 'json'
+      };
+
+      const template = await request.post<{ UniqueId: string }>(requestOptions);
+      itemId = template.UniqueId;
+
+      const layoutType: string = args.options.layoutType || 'Article';
+
+      requestOptions = {
+        url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/ListItemAllFields`,
+        headers: {
+          'X-RequestDigest': requestDigest,
+          'X-HTTP-Method': 'MERGE',
+          'IF-MATCH': '*',
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: {
+          ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
+          Title: pageTitle,
+          ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
+          PageLayoutType: layoutType
+        },
+        responseType: 'json'
+      };
+
+      if (layoutType === 'Article') {
+        requestOptions.data.PromotedState = 0;
+        requestOptions.data.BannerImageUrl = {
+          Description: '/_layouts/15/images/sitepagethumbnail.png',
+          Url: `${resource}/_layouts/15/images/sitepagethumbnail.png`
         };
+      }
 
-        return request.post(requestOptions);
-      })
-      .then((res: { UniqueId: string }): Promise<void> => {
-        itemId = res.UniqueId;
-        const layoutType: string = args.options.layoutType || 'Article';
+      await request.post(requestOptions);
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/ListItemAllFields`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'X-HTTP-Method': 'MERGE',
-            'IF-MATCH': '*',
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: {
-            ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
-            Title: pageTitle,
-            ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
-            PageLayoutType: layoutType
-          },
-          responseType: 'json'
-        };
+      const pageProps = await Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
+      if (pageProps) {
+        pageId = pageProps.Id;
 
-        if (layoutType === 'Article') {
-          requestOptions.data.PromotedState = 0;
-          requestOptions.data.BannerImageUrl = {
-            Description: '/_layouts/15/images/sitepagethumbnail.png',
-            Url: `${resource}/_layouts/15/images/sitepagethumbnail.png`
-          };
-        }
+        bannerImageUrl = pageProps.BannerImageUrl;
+        canvasContent1 = pageProps.CanvasContent1;
+        layoutWebpartsContent = pageProps.LayoutWebpartsContent;
+      }
 
-        return request.post(requestOptions);
-      })
-      .then((): Promise<ClientSidePageProperties> => {
-        return Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
-      })
-      .then((res: ClientSidePageProperties): Promise<{ Id: string }> => {
-        if (res) {
-          pageId = res.Id;
-
-          bannerImageUrl = res.BannerImageUrl;
-          canvasContent1 = res.CanvasContent1;
-          layoutWebpartsContent = res.LayoutWebpartsContent;
-        }
-
-        if (!args.options.promoteAs) {
-          return Promise.resolve({ Id: '' });
-        }
-
+      if (args.options.promoteAs) {
         const requestOptions: any = {
           responseType: 'json'
         };
-
+  
         switch (args.options.promoteAs) {
           case 'HomePage':
             requestOptions.url = `${args.options.webUrl}/_api/web/rootfolder`;
@@ -247,76 +238,63 @@ class SpoPageAddCommand extends SpoCommand {
             };
             break;
         }
+  
+        const res = await request.post<{ Id: string }>(requestOptions);
+        if (args.options.promoteAs === 'Template') {
+          let requestOptions: any = {
+            responseType: 'json',
+            url: `${args.options.webUrl}/_api/SitePages/Pages(${res.Id})/SavePageAsTemplate`,
+            headers: {
+              'X-RequestDigest': requestDigest,
+              'content-type': 'application/json;odata=nometadata',
+              'X-HTTP-Method': 'POST',
+              'IF-MATCH': '*',
+              accept: 'application/json;odata=nometadata'
+            }
+          };
+  
+          const tmpl = await request.post<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string, UniqueId: string }>(requestOptions);
 
-        return request.post(requestOptions);
-      })
-      .then((res: { Id: string }): Promise<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string, UniqueId: string }> => {
-        if (args.options.promoteAs !== 'Template') {
-          return Promise.resolve({ Id: null, BannerImageUrl: '', CanvasContent1: '', LayoutWebpartsContent: '', UniqueId: '' });
+          bannerImageUrl = tmpl.BannerImageUrl;
+          canvasContent1 = tmpl.CanvasContent1;
+          layoutWebpartsContent = tmpl.LayoutWebpartsContent;
+          pageId = tmpl.Id;
+
+          requestOptions = {
+            url: `${args.options.webUrl}/_api/web/getfilebyid('${tmpl.UniqueId}')/ListItemAllFields/SetCommentsDisabled(${!args.options.commentsEnabled})`,
+            headers: {
+              'X-RequestDigest': requestDigest,
+              'content-type': 'application/json;odata=nometadata',
+              accept: 'application/json;odata=nometadata'
+            },
+            responseType: 'json'
+          };
+
+          await request.post(requestOptions);
         }
+      }
 
-        const requestOptions: any = {
-          responseType: 'json',
-          url: `${args.options.webUrl}/_api/SitePages/Pages(${res.Id})/SavePageAsTemplate`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'content-type': 'application/json;odata=nometadata',
-            'X-HTTP-Method': 'POST',
-            'IF-MATCH': '*',
-            accept: 'application/json;odata=nometadata'
-          }
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: { Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string, UniqueId: string }): Promise<void> => {
-        if (args.options.promoteAs !== 'Template') {
-          return Promise.resolve();
+      requestOptions = {
+        responseType: 'json',
+        url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
+        headers: {
+          'X-RequestDigest': requestDigest,
+          'X-HTTP-Method': 'MERGE',
+          'IF-MATCH': '*',
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: {
+          BannerImageUrl: bannerImageUrl,
+          CanvasContent1: canvasContent1,
+          LayoutWebpartsContent: layoutWebpartsContent,
+          Description: pageDescription
         }
+      };
 
-        bannerImageUrl = res.BannerImageUrl;
-        canvasContent1 = res.CanvasContent1;
-        layoutWebpartsContent = res.LayoutWebpartsContent;
-        pageId = res.Id;
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyid('${res.UniqueId}')/ListItemAllFields/SetCommentsDisabled(${!args.options.commentsEnabled})`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((): Promise<void> => {
-        const requestOptions: any = {
-          responseType: 'json',
-          url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'X-HTTP-Method': 'MERGE',
-            'IF-MATCH': '*',
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: {
-            BannerImageUrl: bannerImageUrl,
-            CanvasContent1: canvasContent1,
-            LayoutWebpartsContent: layoutWebpartsContent,
-            Description: pageDescription
-          }
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((): Promise<void> => {
-        if (args.options.promoteAs !== 'Template') {
-          return Promise.resolve();
-        }
-
+      await request.post(requestOptions);
+      
+      if (args.options.promoteAs === 'Template') {
         const requestOptions: any = {
           responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
@@ -335,30 +313,24 @@ class SpoPageAddCommand extends SpoCommand {
             Description: pageDescription
           }
         };
+  
+        await request.post(requestOptions);
+      }
 
-        return request.post(requestOptions);
-      })
-      .then((): Promise<void> => {
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/ListItemAllFields/SetCommentsDisabled(${!args.options.commentsEnabled})`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+      requestOptions = {
+        url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/ListItemAllFields/SetCommentsDisabled(${!args.options.commentsEnabled})`,
+        headers: {
+          'X-RequestDigest': requestDigest,
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-        return request.post(requestOptions);
-      })
-      .then((): Promise<void> => {
-        let requestOptions: any = {};
+      await request.post(requestOptions);
 
-        if (!args.options.publish) {
-          if (args.options.promoteAs === 'Template' || !pageId) {
-            return Promise.resolve();
-          }
-
+      if (!args.options.publish) {
+        if (args.options.promoteAs !== 'Template' && pageId) {
           requestOptions = {
             responseType: 'json',
             url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
@@ -375,21 +347,24 @@ class SpoPageAddCommand extends SpoCommand {
             }
           };
         }
-        else {
-          requestOptions = {
-            url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
-            headers: {
-              'X-RequestDigest': requestDigest,
-              'content-type': 'application/json;odata=nometadata',
-              accept: 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-        }
+      }
+      else {
+        requestOptions = {
+          url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
+          headers: {
+            'X-RequestDigest': requestDigest,
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+      }
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
 }

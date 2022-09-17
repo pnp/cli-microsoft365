@@ -67,7 +67,7 @@ describe(commands.FILE_GET, () => {
     assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
   });
 
-  it('command correctly handles file get reject request', (done) => {
+  it('command correctly handles file get reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
@@ -77,24 +77,16 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         id: 'f09c4efe-b8c0-4e89-a166-03418661b89b'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('uses correct API url when output json option is passed', (done) => {
+  it('uses correct API url when output json option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('select123=') > -1) {
         return Promise.resolve('Correct Url1');
@@ -103,26 +95,18 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         output: 'json',
         debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         id: 'b2307a39-e878-458b-bc90-03bc578531d6'
       }
-    }, () => {
-      try {
-        assert('Correct Url');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    }));
+    assert('Correct Url');
   });
 
-  it('retrieves file as binary string object', (done) => {
+  it('retrieves file as binary string object', async () => {
     const returnValue: string = 'BinaryFileString';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
@@ -132,25 +116,18 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         asString: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(returnValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(returnValue));
   });
 
-  it('retrieves and prints all details of file as ListItem object', (done) => {
+  it('retrieves and prints all details of file as ListItem object', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('?$expand=ListItemAllFields') > -1) {
         return Promise.resolve({
@@ -199,42 +176,35 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         asListItem: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "FileSystemObjectType": 0,
-          "Id": 4,
-          "ServerRedirectedEmbedUri": "https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview",
-          "ServerRedirectedEmbedUrl": "https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview",
-          "ContentTypeId": "0x0101008E462E3ACE8DB844B3BEBF9473311889",
-          "ComplianceAssetId": null,
-          "Title": null,
-          "ID": 4,
-          "Created": "2018-02-05T09:42:36",
-          "AuthorId": 1,
-          "Modified": "2018-02-05T09:44:03",
-          "EditorId": 1,
-          "OData__CopySource": null,
-          "CheckoutUserId": null,
-          "OData__UIVersionString": "3.0",
-          "GUID": "2054f49e-0f76-46d4-ac55-50e1c057941c"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "FileSystemObjectType": 0,
+      "Id": 4,
+      "ServerRedirectedEmbedUri": "https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview",
+      "ServerRedirectedEmbedUrl": "https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview",
+      "ContentTypeId": "0x0101008E462E3ACE8DB844B3BEBF9473311889",
+      "ComplianceAssetId": null,
+      "Title": null,
+      "ID": 4,
+      "Created": "2018-02-05T09:42:36",
+      "AuthorId": 1,
+      "Modified": "2018-02-05T09:44:03",
+      "EditorId": 1,
+      "OData__CopySource": null,
+      "CheckoutUserId": null,
+      "OData__UIVersionString": "3.0",
+      "GUID": "2054f49e-0f76-46d4-ac55-50e1c057941c"
+    }));
   });
 
-  it('uses correct API url when id option is passed', (done) => {
+  it('uses correct API url when id option is passed', async () => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve('Correct Url');
@@ -245,24 +215,17 @@ describe(commands.FILE_GET, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
-    }, () => {
-      try {
-        assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')');
   });
 
-  it('uses correct API url when url option is passed', (done) => {
+  it('uses correct API url when url option is passed', async () => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
         return Promise.resolve('Correct Url');
@@ -271,24 +234,17 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
-    }, () => {
-      try {
-        assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?@f='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx'`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?@f='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx'`);
   });
 
-  it('uses correct API url when url option is passed to get file as list item', (done) => {
+  it('uses correct API url when url option is passed to get file as list item', async () => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
         return Promise.resolve('Correct Url');
@@ -297,25 +253,18 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         asListItem: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields&@f='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx'`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?$expand=ListItemAllFields&@f='%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx'`);
   });
 
-  it('uses correct API url when tenant root URL option is passed', (done) => {
+  it('uses correct API url when tenant root URL option is passed', async () => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
         return Promise.resolve('Correct Url');
@@ -324,43 +273,28 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         url: '/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?@f='%2FDocuments%2FTest1.docx'`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(getStub.lastCall.args[0].url, `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)?@f='%2FDocuments%2FTest1.docx'`);
   });
 
-  it('should handle promise rejection', (done) => {
+  it('should handle promise rejection', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File Not Found." } } });
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject(expectedError);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err.message), JSON.stringify(expectedError));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedError));
   });
 
   it('fails validation if path doesn\'t exist', async () => {
@@ -370,7 +304,7 @@ describe(commands.FILE_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('writeFile called when option --asFile is specified (verbose)', (done) => {
+  it('writeFile called when option --asFile is specified (verbose)', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -402,24 +336,18 @@ describe(commands.FILE_GET, () => {
       fileName: 'Test1.docx'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert(fsStub.calledOnce);
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          fs.createWriteStream
-        ]);
-      }
-    });
+    try {
+      await command.action(logger, { options: options } as any);
+      assert(fsStub.calledOnce);
+    }
+    finally {
+      sinonUtil.restore([
+        fs.createWriteStream
+      ]);
+    }
   });
 
-  it('fails when empty file is created file with --asFile is specified', (done) => {
+  it('fails when empty file is created file with --asFile is specified', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -451,21 +379,15 @@ describe(commands.FILE_GET, () => {
       fileName: 'Test1.docx'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert(fsStub.calledOnce);
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Writestream throws error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          fs.createWriteStream
-        ]);
-      }
-    });
+    try {
+      await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Writestream throws error'));
+      assert(fsStub.calledOnce);
+    }
+    finally {
+      sinonUtil.restore([
+        fs.createWriteStream
+      ]);
+    }
   });
 
   it('supports debug mode', () => {

@@ -109,56 +109,56 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this.appCatalogUrl = args.options.appCatalogUrl;
-    const appInfo: AppInfo = {
-      id: args.options.appItemId ?? undefined,
-      packageFileName: args.options.fileName ?? undefined
-    };
-    if (this.debug) {
-      logger.logToStderr(`appInfo: ${JSON.stringify(appInfo)}`);
-    }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      this.appCatalogUrl = args.options.appCatalogUrl;
+      const appInfo: AppInfo = {
+        id: args.options.appItemId ?? undefined,
+        packageFileName: args.options.fileName ?? undefined
+      };
+      if (this.debug) {
+        logger.logToStderr(`appInfo: ${JSON.stringify(appInfo)}`);
+      }
 
-    this
-      .ensureAppInfo(logger, args, appInfo)
-      .then(_ => {
-        if (this.debug) {
-          logger.logToStderr(`ensureAppInfo: ${JSON.stringify(appInfo)}`);
-        }
+      await this.ensureAppInfo(logger, args, appInfo);
 
-        return this.loadAppCatalogUrl(logger, args);
-      })
-      .then(_ => {
-        const requestOptions: AxiosRequestConfig = {
-          url: `${this.appCatalogUrl}/_api/web/tenantappcatalog/downloadteamssolution(${appInfo.id})/$value`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'stream'
-        };
+      if (this.debug) {
+        logger.logToStderr(`ensureAppInfo: ${JSON.stringify(appInfo)}`);
+      }
 
-        return request.get(requestOptions);
-      })
-      .then((file: any): Promise<string> => {
-        return new Promise((resolve, reject) => {
-          const writer = fs.createWriteStream(appInfo.packageFileName as string);
+      await this.loadAppCatalogUrl(logger, args);
 
-          file.data.pipe(writer);
+      const requestOptions: AxiosRequestConfig = {
+        url: `${this.appCatalogUrl}/_api/web/tenantappcatalog/downloadteamssolution(${appInfo.id})/$value`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'stream'
+      };
 
-          writer.on('error', err => {
-            reject(err);
-          });
-          writer.on('close', () => {
-            resolve(appInfo.packageFileName as string);
-          });
+      const file = await request.get<any>(requestOptions);
+
+      // Not possible to use async/await for this promise
+      await new Promise<void>((resolve, reject) => {
+        const writer = fs.createWriteStream(appInfo.packageFileName as string);
+
+        file.data.pipe(writer);
+
+        writer.on('error', err => {
+          return reject(err);
         });
-      })
-      .then((file: string): void => {
-        if (this.verbose) {
-          logger.logToStderr(`Package saved to ${file}`);
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        writer.on('close', () => {
+          const fileName = appInfo.packageFileName as string;
+          if (this.verbose) {
+            logger.logToStderr(`Package saved to ${fileName}`);
+          }
+          return resolve();
+        });
+      });
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private ensureAppInfo(logger: Logger, args: CommandArgs, appInfo: AppInfo): Promise<void> {

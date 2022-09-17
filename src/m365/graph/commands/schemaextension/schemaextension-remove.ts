@@ -48,8 +48,8 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeSchemaExtension: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeSchemaExtension: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removes specified Microsoft Graph schema extension with id '${args.options.id}'...`);
       }
@@ -63,26 +63,28 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      request.delete(requestOptions)
-        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        await request.delete(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
+
     if (args.options.confirm) {
-      removeSchemaExtension();
+      await removeSchemaExtension();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the schema extension with ID ${args.options.id}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeSchemaExtension();
-        }
       });
+
+      if (result.continue) {
+        await removeSchemaExtension();
+      }
     }
   }
 }

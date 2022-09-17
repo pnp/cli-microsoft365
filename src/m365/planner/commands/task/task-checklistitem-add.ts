@@ -55,50 +55,49 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
-    this
-      .getTaskDetailsEtag(args.options.taskId)
-      .then(etag => {
-        const body: PlannerTaskDetails = {
-          checklist: {
-            // Generate new GUID for new task checklist item
-            [v4()]: {
-              '@odata.type': 'microsoft.graph.plannerChecklistItem',
-              title: args.options.title,
-              isChecked: args.options.isChecked || false
-            }
+    try {
+      const etag = await this.getTaskDetailsEtag(args.options.taskId);
+      const body: PlannerTaskDetails = {
+        checklist: {
+          // Generate new GUID for new task checklist item
+          [v4()]: {
+            '@odata.type': 'microsoft.graph.plannerChecklistItem',
+            title: args.options.title,
+            isChecked: args.options.isChecked || false
           }
-        };
-
-        const requestOptions: AxiosRequestConfig = {
-          url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.taskId)}/details`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            prefer: 'return=representation',
-            'if-match': etag
-          },
-          responseType: 'json',
-          data: body
-        };
-
-        return request.patch<PlannerTaskDetails>(requestOptions);
-      })
-      .then((result): void => {
-        if (args.options.output === 'json') {
-          logger.log(result.checklist);
         }
-        else {
-          // Transform checklist item object to text friendly format
-          const output = Object.getOwnPropertyNames(result.checklist).map(prop => ({ id: prop, ...(result.checklist as any)[prop] }));
-          logger.log(output);
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      };
+
+      const requestOptions: AxiosRequestConfig = {
+        url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.taskId)}/details`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          prefer: 'return=representation',
+          'if-match': etag
+        },
+        responseType: 'json',
+        data: body
+      };
+
+      const result = await request.patch<PlannerTaskDetails>(requestOptions);
+      if (args.options.output === 'json') {
+        logger.log(result.checklist);
+      }
+      else {
+        // Transform checklist item object to text friendly format
+        const output = Object.getOwnPropertyNames(result.checklist).map(prop => ({ id: prop, ...(result.checklist as any)[prop] }));
+        logger.log(output);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {

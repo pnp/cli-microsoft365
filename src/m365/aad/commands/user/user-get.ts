@@ -79,7 +79,7 @@ class AadUserGetCommand extends GraphCommand {
     this.optionSets.push(['id', 'userName', 'email']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const properties: string = args.options.properties ?
       `&$select=${args.options.properties.split(',').map(p => encodeURIComponent(p.trim())).join(',')}` :
       '';
@@ -104,27 +104,26 @@ class AadUserGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: User[] }>(requestOptions)
-      .then((res: { value: User[] }): Promise<User> => {
-        if (res.value.length === 1) {
-          return Promise.resolve(res.value[0]);
-        }
+    try {
+      const res = await request.get<{ value: User[] }>(requestOptions);
 
-        const identifier = args.options.id ? `id ${args.options.id}`
-          : args.options.userName ? `user name ${args.options.userName}`
-            : `email ${args.options.email}`;
+      const identifier = args.options.id ? `id ${args.options.id}`
+        : args.options.userName ? `user name ${args.options.userName}`
+          : `email ${args.options.email}`;
 
-        if (res.value.length === 0) {
-          return Promise.reject(`The specified user with ${identifier} does not exist`);
-        }
+      if (res.value.length === 0) {
+        throw `The specified user with ${identifier} does not exist`;
+      }
 
-        return Promise.reject(`Multiple users with ${identifier} found. Please disambiguate (user names): ${res.value.map(a => a.userPrincipalName).join(', ')} or (ids): ${res.value.map(a => a.id).join(', ')}`);
-      })
-      .then((res: User): void => {
-        logger.log(res);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      if (res.value.length > 1) {
+        throw `Multiple users with ${identifier} found. Please disambiguate (user names): ${res.value.map(a => a.userPrincipalName).join(', ')} or (ids): ${res.value.map(a => a.id).join(', ')}`;
+      }
+
+      logger.log(res.value[0]);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

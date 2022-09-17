@@ -256,149 +256,65 @@ describe(commands.CHAT_GET, () => {
     assert(containsOption);
   });
   
-  it('gets chat conversation using id', (done) => {
-    command.action(logger, {
+  it('gets chat conversation using id', async () => {
+    await command.action(logger, {
       options: {
         id: "19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces"
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(singleChatResponse));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(singleChatResponse));
   });
   
-  it('gets chat conversation using name', (done) => {    
-    command.action(logger, {
+  it('gets chat conversation using name', async () => {    
+    await command.action(logger, {
       options: {
         name: "Just a conversation"
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(singleGroupChatResponse));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(singleGroupChatResponse));
   });
   
-  it('gets chat conversation using participants (single)', (done) => {
-    command.action(logger, {
+  it('gets chat conversation using participants (single)', async () => {
+    await command.action(logger, {
       options: {
         participants: "AlexW@M365x214355.onmicrosoft.com"
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(singleChatResponse));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(singleChatResponse));
   });
   
-  it('gets chat conversation to existing conversation using participants (multiple)', (done) => {
-    command.action(logger, {
+  it('gets chat conversation to existing conversation using participants (multiple)', async () => {
+    await command.action(logger, {
       options: {
         participants: "AndrewK@M365x214355.onmicrosoft.com,DaveK@M365x214355.onmicrosoft.com"
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(singleChatResponse));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(singleChatResponse));
   });
   
-  it('fails retrieving chat conversation with nonexistent name', (done) => {    
-    command.action(logger, {
-      options: {
-        name: "Nonexistent conversation name"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`No chat conversation was found with this name.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('fails retrieving chat conversation with nonexistent name', async () => {
+    await assert.rejects(command.action(logger, { options: {
+      name: "Nonexistent conversation name" } } as any), new CommandError(`No chat conversation was found with this name.`));
   });
     
-  it('fails retrieving non-existent chat conversation by participants', (done) => {
-    command.action(logger, {
-      options: {
-        participants: "NestorB@M365x214355.onmicrosoft.com"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`No chat conversation was found with these participants.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('fails retrieving non-existent chat conversation by participants', async () => {
+    await assert.rejects(command.action(logger, { options: {
+      participants: "NestorB@M365x214355.onmicrosoft.com" } } as any), new CommandError(`No chat conversation was found with these participants.`));
   });
   
-  it('fails retrieving chat conversation with multiple found chat conversations by name', (done) => {    
-    command.action(logger, {
-      options: {
-        name: "Just a conversation with same name"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
-            `- 19:28aca38f8f684a71babac6ab063b4041@thread.v2 - ${new Date("2021-09-14T07:44:11.5Z").toLocaleString()} - AlexW@M365x214355.onmicrosoft.com, MeganB@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`,
-            `- 19:650081f4700a4414ac15cd7993129f80@thread.v2 - ${new Date("2020-06-26T08:27:55.154Z").toLocaleString()} - MeganB@M365x214355.onmicrosoft.com, AlexW@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`
-          ].join(os.EOL)}`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('fails retrieving chat conversation with multiple found chat conversations by name', async () => {   
+    await assert.rejects(command.action(logger, { options: {
+      name: "Just a conversation with same name" } } as any), new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
+      `- 19:28aca38f8f684a71babac6ab063b4041@thread.v2 - ${new Date("2021-09-14T07:44:11.5Z").toLocaleString()} - AlexW@M365x214355.onmicrosoft.com, MeganB@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`,
+      `- 19:650081f4700a4414ac15cd7993129f80@thread.v2 - ${new Date("2020-06-26T08:27:55.154Z").toLocaleString()} - MeganB@M365x214355.onmicrosoft.com, AlexW@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`
+    ].join(os.EOL)}`));
   });
 
-  it('fails retrieving chat conversation with multiple found chat conversations by participants', (done) => {    
-    command.action(logger, {
-      options: {
-        participants: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`Multiple chat conversations with these participants found. Please disambiguate:${os.EOL}${[
-            `- 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2 - Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat - ${new Date("2021-12-22T13:13:11.023Z").toLocaleString()}`,
-            `- 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2 - CC Call v3 - ${new Date("2021-10-18T16:56:30.205Z").toLocaleString()}`
-          ].join(os.EOL)}`)));                              
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('fails retrieving chat conversation with multiple found chat conversations by participants', async () => {    
+    await assert.rejects(command.action(logger, { options: {
+      participants: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com" } } as any), new CommandError(`Multiple chat conversations with these participants found. Please disambiguate:${os.EOL}${[
+      `- 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2 - Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat - ${new Date("2021-12-22T13:13:11.023Z").toLocaleString()}`,
+      `- 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2 - CC Call v3 - ${new Date("2021-10-18T16:56:30.205Z").toLocaleString()}`
+    ].join(os.EOL)}`));
   });    
 });

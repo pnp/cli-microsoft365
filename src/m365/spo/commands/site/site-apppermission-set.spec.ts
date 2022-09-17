@@ -119,7 +119,7 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails when passing a site that does not exist', (done) => {
+  it('fails when passing a site that does not exist', async () => {
     const siteError = {
       "error": {
         "code": "itemNotFound",
@@ -138,24 +138,13 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
       return Promise.reject(siteError);
     });
 
-    command.action(logger, {
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing',
-        permission: "write",
-        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Requested site could not be found")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing',
+      permission: "write",
+      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e" } } as any), new CommandError('Requested site could not be found'));
   });
 
-  it('fails to get Azure AD app when Azure AD app does not exists', (done) => {
+  it('fails to get Azure AD app when Azure AD app does not exists', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -180,25 +169,14 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
         return Promise.reject('The specified app permission does not exist');
       });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        permission: "write",
-        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified app permission does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      permission: "write",
+      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e" } } as any), new CommandError('The specified app permission does not exist'));
   });
 
-  it('fails when multiple Azure AD apps with same name exists', (done) => {
+  it('fails when multiple Azure AD apps with same name exists', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -248,24 +226,13 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
         return Promise.reject('Multiple app permissions with displayName Foo found: 89ea5c94-7736-4e25-95ad-3fa95f62b66e,cca00169-d38b-462f-a3b4-f3566b162f2d7');
       });
 
-    command.action(logger, {
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        permission: "write",
-        appDisplayName: "Foo"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple app permissions with displayName Foo found: 89ea5c94-7736-4e25-95ad-3fa95f62b66e,cca00169-d38b-462f-a3b4-f3566b162f2d7`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      permission: "write",
+      appDisplayName: "Foo" } } as any), new CommandError('Multiple app permissions with displayName Foo found: 89ea5c94-7736-4e25-95ad-3fa95f62b66e,cca00169-d38b-462f-a3b4-f3566b162f2d7'));
   });
 
-  it('Updates an application permission to the site by appId', (done) => {
+  it('Updates an application permission to the site by appId', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -335,37 +302,30 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",
         appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
         output: "json"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
-          "roles": [
-            "write"
-          ],
-          "grantedToIdentities": [
-            {
-              "application": {
-                "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-              }
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
+      "roles": [
+        "write"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+          }
+        }
+      ]
+    }));
   });
 
-  it('Updates an application permission to the site by appDisplayName', (done) => {
+  it('Updates an application permission to the site by appDisplayName', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -435,37 +395,30 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",
         appDisplayName: "Foo",
         output: "json"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
-          "roles": [
-            "write"
-          ],
-          "grantedToIdentities": [
-            {
-              "application": {
-                "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-              }
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
+      "roles": [
+        "write"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+          }
+        }
+      ]
+    }));
   });
 
-  it('Updates an application permission to the site by permissionId', (done) => {
+  it('Updates an application permission to the site by permissionId', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -501,34 +454,27 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",
         permissionId: "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
         output: "json"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
-          "roles": [
-            "write"
-          ],
-          "grantedToIdentities": [
-            {
-              "application": {
-                "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-              }
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
+      "roles": [
+        "write"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+          }
+        }
+      ]
+    }));
   });
 
   it('supports debug mode', () => {

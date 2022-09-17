@@ -104,7 +104,7 @@ describe(commands.APP_PUBLISH, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('adds new Teams app to the tenant app catalog', (done) => {
+  it('adds new Teams app to the tenant app catalog', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps`) {
         return Promise.resolve({
@@ -121,18 +121,11 @@ describe(commands.APP_PUBLISH, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: false, filePath: 'teamsapp.zip' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, filePath: 'teamsapp.zip' } });
+    assert(loggerLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
   });
 
-  it('adds new Teams app to the tenant app catalog (debug)', (done) => {
+  it('adds new Teams app to the tenant app catalog (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps`) {
         return Promise.resolve({
@@ -149,33 +142,18 @@ describe(commands.APP_PUBLISH, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip' } });
+    assert(loggerLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
   });
 
-  it('correctly handles error when publishing an app', (done) => {
+  it('correctly handles error when publishing an app', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: false, filePath: 'teamsapp.zip' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, filePath: 'teamsapp.zip'  } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

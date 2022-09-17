@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -84,50 +83,50 @@ class SpoContentTypeGetCommand extends SpoCommand {
     this.optionSets.push(['id', 'name']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let requestUrl: string = `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/` : '')}contenttypes`;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      let requestUrl: string = `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/` : '')}contenttypes`;
 
-    if (args.options.id) {
-      requestUrl += `('${encodeURIComponent(args.options.id)}')`;
+      if (args.options.id) {
+        requestUrl += `('${encodeURIComponent(args.options.id)}')`;
+      }
+      else if (args.options.name) {
+        requestUrl += `?$filter=Name eq '${encodeURIComponent(args.options.name)}'`;
+      }
+
+      const requestOptions: any = {
+        url: requestUrl,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      let res = await request.get<any>(requestOptions);
+      let errorMessage: string = '';
+
+      if (args.options.name) {
+        if (res.value.length === 0) {
+          errorMessage = `Content type with name ${args.options.name} not found`;
+        }
+        else{
+          res = res.value[0];
+        }
+      }
+
+      if (args.options.id && res['odata.null'] === true) {
+        errorMessage = `Content type with ID ${args.options.id} not found`;
+      }
+
+      if (errorMessage) {
+        throw errorMessage;
+      }
+
+      logger.log(res);
     }
-    else if (args.options.name) {
-      requestUrl += `?$filter=Name eq '${encodeURIComponent(args.options.name)}'`;
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
-
-    const requestOptions: any = {
-      url: requestUrl,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        let errorMessage: string = '';
-
-        if (args.options.name) {
-          if (res.value.length === 0) {
-            errorMessage = `Content type with name ${args.options.name} not found`;
-          }
-          else{
-            res = res.value[0];
-          }
-        }
-
-        if (args.options.id && res['odata.null'] === true) {
-          errorMessage = `Content type with ID ${args.options.id} not found`;
-        }
-
-        if (errorMessage) {
-          cb(new CommandError(errorMessage));
-          return;
-        }
-
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

@@ -92,92 +92,87 @@ class AadO365GroupUserSetCommand extends GraphCommand {
     this.optionSets.push(['groupId', 'teamId']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
-    let users: User[] = [];
+      let users = await this.getOwners(logger, groupId);
+      const membersAndGuests = await this.getMembersAndGuests(logger, groupId);
+      users = users.concat(membersAndGuests);
 
-    this
-      .getOwners(logger, groupId)
-      .then((owners): Promise<User[]> => {
-        users = owners;
+      // Filter out duplicate added values for owners (as they are returned as members as well)
+      users = users.filter((groupUser, index, self) =>
+        index === self.findIndex((t) => (
+          t.id === groupUser.id && t.displayName === groupUser.displayName
+        ))
+      );
 
-        return this.getMembersAndGuests(logger, groupId);
-      })
-      .then((membersAndGuests): Promise<void> | void => {
-        users = users.concat(membersAndGuests);
+      if (this.debug) {
+        logger.logToStderr((typeof args.options.groupId !== 'undefined') ? 'Group owners and members:' : 'Team owners and members:');
+        logger.logToStderr(users);
+        logger.logToStderr('');
+      }
 
-        // Filter out duplicate added values for owners (as they are returned as members as well)
-        users = users.filter((groupUser, index, self) =>
-          index === self.findIndex((t) => (
-            t.id === groupUser.id && t.displayName === groupUser.displayName
-          ))
-        );
+      if (users.filter(i => args.options.userName.toUpperCase() === i.userPrincipalName!.toUpperCase()).length <= 0) {
+        const userNotInGroup = (typeof args.options.groupId !== 'undefined') ?
+          'The specified user does not belong to the given Microsoft 365 Group. Please use the \'o365group user add\' command to add new users.' :
+          'The specified user does not belong to the given Microsoft Teams team. Please use the \'graph teams user add\' command to add new users.';
 
-        if (this.debug) {
-          logger.logToStderr((typeof args.options.groupId !== 'undefined') ? 'Group owners and members:' : 'Team owners and members:');
-          logger.logToStderr(users);
-          logger.logToStderr('');
-        }
+        throw new Error(userNotInGroup);
+      }
 
-        if (users.filter(i => args.options.userName.toUpperCase() === i.userPrincipalName!.toUpperCase()).length <= 0) {
-          const userNotInGroup = (typeof args.options.groupId !== 'undefined') ?
-            'The specified user does not belong to the given Microsoft 365 Group. Please use the \'o365group user add\' command to add new users.' :
-            'The specified user does not belong to the given Microsoft Teams team. Please use the \'graph teams user add\' command to add new users.';
+      if (args.options.role === "Owner") {
+        const foundMember: User | undefined = users.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Member');
 
-          throw new Error(userNotInGroup);
-        }
+        if (foundMember !== undefined) {
+          const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/$ref`;
 
-        if (args.options.role === "Owner") {
-          const foundMember: User | undefined = users.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Member');
+          const requestOptions: any = {
+            url: endpoint,
+            headers: {
+              'accept': 'application/json;odata.metadata=none'
+            },
+            responseType: 'json',
+            data: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + foundMember.id }
+          };
 
-          if (foundMember !== undefined) {
-            const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/$ref`;
-
-            const requestOptions: any = {
-              url: endpoint,
-              headers: {
-                'accept': 'application/json;odata.metadata=none'
-              },
-              responseType: 'json',
-              data: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + foundMember.id }
-            };
-
-            return request.post(requestOptions);
-          }
-          else {
-            const userAlreadyOwner = (typeof args.options.groupId !== 'undefined') ?
-              'The specified user is already an owner in the specified Microsoft 365 group, and thus cannot be promoted.' :
-              'The specified user is already an owner in the specified Microsoft Teams team, and thus cannot be promoted.';
-
-            throw new Error(userAlreadyOwner);
-          }
+          await request.post(requestOptions);
         }
         else {
-          const foundOwner: User | undefined = users.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Owner');
+          const userAlreadyOwner = (typeof args.options.groupId !== 'undefined') ?
+            'The specified user is already an owner in the specified Microsoft 365 group, and thus cannot be promoted.' :
+            'The specified user is already an owner in the specified Microsoft Teams team, and thus cannot be promoted.';
 
-          if (foundOwner !== undefined) {
-            const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/${foundOwner.id}/$ref`;
-
-            const requestOptions: any = {
-              url: endpoint,
-              headers: {
-                'accept': 'application/json;odata.metadata=none'
-              }
-            };
-
-            return request.delete(requestOptions);
-          }
-          else {
-            const userAlreadyMember = (typeof args.options.groupId !== 'undefined') ?
-              'The specified user is already a member in the specified Microsoft 365 group, and thus cannot be demoted.' :
-              'The specified user is already a member in the specified Microsoft Teams team, and thus cannot be demoted.';
-
-            throw new Error(userAlreadyMember);
-          }
+          throw new Error(userAlreadyOwner);
         }
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }
+      else {
+        const foundOwner: User | undefined = users.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Owner');
+
+        if (foundOwner !== undefined) {
+          const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/${foundOwner.id}/$ref`;
+
+          const requestOptions: any = {
+            url: endpoint,
+            headers: {
+              'accept': 'application/json;odata.metadata=none'
+            }
+          };
+
+          await request.delete(requestOptions);
+        }
+        else {
+          const userAlreadyMember = (typeof args.options.groupId !== 'undefined') ?
+            'The specified user is already a member in the specified Microsoft 365 group, and thus cannot be demoted.' :
+            'The specified user is already a member in the specified Microsoft Teams team, and thus cannot be demoted.';
+
+          throw new Error(userAlreadyMember);
+        }
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getOwners(logger: Logger, groupId: string): Promise<User[]> {

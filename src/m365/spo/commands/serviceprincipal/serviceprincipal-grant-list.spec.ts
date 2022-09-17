@@ -68,7 +68,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('lists permissions granted to the service principal (debug)', (done) => {
+  it('lists permissions granted to the service principal (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -95,30 +95,23 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            ObjectId: '50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw',
-            Resource: 'Windows Azure Active Directory',
-            ResourceId: '1c444f1a-bba3-42f2-999f-4106c5b1c20c',
-            Scope: 'Group.ReadWrite.All'
-          },
-          {
-            ObjectId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg',
-            Resource: 'Microsoft 365 SharePoint Online',
-            ResourceId: 'dcf25ef3-e2df-4a77-839d-6b7857a11c78',
-            Scope: 'MyFiles.Read'
-          }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith([
+      {
+        ObjectId: '50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw',
+        Resource: 'Windows Azure Active Directory',
+        ResourceId: '1c444f1a-bba3-42f2-999f-4106c5b1c20c',
+        Scope: 'Group.ReadWrite.All'
+      },
+      {
+        ObjectId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg',
+        Resource: 'Microsoft 365 SharePoint Online',
+        ResourceId: 'dcf25ef3-e2df-4a77-839d-6b7857a11c78',
+        Scope: 'MyFiles.Read'
+      }]));
   });
 
-  it('lists permissions granted to the service principal', (done) => {
+  it('lists permissions granted to the service principal', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -145,30 +138,23 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            ObjectId: '50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw',
-            Resource: 'Windows Azure Active Directory',
-            ResourceId: '1c444f1a-bba3-42f2-999f-4106c5b1c20c',
-            Scope: 'Group.ReadWrite.All'
-          },
-          {
-            ObjectId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg',
-            Resource: 'Microsoft 365 SharePoint Online',
-            ResourceId: 'dcf25ef3-e2df-4a77-839d-6b7857a11c78',
-            Scope: 'MyFiles.Read'
-          }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith([
+      {
+        ObjectId: '50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw',
+        Resource: 'Windows Azure Active Directory',
+        ResourceId: '1c444f1a-bba3-42f2-999f-4106c5b1c20c',
+        Scope: 'Group.ReadWrite.All'
+      },
+      {
+        ObjectId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg',
+        Resource: 'Microsoft 365 SharePoint Online',
+        ResourceId: 'dcf25ef3-e2df-4a77-839d-6b7857a11c78',
+        Scope: 'MyFiles.Read'
+      }]));
   });
 
-  it('correctly handles error when retrieving permissions granted to the service principal', (done) => {
+  it('correctly handles error when retrieving permissions granted to the service principal', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -178,28 +164,14 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('File Not Found.'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('defines alias', () => {

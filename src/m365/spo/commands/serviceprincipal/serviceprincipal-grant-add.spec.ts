@@ -68,7 +68,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('grants the specified API permission (debug)', (done) => {
+  it('grants the specified API permission (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -91,20 +91,13 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, resource: 'Microsoft Graph', scope: 'Mail.Read' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "ClientId": "868668f8-583a-4c66-b3ce-d4e14bc9ceb3", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "-GiGhjpYZkyzztThS8nOs8VG6EHn4S1OjgiedYOfUrQ", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "41e846c5-e1e7-4e2d-8e08-9e75839f52b4", "Scope": "Mail.Read"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, resource: 'Microsoft Graph', scope: 'Mail.Read' } });
+    assert(loggerLogSpy.calledWith({
+      "ClientId": "868668f8-583a-4c66-b3ce-d4e14bc9ceb3", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "-GiGhjpYZkyzztThS8nOs8VG6EHn4S1OjgiedYOfUrQ", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "41e846c5-e1e7-4e2d-8e08-9e75839f52b4", "Scope": "Mail.Read"
+    }));
   });
 
-  it('grants the specified API permission', (done) => {
+  it('grants the specified API permission', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -127,20 +120,13 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "ClientId": "868668f8-583a-4c66-b3ce-d4e14bc9ceb3", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "-GiGhjpYZkyzztThS8nOs8VG6EHn4S1OjgiedYOfUrQ", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "41e846c5-e1e7-4e2d-8e08-9e75839f52b4", "Scope": "Mail.Read"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } });
+    assert(loggerLogSpy.calledWith({
+      "ClientId": "868668f8-583a-4c66-b3ce-d4e14bc9ceb3", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "-GiGhjpYZkyzztThS8nOs8VG6EHn4S1OjgiedYOfUrQ", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "41e846c5-e1e7-4e2d-8e08-9e75839f52b4", "Scope": "Mail.Read"
+    }));
   });
 
-  it('correctly handles error when the specified resource doesn\'t exist', (done) => {
+  it('correctly handles error when the specified resource doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -150,18 +136,11 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false, resource: 'Microsoft Graph1', scope: 'Mail.Read' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('A service principal with the name Microsoft Graph1 could not be found.\r\nParameter name: resourceName')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'Microsoft Graph1', scope: 'Mail.Read' } } as any),
+      new CommandError('A service principal with the name Microsoft Graph1 could not be found.\r\nParameter name: resourceName'));
   });
 
-  it('correctly handles error when the specified scope doesn\'t exist', (done) => {
+  it('correctly handles error when the specified scope doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -171,18 +150,11 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Calendar.Read' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An OAuth permission with the scope Calendar.Read could not be found.\r\nParameter name: permissionRequest')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Calendar.Read' } } as any),
+      new CommandError('An OAuth permission with the scope Calendar.Read could not be found.\r\nParameter name: permissionRequest'));
   });
 
-  it('correctly handles error when the specified permission has already been granted', (done) => {
+  it('correctly handles error when the specified permission has already been granted', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -192,28 +164,14 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An OAuth permission with the resource Microsoft Graph and scope Mail.Read already exists.\r\nParameter name: permissionRequest')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any),
+      new CommandError('An OAuth permission with the resource Microsoft Graph and scope Mail.Read already exists.\r\nParameter name: permissionRequest'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('defines alias', () => {

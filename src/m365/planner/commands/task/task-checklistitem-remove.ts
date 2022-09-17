@@ -47,53 +47,51 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
-      this.removeChecklistitem(logger, args, cb);
+      await this.removeChecklistitem(args);
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the checklist item with id ${args.options.id} from the planner task?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          this.removeChecklistitem(logger, args, cb);
-        }
       });
+      
+      if (result.continue) {
+        await this.removeChecklistitem(args);
+      }
     }
   }
 
-  private removeChecklistitem(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this
-      .getTaskDetails(args.options.taskId)
-      .then(task => {
-        if (!task.checklist || !(task.checklist as any)[args.options.id]) {
-          return Promise.reject(`The specified checklist item with id ${args.options.id} does not exist`);
-        }
+  private async removeChecklistitem(args: CommandArgs): Promise<void> {
+    try {
+      const task = await this.getTaskDetails(args.options.taskId);
+      if (!task.checklist || !(task.checklist as any)[args.options.id]) {
+        throw `The specified checklist item with id ${args.options.id} does not exist`;
+      }
 
-        const requestOptionsTaskDetails: any = {
-          url: `${this.resource}/v1.0/planner/tasks/${args.options.taskId}/details`,
-          headers: {
-            'accept': 'application/json;odata.metadata=none',
-            'If-Match': (task as any)['@odata.etag'],
-            'Prefer': 'return=representation'
-          },
-          responseType: 'json',
-          data: {
-            checklist: {
-              [args.options.id]: null
-            }
+      const requestOptionsTaskDetails: any = {
+        url: `${this.resource}/v1.0/planner/tasks/${args.options.taskId}/details`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none',
+          'If-Match': (task as any)['@odata.etag'],
+          'Prefer': 'return=representation'
+        },
+        responseType: 'json',
+        data: {
+          checklist: {
+            [args.options.id]: null
           }
-        };
+        }
+      };
 
-        return request.patch(requestOptionsTaskDetails);
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.patch(requestOptionsTaskDetails);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getTaskDetails(taskId: string): Promise<PlannerTaskDetails> {

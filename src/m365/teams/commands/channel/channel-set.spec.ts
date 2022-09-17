@@ -12,7 +12,6 @@ const command: Command = require('./channel-set');
 describe(commands.CHANNEL_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -35,7 +34,6 @@ describe(commands.CHANNEL_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -98,7 +96,7 @@ describe(commands.CHANNEL_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails to patch channel updates for the Microsoft Teams team when channel does not exists', (done) => {
+  it('fails to patch channel updates for the Microsoft Teams team when channel does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'Latest'`) > -1) {
         return Promise.resolve({ value: [] });
@@ -106,26 +104,15 @@ describe(commands.CHANNEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: 'Latest',
-        newChannelName: 'New Review',
-        description: 'New Review'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelName: 'Latest',
+      newChannelName: 'New Review',
+      description: 'New Review' } } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
-  it('correctly patches channel updates for the Microsoft Teams team', (done) => {
+  it('correctly patches channel updates for the Microsoft Teams team', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'Review'`) > -1) {
         return Promise.resolve({
@@ -149,7 +136,7 @@ describe(commands.CHANNEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -157,15 +144,7 @@ describe(commands.CHANNEL_SET, () => {
         newChannelName: 'New Review',
         description: 'New Review'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
   it('supports debug mode', () => {

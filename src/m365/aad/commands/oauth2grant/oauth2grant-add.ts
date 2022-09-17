@@ -61,29 +61,32 @@ class AadOAuth2GrantAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Granting the service principal specified permissions...`);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/oauth2PermissionGrants`,
-      headers: {
-        'content-type': 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: {
-        "clientId": args.options.clientId,
-        "consentType": "AllPrincipals",
-        "principalId": null,
-        "resourceId": args.options.resourceId,
-        "scope": args.options.scope
-      }
-    };
+    try {
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/oauth2PermissionGrants`,
+        headers: {
+          'content-type': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: {
+          "clientId": args.options.clientId,
+          "consentType": "AllPrincipals",
+          "principalId": null,
+          "resourceId": args.options.resourceId,
+          "scope": args.options.scope
+        }
+      };
 
-    request
-      .post<void>(requestOptions)
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      await request.post<void>(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

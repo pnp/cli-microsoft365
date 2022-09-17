@@ -68,7 +68,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('lists pending permission requests (debug)', (done) => {
+  it('lists pending permission requests (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -93,23 +93,16 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
-          Resource: 'Microsoft Graph',
-          ResourceId: 'Microsoft Graph',
-          Scope: 'Mail.Read'
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith([{
+      Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
+      Resource: 'Microsoft Graph',
+      ResourceId: 'Microsoft Graph',
+      Scope: 'Mail.Read'
+    }]));
   });
 
-  it('lists pending permission requests', (done) => {
+  it('lists pending permission requests', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -134,23 +127,16 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
-          Resource: 'Microsoft Graph',
-          ResourceId: 'Microsoft Graph',
-          Scope: 'Mail.Read'
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith([{
+      Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
+      Resource: 'Microsoft Graph',
+      ResourceId: 'Microsoft Graph',
+      Scope: 'Mail.Read'
+    }]));
   });
 
-  it('correctly handles error when retrieving pending permission requests', (done) => {
+  it('correctly handles error when retrieving pending permission requests', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -160,28 +146,14 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('File Not Found.'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('defines alias', () => {

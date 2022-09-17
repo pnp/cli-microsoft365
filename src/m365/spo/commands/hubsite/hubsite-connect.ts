@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, spo, validation } from '../../../../utils';
+import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -58,22 +58,23 @@ class SpoHubSiteConnectCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    spo
-      .getRequestDigest(args.options.url)
-      .then((res: ContextInfo): Promise<void> => {
-        const requestOptions: any = {
-          url: `${args.options.url}/_api/site/JoinHubSite('${encodeURIComponent(args.options.hubSiteId)}')`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue,
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const res = await spo.getRequestDigest(args.options.url);
+      const requestOptions: any = {
+        url: `${args.options.url}/_api/site/JoinHubSite('${encodeURIComponent(args.options.hubSiteId)}')`,
+        headers: {
+          'X-RequestDigest': res.FormDigestValue,
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

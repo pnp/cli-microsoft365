@@ -87,7 +87,7 @@ describe(commands.SITEDESIGN_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails to get site design when it does not exists', (done) => {
+  it('fails to get site design when it does not exists', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
         return Promise.resolve({ value: [] });
@@ -95,23 +95,12 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('The specified site design does not exist');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        title: 'Contoso Site Design'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified site design does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      title: 'Contoso Site Design' } } as any), new CommandError('The specified site design does not exist'));
   });
 
-  it('fails when multiple site designs with same title exists', (done) => {
+  it('fails when multiple site designs with same title exists', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
         return Promise.resolve({
@@ -171,23 +160,12 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        title: 'Contoso Site Design'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple site designs with title Contoso Site Design found: ca360b7e-1946-4292-b854-e0ad904f1055, 88ff1405-35d0-4880-909a-97693822d261`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      title: 'Contoso Site Design' } } as any), new CommandError('Multiple site designs with title Contoso Site Design found: ca360b7e-1946-4292-b854-e0ad904f1055, 88ff1405-35d0-4880-909a-97693822d261'));
   });
 
-  it('gets information about the specified site design by id', (done) => {
+  it('gets information about the specified site design by id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignMetadata`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -211,30 +189,23 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "SiteScriptIds": [
-            "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
-          ],
-          "Title": "Contoso REST",
-          "WebTemplate": "64",
-          "Id": "ca360b7e-1946-4292-b854-e0ad904f1055",
-          "Version": 1
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "SiteScriptIds": [
+        "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
+      ],
+      "Title": "Contoso REST",
+      "WebTemplate": "64",
+      "Id": "ca360b7e-1946-4292-b854-e0ad904f1055",
+      "Version": 1
+    }));
   });
 
-  it('gets information about the specified site design by title', (done) => {
+  it('gets information about the specified site design by title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
         return Promise.resolve({
@@ -288,30 +259,23 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso Site Design' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "SiteScriptIds": [
-            "3aff9f82-fe6c-42d3-803f-8951d26ed854"
-          ],
-          "Title": "Contoso Site Design",
-          "WebTemplate": "68",
-          "Id": "ca360b7e-1946-4292-b854-e0ad904f1055",
-          "Version": 1
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Contoso Site Design' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "SiteScriptIds": [
+        "3aff9f82-fe6c-42d3-803f-8951d26ed854"
+      ],
+      "Title": "Contoso Site Design",
+      "WebTemplate": "68",
+      "Id": "ca360b7e-1946-4292-b854-e0ad904f1055",
+      "Version": 1
+    }));
   });
 
-  it('gets information about the specified site design (debug)', (done) => {
+  it('gets information about the specified site design (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignMetadata`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -335,43 +299,28 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "SiteScriptIds": [
-            "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
-          ],
-          "Title": "Contoso REST",
-          "WebTemplate": "64",
-          "Id": "ca360b7e-1946-4292-b854-e0ad904f1055",
-          "Version": 1
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "SiteScriptIds": [
+        "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
+      ],
+      "Title": "Contoso REST",
+      "WebTemplate": "64",
+      "Id": "ca360b7e-1946-4292-b854-e0ad904f1055",
+      "Version": 1
+    }));
   });
 
-  it('correctly handles error when site design not found', (done) => {
+  it('correctly handles error when site design not found', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    command.action(logger, { options: { debug: false, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports debug mode', () => {
