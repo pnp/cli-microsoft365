@@ -172,6 +172,7 @@ export default {
   REPORT_SITEUSAGEPAGES: `${prefix} report siteusagepages`,
   REPORT_SITEUSAGESITECOUNTS: `${prefix} report siteusagesitecounts`,
   REPORT_SITEUSAGESTORAGE: `${prefix} report siteusagestorage`,
+  ROLEDEFINITION_ADD: `${prefix} roledefinition add`,
   ROLEDEFINITION_GET: `${prefix} roledefinition get`,
   ROLEDEFINITION_LIST: `${prefix} roledefinition list`,
   ROLEDEFINITION_REMOVE: `${prefix} roledefinition remove`,
