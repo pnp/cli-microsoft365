@@ -23,7 +23,7 @@ export class FN010008_YORC_nodeVersion extends JsonRule {
   get resolution(): string {
     return `{
   "@microsoft/generator-sharepoint": {
-    "nodeVersion": ${process.version.substring(1)}
+    "nodeVersion": "${process.version.substring(1)}"
   }
 }`;
   }
