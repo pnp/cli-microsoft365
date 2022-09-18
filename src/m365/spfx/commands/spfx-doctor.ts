@@ -440,9 +440,9 @@ class SpfxDoctorCommand extends AnonymousCommand {
       }
     },
     '1.16.0-beta.1': {
-      gulp: {
-        range: '^4',
-        fix: 'npm i -g gulp@4'
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^16.13',
