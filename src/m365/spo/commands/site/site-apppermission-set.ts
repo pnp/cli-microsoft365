@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteAppPermissionSetCommand extends GraphCommand {
   private siteId: string = '';
+  private roles: string[] = ['read', 'write', 'manage', 'fullcontrol'];
 
   public get name(): string {
     return commands.SITE_APPPERMISSION_SET;
@@ -42,7 +43,8 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         permissionId: typeof args.options.permissionId !== 'undefined',
         appId: typeof args.options.appId !== 'undefined',
-        appDisplayName: typeof args.options.appDisplayName !== 'undefined'
+        appDisplayName: typeof args.options.appDisplayName !== 'undefined',
+        permissions: args.options.permissions
       });
     });
   }
@@ -62,7 +64,8 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
         option: '-n, --appDisplayName [appDisplayName]'
       },
       {
-        option: '-p, --permission <permission>'
+        option: '-p, --permission <permission>',
+        autocomplete: this.roles
       }
     );
   }
@@ -74,8 +77,8 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
           return `${args.options.appId} is not a valid GUID`;
         }
 
-        if (['read', 'write', 'owner'].indexOf(args.options.permission) === -1) {
-          return `${args.options.permission} is not a valid permission value. Allowed values are read|write|owner`;
+        if (this.roles.indexOf(args.options.permission) === -1) {
+          return `${args.options.permission} is not a valid permission value. Allowed values are ${this.roles.join('|')}`;
         }
 
         return validation.isValidSharePointUrl(args.options.siteUrl);
