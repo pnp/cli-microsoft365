@@ -21,6 +21,7 @@
 - [spo web roleassignment add](../cmd/spo/web/web-roleassignment-add.md) - adds a role assignment to web permissions [#3549](https://github.com/pnp/cli-microsoft365/issues/3549)
 - [spo web roleassignment remove](../cmd/spo/web/web-roleassignment-remove.md) - removes a role assignment from web permissions [#3550](https://github.com/pnp/cli-microsoft365/issues/3550)
 - [spo listitem roleassignment remove](../cmd/spo/listitem/listitem-roleassignment-remove.md) - removes a role assignment from a listitem [#3543](https://github.com/pnp/cli-microsoft365/issues/3543)
+- [spo roledefinition add](../cmd/spo/roledefinition/roledefinition-add.md) - adds a new roledefinition to web [#3271](https://github.com/pnp/cli-microsoft365/issues/3271)
 
 ### Changes
 
@@ -41,6 +42,7 @@
 - added ability to send emails from a specified account or mailbox [#3589](https://github.com/pnp/cli-microsoft365/issues/3589)
 - fixed rendering code fences in md [#3636](https://github.com/pnp/cli-microsoft365/issues/3636)
 - fixed status command to show correct connection status [#3260](https://github.com/pnp/cli-microsoft365/issues/3260)
+- fixed missing quotes in spfx project upgrade to 1.16.0-beta.1 [#3660](https://github.com/pnp/cli-microsoft365/issues/3660)
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
