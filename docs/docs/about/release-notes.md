@@ -40,6 +40,7 @@
 - resolved file creation suggestion for PS and CMD [#3497](https://github.com/pnp/cli-microsoft365/issues/3497)
 - added ability to send emails from a specified account or mailbox [#3589](https://github.com/pnp/cli-microsoft365/issues/3589)
 - fixed rendering code fences in md [#3636](https://github.com/pnp/cli-microsoft365/issues/3636)
+- fixed status command to show correct connection status [#3260](https://github.com/pnp/cli-microsoft365/issues/3260)
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
