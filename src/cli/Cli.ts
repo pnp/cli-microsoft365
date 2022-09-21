@@ -180,15 +180,15 @@ export class Cli {
 
     try {
       await command.action(logger, args as any);
+
+      if (args.options.debug || args.options.verbose) {
+        const chalk: typeof Chalk = require('chalk');
+        logger.logToStderr(chalk.green('DONE'));
+      }
     }
     finally {
       // restore the original command name
       cli.currentCommandName = parentCommandName;
-    }
-
-    if (args.options.debug || args.options.verbose) {
-      const chalk: typeof Chalk = require('chalk');
-      logger.logToStderr(chalk.green('DONE'));
     }
   }
 
@@ -240,6 +240,7 @@ export class Cli {
     try {
       await command.action(logger, args as any);
 
+      // restoring the command and logger is done here instead of in a 'finally' because there were issues with the code coverage tool
       // restore the original command name
       cli.currentCommandName = parentCommandName;
       // restore the original logger
@@ -251,6 +252,7 @@ export class Cli {
       });
     }
     catch (err: any) {
+      // restoring the command and logger is done here instead of in a 'finally' because there were issues with the code coverage tool
       // restore the original command name
       cli.currentCommandName = parentCommandName;
       // restore the original logger

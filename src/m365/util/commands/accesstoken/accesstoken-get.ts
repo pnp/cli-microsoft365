@@ -51,16 +51,16 @@ class UtilAccessTokenGetCommand extends Command {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let resource: string = args.options.resource;
 
-    try {
-      if (resource.toLowerCase() === 'sharepoint') {
-        if (auth.service.spoUrl) {
-          resource = auth.service.spoUrl;
-        }
-        else {
-          throw `SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`;
-        }
+    if (resource.toLowerCase() === 'sharepoint') {
+      if (auth.service.spoUrl) {
+        resource = auth.service.spoUrl;
       }
-  
+      else {
+        throw `SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`;
+      }
+    }
+
+    try { 
       const accessToken: string = await auth.ensureAccessToken(resource, logger, this.debug, args.options.new);
       logger.log(accessToken);      
     } 
