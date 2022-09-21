@@ -1,6 +1,8 @@
 ---
 tags:  
-  - Reports
+  - adaptivecards
+  - flows
+  - reports
 ---
 
 # Flow runs day summary report
@@ -60,9 +62,3 @@ This script creates a report of all flow runs from current day and sends the rep
 
     m365 adaptivecard send --url $webhook --card $adaptiveCard --cardData $cardData
     ```
-
-Keywords:
-
-- Flow
-- Power Automate
-- Adaptive Card

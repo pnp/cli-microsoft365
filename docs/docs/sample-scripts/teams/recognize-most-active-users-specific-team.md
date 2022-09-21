@@ -1,7 +1,7 @@
 ---
 tags:
-  - Users
-  - Social
+  - adoption
+  - users
 ---
 
 # Recognize most active users for a specific Team
@@ -120,8 +120,3 @@ Retrieves all activities for a specific Microsoft Teams Team and shares the top 
 
     m365 adaptivecard send --url $webhookUrl --card $card
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Adoption

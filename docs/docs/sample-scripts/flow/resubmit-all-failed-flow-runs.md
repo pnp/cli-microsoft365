@@ -1,6 +1,6 @@
 ---
 tags:  
-  - Failures
+  - flows
 ---
 
 # Resubmit all failed flow runs for a flow in an environment

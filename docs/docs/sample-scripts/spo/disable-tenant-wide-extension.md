@@ -1,6 +1,7 @@
 ---
 tags:
-  - Provisioning
+  - customizations
+  - provisioning
 ---
 
 # Disable specified Tenant-wide Extension
@@ -54,8 +55,3 @@ Note: TenantWideExtensionDisabled column denotes the extension is enabled or dis
       echo "No extensions found with the name '$extensionName'."
     fi
     ```
-
-Keywords:
-
-- SharePoint Online
-- Tenant Wide Extension

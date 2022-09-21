@@ -1,6 +1,7 @@
 ---
 tags:
-  - Files    
+  - files
+  - migration
 ---
 
 # Upload local files and folders to SharePoint Online
@@ -46,7 +47,3 @@ This script shows how you can use the CLI to upload files located on a local fol
     $siteUrl = 'https://contoso.sharepoint.com/sites/TestFileImport'
     Import-FilesAndFolders -folderPath $importFolderPath -sPFolderPath $sPFolderPath -siteUrl $siteUrl
     ```
-
-Keywords:
-
-- SharePoint Migration

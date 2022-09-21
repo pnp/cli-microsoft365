@@ -1,7 +1,8 @@
 ---
 tags:  
-  - Cleanup
-  - Sites
+  - cleanup
+  - groups
+  - sites
 ---
 
 # Delete all Microsoft 365 groups and SharePoint sites
@@ -60,8 +61,3 @@ Another example how you can delete all Microsoft 365 Groups and SharePoint Onlin
       m365 spo site remove --url $site.Url --skipRecycleBin $skipRecycleBin --confirm $true
     }
     ```
-
-Keywords:
-
-- SharePoint Online
-- Microsoft 365 Groups

@@ -1,7 +1,10 @@
 ---
 tags:  
-  - Users
-  - Security
+  - users
+  - groups
+  - security
+  - security
+  - teams
 ---
 
 # Replace an owner in a Microsoft 365 Group or Microsoft Team
@@ -86,9 +89,3 @@ Find all the Microsoft 365 Groups that a user is an Owner of and replace them wi
 
     Replace-Owner $oldUser $newUser
     ```
-
-Keywords:
-
-- Microsoft 365 Groups
-- Microsoft Teams
-- Governance

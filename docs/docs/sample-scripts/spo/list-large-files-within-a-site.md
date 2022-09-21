@@ -1,7 +1,7 @@
 ---
 tags:
-  - Files
-  - Reports
+  - files
+  - reports
 ---
 
 # List all large files within a SharePoint Site
@@ -62,8 +62,3 @@ The following script will help you find every files in a specific SharePoint Onl
 
     $results
     ```
-
-Keywords
-
-- SharePoint Online
-- Governance

@@ -1,7 +1,7 @@
 ---
 tags:
-  - Security
-  - Users  
+  - security
+  - users  
 ---
 
 # Replace site collection admin with another user
@@ -29,8 +29,3 @@ The script removes a user from a site collection and adds a new one as site coll
     m365 spo user remove --webUrl $webUrl --loginName "i:0#.f|membership|$userToRemove" --confirm
     m365 spo site classic set --url $webUrl --owners $userToAdd
     ```
-
-Keywords
-
-- SharePoint Online
-- Governance

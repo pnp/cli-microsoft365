@@ -1,7 +1,8 @@
 ---
 tags:
-  - Files  
-  - Reports
+  - files  
+  - libraries  
+  - reports
 ---
 
 # Lists number of files in all lists and folders for the given site
@@ -51,8 +52,3 @@ List all Lists, the folders and sub folders in a given site, and output the item
 
     $results | Export-Csv -Path $fileExportPath -NoTypeInformation
     ```
-
-Keywords:
-
-- SharePoint Online
-- Governance

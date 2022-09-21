@@ -1,7 +1,8 @@
 ---
 tags:
-  - Files
-  - Migration
+  - azure
+  - files
+  - migration
 ---
 
 # Sync SharePoint Document Library Documents with Azure Storage Container
@@ -79,10 +80,3 @@ Prerequisites:
       Write-Host "No files in $spolDocLibTitle library" -ForegroundColor Yellow
     }
     ```
-
-Keywords:
-
-- Azure
-- Azure CLI
-- SharePoint Online
-- Storage

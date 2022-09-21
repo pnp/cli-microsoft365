@@ -1,8 +1,8 @@
 ---
 tags:
-  - Reports
-  - Users
-  - Security
+  - reports
+  - security
+  - users
 ---
 
 # List site collection owners
@@ -50,8 +50,3 @@ This script helps you to list and export all site collection owners in your Shar
     $results | Export-Csv -Path $fileExportPath -NoTypeInformation
     Write-Host "Completed."
     ```
-
-Keywords:
-
-- SharePoint Online
-- Governance

@@ -1,7 +1,8 @@
 ---
 tags:
-  - Lists
-  - Migration
+  - lists
+  - listitems
+  - migration
 ---
 
 # Copy list items between SharePoint lists
@@ -34,8 +35,3 @@ This script helps you to copy list items from one list to another list. I have w
     }
     Write-Host 'Report has been generated in .txt format, please check your drive' -fore Cyan
     ```
-
-Keywords:
-
-- SharePoint Online
-- Lists

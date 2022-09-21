@@ -1,6 +1,7 @@
 ---
 tags:
-  - Reports
+  - reports
+  - sites
 ---
 
 # Monitor Site Collections Storage Usage
@@ -66,8 +67,3 @@ Inspired by [Salaudeen Rajack](https://www.sharepointdiary.com/2020/08/sharepoin
         }
     }
     ```
-
-Keywords
-
-- SharePoint Online
-- Governance

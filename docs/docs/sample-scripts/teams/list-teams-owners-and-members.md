@@ -1,6 +1,6 @@
 ---
 tags:
-  - Users
+  - teams
 ---
 
 # List all Microsoft Teams team's Owners and Members
@@ -47,8 +47,3 @@ This script allows you to list all Teams team's owners and members and export th
     $exportData | Export-Csv -Path $fileExportPath -NoTypeInformation
     Write-Host "Completed."
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Governance

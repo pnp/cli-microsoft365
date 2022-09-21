@@ -1,6 +1,7 @@
 ---
 tags:
-  - Cleanup
+  - cleanup
+  - teams
 ---
 
 # Remove Wiki tab in a Microsoft Teams channel
@@ -67,7 +68,3 @@ Removes the wiki tab of a Microsoft Teams Team's channel.
       fi
     fi
     ```
-
-Keywords:
-
-- Microsoft Teams

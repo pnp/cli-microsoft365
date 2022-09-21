@@ -1,6 +1,8 @@
 ---
 tags:
-  - Users
+  - provisioning
+  - teams
+  - users
 ---
 
 # Create a Microsoft Teams team and bulk add members from CSV file
@@ -87,8 +89,3 @@ This sample script shows you how to create a Team and add members and owners usi
     Write-Host "Completed."
     ```
 
-Keywords:
-
-- Microsoft Teams
-- Provisioning
-- Governance

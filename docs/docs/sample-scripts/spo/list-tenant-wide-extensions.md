@@ -1,6 +1,7 @@
 ---
 tags:
-  - Reports
+  - customizations
+  - reports
 ---
 
 # List all tenant-wide extensions
@@ -45,8 +46,3 @@ Location|TenantWideExtensionLocation|Location of the extension. There are differ
 Sequence|TenantWideExtensionSequence|The sequence of the extension in rendering.
 Host Properties|TenantWideExtensionHostProperties|Additional server-side configuration, like pre-allocated height for placeholders.
 Disabled|TenantWideExtensionDisabled|Is the extension enabled or disabled?
-
-Keywords:
-
-- SharePoint Online
-- Tenant Wide Extension

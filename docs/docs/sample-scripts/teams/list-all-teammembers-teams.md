@@ -1,7 +1,8 @@
 ---
 tags:
-  - Users
-  - Reports
+  - users
+  - reports
+  - teams
 ---
 
 # List all team members in Microsoft Teams teams in the tenant
@@ -46,8 +47,3 @@ List all team members in Microsoft Teams teams in the tenant and exports the res
         m365 login --authType browser
     }
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Governance

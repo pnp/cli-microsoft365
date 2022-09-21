@@ -1,6 +1,6 @@
 ---
 tags:
-  - Lists
+  - lists
 ---
 
 # Hide SharePoint list from Site Contents
@@ -34,8 +34,3 @@ If you need to hide the SharePoint list from the UI this simple PowerShell scrip
     listId=$(m365 spo list get --webUrl $site -t "$listName" -o json | jq ".Id")
     m365 spo list set --webUrl $site -i $listId -t $listName --hidden true
     ```
-
-Keywords:
-
-- SharePoint Online
-- Hide List

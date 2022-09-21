@@ -1,6 +1,6 @@
 ---
 tags:
-  - Security
+  - security
 ---
 
 # Grant API permissions to SharePoint Azure AD Application
@@ -145,9 +145,3 @@ So what if you could bypass all these steps for both Graph and owned API?
       fi
     done
     ```
-
-Keywords:
-
-* SharePoint Online
-* Azure Active Directory
-* Microsoft Graph

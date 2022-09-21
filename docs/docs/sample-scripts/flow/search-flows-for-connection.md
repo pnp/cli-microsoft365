@@ -1,6 +1,7 @@
 ---
 tags:  
-  - Reports
+  - flows
+  - reports
 ---
 
 # Search flows for connections
@@ -40,7 +41,3 @@ Search all flows as, an administrator, for a specific search string and report r
         }
     }
     ```
-
-Keywords:
-
-- Power Automate

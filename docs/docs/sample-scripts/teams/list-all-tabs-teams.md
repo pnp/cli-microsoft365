@@ -1,6 +1,7 @@
 ---
 tags:
-  - Reports
+  - reports
+  - teams
 ---
 
 # List all tabs in Microsoft Teams teams in the tenant
@@ -54,8 +55,3 @@ List all tabs in Microsoft Teams teams in the tenant and exports the results in 
     $results | Export-Csv -Path $fileExportPath -NoTypeInformation
     Write-Host "Completed."
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Governance

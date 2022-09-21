@@ -1,6 +1,8 @@
 ---
 tags:
-  - Provisioning
+  - apps
+  - provisioning
+  - users
 ---
 
 # Deploy Microsoft Teams personal app and add it to users
@@ -118,7 +120,3 @@ Installs or updates a Microsoft Teams app from a provided zipped manifest and th
       }
     }
     ```
-
-Keywords:
-
-- Microsoft Teams

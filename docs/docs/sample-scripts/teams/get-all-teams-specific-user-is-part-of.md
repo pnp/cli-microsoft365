@@ -1,6 +1,8 @@
 ---
 tags:
-  - Users
+  - teams
+  - reports
+  - users
 ---
 
 # Get all the Teams a specific user is part of
@@ -104,8 +106,3 @@ Author: [Veronique Lengelle](https://twitter.com/veronicageek)
         $results | Export-Csv -Path $logFile -NoTypeInformation
     }
     ```
-
-Keywords
-
-- Microsoft Teams
-- Governance

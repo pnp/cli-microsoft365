@@ -1,6 +1,7 @@
 ---
 tags:
-  - Lists
+  - libraries
+  - files
 ---
 
 # Insert pictures in a SharePoint Document Library into a Word document
@@ -89,9 +90,3 @@ Prerequisites:
 
     Write-Host "Execution completed"
     ```
-
-Keywords:
-
-- SharePoint Online
-- Windows
-- Microsoft Word

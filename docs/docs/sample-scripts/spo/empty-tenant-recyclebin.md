@@ -1,6 +1,6 @@
 ---
 tags:
-  - Cleanup
+  - cleanup
 ---
 
 # Empty the tenant recycle bin
@@ -57,6 +57,3 @@ Your deleted modern SharePoint sites are not going to disappear from the UI befo
     done
     ```
 
-Keywords:
-
-- SharePoint Online

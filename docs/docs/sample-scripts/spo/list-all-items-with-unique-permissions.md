@@ -1,7 +1,7 @@
 ---
 tags:
-  - Security
-  - Lists
+  - listitems
+  - security
 ---
 
 # List all items with unique permissions
@@ -58,8 +58,3 @@ Author: [Veronique Lengelle](https://twitter.com/veronicageek), Inspired by [Sal
     }
     $results
     ```
-
-Keywords
-
-- SharePoint Online
-- Governance

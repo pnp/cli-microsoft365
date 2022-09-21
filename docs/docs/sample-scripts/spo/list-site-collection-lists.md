@@ -1,6 +1,8 @@
 ---
 tags:
-  - Reports
+  - lists
+  - reports
+  - sites
 ---
 
 # List site collections and their lists
@@ -60,8 +62,3 @@ This script helps you to list and export all site collection and their lists Sha
     $results | Export-Csv -Path $fileExportPath -NoTypeInformation
     Write-Host "Completed."
     ```
-
-Keywords:
-
-- SharePoint Online
-- Governance

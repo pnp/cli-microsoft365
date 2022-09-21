@@ -1,7 +1,9 @@
 ---
 tags:
-  - Users
-  - Security
+  - reports
+  - security
+  - teams
+  - users
 ---
 
 # Govern orphaned Microsoft Teams
@@ -92,8 +94,3 @@ Every team needs an owner, at least one. Common best practice is that you should
 
     exit 1
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Governance

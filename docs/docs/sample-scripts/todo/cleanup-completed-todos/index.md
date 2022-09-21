@@ -1,7 +1,7 @@
 ---
 tags:
-  - Cleanup
-  - Tasks
+  - cleanup
+  - tasks
 ---
 
 # Cleanup completed Microsoft To Do tasks
@@ -60,7 +60,3 @@ This script iterates across all of the task lists and removes the tasks that hav
 
     echo "Done"
     ```
-
-Keywords:
-
-- Microsoft To Do

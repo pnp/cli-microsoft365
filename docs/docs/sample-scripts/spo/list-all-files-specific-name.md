@@ -1,6 +1,7 @@
 ---
 tags:
-  - Files
+  - files
+  - reports
 ---
 
 # List all documents with a specific name within a SharePoint site
@@ -56,8 +57,3 @@ This script will retrieve all the files in a site that have a specific word (i.e
     }
     $results
     ```
-
-Keywords
-
--   SharePoint Online
--   Governance

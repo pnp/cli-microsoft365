@@ -1,6 +1,7 @@
 ---
 tags:
-  - Provisioning
+  - provisioning
+  - sites
 ---
 
 # Add App Catalog to SharePoint site
@@ -29,8 +30,3 @@ When you just want to deploy certain SharePoint solution to a specific site, it'
     m365 spo site appcatalog add --url $site
     echo "App Catalog Created on $site"
     ```
-
-Keywords:
-
-- SharePoint Online
-- Create App Catalog for site

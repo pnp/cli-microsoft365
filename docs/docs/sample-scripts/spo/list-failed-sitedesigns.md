@@ -1,7 +1,6 @@
 ---
 tags:
-  - Reports
-  - Failures
+  - reports
 ---
 
 # List all failed site design for all sites
@@ -28,8 +27,3 @@ The following script iterates through all site collections and lists all site de
         }
     }
     ```
-
-Keywords:
-
-- SharePoint Online
-- Site Design

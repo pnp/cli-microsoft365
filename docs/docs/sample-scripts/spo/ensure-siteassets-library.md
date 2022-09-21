@@ -1,7 +1,7 @@
 ---
 tags:
-  - Provisioning
-  - Lists
+  - lists
+  - provisioning
 ---
 
 # Ensure the Site Assets Library is created

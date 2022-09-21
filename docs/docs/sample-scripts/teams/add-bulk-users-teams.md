@@ -1,6 +1,7 @@
 ---
 tags:
-  - Users
+  - provisioning
+  - users
 ---
 
 # Bulk add members to Microsoft Teams team from CSV file
@@ -41,8 +42,3 @@ Inspired by: [Rakesh Pandey](https://www.flexmind.co/blog/how-to-add-bulk-users-
       m365 aad o365group user add --groupId $row.teamId --userName $($row.UPN) --role $($row.role)
     }
     ```
-
-Keywords:
-
-- Teams
-- Provisioning

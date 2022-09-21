@@ -1,7 +1,10 @@
 ---
 tags:  
-  - Cleanup
-  - Users
+  - cleanup
+  - groups
+  - security
+  - teams
+  - users
 ---
 
 # Replace a user's membership in selected Microsoft 365 Groups or Teams
@@ -125,9 +128,3 @@ This script can be used to replace the membership of a user for a selected list 
     <groupId>
     <groupId>
     ```
-
-Keywords:
-
-- Microsoft 365 Groups
-- Microsoft Teams
-- Governance

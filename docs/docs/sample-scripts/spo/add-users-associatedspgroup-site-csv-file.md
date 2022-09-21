@@ -1,7 +1,8 @@
 ---
 tags:
-  - Users
-  - Security
+  - groups
+  - users
+  - security
 ---
 
 # Add users to the Associated SharePoint Groups of a site from a CSV File
@@ -79,8 +80,3 @@ Permission Level mapping assumptions are given below
         m365 spo group user add --webUrl $siteURL --groupId $PermissionLevel.SPGroupId --userName $PermissionLevel.UsernameValues
     }
     ```
-
-Keywords
-
-- SharePoint Online
-- SharePoint Group

@@ -1,6 +1,7 @@
 ---
 tags:  
-  - Migration
+  - flows
+  - migration
 ---
 
 # Export all flows in environment

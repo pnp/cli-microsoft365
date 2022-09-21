@@ -1,7 +1,8 @@
 ---
 tags:  
-  - Users
-  - Reports
+  - users
+  - reports
+  - groups
 ---
 
 # Scan for Microsoft 365 Groups created with user's first or last name
@@ -83,8 +84,3 @@ Note: The filter condition can be changed as per your requirement.
     IFS=defaultIFS
     exit 1
     ```
-
-Keywords:
-
-- Microsoft 365 Group
-- Governance

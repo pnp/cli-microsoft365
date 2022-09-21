@@ -1,7 +1,7 @@
 ---
 tags:
-  - Provisioning
-  - Cleanup
+  - provisioning
+  - cleanup
 ---
 
 # Delete custom color themes from SharePoint
@@ -64,8 +64,3 @@ Have you been creating a lot of beautiful themes lately and testing them in your
       m365 spo theme remove --name "$theme" --confirm
     done
     ```
-
-Keywords:
-
-- SharePoint Online
-- Themes

@@ -1,6 +1,7 @@
 ---
 tags:
-  - Reports
+  - reports
+  - teams
 ---
 
 # List Microsoft Teams teams, channels, and tabs in the tenant
@@ -52,8 +53,3 @@ Inspired by: [Veronique Lengelle](https://veronicageek.com/powershell/powershell
     }
     $results | Export-Csv -Path $exportFile -NoTypeInformation
     ```
-
-Keywords:
-
-- Teams
-- Governance

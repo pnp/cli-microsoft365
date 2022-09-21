@@ -1,6 +1,6 @@
 ---
 tags:
-  - Reports
+  - reports
 ---
 
 # Lists active SharePoint site collection application catalogs
@@ -32,9 +32,3 @@ Note, because the sample uses the SharePoint search API to identify the site col
     echo $appCatalogs | jq -r '.[].SPSiteURL'
     echo "Total count:" $(echo $appCatalogs | jq length)
     ```
-
-Keywords:
-
-- SharePoint Online
-- Governance
-- Security

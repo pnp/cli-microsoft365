@@ -1,8 +1,8 @@
 ---
 tags:
-  - Migration
-  - Lists
-  - Tasks
+  - lists
+  - migration
+  - tasks
 ---
 
 # Planner migration to SharePoint list
@@ -132,9 +132,3 @@ Use the CLI for Microsoft 365 to migrate an existing plan to a SharePoint Online
         }
     }
     ```
-
-Keywords:
-
-- CLI for Microsoft 365
-- SharePoint Online
-- Planner

@@ -1,6 +1,7 @@
 ---
 tags:  
-  - Cleanup
+  - cleanup
+  - flows
 ---
 
 # Cancel all running flow runs for a flow in an environment

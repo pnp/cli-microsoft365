@@ -1,6 +1,8 @@
 ---
 tags:  
-  - Migration
+  - azure
+  - flows
+  - migration
 ---
 
 # Export a single flow to a Logic App

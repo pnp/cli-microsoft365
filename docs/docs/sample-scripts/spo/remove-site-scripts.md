@@ -1,6 +1,6 @@
 ---
 tags:
-  - Cleanup    
+  - cleanup    
 ---
 
 # Delete custom SharePoint site scripts
@@ -67,8 +67,3 @@ Site designs and especially site scripts can be something that ends up just hang
       m365 spo sitescript remove --id $scriptId --confirm
     done
     ```
-
-Keywords:
-
-- SharePoint Online
-- Site Scripts

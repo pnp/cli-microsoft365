@@ -1,6 +1,7 @@
 ---
 tags:
-  - Migration
+  - migration
+  - teams
 ---
 
 # Export conversations from Microsoft Teams Channels
@@ -98,8 +99,3 @@ This script uses CLI for Microsoft 365 to export the conversations from Microsof
       Write-Error $ErrorMessage
     }
     ```
-
-Keywords:
-
-- Microsoft Teams
-- PowerShell

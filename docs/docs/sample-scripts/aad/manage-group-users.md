@@ -1,7 +1,9 @@
 ---
 tags:
-  - Security
-  - Users
+  - groups
+  - security
+  - teams
+  - users
 ---
 
 # Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups
@@ -61,9 +63,3 @@ Note: Refactor the code as per your requirement.
     groupMailNickname2, user2@domainname.com, member, add
     groupMailNickname3, user3@domainname.com, , remove
     ```
-
-Keywords:
-
-- Microsoft 365 Groups
-- Microsoft Teams
-- Governance

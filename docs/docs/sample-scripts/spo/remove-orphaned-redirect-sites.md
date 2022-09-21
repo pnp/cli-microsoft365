@@ -1,6 +1,7 @@
 ---
 tags:
-  - Cleanup
+  - cleanup
+  - sites
 ---
 
 # Remove orphaned redirect sites

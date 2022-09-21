@@ -1,7 +1,7 @@
 ---
 tags:  
-  - Privacy
-  - Users
+  - security
+  - users
 ---
 
 # Analyze users for known data breaches with have i been pwned
@@ -38,10 +38,3 @@ Validate all your users against known breaches with the have i been pwned api. T
       Start-Sleep -Milliseconds 1500
     }
     ```
-
-Keywords:
-
-- Azure
-- Microsoft 365
-- PowerShell
-- Security

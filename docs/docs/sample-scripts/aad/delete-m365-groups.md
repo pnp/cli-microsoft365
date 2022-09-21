@@ -1,6 +1,7 @@
 ---
 tags:  
-  - Cleanup
+  - cleanup
+  - groups
 ---
 
 # Delete all Microsoft 365 groups
@@ -67,8 +68,3 @@ There are so many different ways to create Microsoft 365 groups. Teams, Planner,
       m365 aad o365group remove --id "$id" --confirm
     done
     ```
-
-Keywords:
-
-- SharePoint Online
-- Microsoft 365 Groups

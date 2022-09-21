@@ -23,9 +23,3 @@ Obtain a new access token for the Microsoft Graph and use it an HTTP request.
     me=`curl https://graph.microsoft.com/v1.0/me -H "Authorization: Bearer $token"`
     echo $me | jq
     ```
-
-Keywords:
-
-- Microsoft Graph
-- Access Token
-- HTTP

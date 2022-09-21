@@ -1,7 +1,8 @@
 ---
 tags:
-  - Users
-  - Security
+  - groups
+  - users
+  - security
 ---
 
 # Change group membership of all SharePoint Online sites
@@ -47,7 +48,3 @@ This is a script which takes a subset or all members of the default owner group 
     }
     ```
 
-Keywords
-
-- SharePoint Online
-- Governance
