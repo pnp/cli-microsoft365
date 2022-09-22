@@ -63,7 +63,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['SchemaName', 'EntitySetName', 'IsManaged']);
   });
 
-  it('Retrieves retrieves data from dataverse as admin', (done) => {
+  it('Retrieves retrieves data from dataverse as admin', async () => {
     const envResponse: any = { "properties": { "linkedEnvironmentMetadata": { "instanceApiUrl": "https://contoso-dev.api.crm4.dynamics.com" } } };
 
     const dataverseResponse: any = {
@@ -215,18 +215,11 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(dataverseResponse.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true } });
+    assert(loggerLogSpy.calledWith(dataverseResponse.value));
   });
 
-  it('Retrieves retrieves data from dataverse', (done) => {
+  it('Retrieves retrieves data from dataverse', async () => {
     const envResponse: any = { "properties": { "linkedEnvironmentMetadata": { "instanceApiUrl": "https://contoso-dev.api.crm4.dynamics.com" } } };
 
     const dataverseResponse: any = {
@@ -379,18 +372,11 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(dataverseResponse.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+    assert(loggerLogSpy.calledWith(dataverseResponse.value));
   });
 
-  it('correctly handles access denied to environment', (done) => {
+  it('correctly handles access denied to environment', async () => {
     const errorResponse: any = {
       "error": {
         "code": "EnvironmentAccessDenied",
@@ -402,20 +388,11 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
       return Promise.reject(errorResponse);
     });
 
-    command.action(logger, { options: { debug: false, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { } } as any),
+      new CommandError(`Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied.`));
   });
 
-  it('correctly handles non existing environments', (done) => {
+  it('correctly handles non existing environments', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -425,18 +402,12 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, environment: 'nonexisting' } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The environment 'nonexisting' could not be found in the tenant 'someid'.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false, environment: 'nonexisting' } } as any),
+      new CommandError(`The environment 'nonexisting' could not be found in the tenant 'someid'.`));
   });
 
-  it('correctly handles dataverse URI not found', (done) => {
+  it('correctly handles dataverse URI not found', async () => {
     const envResponse: any = { "properties": { "linkedEnvironmentMetadata": { "instanceApiUrl": "" } } };
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -450,18 +421,11 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, environment: 'noDynamics' } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`No Dynamics instance found for 'noDynamics'`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, environment: 'noDynamics' } } as any),
+      new CommandError(`No Dynamics instance found for 'noDynamics'`));
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -475,15 +439,9 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
+
   });
 
   it('supports debug mode', () => {

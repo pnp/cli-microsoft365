@@ -1,9 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import auth from '../../Auth';
-import { Logger } from '../../cli';
-import { CommandError } from '../../Command';
-
 import request from '../../request';
 import { sinonUtil } from '../../utils';
 
@@ -19,7 +16,8 @@ class MockCommand extends DataverseCommand {
     return 'Mock command';
   }
 
-  public commandAction(): void {
+  public commandAction(): Promise<void> {
+    return Promise.resolve();
   }
 
   public commandHelp(): void {
@@ -27,29 +25,9 @@ class MockCommand extends DataverseCommand {
 }
 
 describe('DataverseCommand', () => {
-  let log: string[];
-  let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
-
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     auth.service.connected = true;
-  });
-
-  beforeEach(() => {
-    log = [];
-    logger = {
-      log: (msg: string) => {
-        log.push(msg);
-      },
-      logRaw: (msg: string) => {
-        log.push(msg);
-      },
-      logToStderr: (msg: string) => {
-        log.push(msg);
-      }
-    };
-    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -60,7 +38,7 @@ describe('DataverseCommand', () => {
 
   after(() => {
     sinonUtil.restore([
-      auth.restoreAuth,
+      auth.restoreAuth
     ]);
     auth.service.connected = false;
   });
