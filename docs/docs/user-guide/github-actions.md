@@ -198,7 +198,7 @@ Add the respective script file to your repository and this step to a `.yaml` bui
 
 ### CLI for Microsoft 365 Login
 
-View on [GitHub Marketplace](https://github.com/marketplace/actions/office-365-cli-login)
+View on [GitHub Marketplace](https://github.com/marketplace/actions/cli-for-microsoft-365-login)
 
 #### Inputs
 
