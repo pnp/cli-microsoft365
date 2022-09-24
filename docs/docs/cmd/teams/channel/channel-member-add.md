@@ -43,7 +43,7 @@ m365 teams conversationmember add [options]
 
 At least one owner must be assigned to a private channel.
 
-You can only add members and owners of a Team to a private channel.
+You can only add members and owners of a Team to a private or shared channel.
 
 ## Examples
 
