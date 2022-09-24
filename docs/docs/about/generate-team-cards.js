@@ -381,6 +381,12 @@ const contributors = [
     twitter: 'nickhonen4'
   },
   {
+    name: 'Otto',
+    company: '',
+    github: 'berot3',
+    twitter: ''
+  },
+  {
     name: 'Patrick Lamber',
     company: 'Experts Inside',
     github: 'plamber',
