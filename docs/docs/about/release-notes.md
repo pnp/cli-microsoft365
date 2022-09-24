@@ -18,10 +18,11 @@
 
 **SharePoint:**
 
-- [spo web roleassignment add](../cmd/spo/web/web-roleassignment-add.md) - adds a role assignment to web permissions [#3549](https://github.com/pnp/cli-microsoft365/issues/3549)
-- [spo web roleassignment remove](../cmd/spo/web/web-roleassignment-remove.md) - removes a role assignment from web permissions [#3550](https://github.com/pnp/cli-microsoft365/issues/3550)
+- [spo contenttype set](../cmd/spo/contenttype/contenttype-set.md) - updates existing content type [#3613](https://github.com/pnp/cli-microsoft365/issues/3613)
 - [spo listitem roleassignment remove](../cmd/spo/listitem/listitem-roleassignment-remove.md) - removes a role assignment from a listitem [#3543](https://github.com/pnp/cli-microsoft365/issues/3543)
 - [spo roledefinition add](../cmd/spo/roledefinition/roledefinition-add.md) - adds a new roledefinition to web [#3271](https://github.com/pnp/cli-microsoft365/issues/3271)
+- [spo web roleassignment add](../cmd/spo/web/web-roleassignment-add.md) - adds a role assignment to web permissions [#3549](https://github.com/pnp/cli-microsoft365/issues/3549)
+- [spo web roleassignment remove](../cmd/spo/web/web-roleassignment-remove.md) - removes a role assignment from web permissions [#3550](https://github.com/pnp/cli-microsoft365/issues/3550)
 
 ### Changes
 
@@ -44,6 +45,8 @@
 - fixed status command to show correct connection status [#3260](https://github.com/pnp/cli-microsoft365/issues/3260)
 - fixed missing quotes in spfx project upgrade to 1.16.0-beta.1 [#3660](https://github.com/pnp/cli-microsoft365/issues/3660)
 - refactored commandAction to async/await [#3430](https://github.com/pnp/cli-microsoft365/issues/3430)
+- extended 'outlook mail send' with cc, bcc, and importance [#3544](https://github.com/pnp/cli-microsoft365/issues/3544)
+- fixed 'spo site apppermissions add/set' assigning the wrong owner permissions [#3630](https://github.com/pnp/cli-microsoft365/issues/3630)
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
@@ -120,7 +123,7 @@
 ### Changes
 
 - fixed login issue [#3431](https://github.com/pnp/cli-microsoft365/issues/3431)
-- fixed issue with wrong _global.md reference breaking the docs and cli help [#3425](https://github.com/pnp/cli-microsoft365/issues/3425)
+- fixed issue with wrong \_global.md reference breaking the docs and cli help [#3425](https://github.com/pnp/cli-microsoft365/issues/3425)
 - combined `planner plan get` with `planner plan details get` [#3344](https://github.com/pnp/cli-microsoft365/issues/3344)
 - extended `spfx doctor command` with support for SPFx v1.15.0 [#3432](https://github.com/pnp/cli-microsoft365/issues/3432)
 - extended `spfx project doctor` command with support for SPFx v1.15.0 [#3440](https://github.com/pnp/cli-microsoft365/issues/3440)
