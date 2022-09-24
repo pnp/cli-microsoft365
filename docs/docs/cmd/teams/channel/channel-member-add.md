@@ -1,6 +1,6 @@
 # teams channel member add
 
-Adds a specified member in the specified Microsoft Teams private team channel
+Adds a specified member in the specified Microsoft Teams private or shared team channel
 
 ## Usage
 
@@ -23,10 +23,10 @@ m365 teams conversationmember add [options]
 : The name of the team where the channel is located. Specify either `teamId` or `teamName`, but not both.
 
 `-c, --channelId [channelId]`
-: The private channel's ID. Specify either `channelId` or `channelName`, but not both.
+: The channel ID. Specify either `channelId` or `channelName`, but not both.
 
 `--channelName [channelName]`
-: The private channel's name. Specify either `channelId` or `channelName`, but not both.
+: The channel name. Specify either `channelId` or `channelName`, but not both.
 
 `--userId [userId]`
 : The user's ID or principal name. You can also pass a comma separated list of userIds.
@@ -41,7 +41,7 @@ m365 teams conversationmember add [options]
 
 ## Remarks
 
-At least one owner must be assigned to a private channel.
+At least one owner must be assigned to a channel.
 
 You can only add members and owners of a Team to a private or shared channel.
 
@@ -56,5 +56,5 @@ m365 teams channel member add --teamId 47d6625d-a540-4b59-a4ab-19b787e40593 --ch
 Add owners to a channel based on their display names
 
 ```sh
-m365 teams channel member add --teamName "Human Resources" --channelName "Private Channel" --userDisplayName "Anne Matthews,John Doe" --owner
+m365 teams channel member add --teamName "Human Resources" --channelName "Channel" --userDisplayName "Anne Matthews,John Doe" --owner
 ```
