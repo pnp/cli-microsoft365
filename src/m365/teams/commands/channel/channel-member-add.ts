@@ -32,7 +32,7 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Adds a conversation member in a private channel.';
+    return 'Adds a specified member in the specified Microsoft Teams private or shared team channel';
   }
 
   public alias(): string[] | undefined {

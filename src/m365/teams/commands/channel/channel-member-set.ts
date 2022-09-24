@@ -36,7 +36,7 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Updates the role of the specified member in the specified Microsoft Teams private team channel';
+    return 'Updates the role of the specified member in the specified Microsoft Teams private or shared team channel';
   }
 
   constructor() {

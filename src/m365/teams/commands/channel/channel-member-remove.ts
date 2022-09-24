@@ -36,7 +36,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Updates the role of the specified member in the specified Microsoft Teams private team channel';
+    return 'Remove the specified member from the specified Microsoft Teams private or shared team channel';
   }
 
   public alias(): string[] | undefined {
