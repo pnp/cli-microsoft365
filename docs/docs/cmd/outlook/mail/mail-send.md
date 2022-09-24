@@ -1,4 +1,4 @@
-# outlook sendmail
+# outlook mail send
 
 Sends an email
 
