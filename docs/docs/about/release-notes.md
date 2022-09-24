@@ -47,6 +47,9 @@
 - refactored commandAction to async/await [#3430](https://github.com/pnp/cli-microsoft365/issues/3430)
 - extended 'outlook mail send' with cc, bcc, and importance [#3544](https://github.com/pnp/cli-microsoft365/issues/3544)
 - fixed 'spo site apppermissions add/set' assigning the wrong owner permissions [#3630](https://github.com/pnp/cli-microsoft365/issues/3630)
+- fixed links in 'GitHub Actions' docs [#3694](https://github.com/pnp/cli-microsoft365/issues/3694)
+- fixed `outlook mail send` docs title [#3695](https://github.com/pnp/cli-microsoft365/issues/3695)
+- added shared channel support to `teams channel member` command docs [#3692](https://github.com/pnp/cli-microsoft365/issues/3692)
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
