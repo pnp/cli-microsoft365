@@ -36,9 +36,9 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -103,44 +103,37 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before resetting role inheritance for the file when confirm option not passed', (done) => {
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', fileId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('prompts before resetting role inheritance for the file when confirm option not passed', async () => {
+    await command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        fileId: 'b2307a39-e878-458b-bc90-03bc578531d6'
       }
     });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('aborts resetting role inheritance for the file when confirm option is not passed and prompt not confirmed', (done) => {
+  it('aborts resetting role inheritance for the file when confirm option is not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
+    await command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        fileId: 'b2307a39-e878-458b-bc90-03bc578531d6'
+      }
     });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', fileId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(postSpy.notCalled);
   });
 
-  it('reset role inheritance on file by relative URL (debug)', (done) => {
+  it('reset role inheritance on file by relative URL (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativeUrl('/sites/project-x/documents/Test1.docx')/ListItemAllFields/resetroleinheritance`) > -1) {
         return Promise.resolve();
@@ -149,25 +142,17 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         fileUrl: '/sites/project-x/documents/Test1.docx',
         confirm: true
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('reset role inheritance on file by Id when prompt confirmed', (done) => {
+  it('reset role inheritance on file by Id when prompt confirmed', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === SpoFileGetCommand) {
         return Promise.resolve({
@@ -187,27 +172,19 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         fileId: 'b2307a39-e878-458b-bc90-03bc578531d6'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly handles error when resetting file role inheritance', (done) => {
+  it('correctly handles error when resetting file role inheritance', async () => {
     const err = 'request rejected';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativeUrl('/sites/project-x/documents/Test1.docx')/ListItemAllFields/resetroleinheritance`) > -1) {
@@ -217,20 +194,12 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         fileUrl: '/sites/project-x/documents/Test1.docx',
         confirm: true
-      }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });
