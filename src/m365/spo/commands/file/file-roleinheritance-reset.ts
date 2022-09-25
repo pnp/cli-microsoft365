@@ -105,41 +105,40 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const resetFileRoleInheritance: () => void = (): void => {
-      this
-        .getFileURL(args)
-        .then((fileURL: string): Promise<string> => {
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${fileURL}')/ListItemAllFields/resetroleinheritance`,
-            headers: {
-              accept: 'application/json;odata.metadata=none'
-            },
-            responseType: 'json'
-          };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const resetFileRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const fileURL: string = await this.getFileURL(args);
 
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${fileURL}')/ListItemAllFields/resetroleinheritance`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
       resetFileRoleInheritance();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to reset the role inheritance of file ${args.options.fileUrl || args.options.fileId} located in site ${args.options.webUrl}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          resetFileRoleInheritance();
-        }
       });
+
+      if (result.continue) {
+        await resetFileRoleInheritance();
+      }
     }
   }
 }
