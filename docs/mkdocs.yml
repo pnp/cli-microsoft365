@@ -815,6 +815,7 @@ nav:
     - License: 'about/license.md'
 theme:
     name: 'material'
+    custom_dir: overrides
     palette:
         - media: "(prefers-color-scheme: light)"
           scheme: default
@@ -832,6 +833,7 @@ theme:
     logo: 'images/pnp-cli-microsoft365-white.svg'
     features:
         - navigation.tabs
+        - announce.dismiss
 google_analytics:
     - 'UA-110480857-1'
     - 'auto'
@@ -856,6 +858,8 @@ extra:
     social:
         - icon: fontawesome/brands/github
           link: 'https://github.com/pnp/cli-microsoft365'
+        - icon: fontawesome/brands/discord
+          link: 'https://discord.com/invite/7rfW4kg6B5'
         - icon: fontawesome/brands/twitter
           link: 'https://twitter.com/climicrosoft365'
         - icon: fontawesome/brands/youtube
