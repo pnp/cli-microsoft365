@@ -216,7 +216,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     });
 
     await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true } });
-    assert(loggerLogSpy.calledWith(dataverseResponse.value));
+    assert(loggerLogSpy.calledWith(dataverseResponse));
   });
 
   it('Retrieves retrieves data from dataverse', async () => {
@@ -376,55 +376,6 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     assert(loggerLogSpy.calledWith(dataverseResponse.value));
   });
 
-  it('correctly handles access denied to environment', async () => {
-    const errorResponse: any = {
-      "error": {
-        "code": "EnvironmentAccessDenied",
-        "message": "Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied."
-      }
-    };
-
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject(errorResponse);
-    });
-
-    await assert.rejects(command.action(logger, { options: { } } as any),
-      new CommandError(`Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied.`));
-  });
-
-  it('correctly handles non existing environments', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "EnvironmentNotFound",
-          "message": "The environment 'nonexisting' could not be found in the tenant 'someid'."
-        }
-      });
-    });
-
-
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: 'nonexisting' } } as any),
-      new CommandError(`The environment 'nonexisting' could not be found in the tenant 'someid'.`));
-  });
-
-  it('correctly handles dataverse URI not found', async () => {
-    const envResponse: any = { "properties": { "linkedEnvironmentMetadata": { "instanceApiUrl": "" } } };
-
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/noDynamics?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(envResponse);
-        }
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: 'noDynamics' } } as any),
-      new CommandError(`No Dynamics instance found for 'noDynamics'`));
-  });
-
   it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
@@ -440,8 +391,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false } } as any),
-      new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
-
+      new CommandError("Error: The environment 'undefined' could not be found"));
   });
 
   it('supports debug mode', () => {

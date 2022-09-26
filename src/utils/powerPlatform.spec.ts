@@ -1,30 +1,11 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import auth from '../../Auth';
-import request from '../../request';
-import { sinonUtil } from '../../utils';
+import request from "../request";
+import auth from '../Auth';
+import { powerPlatform } from './powerPlatform';
+import { sinonUtil } from "./sinonUtil";
 
-
-import DataverseCommand from './DataverseCommand';
-
-class MockCommand extends DataverseCommand {
-  public get name(): string {
-    return 'mock';
-  }
-
-  public get description(): string {
-    return 'Mock command';
-  }
-
-  public commandAction(): Promise<void> {
-    return Promise.resolve();
-  }
-
-  public commandHelp(): void {
-  }
-}
-
-describe('DataverseCommand', () => {
+describe('utils/powerPlatform', () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     auth.service.connected = true;
@@ -43,13 +24,7 @@ describe('DataverseCommand', () => {
     auth.service.connected = false;
   });
 
-  it('defines correct resource', () => {
-    const cmd = new MockCommand();
-    assert.strictEqual((cmd as any).resource, 'https://api.bap.microsoft.com');
-  });
-
-  it('returns correct dynamics url as admin', (done) => {
-    const cmd = new MockCommand();
+  it('returns correct dynamics url as admin', async () => {
     const envResponse: any = { "properties": { "linkedEnvironmentMetadata": { "instanceApiUrl": "https://contoso-dev.api.crm4.dynamics.com" } } };
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -64,20 +39,11 @@ describe('DataverseCommand', () => {
       return Promise.reject('Invalid request');
     });
 
-    (cmd as any).getDynamicsInstance('someRandomGuid', true).then((instanceUrl: string) => {
-      try {
-        assert(instanceUrl === 'https://contoso-dev.api.crm4.dynamics.com');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    const actual = await powerPlatform.getDynamicsInstanceApiUrl('someRandomGuid', true);
+    assert.strictEqual(actual, 'https://contoso-dev.api.crm4.dynamics.com');
   });
 
-  it('returns correct dynamics url', (done) => {
-    const cmd = new MockCommand();
+  it('returns correct dynamics url', async () => {
     const envResponse: any = { "properties": { "linkedEnvironmentMetadata": { "instanceApiUrl": "https://contoso-dev.api.crm4.dynamics.com" } } };
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -92,15 +58,27 @@ describe('DataverseCommand', () => {
       return Promise.reject('Invalid request');
     });
 
-    (cmd as any).getDynamicsInstance('someRandomGuid', false).then((instanceUrl: string) => {
-      try {
-        assert(instanceUrl === 'https://contoso-dev.api.crm4.dynamics.com');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    const actual = await powerPlatform.getDynamicsInstanceApiUrl('someRandomGuid', false);
+    assert.strictEqual(actual, 'https://contoso-dev.api.crm4.dynamics.com');
+
   });
 
+  it('handles no environment found', async () => {
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/someRandomGuid?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
+        throw Error('The environment \'someRandomGuid\' could not be found');
+      }
+
+      return 'Invalid request';
+    });
+
+    try {
+      await powerPlatform.getDynamicsInstanceApiUrl('someRandomGuid', false);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`The environment 'someRandomGuid' could not be found`));
+    }
+  });
 });
