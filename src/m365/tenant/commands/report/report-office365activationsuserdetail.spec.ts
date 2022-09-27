@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -59,7 +59,7 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets details about users who have activated Microsoft 365', (done) => {
+  it('gets details about users who have activated Microsoft 365', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserDetail`) {
         return Promise.resolve(`Report Refresh Date,User Principal Name,Display Name,Product Type,Last Activated Date,Windows,Mac,Windows 10 Mobile,iOS,Android,Activated On Shared Computer
@@ -70,19 +70,12 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserDetail");
-        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserDetail");
+    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
 
-  it('gets details about users who have activated Microsoft 365 (json)', (done) => {
+  it('gets details about users who have activated Microsoft 365 (json)', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserDetail`) {
         return Promise.resolve(`Report Refresh Date,User Principal Name,Display Name,Product Type,Last Activated Date,Windows,Mac,Windows 10 Mobile,iOS,Android,Activated On Shared Computer
@@ -93,17 +86,17 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, output: 'json' } }, () => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserDetail");
-        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert(loggerLogSpy.calledWith([{"Report Refresh Date":"2021-05-25","User Principal Name":"user1@contoso.onmicrosoft.com","Display Name":"User1","Product Type":"MICROSOFT 365 APPS FOR ENTERPRISE","Last Activated Date":"","Windows":0,"Mac":0,"Windows 10 Mobile":0,"iOS":0,"Android":0,"Activated On Shared Computer":"False"},{"Report Refresh Date":"2021-05-25","User Principal Name":"user1@contoso.onmicrosoft.com","Display Name":"User1","Product Type":"MICROSOFT EXCEL ADVANCED ANALYTICS","Last Activated Date":"","Windows":0,"Mac":0,"Windows 10 Mobile":0,"iOS":0,"Android":0,"Activated On Shared Computer":"False"}]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, output: 'json' } });
+    assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserDetail");
+    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+    assert(loggerLogSpy.calledWith([{"Report Refresh Date":"2021-05-25","User Principal Name":"user1@contoso.onmicrosoft.com","Display Name":"User1","Product Type":"MICROSOFT 365 APPS FOR ENTERPRISE","Last Activated Date":"","Windows":0,"Mac":0,"Windows 10 Mobile":0,"iOS":0,"Android":0,"Activated On Shared Computer":"False"},{"Report Refresh Date":"2021-05-25","User Principal Name":"user1@contoso.onmicrosoft.com","Display Name":"User1","Product Type":"MICROSOFT EXCEL ADVANCED ANALYTICS","Last Activated Date":"","Windows":0,"Mac":0,"Windows 10 Mobile":0,"iOS":0,"Android":0,"Activated On Shared Computer":"False"}]));
   });
 
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+  });
 });

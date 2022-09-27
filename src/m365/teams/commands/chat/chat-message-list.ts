@@ -57,38 +57,39 @@ class TeamsChatMessageListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0/chats/${args.options.chatId}/messages`;
 
-    odata
-      .getAllItems<ExtendedMessage>(endpoint)
-      .then((items): void => {
-        if (args.options.output !== 'json') {
-          items.forEach(i => {
-            // hoist the content to body for readability
-            i.body = (i.body as ItemBody).content as any;
+    try {
+      const items = await odata.getAllItems<ExtendedMessage>(endpoint);
+      if (args.options.output !== 'json') {
+        items.forEach(i => {
+          // hoist the content to body for readability
+          i.body = (i.body as ItemBody).content as any;
 
-            let shortBody: string | undefined;
-            const bodyToProcess = i.body as string;
+          let shortBody: string | undefined;
+          const bodyToProcess = i.body as string;
 
-            if (bodyToProcess) {
-              let maxLength = 50;
-              let addedDots = '...';
-              if (bodyToProcess.length < maxLength) {
-                maxLength = bodyToProcess.length;
-                addedDots = '';
-              }
-
-              shortBody = bodyToProcess.replace(/\n/g, ' ').substring(0, maxLength) + addedDots;
+          if (bodyToProcess) {
+            let maxLength = 50;
+            let addedDots = '...';
+            if (bodyToProcess.length < maxLength) {
+              maxLength = bodyToProcess.length;
+              addedDots = '';
             }
 
-            i.shortBody = shortBody;
-          });
-        }
+            shortBody = bodyToProcess.replace(/\n/g, ' ').substring(0, maxLength) + addedDots;
+          }
 
-        logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+          i.shortBody = shortBody;
+        });
+      }
+
+      logger.log(items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

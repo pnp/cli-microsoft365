@@ -2,7 +2,7 @@ import { isNumber } from 'util';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, spo, urlUtil, validation } from '../../../../utils';
+import { spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import {
@@ -90,7 +90,7 @@ class SpoPageTextAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let requestDigest: string = '';
 
     let pageName: string = args.options.pageName;
@@ -102,46 +102,46 @@ class SpoPageTextAddCommand extends SpoCommand {
       logger.logToStderr(`Retrieving request digest...`);
     }
 
-    spo
-      .getRequestDigest(args.options.webUrl)
-      .then((res: ContextInfo): Promise<ClientSidePage> => {
-        // Keep the reference of request digest for subsequent requests
-        requestDigest = res.FormDigestValue;
+    try {
+      const reqDigest = await spo.getRequestDigest(args.options.webUrl);
+      // Keep the reference of request digest for subsequent requests
+      requestDigest = reqDigest.FormDigestValue;
 
-        if (this.verbose) {
-          logger.logToStderr(`Retrieving modern page ${pageName}...`);
-        }
-        // Get Client Side Page
-        return Page.getPage(pageName, args.options.webUrl, logger, this.debug, this.verbose);
-      })
-      .then((page: ClientSidePage): Promise<void> => {
-        const section: number = (args.options.section || 1) - 1;
-        const column: number = (args.options.column || 1) - 1;
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving modern page ${pageName}...`);
+      }
 
-        // Make sure the section is in range
-        if (section >= page.sections.length) {
-          throw new Error(`Invalid section '${section + 1}'`);
-        }
+      // Get Client Side Page
+      const page = await Page.getPage(pageName, args.options.webUrl, logger, this.debug, this.verbose);
 
-        // Make sure the column is in range
-        if (column >= page.sections[section].columns.length) {
-          throw new Error(`Invalid column '${column + 1}'`);
-        }
+      const section: number = (args.options.section || 1) - 1;
+      const column: number = (args.options.column || 1) - 1;
 
-        const text: ClientSideText = new ClientSideText(args.options.text);
-        if (typeof args.options.order === 'undefined') {
-          page.sections[section].columns[column].addControl(text);
-        }
-        else {
-          const order: number = args.options.order - 1;
-          page.sections[section].columns[column].insertControl(text, order);
-        }
+      // Make sure the section is in range
+      if (section >= page.sections.length) {
+        throw new Error(`Invalid section '${section + 1}'`);
+      }
 
-        // Save the Client Side Page with updated information
-        return this.saveClientSidePage(page, logger, args, pageName, requestDigest);
-      })
-      .then(_ => cb())
-      .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      // Make sure the column is in range
+      if (column >= page.sections[section].columns.length) {
+        throw new Error(`Invalid column '${column + 1}'`);
+      }
+
+      const text: ClientSideText = new ClientSideText(args.options.text);
+      if (typeof args.options.order === 'undefined') {
+        page.sections[section].columns[column].addControl(text);
+      }
+      else {
+        const order: number = args.options.order - 1;
+        page.sections[section].columns[column].insertControl(text, order);
+      }
+
+      // Save the Client Side Page with updated information
+      await this.saveClientSidePage(page, logger, args, pageName, requestDigest);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private saveClientSidePage(

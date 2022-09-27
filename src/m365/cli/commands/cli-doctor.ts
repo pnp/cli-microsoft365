@@ -32,7 +32,7 @@ class CliDoctorCommand extends Command {
     return 'Retrieves diagnostic information about the current environment';
   }
 
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     const roles: string[] = [];
     const scopes: string[] = [];
 
@@ -61,7 +61,6 @@ class CliDoctorCommand extends Command {
     };
 
     logger.log(diagnosticInfo);
-    cb();
   }
 
   private getRolesFromAccessToken(accessToken: string): string[] {

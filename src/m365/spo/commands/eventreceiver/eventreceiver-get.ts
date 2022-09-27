@@ -111,7 +111,7 @@ class SpoEventreceiverGetCommand extends SpoCommand {
     this.optionSets.push(['name', 'id']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let requestUrl = `${args.options.webUrl}/_api/`;
     let listUrl: string = '';
     let filter: string = '?$filter=';
@@ -149,12 +149,13 @@ class SpoEventreceiverGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: any[] }>(requestOptions)
-      .then((res: any): void => {
-        logger.log(res.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res = await request.get<{ value: any[] }>(requestOptions);
+      logger.log(res.value);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

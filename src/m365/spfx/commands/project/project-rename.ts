@@ -53,11 +53,10 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.projectRootPath = this.getProjectRoot(process.cwd());
     if (this.projectRootPath === null) {
-      cb(new CommandError(`Couldn't find project root folder`, SpfxProjectRenameCommand.ERROR_NO_PROJECT_ROOT_FOLDER));
-      return;
+      throw new CommandError(`Couldn't find project root folder`, SpfxProjectRenameCommand.ERROR_NO_PROJECT_ROOT_FOLDER);
     }
 
     const packageJson: any = this.getProject(this.projectRootPath).packageJson;
@@ -84,11 +83,8 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       this.replaceReadMeContent(path.join(this.projectRootPath, 'README.md'), projectName, args, logger);
     }
     catch (error: any) {
-      cb(new CommandError(error));
-      return;
+      throw new CommandError(error);
     }
-
-    cb();
   }
 
   private generateNewId = (): string => {

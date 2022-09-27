@@ -37,9 +37,9 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
     sinon.stub(request, 'get').callsFake((opts: any) => {
@@ -86,147 +86,77 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the app role assignment when confirm option not passed', (done) => {
-    command.action(logger, { options: { debug: false, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing the app role assignment when confirm option not passed', async () => {
+    await command.action(logger, { options: { debug: false, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scope: 'Sites.Read.All' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('prompts before removing the app role assignment when confirm option not passed (debug)', (done) => {
-    command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing the app role assignment when confirm option not passed (debug)', async () => {
+    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scope: 'Sites.Read.All' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts removing the app role assignment when prompt not confirmed', (done) => {
+  it('aborts removing the app role assignment when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
-      try {
-        assert(deleteRequestStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
+    assert(deleteRequestStub.notCalled);
   });
 
-  it('deletes app role assignment when prompt confirmed (debug)', (done) => {
+  it('deletes app role assignment when prompt confirmed (debug)', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: true, displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: true, displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
+    assert(deleteRequestStub.called);
   });
 
-  it('deletes app role assignments for service principal with specified displayName', (done) => {
-    command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('deletes app role assignments for service principal with specified displayName', async () => {
+    await command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } });
+    assert(deleteRequestStub.called);
   });
 
-  it('deletes app role assignments for service principal with specified objectId and multiple scopes', (done) => {
-    command.action(logger, { options: { objectId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All,Sites.FullControl.All', confirm: true } }, () => {
-      try {
-        assert(deleteRequestStub.calledTwice);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('deletes app role assignments for service principal with specified objectId and multiple scopes', async () => {
+    await command.action(logger, { options: { objectId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All,Sites.FullControl.All', confirm: true } });
+    assert(deleteRequestStub.calledTwice);
   });
 
-  it('deletes app role assignments for service principal with specified appId (debug)', (done) => {
-    command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('deletes app role assignments for service principal with specified appId (debug)', async () => {
+    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } });
+    assert(deleteRequestStub.called);
   });
 
-  it('handles intune alias for the resource option value', (done) => {
-    command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'intune', scope: 'Sites.Read.All', confirm: true } }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('handles intune alias for the resource option value', async () => {
+    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'intune', scope: 'Sites.Read.All', confirm: true } });
+    assert(deleteRequestStub.called);
   });
 
-  it('handles exchange alias for the resource option value', (done) => {
-    command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'exchange', scope: 'Sites.Read.All', confirm: true } }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('handles exchange alias for the resource option value', async () => {
+    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'exchange', scope: 'Sites.Read.All', confirm: true } });
+    assert(deleteRequestStub.called);
   });
 
-  it('handles appId for the resource option value', (done) => {
-    command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scope: 'Sites.Read.All', confirm: true } }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('handles appId for the resource option value', async () => {
+    await command.action(logger, { options: { debug: true, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scope: 'Sites.Read.All', confirm: true } });
+    assert(deleteRequestStub.called);
   });
 
-  it('rejects if no resource is found', (done) => {
+  it('rejects if no resource is found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
@@ -240,18 +170,11 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource not found`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } } as any),
+      new CommandError(`Resource not found`));
   });
 
-  it('rejects if no app roles found for the specified resource', (done) => {
+  it('rejects if no app roles found for the specified resource', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
@@ -265,18 +188,11 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The resource 'SharePoint' does not have any application permissions available.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } } as any),
+      new CommandError(`The resource 'SharePoint' does not have any application permissions available.`));
   });
 
-  it('rejects if no app roles found for the specified resource option value', (done) => {
+  it('rejects if no app roles found for the specified resource option value', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
@@ -290,18 +206,11 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The scope value 'Sites.Read.All' you have specified does not exist for SharePoint. ${os.EOL}Available scopes (application permissions) are: ${os.EOL}Scope1${os.EOL}Scope2`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } } as any),
+      new CommandError(`The scope value 'Sites.Read.All' you have specified does not exist for SharePoint. ${os.EOL}Available scopes (application permissions) are: ${os.EOL}Scope1${os.EOL}Scope2`));
   });
 
-  it('rejects if no service principal found', (done) => {
+  it('rejects if no service principal found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
@@ -315,30 +224,16 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("app registration not found")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } } as any),
+      new CommandError("app registration not found"));
   });
 
-  it('rejects if app role assignment is not found', (done) => {
-    command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.ReadWrite.All', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("App role assignment not found")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('rejects if app role assignment is not found', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.ReadWrite.All', confirm: true } } as any),
+      new CommandError("App role assignment not found"));
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
@@ -353,15 +248,8 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633', confirm: true } } as any),
+      new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
   it('fails validation if neither appId, objectId nor displayName are not specified', async () => {

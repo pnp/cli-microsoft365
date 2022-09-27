@@ -65,7 +65,7 @@ describe(commands.NETWORK_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'email', 'community', 'permalink', 'web_url']);
   });
 
-  it('calls the networking endpoint without parameter', function (done) {
+  it('calls the networking endpoint without parameter', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
         return Promise.resolve(
@@ -91,18 +91,11 @@ describe(commands.NETWORK_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -111,18 +104,10 @@ describe(commands.NETWORK_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
-  it('calls the networking endpoint without parameter and json', function (done) {
+  it('calls the networking endpoint without parameter and json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
         return Promise.resolve(
@@ -148,18 +133,11 @@ describe(commands.NETWORK_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, output: "json" } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, output: "json" } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
   });
 
-  it('calls the networking endpoint with parameter', function (done) {
+  it('calls the networking endpoint with parameter', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/networks/current.json') {
         return Promise.resolve(
@@ -185,15 +163,8 @@ describe(commands.NETWORK_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, includeSuspended: true } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, includeSuspended: true } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
   });
 
   it('passes validation without parameters', async () => {

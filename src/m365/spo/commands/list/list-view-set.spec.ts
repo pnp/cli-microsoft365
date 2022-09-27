@@ -67,7 +67,7 @@ describe(commands.LIST_VIEW_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates the Title of the list view specified using its name', (done) => {
+  it('updates the Title of the list view specified using its name', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('List%201')/views/getByTitle('All%20items')`) {
         if (opts.headers &&
@@ -82,18 +82,11 @@ describe(commands.LIST_VIEW_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewTitle: 'All items', Title: 'All events' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewTitle: 'All items', Title: 'All events' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('ignores global options when creating request data', (done) => {
+  it('ignores global options when creating request data', async () => {
     const patchRequest: sinon.SinonStub = sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('List%201')/views/getByTitle('All%20items')`) {
         if (opts.headers &&
@@ -108,18 +101,11 @@ describe(commands.LIST_VIEW_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, verbose: false, output: "text", webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewTitle: 'All items', Title: 'All events' } }, () => {
-      try {
-        assert.deepEqual(patchRequest.lastCall.args[0].data, { Title: 'All events' });
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, verbose: false, output: "text", webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewTitle: 'All items', Title: 'All events' } });
+    assert.deepEqual(patchRequest.lastCall.args[0].data, { Title: 'All events' });
   });
 
-  it('updates the Title and CustomFormatter of the list view specified using its ID', (done) => {
+  it('updates the Title and CustomFormatter of the list view specified using its ID', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'330f29c5-5c4c-465f-9f4b-7903020ae1cf')/views/getById('330f29c5-5c4c-465f-9f4b-7903020ae1ce')`) {
         if (opts.headers &&
@@ -134,18 +120,10 @@ describe(commands.LIST_VIEW_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1cf', viewId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', Title: 'All events', CustomFormatter: 'abc' } }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1cf', viewId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', Title: 'All events', CustomFormatter: 'abc' } });
   });
 
-  it('correctly handles error when the specified list doesn\'t exist', (done) => {
+  it('correctly handles error when the specified list doesn\'t exist', async () => {
     sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject({
         error: {
@@ -160,18 +138,11 @@ describe(commands.LIST_VIEW_SET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All items' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("List 'List' does not exist at site with URL 'https://contoso.sharepoint.com'.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All items' } } as any),
+      new CommandError("List 'List' does not exist at site with URL 'https://contoso.sharepoint.com'."));
   });
 
-  it('correctly handles error when the specified view doesn\'t exist', (done) => {
+  it('correctly handles error when the specified view doesn\'t exist', async () => {
     sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject({
         error: {
@@ -186,15 +157,8 @@ describe(commands.LIST_VIEW_SET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All items' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("The specified view is invalid.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All items' } } as any),
+      new CommandError("The specified view is invalid."));
   });
 
   it('supports debug mode', () => {

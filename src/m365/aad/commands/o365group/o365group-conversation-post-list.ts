@@ -77,16 +77,15 @@ class AadO365GroupConversationPostListCommand extends GraphCommand {
     return ['receivedDateTime', 'id'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getGroupId(args)
-      .then((retrievedgroupId: string): Promise<Post[]> => {
-        return odata.getAllItems<Post>(`${this.resource}/v1.0/groups/${retrievedgroupId}/threads/${args.options.threadId}/posts`);
-      })
-      .then((posts): void => {
-        logger.log(posts);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const retrievedgroupId = await this.getGroupId(args);
+      const posts = await odata.getAllItems<Post>(`${this.resource}/v1.0/groups/${retrievedgroupId}/threads/${args.options.threadId}/posts`);
+      logger.log(posts);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {

@@ -16,13 +16,14 @@ class SearchExternalConnectionListCommand extends GraphCommand {
     return ['id', 'name', 'state'];
   }
 
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
-    odata
-      .getAllItems(`${this.resource}/v1.0/external/connections`)
-      .then((connections): void => {
-        logger.log(connections);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger): Promise<void> {
+    try {
+      const connections = await odata.getAllItems(`${this.resource}/v1.0/external/connections`);
+      logger.log(connections);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

@@ -58,7 +58,7 @@ describe(commands.LIST_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds To Do task list', (done) => {
+  it('adds To Do task list', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists`) {
         return Promise.resolve({
@@ -75,49 +75,29 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: "FooList"
       }
-    } as any, () => {
-      try {
-        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists/$entity",
-          "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGlTQ==\"",
-          "displayName": "FooList",
-          "isOwner": true,
-          "isShared": false,
-          "wellknownListName": "none",
-          "id": "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIgAAA="
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
+      "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists/$entity",
+      "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGlTQ==\"",
+      "displayName": "FooList",
+      "isOwner": true,
+      "isShared": false,
+      "wellknownListName": "none",
+      "id": "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIgAAA="
+    }));
   });
 
-  it('handles error correctly', (done) => {
+  it('handles error correctly', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: "FooList"
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, name: "FooList" } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -65,16 +65,14 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('calls telemetry', () => {
-    command.action(logger, { options: {} }, () => {
-      assert(trackEvent.called);
-    });
+  it('calls telemetry', async () => {
+    await assert.rejects(command.action(logger, { options: {} }));
+    assert(trackEvent.called);
   });
 
-  it('logs correct telemetry event', () => {
-    command.action(logger, { options: {} }, () => {
-      assert.strictEqual(telemetry.name, commands.SOLUTION_REFERENCE_ADD);
-    });
+  it('logs correct telemetry event', async () => {
+    await assert.rejects(command.action(logger, { options: {} }));
+    assert.strictEqual(telemetry.name, commands.SOLUTION_REFERENCE_ADD);
   });
 
   it('supports specifying path', () => {
@@ -221,7 +219,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('Creates an instance of CdsProjectMutator, adds project reference and saves updated file', () => {
+  it('Creates an instance of CdsProjectMutator, adds project reference and saves updated file', async () => {
     const pathToDirectory = '../path/to/projectDirectory';
     const pcfProjectFile = 'project.pcfproj';
     const pathToPcfProject = path.join(pathToDirectory, pcfProjectFile);
@@ -243,12 +241,11 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     const addProjectReferenceStub = sinon.stub(CdsProjectMutator.prototype, 'addProjectReference').callsFake(() => { });
     const fsWriteFileSync = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
-    command.action(logger, { options: { path: pathToDirectory } }, () => {
-      assert(pathRelative.calledWith(process.cwd(), pathToPcfProject));
-      assert(fsReadFileSync.calledWith(pathToCdsProject, 'utf8'));
-      assert(addProjectReferenceStub.calledWith(pathToPcfProject));
-      assert(fsWriteFileSync.calledWith(pathToCdsProject, sinon.match.any));
-    });
+    await command.action(logger, { options: { path: pathToDirectory } });
+    assert(pathRelative.calledWith(process.cwd(), pathToPcfProject));
+    assert(fsReadFileSync.calledWith(pathToCdsProject, 'utf8'));
+    assert(addProjectReferenceStub.calledWith(pathToPcfProject));
+    assert(fsWriteFileSync.calledWith(pathToCdsProject, sinon.match.any));
   });
 
   it('supports verbose mode', () => {

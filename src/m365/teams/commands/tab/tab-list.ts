@@ -61,19 +61,20 @@ class TeamsTabListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${encodeURIComponent(args.options.channelId)}/tabs?$expand=teamsApp`;
 
-    odata
-      .getAllItems<Tab>(endpoint)
-      .then((items): void => {
-        items.forEach(i => {
-          (i as any).teamsAppTabId = i.teamsApp.id;
-        });
+    try {
+      const items = await odata.getAllItems<Tab>(endpoint);
+      items.forEach(i => {
+        (i as any).teamsAppTabId = i.teamsApp.id;
+      });
 
-        logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

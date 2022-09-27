@@ -126,7 +126,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('restores the specified group by id', (done) => {
+  it('restores the specified group by id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deleteditems/${validGroupId}/restore`) {
         return Promise.resolve();
@@ -135,23 +135,15 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         id: validGroupId
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly restores group by displayName', (done) => {
+  it('correctly restores group by displayName', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupDisplayName)}'`) {
         return Promise.resolve(singleGroupsResponse);
@@ -167,23 +159,15 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         displayName: validGroupDisplayName
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly restores group by mailNickname', (done) => {
+  it('correctly restores group by mailNickname', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
         return Promise.resolve(singleGroupsResponse);
@@ -199,39 +183,24 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         mailNickname: validGroupMailNickname
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly handles error when group is not found', (done) => {
+  it('correctly handles error when group is not found', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'Group Not Found.' } } } });
     });
 
-    command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Group Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
+      new CommandError('Group Not Found.'));
   });
 
-  it('throws error message when no group was found', (done) => {
+  it('throws error message when no group was found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
         return Promise.resolve({ value: [] });
@@ -240,20 +209,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         mailNickname: validGroupMailNickname,
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group '${validGroupMailNickname}' does not exist.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified group '${validGroupMailNickname}' does not exist.`));
   });
 
   it('supports debug mode', () => {
@@ -267,7 +228,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
     assert(containsOption);
   });
 
-  it('throws error message when multiple groups were found', (done) => {
+  it('throws error message when multiple groups were found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
         return Promise.resolve(multipleGroupsResponse);
@@ -276,20 +237,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         mailNickname: validGroupMailNickname,
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`));
   });
 
   it('supports debug mode', () => {

@@ -89,45 +89,49 @@ class SpoCustomActionGetCommand extends SpoCommand {
   	this.optionSets.push(['id', 'title']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    ((): Promise<CustomAction> => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      let customAction: CustomAction;
       if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
-        return this.getCustomAction(args.options);
+        customAction = await this.getCustomAction(args.options);
+      }
+      else {
+        customAction = await this.searchAllScopes(args.options);
       }
 
-      return this.searchAllScopes(args.options);
-    })()
-      .then((customAction: CustomAction): void => {
-        if (customAction["odata.null"] === true) {
-          if (this.verbose) {
-            logger.logToStderr(`Custom action with id ${args.options.id} not found`);
-          }
+
+      if (customAction["odata.null"] === true) {
+        if (this.verbose) {
+          logger.logToStderr(`Custom action with id ${args.options.id} not found`);
         }
-        else {
-          logger.log({
-            ClientSideComponentId: customAction.ClientSideComponentId,
-            ClientSideComponentProperties: customAction.ClientSideComponentProperties,
-            CommandUIExtension: customAction.CommandUIExtension,
-            Description: customAction.Description,
-            Group: customAction.Group,
-            Id: customAction.Id,
-            ImageUrl: customAction.ImageUrl,
-            Location: customAction.Location,
-            Name: customAction.Name,
-            RegistrationId: customAction.RegistrationId,
-            RegistrationType: customAction.RegistrationType,
-            Rights: JSON.stringify(customAction.Rights),
-            Scope: this.humanizeScope(customAction.Scope),
-            ScriptBlock: customAction.ScriptBlock,
-            ScriptSrc: customAction.ScriptSrc,
-            Sequence: customAction.Sequence,
-            Title: customAction.Title,
-            Url: customAction.Url,
-            VersionOfUserCustomAction: customAction.VersionOfUserCustomAction
-          });
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      }
+      else {
+        logger.log({
+          ClientSideComponentId: customAction.ClientSideComponentId,
+          ClientSideComponentProperties: customAction.ClientSideComponentProperties,
+          CommandUIExtension: customAction.CommandUIExtension,
+          Description: customAction.Description,
+          Group: customAction.Group,
+          Id: customAction.Id,
+          ImageUrl: customAction.ImageUrl,
+          Location: customAction.Location,
+          Name: customAction.Name,
+          RegistrationId: customAction.RegistrationId,
+          RegistrationType: customAction.RegistrationType,
+          Rights: JSON.stringify(customAction.Rights),
+          Scope: this.humanizeScope(customAction.Scope),
+          ScriptBlock: customAction.ScriptBlock,
+          ScriptSrc: customAction.ScriptSrc,
+          Sequence: customAction.Sequence,
+          Title: customAction.Title,
+          Url: customAction.Url,
+          VersionOfUserCustomAction: customAction.VersionOfUserCustomAction
+        });
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   private getCustomAction(options: Options): Promise<CustomAction> {

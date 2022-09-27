@@ -13,7 +13,6 @@ const command: Command = require('./team-unarchive');
 describe(commands.TEAM_UNARCHIVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
@@ -37,7 +36,6 @@ describe(commands.TEAM_UNARCHIVE, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
@@ -131,7 +129,7 @@ describe(commands.TEAM_UNARCHIVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('logs deprecation warning when option teamId is specified', (done) => {
+  it('logs deprecation warning when option teamId is specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/unarchive`) {
         return Promise.resolve();
@@ -140,22 +138,15 @@ describe(commands.TEAM_UNARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
   });
 
-  it('fails when team name does not exist', (done) => {
+  it('fails when team name does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
         return Promise.resolve({
@@ -173,24 +164,13 @@ describe(commands.TEAM_UNARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Finance',
-        confirm: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      name: 'Finance',
+      confirm: true } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('restores an archived Microsoft Team by id', (done) => {
+  it('restores an archived Microsoft Team by id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/unarchive`) {
         return Promise.resolve();
@@ -199,22 +179,14 @@ describe(commands.TEAM_UNARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('restores an archived Microsoft Team by name', (done) => {
+  it('restores an archived Microsoft Team by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
         return Promise.resolve({
@@ -237,22 +209,14 @@ describe(commands.TEAM_UNARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         name: 'Finance'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('should correctly handle graph error response', (done) => {
+  it('should correctly handle graph error response', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/unarchive`) {
         return Promise.reject(
@@ -271,19 +235,7 @@ describe(commands.TEAM_UNARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6' } } as any), new CommandError('No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6'));
   });
 
   it('supports debug mode', () => {

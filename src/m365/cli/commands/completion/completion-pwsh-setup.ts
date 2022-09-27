@@ -41,7 +41,7 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
     );
   }
   
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.debug) {
       logger.logToStderr('Generating command completion...');
     }
@@ -74,8 +74,7 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
           fs.mkdirSync(dirname, { recursive: true });
         }
         catch (e: any) {
-          cb(new CommandError(e));
-          return;
+          throw new CommandError(e);
         }
       }
 
@@ -87,8 +86,7 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
         fs.writeFileSync(args.options.profile, '', 'utf8');
       }
       catch (e: any) {
-        cb(new CommandError(e));
-        return;
+        throw new CommandError(e);
       }
     }
 
@@ -99,10 +97,10 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
     const completionScriptPath: string = path.resolve(__dirname, '..', '..', '..', '..', '..', 'scripts', 'Register-CLIM365Completion.ps1');
     try {
       fs.appendFileSync(args.options.profile, os.EOL + completionScriptPath, 'utf8');
-      cb();
+      return;
     }
     catch (e: any) {
-      cb(new CommandError(e));
+      throw new CommandError(e);
     }
   }
 }

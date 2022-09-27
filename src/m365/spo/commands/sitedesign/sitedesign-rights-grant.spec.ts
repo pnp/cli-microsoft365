@@ -69,7 +69,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('grants rights on the specified site design to the specified principal', (done) => {
+  it('grants rights on the specified site design to the specified principal', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -85,18 +85,11 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('grants rights on the specified site design to the specified principals', (done) => {
+  it('grants rights on the specified site design to the specified principals', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -112,18 +105,11 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF,AdeleV', rights: 'View' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF,AdeleV', rights: 'View' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('grants rights on the specified site design to the specified principals (email)', (done) => {
+  it('grants rights on the specified site design to the specified principals (email)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -139,18 +125,10 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF@contoso.com,AdeleV@contoso.com', rights: 'View' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF@contoso.com,AdeleV@contoso.com', rights: 'View' } });
   });
 
-  it('grants rights on the specified site design to the specified principals separated with an extra space', (done) => {
+  it('grants rights on the specified site design to the specified principals separated with an extra space', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -166,31 +144,19 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF, AdeleV', rights: 'View' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF, AdeleV', rights: 'View' } });
   });
 
-  it('correctly handles OData error when granting rights', (done) => {
+  it('correctly handles OData error when granting rights', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+      return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false, 
+      id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', 
+      principals: 'PattiF', 
+      rights: 'View' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

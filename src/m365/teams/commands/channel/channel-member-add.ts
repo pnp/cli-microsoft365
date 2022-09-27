@@ -32,7 +32,7 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Adds a conversation member in a private channel.';
+    return 'Adds a specified member in the specified Microsoft Teams private or shared team channel';
   }
 
   public alias(): string[] | undefined {
@@ -112,35 +112,26 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.showDeprecationWarning(logger, commands.CONVERSATIONMEMBER_ADD, commands.CHANNEL_MEMBER_ADD);
 
-    let teamId: string = '';
-    let channelId: string = '';
+    try {
+      const teamId: string = await this.getTeamId(args);
+      const channelId: string = await this.getChannelId(teamId, args);
+      const userIds: string[] = await this.getUserId(args);
+      const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}/members`;
+      const roles: string[] = args.options.owner ? ["owner"] : [];
+      const tasks: Promise<void>[] = [];
 
-    this
-      .getTeamId(args)
-      .then((_teamId: string): Promise<string> => {
-        teamId = _teamId;
-        return this.getChannelId(_teamId, args);
-      })
-      .then((_channelId: string): Promise<string[]> => {
-        channelId = _channelId;
-        return this.getUserId(args);
-      })
-      .then((userIds: string[]): Promise<void[]> => {
-        const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}/members`;
-        const roles: string[] = args.options.owner ? ["owner"] : [];
-        const tasks: Promise<void>[] = [];
+      for (const userId of userIds) {
+        tasks.push(this.addUser(userId, endpoint, roles));
+      }
 
-        for (const userId of userIds) {
-          tasks.push(this.addUser(userId, endpoint, roles));
-        }
-
-        return Promise.all(tasks);
-      })
-      .then(_ => cb(),
-        (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await Promise.all(tasks);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private addUser(userId: string, endpoint: string, roles: string[]): Promise<void> {

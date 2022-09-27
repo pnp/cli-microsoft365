@@ -66,36 +66,34 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getTaskDetailsEtag(args.options.taskId)
-      .then(etag => {
-        const requestOptionsTaskDetails: any = {
-          url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.taskId)}/details`,
-          headers: {
-            'accept': 'application/json;odata.metadata=none',
-            'If-Match': etag,
-            'Prefer': 'return=representation'
-          },
-          responseType: 'json',
-          data: {
-            references: {
-              [formatting.openTypesEncoder(args.options.url)]: {
-                '@odata.type': 'microsoft.graph.plannerExternalReference',
-                previewPriority: ' !',
-                ...(args.options.alias && { alias: args.options.alias }),
-                ...(args.options.type && { type: args.options.type })
-              }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const etag = await this.getTaskDetailsEtag(args.options.taskId);
+      const requestOptionsTaskDetails: any = {
+        url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.taskId)}/details`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none',
+          'If-Match': etag,
+          'Prefer': 'return=representation'
+        },
+        responseType: 'json',
+        data: {
+          references: {
+            [formatting.openTypesEncoder(args.options.url)]: {
+              '@odata.type': 'microsoft.graph.plannerExternalReference',
+              previewPriority: ' !',
+              ...(args.options.alias && { alias: args.options.alias }),
+              ...(args.options.type && { type: args.options.type })
             }
           }
-        };
-
-        return request.patch(requestOptionsTaskDetails);
-      })
-      .then((res: any): void => {
-        logger.log(res.references);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        }
+      };
+      const res = await request.patch<any>(requestOptionsTaskDetails);
+      logger.log(res.references);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {

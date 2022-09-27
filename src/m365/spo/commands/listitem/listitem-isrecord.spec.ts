@@ -21,9 +21,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
     if (opts.data.indexOf('Name="Current"') > -1) {
       if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
         logger.log("Returns error from requestObjectIdentity");
-        return Promise.reject(JSON.stringify(
-          [{ "ErrorInfo": "error occurred" }]
-        ));
+        return Promise.reject("error occurred");
       }
 
       return Promise.resolve(JSON.stringify(
@@ -138,7 +136,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('throws an error when requesting a record for an item that does not exist', (done) => {
+  it('throws an error when requesting a record for an item that does not exist', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -150,18 +148,10 @@ describe(commands.LISTITEM_ISRECORD, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Item does not exist. It may have been deleted by another user.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Item does not exist. It may have been deleted by another user.'));
   });
 
-  it('test a record with list title passed in as an option', (done) => {
+  it('test a record with list title passed in as an option', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -173,18 +163,11 @@ describe(commands.LISTITEM_ISRECORD, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith("Getting list id..."));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogToStderrSpy.calledWith("Getting list id..."));
   });
 
-  it('test a record with list id passed in as an option', (done) => {
+  it('test a record with list id passed in as an option', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -196,18 +179,11 @@ describe(commands.LISTITEM_ISRECORD, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith("List Id passed in as an argument."));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogToStderrSpy.calledWith("List Id passed in as an argument."));
   });
 
-  it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request', (done) => {
+  it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -219,15 +195,8 @@ describe(commands.LISTITEM_ISRECORD, () => {
       webUrl: `https://returnerror.sharepoint.com/sites/project-y/`
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith("Returns error from requestObjectIdentity"));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('error occurred'));
+    assert(loggerLogSpy.calledWith("Returns error from requestObjectIdentity"));
   });
 
   it('supports debug mode', () => {

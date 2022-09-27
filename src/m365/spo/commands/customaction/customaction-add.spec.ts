@@ -85,7 +85,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
     assert.strictEqual((command as any)['permissionsKindMap'].length, 37);
   });
 
-  it('correct https data send when custom action with location StandardMenu', (done) => {
+  it('correct https data send when custom action with location StandardMenu', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -98,28 +98,21 @@ describe(commands.CUSTOMACTION_ADD, () => {
       actionUrl: '~site/Shared%20Documents/Forms/AllItems.aspx'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postRequestSpy.calledWith(sinon.match({
-          data: {
-            Title: 'title1',
-            Name: 'name1',
-            Location: 'Microsoft.SharePoint.StandardMenu',
-            Group: 'SiteActions',
-            Description: 'description1',
-            Sequence: 102,
-            Url: '~site/Shared%20Documents/Forms/AllItems.aspx'
-          }
-        })));
-        done();
+    await command.action(logger, { options: options } as any);
+    assert(postRequestSpy.calledWith(sinon.match({
+      data: {
+        Title: 'title1',
+        Name: 'name1',
+        Location: 'Microsoft.SharePoint.StandardMenu',
+        Group: 'SiteActions',
+        Description: 'description1',
+        Sequence: 102,
+        Url: '~site/Shared%20Documents/Forms/AllItems.aspx'
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    })));
   });
 
-  it('correct https data send when custom action with location ClientSideExtension.ApplicationCustomizer', (done) => {
+  it('correct https data send when custom action with location ClientSideExtension.ApplicationCustomizer', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -133,28 +126,21 @@ describe(commands.CUSTOMACTION_ADD, () => {
       debug: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postRequestSpy.calledWith(sinon.match({
-          data: {
-            Title: 'title1',
-            Name: 'name1',
-            Location: 'ClientSideExtension.ApplicationCustomizer',
-            Description: 'description1',
-            Sequence: 101,
-            ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
-            ClientSideComponentProperties: '{"testMessage":"Test message"}'
-          }
-        })));
-        done();
+    await command.action(logger, { options: options } as any);
+    assert(postRequestSpy.calledWith(sinon.match({
+      data: {
+        Title: 'title1',
+        Name: 'name1',
+        Location: 'ClientSideExtension.ApplicationCustomizer',
+        Description: 'description1',
+        Sequence: 101,
+        ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
+        ClientSideComponentProperties: '{"testMessage":"Test message"}'
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    })));
   });
 
-  it('correct https data send when custom action with location ClientSideExtension.ListViewCommandSet', (done) => {
+  it('correct https data send when custom action with location ClientSideExtension.ListViewCommandSet', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -169,30 +155,23 @@ describe(commands.CUSTOMACTION_ADD, () => {
       registrationType: 'List'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postRequestSpy.calledWith(sinon.match({
-          data: {
-            Title: 'title1',
-            Name: 'name1',
-            Location: 'ClientSideExtension.ListViewCommandSet',
-            Description: 'description1',
-            Sequence: 103,
-            ClientSideComponentId: 'db3e6e35-363c-42b9-a254-ca661e437848',
-            ClientSideComponentProperties: '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}',
-            RegistrationId: '100',
-            RegistrationType: 1
-          }
-        })));
-        done();
+    await command.action(logger, { options: options } as any);
+    assert(postRequestSpy.calledWith(sinon.match({
+      data: {
+        Title: 'title1',
+        Name: 'name1',
+        Location: 'ClientSideExtension.ListViewCommandSet',
+        Description: 'description1',
+        Sequence: 103,
+        ClientSideComponentId: 'db3e6e35-363c-42b9-a254-ca661e437848',
+        ClientSideComponentProperties: '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}',
+        RegistrationId: '100',
+        RegistrationType: 1
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    })));
   });
 
-  it('correct https data send when custom action with location EditControlBlock', (done) => {
+  it('correct https data send when custom action with location EditControlBlock', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -206,29 +185,22 @@ describe(commands.CUSTOMACTION_ADD, () => {
       registrationType: 'List'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postRequestSpy.calledWith(sinon.match({
-          data: {
-            Title: 'title1',
-            Name: 'name1',
-            Location: 'EditControlBlock',
-            Description: 'description1',
-            Sequence: 104,
-            Url: 'javascript:(function(){ return console.log("CLI for Microsoft 365 rocks!"); })();',
-            RegistrationId: '101',
-            RegistrationType: 1
-          }
-        })));
-        done();
+    await command.action(logger, { options: options } as any);
+    assert(postRequestSpy.calledWith(sinon.match({
+      data: {
+        Title: 'title1',
+        Name: 'name1',
+        Location: 'EditControlBlock',
+        Description: 'description1',
+        Sequence: 104,
+        Url: 'javascript:(function(){ return console.log("CLI for Microsoft 365 rocks!"); })();',
+        RegistrationId: '101',
+        RegistrationType: 1
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    })));
   });
 
-  it('correct https data send when custom action with location ScriptLink', (done) => {
+  it('correct https data send when custom action with location ScriptLink', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -241,27 +213,20 @@ describe(commands.CUSTOMACTION_ADD, () => {
       scope: 'Site'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postRequestSpy.calledWith(sinon.match({
-          data: {
-            Title: 'title1',
-            Name: 'name1',
-            Location: 'ScriptLink',
-            Description: 'description1',
-            Sequence: 105,
-            ScriptSrc: '~sitecollection/SiteAssets/YourScript.js'
-          }
-        })));
-        done();
+    await command.action(logger, { options: options } as any);
+    assert(postRequestSpy.calledWith(sinon.match({
+      data: {
+        Title: 'title1',
+        Name: 'name1',
+        Location: 'ScriptLink',
+        Description: 'description1',
+        Sequence: 105,
+        ScriptSrc: '~sitecollection/SiteAssets/YourScript.js'
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    })));
   });
 
-  it('correct https data send when custom action with location ScriptLink and ScriptBlock', (done) => {
+  it('correct https data send when custom action with location ScriptLink and ScriptBlock', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -272,26 +237,19 @@ describe(commands.CUSTOMACTION_ADD, () => {
       scriptBlock: '(function(){ return console.log("Hello CLI for Microsoft 365!"); })();'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postRequestSpy.calledWith(sinon.match({
-          data: {
-            Title: 'title1',
-            Name: 'name1',
-            Location: 'ScriptLink',
-            Sequence: 108,
-            ScriptBlock: '(function(){ return console.log("Hello CLI for Microsoft 365!"); })();'
-          }
-        })));
-        done();
+    await command.action(logger, { options: options } as any);
+    assert(postRequestSpy.calledWith(sinon.match({
+      data: {
+        Title: 'title1',
+        Name: 'name1',
+        Location: 'ScriptLink',
+        Sequence: 108,
+        ScriptBlock: '(function(){ return console.log("Hello CLI for Microsoft 365!"); })();'
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    })));
   });
 
-  it('correct https data send when custom action with location CommandUI.Ribbon', (done) => {
+  it('correct https data send when custom action with location CommandUI.Ribbon', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -305,28 +263,21 @@ describe(commands.CUSTOMACTION_ADD, () => {
       scope: 'Web'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postRequestSpy.calledWith(sinon.match({
-          data: {
-            Title: 'title1',
-            Name: 'name1',
-            Location: 'CommandUI.Ribbon',
-            Description: 'description1',
-            Sequence: 106,
-            ImageUrl: '_layouts/15/images/placeholder32x32.png',
-            CommandUIExtension: '<CommandUIExtension><CommandUIDefinitions><CommandUIDefinition Location = "Ribbon.List.Share.Controls._children"><Button Id = "Ribbon.List.Share.GetItemsCountButton" Alt = "Get list items count" Sequence = "11" Command = "Invoke_GetItemsCountButtonRequest" LabelText = "Get Items Count" TemplateAlias = "o1" Image32by32 = "_layouts/15/images/placeholder32x32.png" Image16by16 = "_layouts/15/images/placeholder16x16.png" /></CommandUIDefinition></CommandUIDefinitions><CommandUIHandlers><CommandUIHandler Command = "Invoke_GetItemsCountButtonRequest" CommandAction = "javascript: alert(ctx.TotalListItems);" EnabledScript = "javascript: function checkEnable() { return (true);} checkEnable();"/></CommandUIHandlers></CommandUIExtension>'
-          }
-        })));
-        done();
+    await command.action(logger, { options: options } as any);
+    assert(postRequestSpy.calledWith(sinon.match({
+      data: {
+        Title: 'title1',
+        Name: 'name1',
+        Location: 'CommandUI.Ribbon',
+        Description: 'description1',
+        Sequence: 106,
+        ImageUrl: '_layouts/15/images/placeholder32x32.png',
+        CommandUIExtension: '<CommandUIExtension><CommandUIDefinitions><CommandUIDefinition Location = "Ribbon.List.Share.Controls._children"><Button Id = "Ribbon.List.Share.GetItemsCountButton" Alt = "Get list items count" Sequence = "11" Command = "Invoke_GetItemsCountButtonRequest" LabelText = "Get Items Count" TemplateAlias = "o1" Image32by32 = "_layouts/15/images/placeholder32x32.png" Image16by16 = "_layouts/15/images/placeholder16x16.png" /></CommandUIDefinition></CommandUIDefinitions><CommandUIHandlers><CommandUIHandler Command = "Invoke_GetItemsCountButtonRequest" CommandAction = "javascript: alert(ctx.TotalListItems);" EnabledScript = "javascript: function checkEnable() { return (true);} checkEnable();"/></CommandUIHandlers></CommandUIExtension>'
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    })));
   });
 
-  it('correct https data send when custom action with delegated rights', (done) => {
+  it('correct https data send when custom action with delegated rights', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -339,28 +290,21 @@ describe(commands.CUSTOMACTION_ADD, () => {
       rights: 'AddListItems,DeleteListItems,ManageLists'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postRequestSpy.calledWith(sinon.match({
-          data: {
-            Title: 'title1',
-            Name: 'name1',
-            Location: 'Microsoft.SharePoint.StandardMenu',
-            Group: 'SiteActions',
-            Url: '~site/SitePages/Home.aspx',
-            Sequence: 107,
-            Rights: { High: '0', Low: '2058' }
-          }
-        })));
-        done();
+    await command.action(logger, { options: options } as any);
+    assert(postRequestSpy.calledWith(sinon.match({
+      data: {
+        Title: 'title1',
+        Name: 'name1',
+        Location: 'Microsoft.SharePoint.StandardMenu',
+        Group: 'SiteActions',
+        Url: '~site/SitePages/Home.aspx',
+        Sequence: 107,
+        Rights: { High: '0', Low: '2058' }
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    })));
   });
 
-  it('retrieves and prints the added user custom actions details when verbose specified', (done) => {
+  it('retrieves and prints the added user custom actions details when verbose specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
@@ -402,51 +346,37 @@ describe(commands.CUSTOMACTION_ADD, () => {
 
     defaultCommandOptions.verbose = true;
 
-    command.action(logger, { options: defaultCommandOptions } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith({
-          ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
-          ClientSideComponentProperties: '{"testMessage":"Test message"}',
-          CommandUIExtension: null,
-          Description: null,
-          Group: null,
-          Id: 'd26af83a-6421-4bb3-9f5c-8174ba645c80',
-          ImageUrl: null,
-          Location: 'ClientSideExtension.ApplicationCustomizer',
-          Name: '{d26af83a-6421-4bb3-9f5c-8174ba645c80}',
-          RegistrationId: null,
-          RegistrationType: 0,
-          Rights: '{"High":0,"Low":0}',
-          Scope: 'Web',
-          ScriptBlock: null,
-          ScriptSrc: null,
-          Sequence: 65536,
-          Title: 'Places',
-          Url: null,
-          VersionOfUserCustomAction: '1.0.1.0'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: defaultCommandOptions } as any);
+    assert(loggerLogToStderrSpy.calledWith({
+      ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
+      ClientSideComponentProperties: '{"testMessage":"Test message"}',
+      CommandUIExtension: null,
+      Description: null,
+      Group: null,
+      Id: 'd26af83a-6421-4bb3-9f5c-8174ba645c80',
+      ImageUrl: null,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      Name: '{d26af83a-6421-4bb3-9f5c-8174ba645c80}',
+      RegistrationId: null,
+      RegistrationType: 0,
+      Rights: '{"High":0,"Low":0}',
+      Scope: 'Web',
+      ScriptBlock: null,
+      ScriptSrc: null,
+      Sequence: 65536,
+      Title: 'Places',
+      Url: null,
+      VersionOfUserCustomAction: '1.0.1.0'
+    }));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: defaultCommandOptions } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: defaultCommandOptions } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('offers autocomplete for the registrationType option', () => {
@@ -599,37 +529,23 @@ describe(commands.CUSTOMACTION_ADD, () => {
     assert(actual === true);
   });
 
-  it('calls the correct endpoint (url) when scope is Web', (done) => {
+  it('calls the correct endpoint (url) when scope is Web', async () => {
     const postRequestSpy = initDefaultPostStubs();
 
-    command.action(logger, { options: defaultCommandOptions } as any, () => {
-      try {
-        assert(postRequestSpy.calledWith(sinon.match({
-          url: 'https://contoso.sharepoint.com/_api/Web/UserCustomActions'
-        })));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: defaultCommandOptions } as any);
+    assert(postRequestSpy.calledWith(sinon.match({
+      url: 'https://contoso.sharepoint.com/_api/Web/UserCustomActions'
+    })));
   });
 
-  it('calls the correct endpoint (url) when scope is Site', (done) => {
+  it('calls the correct endpoint (url) when scope is Site', async () => {
     const postRequestSpy = initDefaultPostStubs();
 
     defaultCommandOptions.scope = "Site";
-    command.action(logger, { options: defaultCommandOptions } as any, () => {
-      try {
-        assert(postRequestSpy.calledWith(sinon.match({
-          url: 'https://contoso.sharepoint.com/_api/Site/UserCustomActions'
-        })));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: defaultCommandOptions } as any);
+    assert(postRequestSpy.calledWith(sinon.match({
+      url: 'https://contoso.sharepoint.com/_api/Site/UserCustomActions'
+    })));
   });
 
   it('rejects invalid string scope', async () => {

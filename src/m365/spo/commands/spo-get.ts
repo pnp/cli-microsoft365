@@ -1,12 +1,7 @@
 import auth from '../../../Auth';
 import { Logger } from '../../../cli';
-import GlobalOptions from '../../../GlobalOptions';
 import SpoCommand from '../../base/SpoCommand';
 import commands from '../commands';
-
-interface CommandArgs {
-  options: GlobalOptions;
-}
 
 interface SpoContext {
   SpoUrl: string;
@@ -21,12 +16,11 @@ class SpoGetCommand extends SpoCommand {
     return 'Gets the context URL for the root SharePoint site collection and SharePoint tenant admin site';
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     const spoContext: SpoContext = {
       SpoUrl: auth.service.spoUrl ? auth.service.spoUrl : ''
     };
-    logger.log(spoContext);
-    cb();
+    logger.log(spoContext);    
   }
 }
 

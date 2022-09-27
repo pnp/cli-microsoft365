@@ -2,6 +2,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { AxiosRequestConfig } from 'axios';
 import { accessToken, validation } from '../../../../utils';
 import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
@@ -107,7 +108,7 @@ class PlannerBucketAddCommand extends GraphCommand {
     this.optionSets.push(['planId', 'planTitle']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 
@@ -115,32 +116,32 @@ class PlannerBucketAddCommand extends GraphCommand {
     }
 
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
-    this
-      .getPlanId(args)
-      .then((planId: string): Promise<any> => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/buckets`,
-          headers: {
-            'accept': 'application/json;odata.metadata=none'
-          },
-          responseType: 'json',
-          data: {
-            name: args.options.name,
-            planId: planId,
-            orderHint: args.options.orderHint
-          }
-        };
+    try {
+      const planId = await this.getPlanId(args);
 
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const requestOptions: AxiosRequestConfig = {
+        url: `${this.resource}/v1.0/planner/buckets`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: {
+          name: args.options.name,
+          planId: planId,
+          orderHint: args.options.orderHint
+        }
+      };
+
+      const response = await request.post(requestOptions);
+      logger.log(response);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getPlanId(args: CommandArgs): Promise<string> {

@@ -63,15 +63,18 @@ class SpoFileListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving all files in folder ${args.options.folder} at site ${args.options.webUrl}...`);
     }
 
-    this.getFiles(args.options.folder, args).then((files: FilePropertiesCollection): void => {
+    try {
+      const files = await this.getFiles(args.options.folder, args);
       logger.log(files.value);
-      cb();
-    }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   // Gets files from a folder recursively.

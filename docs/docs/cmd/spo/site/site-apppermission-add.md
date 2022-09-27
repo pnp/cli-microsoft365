@@ -14,7 +14,7 @@ m365 spo site apppermission add [options]
 : URL of the site collection to add the permission
 
 `-p, --permission <permission>`
-: Permission to site (`read`, `write`, or `owner`)
+: Permission to site (`read`, `write`, `manage` or `fullcontrol`)
 
 `-i, --appId [appId]`
 : Client ID of the Azure AD app for which to grant permissions

@@ -135,7 +135,7 @@ describe(commands.MESSAGE_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('retrieves the specified message (debug)', (done) => {
+  it('retrieves the specified message (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/5f5d7b71-1161-44d8-bcc1-3da710eb4171/channels/19:88f7e66a8dfe42be92db19505ae912a8@thread.skype/messages/1540911392778`) {
         return Promise.resolve({
@@ -162,43 +162,36 @@ describe(commands.MESSAGE_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
         channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
         messageId: "1540911392778"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          attachments: [],
-          body: { "contentType": "text", "content": "Konnichiwa" },
-          createdDateTime: "2018-10-28T15:56:25.116Z",
-          deleted: false,
-          etag: "1540742185116",
-          from: { "application": null, "device": null, "user": { "id": "c500ecce-645d-4fe1-a2ea-b70f32416b51", "displayName": "Arjen Bloemsma", "identityProvider": "Aad" } },
-          id: "1540742185116",
-          importance: "normal",
-          lastModifiedDateTime: null,
-          locale: "en-us",
-          mentions: [],
-          messageType: "message",
-          policyViolation: null,
-          reactions: [],
-          replyToId: null,
-          subject: "",
-          summary: null
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      attachments: [],
+      body: { "contentType": "text", "content": "Konnichiwa" },
+      createdDateTime: "2018-10-28T15:56:25.116Z",
+      deleted: false,
+      etag: "1540742185116",
+      from: { "application": null, "device": null, "user": { "id": "c500ecce-645d-4fe1-a2ea-b70f32416b51", "displayName": "Arjen Bloemsma", "identityProvider": "Aad" } },
+      id: "1540742185116",
+      importance: "normal",
+      lastModifiedDateTime: null,
+      locale: "en-us",
+      mentions: [],
+      messageType: "message",
+      policyViolation: null,
+      reactions: [],
+      replyToId: null,
+      subject: "",
+      summary: null
+    }));
   });
 
-  it('retrieves the specified message', (done) => {
+  it('retrieves the specified message', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/5f5d7b71-1161-44d8-bcc1-3da710eb4171/channels/19:88f7e66a8dfe42be92db19505ae912a8@thread.skype/messages/1540911392778`) {
         return Promise.resolve({
@@ -225,62 +218,44 @@ describe(commands.MESSAGE_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
         channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
         messageId: "1540911392778"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          attachments: [],
-          body: { "contentType": "text", "content": "Konnichiwa" },
-          createdDateTime: "2018-10-28T15:56:25.116Z",
-          deleted: false,
-          etag: "1540742185116",
-          from: { "application": null, "device": null, "user": { "id": "c500ecce-645d-4fe1-a2ea-b70f32416b51", "displayName": "Arjen Bloemsma", "identityProvider": "Aad" } },
-          id: "1540742185116",
-          importance: "normal",
-          lastModifiedDateTime: null,
-          locale: "en-us",
-          mentions: [],
-          messageType: "message",
-          policyViolation: null,
-          reactions: [],
-          replyToId: null,
-          subject: "",
-          summary: null
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      attachments: [],
+      body: { "contentType": "text", "content": "Konnichiwa" },
+      createdDateTime: "2018-10-28T15:56:25.116Z",
+      deleted: false,
+      etag: "1540742185116",
+      from: { "application": null, "device": null, "user": { "id": "c500ecce-645d-4fe1-a2ea-b70f32416b51", "displayName": "Arjen Bloemsma", "identityProvider": "Aad" } },
+      id: "1540742185116",
+      importance: "normal",
+      lastModifiedDateTime: null,
+      locale: "en-us",
+      mentions: [],
+      messageType: "message",
+      policyViolation: null,
+      reactions: [],
+      replyToId: null,
+      subject: "",
+      summary: null
+    }));
   });
 
-  it('correctly handles error when retrieving a message', (done) => {
+  it('correctly handles error when retrieving a message', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
-        channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
-        messageId: "1540911392778"
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
+      channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
+      messageId: "1540911392778" } } as any), new CommandError('An error has occurred'));
   });
 });

@@ -86,7 +86,7 @@ describe(commands.USER_SET, () => {
     assert.strictEqual(allowUnknownOptions, true);
   });
 
-  it('correctly handles user or property not found', (done) => {
+  it('correctly handles user or property not found', async () => {
     sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -100,18 +100,11 @@ describe(commands.USER_SET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, objectId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', NonExistingProperty: 'Value' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c844' does not exist or one of its queried reference-property objects are not present.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, objectId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', NonExistingProperty: 'Value' } } as any),
+      new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c844' does not exist or one of its queried reference-property objects are not present.`));
   });
 
-  it('correctly updates information about the specified user', (done) => {    
+  it('correctly updates information about the specified user', async () => {    
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/users/`) > -1) {
         return Promise.resolve({});
@@ -119,25 +112,18 @@ describe(commands.USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         objectId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844',
         Department: 'Sales & Marketing',
         CompanyName: 'Contoso'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly enables the specified user', (done) => {    
+  it('correctly enables the specified user', async () => {    
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/users/`) > -1) {
         return Promise.resolve({});
@@ -145,21 +131,14 @@ describe(commands.USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         userPrincipalName: 'steve@contoso.onmicrosoft.com',
         accountEnabled: true
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogSpy.notCalled);
   });
 
   it('supports debug mode', () => {

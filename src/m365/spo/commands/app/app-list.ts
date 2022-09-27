@@ -81,45 +81,40 @@ class SpoAppListCommand extends SpoAppBaseCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     let appCatalogSiteUrl: string = '';
     let spoUrl: string = '';
 
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((_spoUrl: string): Promise<string> => {
-        spoUrl = _spoUrl;
-        return this.getAppCatalogSiteUrl(logger, spoUrl, args);
-      })
-      .then((appCatalogUrl: string): Promise<{ value: any[] }> => {
-        appCatalogSiteUrl = appCatalogUrl;
+    try {
+      spoUrl = await spo.getSpoUrl(logger, this.debug);
+      appCatalogSiteUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
 
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving apps...`);
+      }
+
+      const requestOptions: any = {
+        url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const apps = await request.get<{ value: any[] }>(requestOptions);
+      if (apps.value && apps.value.length > 0) {
+        logger.log(apps.value);
+      }
+      else {
         if (this.verbose) {
-          logger.logToStderr(`Retrieving apps...`);
+          logger.logToStderr('No apps found');
         }
-
-        const requestOptions: any = {
-          url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        return request.get(requestOptions);
-      })
-      .then((apps: { value: any[] }): void => {
-        if (apps.value && apps.value.length > 0) {
-          logger.log(apps.value);
-        }
-        else {
-          if (this.verbose) {
-            logger.logToStderr('No apps found');
-          }
-        }
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

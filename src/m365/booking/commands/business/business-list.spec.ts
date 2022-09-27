@@ -63,7 +63,7 @@ describe(commands.BUSINESS_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName']);
   });
 
-  it('lists Microsoft Bookings businesses in the tenant (debug)', (done) => {
+  it('lists Microsoft Bookings businesses in the tenant (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
         return Promise.resolve(
@@ -82,37 +82,22 @@ describe(commands.BUSINESS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "id": "FourthCoffee@contoso.onmicrosoft.com",
-              "displayName": "Fourth Coffee"
-            }
-          ]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "id": "FourthCoffee@contoso.onmicrosoft.com",
+          "displayName": "Fourth Coffee"
+        }
+      ]
+    ));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -51,32 +51,34 @@ class AadGroupListCommand extends GraphCommand {
     return ['id', 'displayName', 'groupType'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.group' : 'groups';
 
-    odata
-      .getAllItems<Group>(`${this.resource}/v1.0/${endpoint}`)
-      .then((groups): void => {
-        if (args.options.output === 'text') {
-          groups.forEach((group: ExtendedGroup) => {
-            if (group.groupTypes && group.groupTypes.length > 0 && group.groupTypes[0] === 'Unified') {
-              group.groupType = 'Microsoft 365';
-            }
-            else if (group.mailEnabled && group.securityEnabled) {
-              group.groupType = 'Mail enabled security';
-            }
-            else if (group.securityEnabled) {
-              group.groupType = 'Security';
-            }
-            else if (group.mailEnabled) {
-              group.groupType = 'Distribution';
-            }
-          });
-        }
+    try {
+      const groups = await odata.getAllItems<Group>(`${this.resource}/v1.0/${endpoint}`);
 
-        logger.log(groups);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      if (args.options.output === 'text') {
+        groups.forEach((group: ExtendedGroup) => {
+          if (group.groupTypes && group.groupTypes.length > 0 && group.groupTypes[0] === 'Unified') {
+            group.groupType = 'Microsoft 365';
+          }
+          else if (group.mailEnabled && group.securityEnabled) {
+            group.groupType = 'Mail enabled security';
+          }
+          else if (group.securityEnabled) {
+            group.groupType = 'Security';
+          }
+          else if (group.mailEnabled) {
+            group.groupType = 'Distribution';
+          }
+        });
+      }
+
+      logger.log(groups);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

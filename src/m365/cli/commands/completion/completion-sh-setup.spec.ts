@@ -58,39 +58,18 @@ describe(commands.COMPLETION_SH_SETUP, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('generates file with commands info', (done) => {
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(generateShCompletionStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('generates file with commands info', async () => {
+    await command.action(logger, { options: { debug: false } });
+    assert(generateShCompletionStub.called);
   });
 
-  it('sets up command completion in the shell', (done) => {
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(setupShCompletionStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('sets up command completion in the shell', async () => {
+    await command.action(logger, { options: { debug: false } });
+    assert(setupShCompletionStub.called);
   });
 
-  it('writes additional info in debug mode', (done) => {
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith('Generating command completion...'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('writes additional info in debug mode', async () => {
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogToStderrSpy.calledWith('Generating command completion...'));
   });
 });

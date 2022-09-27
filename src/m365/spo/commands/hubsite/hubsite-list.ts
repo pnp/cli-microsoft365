@@ -55,39 +55,28 @@ class SpoHubSiteListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let hubSites: HubSite[];
-    let spoAdminUrl: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      
+      let requestOptions: any = {
+        url: `${spoAdminUrl}/_api/hubsites`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-    spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((_spoAdminUrl: string): Promise<{ value: HubSite[]; }> => {
-        spoAdminUrl = _spoAdminUrl;
+      const hubSitesResult = await request.get<{ value: HubSite[] }>(requestOptions);
+      const hubSites = hubSitesResult.value;
 
-        const requestOptions: any = {
-          url: `${spoAdminUrl}/_api/hubsites`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        return request.get(requestOptions);
-      })
-      .then((res: { value: HubSite[] }): Promise<any[] | void> => {
-        hubSites = res.value;
-
-        if (args.options.includeAssociatedSites !== true || args.options.output && args.options.output !== 'json') {
-          return Promise.resolve();
-        }
-        else {
-          if (this.debug) {
-            logger.logToStderr('Retrieving associated sites...');
-            logger.logToStderr('');
-          }
+      if (!(args.options.includeAssociatedSites !== true || args.options.output && args.options.output !== 'json')) {
+        if (this.debug) {
+          logger.logToStderr('Retrieving associated sites...');
+          logger.logToStderr('');
         }
 
-        const requestOptions: any = {
+        requestOptions = {
           url: `${spoAdminUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`,
           headers: {
             accept: 'application/json;odata=nometadata'
@@ -100,14 +89,13 @@ class SpoHubSiteListCommand extends SpoCommand {
             }
           }
         };
-
+  
         if (this.debug) {
           logger.logToStderr(`Will retrieve associated sites (including the hub sites) in batches of ${this.batchSize}`);
         }
-
-        return this.getSites(requestOptions, requestOptions.url, logger);
-      })
-      .then((res: AssociatedSite[] | void): void => {
+  
+        const res = await this.getSites(requestOptions, requestOptions.url, logger);
+  
         if (res) {
           hubSites.forEach(h => {
             const filteredSites = res.filter(f => {
@@ -125,10 +113,13 @@ class SpoHubSiteListCommand extends SpoCommand {
             });
           });
         }
+      }
 
-        logger.log(hubSites);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(hubSites);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getSites(reqOptions: any, nonPagedUrl: string, logger: Logger, sites: AssociatedSite[] = [], batchNumber: number = 0): Promise<AssociatedSite[]> {

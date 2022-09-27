@@ -100,43 +100,33 @@ describe(commands.MESSAGE_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('posts a message', function (done) {
+  it('posts a message', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages.json') {
         return Promise.resolve(firstMessage);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { body: "send a letter to me", groupId: 13114941440, debug: true } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 470839661887488);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { body: "send a letter to me", groupId: 13114941440, debug: true } } as any);
+
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 470839661887488);
   });
 
-  it('posts a message handling json', function (done) {
+  it('posts a message handling json', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages.json') {
         return Promise.resolve(firstMessage);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { body: "send a letter to me", groupId: 13114941440, debug: true, output: "json" } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 470839661887488);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { body: "send a letter to me", groupId: 13114941440, debug: true, output: "json" } } as any);
+
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 470839661887488);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -145,15 +135,7 @@ describe(commands.MESSAGE_ADD, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
   it('supports debug mode', () => {

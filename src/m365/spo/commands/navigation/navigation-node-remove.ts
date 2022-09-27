@@ -1,7 +1,7 @@
 import { Cli, Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, spo, validation } from '../../../../utils';
+import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -83,46 +83,45 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeNode: () => void = (): void => {
-      spo
-        .getRequestDigest(args.options.webUrl)
-        .then((res: ContextInfo): Promise<void> => {
-          if (this.verbose) {
-            logger.logToStderr(`Removing navigation node...`);
-          }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeNode: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const res = await spo.getRequestDigest(args.options.webUrl);
 
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}/getbyid(${args.options.id})`,
-            headers: {
-              accept: 'application/json;odata=nometadata',
-              'X-RequestDigest': res.FormDigestValue
-            },
-            responseType: 'json'
-          };
+        if (this.verbose) {
+          logger.logToStderr(`Removing navigation node...`);
+        }
 
-          return request.delete(requestOptions);
-        })
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}/getbyid(${args.options.id})`,
+          headers: {
+            accept: 'application/json;odata=nometadata',
+            'X-RequestDigest': res.FormDigestValue
+          },
+          responseType: 'json'
+        };
+
+        await request.delete(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeNode();
+      await removeNode();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the node ${args.options.id} from the navigation?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeNode();
-        }
       });
+
+      if (result.continue) {
+        await removeNode();
+      }
     }
   }
 }

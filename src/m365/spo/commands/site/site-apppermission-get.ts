@@ -75,26 +75,28 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
     return request.get(requestOptions);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this
-      .getSpoSiteId(args)
-      .then((siteId: string): Promise<SitePermission> => this.getApplicationPermission(args, siteId))
-      .then((permissionObject: SitePermission) => {
-        const transposed: { appDisplayName: string; appId: string; permissionId: string, roles: string }[] = [];
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const siteId: string = await this.getSpoSiteId(args);
+      const permissionObject: SitePermission = await this.getApplicationPermission(args, siteId);
+      const transposed: { appDisplayName: string; appId: string; permissionId: string, roles: string }[] = [];
 
-        permissionObject.grantedToIdentities.forEach((permissionEntity: SitePermissionIdentitySet) => {
-          transposed.push(
-            {
-              appDisplayName: permissionEntity.application.displayName,
-              appId: permissionEntity.application.id,
-              permissionId: permissionObject.id,
-              roles: permissionObject.roles.join()
-            });
-        });
+      permissionObject.grantedToIdentities.forEach((permissionEntity: SitePermissionIdentitySet) => {
+        transposed.push(
+          {
+            appDisplayName: permissionEntity.application.displayName,
+            appId: permissionEntity.application.id,
+            permissionId: permissionObject.id,
+            roles: permissionObject.roles.join()
+          });
+      });
 
-        logger.log(transposed);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(transposed);
+
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

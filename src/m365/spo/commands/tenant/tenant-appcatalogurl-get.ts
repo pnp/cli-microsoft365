@@ -13,32 +13,31 @@ class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
     return 'Gets the URL of the tenant app catalog';
   }
 
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((spoUrl: string): Promise<string> => {
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/SP_TenantSettings_Current`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          }
-        };
-    
-        return request.get(requestOptions);
-      })
-      .then((res: string): void => {
-        const json = JSON.parse(res);
+  public async commandAction(logger: Logger): Promise<void> {
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/SP_TenantSettings_Current`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        }
+      };
+  
+      const res: string = await request.get(requestOptions);
+      const json = JSON.parse(res);
 
-        if (json.CorporateCatalogUrl) {
-          logger.log(json.CorporateCatalogUrl);
+      if (json.CorporateCatalogUrl) {
+        logger.log(json.CorporateCatalogUrl);
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr("Tenant app catalog is not configured.");
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr("Tenant app catalog is not configured.");
-          }
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

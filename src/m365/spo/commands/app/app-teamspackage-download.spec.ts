@@ -65,7 +65,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('downloads Teams app package when appItemUniqueId specified', (done) => {
+  it('downloads Teams app package when appItemUniqueId specified', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -102,19 +102,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' } }, (err) => {
-      try {
-        assert(fsStub.calledOnce);
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' } });
+    assert(fsStub.calledOnce);
   });
 
-  it('downloads Teams app package when appItemId specified', (done) => {
+  it('downloads Teams app package when appItemId specified', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -149,19 +141,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appItemId: 2 } }, (err) => {
-      try {
-        assert(fsStub.calledOnce);
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { appItemId: 2 } });
+    assert(fsStub.calledOnce);
   });
 
-  it('downloads Teams app package when appItemId specified (debug)', (done) => {
+  it('downloads Teams app package when appItemId specified (debug)', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -196,19 +180,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appItemId: 2, debug: true } }, (err) => {
-      try {
-        assert(fsStub.calledOnce);
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { appItemId: 2, debug: true } });
+    assert(fsStub.calledOnce);
   });
 
-  it('downloads Teams app package when appName specified', (done) => {
+  it('downloads Teams app package when appName specified', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -242,19 +218,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } }, (err) => {
-      try {
-        assert(fsStub.calledOnce);
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } });
+    assert(fsStub.calledOnce);
   });
 
-  it('saves the downloaded Teams package to file with name following the .sppkg file', (done) => {
+  it('saves the downloaded Teams package to file with name following the .sppkg file', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -288,19 +256,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } }, (err) => {
-      try {
-        assert(fsStub.calledWith('m365-spfx-wellbeing.zip'));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } });
+    assert(fsStub.calledWith('m365-spfx-wellbeing.zip'));
   });
 
-  it('saves the app package downloaded using appItemUniqueId to the specified file', (done) => {
+  it('saves the app package downloaded using appItemUniqueId to the specified file', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -337,19 +297,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', fileName: 'package.zip' } }, (err) => {
-      try {
-        assert(fsStub.calledWith('package.zip'));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', fileName: 'package.zip' } });
+    assert(fsStub.calledWith('package.zip'));
   });
 
-  it('saves the app package downloaded using appItemId to the specified file', (done) => {
+  it('saves the app package downloaded using appItemId to the specified file', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -384,19 +336,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appItemId: 2, fileName: 'package.zip' } }, (err) => {
-      try {
-        assert(fsStub.calledWith('package.zip'));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { appItemId: 2, fileName: 'package.zip' } });
+    assert(fsStub.calledWith('package.zip'));
   });
 
-  it('saves the app package downloaded using appName to the specified file', (done) => {
+  it('saves the app package downloaded using appName to the specified file', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -430,19 +374,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg', fileName: 'package.zip' } }, (err) => {
-      try {
-        assert(fsStub.calledWith('package.zip'));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg', fileName: 'package.zip' } });
+    assert(fsStub.calledWith('package.zip'));
   });
 
-  it(`doesn't detect app catalog URL when specified`, (done) => {
+  it(`doesn't detect app catalog URL when specified`, async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -473,19 +409,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appItemId: 2, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, (err) => {
-      try {
-        assert(fsStub.calledOnce);
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { appItemId: 2, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    assert(fsStub.calledOnce);
   });
 
-  it(`handles error when the specified app catalog doesn't exist`, (done) => {
+  it(`handles error when the specified app catalog doesn't exist`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/appcatalog/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('m365-spfx-wellbeing.sppkg')/ListItemAllFields?$select=Id`) {
         return Promise.reject('404 FILE NOT FOUND');
@@ -494,18 +422,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`404 FILE NOT FOUND`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }),
+      new CommandError(`404 FILE NOT FOUND`));
   });
 
-  it(`handles error when the specified appItemUniqueId doesn't exist`, (done) => {
+  it(`handles error when the specified appItemUniqueId doesn't exist`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
@@ -528,18 +449,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' } }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Value does not fall within the expected range.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' } }),
+      new CommandError(`Value does not fall within the expected range.`));
   });
 
-  it(`handles error when the specified appItemId doesn't exist`, (done) => {
+  it(`handles error when the specified appItemId doesn't exist`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
@@ -562,18 +476,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appItemId: 2 } }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Item does not exist. It may have been deleted by another user.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),
+      new CommandError('Item does not exist. It may have been deleted by another user.'));
   });
 
-  it(`handles error when the specified appName doesn't exist`, (done) => {
+  it(`handles error when the specified appName doesn't exist`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
@@ -596,18 +503,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } }),
+      new CommandError('File Not Found.'));
   });
 
-  it(`handles error when the package doesn't support syncing to Teams`, (done) => {
+  it(`handles error when the package doesn't support syncing to Teams`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/SP_TenantSettings_Current`) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/appcatalog" });
@@ -628,18 +528,11 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appItemId: 2 } }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Request failed with status code 404')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),
+      new CommandError('Request failed with status code 404'));
   });
 
-  it(`handles error when saving the package to file fails`, (done) => {
+  it(`handles error when saving the package to file fails`, async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -674,15 +567,8 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { appItemId: 2 } }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),
+      new CommandError('An error has occurred'));
   });
 
   it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', async () => {

@@ -47,31 +47,32 @@ class TeamsTeamListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let endpoint: string = `${this.resource}/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`;
     if (args.options.joined) {
       endpoint = `${this.resource}/v1.0/me/joinedTeams`;
     }
-    odata
-      .getAllItems<Group>(endpoint)
-      .then((items): Promise<Group[] | Team[]> => {
-        if (args.options.joined) {
-          return Promise.resolve(items);
-        }
-        else {
-          return Promise.all(
-            items.filter((e: any) => {
-              return e.resourceProvisioningOptions.indexOf('Team') > -1;
-            }).map(
-              g => this.getTeamFromGroup(g)
-            )
-          );
-        }
-      })
-      .then((items: Group[] | Team[]): void => {
+
+    try {
+      const items = await odata.getAllItems<Group>(endpoint);
+      
+      if (args.options.joined) {
         logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }
+      else {
+        const teamItems = await Promise.all(
+          items.filter((e: any) => {
+            return e.resourceProvisioningOptions.indexOf('Team') > -1;
+          }).map(
+            g => this.getTeamFromGroup(g)
+          )
+        );
+        logger.log(teamItems);
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getTeamFromGroup(group: Group): Promise<Team> {

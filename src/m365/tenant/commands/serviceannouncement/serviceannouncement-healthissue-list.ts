@@ -40,19 +40,20 @@ class TenantServiceAnnouncementHealthIssueListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let endpoint: string = `${this.resource}/v1.0/admin/serviceAnnouncement/issues`;
 
     if (args.options.service) {
       endpoint += `?$filter=service eq '${encodeURIComponent(args.options.service)}'`;
     }
 
-    odata
-      .getAllItems<ServiceHealthIssue>(endpoint)
-      .then((items): void => {
-        logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const items: any = await odata.getAllItems<ServiceHealthIssue>(endpoint);
+      logger.log(items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

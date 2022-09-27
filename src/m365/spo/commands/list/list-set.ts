@@ -557,7 +557,7 @@ class SpoListSetCommand extends SpoCommand {
     ]));
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Updating list in site at ${args.options.webUrl}...`);
     }
@@ -576,12 +576,13 @@ class SpoListSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .post(requestOptions)
-      .then((): void => {
-        // REST post call doesn't return anything
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.post(requestOptions);
+      // REST post call doesn't return anything
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private mapRequestBody(options: Options): any {

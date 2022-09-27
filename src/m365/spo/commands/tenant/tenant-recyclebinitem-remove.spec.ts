@@ -12,11 +12,8 @@ const command: Command = require('./tenant-recyclebinitem-remove');
 
 describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   let log: any[];
-  let requests: any[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -38,7 +35,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
     sinon.stub(spo, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' }); });
 
     log = [];
-    requests = [];
     logger = {
       log: (msg: string) => {
         log.push(msg);
@@ -50,11 +46,9 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
   });
 
   afterEach(() => {
@@ -105,19 +99,11 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
     assert(actual);
   });
 
-  it('aborts removing deleting site when prompt not confirmed', (done) => {
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', debug: true, verbose: true } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('aborts removing deleting site when prompt not confirmed', async () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', debug: true, verbose: true } });
   });
 
-  it('removes the deleted site collection from the tenant recycle bin when prompt confirmed, doesn\'t wait for completion', (done) => {
+  it('removes the deleted site collection from the tenant recycle bin when prompt confirmed, doesn\'t wait for completion', async () => {
     sinonUtil.restore(spo.ensureFormDigest);
 
     const pastDate = new Date();
@@ -146,27 +132,16 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post
-        ]);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr' } });
+    sinonUtil.restore([
+      request.post
+    ]);
   });
 
-  it('removes the deleted site collection from the tenant recycle bin, doesn\'t wait for completion (debug)', (done) => {
+  it('removes the deleted site collection from the tenant recycle bin, doesn\'t wait for completion (debug)', async () => {
     sinonUtil.restore(spo.ensureFormDigest);
 
     const pastDate = new Date();
@@ -194,23 +169,13 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, debug: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post
-        ]);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, debug: true } });
+    sinonUtil.restore([
+      request.post
+    ]);
   });
 
-  it('removes the deleted site collection from the tenant recycle bin, doesn\'t wait for completion (verbose)', (done) => {
+  it('removes the deleted site collection from the tenant recycle bin, doesn\'t wait for completion (verbose)', async () => {
     sinonUtil.restore(spo.ensureFormDigest);
 
     const pastDate = new Date();
@@ -238,23 +203,13 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, verbose: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post
-        ]);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, verbose: true } });
+    sinonUtil.restore([
+      request.post
+    ]);
   });
 
-  it('removes the deleted site collection from the tenant recycle bin, wait for completion. Operation immediately completed', (done) => {
+  it('removes the deleted site collection from the tenant recycle bin, wait for completion. Operation immediately completed', async () => {
     sinonUtil.restore(spo.ensureFormDigest);
 
     const pastDate = new Date();
@@ -282,23 +237,13 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post
-        ]);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } });
+    sinonUtil.restore([
+      request.post
+    ]);
   });
 
-  it('removes the deleted site collection from the tenant recycle bin, wait for completion', (done) => {
+  it('removes the deleted site collection from the tenant recycle bin, wait for completion', async () => {
     sinonUtil.restore(spo.ensureFormDigest);
 
     const pastDate = new Date();
@@ -342,23 +287,13 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post
-        ]);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } });
+    sinonUtil.restore([
+      request.post
+    ]);
   });
 
-  it('removes the deleted site collection from the tenant recycle bin, wait for completion (debug)', (done) => {
+  it('removes the deleted site collection from the tenant recycle bin, wait for completion (debug)', async () => {
     sinonUtil.restore(spo.ensureFormDigest);
 
     const pastDate = new Date();
@@ -402,23 +337,13 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true, debug: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post
-        ]);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true, debug: true } });
+    sinonUtil.restore([
+      request.post
+    ]);
   });
 
-  it('removes the deleted site collection from the tenant recycle bin, wait for completion (verbose)', (done) => {
+  it('removes the deleted site collection from the tenant recycle bin, wait for completion (verbose)', async () => {
     sinonUtil.restore(spo.ensureFormDigest);
 
     const pastDate = new Date();
@@ -462,23 +387,13 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true, verbose: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post
-        ]);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true, verbose: true } });
+    sinonUtil.restore([
+      request.post
+    ]);
   });
 
-  it('did not remove the deleted site collection from the tenant recycle bin', (done) => {
+  it('did not remove the deleted site collection from the tenant recycle bin', async () => {
     sinonUtil.restore(spo.ensureFormDigest);
 
     const pastDate = new Date();
@@ -504,14 +419,6 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } }, (err?: any) => {
-      try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Unable to find the deleted site: https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fhr.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } } as any), new CommandError('Unable to find the deleted site: https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fhr.'));
   });
 });

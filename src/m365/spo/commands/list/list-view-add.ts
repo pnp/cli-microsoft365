@@ -110,7 +110,7 @@ class SpoListViewAddCommand extends SpoCommand {
     this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: AxiosRequestConfig = {
       url: this.getRestUrl(args.options),
       headers: {
@@ -133,12 +133,13 @@ class SpoListViewAddCommand extends SpoCommand {
       }
     };
 
-    request
-      .post(requestOptions)
-      .then((result: any): void => {
-        logger.log(result);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const result = await request.post<any>(requestOptions);
+      logger.log(result);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getRestUrl(options: Options): string {

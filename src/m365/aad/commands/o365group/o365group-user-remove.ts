@@ -90,10 +90,10 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
     this.optionSets.push(['groupId', 'teamId']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
-    const removeUser: () => void = async (): Promise<void> => {
+    const removeUser: () => Promise<void> = async (): Promise<void> => {
       try {
         // retrieve user
         const user: UserResponse = await request.get({
@@ -143,31 +143,26 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
             throw err.response.data;
           }
         }
-
-        cb();
       }
       catch (err: any) {
-        this.handleRejectedODataJsonPromise(err, logger, cb);
+        this.handleRejectedODataJsonPromise(err);
       }
     };
 
     if (args.options.confirm) {
-      removeUser();
+      await removeUser();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove ${args.options.userName} from the ${(typeof args.options.groupId !== 'undefined' ? 'group' : 'team')} ${groupId}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeUser();
-        }
       });
+
+      if (result.continue) {
+        await removeUser();
+      }
     }
   }
 }

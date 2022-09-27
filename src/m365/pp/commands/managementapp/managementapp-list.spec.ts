@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -57,7 +57,7 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('successfully retrieves management application', (done) => {
+  it('successfully retrieves management application', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01") {
         return Promise.resolve({
@@ -67,25 +67,18 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true
       }
-    }, () => {
-      try {
-        const actual = JSON.stringify(log[log.length - 1]);
-        const expected = JSON.stringify([{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548e"}]);
-
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const actual = JSON.stringify(log[log.length - 1]);
+    const expected = JSON.stringify([{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548e"}]);
+
+    assert.strictEqual(actual, expected);
   });
 
-  it('successfully retrieves multiple management applications', (done) => {
+  it('successfully retrieves multiple management applications', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01") {
         return Promise.resolve({
@@ -95,25 +88,18 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true
       }
-    }, () => {
-      try {
-        const actual = JSON.stringify(log[log.length - 1]);
-        const expected = JSON.stringify([{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548e"}, {"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548f"}]);
-
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const actual = JSON.stringify(log[log.length - 1]);
+    const expected = JSON.stringify([{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548e"}, {"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548f"}]);
+
+    assert.strictEqual(actual, expected);
   });
 
-  it('successfully handles no result found', (done) => {
+  it('successfully handles no result found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01") {
         return Promise.resolve({
@@ -123,21 +109,22 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true
       }
-    }, () => {
-      try {
-        const actual = JSON.stringify(log[log.length - 1]);
-        const expected = JSON.stringify([ {} ]);
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const actual = JSON.stringify(log[log.length - 1]);
+    const expected = JSON.stringify([ {} ]);
+    assert.strictEqual(actual, expected);
+  });
+
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: { } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

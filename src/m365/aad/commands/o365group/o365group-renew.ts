@@ -49,21 +49,24 @@ class AadO365GroupRenewCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Renewing Microsoft 365 group's expiration: ${args.options.id}...`);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups/${args.options.id}/renew/`,
-      headers: {
-        'accept': 'application/json;odata.metadata=none'
-      }
-    };
-
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+    try {
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/groups/${args.options.id}/renew/`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none'
+        }
+      };
+  
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

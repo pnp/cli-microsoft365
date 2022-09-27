@@ -58,7 +58,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('uses correct API url when list id option is passed', (done) => {
+  it('uses correct API url when list id option is passed', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve('Correct Url');
@@ -67,7 +67,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
@@ -76,18 +76,10 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-10-09'
       }
-    }, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('uses correct API url when list title option is passed', (done) => {
+  it('uses correct API url when list title option is passed', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.resolve('Correct Url');
@@ -96,7 +88,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
@@ -105,18 +97,10 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-10-09'
       }
-    }, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('updates notification url and expiration date of the webhook by passing list title (debug)', (done) => {
+  it('updates notification url and expiration date of the webhook by passing list title (debug)', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
@@ -131,7 +115,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: true,
@@ -141,18 +125,11 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-10-09'
       }
-    }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(actual, expected);
   });
 
-  it('updates notification url and expiration date of the webhook by passing list id (verbose)', (done) => {
+  it('updates notification url and expiration date of the webhook by passing list id (verbose)', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
@@ -167,7 +144,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         verbose: true,
@@ -177,18 +154,11 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-10-09'
       }
-    }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(actual, expected);
   });
 
-  it('updates notification url and expiration date of the webhook by passing list title', (done) => {
+  it('updates notification url and expiration date of the webhook by passing list title', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
@@ -203,7 +173,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: false,
@@ -213,18 +183,11 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-10-09'
       }
-    }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(actual, expected);
   });
 
-  it('updates notification url of the webhook by passing list title', (done) => {
+  it('updates notification url of the webhook by passing list title', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
@@ -238,7 +201,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: false,
@@ -247,18 +210,11 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(actual, expected);
   });
 
-  it('updates expiration date of the webhook by passing list title', (done) => {
+  it('updates expiration date of the webhook by passing list title', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       expirationDateTime: '2019-03-02'
@@ -272,7 +228,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: false,
@@ -281,23 +237,16 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         expirationDateTime: '2019-03-02'
       }
-    }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(actual, expected);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options:
       {
         debug: false,
@@ -306,15 +255,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         expirationDateTime: '2019-03-02'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if both list id and title options are not passed', async () => {

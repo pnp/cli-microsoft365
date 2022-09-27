@@ -88,49 +88,46 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
 
-    const retractApp: () => void = (): void => {
-      spo
-        .getSpoUrl(logger, this.debug)
-        .then((spoUrl: string): Promise<string> => {
-          return this.getAppCatalogSiteUrl(logger, spoUrl, args);
-        })
-        .then((appCatalogSiteUrl: string): Promise<string> => {
-          if (this.verbose) {
-            logger.logToStderr(`Retracting app...`);
+    const retractApp: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const spoUrl = await spo.getSpoUrl(logger, this.debug);
+        const appCatalogSiteUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
+
+        if (this.verbose) {
+          logger.logToStderr(`Retracting app...`);
+        }
+
+        const requestOptions: any = {
+          url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/retract`,
+          headers: {
+            accept: 'application/json;odata=nometadata'
           }
+        };
 
-          const requestOptions: any = {
-            url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/retract`,
-            headers: {
-              accept: 'application/json;odata=nometadata'
-            }
-          };
-
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      retractApp();
+      await retractApp();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to retract the app ${args.options.id} from the app catalog?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          retractApp();
-        }
       });
+
+      if (result.continue) {
+        await retractApp();
+      }
     }
   }
 }

@@ -219,27 +219,19 @@ describe(commands.PLAN_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when using app only access token', (done) => {
+  it('fails validation when using app only access token', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         title: validTitle,
         ownerGroupId: validOwnerGroupId
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('This command does not support application permissions.'));
   });
 
-  it('correctly adds planner plan with given title with available ownerGroupId', (done) => {
+  it('correctly adds planner plan with given title with available ownerGroupId', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
         return Promise.resolve(planResponse);
@@ -248,24 +240,17 @@ describe(commands.PLAN_ADD, () => {
       return Promise.reject(`Invalid request ${opts.url}`);
     });
 
-    const options: any = {
-      debug: false,
-      title: validTitle,
-      ownerGroupId: validOwnerGroupId
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(planResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, {
+      options: {
+        debug: false,
+        title: validTitle,
+        ownerGroupId: validOwnerGroupId
       }
     });
+    assert(loggerLogSpy.calledWith(planResponse));
   });
 
-  it('correctly adds planner plan with given title with available ownerGroupName', (done) => {
+  it('correctly adds planner plan with given title with available ownerGroupName', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
         return Promise.resolve(singleGroupResponse);
@@ -282,24 +267,18 @@ describe(commands.PLAN_ADD, () => {
       return Promise.reject(`Invalid request ${opts.url}`);
     });
 
-    const options: any = {
-      debug: false,
-      title: validTitle,
-      ownerGroupName: validOwnerGroupName
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(planResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, {
+      options: {
+        debug: false,
+        title: validTitle,
+        ownerGroupName: validOwnerGroupName
       }
     });
+
+    assert(loggerLogSpy.calledWith(planResponse));
   });
 
-  it('correctly adds planner plan with given title with ownerGroupId and shareWithUserIds', (done) => {
+  it('correctly adds planner plan with given title with ownerGroupId and shareWithUserIds', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
         return Promise.resolve(planDetailsEtagResponse);
@@ -324,25 +303,18 @@ describe(commands.PLAN_ADD, () => {
       return Promise.reject(`Invalid request ${opts.url}`);
     });
 
-    const options: any = {
-      debug: false,
-      title: validTitle,
-      ownerGroupId: validOwnerGroupId,
-      shareWithUserIds: validShareWithUserIds
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(outputResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { 
+      options: {
+        debug: false,
+        title: validTitle,
+        ownerGroupId: validOwnerGroupId,
+        shareWithUserIds: validShareWithUserIds
       }
     });
+    assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('correctly adds planner plan with given title with ownerGroupId and shareWithUserNames', (done) => {
+  it('correctly adds planner plan with given title with ownerGroupId and shareWithUserNames', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
         return Promise.resolve(planDetailsEtagResponse);
@@ -375,25 +347,18 @@ describe(commands.PLAN_ADD, () => {
       return Promise.reject(`Invalid request ${opts.url}`);
     });
 
-    const options: any = {
-      debug: false,
-      title: validTitle,
-      ownerGroupId: validOwnerGroupId,
-      shareWithUserNames: validShareWithUserNames
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(outputResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, {
+      options: {
+        debug: false,
+        title: validTitle,
+        ownerGroupId: validOwnerGroupId,
+        shareWithUserNames: validShareWithUserNames
       }
     });
+    assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('fails when an invalid user is specified', (done) => {
+  it('fails when an invalid user is specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
         return Promise.resolve(planDetailsEtagResponse);
@@ -426,38 +391,22 @@ describe(commands.PLAN_ADD, () => {
       return Promise.reject(`Invalid request ${opts.url}`);
     });
 
-    const options: any = {
-      debug: false,
-      title: validTitle,
-      ownerGroupId: validOwnerGroupId,
-      shareWithUserNames: validShareWithUserNames
-    };
-
-    command.action(logger, { options: options } as any, (err: any) => {
-      try {
-        assert.strictEqual(err.message, `Cannot proceed with planner plan creation. The following users provided are invalid : ${user1}`);
-        done();
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        title: validTitle,
+        ownerGroupId: validOwnerGroupId,
+        shareWithUserNames: validShareWithUserNames
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Cannot proceed with planner plan creation. The following users provided are invalid : ${user1}`));
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject("An error has occurred.");
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError("An error has occurred."));
   });
 
   it('supports debug mode', () => {

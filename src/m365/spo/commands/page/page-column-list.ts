@@ -3,7 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { CanvasSection, ClientSidePage } from './clientsidepages';
+import { CanvasSection } from './clientsidepages';
 import { Page } from './Page';
 
 interface CommandArgs {
@@ -58,24 +58,24 @@ class SpoPageColumnListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    Page
-      .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
-      .then((clientSidePage: ClientSidePage): void => {
-        const sections: CanvasSection[] = clientSidePage.sections
-          .filter(section => section.order === args.options.section);
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const clientSidePage = await Page.getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose);
+      const sections: CanvasSection[] = clientSidePage.sections
+        .filter(section => section.order === args.options.section);
 
-        if (sections.length) {
-          const isJSONOutput = args.options.output === 'json';
-          logger.log(sections[0].columns.map(c => {
-            const column = Page.getColumnsInformation(c, isJSONOutput);
-            column.controls = c.controls.length;
-            return column;
-          }));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      if (sections.length) {
+        const isJSONOutput = args.options.output === 'json';
+        logger.log(sections[0].columns.map(c => {
+          const column = Page.getColumnsInformation(c, isJSONOutput);
+          column.controls = c.controls.length;
+          return column;
+        }));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

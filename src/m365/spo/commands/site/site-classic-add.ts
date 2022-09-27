@@ -164,103 +164,86 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.dots = '';
     this.showDeprecationWarning(logger, commands.SITE_CLASSIC_ADD, commands.SITE_ADD);
 
-    spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
-        this.spoAdminUrl = _spoAdminUrl;
+    try {
+      this.spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      this.context = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
 
-        return spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
-      })
-      .then((res: FormDigestInfo): Promise<boolean> => {
-        this.context = res;
-
-        if (args.options.removeDeletedSite) {
-          return this.siteExistsInTheRecycleBin(args.options.url, logger);
-        }
-        else {
-          // assume site doesn't exist
-          return Promise.resolve(false);
-        }
-      })
-      .then((exists: boolean): Promise<void> => {
-        if (exists) {
-          if (this.verbose) {
-            logger.logToStderr('Site exists in the recycle bin');
-          }
-
-          return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
-        }
-        else {
-          if (this.verbose) {
-            logger.logToStderr('Site not found');
-          }
-
-          return Promise.resolve();
-        }
-      })
-      .then((): Promise<FormDigestInfo> => {
-        return spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
-      })
-      .then((res: FormDigestInfo): Promise<string> => {
-        this.context = res;
+      if (args.options.removeDeletedSite) {
+        await this.siteExistsInTheRecycleBin(args.options.url, logger);
 
         if (this.verbose) {
-          logger.logToStderr(`Creating site collection ${args.options.url}...`);
+          logger.logToStderr('Site exists in the recycle bin');
         }
 
-        const lcid: number = typeof args.options.lcid === 'number' ? args.options.lcid : 1033;
-        const storageQuota: number = typeof args.options.storageQuota === 'number' ? args.options.storageQuota : 100;
-        const storageQuotaWarningLevel: number = typeof args.options.storageQuotaWarningLevel === 'number' ? args.options.storageQuotaWarningLevel : 100;
-        const resourceQuota: number = typeof args.options.resourceQuota === 'number' ? args.options.resourceQuota : 0;
-        const resourceQuotaWarningLevel: number = typeof args.options.resourceQuotaWarningLevel === 'number' ? args.options.resourceQuotaWarningLevel : 0;
-        const webTemplate: string = args.options.webTemplate || 'STS#0';
+        await this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
+      }
+      else {
+        // assume site doesn't exist
+        if (this.verbose) {
+          logger.logToStderr('Site not found');
+        }
+      }
 
-        const requestOptions: any = {
-          url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': this.context.FormDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcid}</Property><Property Name="Owner" Type="String">${formatting.escapeXml(args.options.owner)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuota}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevel}</Property><Property Name="Template" Type="String">${formatting.escapeXml(webTemplate)}</Property><Property Name="TimeZoneId" Type="Int32">${args.options.timeZone}</Property><Property Name="Title" Type="String">${formatting.escapeXml(args.options.title)}</Property><Property Name="Url" Type="String">${formatting.escapeXml(args.options.url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuota}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevel}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
-        };
+      this.context = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
 
-        return request.post(requestOptions);
-      })
-      .then((res: string): Promise<void> => {
-        return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
+      if (this.verbose) {
+        logger.logToStderr(`Creating site collection ${args.options.url}...`);
+      }
+
+      const lcid: number = typeof args.options.lcid === 'number' ? args.options.lcid : 1033;
+      const storageQuota: number = typeof args.options.storageQuota === 'number' ? args.options.storageQuota : 100;
+      const storageQuotaWarningLevel: number = typeof args.options.storageQuotaWarningLevel === 'number' ? args.options.storageQuotaWarningLevel : 100;
+      const resourceQuota: number = typeof args.options.resourceQuota === 'number' ? args.options.resourceQuota : 0;
+      const resourceQuotaWarningLevel: number = typeof args.options.resourceQuotaWarningLevel === 'number' ? args.options.resourceQuotaWarningLevel : 0;
+      const webTemplate: string = args.options.webTemplate || 'STS#0';
+
+      const requestOptions: any = {
+        url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'X-RequestDigest': this.context.FormDigestValue
+        },
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcid}</Property><Property Name="Owner" Type="String">${formatting.escapeXml(args.options.owner)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuota}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevel}</Property><Property Name="Template" Type="String">${formatting.escapeXml(webTemplate)}</Property><Property Name="TimeZoneId" Type="Int32">${args.options.timeZone}</Property><Property Name="Title" Type="String">${formatting.escapeXml(args.options.title)}</Property><Property Name="Url" Type="String">${formatting.escapeXml(args.options.url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuota}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevel}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
+      };
+
+      const res: string = await request.post(requestOptions);
+      
+      return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          throw response.ErrorInfo.ErrorMessage;
+        }
+        else {
+          const operation: SpoOperation = json[json.length - 1];
+          const isComplete: boolean = operation.IsComplete;
+          if (!args.options.wait || isComplete) {
+            resolve();
+            return;
           }
-          else {
-            const operation: SpoOperation = json[json.length - 1];
-            const isComplete: boolean = operation.IsComplete;
-            if (!args.options.wait || isComplete) {
-              resolve();
-              return;
-            }
 
-            setTimeout(() => {
-              spo.waitUntilFinished({
-                operationId: JSON.stringify(operation._ObjectIdentity_),
-                siteUrl: this.spoAdminUrl as string,
-                resolve,
-                reject,
-                logger,
-                currentContext: this.context as FormDigestInfo,
-                dots: this.dots,
-                debug: this.debug,
-                verbose: this.verbose
-              });
-            }, operation.PollingInterval);
-          }
-        });
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
+          setTimeout(() => {
+            spo.waitUntilFinished({
+              operationId: JSON.stringify(operation._ObjectIdentity_),
+              siteUrl: this.spoAdminUrl as string,
+              resolve,
+              reject,
+              logger,
+              currentContext: this.context as FormDigestInfo,
+              dots: this.dots,
+              debug: this.debug,
+              verbose: this.verbose
+            });
+          }, operation.PollingInterval);
+        }
+      });
+    } 
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   private siteExistsInTheRecycleBin(url: string, logger: Logger): Promise<boolean> {

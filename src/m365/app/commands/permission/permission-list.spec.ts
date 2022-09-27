@@ -73,7 +73,7 @@ describe(commands.PERMISSION_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves permissions from app registration if service principal not found', (done) => {
+  it('retrieves permissions from app registration if service principal not found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -146,45 +146,37 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
-          {
-            "resource": "Microsoft Flow Service",
-            "permission": "Flows.Read.All",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Flow Service",
-            "permission": "Flows.Manage.All",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Windows Azure Service Management API",
-            "permission": "user_impersonation",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "AccessReview.Read.All",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "Agreement.Read.All",
-            "type": "Delegated"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+      {
+        "resource": "Microsoft Flow Service",
+        "permission": "Flows.Read.All",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Flow Service",
+        "permission": "Flows.Manage.All",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Windows Azure Service Management API",
+        "permission": "user_impersonation",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "AccessReview.Read.All",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "Agreement.Read.All",
+        "type": "Delegated"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('retrieves permissions from app registration if service principal not found (debug)', (done) => {
+  it('retrieves permissions from app registration if service principal not found (debug)', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -257,19 +249,11 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: true } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('retrieves delegated permissions from app registration', (done) => {
+  it('retrieves delegated permissions from app registration', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -342,45 +326,37 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
-          {
-            "resource": "Microsoft Flow Service",
-            "permission": "Flows.Read.All",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Flow Service",
-            "permission": "Flows.Manage.All",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Windows Azure Service Management API",
-            "permission": "user_impersonation",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "AccessReview.Read.All",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "Agreement.Read.All",
-            "type": "Delegated"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+      {
+        "resource": "Microsoft Flow Service",
+        "permission": "Flows.Read.All",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Flow Service",
+        "permission": "Flows.Manage.All",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Windows Azure Service Management API",
+        "permission": "user_impersonation",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "AccessReview.Read.All",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "Agreement.Read.All",
+        "type": "Delegated"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('retrieves application permissions from app registration', (done) => {
+  it('retrieves application permissions from app registration', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -414,25 +390,17 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
-          {
-            "resource": "Microsoft Graph",
-            "permission": "AppCatalog.Read.All",
-            "type": "Application"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+      {
+        "resource": "Microsoft Graph",
+        "permission": "AppCatalog.Read.All",
+        "type": "Application"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it(`doesn't fail when the app registration has no API permissions`, (done) => {
+  it(`doesn't fail when the app registration has no API permissions`, async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -452,19 +420,11 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([]));
   });
 
-  it('retrieves permissions for a service principal with delegated and app permissions', (done) => {
+  it('retrieves permissions for a service principal with delegated and app permissions', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -532,40 +492,32 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
-          {
-            "resource": "Microsoft Graph",
-            "permission": "Files.Read.All",
-            "type": "Application"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "Mail.Read",
-            "type": "Application"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "Mail.Read",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "offline_access",
-            "type": "Delegated"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+      {
+        "resource": "Microsoft Graph",
+        "permission": "Files.Read.All",
+        "type": "Application"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "Mail.Read",
+        "type": "Application"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "Mail.Read",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "offline_access",
+        "type": "Delegated"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('retrieves permissions for a service principal with delegated and app permissions (debug)', (done) => {
+  it('retrieves permissions for a service principal with delegated and app permissions (debug)', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -633,19 +585,11 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: true } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('retrieves permissions for a service principal with delegated permissions', (done) => {
+  it('retrieves permissions for a service principal with delegated permissions', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -688,30 +632,22 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
-          {
-            "resource": "Microsoft Graph",
-            "permission": "Mail.Read",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "offline_access",
-            "type": "Delegated"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+      {
+        "resource": "Microsoft Graph",
+        "permission": "Mail.Read",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "offline_access",
+        "type": "Delegated"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('handles non-existent app', (done) => {
+  it('handles non-existent app', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=id`:
@@ -722,18 +658,11 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('No Azure AD application registration with ID 9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d found')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } }),
+      new CommandError('No Azure AD application registration with ID 9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d found'));
   });
 
-  it('handles error when retrieving service principal for the AAD app', (done) => {
+  it('handles error when retrieving service principal for the AAD app', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -747,18 +676,11 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } }),
+      new CommandError(`An error has occurred`));
   });
 
-  it('handles error when retrieving OAuth2 permission grants for service principal', (done) => {
+  it('handles error when retrieving OAuth2 permission grants for service principal', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -784,18 +706,10 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError(`An error has occurred`));
   });
 
-  it('handles error when retrieving OAuth2 permission scopes for service principal', (done) => {
+  it('handles error when retrieving OAuth2 permission scopes for service principal', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -867,18 +781,10 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError(`An error has occurred`));
   });
 
-  it('handles error when retrieving app role assignments for service principal', (done) => {
+  it('handles error when retrieving app role assignments for service principal', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -915,18 +821,10 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError(`An error has occurred`));
   });
 
-  it('handles error when retrieving app roles for service principal', (done) => {
+  it('handles error when retrieving app roles for service principal', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -998,18 +896,10 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError(`An error has occurred`));
   });
 
-  it('handles error when retrieving AAD app registration', (done) => {
+  it('handles error when retrieving AAD app registration', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -1024,18 +914,10 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError(`An error has occurred`));
   });
 
-  it('handles non-existent service principal from app registration permissions', (done) => {
+  it('handles non-existent service principal from app registration permissions', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -1056,25 +938,17 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
-          {
-            "resource": "00000003-0000-0000-c000-000000000000",
-            "permission": "e12dae10-5a57-4817-b79d-dfbec5348930",
-            "type": "Application"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+      {
+        "resource": "00000003-0000-0000-c000-000000000000",
+        "permission": "e12dae10-5a57-4817-b79d-dfbec5348930",
+        "type": "Application"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('handles service principal referencing a non-existent app permission', (done) => {
+  it('handles service principal referencing a non-existent app permission', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -1142,40 +1016,32 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
-          {
-            "resource": "Microsoft Graph",
-            "permission": "01d4889c-1287-42c6-ac1f-5d1e02578ef7",
-            "type": "Application"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "Mail.Read",
-            "type": "Application"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "Mail.Read",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "offline_access",
-            "type": "Delegated"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+      {
+        "resource": "Microsoft Graph",
+        "permission": "01d4889c-1287-42c6-ac1f-5d1e02578ef7",
+        "type": "Application"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "Mail.Read",
+        "type": "Application"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "Mail.Read",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "offline_access",
+        "type": "Delegated"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('handles unknown delegated permissions from app registration', (done) => {
+  it('handles unknown delegated permissions from app registration', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -1250,45 +1116,37 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
-          {
-            "resource": "Microsoft Flow Service",
-            "permission": "e45c5562-459d-4d1b-8148-83eb1b6dcf84",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Flow Service",
-            "permission": "Flows.Manage.All",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Windows Azure Service Management API",
-            "permission": "user_impersonation",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "AccessReview.Read.All",
-            "type": "Delegated"
-          },
-          {
-            "resource": "Microsoft Graph",
-            "permission": "Agreement.Read.All",
-            "type": "Delegated"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+      {
+        "resource": "Microsoft Flow Service",
+        "permission": "e45c5562-459d-4d1b-8148-83eb1b6dcf84",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Flow Service",
+        "permission": "Flows.Manage.All",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Windows Azure Service Management API",
+        "permission": "user_impersonation",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "AccessReview.Read.All",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Microsoft Graph",
+        "permission": "Agreement.Read.All",
+        "type": "Delegated"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('handles unknown application permissions from app registration', (done) => {
+  it('handles unknown application permissions from app registration', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       switch (opts.url) {
         case `https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d'&$select=appId,id,displayName`:
@@ -1324,22 +1182,14 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
-          {
-            "resource": "Microsoft Graph",
-            "permission": "e12dae10-5a57-4817-b79d-dfbec5348931",
-            "type": "Application"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+      {
+        "resource": "Microsoft Graph",
+        "permission": "e12dae10-5a57-4817-b79d-dfbec5348931",
+        "type": "Application"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
   it('supports debug mode', () => {

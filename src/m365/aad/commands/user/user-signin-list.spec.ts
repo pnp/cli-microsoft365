@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -192,7 +192,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'userPrincipalName', 'appId', 'appDisplayName', 'createdDateTime']);
   });
 
-  it('lists all signins in the tenant (verbose)', (done) => {
+  it('lists all signins in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/auditLogs/signIns`) {
         return Promise.resolve(
@@ -202,20 +202,12 @@ describe(commands.USER_SIGNIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await command.action(logger, { options: { verbose: true } });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
   });
-  it('lists all signins by userName in the tenant (verbose)', (done) => {
+  it('lists all signins by userName in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/auditLogs/signIns?$filter=userPrincipalName eq 'testaccount1%40contoso.com'`) {
         return Promise.resolve(
@@ -225,19 +217,13 @@ describe(commands.USER_SIGNIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true, userName: 'testaccount1@contoso.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { verbose: true, userName: 'testaccount1@contoso.com' } });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
   });
-  it('lists all signins by userId in the tenant (verbose)', (done) => {
+
+  it('lists all signins by userId in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/auditLogs/signIns?$filter=userId eq '737002f2-9582-4068-b706-044e09481897'`) {
         return Promise.resolve(
@@ -247,19 +233,13 @@ describe(commands.USER_SIGNIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true, userId: '737002f2-9582-4068-b706-044e09481897' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { verbose: true, userId: '737002f2-9582-4068-b706-044e09481897' } });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
   });
-  it('lists all signins by appId in the tenant (verbose)', (done) => {
+
+  it('lists all signins by appId in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/auditLogs/signIns?$filter=appId eq 'de8bc8b5-d9f9-48b1-a8ad-b748da725064'`) {
         return Promise.resolve(
@@ -269,19 +249,13 @@ describe(commands.USER_SIGNIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true, appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { verbose: true, appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
   });
-  it('lists all signins by appDisplayName in the tenant (verbose)', (done) => {
+
+  it('lists all signins by appDisplayName in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/auditLogs/signIns?$filter=appDisplayName eq 'Graph%20explorer'`) {
         return Promise.resolve(
@@ -291,19 +265,13 @@ describe(commands.USER_SIGNIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true, appDisplayName: 'Graph explorer' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { verbose: true, appDisplayName: 'Graph explorer' } });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
   });
-  it('lists all signins by userName and appId in the tenant (verbose)', (done) => {
+
+  it('lists all signins by userName and appId in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/auditLogs/signIns?$filter=userPrincipalName eq 'testaccount1%40contoso.com' and appId eq 'de8bc8b5-d9f9-48b1-a8ad-b748da725064'`) {
         return Promise.resolve(
@@ -313,19 +281,13 @@ describe(commands.USER_SIGNIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true, userName: 'testaccount1@contoso.com', appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { verbose: true, userName: 'testaccount1@contoso.com', appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
   });
-  it('lists all signins by userName and appDisplayName in the tenant (verbose)', (done) => {
+
+  it('lists all signins by userName and appDisplayName in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/auditLogs/signIns?$filter=userPrincipalName eq 'testaccount1%40contoso.com' and appDisplayName eq 'Graph%20explorer'`) {
         return Promise.resolve(
@@ -335,42 +297,49 @@ describe(commands.USER_SIGNIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true, userName: 'testaccount1@contoso.com', appDisplayName: 'Graph explorer' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { verbose: true, userName: 'testaccount1@contoso.com', appDisplayName: 'Graph explorer' } });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
   });
+
+  it('handles random API error', async () => {
+    const errorMessage = 'Something went wrong';
+    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+
+    await assert.rejects(command.action(logger, { options: { userName: 'testaccount1@contoso.com', appDisplayName: 'Graph explorer' } }), new CommandError(errorMessage));
+  });
+
   it('fails validation if userId and userName specified', async () => {
     const actual = await command.validate({ options: { userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', userName: 'Graph explorer' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
+
   it('fails validation if the userId is not a valid GUID', async () => {
     const actual = await command.validate({ options: { userId: 'not-c49b-4fd4-8223-28f0ac3a6402' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
+
   it('passes validation if the userId is a valid GUID', async () => {
     const actual = await command.validate({ options: { userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
   it('fails validation if appId and appDisplayName specified', async () => {
     const actual = await command.validate({ options: { appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', appDisplayName: 'Graph explorer' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
+
   it('fails validation if the appId is not a valid GUID', async () => {
     const actual = await command.validate({ options: { appId: 'not-c49b-4fd4-8223-28f0ac3a6402' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
+
   it('passes validation if the appId is a valid GUID', async () => {
     const actual = await command.validate({ options: { appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
+  
   it('supports debug mode', () => {
     const options = command.options;
     let containsOption = false;

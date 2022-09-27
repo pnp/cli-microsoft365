@@ -3,7 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { CanvasSection, ClientSidePage } from './clientsidepages';
+import { CanvasSection } from './clientsidepages';
 import { Page } from './Page';
 
 interface CommandArgs {
@@ -49,30 +49,30 @@ class SpoPageSectionListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    Page
-      .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
-      .then((clientSidePage: ClientSidePage): void => {
-        const sections: CanvasSection[] = clientSidePage.sections;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const clientSidePage = await Page.getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose);
+      const sections: CanvasSection[] = clientSidePage.sections;
 
-        const isJSONOutput = args.options.output === 'json';
-        if (sections.length) {
-          const output = sections.map(section => Page.getSectionInformation(section, isJSONOutput));
-          if (isJSONOutput) {
-            logger.log(output);
-          }
-          else {
-            logger.log(output.map(s => {
-              return {
-                order: s.order,
-                columns: s.columns.length
-              };
-            }));
-          }
+      const isJSONOutput = args.options.output === 'json';
+      if (sections.length) {
+        const output = sections.map(section => Page.getSectionInformation(section, isJSONOutput));
+        if (isJSONOutput) {
+          logger.log(output);
         }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        else {
+          logger.log(output.map(s => {
+            return {
+              order: s.order,
+              columns: s.columns.length
+            };
+          }));
+        }
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

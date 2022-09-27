@@ -64,16 +64,17 @@ class TeamsChatListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const filter = args.options.type !== undefined ? `?$filter=chatType eq '${args.options.type}'` : '';
     const endpoint: string = `${this.resource}/v1.0/chats${filter}`;
 
-    odata
-      .getAllItems(endpoint)
-      .then((items): void => {
-        logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const items = await odata.getAllItems(endpoint);
+      logger.log(items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

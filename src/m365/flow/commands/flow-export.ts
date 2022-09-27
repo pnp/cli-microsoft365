@@ -121,7 +121,7 @@ class FlowExportCommand extends AzmgmtCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let filenameFromApi = '';
     const formatArgument = args.options.format ? args.options.format.toLowerCase() : '';
 
@@ -129,125 +129,123 @@ class FlowExportCommand extends AzmgmtCommand {
       logger.logToStderr(`Retrieving package resources for Microsoft Flow ${args.options.id}...`);
     }
 
-    ((): Promise<any> => {
+    try {
+      let res: any;
       if (formatArgument === 'json') {
         if (this.debug) {
           logger.logToStderr('format = json, skipping listing package resources step');
         }
-
-        return Promise.resolve();
       }
-
-      const requestOptions: any = {
-        url: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environment)}/listPackageResources?api-version=2016-11-01`,
-        headers: {
-          accept: 'application/json'
-        },
-        data: {
-          "baseResourceIds": [
-            `/providers/Microsoft.Flow/flows/${args.options.id}`
-          ]
-        },
-        responseType: 'json'
-      };
-
-      return request.post(requestOptions);
-    })()
-      .then((res: any): Promise<any> => {
-        if (typeof res !== 'undefined' && res.errors && res.errors.length && res.errors.length > 0) {
-          return Promise.reject(res.errors[0].message);
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(`Initiating package export for Microsoft Flow ${args.options.id}...`);
-        }
-
+      else {
         const requestOptions: any = {
-          url: formatArgument === 'json' ?
-            `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}?api-version=2016-11-01`
-            : `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environment)}/exportPackage?api-version=2016-11-01`,
+          url: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environment)}/listPackageResources?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
+          },
+          data: {
+            "baseResourceIds": [
+              `/providers/Microsoft.Flow/flows/${args.options.id}`
+            ]
           },
           responseType: 'json'
         };
 
-        if (formatArgument !== 'json') {
-          // adds suggestedCreationType property to all resources
-          // see https://github.com/pnp/cli-microsoft365/issues/1845
-          Object.keys(res.resources).forEach((key) => {
-            res.resources[key].type === 'Microsoft.Flow/flows'
-              ? res.resources[key].suggestedCreationType = 'Update'
-              : res.resources[key].suggestedCreationType = 'Existing';
-          });
+        res = await request.post<any>(requestOptions);
+      }
 
-          requestOptions['data'] = {
-            "includedResourceIds": [
-              `/providers/Microsoft.Flow/flows/${args.options.id}`
-            ],
-            "details": {
-              "displayName": args.options.packageDisplayName,
-              "description": args.options.packageDescription,
-              "creator": args.options.packageCreatedBy,
-              "sourceEnvironment": args.options.packageSourceEnvironment
-            },
-            "resources": res.resources
-          };
-        }
+      if (typeof res !== 'undefined' && res.errors && res.errors.length && res.errors.length > 0) {
+        throw res.errors[0].message;
+      }
 
-        return formatArgument === 'json' ? request.get(requestOptions) : request.post(requestOptions);
-      })
-      .then((res: any): Promise<string> => {
-        if (this.verbose) {
-          logger.logToStderr(`Getting file for Microsoft Flow ${args.options.id}...`);
-        }
+      if (this.verbose) {
+        logger.logToStderr(`Initiating package export for Microsoft Flow ${args.options.id}...`);
+      }
 
-        const downloadFileUrl: string = formatArgument === 'json' ? '' : res.packageLink.value;
-        const filenameRegEx: RegExp = /([^\/]+\.zip)/i;
-        filenameFromApi = formatArgument === 'json' ? `${res.properties.displayName}.json` : (filenameRegEx.exec(downloadFileUrl) || ['output.zip'])[0];
-        // Replace all illegal characters from the file name
-        const illegalCharsRegEx = /[\\\/:*?"<>|]/g;
-        filenameFromApi = filenameFromApi.replace(illegalCharsRegEx, '_');
+      let requestOptions: any = {
+        url: formatArgument === 'json' ?
+          `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}?api-version=2016-11-01`
+          : `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environment)}/exportPackage?api-version=2016-11-01`,
+        headers: {
+          accept: 'application/json'
+        },
+        responseType: 'json'
+      };
 
-        if (this.debug) {
-          logger.logToStderr(`Filename from PowerApps API: ${filenameFromApi}`);
-          logger.logToStderr('');
-        }
+      if (formatArgument !== 'json') {
+        // adds suggestedCreationType property to all resources
+        // see https://github.com/pnp/cli-microsoft365/issues/1845
+        Object.keys(res.resources).forEach((key) => {
+          res.resources[key].type === 'Microsoft.Flow/flows'
+            ? res.resources[key].suggestedCreationType = 'Update'
+            : res.resources[key].suggestedCreationType = 'Existing';
+        });
 
-        const requestOptions: any = {
-          url: formatArgument === 'json' ?
-            `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
-            : downloadFileUrl,
-          // Set responseType to arraybuffer, otherwise binary data will be encoded
-          // to utf8 and binary data is corrupt
-          responseType: 'arraybuffer',
-          headers: formatArgument === 'json' ?
-            {
-              accept: 'application/json'
-            } : {
-              'x-anonymous': true
-            }
+        requestOptions['data'] = {
+          "includedResourceIds": [
+            `/providers/Microsoft.Flow/flows/${args.options.id}`
+          ],
+          "details": {
+            "displayName": args.options.packageDisplayName,
+            "description": args.options.packageDescription,
+            "creator": args.options.packageCreatedBy,
+            "sourceEnvironment": args.options.packageSourceEnvironment
+          },
+          "resources": res.resources
         };
+      }
 
-        return formatArgument === 'json' ?
-          request.post(requestOptions)
-          : request.get(requestOptions);
-      })
-      .then((file: string): void => {
-        const path = args.options.path ? args.options.path : `./${filenameFromApi}`;
+      res = formatArgument === 'json' ? await request.get(requestOptions) : await request.post(requestOptions);
 
-        fs.writeFileSync(path, file, 'binary');
-        if (!args.options.path || this.verbose) {
-          if (this.verbose) {
-            logger.logToStderr(`File saved to path '${path}'`);
+      if (this.verbose) {
+        logger.logToStderr(`Getting file for Microsoft Flow ${args.options.id}...`);
+      }
+
+      const downloadFileUrl: string = formatArgument === 'json' ? '' : res.packageLink.value;
+      const filenameRegEx: RegExp = /([^\/]+\.zip)/i;
+      filenameFromApi = formatArgument === 'json' ? `${res.properties.displayName}.json` : (filenameRegEx.exec(downloadFileUrl) || ['output.zip'])[0];
+      // Replace all illegal characters from the file name
+      const illegalCharsRegEx = /[\\\/:*?"<>|]/g;
+      filenameFromApi = filenameFromApi.replace(illegalCharsRegEx, '_');
+
+      if (this.debug) {
+        logger.logToStderr(`Filename from PowerApps API: ${filenameFromApi}`);
+        logger.logToStderr('');
+      }
+
+      requestOptions = {
+        url: formatArgument === 'json' ?
+          `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
+          : downloadFileUrl,
+        // Set responseType to arraybuffer, otherwise binary data will be encoded
+        // to utf8 and binary data is corrupt
+        responseType: 'arraybuffer',
+        headers: formatArgument === 'json' ?
+          {
+            accept: 'application/json'
+          } : {
+            'x-anonymous': true
           }
-          else {
-            logger.log(path);
-          }
+      };
+
+      const file = formatArgument === 'json' ?
+        await request.post<string>(requestOptions)
+        : await request.get<string>(requestOptions);
+
+      const path = args.options.path ? args.options.path : `./${filenameFromApi}`;
+
+      fs.writeFileSync(path, file, 'binary');
+      if (!args.options.path || this.verbose) {
+        if (this.verbose) {
+          logger.logToStderr(`File saved to path '${path}'`);
         }
-
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        else {
+          logger.log(path);
+        }
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

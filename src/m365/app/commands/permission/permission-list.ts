@@ -5,7 +5,7 @@ import Command from '../../../../Command';
 import request from '../../../../request';
 import * as appGetCommand from '../../../aad/commands/app/app-get';
 import { Options as AppGetCommandOptions } from '../../../aad/commands/app/app-get';
-import AppCommand, { AppCommandArgs } from '../../../base/AppCommand';
+import AppCommand from '../../../base/AppCommand';
 import commands from '../../commands';
 
 interface ApiPermission {
@@ -33,23 +33,25 @@ class AppPermissionListCommand extends AppCommand {
     return 'Lists API permissions for the current AAD app';
   }
 
-  public commandAction(logger: Logger, args: AppCommandArgs, cb: (err?: any) => void): void {
-    this
-      .getServicePrincipal({ appId: this.appId }, logger, GetServicePrincipal.withPermissions)
-      .then(servicePrincipal => {
-        if (servicePrincipal) {
-          // service principal found, get permissions from the service principal
-          return this.getServicePrincipalPermissions(servicePrincipal, logger);
-        }
-        else {
-          // service principal not found, get permissions from app registration
-          return this.getAppRegPermissions(this.appId as string, logger);
-        }
-      })
-      .then(permissions => {
-        logger.log(permissions);
-        cb();
-      }, err => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger): Promise<void> {
+    try {
+      const servicePrincipal = await this.getServicePrincipal({ appId: this.appId }, logger, GetServicePrincipal.withPermissions);
+
+      let permissions: ApiPermission[];
+      if (servicePrincipal) {
+        // service principal found, get permissions from the service principal
+        permissions = await this.getServicePrincipalPermissions(servicePrincipal, logger);
+      }
+      else {
+        // service principal not found, get permissions from app registration
+        permissions = await this.getAppRegPermissions(this.appId as string, logger);
+      }
+
+      logger.log(permissions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private async getServicePrincipal(servicePrincipalInfo: ServicePrincipalInfo, logger: Logger, mode: GetServicePrincipal): Promise<ServicePrincipal | undefined> {

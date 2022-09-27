@@ -81,8 +81,8 @@ class SpoGroupUserRemoveCommand extends SpoCommand {
     this.optionSets.push(['groupName', 'groupId']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const removeUserfromSPGroup = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeUserfromSPGroup: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing User with Username ${args.options.userName} from Group: ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
       }
@@ -100,33 +100,31 @@ class SpoGroupUserRemoveCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      request
-        .post(requestOptions)
-        .then((): void => {
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
       if (this.debug) {
         logger.logToStderr('Confirmation bypassed by entering confirm option. Removing the user from SharePoint Group...');
       }
-      removeUserfromSPGroup();
+      await removeUserfromSPGroup();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove user User ${args.options.userName} from SharePoint group?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeUserfromSPGroup();
-        }
       });
+
+      if (result.continue) {
+        await removeUserfromSPGroup();
+      }
     }
   }
 }

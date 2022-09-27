@@ -97,7 +97,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('successfully updates tenant planner settings', (done) => {
+  it('successfully updates tenant planner settings', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://tasks.office.com/taskAPI/tenantAdminSettings/Settings') {
         return Promise.resolve(successResponse);
@@ -106,22 +106,15 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         isPlannerAllowed: 'true'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(successResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(successResponse));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://tasks.office.com/taskAPI/tenantAdminSettings/Settings') {
         return Promise.reject('An error has occurred');
@@ -130,19 +123,11 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         isPlannerAllowed: 'true'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

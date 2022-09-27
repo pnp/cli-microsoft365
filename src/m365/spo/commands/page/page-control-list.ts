@@ -54,7 +54,7 @@ class SpoPageControlListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let pageName: string = args.options.name;
     if (args.options.name.indexOf('.aspx') < 0) {
       pageName += '.aspx';
@@ -68,29 +68,30 @@ class SpoPageControlListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<ClientSidePageProperties>(requestOptions)
-      .then((clientSidePage: ClientSidePageProperties): void => {
-        const canvasData: Control[] = clientSidePage.CanvasContent1 ? JSON.parse(clientSidePage.CanvasContent1) : [];
-        const controls: any[] = canvasData.filter(c => c.position).map(c => {
-          return {
-            id: c.id,
-            type: getControlTypeDisplayName(
-              c.controlType || 0
-            ),
-            title: c.webPartData?.title,
-            controlType: c.controlType,
-            order: c.position.sectionIndex,
-            controlData: {
-              ...c
-            }
-          };
-        });
+    try {
+      const clientSidePage = await request.get<ClientSidePageProperties>(requestOptions);
 
-        logger.log(JSON.parse(JSON.stringify(controls)));
+      const canvasData: Control[] = clientSidePage.CanvasContent1 ? JSON.parse(clientSidePage.CanvasContent1) : [];
+      const controls: any[] = canvasData.filter(c => c.position).map(c => {
+        return {
+          id: c.id,
+          type: getControlTypeDisplayName(
+            c.controlType || 0
+          ),
+          title: c.webPartData?.title,
+          controlType: c.controlType,
+          order: c.position.sectionIndex,
+          controlData: {
+            ...c
+          }
+        };
+      });
 
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(JSON.parse(JSON.stringify(controls)));
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

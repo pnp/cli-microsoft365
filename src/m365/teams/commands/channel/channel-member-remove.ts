@@ -36,7 +36,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Updates the role of the specified member in the specified Microsoft Teams private team channel';
+    return 'Remove the specified member from the specified Microsoft Teams private or shared team channel';
   }
 
   public alias(): string[] | undefined {
@@ -124,36 +124,35 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.showDeprecationWarning(logger, commands.CONVERSATIONMEMBER_REMOVE, commands.CHANNEL_MEMBER_REMOVE);
 
-    const removeMember: () => void = (): void => {
-      this
-        .removeMemberFromChannel(args)
-        .then(cb, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+    const removeMember: () => Promise<void> = async (): Promise<void> => {
+      try {
+        await this.removeMemberFromChannel(args);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeMember();
+      await removeMember();
     }
     else {
       const userName = args.options.userName || args.options.userId || args.options.id;
       const teamName = args.options.teamName || args.options.teamId;
       const channelName = args.options.channelName || args.options.channelId;
-
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the member ${userName} from the channel ${channelName} in team ${teamName}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeMember();
-        }
       });
+      
+      if (result.continue) {
+        await removeMember();
+      }
     }
   }
 

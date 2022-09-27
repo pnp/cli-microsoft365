@@ -147,17 +147,15 @@ class OneNoteNotebookListCommand extends GraphCommand {
       .then((site: { id: string }) => site.id);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getEndpointUrl(args)
-      .then(endpoint => odata.getAllItems<Notebook>(endpoint))
-      .then((items): Promise<Notebook[]> => {
-        return Promise.resolve(items);
-      })
-      .then((items: Notebook[]): void => {
-        logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const endpoint = await this.getEndpointUrl(args);
+      const items = await odata.getAllItems<Notebook>(endpoint);
+      logger.log(items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

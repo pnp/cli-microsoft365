@@ -45,9 +45,9 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -77,7 +77,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('enables the service principal (debug)', (done) => {
+  it('enables the service principal (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -98,24 +98,17 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, enabled: 'true', confirm: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          AccountEnabled: true,
-          AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
-          ReplyUrls: [
-            "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, enabled: 'true', confirm: true } });
+    assert(loggerLogSpy.calledWith({
+      AccountEnabled: true,
+      AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
+      ReplyUrls: [
+        "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+      ]
+    }));
   });
 
-  it('enables the service principal', (done) => {
+  it('enables the service principal', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -136,24 +129,17 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, enabled: 'true', confirm: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          AccountEnabled: true,
-          AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
-          ReplyUrls: [
-            "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, enabled: 'true', confirm: true } });
+    assert(loggerLogSpy.calledWith({
+      AccountEnabled: true,
+      AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
+      ReplyUrls: [
+        "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+      ]
+    }));
   });
 
-  it('disables the service principal (debug)', (done) => {
+  it('disables the service principal (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -174,24 +160,17 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, enabled: 'false', confirm: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          AccountEnabled: false,
-          AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
-          ReplyUrls: [
-            "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, enabled: 'false', confirm: true } });
+    assert(loggerLogSpy.calledWith({
+      AccountEnabled: false,
+      AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
+      ReplyUrls: [
+        "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+      ]
+    }));
   });
 
-  it('correctly handles error when approving permission request', (done) => {
+  it('correctly handles error when approving permission request', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -201,71 +180,43 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false, confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('prompts before enabling service principal when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: false, enabled: 'true' } }, () => {
-      let promptIssued = false;
+  it('prompts before enabling service principal when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { debug: false, enabled: 'true' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('prompts before disabling service principal when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: false, enabled: 'false' } }, () => {
-      let promptIssued = false;
+  it('prompts before disabling service principal when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { debug: false, enabled: 'false' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts enabling service principal when prompt not confirmed', (done) => {
+  it('aborts enabling service principal when prompt not confirmed', async () => {
     const requestPostSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false, enabled: 'true' } }, () => {
-      try {
-        assert(requestPostSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: false, enabled: 'true' } });
+    assert(requestPostSpy.notCalled);
   });
 
-  it('enables the service principal when prompt confirmed', (done) => {
+  it('enables the service principal when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify([
       {
         "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7213.1200", "ErrorInfo": null, "TraceCorrelationId": "87b53a9e-90b1-4000-c0ac-27fb4ee21f41"
@@ -279,37 +230,23 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     ])));
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, enabled: 'true' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          AccountEnabled: true,
-          AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
-          ReplyUrls: [
-            "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, enabled: 'true' } });
+    assert(loggerLogSpy.calledWith({
+      AccountEnabled: true,
+      AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
+      ReplyUrls: [
+        "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+      ]
+    }));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    command.action(logger, { options: { debug: false, enabled: 'true', confirm: 'true' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'true', confirm: 'true' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('defines alias', () => {

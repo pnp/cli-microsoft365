@@ -91,7 +91,7 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('returns a specific application permissions for the site', (done) => {
+  it('returns a specific application permissions for the site', async () => {
     const site = {
       "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
       "displayName": "OneDrive Team Site",
@@ -133,29 +133,22 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
         output: 'json'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          appDisplayName: 'Selected',
-          appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
-          permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
-          roles: "write"
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([{
+      appDisplayName: 'Selected',
+      appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
+      permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+      roles: "write"
+    }]));
   });
 
-  it('fails when passing a site that does not exist', (done) => {
+  it('fails when passing a site that does not exist', async () => {
     const siteError = {
       "error": {
         "code": "itemNotFound",
@@ -174,19 +167,7 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
       return Promise.reject(siteError);
     });
 
-    command.action(logger, {
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Requested site could not be found")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing' } } as any), new CommandError('Requested site could not be found'));
   });
 
   it('supports debug mode', () => {

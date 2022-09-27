@@ -60,9 +60,8 @@ class CliConfigGetCommand extends AnonymousCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     logger.log(Cli.getInstance().config.get(args.options.key));
-    cb();
   }
 }
 

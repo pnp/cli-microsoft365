@@ -97,8 +97,8 @@ class SpoListItemRemoveCommand extends SpoCommand {
     this.optionSets.push(['listId', 'listTitle']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeListItem: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeListItem: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing list item in site at ${args.options.webUrl}...`);
       }
@@ -129,31 +129,29 @@ class SpoListItemRemoveCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      request
-        .post(requestOptions)
-        .then((): void => {
-          // REST post call doesn't return anything
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        await request.post(requestOptions);
+        // REST post call doesn't return anything
+      }
+      catch (err: any){
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeListItem();
+      await removeListItem();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the list item ${args.options.id} from list ${args.options.listId || args.options.listTitle} located in site ${args.options.webUrl}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeListItem();
-        }
       });
+
+      if (result.continue) {
+        await removeListItem();
+      }
     }
   }
 }

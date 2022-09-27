@@ -37,9 +37,9 @@ describe(commands.APP_REMOVE, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -85,52 +85,38 @@ describe(commands.APP_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified Microsoft Power App when confirm option not passed', (done) => {
-    command.action(logger, {
+  it('prompts before removing the specified Microsoft Power App when confirm option not passed', async () => {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    
+    assert(promptIssued);
   });
 
-  it('aborts removing the specified Microsoft Power App when confirm option not passed and prompt not confirmed', (done) => {
+  it('aborts removing the specified Microsoft Power App when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
-    }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(postSpy.notCalled);
   });
 
-  it('removes the specified Microsoft Power App when prompt confirmed (debug)', (done) => {
+  it('removes the specified Microsoft Power App when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2017-08-01`) {
         return Promise.resolve({ statusCode: 200 });
@@ -140,26 +126,19 @@ describe(commands.APP_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('removes the specified Microsoft Power App from other user when prompt confirmed (debug)', (done) => {
+  it('removes the specified Microsoft Power App from other user when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2017-08-01`) {
         return Promise.resolve({ statusCode: 200 });
@@ -169,26 +148,19 @@ describe(commands.APP_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('removes the specified Microsoft Power App without prompting when confirm specified (debug)', (done) => {
+  it('removes the specified Microsoft Power App without prompting when confirm specified (debug)', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2017-08-01`) {
         return Promise.resolve({ statusCode: 200 });
@@ -197,19 +169,17 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
-    }, () => {
-      assert(loggerLogToStderrSpy.called);
-      done();
     });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('removes the specified Microsoft PowerApp from other user without prompting when confirm specified (debug)', (done) => {
+  it('removes the specified Microsoft PowerApp from other user without prompting when confirm specified (debug)', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2017-08-01`) {
         return Promise.resolve({ statusCode: 200 });
@@ -218,114 +188,82 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         confirm: true
       }
-    }, () => {
-      assert(loggerLogToStderrSpy.called);
-      done();
     });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('correctly handles no Microsoft Power App found when prompt confirmed', (done) => {
+  it('correctly handles no Microsoft Power App found when prompt confirmed', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({ response: { status: 403 } });
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options:
       {
         debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err, `App 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError(`App 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`));
   });
 
-  it('correctly handles no Microsoft Power App found when confirm specified', (done) => {
+  it('correctly handles no Microsoft Power App found when confirm specified', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({ response: { status: 403 } });
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options:
       {
         debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err, `App 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError(`App 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`));
   });
 
-  it('correctly handles Microsoft Power App found when prompt confirmed', (done) => {
+  it('correctly handles Microsoft Power App found when prompt confirmed', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.resolve({ statusCode: 200 });
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
-    } as any, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('correctly handles Microsoft Power App found when confirm specified', (done) => {
+  it('correctly handles Microsoft Power App found when confirm specified', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.resolve({ statusCode: 200 });
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
-    } as any, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
   it('supports debug mode', () => {
@@ -361,30 +299,22 @@ describe(commands.APP_REMOVE, () => {
     assert(containsOption);
   });
 
-  it('correctly handles random api error', (done) => {
+  it('correctly handles random api error', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject("Something went wrong");
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options:
       {
         debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.deepStrictEqual(err, new CommandError("Something went wrong"));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError("Something went wrong"));
   });
 });

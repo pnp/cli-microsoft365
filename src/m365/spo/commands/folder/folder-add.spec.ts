@@ -76,99 +76,70 @@ describe(commands.FOLDER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should correctly handle folder add reject request', (done) => {
+  it('should correctly handle folder add reject request', async () => {
     stubPostResponses(new Promise((resolve, reject) => { reject('error1'); }));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         parentFolderUrl: '/Shared Documents',
         name: 'abc'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('error1'));
   });
 
-  it('should correctly handle folder add success request', (done) => {
+  it('should correctly handle folder add success request', async () => {
     stubPostResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         parentFolderUrl: '/Shared Documents',
         name: 'abc'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.lastCall.calledWith({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "abc", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/abc", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.lastCall.calledWith({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "abc", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/abc", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" }));
   });
 
-  it('should correctly pass params to request', (done) => {
+  it('should correctly pass params to request', async () => {
     const request: sinon.SinonStub = stubPostResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         parentFolderUrl: '/Shared Documents',
         name: 'abc'
       }
-    }, () => {
-      try {
-        assert(request.calledWith({
-          url: 'https://contoso.sharepoint.com/_api/web/folders',
-          headers:
-            { accept: 'application/json;odata=nometadata' },
-          data: { ServerRelativeUrl: '/Shared Documents/abc' },
-          responseType: 'json'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(request.calledWith({
+      url: 'https://contoso.sharepoint.com/_api/web/folders',
+      headers:
+        { accept: 'application/json;odata=nometadata' },
+      data: { ServerRelativeUrl: '/Shared Documents/abc' },
+      responseType: 'json'
+    }));
   });
 
-  it('should correctly pass params to request (sites/test1)', (done) => {
+  it('should correctly pass params to request (sites/test1)', async () => {
     const request: sinon.SinonStub = stubPostResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
         parentFolderUrl: 'Shared Documents',
         name: 'abc'
       }
-    }, () => {
-      try {
-        assert(request.calledWith({
-          url: 'https://contoso.sharepoint.com/sites/test1/_api/web/folders',
-          headers:
-            { accept: 'application/json;odata=nometadata' },
-          data: { ServerRelativeUrl: '/sites/test1/Shared Documents/abc' },
-          responseType: 'json'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(request.calledWith({
+      url: 'https://contoso.sharepoint.com/sites/test1/_api/web/folders',
+      headers:
+        { accept: 'application/json;odata=nometadata' },
+      data: { ServerRelativeUrl: '/sites/test1/Shared Documents/abc' },
+      responseType: 'json'
+    }));
   });
 
   it('supports debug mode', () => {

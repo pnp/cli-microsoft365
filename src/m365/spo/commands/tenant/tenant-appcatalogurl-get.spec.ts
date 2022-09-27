@@ -76,7 +76,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     assert(containsDebugOption);
   });
 
-  it('handles promise error while getting tenant appcatalog', (done) => {
+  it('handles promise error while getting tenant appcatalog', async () => {
     // get tenant app catalog
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
@@ -86,22 +86,10 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
-  it('gets the tenant appcatalog url (debug)', (done) => {
+  it('gets the tenant appcatalog url (debug)', async () => {
     // get tenant app catalog
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
@@ -111,22 +99,15 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.lastCall.args[0] === 'https://contoso.sharepoint.com/sites/apps');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.lastCall.args[0] === 'https://contoso.sharepoint.com/sites/apps');
   });
 
-  it('handles if tenant appcatalog is null or not exist', (done) => {
+  it('handles if tenant appcatalog is null or not exist', async () => {
     // get tenant app catalog
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
@@ -136,22 +117,14 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('handles if tenant appcatalog is null or not exist (debug)', (done) => {
+  it('handles if tenant appcatalog is null or not exist (debug)', async () => {
     // get tenant app catalog
     sinon.stub(request, 'get').callsFake((opts) => {
       requests.push(opts);
@@ -161,18 +134,11 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith('Tenant app catalog is not configured.'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.calledWith('Tenant app catalog is not configured.'));
   });
 });

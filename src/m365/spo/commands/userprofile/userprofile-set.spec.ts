@@ -63,7 +63,7 @@ describe(commands.USERPROFILE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates single valued profile property', (done) => {
+  it('updates single valued profile property', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`${spoUrl}/_api/SP.UserProfiles.PeopleManager/SetSingleValueProfileProperty`) > -1) {
         return Promise.resolve({
@@ -79,26 +79,19 @@ describe(commands.USERPROFILE_SET, () => {
       'propertyValue': 'Senior Developer'
     };
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         userName: 'john.doe@mytenant.onmicrosoft.com',
         propertyName: 'SPS-JobTitle',
         propertyValue: 'Senior Developer',
         debug: true
       }
-    }, () => {
-      try {
-        const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(JSON.stringify(lastCall.data), JSON.stringify(data));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const lastCall = postStub.lastCall.args[0];
+    assert.strictEqual(JSON.stringify(lastCall.data), JSON.stringify(data));
   });
 
-  it('updates multi valued profile property', (done) => {
+  it('updates multi valued profile property', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`${spoUrl}/_api/SP.UserProfiles.PeopleManager/SetMultiValuedProfileProperty`) > -1) {
         return Promise.resolve({
@@ -114,44 +107,26 @@ describe(commands.USERPROFILE_SET, () => {
       'propertyValues': ['CSS', 'HTML']
     };
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         userName: 'john.doe@mytenant.onmicrosoft.com',
         propertyName: 'SPS-Skills',
         propertyValue: 'CSS, HTML'
       }
-    }, () => {
-      try {
-        const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(JSON.stringify(lastCall.data), JSON.stringify(data));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const lastCall = postStub.lastCall.args[0];
+    assert.strictEqual(JSON.stringify(lastCall.data), JSON.stringify(data));
   });
 
-  it('correctly handles error while updating profile property', (done) => {
+  it('correctly handles error while updating profile property', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        userName: 'john.doe@mytenant.onmicrosoft.com',
-        propertyName: 'SPS-JobTitle',
-        propertyValue: 'Senior Developer'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      userName: 'john.doe@mytenant.onmicrosoft.com',
+      propertyName: 'SPS-JobTitle',
+      propertyValue: 'Senior Developer' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

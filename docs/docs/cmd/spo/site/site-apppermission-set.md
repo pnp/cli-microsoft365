@@ -23,7 +23,7 @@ m365 spo site apppermission set [options]
 : Display name of the Azure AD app for which to update permissions. Specify `permissionId`, `appId` or `appDisplayName`
 
 `-p, --permission <permission>`
-: Permission to site (`read`, `write`, or `owner`)
+: Permission to site (`read`, `write`, `manage` or `fullcontrol`)
 
 --8<-- "docs/cmd/_global.md"
 

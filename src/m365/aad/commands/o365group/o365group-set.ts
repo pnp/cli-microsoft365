@@ -137,49 +137,37 @@ class AadO365GroupSetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    ((): Promise<void> => {
-      if (!args.options.displayName &&
-        !args.options.description &&
-        typeof args.options.isPrivate === 'undefined') {
-        return Promise.resolve();
-      }
-
-      if (this.verbose) {
-        logger.logToStderr(`Updating Microsoft 365 Group ${args.options.id}...`);
-      }
-
-      const update: Group = {};
-      if (args.options.displayName) {
-        update.displayName = args.options.displayName;
-      }
-      if (args.options.description) {
-        update.description = args.options.description;
-      }
-      if (typeof args.options.isPrivate !== 'undefined') {
-        update.visibility = args.options.isPrivate === 'true' ? 'Private' : 'Public';
-      }
-
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/groups/${args.options.id}`,
-        headers: {
-          'accept': 'application/json;odata.metadata=none'
-        },
-        responseType: 'json',
-        data: update
-      };
-
-      return request.patch(requestOptions);
-    })()
-      .then((): Promise<void> => {
-        if (!args.options.logoPath) {
-          if (this.debug) {
-            logger.logToStderr('logoPath not set. Skipping');
-          }
-
-          return Promise.resolve();
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      if (args.options.displayName || args.options.description || typeof args.options.isPrivate !== 'undefined') {
+        if (this.verbose) {
+          logger.logToStderr(`Updating Microsoft 365 Group ${args.options.id}...`);
         }
+  
+        const update: Group = {};
+        if (args.options.displayName) {
+          update.displayName = args.options.displayName;
+        }
+        if (args.options.description) {
+          update.description = args.options.description;
+        }
+        if (typeof args.options.isPrivate !== 'undefined') {
+          update.visibility = args.options.isPrivate === 'true' ? 'Private' : 'Public';
+        }
+  
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/groups/${args.options.id}`,
+          headers: {
+            'accept': 'application/json;odata.metadata=none'
+          },
+          responseType: 'json',
+          data: update
+        };
+  
+        await request.patch(requestOptions);          
+      }
 
+      if (args.options.logoPath) {
         const fullPath: string = path.resolve(args.options.logoPath);
         if (this.verbose) {
           logger.logToStderr(`Setting group logo ${fullPath}...`);
@@ -193,19 +181,15 @@ class AadO365GroupSetCommand extends GraphCommand {
           data: fs.readFileSync(fullPath)
         };
 
-        return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
+        await new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
           this.setGroupLogo(requestOptions, AadO365GroupSetCommand.numRepeat, resolve, reject, logger);
         });
-      })
-      .then((): Promise<{ value: { id: string; }[] }> => {
-        if (!args.options.owners) {
-          if (this.debug) {
-            logger.logToStderr('Owners not set. Skipping');
-          }
+      }
+      else if (this.debug) {
+        logger.logToStderr('logoPath not set. Skipping');
+      }
 
-          return Promise.resolve(undefined as any);
-        }
-
+      if (args.options.owners) {
         const owners: string[] = args.options.owners.split(',').map(o => o.trim());
 
         if (this.verbose) {
@@ -220,14 +204,9 @@ class AadO365GroupSetCommand extends GraphCommand {
           responseType: 'json'
         };
 
-        return request.get(requestOptions);
-      })
-      .then((res?: { value: { id: string; }[] }): Promise<any> => {
-        if (!res) {
-          return Promise.resolve();
-        }
+        const res = await request.get<{ value: { id: string; }[] }>(requestOptions);
 
-        return Promise.all(res.value.map(u => request.post({
+        await Promise.all(res.value.map(u => request.post({
           url: `${this.resource}/v1.0/groups/${args.options.id}/owners/$ref`,
           headers: {
             'content-type': 'application/json'
@@ -237,16 +216,12 @@ class AadO365GroupSetCommand extends GraphCommand {
             "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
           }
         })));
-      })
-      .then((): Promise<{ value: { id: string; }[] }> => {
-        if (!args.options.members) {
-          if (this.debug) {
-            logger.logToStderr('Members not set. Skipping');
-          }
+      }
+      else if (this.debug) {
+        logger.logToStderr('Owners not set. Skipping');
+      }
 
-          return Promise.resolve(undefined as any);
-        }
-
+      if (args.options.members) {
         const members: string[] = args.options.members.split(',').map(o => o.trim());
 
         if (this.verbose) {
@@ -261,14 +236,9 @@ class AadO365GroupSetCommand extends GraphCommand {
           responseType: 'json'
         };
 
-        return request.get(requestOptions);
-      })
-      .then((res?: { value: { id: string; }[] }): Promise<any> => {
-        if (!res) {
-          return Promise.resolve();
-        }
+        const res = await request.get<{ value: { id: string; }[] }>(requestOptions);
 
-        return Promise.all(res.value.map(u => request.post({
+        await Promise.all(res.value.map(u => request.post({
           url: `${this.resource}/v1.0/groups/${args.options.id}/members/$ref`,
           headers: {
             'content-type': 'application/json'
@@ -278,8 +248,14 @@ class AadO365GroupSetCommand extends GraphCommand {
             "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
           }
         })));
-      })
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      }
+      else if (this.debug) {
+        logger.logToStderr('Members not set. Skipping');
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private setGroupLogo(requestOptions: any, retryLeft: number, resolve: () => void, reject: (err: any) => void, logger: Logger): void {

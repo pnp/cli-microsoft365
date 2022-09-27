@@ -48,7 +48,7 @@ class SpoWebInstalledLanguageListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving all installed languages on site ${args.options.webUrl}...`);
     }
@@ -61,12 +61,13 @@ class SpoWebInstalledLanguageListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<WebInstalledLanguagePropertiesCollection>(requestOptions)
-      .then((webInstalledLanguageProperties: WebInstalledLanguagePropertiesCollection): void => {
-        logger.log(webInstalledLanguageProperties.Items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const webInstalledLanguageProperties: WebInstalledLanguagePropertiesCollection = await request.get<WebInstalledLanguagePropertiesCollection>(requestOptions);
+      logger.log(webInstalledLanguageProperties.Items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

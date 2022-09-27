@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, spo, validation } from '../../../../utils';
+import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -43,25 +43,25 @@ class SpoHubSiteRegisterCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    spo
-      .getRequestDigest(args.options.url)
-      .then((res: ContextInfo): Promise<any> => {
-        const requestOptions: any = {
-          url: `${args.options.url}/_api/site/RegisterHubSite`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue,
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const reqDigest = await spo.getRequestDigest(args.options.url);
 
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const requestOptions: any = {
+        url: `${args.options.url}/_api/site/RegisterHubSite`,
+        headers: {
+          'X-RequestDigest': reqDigest.FormDigestValue,
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const res = await request.post(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

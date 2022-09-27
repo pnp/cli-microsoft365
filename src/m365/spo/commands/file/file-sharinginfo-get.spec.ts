@@ -510,7 +510,7 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
     assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
   });
 
-  it('command correctly handles file get reject request', (done) => {
+  it('command correctly handles file get reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
@@ -520,21 +520,13 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         id: 'f09c4efe-b8c0-4e89-a166-03418661b89b'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
   it('supports debug mode', () => {
@@ -548,7 +540,7 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
     assert(containsDebugOption);
   });
 
-  it('Retrieves Sharing Information When Site ID is Passed - JSON Output', (done) => {
+  it('Retrieves Sharing Information When Site ID is Passed - JSON Output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
         return Promise.resolve({
@@ -573,25 +565,18 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         output: 'json'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(JSONOuput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogSpy.calledWith(JSONOuput));
   });
 
-  it('Retrieves Sharing Information When document URL is Passed - JSON Output (Debug)', (done) => {
+  it('Retrieves Sharing Information When document URL is Passed - JSON Output (Debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath') > -1) {
         return Promise.resolve({
@@ -616,25 +601,18 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         url: '/sites/project-x/documents/SharedFile.docx',
         output: 'json'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('Retrieves Sharing Information When Site ID is Passed - Text Output (Debug)', (done) => {
+  it('Retrieves Sharing Information When Site ID is Passed - Text Output (Debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
         return Promise.resolve({
@@ -659,22 +637,15 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         output: 'text',
         debug: true
       }
-    } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogToStderrSpy.called);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

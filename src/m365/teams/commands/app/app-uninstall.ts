@@ -66,8 +66,8 @@ class TeamsAppUninstallCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const uninstallApp: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const uninstallApp: () => Promise<void> = async (): Promise<void> => {
       const requestOptions: any = {
         url: `${this.resource}/v1.0/teams/${args.options.teamId}/installedApps/${args.options.appId}`,
         headers: {
@@ -75,28 +75,28 @@ class TeamsAppUninstallCommand extends GraphCommand {
         }
       };
 
-      request
-        .delete(requestOptions)
-        .then(_ => cb(), (res: Error): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+      try {
+        await request.delete(requestOptions);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      uninstallApp();
+      await uninstallApp();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to uninstall the app with id ${args.options.appId} from the Microsoft Teams team ${args.options.teamId}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          uninstallApp();
-        }
       });
+      
+      if (result.continue) {
+        await uninstallApp();
+      }
     }
   }
 }

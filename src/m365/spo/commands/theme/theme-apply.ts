@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -77,79 +74,73 @@ class SpoThemeApplyCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const isSharePointTheme: boolean = args.options.sharePointTheme ? true : false;
-    let spoAdminUrl: string = '';
 
-    spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
-        spoAdminUrl = _spoAdminUrl;
+    try {
+      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
 
-        if (isSharePointTheme) {
-          return Promise.resolve(undefined as any);
-        }
+      let res: ContextInfo = undefined as any;
+      if (!isSharePointTheme) {
+        res = await spo.getRequestDigest(spoAdminUrl);
+      }
 
-        return spo.getRequestDigest(spoAdminUrl);
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        if (this.verbose) {
-          logger.logToStderr(`Applying theme ${args.options.name} to the ${args.options.webUrl} site...`);
-        }
+      if (this.verbose) {
+        logger.logToStderr(`Applying theme ${args.options.name} to the ${args.options.webUrl} site...`);
+      }
 
-        let requestOptions: any = {};
+      let requestOptions: any = {};
 
-        if (isSharePointTheme) {
-          const requestBody: any = this.getSharePointTheme(args.options.name);
+      if (isSharePointTheme) {
+        const requestBody: any = this.getSharePointTheme(args.options.name);
 
-          requestOptions = {
-            url: `${args.options.webUrl}/_api/ThemeManager/ApplyTheme`,
-            headers: {
-              'accept': 'application/json;odata=nometadata',
-              'Content-Type': 'application/json;odata=nometadata'
-            },
-            data: requestBody
-          };
-        }
-        else {
-          requestOptions = {
-            url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': res.FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="SetWebTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name)}</Parameter><Parameter Type="String">${formatting.escapeXml(args.options.webUrl)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-          };
-        }
+        requestOptions = {
+          url: `${args.options.webUrl}/_api/ThemeManager/ApplyTheme`,
+          headers: {
+            'accept': 'application/json;odata=nometadata',
+            'Content-Type': 'application/json;odata=nometadata'
+          },
+          data: requestBody
+        };
+      }
+      else {
+        requestOptions = {
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': res.FormDigestValue
+          },
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="SetWebTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name)}</Parameter><Parameter Type="String">${formatting.escapeXml(args.options.webUrl)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+        };
+      }
 
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        if (isSharePointTheme) {
-          const json: any = JSON.parse(res);
+      const processQuery: string = await request.post(requestOptions);
+      if (isSharePointTheme) {
+        const json: any = JSON.parse(processQuery);
 
-          if (json.error) {
-            cb(new CommandError(json.error));
-            return;
-          }
-          else {
-            logger.log(json.value);
-          }
+        if (json.error) {
+          throw json.error;
         }
         else {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-
-          if (response.ErrorInfo) {
-            cb(new CommandError(response.ErrorInfo.ErrorMessage));
-            return;
-          }
-          else {
-            const result: boolean = json[json.length - 1];
-            logger.log(result);
-          }
+          logger.log(json.value);
         }
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      }
+      else {
+        const json: ClientSvcResponse = JSON.parse(processQuery);
+        const response: ClientSvcResponseContents = json[0];
+
+        if (response.ErrorInfo) {
+          throw response.ErrorInfo.ErrorMessage;
+        }
+        else {
+          const result: boolean = json[json.length - 1];
+          logger.log(result);
+        }
+      }
+      
+    } 
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   private getSharePointTheme(themeName: string): any {

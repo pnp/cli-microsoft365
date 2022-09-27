@@ -54,9 +54,9 @@ describe(commands.FOLDER_REMOVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     requests = [];
   });
@@ -84,157 +84,107 @@ describe(commands.FOLDER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing folder when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } }, () => {
-      let promptIssued = false;
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+  it('prompts before removing folder when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } });
+    let promptIssued = false;
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts removing folder when prompt not confirmed', (done) => {
+  it('aborts removing folder when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } });
+    assert(requests.length === 0);
   });
 
-  it('removes the folder when prompt confirmed', (done) => {
+  it('removes the folder when prompt confirmed', async () => {
     stubPostResponses();
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: 
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: 
       { debug: false, 
         webUrl: 'https://contoso.sharepoint.com', 
         folderUrl: '/Shared Documents/Folder1' 
-      } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled === true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+      } });
+    assert(loggerLogSpy.notCalled === true);
   });
 
-  it('should send params for remove request', (done) => {
+  it('should send params for remove request', async () => {
     const request: sinon.SinonStub = stubPostResponses();
 
-    command.action(logger, { options: 
+    await command.action(logger, { options: 
       { verbose: true, 
         webUrl: 'https://contoso.sharepoint.com', 
         folderUrl: '/Shared Documents/Folder1',
         confirm: true
-      } }, () => {
-      try {
-        const lastCall: any = request.lastCall.args[0];
-        assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolder1\')');
-        assert.strictEqual(lastCall.method, 'POST');
-        assert.strictEqual(lastCall.headers['X-HTTP-Method'], 'DELETE');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+      } });
+    const lastCall: any = request.lastCall.args[0];
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolder1\')');
+    assert.strictEqual(lastCall.method, 'POST');
+    assert.strictEqual(lastCall.headers['X-HTTP-Method'], 'DELETE');
   });
 
-  it('should send params for remove request for sites/test1', (done) => {
+  it('should send params for remove request for sites/test1', async () => {
     const request: sinon.SinonStub = stubPostResponses();
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: 
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: 
       { verbose: true, 
         webUrl: 'https://contoso.sharepoint.com/sites/test1', 
         folderUrl: '/Shared Documents/Folder1' 
-      } }, () => {
-      try {
-        const lastCall: any = request.lastCall.args[0];
-        assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2Ftest1%2FShared%20Documents%2FFolder1\')');
-        assert.strictEqual(lastCall.method, 'POST');
-        assert.strictEqual(lastCall.headers['X-HTTP-Method'], 'DELETE');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+      } });
+    const lastCall: any = request.lastCall.args[0];
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2Ftest1%2FShared%20Documents%2FFolder1\')');
+    assert.strictEqual(lastCall.method, 'POST');
+    assert.strictEqual(lastCall.headers['X-HTTP-Method'], 'DELETE');
   });
 
-  it('should send params for recycle request when recycle is set to true', (done) => {
+  it('should send params for recycle request when recycle is set to true', async () => {
     const request: sinon.SinonStub = stubPostResponses();
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: 
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: 
       { 
         debug: true,
         webUrl: 'https://contoso.sharepoint.com', 
         folderUrl: '/Shared Documents/Folder1', 
         recycle: true 
-      } }, () => {
-      try {
-        const lastCall: any = request.lastCall.args[0];
-        assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolder1\')/recycle()');
-        assert.strictEqual(lastCall.method, 'POST');
-        assert.strictEqual(lastCall.headers['X-HTTP-Method'], 'DELETE');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+      } });
+    const lastCall: any = request.lastCall.args[0];
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolder1\')/recycle()');
+    assert.strictEqual(lastCall.method, 'POST');
+    assert.strictEqual(lastCall.headers['X-HTTP-Method'], 'DELETE');
   });
 
-  it('should show error on request reject', (done) => {
+  it('should show error on request reject', async () => {
     stubPostResponses(new Promise((resp, rej) => rej('error1')));
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: 
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await assert.rejects(command.action(logger, { options: 
       { 
         debug: true,
         webUrl: 'https://contoso.sharepoint.com', 
         folderUrl: '/Shared Documents/Folder1', 
         recycle: true 
-      } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+      } } as any), new CommandError('error1'));
   });
 
   it('supports debug mode', () => {

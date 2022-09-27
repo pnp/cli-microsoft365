@@ -140,7 +140,7 @@ class SpoGroupSetCommand extends SpoCommand {
     this.optionSets.push(['id', 'name']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: AxiosRequestConfig = {
       url: `${args.options.webUrl}/_api/web/sitegroups/${args.options.id ? `GetById(${args.options.id})` : `GetByName('${args.options.name}')`}`,
       headers: {
@@ -159,10 +159,13 @@ class SpoGroupSetCommand extends SpoCommand {
       }
     };
 
-    request
-      .patch(requestOptions)
-      .then(() => this.setGroupOwner(args.options))
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.patch(requestOptions);
+      await this.setGroupOwner(args.options);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private setGroupOwner(options: Options): Promise<void> {

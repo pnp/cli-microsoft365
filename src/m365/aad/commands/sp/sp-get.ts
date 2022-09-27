@@ -115,29 +115,29 @@ class AadSpGetCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving service principal information...`);
     }
 
-    this
-      .getSpId(args)
-      .then((id: string): Promise<void> => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/servicePrincipals/${id}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
+    try {
+      const id = await this.getSpId(args);
 
-        return request.get(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/servicePrincipals/${id}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+
+      const res = await request.get(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

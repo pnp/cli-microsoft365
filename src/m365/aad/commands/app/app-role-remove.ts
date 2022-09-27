@@ -87,32 +87,32 @@ class AadAppRoleRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.showDeprecationWarning(logger, commands.APP_ROLE_DELETE, commands.APP_ROLE_REMOVE);
 
-    const deleteAppRole: () => void = (): void => {
-      this
-        .processAppRoleDelete(logger, args)
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+    const deleteAppRole: () => Promise<void> = async (): Promise<void> => {
+      try {
+        await this.processAppRoleDelete(logger, args);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      deleteAppRole();
+      await deleteAppRole();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the app role ?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          deleteAppRole();
-        }
       });
+
+      if (result.continue) {
+        await deleteAppRole();
+      }
     }
   }
 

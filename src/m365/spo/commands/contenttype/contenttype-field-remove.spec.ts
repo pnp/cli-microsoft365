@@ -156,9 +156,9 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).requestDigest = '';
@@ -219,415 +219,303 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   });
 
   // WEB CT
-  it('removes the field link from web content type', (done) => {
+  it('removes the field link from web content type', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
         confirm: true,
         debug: false
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.called);
   });
-  it('removes the field link from web content type - prompt', (done) => {
+  it('removes the field link from web content type - prompt', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
         confirm: false,
         debug: false
       }
-    } as any, () => {
-      let promptIssued = false;
+    } as any);
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
-  it('removes the field link from web content type - prompt: confirmed', (done) => {
+  it('removes the field link from web content type - prompt: confirmed', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
         debug: false
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.called);
   });
-  it('doesnt remove the field link from web content type - prompt: declined', (done) => {
+  it('doesnt remove the field link from web content type - prompt: declined', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         debug: false
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.notCalled);
   });
 
-  it('removes the field link from web content type with debug - prompt', (done) => {
+  it('removes the field link from web content type with debug - prompt', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
         confirm: false,
         debug: true
       }
-    } as any, () => {
-      try {
-        let promptIssued = false;
-
-        if (promptOptions && promptOptions.type === 'confirm') {
-          promptIssued = true;
-        }
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    let promptIssued = false;
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
 
-  it(`doesn't remove the field link from web content type with debug - prompt: declined`, (done) => {
+  it(`doesn't remove the field link from web content type with debug - prompt: declined`, async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         debug: true
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.notCalled);
   });
 
   // WEB CT: with update child content types
-  it('removes the field link from web content type with update child content types', (done) => {
+  it('removes the field link from web content type with update child content types', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         confirm: true,
         debug: false
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogSpy.notCalled);
   });
-  it('removes the field link from web content type with update child content types - prompt', (done) => {
+  it('removes the field link from web content type with update child content types - prompt', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         debug: false
       }
-    } as any, () => {
-      try {
-        let promptIssued = false;
+    } as any);
+    let promptIssued = false;
 
-        if (promptOptions && promptOptions.type === 'confirm') {
-          promptIssued = true;
-        }
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
-  it('removes the field link from web content type with update child content types - prompt: confirmed', (done) => {
+  it('removes the field link from web content type with update child content types - prompt: confirmed', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         confirm: false,
         debug: false
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.called);
   });
-  it('doesnt remove the field link from web content type with update child content types - prompt: declined', (done) => {
+  it('doesnt remove the field link from web content type with update child content types - prompt: declined', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         confirm: false,
         debug: false
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.notCalled);
   });
 
-  it('removes the field link from web content type with update child content types with debug - prompt', (done) => {
+  it('removes the field link from web content type with update child content types with debug - prompt', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         confirm: false,
         debug: true
       }
-    } as any, () => {
-      try {
-        let promptIssued = false;
+    } as any);
+    let promptIssued = false;
 
-        if (promptOptions && promptOptions.type === 'confirm') {
-          promptIssued = true;
-        }
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
 
-  it('doesnt remove the field link from web content type with update child content types with debug - prompt: confirmed', (done) => {
+  it('doesnt remove the field link from web content type with update child content types with debug - prompt: confirmed', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         confirm: false,
         debug: true
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.called);
   });
 
-  it('doesnt remove the field link from web content type with update child content types with debug - prompt: declined', (done) => {
+  it('doesnt remove the field link from web content type with update child content types with debug - prompt: declined', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         confirm: false,
         debug: true
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.notCalled);
   });
 
   // LIST CT
-  it('removes the field link from list content type', (done) => {
+  it('removes the field link from list content type', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         confirm: true,
         debug: false
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.called);
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.called);
+    assert(loggerLogSpy.notCalled);
   });
-  it('removes the field link from list content type - prompt', (done) => {
+
+  it('removes the field link from list content type - prompt', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         debug: false
       }
-    } as any, () => {
-      let promptIssued = false;
+    } as any);
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('removes the field link from list content type - prompt: confirmed', (done) => {
+  it('removes the field link from list content type - prompt: confirmed', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
         confirm: true,
         debug: false
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.called);
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.called);
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('removes the field link from list content type - prompt: declined', (done) => {
+  it('removes the field link from list content type - prompt: declined', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
     command.action(logger, {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
@@ -635,196 +523,131 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: false,
         debug: false
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.notCalled);
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.notCalled);
+    assert(loggerLogSpy.notCalled);
   });
 
   // LIST CT with debug
-  it('removes the field link from list content type with debug', (done) => {
+  it('removes the field link from list content type with debug', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
         confirm: true,
         debug: true
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.called);
   });
-  it('removes the field link from list content type with debug - prompt', (done) => {
+  it('removes the field link from list content type with debug - prompt', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         debug: true
       }
-    } as any, () => {
-      let promptIssued = false;
+    } as any);
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
-  it('removes the field link from list content type with debug - prompt: confirmed', (done) => {
+  it('removes the field link from list content type with debug - prompt: confirmed', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
+      options: {
+        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        updateChildContentTypes: false,
+        debug: true
+      }
+    } as any);
+    assert(postCallbackStub.called);
+  });
+  it('removes the field link from list content type with debug - prompt: declined', async () => {
+    sinon.stub(request, 'get').callsFake(getStubCalls);
+    const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
     command.action(logger, {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
         debug: true
       }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-  it('removes the field link from list content type with debug - prompt: declined', (done) => {
-    sinon.stub(request, 'get').callsFake(getStubCalls);
-    const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
-
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, {
-      options: {
-        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        updateChildContentTypes: false,
-        debug: true
-      }
-    } as any, () => {
-      try {
-        assert(postCallbackStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(postCallbackStub.notCalled);
   });
 
   // Handles error
-  it('handles error when remove the field link from web content type with update child content types', (done) => {
+  it('handles error when remove the field link from web content type with update child content types', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubFailedCalls);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         confirm: true,
         debug: false
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('Unknown Error'));
   });
-  it('handles error when remove the field link from web content type with update child content types (debug)', (done) => {
+
+  it('handles error when remove the field link from web content type with update child content types (debug)', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubFailedCalls);
 
-    command.action(logger, { options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, confirm: true } } as any),
+      new CommandError('Unknown Error'));
   });
 
-  it('handles error when remove the field link from web content type with update child content types with prompt', (done) => {
+  it('handles error when remove the field link from web content type with update child content types with prompt', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubFailedCalls);
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         confirm: false,
         debug: false
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('Unknown Error'));
   });
 
-  it('correctly handles a random API error', (done) => {
+  it('correctly handles a random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         confirm: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
 
   // Fails validation

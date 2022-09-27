@@ -74,7 +74,7 @@ describe(commands.WEB_REINDEX, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('requests reindexing site that is not a no-script site for the first time', (done) => {
+  it('requests reindexing site that is not a no-script site for the first time', async () => {
     let propertyName: string = '';
     let propertyValue: string = '';
 
@@ -110,20 +110,13 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled, 'Something has been logged');
-        assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
-        assert.strictEqual(propertyValue, '1', 'Incorrect property value stored in the property bag');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert(loggerLogSpy.notCalled, 'Something has been logged');
+    assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
+    assert.strictEqual(propertyValue, '1', 'Incorrect property value stored in the property bag');
   });
 
-  it('requests reindexing site that is not a no-script site for the second time', (done) => {
+  it('requests reindexing site that is not a no-script site for the second time', async () => {
     let propertyName: string = '';
     let propertyValue: string = '';
 
@@ -161,19 +154,12 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
-        assert.strictEqual(propertyValue, '2', 'Incorrect property value stored in the property bag');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
+    assert.strictEqual(propertyValue, '2', 'Incorrect property value stored in the property bag');
   });
 
-  it('requests reindexing no-script site', (done) => {
+  it('requests reindexing no-script site', async () => {
     const propertyName: string[] = [];
     const propertyValue: string[] = [];
 
@@ -240,6 +226,10 @@ describe(commands.WEB_REINDEX, () => {
           ]
         });
       }
+      
+      if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
+        return Promise.resolve({});
+      }
 
       return Promise.reject('Invalid request');
     });
@@ -250,22 +240,15 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled, 'Something has been logged');
-        assert.strictEqual(propertyName[0], 'vti_searchversion');
-        assert.strictEqual(propertyName[1], 'vti_searchversion');
-        assert.strictEqual(propertyValue[0], '1');
-        assert.strictEqual(propertyValue[1], '2');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert(loggerLogSpy.notCalled, 'Something has been logged');
+    assert.strictEqual(propertyName[0], 'vti_searchversion');
+    assert.strictEqual(propertyName[1], 'vti_searchversion');
+    assert.strictEqual(propertyValue[0], '1');
+    assert.strictEqual(propertyValue[1], '2');
   });
 
-  it('requests reindexing no-script site (debug)', (done) => {
+  it('requests reindexing no-script site (debug)', async () => {
     const propertyName: string[] = [];
     const propertyValue: string[] = [];
 
@@ -332,6 +315,10 @@ describe(commands.WEB_REINDEX, () => {
           ]
         });
       }
+      
+      if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
+        return Promise.resolve({});
+      }
 
       return Promise.reject('Invalid request');
     });
@@ -342,22 +329,15 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called, 'Nothing has been logged');
-        assert.strictEqual(propertyName[0], 'vti_searchversion');
-        assert.strictEqual(propertyName[1], 'vti_searchversion');
-        assert.strictEqual(propertyValue[0], '1');
-        assert.strictEqual(propertyValue[1], '2');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert(loggerLogToStderrSpy.called, 'Nothing has been logged');
+    assert.strictEqual(propertyName[0], 'vti_searchversion');
+    assert.strictEqual(propertyName[1], 'vti_searchversion');
+    assert.strictEqual(propertyValue[0], '1');
+    assert.strictEqual(propertyValue[1], '2');
   });
 
-  it('correctly handles error while requiring reindexing a list', (done) => {
+  it('correctly handles error while requiring reindexing a list', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
@@ -427,15 +407,7 @@ describe(commands.WEB_REINDEX, () => {
     sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').callsFake(() => Promise.resolve(true));
     sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake(() => Promise.reject('ClientSvc unknown error'));
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('ClientSvc unknown error'));
   });
 
   it('supports debug mode', () => {

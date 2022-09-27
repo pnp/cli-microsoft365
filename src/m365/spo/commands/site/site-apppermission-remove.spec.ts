@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -74,9 +74,9 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
 
     promptOptions = undefined;
@@ -197,58 +197,43 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('prompts before removing the site apppermission when confirm option not passed', (done) => {
-    command.action(logger, {
+  it('prompts before removing the site apppermission when confirm option not passed', async () => {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo'
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
 
-  it('aborts removing the site apppermission when prompt not confirmed', (done) => {
+  it('aborts removing the site apppermission when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo'
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.notCalled);
   });
 
-  it('removes site apppermission when prompt confirmed (debug)', (done) => {
+  it('removes site apppermission when prompt confirmed (debug)', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
@@ -267,29 +252,22 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.called);
   });
 
-  it('removes site apppermission with specified appId', (done) => {
+  it('removes site apppermission with specified appId', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));    
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
@@ -308,29 +286,22 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.called);
   });
 
-  it('removes site apppermission with specified appDisplayName', (done) => {
+  it('removes site apppermission with specified appDisplayName', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));    
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
@@ -349,21 +320,25 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.called);
+  });
+
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: {
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      appDisplayName: 'Foo',
+      confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

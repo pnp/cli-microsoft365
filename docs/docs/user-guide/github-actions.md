@@ -198,7 +198,7 @@ Add the respective script file to your repository and this step to a `.yaml` bui
 
 ### CLI for Microsoft 365 Login
 
-View on [GitHub Marketplace](https://github.com/marketplace/actions/office-365-cli-login)
+View on [GitHub Marketplace](https://github.com/marketplace/actions/cli-for-microsoft-365-login)
 
 #### Inputs
 
@@ -209,7 +209,7 @@ View on [GitHub Marketplace](https://github.com/marketplace/actions/office-365-c
 
 ### Microsoft 365 Deploy App
 
-View on [GitHub Marketplace](https://github.com/marketplace/actions/office-365-cli-deploy-app)
+View on [GitHub Marketplace](https://github.com/marketplace/actions/cli-for-microsoft-365-deploy-app)
 
 #### Inputs
 
@@ -227,7 +227,7 @@ The `APP_ID` of the app that has been deployed.
 
 ### Microsoft 365 Run Script
 
-View on [GitHub Marketplace](https://github.com/marketplace/actions/office-365-cli-run-script)
+View on [GitHub Marketplace](https://github.com/marketplace/actions/cli-for-microsoft-365-run-script)
 
 #### Inputs
 

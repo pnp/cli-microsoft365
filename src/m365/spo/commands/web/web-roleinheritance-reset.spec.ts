@@ -90,7 +90,7 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('reset role inheritance of subsite', (done) => {
+  it('reset role inheritance of subsite', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/resetroleinheritance') > -1) {
         return Promise.resolve();
@@ -99,23 +99,15 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('web role inheritance reset command handles reject request correctly', (done) => {
+  it('web role inheritance reset command handles reject request correctly', async () => {
     const err = 'request rejected';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/resetroleinheritance') > -1) {
@@ -125,19 +117,8 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
-      }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      webUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError(err));
   });
 });

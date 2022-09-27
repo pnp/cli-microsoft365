@@ -37,9 +37,9 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -97,7 +97,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('remove role definitions handles reject request correctly', (done) => {
+  it('remove role definitions handles reject request correctly', async () => {
     const err = 'request rejected';
     sinon.stub(request, 'delete').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roledefinitions') > -1) {
@@ -107,59 +107,37 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         id: 1,
         confirm: true
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('prompts before removing role definition when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: 1 } }, () => {
-      let promptIssued = false;
+  it('prompts before removing role definition when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts removing role definition when prompt not confirmed', (done) => {
+  it('aborts removing role definition when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: 1 } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    assert(requests.length === 0);
   });
 
-  it('removes the role definition when prompt confirmed', (done) => {
+  it('removes the role definition when prompt confirmed', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       requests.push(opts);
 
@@ -175,29 +153,22 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: 1 } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/roledefinitions(1)`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/roledefinitions(1)`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the role definition without confirm prompt', (done) => {
+  it('removes the role definition without confirm prompt', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       requests.push(opts);
 
@@ -212,22 +183,15 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: 1, confirm: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/roledefinitions(1)`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: 1, confirm: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/roledefinitions(1)`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 });

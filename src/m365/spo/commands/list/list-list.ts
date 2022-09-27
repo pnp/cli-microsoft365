@@ -61,7 +61,7 @@ class SpoListListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving all lists in site at ${args.options.webUrl}...`);
     }
@@ -77,16 +77,17 @@ class SpoListListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<ListInstanceCollection>(requestOptions)
-      .then((listInstances: ListInstanceCollection): void => {
-        listInstances.value.forEach(l => {
-          l.Url = l.RootFolder.ServerRelativeUrl;
-        });
+    try {
+      const listInstances = await request.get<ListInstanceCollection>(requestOptions);
+      listInstances.value.forEach(l => {
+        l.Url = l.RootFolder.ServerRelativeUrl;
+      });
 
-        logger.log(listInstances.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(listInstances.value);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

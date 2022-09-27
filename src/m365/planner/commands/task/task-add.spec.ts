@@ -485,46 +485,31 @@ describe(commands.TASK_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('correctly adds planner task with title, planId, and bucketId', (done) => {
+  it('correctly adds planner task with title, planId, and bucketId', async () => {
     const options: any = {
       title: 'My Planner Task',
       planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
       bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskAddResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskAddResponse));
   });
 
-  it('fails validation when using app only access token', (done) => {
+  it('fails validation when using app only access token', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('This command does not support application permissions.'));
   });
 
-  it('correctly adds planner bucket with title, bucketId, planTitle, and ownerGroupName', (done) => {
+  it('correctly adds planner bucket with title, bucketId, planTitle, and ownerGroupName', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
@@ -553,18 +538,11 @@ describe(commands.TASK_ADD, () => {
       ownerGroupName: 'My Planner Group'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskAddResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskAddResponse));
   });
 
-  it('correctly adds planner task with title, bucketId, planTitle, and ownerGroupId', (done) => {
+  it('correctly adds planner task with title, bucketId, planTitle, and ownerGroupId', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
@@ -598,18 +576,11 @@ describe(commands.TASK_ADD, () => {
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskAddResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskAddResponse));
   });
 
-  it('correctly adds planner task with title, bucketId, deprecated planName, and ownerGroupId', (done) => {
+  it('correctly adds planner task with title, bucketId, deprecated planName, and ownerGroupId', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
@@ -644,18 +615,11 @@ describe(commands.TASK_ADD, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskAddResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskAddResponse));
   });
 
-  it('correctly adds planner task with title, planId, and bucketName', (done) => {
+  it('correctly adds planner task with title, planId, and bucketName', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/8QZEH7b3wkS_bGQobscsM5gADCBb/buckets`) {
@@ -680,18 +644,11 @@ describe(commands.TASK_ADD, () => {
       bucketName: 'My Planner Bucket'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskAddResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskAddResponse));
   });
 
-  it('correctly adds planner task with title, bucketId, planId, and assignedToUserIds', (done) => {
+  it('correctly adds planner task with title, bucketId, planId, and assignedToUserIds', async () => {
     const options: any = {
       title: 'My Planner Task',
       planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
@@ -699,18 +656,11 @@ describe(commands.TASK_ADD, () => {
       assignedToUserIds: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskAddResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskAddResponse));
   });
 
-  it('correctly adds planner task with title, bucketId, planId, assignedToUserNames, and appliedCategories', (done) => {
+  it('correctly adds planner task with title, bucketId, planId, assignedToUserNames, and appliedCategories', async () => {
     sinonUtil.restore(request.get);
     sinonUtil.restore(request.post);
 
@@ -744,18 +694,11 @@ describe(commands.TASK_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskAddResponseWithAssignments));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskAddResponseWithAssignments));
   });
 
-  it('correctly adds planner task with title, bucketId, planId, assignedToUserNames, and appliedCategories split with space', (done) => {
+  it('correctly adds planner task with title, bucketId, planId, assignedToUserNames, and appliedCategories split with space', async () => {
     sinonUtil.restore(request.get);
     sinonUtil.restore(request.post);
 
@@ -789,18 +732,11 @@ describe(commands.TASK_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskAddResponseWithAssignments));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskAddResponseWithAssignments));
   });
 
-  it('correctly adds planner task with title, bucketId, planId, and description', (done) => {
+  it('correctly adds planner task with title, bucketId, planId, and description', async () => {
     sinonUtil.restore(request.get);
     sinonUtil.restore(request.patch);
 
@@ -839,18 +775,11 @@ describe(commands.TASK_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskAddResponseWithDetails));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskAddResponseWithDetails));
   });
 
-  it('uses correct value for urgent priority', (done) => {
+  it('uses correct value for urgent priority', async () => {
     sinonUtil.restore(request.post);
     const requestPostStub = sinon.stub(request, 'post');
     requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
@@ -862,18 +791,11 @@ describe(commands.TASK_ADD, () => {
       priority: 'Urgent'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 1);
   });
 
-  it('uses correct value for important priority', (done) => {
+  it('uses correct value for important priority', async () => {
     sinonUtil.restore(request.post);
     const requestPostStub = sinon.stub(request, 'post');
     requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
@@ -885,18 +807,11 @@ describe(commands.TASK_ADD, () => {
       priority: 'Important'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 3);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 3);
   });
 
-  it('uses correct value for medium priority', (done) => {
+  it('uses correct value for medium priority', async () => {
     sinonUtil.restore(request.post);
     const requestPostStub = sinon.stub(request, 'post');
     requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
@@ -908,18 +823,11 @@ describe(commands.TASK_ADD, () => {
       priority: 'Medium'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 5);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 5);
   });
 
-  it('uses correct value for low priority', (done) => {
+  it('uses correct value for low priority', async () => {
     sinonUtil.restore(request.post);
     const requestPostStub = sinon.stub(request, 'post');
     requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
@@ -931,18 +839,11 @@ describe(commands.TASK_ADD, () => {
       priority: 'Low'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 9);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 9);
   });
 
-  it('fails when no bucket is found', (done) => {
+  it('fails when no bucket is found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/8QZEH7b3wkS_bGQobscsM5gADCBb/buckets`) {
@@ -960,18 +861,10 @@ describe(commands.TASK_ADD, () => {
       bucketName: 'My Planner Bucket'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "The specified bucket does not exist");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('The specified bucket does not exist'));
   });
 
-  it('fails when an invalid user is specified', (done) => {
+  it('fails when an invalid user is specified', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
@@ -1001,18 +894,10 @@ describe(commands.TASK_ADD, () => {
       assignedToUserNames: 'user@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "Cannot proceed with planner task creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Cannot proceed with planner task creation. The following users provided are invalid : user2@contoso.onmicrosoft.com'));
   });
 
-  it('fails validation when ownerGroupName not found', (done) => {
+  it('fails validation when ownerGroupName not found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
@@ -1021,25 +906,17 @@ describe(commands.TASK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         name: 'My Planner Bucket',
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group 'foo' does not exist.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified group 'foo' does not exist.`));
   });
 
-  it('fails validation when task details endpoint fails', (done) => {
+  it('fails validation when task details endpoint fails', async () => {
     sinonUtil.restore(request.get);
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -1050,37 +927,21 @@ describe(commands.TASK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         description: 'My Task Description'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Error fetching task details`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Error fetching task details`));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

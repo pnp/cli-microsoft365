@@ -56,7 +56,7 @@ class SpoRoleDefinitionGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Getting role definition from ${args.options.webUrl}...`);
     }
@@ -69,18 +69,20 @@ class SpoRoleDefinitionGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<RoleDefinition>(requestOptions)
-      .then((response: RoleDefinition): void => {
-        const permissions: BasePermissions = new BasePermissions();
-        permissions.high = response.BasePermissions.High as number;
-        permissions.low = response.BasePermissions.Low as number;
-        response.BasePermissionsValue = permissions.parse();
-        response.RoleTypeKindValue = RoleType[response.RoleTypeKind];
+    try {
+      const response = await request.get<RoleDefinition>(requestOptions);
 
-        logger.log(response);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const permissions: BasePermissions = new BasePermissions();
+      permissions.high = response.BasePermissions.High as number;
+      permissions.low = response.BasePermissions.Low as number;
+      response.BasePermissionsValue = permissions.parse();
+      response.RoleTypeKindValue = RoleType[response.RoleTypeKind];
+
+      logger.log(response);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

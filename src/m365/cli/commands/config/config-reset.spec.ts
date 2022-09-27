@@ -43,11 +43,11 @@ describe(commands.CONFIG_RESET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it(`Resets a specific configuration option to its default value`, (done) => {
+  it(`Resets a specific configuration option to its default value`, async () => {
     const output = undefined;
     const config = Cli.getInstance().config;
 
-    let actualKey: string, actualValue: any;
+    let actualKey: string = '', actualValue: any;
 
     sinon.restore();
     sinon.stub(config, 'delete').callsFake(((key: string) => {
@@ -55,24 +55,17 @@ describe(commands.CONFIG_RESET, () => {
       actualValue = undefined;
     }) as any);
 
-    command.action(logger, { options: { key: settingsNames.output, value: output } }, () => {
-      try {
-        assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
-        assert.strictEqual(actualValue, undefined, 'Invalid value');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.output, value: output } });
+    assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
+    assert.strictEqual(actualValue, undefined, 'Invalid value');
   });
 
-  it(`Resets all configuration settings to default`, (done) => {
+  it(`Resets all configuration settings to default`, async () => {
     const config = Cli.getInstance().config;
-    let errorOutputKey: string, errorOutputValue: any
-      , outputKey: string, outputValue: any
-      , printErrorsAsPlainTextKey: string, printErrorsAsPlainTextValue: any
-      , showHelpOnFailureKey: string, showHelpOnFailureValue: any;
+    let errorOutputKey: string = '', errorOutputValue: any
+      , outputKey: string = '', outputValue: any
+      , printErrorsAsPlainTextKey: string = '', printErrorsAsPlainTextValue: any
+      , showHelpOnFailureKey: string = '', showHelpOnFailureValue: any;
 
     sinon.restore();
 
@@ -90,25 +83,18 @@ describe(commands.CONFIG_RESET, () => {
       showHelpOnFailureValue = undefined;
     }) as any);
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert.strictEqual(errorOutputKey, settingsNames.errorOutput, 'Invalid key');
-        assert.strictEqual(errorOutputValue, undefined, 'Invalid value');
+    await command.action(logger, { options: {} });
+    assert.strictEqual(errorOutputKey, settingsNames.errorOutput, 'Invalid key');
+    assert.strictEqual(errorOutputValue, undefined, 'Invalid value');
 
-        assert.strictEqual(outputKey, settingsNames.output, 'Invalid key');
-        assert.strictEqual(outputValue, undefined, 'Invalid value');
+    assert.strictEqual(outputKey, settingsNames.output, 'Invalid key');
+    assert.strictEqual(outputValue, undefined, 'Invalid value');
 
-        assert.strictEqual(printErrorsAsPlainTextKey, settingsNames.printErrorsAsPlainText, 'Invalid key');
-        assert.strictEqual(printErrorsAsPlainTextValue, undefined, 'Invalid value');
+    assert.strictEqual(printErrorsAsPlainTextKey, settingsNames.printErrorsAsPlainText, 'Invalid key');
+    assert.strictEqual(printErrorsAsPlainTextValue, undefined, 'Invalid value');
 
-        assert.strictEqual(showHelpOnFailureKey, settingsNames.showHelpOnFailure, 'Invalid key');
-        assert.strictEqual(showHelpOnFailureValue, undefined, 'Invalid value');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert.strictEqual(showHelpOnFailureKey, settingsNames.showHelpOnFailure, 'Invalid key');
+    assert.strictEqual(showHelpOnFailureValue, undefined, 'Invalid value');
   });
 
   it('fails validation if specified key is invalid', async () => {

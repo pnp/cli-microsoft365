@@ -62,7 +62,7 @@ describe(commands.GROUPSETTING_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates group setting', (done) => {
+  it('updates group setting', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/c391b57d-5783-4c53-9236-cefb5c6ef323`) {
         return Promise.resolve({
@@ -138,7 +138,7 @@ describe(commands.GROUPSETTING_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
@@ -146,18 +146,11 @@ describe(commands.GROUPSETTING_SET, () => {
         ClassificationList: 'HBI, MBI, LBI, GDPR',
         DefaultClassification: 'MBI'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('updates group setting (debug)', (done) => {
+  it('updates group setting (debug)', async () => {
     let settingsUpdated: boolean = false;
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/c391b57d-5783-4c53-9236-cefb5c6ef323`) {
@@ -240,7 +233,7 @@ describe(commands.GROUPSETTING_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
@@ -248,18 +241,11 @@ describe(commands.GROUPSETTING_SET, () => {
         ClassificationList: 'HBI, MBI, LBI, GDPR',
         DefaultClassification: 'MBI'
       }
-    }, () => {
-      try {
-        assert(settingsUpdated);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(settingsUpdated);
   });
 
-  it('ignores global options when creating request data', (done) => {
+  it('ignores global options when creating request data', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/c391b57d-5783-4c53-9236-cefb5c6ef323`) {
         return Promise.resolve({
@@ -340,7 +326,7 @@ describe(commands.GROUPSETTING_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         verbose: true,
@@ -350,39 +336,32 @@ describe(commands.GROUPSETTING_SET, () => {
         ClassificationList: 'HBI, MBI, LBI, GDPR',
         DefaultClassification: 'MBI'
       }
-    }, () => {
-      try {
-        assert.deepEqual(patchStub.firstCall.args[0].data, {
-          displayName: null,
-          templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
-          values: [
-            {
-              name: 'UsageGuidelinesUrl',
-              value: 'https://contoso.sharepoint.com/sites/compliance'
-            },
-            { name: 'ClassificationList', value: 'HBI, MBI, LBI, GDPR' },
-            { name: 'DefaultClassification', value: 'MBI' },
-            { name: 'CustomBlockedWordsList', value: '' },
-            { name: 'EnableMSStandardBlockedWords', value: 'false' },
-            { name: 'ClassificationDescriptions', value: '' },
-            { name: 'PrefixSuffixNamingRequirement', value: '' },
-            { name: 'AllowGuestsToBeGroupOwner', value: 'false' },
-            { name: 'AllowGuestsToAccessGroups', value: 'true' },
-            { name: 'GuestUsageGuidelinesUrl', value: '' },
-            { name: 'GroupCreationAllowedGroupId', value: '' },
-            { name: 'AllowToAddGuests', value: 'true' },
-            { name: 'EnableGroupCreation', value: 'true' }
-          ]
-        });
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
+    });
+    assert.deepEqual(patchStub.firstCall.args[0].data, {
+      displayName: null,
+      templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
+      values: [
+        {
+          name: 'UsageGuidelinesUrl',
+          value: 'https://contoso.sharepoint.com/sites/compliance'
+        },
+        { name: 'ClassificationList', value: 'HBI, MBI, LBI, GDPR' },
+        { name: 'DefaultClassification', value: 'MBI' },
+        { name: 'CustomBlockedWordsList', value: '' },
+        { name: 'EnableMSStandardBlockedWords', value: 'false' },
+        { name: 'ClassificationDescriptions', value: '' },
+        { name: 'PrefixSuffixNamingRequirement', value: '' },
+        { name: 'AllowGuestsToBeGroupOwner', value: 'false' },
+        { name: 'AllowGuestsToAccessGroups', value: 'true' },
+        { name: 'GuestUsageGuidelinesUrl', value: '' },
+        { name: 'GroupCreationAllowedGroupId', value: '' },
+        { name: 'AllowToAddGuests', value: 'true' },
+        { name: 'EnableGroupCreation', value: 'true' }
+      ]
     });
   });
 
-  it('handles error when no group setting with the specified id found', (done) => {
+  it('handles error when no group setting with the specified id found', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -398,15 +377,8 @@ describe(commands.GROUPSETTING_SET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } } as any),
+      new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`));
   });
 
   it('fails validation if the id is not a valid GUID', async () => {

@@ -51,27 +51,28 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const url: string = `${this.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${encodeURIComponent(args.options.environment)}/flows?api-version=2016-11-01`;
 
-    this
-      .getAllItems(url, logger, true)
-      .then((): void => {
-        if (this.items.length > 0) {
-          this.items.forEach(i => {
-            i.displayName = i.properties.displayName;
-          });
+    try {
+      await this.getAllItems(url, logger, true);
 
-          logger.log(this.items);
-        }
-        else {
-          if (this.verbose) {
-            logger.logToStderr('No Flows found');
-          }
-        }
+      if (this.items.length > 0) {
+        this.items.forEach(i => {
+          i.displayName = i.properties.displayName;
+        });
 
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        logger.log(this.items);
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr('No Flows found');
+        }
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

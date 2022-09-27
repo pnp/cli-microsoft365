@@ -1,13 +1,8 @@
 import { Logger } from '../../../../cli';
-import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-
-interface CommandArgs {
-  options: GlobalOptions;
-}
 
 class SpoThemeListCommand extends SpoCommand {
   public get name(): string {
@@ -22,36 +17,35 @@ class SpoThemeListCommand extends SpoCommand {
     return ['name'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((spoAdminUrl: string): Promise<any> => {
+  public async commandAction(logger: Logger): Promise<void> {
+    try {
+      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving themes from tenant store...`);
+      }
+
+      const requestOptions: any = {
+        url: `${spoAdminUrl}/_api/thememanager/GetTenantThemingOptions`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const rawRes: any = await request.post(requestOptions);
+      const themePreviews: any[] = rawRes.themePreviews;
+      if (themePreviews && themePreviews.length > 0) {
+        logger.log(themePreviews);
+      }
+      else {
         if (this.verbose) {
-          logger.logToStderr(`Retrieving themes from tenant store...`);
+          logger.logToStderr('No themes found');
         }
-
-        const requestOptions: any = {
-          url: `${spoAdminUrl}/_api/thememanager/GetTenantThemingOptions`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((rawRes: any): void => {
-        const themePreviews: any[] = rawRes.themePreviews;
-        if (themePreviews && themePreviews.length > 0) {
-          logger.log(themePreviews);
-        }
-        else {
-          if (this.verbose) {
-            logger.logToStderr('No themes found');
-          }
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

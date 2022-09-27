@@ -84,7 +84,7 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const referencedProjectFilePath: string = this.getSupportedProjectFiles(args.options.path)[0];
       const relativeReferencedProjectFilePath: string = path.relative(process.cwd(), referencedProjectFilePath);
@@ -95,11 +95,9 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
       cdsProjectMutator.addProjectReference(relativeReferencedProjectFilePath);
 
       fs.writeFileSync(cdsProjectFilePath, cdsProjectMutator.cdsProjectDocument as any);
-
-      cb();
     }
     catch (err: any) {
-      cb(new CommandError(err));
+      throw new CommandError(err);
     }
   }
 

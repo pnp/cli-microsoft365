@@ -1,4 +1,4 @@
-import { Cli, CommandOutput, Logger } from '../../../cli';
+import { Cli, Logger } from '../../../cli';
 import Command from '../../../Command';
 import * as AadAppGetCommand from '../../aad/commands/app/app-get';
 import { Options as AadAppGetCommandOptions } from '../../aad/commands/app/app-get';
@@ -14,7 +14,7 @@ class AppGetCommand extends AppCommand {
     return 'Retrieves information about the current Azure AD app';
   }
 
-  public commandAction(logger: Logger, args: AppCommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: AppCommandArgs): Promise<void> {
     const options: AadAppGetCommandOptions = {
       appId: this.appId,
       output: 'json',
@@ -22,16 +22,17 @@ class AppGetCommand extends AppCommand {
       verbose: args.options.verbose
     };
 
-    Cli
-      .executeCommandWithOutput(AadAppGetCommand as Command, { options: { ...options, _: [] } })
-      .then((appGetOutput: CommandOutput): void => {
-        if (this.verbose) {
-          logger.logToStderr(appGetOutput.stderr);
-        }
+    try {
+      const appGetOutput = await Cli.executeCommandWithOutput(AadAppGetCommand as Command, { options: { ...options, _: [] } });
+      if (this.verbose) {
+        logger.logToStderr(appGetOutput.stderr);
+      }
 
-        logger.log(JSON.parse(appGetOutput.stdout));
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(JSON.parse(appGetOutput.stdout));
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

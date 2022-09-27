@@ -47,7 +47,7 @@ class SpoRoleDefinitionListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Getting role definitions list from ${args.options.webUrl}...`);
     }
@@ -60,12 +60,13 @@ class SpoRoleDefinitionListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: any[] }>(requestOptions)
-      .then((response: { value: any[] }): void => {
-        logger.log(response.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const response = await request.get<{ value: any[] }>(requestOptions);
+      logger.log(response.value);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

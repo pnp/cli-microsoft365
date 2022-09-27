@@ -57,7 +57,7 @@ class SpoWebGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let url: string = `${args.options.webUrl}/_api/web`;
     if (args.options.withGroups) {
       url += '?$expand=AssociatedMemberGroup,AssociatedOwnerGroup,AssociatedVisitorGroup';
@@ -70,12 +70,13 @@ class SpoWebGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<WebPropertiesCollection>(requestOptions)
-      .then((webProperties: WebPropertiesCollection): void => {
-        logger.log(webProperties);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const webProperties: WebPropertiesCollection = await request.get<WebPropertiesCollection>(requestOptions);
+      logger.log(webProperties);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

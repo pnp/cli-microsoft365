@@ -65,7 +65,7 @@ describe(commands.ID_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets logged in Microsoft 365 tenant ID if no domain name is passed', (done) => {
+  it('gets logged in Microsoft 365 tenant ID if no domain name is passed', async () => {
     sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => {
       return 'admin@contoso.onmicrosoft.com';
     });
@@ -141,19 +141,12 @@ describe(commands.ID_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(loggerLogSpy.calledWith('31537af4-6d77-4bb9-a681-d2394888ea26'));
-        sinonUtil.restore(accessToken.getUserNameFromAccessToken);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith('31537af4-6d77-4bb9-a681-d2394888ea26'));
+    sinonUtil.restore(accessToken.getUserNameFromAccessToken);
   });
 
-  it('gets Microsoft 365 tenant ID with correct domain name', (done) => {
+  it('gets Microsoft 365 tenant ID with correct domain name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://login.windows.net/contoso.com/.well-known/openid-configuration`) {
         return Promise.resolve(
@@ -225,18 +218,11 @@ describe(commands.ID_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: false, domainName: 'contoso.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith('6babcaad-604b-40ac-a9d7-9fd97c0b779f'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, domainName: 'contoso.com' } });
+    assert(loggerLogSpy.calledWith('6babcaad-604b-40ac-a9d7-9fd97c0b779f'));
   });
 
-  it('returns errors when trying to retrieve ID for a non-existant tenant', (done) => {
+  it('returns errors when trying to retrieve ID for a non-existant tenant', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://login.windows.net/xyz.com/.well-known/openid-configuration`) {
         return Promise.resolve(
@@ -256,29 +242,13 @@ describe(commands.ID_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: false, domainName: 'xyz.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("AADSTS90002: Tenant 'xyz.com' not found. This may happen if there are no active subscriptions for the tenant. Check with your subscription administrator.\r\nTrace ID: 8c0e5644-738f-460f-900c-edb4c918b100\r\nCorrelation ID: 69a7237f-1f84-4b88-aae7-8f7fd46d685a\r\nTimestamp: 2019-06-15 15:41:39Z")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, domainName: 'xyz.com' } } as any), new CommandError("AADSTS90002: Tenant 'xyz.com' not found. This may happen if there are no active subscriptions for the tenant. Check with your subscription administrator.\r\nTrace ID: 8c0e5644-738f-460f-900c-edb4c918b100\r\nCorrelation ID: 69a7237f-1f84-4b88-aae7-8f7fd46d685a\r\nTimestamp: 2019-06-15 15:41:39Z"));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false, domainName: 'xyz.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, domainName: 'xyz.com' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

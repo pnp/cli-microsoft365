@@ -112,155 +112,145 @@ class SpoListItemAddCommand extends SpoCommand {
     this.optionSets.push(['listId', 'listTitle']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const listIdArgument = args.options.listId || '';
-    const listTitleArgument = args.options.listTitle || '';
-    const listRestUrl: string = (args.options.listId ?
-      `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
-    let contentTypeName: string = '';
-    let targetFolderServerRelativeUrl: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const listIdArgument = args.options.listId || '';
+      const listTitleArgument = args.options.listTitle || '';
+      const listRestUrl: string = (args.options.listId ?
+        `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
+        : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
+      let contentTypeName: string = '';
+      let targetFolderServerRelativeUrl: string = '';
 
-    if (this.verbose) {
-      logger.logToStderr(`Getting content types for list...`);
-    }
+      if (this.verbose) {
+        logger.logToStderr(`Getting content types for list...`);
+      }
 
-    const requestOptions: any = {
-      url: `${listRestUrl}/contenttypes?$select=Name,Id`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
+      let requestOptions: any = {
+        url: `${listRestUrl}/contenttypes?$select=Name,Id`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get(requestOptions)
-      .then((response: any): Promise<void> => {
-        if (args.options.contentType) {
-          const foundContentType = response.value.filter((ct: any) => {
-            const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
-
-            if (this.debug) {
-              logger.logToStderr(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
-            }
-
-            return contentTypeMatch;
-          });
+      const ctypes = await request.get<any>(requestOptions);
+      if (args.options.contentType) {
+        const foundContentType = ctypes.value.filter((ct: any) => {
+          const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
 
           if (this.debug) {
-            logger.logToStderr('content type filter output...');
-            logger.logToStderr(foundContentType);
+            logger.logToStderr(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
           }
 
-          if (foundContentType.length > 0) {
-            contentTypeName = foundContentType[0].Name;
-          }
-
-          // After checking for content types, throw an error if the name is blank
-          if (!contentTypeName || contentTypeName === '') {
-            return Promise.reject(`Specified content type '${args.options.contentType}' doesn't exist on the target list`);
-          }
-
-          if (this.debug) {
-            logger.logToStderr(`using content type name: ${contentTypeName}`);
-          }
-        }
-
-        if (args.options.folder) {
-          if (this.debug) {
-            logger.logToStderr('setting up folder lookup response ...');
-          }
-
-          const requestOptions: any = {
-            url: `${listRestUrl}/rootFolder`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-
-          return request
-            .get<any>(requestOptions)
-            .then(rootFolderResponse => {
-              targetFolderServerRelativeUrl = urlUtil.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder as string);
-
-              return spo.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl, logger, this.debug);
-            });
-        }
-        else {
-          return Promise.resolve();
-        }
-      })
-      .then((): Promise<any> => {
-        if (this.verbose) {
-          logger.logToStderr(`Creating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
-        }
-
-        const requestBody: any = {
-          formValues: this.mapRequestBody(args.options)
-        };
-
-        if (args.options.folder) {
-          requestBody.listItemCreateInfo = {
-            FolderPath: {
-              DecodedUrl: targetFolderServerRelativeUrl
-            }
-          };
-        }
-
-        if (args.options.contentType && contentTypeName !== '') {
-          if (this.debug) {
-            logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
-          }
-
-          requestBody.formValues.push({
-            FieldName: 'ContentType',
-            FieldValue: contentTypeName
-          });
-        }
-
-        const requestOptions: any = {
-          url: `${listRestUrl}/AddValidateUpdateItemUsingPath()`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          data: requestBody,
-          responseType: 'json'
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((response: any): Promise<any> => {
-        // Response is from /AddValidateUpdateItemUsingPath POST call, perform get on added item to get all field values
-        const fieldValues: FieldValue[] = response.value;
-        const idField = fieldValues.filter((thisField) => {
-          return (thisField.FieldName === "Id");
+          return contentTypeMatch;
         });
 
         if (this.debug) {
-          logger.logToStderr(`field values returned:`);
-          logger.logToStderr(fieldValues);
-          logger.logToStderr(`Id returned by AddValidateUpdateItemUsingPath: ${idField}`);
+          logger.logToStderr('content type filter output...');
+          logger.logToStderr(foundContentType);
         }
 
-        if (idField.length === 0) {
-          return Promise.reject(`Item didn't add successfully`);
+        if (foundContentType.length > 0) {
+          contentTypeName = foundContentType[0].Name;
         }
 
-        const requestOptions: any = {
-          url: `${listRestUrl}/items(${idField[0].FieldValue})`,
+        // After checking for content types, throw an error if the name is blank
+        if (!contentTypeName || contentTypeName === '') {
+          throw `Specified content type '${args.options.contentType}' doesn't exist on the target list`;
+        }
+
+        if (this.debug) {
+          logger.logToStderr(`using content type name: ${contentTypeName}`);
+        }
+      }
+
+      if (args.options.folder) {
+        if (this.debug) {
+          logger.logToStderr('setting up folder lookup response ...');
+        }
+
+        requestOptions = {
+          url: `${listRestUrl}/rootFolder`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
 
-        return request.get(requestOptions);
-      })
-      .then((response: any): void => {
-        logger.log(<ListItemInstance>response);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        const rootFolderResponse = await request.get<any>(requestOptions);
+        targetFolderServerRelativeUrl = urlUtil.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder as string);
+        await spo.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl, logger, this.debug);
+      }
+
+      if (this.verbose) {
+        logger.logToStderr(`Creating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+      }
+
+      const requestBody: any = {
+        formValues: this.mapRequestBody(args.options)
+      };
+
+      if (args.options.folder) {
+        requestBody.listItemCreateInfo = {
+          FolderPath: {
+            DecodedUrl: targetFolderServerRelativeUrl
+          }
+        };
+      }
+
+      if (args.options.contentType && contentTypeName !== '') {
+        if (this.debug) {
+          logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
+        }
+
+        requestBody.formValues.push({
+          FieldName: 'ContentType',
+          FieldValue: contentTypeName
+        });
+      }
+
+      requestOptions = {
+        url: `${listRestUrl}/AddValidateUpdateItemUsingPath()`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        data: requestBody,
+        responseType: 'json'
+      };
+
+      const response = await request.post<any>(requestOptions);
+
+      // Response is from /AddValidateUpdateItemUsingPath POST call, perform get on added item to get all field values
+      const fieldValues: FieldValue[] = response.value;
+      const idField = fieldValues.filter((thisField) => {
+        return (thisField.FieldName === "Id");
+      });
+
+      if (this.debug) {
+        logger.logToStderr(`field values returned:`);
+        logger.logToStderr(fieldValues);
+        logger.logToStderr(`Id returned by AddValidateUpdateItemUsingPath: ${idField}`);
+      }
+
+      if (idField.length === 0) {
+        return Promise.reject(`Item didn't add successfully`);
+      }
+
+      requestOptions = {
+        url: `${listRestUrl}/items(${idField[0].FieldValue})`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const item = await request.get(requestOptions);
+      logger.log(<ListItemInstance>item);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private mapRequestBody(options: Options): any {

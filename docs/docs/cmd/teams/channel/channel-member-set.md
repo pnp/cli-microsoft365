@@ -1,6 +1,6 @@
 # teams channel member set
 
-Updates the role of the specified member in the specified Microsoft Teams private team channel
+Updates the role of the specified member in the specified Microsoft Teams private or shared team channel
 
 ## Usage
 

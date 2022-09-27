@@ -147,7 +147,7 @@ describe(commands.EVENTRECEIVER_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('correctly handles list not found', (done) => {
+  it('correctly handles list not found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/eventreceivers`) > -1) {
         return Promise.reject({
@@ -166,18 +166,11 @@ describe(commands.EVENTRECEIVER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("List 'Documents' does not exist at site with URL 'https://contoso.sharepoint.com/sites/portal'.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents' } } as any),
+      new CommandError("List 'Documents' does not exist at site with URL 'https://contoso.sharepoint.com/sites/portal'."));
   });
 
-  it('retrieves all web event receivers', (done) => {
+  it('retrieves all web event receivers', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/eventreceivers`) > -1) {
         return Promise.resolve(eventReceiverValue);
@@ -185,18 +178,11 @@ describe(commands.EVENTRECEIVER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal' } });
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
-  it('retrieves all site event receivers', (done) => {
+  it('retrieves all site event receivers', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/site/eventreceivers`) > -1) {
         return Promise.resolve(eventReceiverValue);
@@ -204,18 +190,11 @@ describe(commands.EVENTRECEIVER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site' } });
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
-  it('retrieves all list event receivers queried by title', (done) => {
+  it('retrieves all list event receivers queried by title', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/eventreceivers`) > -1) {
         return Promise.resolve(eventReceiverValue);
@@ -223,18 +202,11 @@ describe(commands.EVENTRECEIVER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents' } });
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
-  it('retrieves all list event receivers queried by url', (done) => {
+  it('retrieves all list event receivers queried by url', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/GetList('%2Fsites%2Fportal%2FShared%20Documents')/eventreceivers`) > -1) {
         return Promise.resolve(eventReceiverValue);
@@ -242,18 +214,11 @@ describe(commands.EVENTRECEIVER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listUrl: 'Shared Documents' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listUrl: 'Shared Documents' } });
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
-  it('retrieves all list event receivers queried by guid', (done) => {
+  it('retrieves all list event receivers queried by guid', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists(guid'b17bd74f-d1b1-42bf-a21d-f865a903acc3')/eventreceivers`) > -1) {
         return Promise.resolve(eventReceiverValue);
@@ -261,15 +226,8 @@ describe(commands.EVENTRECEIVER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listId: 'b17bd74f-d1b1-42bf-a21d-f865a903acc3' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listId: 'b17bd74f-d1b1-42bf-a21d-f865a903acc3' } });
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('supports debug mode', () => {

@@ -18,12 +18,12 @@ class TenantReportOffice365ActivationsUserDetailCommand extends GraphCommand {
     return 'Get details about users who have activated Microsoft 365.';
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0/reports/getOffice365ActivationsUserDetail`;
-    this.loadReport(endpoint, logger, args.options.output, cb);
+    await this.loadReport(endpoint, logger, args.options.output);
   }
 
-  private loadReport(endPoint: string, logger: Logger, output: string | undefined, cb: () => void): void {
+  private async loadReport(endPoint: string, logger: Logger, output: string | undefined): Promise<void> {
     const requestOptions: any = {
       url: endPoint,
       headers: {
@@ -32,23 +32,24 @@ class TenantReportOffice365ActivationsUserDetailCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        let content: string = '';
-        const cleanResponse = this.removeEmptyLines(res);
+    try {
+      const res: any = await request.get(requestOptions);
+      let content: string = '';
+      const cleanResponse = this.removeEmptyLines(res);
 
-        if (output && output.toLowerCase() === 'json') {
-          content = formatting.parseCsvToJson(cleanResponse);
-        }
-        else {
-          content = cleanResponse;
-        }
+      if (output && output.toLowerCase() === 'json') {
+        content = formatting.parseCsvToJson(cleanResponse);
+      }
+      else {
+        content = cleanResponse;
+      }
 
-        logger.log(content);
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(content);
+      
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private removeEmptyLines(input: string): string {

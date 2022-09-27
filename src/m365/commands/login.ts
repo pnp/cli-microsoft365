@@ -122,7 +122,7 @@ class LoginCommand extends Command {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     // disconnect before re-connecting
     if (this.debug) {
       logger.logToStderr(`Logging out from Microsoft 365...`);
@@ -130,7 +130,7 @@ class LoginCommand extends Command {
 
     const logout: () => void = (): void => auth.service.logout();
 
-    const login: () => void = (): void => {
+    const login: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Signing in to Microsoft 365...`);
       }
@@ -163,46 +163,45 @@ class LoginCommand extends Command {
           break;
       }
 
-      auth
-        .ensureAccessToken(auth.defaultResource, logger, this.debug)
-        .then((): void => {
-          auth.service.connected = true;
-          cb();
-        }, (rej: Error): void => {
-          if (this.debug) {
-            logger.logToStderr('Error:');
-            logger.logToStderr(rej);
-            logger.logToStderr('');
-          }
-
-          cb(new CommandError(rej.message));
-        });
-    };
-
-    auth
-      .clearConnectionInfo()
-      .then((): void => {
-        logout();
-        login();
-      }, (error: any): void => {
+      try {
+        await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
+        auth.service.connected = true;
+      }
+      catch(error: any) {
         if (this.debug) {
-          logger.logToStderr(new CommandError(error));
+          logger.logToStderr('Error:');
+          logger.logToStderr(error);
+          logger.logToStderr('');
         }
 
-        logout();
-        login();
-      });
+        throw new CommandError(error.message);
+      }
+    };
+
+    try {
+      await auth.clearConnectionInfo();
+    }
+    catch (error: any) {
+      if (this.debug) {
+        logger.logToStderr(new CommandError(error));
+      }
+    }
+    finally {
+      logout();
+      await login();
+    }
   }
 
-  public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    auth
-      .restoreAuth()
-      .then((): void => {
-        this.initAction(args, logger);
-        this.commandAction(logger, args, cb);
-      }, (error: any): void => {
-        cb(new CommandError(error));
-      });
+  public async action(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      await auth.restoreAuth();
+    }
+    catch (error: any) {
+      throw new CommandError(error);
+    }
+
+    this.initAction(args, logger);
+    await this.commandAction(logger, args);
   }
 }
 

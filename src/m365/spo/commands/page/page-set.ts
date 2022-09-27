@@ -2,10 +2,9 @@ import { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, spo, urlUtil, validation } from '../../../../utils';
+import { spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSidePageProperties } from './ClientSidePageProperties';
 import { Page, supportedPageLayouts, supportedPromoteAs } from './Page';
 
 interface CommandArgs {
@@ -127,9 +126,8 @@ class SpoPageSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let requestDigest: string = '';
     let pageName: string = args.options.name;
     const fileNameWithoutExtension: string = pageName.replace('.aspx', '');
     let bannerImageUrl: string = '';
@@ -148,30 +146,24 @@ class SpoPageSetCommand extends SpoCommand {
     const serverRelativeFileUrl: string = `${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}`;
     const needsToSavePage = !!args.options.title || !!args.options.description;
 
-    spo
-      .getRequestDigest(args.options.webUrl)
-      .then((res: ContextInfo): Promise<ClientSidePageProperties> => {
-        requestDigest = res.FormDigestValue;
+    try {
+      const requestDigestResult = await spo.getRequestDigest(args.options.webUrl);
+      const requestDigest = requestDigestResult.FormDigestValue;
+      const page = await Page.checkout(args.options.name, args.options.webUrl, logger, this.debug, this.verbose);
 
-        return Page.checkout(args.options.name, args.options.webUrl, logger, this.debug, this.verbose);
-      })
-      .then((res: ClientSidePageProperties): Promise<void> => {
-        if (res) {
-          pageTitle = pageTitle || res.Title;
-          pageId = res.Id;
+      if (page) {
+        pageTitle = pageTitle || page.Title;
+        pageId = page.Id;
 
-          bannerImageUrl = res.BannerImageUrl;
-          canvasContent1 = res.CanvasContent1;
-          layoutWebpartsContent = res.LayoutWebpartsContent;
-          pageDescription = pageDescription || res.Description;
-          topicHeader = res.TopicHeader;
-          authorByline = res.AuthorByline;
-        }
+        bannerImageUrl = page.BannerImageUrl;
+        canvasContent1 = page.CanvasContent1;
+        layoutWebpartsContent = page.LayoutWebpartsContent;
+        pageDescription = pageDescription || page.Description;
+        topicHeader = page.TopicHeader;
+        authorByline = page.AuthorByline;
+      }
 
-        if (!args.options.layoutType) {
-          return Promise.resolve();
-        }
-
+      if (args.options.layoutType) {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields`,
           headers: {
@@ -186,7 +178,7 @@ class SpoPageSetCommand extends SpoCommand {
           },
           responseType: 'json'
         };
-
+  
         if (args.options.layoutType === 'Article') {
           requestOptions.data.PromotedState = 0;
           requestOptions.data.BannerImageUrl = {
@@ -194,14 +186,11 @@ class SpoPageSetCommand extends SpoCommand {
             Url: `${resource}/_layouts/15/images/sitepagethumbnail.png`
           };
         }
+  
+        await request.post(requestOptions);
+      }
 
-        return request.post(requestOptions);
-      })
-      .then((): Promise<{ Id: string }> => {
-        if (!args.options.promoteAs) {
-          return Promise.resolve({ Id: '' });
-        }
-
+      if (args.options.promoteAs) {
         const requestOptions: any = {
           responseType: 'json'
         };
@@ -244,57 +233,22 @@ class SpoPageSetCommand extends SpoCommand {
             break;
         }
 
-        return request.post(requestOptions);
-      })
-      .then((res: { Id: string }): Promise<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }> => {
-        if (args.options.promoteAs !== 'Template') {
-          return Promise.resolve({ Id: null, BannerImageUrl: '', CanvasContent1: '', LayoutWebpartsContent: '' });
-        }
+        const pageRes = await request.post<{ Id: string }>(requestOptions);
 
-        const requestOptions: any = {
-          responseType: 'json',
-          url: `${args.options.webUrl}/_api/SitePages/Pages(${res.Id})/SavePageAsTemplate`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'content-type': 'application/json;odata=nometadata',
-            'X-HTTP-Method': 'POST',
-            'IF-MATCH': '*',
-            accept: 'application/json;odata=nometadata'
-          }
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: { Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }): Promise<void> => {
-        if (args.options.promoteAs !== 'Template') {
-          if (pageTitle) {
-            pageData.Title = pageTitle;
-          }
-          if (pageDescription) {
-            pageData.Description = pageDescription;
-          }
-          if (bannerImageUrl) {
-            pageData.BannerImageUrl = bannerImageUrl;
-          }
-          if (canvasContent1) {
-            pageData.CanvasContent1 = canvasContent1;
-          }
-          if (layoutWebpartsContent) {
-            pageData.LayoutWebpartsContent = layoutWebpartsContent;
-          }
-          if (topicHeader) {
-            pageData.TopicHeader = topicHeader;
-          }
-          if (authorByline) {
-            pageData.AuthorByline = authorByline;
-          }
-
-          // Needs to be at the end, as the data is still needed in the last step
-          if (!needsToSavePage) {
-            return Promise.resolve();
-          }
-        }
-        else {
+        if (args.options.promoteAs === 'Template') {
+          const requestOptions: any = {
+            responseType: 'json',
+            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageRes.Id})/SavePageAsTemplate`,
+            headers: {
+              'X-RequestDigest': requestDigest,
+              'content-type': 'application/json;odata=nometadata',
+              'X-HTTP-Method': 'POST',
+              'IF-MATCH': '*',
+              accept: 'application/json;odata=nometadata'
+            }
+          };
+  
+          const res = await request.post<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }>(requestOptions);
           if (fileNameWithoutExtension) {
             pageData.Title = fileNameWithoutExtension;
           }
@@ -313,7 +267,32 @@ class SpoPageSetCommand extends SpoCommand {
 
           pageId = res.Id;
         }
+      }
+      if (args.options.promoteAs !== 'Template') {
+        if (pageTitle) {
+          pageData.Title = pageTitle;
+        }
+        if (pageDescription) {
+          pageData.Description = pageDescription;
+        }
+        if (bannerImageUrl) {
+          pageData.BannerImageUrl = bannerImageUrl;
+        }
+        if (canvasContent1) {
+          pageData.CanvasContent1 = canvasContent1;
+        }
+        if (layoutWebpartsContent) {
+          pageData.LayoutWebpartsContent = layoutWebpartsContent;
+        }
+        if (topicHeader) {
+          pageData.TopicHeader = topicHeader;
+        }
+        if (authorByline) {
+          pageData.AuthorByline = authorByline;
+        }
+      }
 
+      if (needsToSavePage) {
         const requestOptions: any = {
           responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
@@ -327,13 +306,10 @@ class SpoPageSetCommand extends SpoCommand {
           data: pageData
         };
 
-        return request.post(requestOptions);
-      })
-      .then((): Promise<void> => {
-        if (args.options.promoteAs !== 'Template') {
-          return Promise.resolve();
-        }
+        await request.post(requestOptions);
+      }
 
+      if (args.options.promoteAs === 'Template') {
         const requestOptions: any = {
           responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
@@ -346,14 +322,11 @@ class SpoPageSetCommand extends SpoCommand {
           },
           data: pageData
         };
+  
+        await request.post(requestOptions);
+      }
 
-        return request.post(requestOptions);
-      })
-      .then((): Promise<void> => {
-        if (typeof args.options.commentsEnabled === 'undefined') {
-          return Promise.resolve();
-        }
-
+      if (typeof args.options.commentsEnabled !== 'undefined') {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields/SetCommentsDisabled(${args.options.commentsEnabled === 'false'})`,
           headers: {
@@ -363,42 +336,44 @@ class SpoPageSetCommand extends SpoCommand {
           },
           responseType: 'json'
         };
+  
+        await request.post(requestOptions);
+      }
 
-        return request.post(requestOptions);
-      })
-      .then((): Promise<void> => {
-        let requestOptions: any;
+      let requestOptions: any;
 
-        if (!args.options.publish) {
-          if (args.options.promoteAs === 'Template' || !pageId) {
-            return Promise.resolve();
-          }
-
-          requestOptions = {
-            responseType: 'json',
-            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
-            headers: {
-              'content-type': 'application/json;odata=nometadata',
-              'accept': 'application/json;odata=nometadata'
-            },
-            data: pageData
-          };
-        }
-        else {
-          requestOptions = {
-            url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
-            headers: {
-              'X-RequestDigest': requestDigest,
-              'content-type': 'application/json;odata=nometadata',
-              accept: 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
+      if (!args.options.publish) {
+        if (args.options.promoteAs === 'Template' || !pageId) {
+          return;
         }
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        requestOptions = {
+          responseType: 'json',
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
+          headers: {
+            'content-type': 'application/json;odata=nometadata',
+            'accept': 'application/json;odata=nometadata'
+          },
+          data: pageData
+        };
+      }
+      else {
+        requestOptions = {
+          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
+          headers: {
+            'X-RequestDigest': requestDigest,
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+      }
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

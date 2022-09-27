@@ -35,9 +35,9 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     };
 
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -70,64 +70,43 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     assert.deepStrictEqual(optionSets, [['id', 'name']]);
   });
 
-  it('prompts before removing the specified external connection by id when confirm option not passed', (done) => {
-    command.action(logger, {
+  it('prompts before removing the specified external connection by id when confirm option not passed', async () => {
+    await command.action(logger, {
       options: {
         id: "contosohr"
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('prompts before removing the specified external connection by name when confirm option not passed', (done) => {
-    command.action(logger, {
+  it('prompts before removing the specified external connection by name when confirm option not passed', async () => {
+    await command.action(logger, {
       options: {
         name: "Contoso HR"
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('aborts removing the specified external connection when confirm option not passed and prompt not confirmed (debug)', (done) => {
+  it('aborts removing the specified external connection when confirm option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    command.action(logger, { options: { debug: true, id: "contosohr" } }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: "contosohr" } });
+    assert(postSpy.notCalled);
   });
 
-  it('removes the specified external connection when prompt confirmed (debug)', (done) => {
+  it('removes the specified external connection when prompt confirmed (debug)', async () => {
     let externalConnectionRemoveCallIssued = false;
 
     sinon.stub(request, 'delete').callsFake((opts) => {
@@ -140,22 +119,16 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    
 
-    command.action(logger, { options: { debug: true, id: "contosohr" } }, () => {
-      try {
-        assert(externalConnectionRemoveCallIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: "contosohr" } });
+    assert(externalConnectionRemoveCallIssued);
   });
 
-  it('removes the specified external connection without prompting when confirm specified', (done) => {
+  it('removes the specified external connection without prompting when confirm specified', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/contosohr`) {
         return Promise.resolve();
@@ -164,12 +137,10 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: "contosohr", confirm: true } }, () => {
-      done();
-    });
+    await command.action(logger, { options: { debug: false, id: "contosohr", confirm: true } });
   });
 
-  it('removes external connection with specified ID', (done) => {
+  it('removes external connection with specified ID', async () => {
     sinon.stub(request, 'delete').callsFake((opts: any) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/external/connections/contosohr') {
         return Promise.resolve();
@@ -177,12 +148,10 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, id: "contosohr", confirm: true } }, () => {
-      done();
-    });
+    await command.action(logger, { options: { debug: false, id: "contosohr", confirm: true } });
   });
 
-  it('removes external connection with specified name', (done) => {
+  it('removes external connection with specified name', async () => {
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=name eq `) > -1) {
         return Promise.resolve({
@@ -205,12 +174,10 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, name: "Contoso HR", confirm: true } }, () => {
-      done();
-    });
+    await command.action(logger, { options: { debug: false, name: "Contoso HR", confirm: true } });
   });
 
-  it('fails to get external connection by name when it does not exists', (done) => {
+  it('fails to get external connection by name when it does not exists', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=`) > -1) {
@@ -220,18 +187,13 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject('The specified connection does not exist in Microsoft Search');
     });
 
-    command.action(logger, { options: { debug: false, name: "Fabrikam HR", confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("The specified connection does not exist in Microsoft Search")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false, 
+      name: "Fabrikam HR", 
+      confirm: true } } as any), new CommandError("The specified connection does not exist in Microsoft Search"));
   });
 
-  it('fails when multiple external connections with same name exists', (done) => {
+  it('fails when multiple external connections with same name exists', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=`) > -1) {
@@ -250,21 +212,10 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject("Invalid request");
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: "My HR",
-        confirm: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Multiple external connections with name My HR found. Please disambiguate (IDs): fabrikamhr, contosohr")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      name: "My HR",
+      confirm: true } } as any), new CommandError("Multiple external connections with name My HR found. Please disambiguate (IDs): fabrikamhr, contosohr"));
   });
 
   it('supports debug mode', () => {

@@ -59,7 +59,7 @@ describe(commands.LIST_LABEL_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should handle error when trying to set label', (done) => {
+  it('should handle error when trying to set label', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) {
         return Promise.reject({
@@ -86,23 +86,15 @@ describe(commands.LIST_LABEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Can not find compliance tag with value: abc. SiteSubscriptionId: ea1787c6-7ce2-4e71-be47-5e0deb30f9e4")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError("Can not find compliance tag with value: abc. SiteSubscriptionId: ea1787c6-7ce2-4e71-be47-5e0deb30f9e4"));
   });
 
-  it('should handle error if list does not exist', (done) => {
+  it('should handle error if list does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/web/lists/getByTitle('MyLibrary')/?$expand=RootFolder&$select=RootFolder`) {
         return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
@@ -111,25 +103,17 @@ describe(commands.LIST_LABEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
         label: 'abc'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('404 - "404 FILE NOT FOUND"')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('404 - "404 FILE NOT FOUND"'));
   });
 
-  it('should set label for list (debug)', (done) => {
+  it('should set label for list (debug)', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
         return Promise.resolve();
@@ -147,30 +131,23 @@ describe(commands.LIST_LABEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
         label: 'abc'
       }
-    }, () => {
-      try {
-        const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-        assert.strictEqual(lastCall.data.blockDelete, false);
-        assert.strictEqual(lastCall.data.blockEdit, false);
-        assert.strictEqual(lastCall.data.syncToItems, false);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const lastCall = postStub.lastCall.args[0];
+    assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+    assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
+    assert.strictEqual(lastCall.data.blockDelete, false);
+    assert.strictEqual(lastCall.data.blockEdit, false);
+    assert.strictEqual(lastCall.data.syncToItems, false);
   });
 
-  it('should set label for list using listId (debug)', (done) => {
+  it('should set label for list using listId (debug)', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
         return Promise.resolve();
@@ -188,29 +165,22 @@ describe(commands.LIST_LABEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: '4d535433-2a7b-40b0-9dad-8f0f8f3b3841',
         label: 'abc'
       }
-    }, () => {
-      try {
-        const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-        assert.strictEqual(lastCall.data.blockDelete, false);
-        assert.strictEqual(lastCall.data.blockEdit, false);
-        assert.strictEqual(lastCall.data.syncToItems, false);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const lastCall = postStub.lastCall.args[0];
+    assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+    assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
+    assert.strictEqual(lastCall.data.blockDelete, false);
+    assert.strictEqual(lastCall.data.blockEdit, false);
+    assert.strictEqual(lastCall.data.syncToItems, false);
   });
 
-  it('should set label for list using blockDelete,blockEdit,syncToItems options', (done) => {
+  it('should set label for list using blockDelete,blockEdit,syncToItems options', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
         return Promise.resolve();
@@ -219,7 +189,7 @@ describe(commands.LIST_LABEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listUrl: 'MyLibrary',
@@ -228,20 +198,13 @@ describe(commands.LIST_LABEL_SET, () => {
         blockEdit: true,
         syncToItems: true
       }
-    }, () => {
-      try {
-        const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-        assert.strictEqual(lastCall.data.blockDelete, true);
-        assert.strictEqual(lastCall.data.blockEdit, true);
-        assert.strictEqual(lastCall.data.syncToItems, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const lastCall = postStub.lastCall.args[0];
+    assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+    assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
+    assert.strictEqual(lastCall.data.blockDelete, true);
+    assert.strictEqual(lastCall.data.blockEdit, true);
+    assert.strictEqual(lastCall.data.syncToItems, true);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {

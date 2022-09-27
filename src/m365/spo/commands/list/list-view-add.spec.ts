@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import { sinonUtil, urlUtil } from '../../../../utils';
 import request from '../../../../request';
 import commands from '../../commands';
@@ -167,7 +167,7 @@ describe(commands.LIST_VIEW_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('Correctly add view by list title', (done) => {
+  it('Correctly add view by list title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `${validWebUrl}/_api/web/lists/getByTitle(\'${encodeURIComponent(validListTitle)}\')/views/add`) {
         return Promise.resolve(viewCreationResponse);
@@ -176,25 +176,18 @@ describe(commands.LIST_VIEW_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: validWebUrl,
         listTitle: validListTitle,
         title: validTitle,
         fields: validFieldsInput
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(viewCreationResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(viewCreationResponse));
   });
 
-  it('Correctly add view by list id', (done) => {
+  it('Correctly add view by list id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `${validWebUrl}/_api/web/lists(guid\'${encodeURIComponent(validListId)}\')/views/add`) {
         return Promise.resolve(viewCreationResponse);
@@ -203,25 +196,18 @@ describe(commands.LIST_VIEW_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: validWebUrl,
         listId: validListId,
         title: validTitle,
         fields: validFieldsInput
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(viewCreationResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(viewCreationResponse));
   });
 
-  it('Correctly add view by list URL', (done) => {
+  it('Correctly add view by list URL', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `${validWebUrl}/_api/web/GetList(\'${encodeURIComponent(urlUtil.getServerRelativePath(validWebUrl, validListUrl))}\')/views/add`) {
         return Promise.resolve(viewCreationResponse);
@@ -230,7 +216,7 @@ describe(commands.LIST_VIEW_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: validWebUrl,
         listUrl: validListUrl,
@@ -238,15 +224,21 @@ describe(commands.LIST_VIEW_ADD, () => {
         fields: validFieldsInput,
         rowLimit: 100
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(viewCreationResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(viewCreationResponse));
+  });
+
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'post').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: {
+      webUrl: validWebUrl,
+      listUrl: validListUrl,
+      title: validTitle,
+      fields: validFieldsInput,
+      rowLimit: 100 } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

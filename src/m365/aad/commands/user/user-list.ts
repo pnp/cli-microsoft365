@@ -1,6 +1,5 @@
 import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
@@ -51,27 +50,26 @@ class AadUserListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let filter: string = '';
-    const properties: string[] = args.options.properties ?
-      args.options.properties.split(',').map(p => p.trim()) :
-      ['userPrincipalName', 'displayName'];
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      filter = this.getFilter(args.options);
+      let filter: string = '';
+      const properties: string[] = args.options.properties ?
+        args.options.properties.split(',').map(p => p.trim()) :
+        ['userPrincipalName', 'displayName'];
+      try {
+        filter = this.getFilter(args.options);
+      }
+      catch (ex: any) {
+        throw ex;
+      }
+      const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.user' : 'users';
+      const url: string = `${this.resource}/v1.0/${endpoint}?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
+      const users = await odata.getAllItems<User>(url);
+      logger.log(users);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
-    catch (ex: any) {
-      cb(new CommandError(ex));
-      return;
-    }
-    const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.user' : 'users';
-    const url: string = `${this.resource}/v1.0/${endpoint}?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
-
-    odata
-      .getAllItems<User>(url)
-      .then((users): void => {
-        logger.log(users);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getFilter(options: any): string {
