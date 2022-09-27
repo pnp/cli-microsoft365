@@ -1,4 +1,5 @@
-import { Cli, CommandOutput, Logger } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import { AxiosRequestConfig } from 'axios';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -25,7 +26,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Restores the role inheritance of list item, file, or folder';
+    return 'Restores the role inheritance of a file';
   }
 
   constructor() {
@@ -40,9 +41,9 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        webUrl: typeof args.options.webUrl !== 'undefined',
         fileUrl: typeof args.options.fileUrl !== 'undefined',
-        fileId: typeof args.options.fileId !== 'undefined'
+        fileId: typeof args.options.fileId !== 'undefined',
+        confirm: typeof args.options.confirm !== 'undefined'
       });
     });
   }
@@ -85,32 +86,12 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
     this.optionSets.push(['fileId', 'fileUrl']);
   }
 
-  private getFileURL(args: CommandArgs): Promise<string> {
-    if (args.options.fileUrl) {
-      return Promise.resolve(args.options.fileUrl);
-    }
-
-    const options: SpoFileGetCommandOptions = {
-      webUrl: args.options.webUrl,
-      id: args.options.fileId,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
-    };
-
-    return Cli.executeCommandWithOutput(SpoFileGetCommand as Command, { options: { ...options, _: [] } })
-      .then((output: CommandOutput): Promise<string> => {
-        const getFileOutput = JSON.parse(output.stdout);
-        return Promise.resolve(getFileOutput.ServerRelativeUrl);
-      });
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const resetFileRoleInheritance: () => Promise<void> = async (): Promise<void> => {
       try {
         const fileURL: string = await this.getFileURL(args);
 
-        const requestOptions: any = {
+        const requestOptions: AxiosRequestConfig = {
           url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${fileURL}')/ListItemAllFields/resetroleinheritance`,
           headers: {
             accept: 'application/json;odata.metadata=none'
@@ -126,7 +107,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
     };
 
     if (args.options.confirm) {
-      resetFileRoleInheritance();
+      await resetFileRoleInheritance();
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -140,6 +121,24 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
         await resetFileRoleInheritance();
       }
     }
+  }
+  
+  private async getFileURL(args: CommandArgs): Promise<string> {
+    if (args.options.fileUrl) {
+      return args.options.fileUrl;
+    }
+
+    const options: SpoFileGetCommandOptions = {
+      webUrl: args.options.webUrl,
+      id: args.options.fileId,
+      output: 'json',
+      debug: this.debug,
+      verbose: this.verbose
+    };
+
+    const output = await Cli.executeCommandWithOutput(SpoFileGetCommand as Command, { options: { ...options, _: [] } });
+    const getFileOutput = JSON.parse(output.stdout);
+    return getFileOutput.ServerRelativeUrl;
   }
 }
 

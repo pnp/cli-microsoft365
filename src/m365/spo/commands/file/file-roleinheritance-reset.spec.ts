@@ -5,12 +5,16 @@ import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { formatting, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./file-roleinheritance-reset');
 import * as SpoFileGetCommand from './file-get';
 
 describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
+  const webUrl = 'https://contoso.sharepoint.com';
+  const fileUrl = '/sites/project-x/documents/Test1.docx';
+  const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -46,7 +50,6 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   afterEach(() => {
     sinonUtil.restore([
       Cli.prompt,
-      request.get,
       request.post
     ]);
   });
@@ -84,30 +87,25 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, confirm: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } }, commandInfo);
-    assert.strictEqual(actual, true);
   });
 
   it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: 'foo', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo', confirm: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the fileId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', confirm: true } }, commandInfo);
+  it('passes validation if webUrl and fileId are valid', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', confirm: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('prompts before resetting role inheritance for the file when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        fileId: 'b2307a39-e878-458b-bc90-03bc578531d6'
+        webUrl: webUrl,
+        fileId: fileId
       }
     });
 
@@ -125,8 +123,8 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        fileId: 'b2307a39-e878-458b-bc90-03bc578531d6'
+        webUrl: webUrl,
+        fileId: fileId
       }
     });
 
@@ -134,26 +132,26 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   });
 
   it('reset role inheritance on file by relative URL (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativeUrl('/sites/project-x/documents/Test1.docx')/ListItemAllFields/resetroleinheritance`) > -1) {
-        return Promise.resolve();
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/resetroleinheritance`) {
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
 
     await command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        fileUrl: '/sites/project-x/documents/Test1.docx',
+        webUrl: webUrl,
+        fileUrl: fileUrl,
         confirm: true
       }
     });
   });
 
   it('reset role inheritance on file by Id when prompt confirmed', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoFileGetCommand) {
         return Promise.resolve({
           stdout: '{"LinkingUri": "https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/project-x/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}'
@@ -163,12 +161,12 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativeUrl`) > -1) {
-        return Promise.resolve();
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/resetroleinheritance`) {
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -179,29 +177,23 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        fileId: 'b2307a39-e878-458b-bc90-03bc578531d6'
+        fileId: fileId
       }
     });
   });
 
   it('correctly handles error when resetting file role inheritance', async () => {
-    const err = 'request rejected';
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativeUrl('/sites/project-x/documents/Test1.docx')/ListItemAllFields/resetroleinheritance`) > -1) {
-        return Promise.reject(err);
-      }
+    const errorMessage = 'request rejected';
+    sinon.stub(request, 'post').callsFake(async () => { throw errorMessage; });
 
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        fileUrl: '/sites/project-x/documents/Test1.docx',
+        webUrl: webUrl,
+        fileUrl: fileUrl,
         confirm: true
       }
-    });
+    }), new CommandError(errorMessage));
   });
 
   it('supports debug mode', () => {
