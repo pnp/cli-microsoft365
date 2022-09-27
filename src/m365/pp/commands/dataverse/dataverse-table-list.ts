@@ -1,9 +1,9 @@
-import { Logger } from '../../../../../cli';
-import GlobalOptions from '../../../../../GlobalOptions';
-import request from '../../../../../request';
-import { powerPlatform } from '../../../../../utils/powerPlatform';
-import PowerPlatformCommand from '../../../../base/PowerPlatformCommand';
-import commands from '../../../commands';
+import { Logger } from '../../../../cli';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import { powerPlatform } from '../../../../utils/powerPlatform';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
