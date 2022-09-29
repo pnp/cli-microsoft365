@@ -66,6 +66,7 @@ export default {
   FOLDER_MOVE: `${prefix} folder move`,
   FOLDER_REMOVE: `${prefix} folder remove`,
   FOLDER_RENAME: `${prefix} folder rename`,
+  FOLDER_ROLEASSIGNMENT_REMOVE: `${prefix} folder roleassignment remove`,
   FOLDER_ROLEINHERITANCE_BREAK: `${prefix} folder roleinheritance break`,
   FOLDER_ROLEINHERITANCE_RESET: `${prefix} folder roleinheritance reset`,
   GET: `${prefix} get`,
