@@ -28,7 +28,7 @@ m365 spo folder roleassignment remove [options]
 `--confirm`
 : Don't prompt for confirmation when removing the role assignment.
 
---8<-- "docs/cmd/_global.md"
+--8<-- "docs/cmd/\_global.md"
 
 ## Examples
 
