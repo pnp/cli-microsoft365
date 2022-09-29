@@ -61,7 +61,7 @@ describe(commands.MEMBERSETTINGS_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('lists member settings for a Microsoft Team', (done) => {
+  it('lists member settings for a Microsoft Team', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/2609af39-7775-4f94-a3dc-0dd67657e900?$select=memberSettings`) {
         return Promise.resolve({
@@ -78,24 +78,17 @@ describe(commands.MEMBERSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "allowCreateUpdateChannels": true,
-          "allowDeleteChannels": true,
-          "allowAddRemoveApps": true,
-          "allowCreateUpdateRemoveTabs": true,
-          "allowCreateUpdateRemoveConnectors": true
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } });
+    assert(loggerLogSpy.calledWith({
+      "allowCreateUpdateChannels": true,
+      "allowDeleteChannels": true,
+      "allowAddRemoveApps": true,
+      "allowCreateUpdateRemoveTabs": true,
+      "allowCreateUpdateRemoveConnectors": true
+    }));
   });
 
-  it('lists member settings for a Microsoft Team (debug)', (done) => {
+  it('lists member settings for a Microsoft Team (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/2609af39-7775-4f94-a3dc-0dd67657e900?$select=memberSettings`) {
         return Promise.resolve({
@@ -112,21 +105,14 @@ describe(commands.MEMBERSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "allowCreateUpdateChannels": true,
-          "allowDeleteChannels": true,
-          "allowAddRemoveApps": true,
-          "allowCreateUpdateRemoveTabs": true,
-          "allowCreateUpdateRemoveConnectors": true
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: true } });
+    assert(loggerLogSpy.calledWith({
+      "allowCreateUpdateChannels": true,
+      "allowDeleteChannels": true,
+      "allowAddRemoveApps": true,
+      "allowCreateUpdateRemoveTabs": true,
+      "allowCreateUpdateRemoveConnectors": true
+    }));
   });
 
   it('fails validation if teamId is not a valid GUID', async () => {
@@ -149,7 +135,7 @@ describe(commands.MEMBERSETTINGS_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('lists all properties for output json', (done) => {
+  it('lists all properties for output json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/2609af39-7775-4f94-a3dc-0dd67657e900?$select=memberSettings`) {
         return Promise.resolve({
@@ -166,37 +152,22 @@ describe(commands.MEMBERSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", output: 'json', debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "allowCreateUpdateChannels": true,
-          "allowDeleteChannels": true,
-          "allowAddRemoveApps": true,
-          "allowCreateUpdateRemoveTabs": true,
-          "allowCreateUpdateRemoveConnectors": true
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", output: 'json', debug: false } });
+    assert(loggerLogSpy.calledWith({
+      "allowCreateUpdateChannels": true,
+      "allowDeleteChannels": true,
+      "allowAddRemoveApps": true,
+      "allowCreateUpdateRemoveTabs": true,
+      "allowCreateUpdateRemoveConnectors": true
+    }));
   });
 
-  it('correctly handles error when listing member settings', (done) => {
+  it('correctly handles error when listing member settings', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

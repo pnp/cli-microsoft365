@@ -73,8 +73,8 @@ class SpoUserRemoveCommand extends SpoCommand {
     this.optionSets.push(['id', 'loginName']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeUser = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeUser = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing user from  subsite ${args.options.webUrl} ...`);
       }
@@ -97,28 +97,28 @@ class SpoUserRemoveCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      request
-        .post(requestOptions)
-        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        await request.post(requestOptions);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeUser();
+      await removeUser();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove specified user from the site ${args.options.webUrl}`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeUser();
-        }
       });
+      
+      if (result.continue) {
+        await removeUser();
+      }
     }
   }
 }

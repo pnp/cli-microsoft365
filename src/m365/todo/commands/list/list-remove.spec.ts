@@ -19,9 +19,9 @@ describe(commands.LIST_REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: true });
+      return { continue: true };
     });
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -66,7 +66,7 @@ describe(commands.LIST_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes a To Do task list by name', (done) => {
+  it('removes a To Do task list by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
@@ -94,23 +94,16 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: "FooList"
       }
-    } as any, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert.strictEqual(log.length, 0);
   });
 
-  it('removes a To Do task list by name when confirm option is passed', (done) => {
+  it('removes a To Do task list by name when confirm option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
@@ -138,24 +131,17 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: "FooList",
         confirm: true
       }
-    } as any, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert.strictEqual(log.length, 0);
   });
 
-  it('removes a To Do task list by id', (done) => {
+  it('removes a To Do task list by id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
@@ -183,23 +169,16 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA="
       }
-    } as any, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert.strictEqual(log.length, 0);
   });
 
-  it('handles error correctly when a list is not found for a specific name', (done) => {
+  it('handles error correctly when a list is not found for a specific name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
@@ -213,24 +192,10 @@ describe(commands.LIST_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.resolve();
     });
-
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: "FooList"
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The list FooList cannot be found')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, name: "FooList" } } as any), new CommandError('The list FooList cannot be found'));
   });
 
-  it('handles error correctly', (done) => {
+  it('handles error correctly', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
@@ -254,23 +219,10 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: "FooList"
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, name: "FooList" } } as any), new CommandError('An error has occurred'));
   });
 
-  it('prompts before removing the list when confirm option not passed', (done) => {
+  it('prompts before removing the list when confirm option not passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
@@ -299,29 +251,22 @@ describe(commands.LIST_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+
     command.action(logger, {
       options: {
         debug: false,
         name: "FooList"
       }
-    } as any, () => {
-      let promptIssued = false;
+    } as any);
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
 
   it('fails validation if both name and id are not set', async () => {

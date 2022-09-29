@@ -3,7 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { CanvasSection, ClientSidePage } from './clientsidepages';
+import { CanvasSection } from './clientsidepages';
 import { Page } from './Page';
 
 interface CommandArgs {
@@ -66,31 +66,32 @@ class SpoPageColumnGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    Page
-      .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
-      .then((clientSidePage: ClientSidePage): void => {
-        const sections: CanvasSection[] = clientSidePage.sections
-          .filter(section => section.order === args.options.section);
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const clientSidePage = await Page.getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose);
 
-        if (sections.length) {
-          const isJSONOutput = args.options.output === 'json';
-          const columns = sections[0].columns.filter(col => col.order === args.options.column);
-          if (columns.length) {
-            const column = Page.getColumnsInformation(columns[0], isJSONOutput);
-            column.controls = columns[0].controls
-              .map(control => Page.getControlsInformation(control, isJSONOutput));
-            if (!isJSONOutput) {
-              column.controls = (column.controls as any[])
-                .map(control => `${control.id} (${control.title})`)
-                .join(', ');
-            }
-            logger.log(column);
+      const sections: CanvasSection[] = clientSidePage.sections
+        .filter(section => section.order === args.options.section);
+
+      if (sections.length) {
+        const isJSONOutput = args.options.output === 'json';
+        const columns = sections[0].columns.filter(col => col.order === args.options.column);
+        if (columns.length) {
+          const column = Page.getColumnsInformation(columns[0], isJSONOutput);
+          column.controls = columns[0].controls
+            .map(control => Page.getControlsInformation(control, isJSONOutput));
+          if (!isJSONOutput) {
+            column.controls = (column.controls as any[])
+              .map(control => `${control.id} (${control.title})`)
+              .join(', ');
           }
+          logger.log(column);
         }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

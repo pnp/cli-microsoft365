@@ -1,7 +1,7 @@
 import { Cli, Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, spo, urlUtil, validation } from '../../../../utils';
+import { spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -51,63 +51,57 @@ class SpoPageRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let requestDigest: string = '';
     let pageName: string = args.options.name;
 
-    const removePage = () => {
-      spo
-        .getRequestDigest(args.options.webUrl)
-        .then((res: ContextInfo): Promise<void> => {
-          requestDigest = res.FormDigestValue;
+    const removePage: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const reqDigest = await spo.getRequestDigest(args.options.webUrl);
+        requestDigest = reqDigest.FormDigestValue;
 
-          if (!pageName.endsWith('.aspx')) {
-            pageName += '.aspx';
-          }
+        if (!pageName.endsWith('.aspx')) {
+          pageName += '.aspx';
+        }
 
-          if (this.verbose) {
-            logger.logToStderr(`Removing page ${pageName}...`);
-          }
+        if (this.verbose) {
+          logger.logToStderr(`Removing page ${pageName}...`);
+        }
 
-          const requestOptions: any = {
-            url: `${args.options
-              .webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')`,
-            headers: {
-              'X-RequestDigest': requestDigest,
-              'X-HTTP-Method': 'DELETE',
-              'content-type': 'application/json;odata=nometadata',
-              accept: 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
+        const requestOptions: any = {
+          url: `${args.options
+            .webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')`,
+          headers: {
+            'X-RequestDigest': requestDigest,
+            'X-HTTP-Method': 'DELETE',
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
 
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(),
-          (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb)
-        );
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removePage();
+      await removePage();
     }
     else {
-      Cli.prompt(
+      const result = await Cli.prompt<{ continue: boolean }>(
         {
           type: 'confirm',
           name: 'continue',
           default: false,
           message: `Are you sure you want to remove the page '${args.options.name}'?`
-        },
-        (result: { continue: boolean }): void => {
-          if (!result.continue) {
-            cb();
-          }
-          else {
-            removePage();
-          }
-        }
-      );
+        });
+
+      if (result.continue) {
+        await removePage();
+      }
     }
   }
 }

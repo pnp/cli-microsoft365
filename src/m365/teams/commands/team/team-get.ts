@@ -90,23 +90,22 @@ class TeamsTeamGetCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getTeamId(args)
-      .then((teamId: string): Promise<Team> => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-        return request.get<Team>(requestOptions);
-      })
-      .then((res: Team): void => {
-        logger.log(res);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const teamId: string = await this.getTeamId(args);
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+      const res: Team = await request.get<Team>(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

@@ -152,7 +152,7 @@ describe(commands.CHANNEL_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails to get team when team does not exists', (done) => {
+  it('fails to get team when team does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/me/joinedTeams`) > -1) {
         return Promise.resolve({ value: [] });
@@ -160,25 +160,14 @@ describe(commands.CHANNEL_ADD, () => {
       return Promise.reject('The specified team does not exist in the Microsoft Teams');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamName: 'Team Name',
-        name: 'Architecture Discussion',
-        description: 'Architecture'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      teamName: 'Team Name',
+      name: 'Architecture Discussion',
+      description: 'Architecture' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('fails when multiple teams with same name exists', (done) => {
+  it('fails when multiple teams with same name exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/me/joinedTeams`) > -1) {
         return Promise.resolve({
@@ -228,25 +217,14 @@ describe(commands.CHANNEL_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamName: 'Team Name',
-        name: 'Architecture Discussion',
-        description: 'Architecture'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple Microsoft Teams teams with name Team Name found: 00000000-0000-0000-0000-000000000000, 00000000-0000-0000-0000-000000000000`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      teamName: 'Team Name',
+      name: 'Architecture Discussion',
+      description: 'Architecture'} } as any), new CommandError('Multiple Microsoft Teams teams with name Team Name found: 00000000-0000-0000-0000-000000000000, 00000000-0000-0000-0000-000000000000'));
   });
 
-  it('creates channel within the Microsoft Teams team in the tenant with description by team id', (done) => {
+  it('creates channel within the Microsoft Teams team in the tenant with description by team id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
         return Promise.resolve({
@@ -258,29 +236,22 @@ describe(commands.CHANNEL_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion',
         description: 'Architecture'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
-          "displayName": "Architecture Discussion",
-          "description": "Architecture"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
+      "displayName": "Architecture Discussion",
+      "description": "Architecture"
+    }));
   });
 
-  it('creates channel within the Microsoft Teams team in the tenant without description by team id', (done) => {
+  it('creates channel within the Microsoft Teams team in the tenant without description by team id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
         return Promise.resolve({
@@ -292,28 +263,21 @@ describe(commands.CHANNEL_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
-          "displayName": "Architecture Discussion",
-          "description": null
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
+      "displayName": "Architecture Discussion",
+      "description": null
+    }));
   });
 
-  it('creates private channel within the Microsoft Teams team by team id', (done) => {
+  it('creates private channel within the Microsoft Teams team by team id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
         return Promise.resolve({
@@ -325,7 +289,7 @@ describe(commands.CHANNEL_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
@@ -333,22 +297,15 @@ describe(commands.CHANNEL_ADD, () => {
         type: 'private',
         owner: 'john.doe@contoso.com'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
-          "displayName": "Architecture Discussion",
-          "membershipType": "private"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
+      "displayName": "Architecture Discussion",
+      "membershipType": "private"
+    }));
   });
 
-  it('creates channel within the Microsoft Teams team in the tenant by team name', (done) => {
+  it('creates channel within the Microsoft Teams team in the tenant by team name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/me/joinedTeams`) > -1) {
         return Promise.resolve({
@@ -390,47 +347,29 @@ describe(commands.CHANNEL_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         teamName: 'Team Name',
         name: 'Architecture Discussion'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
-          "displayName": "Architecture Discussion",
-          "description": null
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
+      "displayName": "Architecture Discussion",
+      "description": null
+    }));
   });
 
-  it('correctly handles error when adding a channel', (done) => {
+  it('correctly handles error when adding a channel', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        name: 'Architecture Discussion'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+      name: 'Architecture Discussion' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

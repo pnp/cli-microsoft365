@@ -61,7 +61,7 @@ describe(commands.FUNSETTINGS_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('lists fun settings of a Microsoft Teams team', (done) => {
+  it('lists fun settings of a Microsoft Teams team', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315?$select=funSettings`) {
         return Promise.resolve({
@@ -77,30 +77,23 @@ describe(commands.FUNSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          {
-            "allowGiphy": true,
-            "giphyContentRating": "moderate",
-            "allowStickersAndMemes": true,
-            "allowCustomMemes": false
-          }
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      {
+        "allowGiphy": true,
+        "giphyContentRating": "moderate",
+        "allowStickersAndMemes": true,
+        "allowCustomMemes": false
+      }
+    ));
   });
 
-  it('lists fun settings of a Microsoft Teams team (debug)', (done) => {
+  it('lists fun settings of a Microsoft Teams team (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315?$select=funSettings`) {
         return Promise.resolve({
@@ -116,48 +109,30 @@ describe(commands.FUNSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          {
-            "allowGiphy": true,
-            "giphyContentRating": "moderate",
-            "allowStickersAndMemes": true,
-            "allowCustomMemes": false
-          }
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      {
+        "allowGiphy": true,
+        "giphyContentRating": "moderate",
+        "allowStickersAndMemes": true,
+        "allowCustomMemes": false
+      }
+    ));
   });
 
-  it('correctly handles error when retrieving funsettings', (done) => {
+  it('correctly handles error when retrieving funsettings', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315" } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if teamId is not a valid GUID', async () => {

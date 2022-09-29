@@ -89,49 +89,46 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
 
-    const removeApp: () => void = (): void => {
-      spo
-        .getSpoUrl(logger, this.debug)
-        .then((spoUrl: string): Promise<string> => {
-          return this.getAppCatalogSiteUrl(logger, spoUrl, args);
-        })
-        .then((appCatalogUrl: string): Promise<void> => {
-          if (this.debug) {
-            logger.logToStderr(`Retrieved app catalog URL ${appCatalogUrl}. Removing app from the app catalog...`);
+    const removeApp: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const spoUrl = await spo.getSpoUrl(logger, this.debug);
+        const appCatalogUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
+
+        if (this.debug) {
+          logger.logToStderr(`Retrieved app catalog URL ${appCatalogUrl}. Removing app from the app catalog...`);
+        }
+
+        const requestOptions: any = {
+          url: `${appCatalogUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/remove`,
+          headers: {
+            accept: 'application/json;odata=nometadata'
           }
+        };
 
-          const requestOptions: any = {
-            url: `${appCatalogUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/remove`,
-            headers: {
-              accept: 'application/json;odata=nometadata'
-            }
-          };
-
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeApp();
+      await removeApp();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the app ${args.options.id} from the app catalog?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeApp();
-        }
       });
+
+      if (result.continue) {
+        await removeApp();
+      }
     }
   }
 }

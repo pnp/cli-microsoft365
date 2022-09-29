@@ -2,10 +2,9 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import * as Sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./connections-app-create');
@@ -22,7 +21,6 @@ const admZipMock = {
 describe(commands.CONNECTIONS_APP_CREATE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: Sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -44,7 +42,6 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -72,7 +69,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates app package for the specified communication site (root site)', (done) => {
+  it('creates app package for the specified communication site (root site)', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify({
         Configuration: 0,
@@ -84,7 +81,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const admZipMockAddLocalFileSpy = sinon.spy(admZipMock, 'addLocalFile');
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
         appName: 'Contoso',
@@ -95,22 +92,14 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err);
-        assert(admZipMockAddFileSpy.calledWith('manifest.json'), 'manifest not added to the zip');
-        assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-color.png'), undefined, 'icon-color.png'));
-        assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-outline.png'), undefined, 'icon-outline.png'));
-        assert(admZipMockWriteZipSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(admZipMockAddFileSpy.calledWith('manifest.json'), 'manifest not added to the zip');
+    assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-color.png'), undefined, 'icon-color.png'));
+    assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-outline.png'), undefined, 'icon-outline.png'));
+    assert(admZipMockWriteZipSpy.called);
   });
 
-  it('creates app package for the specified communication site (/sites)', (done) => {
+  it('creates app package for the specified communication site (/sites)', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify({
         Configuration: 0,
@@ -122,7 +111,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const admZipMockAddLocalFileSpy = sinon.spy(admZipMock, 'addLocalFile');
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         portalUrl: 'https://contoso.sharepoint.com/sites/contoso',
         appName: 'Contoso',
@@ -134,22 +123,14 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         outlineIconPath: 'icon-outline.png',
         debug: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err);
-        assert(admZipMockAddFileSpy.calledWith('manifest.json'), 'manifest not added to the zip');
-        assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-color.png'), undefined, 'icon-color.png'));
-        assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-outline.png'), undefined, 'icon-outline.png'));
-        assert(admZipMockWriteZipSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(admZipMockAddFileSpy.calledWith('manifest.json'), 'manifest not added to the zip');
+    assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-color.png'), undefined, 'icon-color.png'));
+    assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-outline.png'), undefined, 'icon-outline.png'));
+    assert(admZipMockWriteZipSpy.called);
   });
 
-  it('creates app package for the specified communication site (/teams + query string)', (done) => {
+  it('creates app package for the specified communication site (/teams + query string)', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify({
         Configuration: 0,
@@ -161,7 +142,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const admZipMockAddLocalFileSpy = sinon.spy(admZipMock, 'addLocalFile');
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         portalUrl: 'https://contoso.sharepoint.com/teams/contoso?param=value',
         appName: 'Contoso',
@@ -172,81 +153,50 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err);
-        assert(admZipMockAddFileSpy.calledWith('manifest.json'), 'manifest not added to the zip');
-        assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-color.png'), undefined, 'icon-color.png'));
-        assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-outline.png'), undefined, 'icon-outline.png'));
-        assert(admZipMockWriteZipSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(admZipMockAddFileSpy.calledWith('manifest.json'), 'manifest not added to the zip');
+    assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-color.png'), undefined, 'icon-color.png'));
+    assert(admZipMockAddLocalFileSpy.calledWithExactly(path.resolve('icon-outline.png'), undefined, 'icon-outline.png'));
+    assert(admZipMockWriteZipSpy.called);
   });
 
-  it(`fails with an error if the specified site doesn't exist`, (done) => {
+  it(`fails with an error if the specified site doesn't exist`, async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.reject({
       error: '404 - FILE NOT FOUND',
       stderr: '404 - FILE NOT FOUND'
     }));
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
 
-    command.action(logger, {
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
-        description: 'Contoso',
-        longDescription: `Stay on top of what's happening at Contoso`,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err, '404 - FILE NOT FOUND');
-        assert(admZipMockWriteZipSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { portalUrl: 'https://contoso.sharepoint.com',
+      appName: 'Contoso',
+      description: 'Contoso',
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png' } } as any), new CommandError('404 - FILE NOT FOUND'));
+    assert(admZipMockWriteZipSpy.notCalled);
   });
 
-  it(`fails with an error if the specified site doesn't exist (debug)`, (done) => {
+  it(`fails with an error if the specified site doesn't exist (debug)`, async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.reject({
       error: '404 - FILE NOT FOUND',
       stderr: '404 - FILE NOT FOUND stderr'
     }));
 
-    command.action(logger, {
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
-        description: 'Contoso',
-        longDescription: `Stay on top of what's happening at Contoso`,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png',
-        debug: true
-      }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith('404 - FILE NOT FOUND stderr'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { 
+      portalUrl: 'https://contoso.sharepoint.com',
+      appName: 'Contoso',
+      description: 'Contoso',
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png',
+      debug: true } } as any), new CommandError('404 - FILE NOT FOUND'));
   });
 
-  it('fails with an error if the specified site is not a communication site', (done) => {
+  it('fails with an error if the specified site is not a communication site', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify({
         Configuration: 0,
@@ -255,30 +205,19 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
       stderr: ''
     }));
 
-    command.action(logger, {
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com/sites/contoso',
-        appName: 'Contoso',
-        description: 'Contoso',
-        longDescription: `Stay on top of what's happening at Contoso`,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png',
-        debug: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err, 'Site https://contoso.sharepoint.com/sites/contoso is not a Communication Site. Please specify a different site and try again.');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { 
+      portalUrl: 'https://contoso.sharepoint.com/sites/contoso',
+      appName: 'Contoso',
+      description: 'Contoso',
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png',
+      debug: true } } as any), new CommandError('Site https://contoso.sharepoint.com/sites/contoso is not a Communication Site. Please specify a different site and try again.'));
   });
 
-  it(`fails with an error if creating the zip file failed`, (done) => {
+  it(`fails with an error if creating the zip file failed`, async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify({
         Configuration: 0,
@@ -290,26 +229,15 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
       throw new Error('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
-        description: 'Contoso',
-        longDescription: `Stay on top of what's happening at Contoso`,
-        companyName: 'Contoso',
-        companyWebsiteUrl: 'https://contoso.com',
-        coloredIconPath: 'icon-color.png',
-        outlineIconPath: 'icon-outline.png'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { 
+      portalUrl: 'https://contoso.sharepoint.com',
+      appName: 'Contoso',
+      description: 'Contoso',
+      longDescription: `Stay on top of what's happening at Contoso`,
+      companyName: 'Contoso',
+      companyWebsiteUrl: 'https://contoso.com',
+      coloredIconPath: 'icon-color.png',
+      outlineIconPath: 'icon-outline.png' } } as any), new CommandError('An error has occurred'));
   });
 
   it(`fails validation if the specified app name is longer than 30 chars`, async () => {

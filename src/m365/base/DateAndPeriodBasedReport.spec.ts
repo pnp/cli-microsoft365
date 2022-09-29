@@ -134,7 +134,7 @@ describe('PeriodBasedReport', () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('get unique device type in teams and export it in a period', (done) => {
+  it('get unique device type in teams and export it in a period', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')`) {
         return Promise.resolve(`
@@ -146,16 +146,9 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    mockCommand.action(logger, { options: { debug: false, period: 'D7' } }, () => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
-        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await mockCommand.action(logger, { options: { debug: false, period: 'D7' } });
+    assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
+    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   }); 
 
   it('fails validation if the date option is not a valid date string', async () => {
@@ -168,7 +161,7 @@ describe('PeriodBasedReport', () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('gets details about Microsoft Teams user activity by user for the given date', (done) => {
+  it('gets details about Microsoft Teams user activity by user for the given date', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/MockEndPoint(date=2019-07-13)`) {
         return Promise.resolve(`
@@ -181,30 +174,16 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    mockCommand.action(logger, { options: { debug: false, date: '2019-07-13' } }, () => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(date=2019-07-13)");
-        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await mockCommand.action(logger, { options: { debug: false, date: '2019-07-13' } });
+    assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(date=2019-07-13)");
+    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    mockCommand.action(logger, { options: { debug: false, period: 'D7' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(mockCommand.action(logger, { options: { debug: false, period: 'D7' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

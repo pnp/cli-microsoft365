@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
-import { ContextInfo, IdentityResponse, spo, validation } from '../../../../utils';
+import { spo, validation } from '../../../../utils';
 import commands from '../../commands';
 import { Property, SpoPropertyBagBaseCommand } from './propertybag-base';
 
@@ -55,27 +55,27 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    spo
-      .getRequestDigest(args.options.webUrl)
-      .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
-        this.formDigestValue = contextResponse.FormDigestValue;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const contextResponse = await spo.getRequestDigest(args.options.webUrl);
+      this.formDigestValue = contextResponse.FormDigestValue;
 
-        return spo.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
-      })
-      .then((identityResp: IdentityResponse): Promise<any> => {
-        const opts: Options = args.options;
-        if (opts.folder) {
-          return this.getFolderPropertyBag(identityResp, opts.webUrl, opts.folder, logger);
-        }
+      const identityResp = await spo.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
 
-        return this.getWebPropertyBag(identityResp, opts.webUrl, logger);
-      })
-      .then((propertyBagData: any): void => {
-        logger.log(this.formatOutput(propertyBagData));
+      let propertyBagData: any;
+      const opts: Options = args.options;
+      if (opts.folder) {
+        propertyBagData = await this.getFolderPropertyBag(identityResp, opts.webUrl, opts.folder, logger);
+      }
+      else {
+        propertyBagData = await this.getWebPropertyBag(identityResp, opts.webUrl, logger);
+      }
 
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      logger.log(this.formatOutput(propertyBagData));
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   /**

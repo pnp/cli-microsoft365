@@ -228,50 +228,51 @@ class SpoCustomActionAddCommand extends SpoCommand {
     return result;
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (!args.options.scope) {
-      args.options.scope = 'Web';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      if (!args.options.scope) {
+        args.options.scope = 'Web';
+      }
+  
+      const requestBody: any = this.mapRequestBody(args.options);
+  
+      const requestOptions: any = {
+        url: `${args.options.url}/_api/${args.options.scope}/UserCustomActions`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        data: requestBody,
+        responseType: 'json'
+      };
+
+      const customAction = await request.post<CustomAction>(requestOptions);
+      if (this.verbose) {
+        logger.logToStderr({
+          ClientSideComponentId: customAction.ClientSideComponentId,
+          ClientSideComponentProperties: customAction.ClientSideComponentProperties,
+          CommandUIExtension: customAction.CommandUIExtension,
+          Description: customAction.Description,
+          Group: customAction.Group,
+          Id: customAction.Id,
+          ImageUrl: customAction.ImageUrl,
+          Location: customAction.Location,
+          Name: customAction.Name,
+          RegistrationId: customAction.RegistrationId,
+          RegistrationType: customAction.RegistrationType,
+          Rights: JSON.stringify(customAction.Rights),
+          Scope: args.options.scope, // because it is more human readable
+          ScriptBlock: customAction.ScriptBlock,
+          ScriptSrc: customAction.ScriptSrc,
+          Sequence: customAction.Sequence,
+          Title: customAction.Title,
+          Url: customAction.Url,
+          VersionOfUserCustomAction: customAction.VersionOfUserCustomAction
+        });
+      }
     }
-
-    const requestBody: any = this.mapRequestBody(args.options);
-
-    const requestOptions: any = {
-      url: `${args.options.url}/_api/${args.options.scope}/UserCustomActions`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      data: requestBody,
-      responseType: 'json'
-    };
-
-    request
-      .post<CustomAction>(requestOptions)
-      .then((customAction: CustomAction): void => {
-        if (this.verbose) {
-          logger.logToStderr({
-            ClientSideComponentId: customAction.ClientSideComponentId,
-            ClientSideComponentProperties: customAction.ClientSideComponentProperties,
-            CommandUIExtension: customAction.CommandUIExtension,
-            Description: customAction.Description,
-            Group: customAction.Group,
-            Id: customAction.Id,
-            ImageUrl: customAction.ImageUrl,
-            Location: customAction.Location,
-            Name: customAction.Name,
-            RegistrationId: customAction.RegistrationId,
-            RegistrationType: customAction.RegistrationType,
-            Rights: JSON.stringify(customAction.Rights),
-            Scope: args.options.scope, // because it is more human readable
-            ScriptBlock: customAction.ScriptBlock,
-            ScriptSrc: customAction.ScriptSrc,
-            Sequence: customAction.Sequence,
-            Title: customAction.Title,
-            Url: customAction.Url,
-            VersionOfUserCustomAction: customAction.VersionOfUserCustomAction
-          });
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   private mapRequestBody(options: Options): any {

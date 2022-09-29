@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -59,7 +59,7 @@ describe(commands.APP_ROLE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates app role for the specified appId, app has no roles', (done) => {
+  it('creates app role for the specified appId, app has no roles', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'bc724b77-da87-43a9-b385-6ebaaf969db8'&$select=id`) {
         return Promise.resolve({
@@ -94,7 +94,7 @@ describe(commands.APP_ROLE_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
@@ -103,18 +103,10 @@ describe(commands.APP_ROLE_ADD, () => {
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('creates app role for the specified appObjectId, app has one role', (done) => {
+  it('creates app role for the specified appObjectId, app has one role', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return Promise.resolve({
@@ -164,7 +156,7 @@ describe(commands.APP_ROLE_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
@@ -173,18 +165,10 @@ describe(commands.APP_ROLE_ADD, () => {
         allowedMembers: 'applications',
         claim: 'Custom.Role'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('creates app role for the specified appName, app has multiple roles', (done) => {
+  it('creates app role for the specified appName, app has multiple roles', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
         return Promise.resolve({
@@ -244,7 +228,7 @@ describe(commands.APP_ROLE_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         appName: 'My app',
@@ -253,18 +237,10 @@ describe(commands.APP_ROLE_ADD, () => {
         allowedMembers: 'both',
         claim: 'Custom.Role'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('handles error when the app specified with appObjectId not found', (done) => {
+  it('handles error when the app specified with appObjectId not found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return Promise.reject({
@@ -284,7 +260,7 @@ describe(commands.APP_ROLE_ADD, () => {
     });
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
@@ -293,18 +269,10 @@ describe(commands.APP_ROLE_ADD, () => {
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
   });
 
-  it('handles error when the app specified with the appId not found', (done) => {
+  it('handles error when the app specified with the appId not found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
         return Promise.resolve({ value: [] });
@@ -314,7 +282,7 @@ describe(commands.APP_ROLE_ADD, () => {
     });
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
@@ -323,18 +291,10 @@ describe(commands.APP_ROLE_ADD, () => {
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
   });
 
-  it('handles error when the app specified with appName not found', (done) => {
+  it('handles error when the app specified with appName not found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
         return Promise.resolve({ value: [] });
@@ -344,7 +304,7 @@ describe(commands.APP_ROLE_ADD, () => {
     });
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         appName: 'My app',
@@ -353,18 +313,10 @@ describe(commands.APP_ROLE_ADD, () => {
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `No Azure AD application registration with name My app found`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`No Azure AD application registration with name My app found`));
   });
 
-  it('handles error when multiple apps with the specified appName found', (done) => {
+  it('handles error when multiple apps with the specified appName found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
         return Promise.resolve({
@@ -379,7 +331,7 @@ describe(commands.APP_ROLE_ADD, () => {
     });
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         appName: 'My app',
@@ -388,66 +340,36 @@ describe(commands.APP_ROLE_ADD, () => {
         allowedMembers: 'usersGroups',
         claim: 'Custom.Role'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
   });
 
-  it('handles error when retrieving information about app through appId failed', (done) => {
+  it('handles error when retrieving information about app through appId failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
-        name: 'Role',
-        description: 'Custom role',
-        allowedMembers: 'usersGroups',
-        claim: 'Custom.Role'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `An error has occurred`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+      name: 'Role',
+      description: 'Custom role',
+      allowedMembers: 'usersGroups',
+      claim: 'Custom.Role' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error when retrieving information about app through appName failed', (done) => {
+  it('handles error when retrieving information about app through appName failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        appName: 'My app',
-        name: 'Role',
-        description: 'Custom role',
-        allowedMembers: 'usersGroups',
-        claim: 'Custom.Role'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `An error has occurred`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      appName: 'My app',
+      name: 'Role',
+      description: 'Custom role',
+      allowedMembers: 'usersGroups',
+      claim: 'Custom.Role' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error when retrieving app roles failed', (done) => {
+  it('handles error when retrieving app roles failed', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return Promise.reject('An error has occurred');
@@ -457,27 +379,16 @@ describe(commands.APP_ROLE_ADD, () => {
     });
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-        name: 'Role',
-        description: 'Custom role',
-        allowedMembers: 'usersGroups',
-        claim: 'Custom.Role'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      name: 'Role',
+      description: 'Custom role',
+      allowedMembers: 'usersGroups',
+      claim: 'Custom.Role' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error when updating app roles failed', (done) => {
+  it('handles error when updating app roles failed', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {
         return Promise.resolve({
@@ -501,24 +412,13 @@ describe(commands.APP_ROLE_ADD, () => {
     });
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-        name: 'Role',
-        description: 'Custom role',
-        allowedMembers: 'usersGroups',
-        claim: 'Custom.Role'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      name: 'Role',
+      description: 'Custom role',
+      allowedMembers: 'usersGroups',
+      claim: 'Custom.Role' } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if appId and appObjectId specified', async () => {

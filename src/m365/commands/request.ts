@@ -108,78 +108,75 @@ class RequestCommand extends Command {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.debug) {
       logger.logToStderr(`Preparing request...`);
     }
 
-    const method = (args.options.method || 'get').toUpperCase();
-    const headers: AxiosRequestHeaders = {};
+    try {
+      const method = (args.options.method || 'get').toUpperCase();
+      const headers: AxiosRequestHeaders = {};
+  
+      const unknownOptions: any = this.getUnknownOptions(args.options);
+      const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
+      unknownOptionsNames.forEach(o => {
+        headers[o] = unknownOptions[o];
+      });
+  
+      if (!headers.accept) {
+        headers.accept = 'application/json';
+      }
+  
+      if (args.options.resource) {
+        headers['x-resource'] = args.options.resource;
+      }
+  
+      const config: AxiosRequestConfig<string> = {
+        url: args.options.url,
+        headers,
+        method,
+        data: args.options.body
+      };
+  
+      if (headers.accept.toString().startsWith('application/json')) {
+        config.responseType = 'json';
+      }
+  
+      if (args.options.filePath) {
+        config.responseType = 'stream';
+      }
+  
+      if (this.verbose) {
+        logger.logToStderr(`Executing request...`);
+      }
 
-    const unknownOptions: any = this.getUnknownOptions(args.options);
-    const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
-    unknownOptionsNames.forEach(o => {
-      headers[o] = unknownOptions[o];
-    });
 
-    if (!headers.accept) {
-      headers.accept = 'application/json';
-    }
+      if (args.options.filePath) {
+        const file: AxiosResponse = await request.execute<AxiosResponse>(config);
+        const filePath: string = await new Promise((resolve, reject) => {
+          const writer = fs.createWriteStream(args.options.filePath as string);
 
-    if (args.options.resource) {
-      headers['x-resource'] = args.options.resource;
-    }
+          file.data.pipe(writer);
 
-    const config: AxiosRequestConfig<string> = {
-      url: args.options.url,
-      headers,
-      method,
-      data: args.options.body
-    };
-
-    if (headers.accept.toString().startsWith('application/json')) {
-      config.responseType = 'json';
-    }
-
-    if (args.options.filePath) {
-      config.responseType = 'stream';
-    }
-
-    if (this.verbose) {
-      logger.logToStderr(`Executing request...`);
-    }
-
-    if (args.options.filePath) {
-      request
-        .execute<AxiosResponse>(config)
-        .then((file: AxiosResponse): Promise<string> => {
-          return new Promise((resolve, reject) => {
-            const writer = fs.createWriteStream(args.options.filePath as string);
-
-            file.data.pipe(writer);
-
-            writer.on('error', err => {
-              reject(err);
-            });
-            writer.on('close', () => {
-              resolve(args.options.filePath as string);
-            });
+          writer.on('error', err => {
+            reject(err);
           });
-        })
-        .then((file: string): void => {
-          if (this.verbose) {
-            logger.logToStderr(`File saved to path ${file}`);
-          }
-          cb();
-        }, (err: any): void => this.handleError(err, logger, cb));
-    }
-    else {
-      request
-        .execute<string>(config)
-        .then(response => {
-          logger.log(response);
-          cb();
-        }, (rawRes: any): void => this.handleError(rawRes, logger, cb));
+          writer.on('close', () => {
+            resolve(args.options.filePath as string);
+          });
+        });
+
+        if (this.verbose) {
+          logger.logToStderr(`File saved to path ${filePath}`);
+        }
+      }
+      else {
+        const res = await request.execute<string>(config);
+        logger.log(res);
+      }
+    } 
+    catch (err: any) {
+      this.handleError(err);
     }
   }
 }

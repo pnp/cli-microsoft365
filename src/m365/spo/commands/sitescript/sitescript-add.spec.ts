@@ -70,7 +70,7 @@ describe(commands.SITESCRIPT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds new site script', (done) => {
+  it('adds new site script', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteScript(Title=@title, Description=@description)?@title='Contoso'&@description='My%20contoso%20script'`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -88,24 +88,17 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Content": null,
-          "Description": "My contoso script",
-          "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
-          "Title": "Contoso",
-          "Version": 0
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } });
+    assert(loggerLogSpy.calledWith({
+      "Content": null,
+      "Description": "My contoso script",
+      "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
+      "Title": "Contoso",
+      "Version": 0
+    }));
   });
 
-  it('adds new site script (debug)', (done) => {
+  it('adds new site script (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteScript(Title=@title, Description=@description)?@title='Contoso'&@description='My%20contoso%20script'`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -123,24 +116,17 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Content": null,
-          "Description": "My contoso script",
-          "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
-          "Title": "Contoso",
-          "Version": 0
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } });
+    assert(loggerLogSpy.calledWith({
+      "Content": null,
+      "Description": "My contoso script",
+      "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
+      "Title": "Contoso",
+      "Version": 0
+    }));
   });
 
-  it('doesn\'t fail when description not passed', (done) => {
+  it('doesn\'t fail when description not passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteScript(Title=@title, Description=@description)?@title='Contoso'&@description=''`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -158,24 +144,17 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', description: '', content: JSON.stringify({ "abc": "def" }) } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Content": null,
-          "Description": "",
-          "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
-          "Title": "Contoso",
-          "Version": 0
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Contoso', description: '', content: JSON.stringify({ "abc": "def" }) } });
+    assert(loggerLogSpy.calledWith({
+      "Content": null,
+      "Description": "",
+      "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
+      "Title": "Contoso",
+      "Version": 0
+    }));
   });
 
-  it('escapes special characters in user input', (done) => {
+  it('escapes special characters in user input', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteScript(Title=@title, Description=@description)?@title='Contoso%20script'&@description='My%20contoso%20script'`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -193,37 +172,22 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, title: 'Contoso script', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Content": null,
-          "Description": "My contoso script",
-          "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
-          "Title": "Contoso script",
-          "Version": 0
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, title: 'Contoso script', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } });
+    assert(loggerLogSpy.calledWith({
+      "Content": null,
+      "Description": "My contoso script",
+      "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
+      "Title": "Contoso script",
+      "Version": 0
+    }));
   });
 
-  it('correctly handles OData error when creating site script', (done) => {
+  it('correctly handles OData error when creating site script', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', content: JSON.stringify({}) } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, title: 'Contoso', content: JSON.stringify({}) } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

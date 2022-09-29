@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -60,7 +60,7 @@ describe(commands.USER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves user by id with output option json', (done) => {
+  it('retrieves user by id with output option json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/siteusers/GetById') > -1) {
         return Promise.resolve(
@@ -85,41 +85,34 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         id: 1
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          value: [{
-            Id: 6,
-            IsHiddenInUI: false,
-            LoginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
-            Title: "John Doe",
-            PrincipalType: 1,
-            Email: "john.deo@mytenant.onmicrosoft.com",
-            Expiration: "",
-            IsEmailAuthenticationGuestUser: false,
-            IsShareByEmailGuestUser: false,
-            IsSiteAdmin: false,
-            UserId: { NameId: "10010001b0c19a2", NameIdIssuer: "urn:federation:microsoftonline" },
-            UserPrincipalName: "john.deo@mytenant.onmicrosoft.com"
-          }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      value: [{
+        Id: 6,
+        IsHiddenInUI: false,
+        LoginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
+        Title: "John Doe",
+        PrincipalType: 1,
+        Email: "john.deo@mytenant.onmicrosoft.com",
+        Expiration: "",
+        IsEmailAuthenticationGuestUser: false,
+        IsShareByEmailGuestUser: false,
+        IsSiteAdmin: false,
+        UserId: { NameId: "10010001b0c19a2", NameIdIssuer: "urn:federation:microsoftonline" },
+        UserPrincipalName: "john.deo@mytenant.onmicrosoft.com"
+      }]
+    }));
   });
 
 
-  it('retrieves user by email with output option json', (done) => {
+  it('retrieves user by email with output option json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/siteusers/GetByEmail') > -1) {
         return Promise.resolve(
@@ -144,40 +137,33 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         email: "john.deo@mytenant.onmicrosoft.com"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          value: [{
-            Id: 6,
-            IsHiddenInUI: false,
-            LoginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
-            Title: "John Doe",
-            PrincipalType: 1,
-            Email: "john.deo@mytenant.onmicrosoft.com",
-            Expiration: "",
-            IsEmailAuthenticationGuestUser: false,
-            IsShareByEmailGuestUser: false,
-            IsSiteAdmin: false,
-            UserId: { NameId: "10010001b0c19a2", NameIdIssuer: "urn:federation:microsoftonline" },
-            UserPrincipalName: "john.deo@mytenant.onmicrosoft.com"
-          }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      value: [{
+        Id: 6,
+        IsHiddenInUI: false,
+        LoginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
+        Title: "John Doe",
+        PrincipalType: 1,
+        Email: "john.deo@mytenant.onmicrosoft.com",
+        Expiration: "",
+        IsEmailAuthenticationGuestUser: false,
+        IsShareByEmailGuestUser: false,
+        IsSiteAdmin: false,
+        UserId: { NameId: "10010001b0c19a2", NameIdIssuer: "urn:federation:microsoftonline" },
+        UserPrincipalName: "john.deo@mytenant.onmicrosoft.com"
+      }]
+    }));
   });
 
-  it('retrieves user by loginName with output option json', (done) => {
+  it('retrieves user by loginName with output option json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/siteusers/GetByLoginName') > -1) {
         return Promise.resolve(
@@ -202,37 +188,41 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          value: [{
-            Id: 6,
-            IsHiddenInUI: false,
-            LoginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
-            Title: "John Doe",
-            PrincipalType: 1,
-            Email: "john.deo@mytenant.onmicrosoft.com",
-            Expiration: "",
-            IsEmailAuthenticationGuestUser: false,
-            IsShareByEmailGuestUser: false,
-            IsSiteAdmin: false,
-            UserId: { NameId: "10010001b0c19a2", NameIdIssuer: "urn:federation:microsoftonline" },
-            UserPrincipalName: "john.deo@mytenant.onmicrosoft.com"
-          }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      value: [{
+        Id: 6,
+        IsHiddenInUI: false,
+        LoginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
+        Title: "John Doe",
+        PrincipalType: 1,
+        Email: "john.deo@mytenant.onmicrosoft.com",
+        Expiration: "",
+        IsEmailAuthenticationGuestUser: false,
+        IsShareByEmailGuestUser: false,
+        IsSiteAdmin: false,
+        UserId: { NameId: "10010001b0c19a2", NameIdIssuer: "urn:federation:microsoftonline" },
+        UserPrincipalName: "john.deo@mytenant.onmicrosoft.com"
+      }]
+    }));
+  });
+
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: { 
+      debug: false,
+      webUrl: 'https://contoso.sharepoint.com',
+      loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying URL', () => {

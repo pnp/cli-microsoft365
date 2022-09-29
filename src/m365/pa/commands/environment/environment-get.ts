@@ -39,7 +39,7 @@ class PaEnvironmentGetCommand extends PowerAppsCommand {
     );
   }
   
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information about Microsoft Power Apps environment ${args.options.name}...`);
     }
@@ -52,18 +52,20 @@ class PaEnvironmentGetCommand extends PowerAppsCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        res.displayName = res.properties.displayName;
-        res.provisioningState = res.properties.provisioningState;
-        res.environmentSku = res.properties.environmentSku;
-        res.azureRegionHint = res.properties.azureRegionHint;
-        res.isDefault = res.properties.isDefault;
+    try {
+      const res = await request.get<any>(requestOptions);
 
-        logger.log(res);
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      res.displayName = res.properties.displayName;
+      res.provisioningState = res.properties.provisioningState;
+      res.environmentSku = res.properties.environmentSku;
+      res.azureRegionHint = res.properties.azureRegionHint;
+      res.isDefault = res.properties.isDefault;
+
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

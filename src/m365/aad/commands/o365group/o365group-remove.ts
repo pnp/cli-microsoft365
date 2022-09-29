@@ -67,54 +67,51 @@ class AadO365GroupRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeGroup: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeGroup: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id}...`);
       }
 
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/groups/${args.options.id}`,
-        headers: {
-          'accept': 'application/json;odata.metadata=none'
-        }
-      };
-
-      request
-        .delete(requestOptions)
-        .then((): Promise<void> => {
-          if (!args.options.skipRecycleBin) {
-            return Promise.resolve();
+      try {
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/groups/${args.options.id}`,
+          headers: {
+            'accept': 'application/json;odata.metadata=none'
           }
+        };
 
+        await request.delete(requestOptions);
+
+        if (args.options.skipRecycleBin) {
           const requestOptions2: any = {
             url: `${this.resource}/v1.0/directory/deletedItems/${args.options.id}`,
             headers: {
               'accept': 'application/json;odata.metadata=none'
             }
           };
-          return request.delete(requestOptions2);
-        })
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+          await request.delete(requestOptions2);
+        }
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeGroup();
+      await removeGroup();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the group ${args.options.id}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeGroup();
-        }
       });
+
+      if (result.continue) {
+        await removeGroup();
+      }
     }
   }
 }

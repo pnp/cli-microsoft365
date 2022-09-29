@@ -101,29 +101,26 @@ class SpoSiteListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const webTemplate: string = this.getWebTemplateId(args.options);
     const includeOneDriveSites: boolean = args.options.includeOneDriveSites || false;
     const personalSite: string = includeOneDriveSites === false ? '0' : '1';
-    let spoAdminUrl: string = '';
 
-    spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((_spoAdminUrl: string): Promise<void> => {
-        spoAdminUrl = _spoAdminUrl;
+    try {
+      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
 
-        if (this.verbose) {
-          logger.logToStderr(`Retrieving list of site collections...`);
-        }
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving list of site collections...`);
+      }
 
-        this.allSites = [];
+      this.allSites = [];
 
-        return this.getAllSites(spoAdminUrl, formatting.escapeXml(args.options.filter || ''), '0', personalSite, webTemplate, undefined, args.options.deleted, logger);
-      })
-      .then(_ => {
-        logger.log(this.allSites);
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      await this.getAllSites(spoAdminUrl, formatting.escapeXml(args.options.filter || ''), '0', personalSite, webTemplate, undefined, args.options.deleted, logger);
+      logger.log(this.allSites);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getAllSites(spoAdminUrl: string, filter: string | undefined, startIndex: string | undefined, personalSite: string, webTemplate: string, formDigest: FormDigestInfo | undefined, deleted: boolean | undefined, logger: Logger): Promise<void> {

@@ -271,45 +271,36 @@ class SpoSiteSetCommand extends SpoCommand {
     this.types.string.push('classification');
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this.dots = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      this.dots = '';
+      this.tenantId = await spo.getTenantId(logger, this.debug);
+      this.spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      this.context = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
 
-    spo
-      .getTenantId(logger, this.debug)
-      .then((_tenantId: string): Promise<string> => {
-        this.tenantId = _tenantId;
+      await this.loadSiteIds(args.options.url, logger);
 
-        return spo.getSpoAdminUrl(logger, this.debug);
-      })
-      .then(spoAdminUrl => {
-        this.spoAdminUrl = spoAdminUrl;
+      if (this.isGroupConnectedSite()) {
+        await this.updateGroupConnectedSite(logger, args);
+      }
+      else {
+        await this.updateSharePointOnlySite(logger, args);
+      }
 
-        return spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
-      })
-      .then(formDigestInfo => {
-        this.context = formDigestInfo;
+      const siteProps = await this.updateSiteProperties(logger, args);
+      await this.waitForSiteUpdateCompletion(logger, args, siteProps);
+      await this.applySiteDesign(logger, args);
+      await this.setLogo(logger, args);
+      const lockState = await this.updateSiteLockState(logger, args);
+      await this.waitForSiteUpdateCompletion(logger, args, lockState);
+    }
+    catch (err: any) {
+      if (err instanceof CommandError) {
+        err = (err as CommandError).message;
+      }
 
-        return Promise.resolve();
-      })
-      .then(_ => this.loadSiteIds(args.options.url, logger))
-      .then(_ => {
-        return this.isGroupConnectedSite()
-          ? this.updateGroupConnectedSite(logger, args)
-          : this.updateSharePointOnlySite(logger, args);
-      })
-      .then(_ => this.updateSiteProperties(logger, args))
-      .then(res => this.waitForSiteUpdateCompletion(logger, args, res))
-      .then(_ => this.applySiteDesign(logger, args))
-      .then(_ => this.setLogo(logger, args))
-      .then(_ => this.updateSiteLockState(logger, args))
-      .then(res => this.waitForSiteUpdateCompletion(logger, args, res))
-      .then(_ => cb(), (err: any): void => {
-        if (err instanceof CommandError) {
-          err = (err as CommandError).message;
-        }
-
-        this.handleRejectedPromise(err, logger, cb);
-      });
+      this.handleRejectedPromise(err);
+    }
   }
 
   private setLogo(logger: Logger, args: CommandArgs): Promise<void> {

@@ -38,9 +38,9 @@ describe(commands.APP_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
     sinon.stub(request, 'get').resolves({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -49,6 +49,7 @@ describe(commands.APP_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
+      request.post,
       Cli.prompt
     ]);
   });
@@ -71,7 +72,7 @@ describe(commands.APP_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes app from the tenant app catalog (debug)', (done) => {
+  it('removes app from the tenant app catalog (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -86,32 +87,19 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          request.get
-        ]);
+    await command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes app from the tenant app catalog', (done) => {
+  it('removes app from the tenant app catalog', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -126,32 +114,19 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          request.get
-        ]);
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes app from the sitecollection app catalog', (done) => {
+  it('removes app from the sitecollection app catalog', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -166,66 +141,38 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, scope: 'sitecollection', id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          request.get
-        ]);
+    await command.action(logger, { options: { debug: false, scope: 'sitecollection', id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('prompts before removing an app when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing an app when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
 
-  it('aborts removing app when prompt not confirmed', (done) => {
+  it('aborts removing app when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    assert(requests.length === 0);
   });
 
-  it('removes the app when prompt confirmed', (done) => {
+  it('removes the app when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -247,32 +194,22 @@ describe(commands.APP_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('correctly handles failure when app not found in app catalog', (done) => {
+  it('correctly handles failure when app not found in app catalog', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -297,21 +234,11 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
+      new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1) {
@@ -325,21 +252,11 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('correctly handles random API error (error message is not ODataError)', (done) => {
+  it('correctly handles random API error (error message is not ODataError)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1) {
@@ -353,21 +270,11 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('{"message":"An error has occurred"}')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
+      new CommandError('{"message":"An error has occurred"}'));
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1) {
@@ -390,18 +297,8 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('fails validation if the id is not a valid GUID', async () => {

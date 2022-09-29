@@ -67,7 +67,7 @@ describe(commands.ORGNEWSSITE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('completes a set request', (done) => {
+  it('completes a set request', async () => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -81,24 +81,17 @@ describe(commands.ORGNEWSSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         verbose: true,
         url: "http://contoso.sharepoint.com/sites/site1"
       }
-    } as any, () => {
-      try {
-        assert(svcListRequest.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(svcListRequest.called);
   });
 
-  it('handles error during set request', (done) => {
+  it('handles error during set request', async () => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -116,34 +109,19 @@ describe(commands.ORGNEWSSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert(svcListRequest.called);
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
+    assert(svcListRequest.called);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {

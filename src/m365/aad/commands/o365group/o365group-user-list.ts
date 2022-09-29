@@ -69,30 +69,24 @@ class AadO365GroupUserListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let users: User[] = [];
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      let users = await this.getOwners(logger, args.options.groupId);
 
-    this
-      .getOwners(logger, args.options.groupId)
-      .then((owners): Promise<User[]> => {
-        users = owners;
-
-        if (args.options.role === 'Owner') {
-          return Promise.resolve([]);
-        }
-
-        return this.getMembersAndGuests(logger, args.options.groupId);
-      })
-      .then((membersAndGuests): void => {
+      if (args.options.role !== 'Owner') {
+        const membersAndGuests = await this.getMembersAndGuests(logger, args.options.groupId);
         users = users.concat(membersAndGuests);
+      }
 
-        if (args.options.role) {
-          users = users.filter(i => i.userType === args.options.role);
-        }
+      if (args.options.role) {
+        users = users.filter(i => i.userType === args.options.role);
+      }
 
-        logger.log(users);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(users);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getOwners(logger: Logger, groupId: string): Promise<User[]> {

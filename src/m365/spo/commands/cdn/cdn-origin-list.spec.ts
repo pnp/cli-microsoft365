@@ -43,7 +43,8 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      request.post
     ]);
   });
 
@@ -65,7 +66,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves the settings of the public CDN when type set to Public', (done) => {
+  it('retrieves the settings of the public CDN when type set to Public', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -87,21 +88,11 @@ describe(commands.CDN_ORIGIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, type: 'Public' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(['/master','*/cdn']));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await command.action(logger, { options: { debug: true, type: 'Public' } });
+    assert(loggerLogSpy.calledWith(['/master','*/cdn']));
   });
 
-  it('retrieves the settings of the private CDN when type set to Private', (done) => {
+  it('retrieves the settings of the private CDN when type set to Private', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -122,21 +113,11 @@ describe(commands.CDN_ORIGIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, type: 'Private' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(['/master']));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await command.action(logger, { options: { debug: false, type: 'Private' } });
+    assert(loggerLogSpy.calledWith(['/master']));
   });
 
-  it('retrieves the settings of the private CDN when type set to Private (debug)', (done) => {
+  it('retrieves the settings of the private CDN when type set to Private (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -157,21 +138,11 @@ describe(commands.CDN_ORIGIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, type: 'Private' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(['/master']));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await command.action(logger, { options: { debug: true, type: 'Private' } });
+    assert(loggerLogSpy.calledWith(['/master']));
   });
 
-  it('retrieves the settings of the public CDN when no type set', (done) => {
+  it('retrieves the settings of the public CDN when no type set', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -192,21 +163,11 @@ describe(commands.CDN_ORIGIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(['/master', '*/cdn']));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith(['/master', '*/cdn']));
   });
 
-  it('correctly handles an error when getting tenant CDN origins', (done) => {
+  it('correctly handles an error when getting tenant CDN origins', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
@@ -236,38 +197,16 @@ describe(commands.CDN_ORIGIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

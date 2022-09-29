@@ -108,7 +108,7 @@ class SpoGroupAddCommand extends SpoCommand {
     this.optionSets.push(['id', 'name']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: AxiosRequestConfig = {
       url: `${args.options.webUrl}/_api/web/sitegroups`,
       headers: {
@@ -126,13 +126,13 @@ class SpoGroupAddCommand extends SpoCommand {
       }
     };
 
-    request
-      .post(requestOptions)
-      .then((response: any): void => {
-        logger.log(response);
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const response = await request.post<any>(requestOptions);
+      logger.log(response);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

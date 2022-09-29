@@ -70,7 +70,7 @@ describe(commands.TERM_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets taxonomy term by id', (done) => {
+  it('gets taxonomy term by id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -82,18 +82,11 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:05:07.600Z", "Id": "16573ae2-0cc4-42fa-a2ff-8bf0407bd385", "LastModifiedDate": "2018-08-22T14:05:07.600Z", "Name": "Engineering", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Engineering", "TermsCount": 0 }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } });
+    assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:05:07.600Z", "Id": "16573ae2-0cc4-42fa-a2ff-8bf0407bd385", "LastModifiedDate": "2018-08-22T14:05:07.600Z", "Name": "Engineering", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Engineering", "TermsCount": 0 }));
   });
 
-  it('gets taxonomy term by name, term group by id, term set by id', (done) => {
+  it('gets taxonomy term by name, term group by id, term set by id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -105,18 +98,11 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } });
+    assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
-  it('gets taxonomy term by name, term group by id, term set by name', (done) => {
+  it('gets taxonomy term by name, term group by id, term set by name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -128,18 +114,11 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetName: 'Department' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetName: 'Department' } });
+    assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
-  it('gets taxonomy term by name, term group by name, term set by id', (done) => {
+  it('gets taxonomy term by name, term group by name, term set by id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -151,18 +130,11 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } });
+    assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
-  it('gets taxonomy term by name, term group by name, term set by name', (done) => {
+  it('gets taxonomy term by name, term group by name, term set by name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -174,18 +146,11 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department' } });
+    assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
-  it('correctly handles term not found by name', (done) => {
+  it('correctly handles term not found by name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -197,18 +162,14 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false, 
+      name: 'IT', 
+      termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', 
+      termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
-  it('correctly handles term not found by id', (done) => {
+  it('correctly handles term not found by id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -220,18 +181,10 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } });
   });
 
-  it('correctly handles term group not found', (done) => {
+  it('correctly handles term group not found', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -243,18 +196,14 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false, 
+      name: 'IT', 
+      termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', 
+      termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
-  it('correctly handles term set not found', (done) => {
+  it('correctly handles term set not found', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -266,18 +215,14 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false, 
+      name: 'IT', 
+      termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', 
+      termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
-  it('escapes XML in term name', (done) => {
+  it('escapes XML in term name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -289,18 +234,11 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'IT>', termGroupName: 'People', termSetName: 'Department' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT>", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT>", "TermsCount": 0 }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, name: 'IT>', termGroupName: 'People', termSetName: 'Department' } });
+    assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT>", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT>", "TermsCount": 0 }));
   });
 
-  it('escapes XML in term group name', (done) => {
+  it('escapes XML in term group name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -312,18 +250,11 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People>', termSetName: 'Department' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People>', termSetName: 'Department' } });
+    assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
-  it('escapes XML in term set name', (done) => {
+  it('escapes XML in term set name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -335,15 +266,8 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department>' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department>' } });
+    assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
   it('fails validation if neither id nor name specified', async () => {
@@ -417,20 +341,10 @@ describe(commands.TERM_GET, () => {
     assert(containsOption);
   });
 
-  it('handles promise rejection', (done) => {
+  it('handles promise rejection', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
-    
-    command.action(logger, {
-      options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department>' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getRequestDigest error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department>' } } as any), new CommandError('getRequestDigest error'));
   });
 });

@@ -70,7 +70,7 @@ describe(commands.HUBSITE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates the title of the specified hub site', (done) => {
+  it('updates the title of the specified hub site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><ObjectPath Id="11" ObjectPathId="10" /><Query Id="12" ObjectPathId="10"><Query SelectAllProperties="true"><Properties /></Query></Query><SetProperty Id="13" ObjectPathId="10" Name="Title"><Parameter Type="String">Sales</Parameter></SetProperty><Method Name="Update" Id="16" ObjectPathId="10" /></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="10" ParentId="8" Name="GetHubSitePropertiesById"><Parameters><Parameter Type="Guid">255a50b2-527f-4413-8485-57f4c17a24d1</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -90,25 +90,18 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Description: "Description",
-          ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          LogoUrl: "https://contoso.com/logo.png",
-          SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
-          Title: "Sales"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    assert(loggerLogSpy.calledWith({
+      Description: "Description",
+      ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      LogoUrl: "https://contoso.com/logo.png",
+      SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
+      Title: "Sales"
+    }));
   });
 
-  it('updates the description of the specified hub site', (done) => {
+  it('updates the description of the specified hub site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><ObjectPath Id="11" ObjectPathId="10" /><Query Id="12" ObjectPathId="10"><Query SelectAllProperties="true"><Properties /></Query></Query><SetProperty Id="15" ObjectPathId="10" Name="Description"><Parameter Type="String">All things sales</Parameter></SetProperty><Method Name="Update" Id="16" ObjectPathId="10" /></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="10" ParentId="8" Name="GetHubSitePropertiesById"><Parameters><Parameter Type="Guid">255a50b2-527f-4413-8485-57f4c17a24d1</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -128,25 +121,18 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, description: 'All things sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Description: "All things sales",
-          ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          LogoUrl: "https://contoso.com/logo.png",
-          SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
-          Title: "Sales"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, description: 'All things sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    assert(loggerLogSpy.calledWith({
+      Description: "All things sales",
+      ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      LogoUrl: "https://contoso.com/logo.png",
+      SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
+      Title: "Sales"
+    }));
   });
 
-  it('updates the logo URL of the specified hub site', (done) => {
+  it('updates the logo URL of the specified hub site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><ObjectPath Id="11" ObjectPathId="10" /><Query Id="12" ObjectPathId="10"><Query SelectAllProperties="true"><Properties /></Query></Query><SetProperty Id="14" ObjectPathId="10" Name="LogoUrl"><Parameter Type="String">https://contoso.com/logo.png</Parameter></SetProperty><Method Name="Update" Id="16" ObjectPathId="10" /></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="10" ParentId="8" Name="GetHubSitePropertiesById"><Parameters><Parameter Type="Guid">255a50b2-527f-4413-8485-57f4c17a24d1</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -166,25 +152,18 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Description: "All things sales",
-          ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          LogoUrl: "https://contoso.com/logo.png",
-          SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
-          Title: "Sales"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    assert(loggerLogSpy.calledWith({
+      Description: "All things sales",
+      ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      LogoUrl: "https://contoso.com/logo.png",
+      SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
+      Title: "Sales"
+    }));
   });
 
-  it('updates the title, description and logo URL of the specified hub site (debug)', (done) => {
+  it('updates the title, description and logo URL of the specified hub site (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><ObjectPath Id="11" ObjectPathId="10" /><Query Id="12" ObjectPathId="10"><Query SelectAllProperties="true"><Properties /></Query></Query><SetProperty Id="13" ObjectPathId="10" Name="Title"><Parameter Type="String">Sales</Parameter></SetProperty><SetProperty Id="14" ObjectPathId="10" Name="LogoUrl"><Parameter Type="String">https://contoso.com/logo.png</Parameter></SetProperty><SetProperty Id="15" ObjectPathId="10" Name="Description"><Parameter Type="String">All things sales</Parameter></SetProperty><Method Name="Update" Id="16" ObjectPathId="10" /></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="10" ParentId="8" Name="GetHubSitePropertiesById"><Parameters><Parameter Type="Guid">255a50b2-527f-4413-8485-57f4c17a24d1</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -204,25 +183,18 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, title: 'Sales', description: 'All things sales', logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Description: "All things sales",
-          ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          LogoUrl: "https://contoso.com/logo.png",
-          SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
-          Title: "Sales"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, title: 'Sales', description: 'All things sales', logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    assert(loggerLogSpy.calledWith({
+      Description: "All things sales",
+      ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      LogoUrl: "https://contoso.com/logo.png",
+      SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
+      Title: "Sales"
+    }));
   });
 
-  it('escapes XML in user input', (done) => {
+  it('escapes XML in user input', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><ObjectPath Id="11" ObjectPathId="10" /><Query Id="12" ObjectPathId="10"><Query SelectAllProperties="true"><Properties /></Query></Query><SetProperty Id="13" ObjectPathId="10" Name="Title"><Parameter Type="String">&lt;Sales&gt;</Parameter></SetProperty><SetProperty Id="14" ObjectPathId="10" Name="LogoUrl"><Parameter Type="String">&lt;https://contoso.com/logo.png&gt;</Parameter></SetProperty><SetProperty Id="15" ObjectPathId="10" Name="Description"><Parameter Type="String">&lt;All things sales&gt;</Parameter></SetProperty><Method Name="Update" Id="16" ObjectPathId="10" /></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="10" ParentId="8" Name="GetHubSitePropertiesById"><Parameters><Parameter Type="Guid">255a50b2-527f-4413-8485-57f4c17a24d1</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -242,25 +214,18 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, title: '<Sales>', description: '<All things sales>', logoUrl: '<https://contoso.com/logo.png>', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Description: "<All things sales>",
-          ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          LogoUrl: "<https://contoso.com/logo.png>",
-          SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
-          Title: "<Sales>"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, title: '<Sales>', description: '<All things sales>', logoUrl: '<https://contoso.com/logo.png>', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    assert(loggerLogSpy.calledWith({
+      Description: "<All things sales>",
+      ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      LogoUrl: "<https://contoso.com/logo.png>",
+      SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
+      Title: "<Sales>"
+    }));
   });
 
-  it('allows resetting hub site title', (done) => {
+  it('allows resetting hub site title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><ObjectPath Id="11" ObjectPathId="10" /><Query Id="12" ObjectPathId="10"><Query SelectAllProperties="true"><Properties /></Query></Query><SetProperty Id="13" ObjectPathId="10" Name="Title"><Parameter Type="String"></Parameter></SetProperty><Method Name="Update" Id="16" ObjectPathId="10" /></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="10" ParentId="8" Name="GetHubSitePropertiesById"><Parameters><Parameter Type="Guid">255a50b2-527f-4413-8485-57f4c17a24d1</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -280,25 +245,18 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Description: "Description",
-          ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          LogoUrl: "https://contoso.com/logo.png",
-          SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
-          Title: ""
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    assert(loggerLogSpy.calledWith({
+      Description: "Description",
+      ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      LogoUrl: "https://contoso.com/logo.png",
+      SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
+      Title: ""
+    }));
   });
 
-  it('allows resetting hub site description', (done) => {
+  it('allows resetting hub site description', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><ObjectPath Id="11" ObjectPathId="10" /><Query Id="12" ObjectPathId="10"><Query SelectAllProperties="true"><Properties /></Query></Query><SetProperty Id="15" ObjectPathId="10" Name="Description"><Parameter Type="String"></Parameter></SetProperty><Method Name="Update" Id="16" ObjectPathId="10" /></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="10" ParentId="8" Name="GetHubSitePropertiesById"><Parameters><Parameter Type="Guid">255a50b2-527f-4413-8485-57f4c17a24d1</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -318,25 +276,18 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, description: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Description: "",
-          ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          LogoUrl: "https://contoso.com/logo.png",
-          SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
-          Title: "Sales"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, description: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    assert(loggerLogSpy.calledWith({
+      Description: "",
+      ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      LogoUrl: "https://contoso.com/logo.png",
+      SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
+      Title: "Sales"
+    }));
   });
 
-  it('allows resetting hub site logo URL', (done) => {
+  it('allows resetting hub site logo URL', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><ObjectPath Id="11" ObjectPathId="10" /><Query Id="12" ObjectPathId="10"><Query SelectAllProperties="true"><Properties /></Query></Query><SetProperty Id="14" ObjectPathId="10" Name="LogoUrl"><Parameter Type="String"></Parameter></SetProperty><Method Name="Update" Id="16" ObjectPathId="10" /></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="10" ParentId="8" Name="GetHubSitePropertiesById"><Parameters><Parameter Type="Guid">255a50b2-527f-4413-8485-57f4c17a24d1</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -356,25 +307,18 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, logoUrl: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Description: "All things sales",
-          ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          LogoUrl: "",
-          SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
-          SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
-          Title: "Sales"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, logoUrl: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    assert(loggerLogSpy.calledWith({
+      Description: "All things sales",
+      ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      LogoUrl: "",
+      SiteId: "255a50b2-527f-4413-8485-57f4c17a24d1",
+      SiteUrl: "https://contoso.sharepoint.com/sites/Sales",
+      Title: "Sales"
+    }));
   });
 
-  it('correctly handles API error', (done) => {
+  it('correctly handles API error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
@@ -389,31 +333,17 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid URL: Logo.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any),
+      new CommandError('Invalid URL: Logo.'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('configures command types', () => {

@@ -83,7 +83,7 @@ class AadO365GroupListCommand extends GraphCommand {
     return ['id', 'displayName', 'mailNickname', 'deletedDateTime', 'siteUrl'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const groupFilter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
     const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g, `''`)}')` : '';
     const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.mailNickname).replace(/'/g, `''`)}')` : '';
@@ -96,49 +96,41 @@ class AadO365GroupListCommand extends GraphCommand {
       endpoint = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
     }
 
-    let groups: GroupExtended[] = [];
+    try {
+      let groups: GroupExtended[] = [];
+      groups = await odata.getAllItems<GroupExtended>(endpoint);
 
-    odata
-      .getAllItems<GroupExtended>(endpoint)
-      .then((_groups): Promise<any> => {
-        groups = _groups;
+      if (args.options.orphaned) {
+        const orphanedGroups: GroupExtended[] = [];
 
-        if (args.options.orphaned) {
-          const orphanedGroups: GroupExtended[] = [];
+        groups.forEach((group) => {
+          if (!group.owners || group.owners.length === 0) {
+            orphanedGroups.push(group);
+          }
+        });
 
-          groups.forEach((group) => {
-            if (!group.owners || group.owners.length === 0) {
-              orphanedGroups.push(group);
+        groups = orphanedGroups;
+      }
+
+      if (args.options.includeSiteUrl) {
+        const res = await Promise.all(groups.map(g => this.getGroupSiteUrl(g.id as string)));
+        res.forEach(r => {
+          for (let i: number = 0; i < groups.length; i++) {
+            if (groups[i].id !== r.id) {
+              continue;
             }
-          });
 
-          groups = orphanedGroups;
-        }
+            groups[i].siteUrl = r.url;
+            break;
+          }
+        });
+      }
 
-        if (args.options.includeSiteUrl) {
-          return Promise.all(groups.map(g => this.getGroupSiteUrl(g.id as string)));
-        }
-        else {
-          return Promise.resolve();
-        }
-      })
-      .then((res?: { id: string, url: string }[]): void => {
-        if (res) {
-          res.forEach(r => {
-            for (let i: number = 0; i < groups.length; i++) {
-              if (groups[i].id !== r.id) {
-                continue;
-              }
-
-              groups[i].siteUrl = r.url;
-              break;
-            }
-          });
-        }
-
-        logger.log(groups);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(groups);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getGroupSiteUrl(groupId: string): Promise<{ id: string, url: string }> {

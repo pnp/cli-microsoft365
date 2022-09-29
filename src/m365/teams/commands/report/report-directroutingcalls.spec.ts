@@ -143,7 +143,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('gets directroutingcalls in teams', (done) => {
+  it('gets directroutingcalls in teams', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=2019-12-01)`) {
         return Promise.resolve(jsonOutput);
@@ -152,19 +152,12 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } }, () => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=2019-12-01)");
-        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } });
+    assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=2019-12-01)");
+    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
 
-  it('gets directroutingcalls in teams with no toDateTime specified', (done) => {
+  it('gets directroutingcalls in teams with no toDateTime specified', async () => {
     const now = new Date();
     const fakeTimers = sinon.useFakeTimers(now);
     const toDateTime: string = encodeURIComponent(now.toISOString());
@@ -177,33 +170,16 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, fromDateTime: '2019-11-01' } }, () => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, `https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=${toDateTime})`);
-        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        fakeTimers.restore();
-      }
-    });
+    await command.action(logger, { options: { debug: false, fromDateTime: '2019-11-01' } });
+    assert.strictEqual(requestStub.lastCall.args[0].url, `https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=${toDateTime})`);
+    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+    fakeTimers.restore();
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false, fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

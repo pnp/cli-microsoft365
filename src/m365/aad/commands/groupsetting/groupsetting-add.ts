@@ -54,41 +54,40 @@ class AadGroupSettingAddCommand extends GraphCommand {
     return true;
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving group setting template with id '${args.options.templateId}'...`);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groupSettingTemplates/${args.options.templateId}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
+    try {
+      let requestOptions: any = {
+        url: `${this.resource}/v1.0/groupSettingTemplates/${args.options.templateId}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get<GroupSettingTemplate>(requestOptions)
-      .then((groupSettingTemplate: GroupSettingTemplate): Promise<any> => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/groupSettings`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json'
-          },
-          data: {
-            templateId: args.options.templateId,
-            values: this.getGroupSettingValues(args.options, groupSettingTemplate)
-          },
-          responseType: 'json'
-        };
+      const groupSettingTemplate = await request.get<GroupSettingTemplate>(requestOptions);
+      requestOptions = {
+        url: `${this.resource}/v1.0/groupSettings`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json'
+        },
+        data: {
+          templateId: args.options.templateId,
+          values: this.getGroupSettingValues(args.options, groupSettingTemplate)
+        },
+        responseType: 'json'
+      };
 
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res = await request.post(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getGroupSettingValues(options: any, groupSettingTemplate: GroupSettingTemplate): { name: string; value: string }[] {

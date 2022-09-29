@@ -73,9 +73,9 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
     promptOptions = undefined;
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: true });
+      return { continue: true };
     });
   });
 
@@ -140,33 +140,27 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     assert.deepStrictEqual(optionSets, [['url', 'alias']]);
   });
 
-  it('prompts before removal when confirm option not passed', (done) => {
+  it('prompts before removal when confirm option not passed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         taskId: validTaskId,
         url: validUrl
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
   it('passes validation when valid options specified', async () => {
@@ -179,7 +173,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly removes reference', (done) => {
+  it('correctly removes reference', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
         return Promise.resolve({
@@ -209,18 +203,10 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
       confirm: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
   });
 
-  it('correctly removes reference by alias with prompting', (done) => {
+  it('correctly removes reference by alias with prompting', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
         return Promise.resolve({
@@ -250,18 +236,10 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
       alias: validAlias
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
   });
 
-  it('fails validation when no references found', (done) => {
+  it('fails validation when no references found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
@@ -276,23 +254,15 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         taskId: validTaskId,
         alias: validAlias
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified reference with alias ${validAlias} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified reference with alias ${validAlias} does not exist`));
   });
 
-  it('fails validation when reference does not contain alias', (done) => {
+  it('fails validation when reference does not contain alias', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
@@ -307,23 +277,15 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         taskId: validTaskId,
         alias: validAlias
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified reference with alias ${validAlias} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified reference with alias ${validAlias} does not exist`));
   });
 
-  it('fails validation when multiple references found', (done) => {
+  it('fails validation when multiple references found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
@@ -338,35 +300,19 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         taskId: validTaskId,
         alias: validAlias
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple references with alias ${validAlias} found. Pass one of the following urls within the "--url" option : https://www.microsoft.com,https://www.microsoft2.com`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Multiple references with alias ${validAlias} found. Pass one of the following urls within the "--url" option : https://www.microsoft.com,https://www.microsoft2.com`));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

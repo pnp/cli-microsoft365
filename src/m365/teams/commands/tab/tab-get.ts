@@ -183,34 +183,27 @@ class TeamsTabGetCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getTeamId(args)
-      .then((teamId: string): Promise<string> => {
-        this.teamId = teamId;
-        return this.getChannelId(args);
-      })
-      .then((channelId: string): Promise<string> => {
-        this.channelId = channelId;
-        return this.getTabId(args);
-      })
-      .then((tabId: string): Promise<Tab> => {
-        const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(this.channelId)}/tabs/${encodeURIComponent(tabId)}`;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      this.teamId = await this.getTeamId(args);
+      this.channelId = await this.getChannelId(args);
+      const tabId: string = await this.getTabId(args);
+      const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(this.channelId)}/tabs/${encodeURIComponent(tabId)}`;
 
-        const requestOptions: any = {
-          url: endpoint,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
+      const requestOptions: any = {
+        url: endpoint,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-        return request.get<Tab>(requestOptions);
-      })
-      .then((res: Tab): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res: Tab = await request.get<Tab>(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

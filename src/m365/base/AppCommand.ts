@@ -46,46 +46,49 @@ export default abstract class AppCommand extends Command {
     );
   }
 
-  public action(logger: Logger, args: AppCommandArgs, cb: (err?: any) => void): void {
+  public async action(logger: Logger, args: AppCommandArgs): Promise<void> {
     const m365rcJsonPath: string = '.m365rc.json';
 
     if (!fs.existsSync(m365rcJsonPath)) {
-      return cb(new CommandError(`Could not find file: ${m365rcJsonPath}`));
+      throw new CommandError(`Could not find file: ${m365rcJsonPath}`);
     }
 
     try {
       const m365rcJsonContents: string = fs.readFileSync(m365rcJsonPath, 'utf8');
       if (!m365rcJsonContents) {
-        return cb(new CommandError(`File ${m365rcJsonPath} is empty`));
+        throw new CommandError(`File ${m365rcJsonPath} is empty`);
       }
 
       this.m365rcJson = JSON.parse(m365rcJsonContents) as M365RcJson;
     }
-    catch (e) {
-      return cb(new CommandError(`Could not parse file: ${m365rcJsonPath}`));
+    catch (err) {
+      if (err instanceof CommandError) {
+        throw err;
+      }
+      throw new CommandError(`Could not parse file: ${m365rcJsonPath}`);
     }
 
     if (!this.m365rcJson.apps ||
       this.m365rcJson.apps.length === 0) {
-      return cb(new CommandError(`No Azure AD apps found in ${m365rcJsonPath}`));
+      throw new CommandError(`No Azure AD apps found in ${m365rcJsonPath}`);
     }
 
     if (args.options.appId) {
       if (!this.m365rcJson.apps.some(app => app.appId === args.options.appId)) {
-        return cb(new CommandError(`App ${args.options.appId} not found in ${m365rcJsonPath}`));
+        throw new CommandError(`App ${args.options.appId} not found in ${m365rcJsonPath}`);
       }
 
       this.appId = args.options.appId;
-      return super.action(logger, args, cb);
+      return super.action(logger, args);
     }
 
     if (this.m365rcJson.apps.length === 1) {
       this.appId = this.m365rcJson.apps[0].appId;
-      return super.action(logger, args, cb);
+      return super.action(logger, args);
     }
 
     if (this.m365rcJson.apps.length > 1) {
-      Cli.prompt({
+      const result = await Cli.prompt<{ appIdIndex: number }>({
         message: `Multiple Azure AD apps found in ${m365rcJsonPath}. Which app would you like to use?`,
         type: 'list',
         choices: this.m365rcJson.apps.map((app, i) => {
@@ -96,10 +99,10 @@ export default abstract class AppCommand extends Command {
         }),
         default: 0,
         name: 'appIdIndex'
-      }, (result: { appIdIndex: number }): void => {
-        this.appId = ((this.m365rcJson as M365RcJson).apps as M365RcJsonApp[])[result.appIdIndex].appId;
-        super.action(logger, args, cb);
       });
+
+      this.appId = ((this.m365rcJson as M365RcJson).apps as M365RcJsonApp[])[result.appIdIndex].appId;
+      await super.action(logger, args);
     }
   }
 }

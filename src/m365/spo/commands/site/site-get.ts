@@ -41,7 +41,7 @@ class SpoSiteGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: any = {
       url: `${args.options.url}/_api/site`,
       headers: {
@@ -50,12 +50,13 @@ class SpoSiteGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res = await request.get(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

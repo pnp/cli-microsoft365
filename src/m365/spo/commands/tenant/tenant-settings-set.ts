@@ -1,11 +1,8 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -587,83 +584,69 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
   private getSpecialCharactersState(): string[] { return ['NoPreference', 'Allowed', 'Disallowed']; }
   private getSPOLimitedAccessFileType(): string[] { return ['OfficeOnlineFilesOnly', 'WebPreviewableFiles', 'OtherFiles']; }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let formDigestValue = '';
-    let spoAdminUrl: string = '';
-    let tenantId: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const tenantId: string = await spo.getTenantId(logger, this.debug);
+      const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
+      const formDigestValue = await spo.getRequestDigest(spoAdminUrl);
 
-    spo
-      .getTenantId(logger, this.debug)
-      .then((_tenantId: string): Promise<string> => {
-        tenantId = _tenantId;
-        return spo.getSpoAdminUrl(logger, this.debug);
-      })
-      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
-        spoAdminUrl = _spoAdminUrl;
-        return spo.getRequestDigest(spoAdminUrl);
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        formDigestValue = res.FormDigestValue;
-
-        // map the args.options to XML Properties
-        let propsXml: string = '';
-        let id: number = 42; // geek's humor
-        for (const optionKey of Object.keys(args.options)) {
-          if (this.isExcludedOption(optionKey)) {
-            continue;
-          }
-
-          let optionValue = args.options[optionKey];
-          if (this.getAllEnumOptions().indexOf(optionKey) > -1) {
-            // map enum values to int
-            optionValue = this.mapEnumToInt(optionKey, args.options[optionKey]);
-          }
-
-          if (['AllowedDomainListForSyncClient', 'DisabledWebPartIds'].indexOf(optionKey) > -1) {
-            // the XML has to be represented as array of guids
-            let valuesXml: string = '';
-            optionValue.split(',').forEach((value: string) => {
-              valuesXml += `<Object Type="Guid">{${formatting.escapeXml(value)}}</Object>`;
-            });
-            propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="Array">${valuesXml}</Parameter></SetProperty><Method Name="Update" Id="${id++}" ObjectPathId="7" />`;
-          }
-          else if (['ExcludedFileExtensionsForSyncClient'].indexOf(optionKey) > -1) {
-            // the XML has to be represented as array of strings
-            let valuesXml: string = '';
-            optionValue.split(',').forEach((value: string) => {
-              valuesXml += `<Object Type="String">${value}</Object>`;
-            });
-            propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="Array">${valuesXml}</Parameter></SetProperty><Method Name="Update" Id="${id++}" ObjectPathId="7" />`;
-          }
-          else {
-            propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="String">${optionValue}</Parameter></SetProperty>`;
-          }
+      // map the args.options to XML Properties
+      let propsXml: string = '';
+      let id: number = 42; // geek's humor
+      for (const optionKey of Object.keys(args.options)) {
+        if (this.isExcludedOption(optionKey)) {
+          continue;
         }
 
-        const requestOptions: any = {
-          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': formDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${propsXml}</Actions><ObjectPaths><Identity Id="7" Name="${tenantId}" /></ObjectPaths></Request>`
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          cb(new CommandError(response.ErrorInfo.ErrorMessage));
-          return;
+        let optionValue = args.options[optionKey];
+        if (this.getAllEnumOptions().indexOf(optionKey) > -1) {
+          // map enum values to int
+          optionValue = this.mapEnumToInt(optionKey, args.options[optionKey]);
         }
 
-        if (args.options.EnableAzureADB2BIntegration === true) {
-          this.warn(logger, 'WARNING: Make sure to also enable the Azure AD one-time passcode authentication preview. If it is not enabled then SharePoint will not use Azure AD B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.');
+        if (['AllowedDomainListForSyncClient', 'DisabledWebPartIds'].indexOf(optionKey) > -1) {
+          // the XML has to be represented as array of guids
+          let valuesXml: string = '';
+          optionValue.split(',').forEach((value: string) => {
+            valuesXml += `<Object Type="Guid">{${formatting.escapeXml(value)}}</Object>`;
+          });
+          propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="Array">${valuesXml}</Parameter></SetProperty><Method Name="Update" Id="${id++}" ObjectPathId="7" />`;
         }
+        else if (['ExcludedFileExtensionsForSyncClient'].indexOf(optionKey) > -1) {
+          // the XML has to be represented as array of strings
+          let valuesXml: string = '';
+          optionValue.split(',').forEach((value: string) => {
+            valuesXml += `<Object Type="String">${value}</Object>`;
+          });
+          propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="Array">${valuesXml}</Parameter></SetProperty><Method Name="Update" Id="${id++}" ObjectPathId="7" />`;
+        }
+        else {
+          propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="String">${optionValue}</Parameter></SetProperty>`;
+        }
+      }
 
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      const requestOptions: any = {
+        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'X-RequestDigest': formDigestValue
+        },
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${propsXml}</Actions><ObjectPaths><Identity Id="7" Name="${tenantId}" /></ObjectPaths></Request>`
+      };
+
+      const res: string = await request.post(requestOptions);
+      const json: ClientSvcResponse = JSON.parse(res);
+      const response: ClientSvcResponseContents = json[0];
+      if (response.ErrorInfo) {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+
+      if (args.options.EnableAzureADB2BIntegration === true) {
+        this.warn(logger, 'WARNING: Make sure to also enable the Azure AD one-time passcode authentication preview. If it is not enabled then SharePoint will not use Azure AD B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.');
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   public isExcludedOption(optionKey: string): boolean {

@@ -71,45 +71,23 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('calls telemetry', (done) => {
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(trackEvent.called);
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+  it('calls telemetry', async () => {
+    await assert.rejects(command.action(logger, { options: {} }));
+    assert(trackEvent.called);
   });
 
-  it('logs correct telemetry event', (done) => {
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert.strictEqual(telemetry.name, commands.PROJECT_EXTERNALIZE);
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+  it('logs correct telemetry event', async () => {
+    await assert.rejects(command.action(logger, { options: {} }));
+    assert.strictEqual(telemetry.name, commands.PROJECT_EXTERNALIZE);
   });
 
-  it('shows error if the project path couldn\'t be determined', (done) => {
+  it('shows error if the project path couldn\'t be determined', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => null);
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError(`Couldn't find project root folder`, 1));
   });
 
-  it('searches for package.json in the parent folder when it doesn\'t exist in the current folder', (done) => {
+  it('searches for package.json in the parent folder when it doesn\'t exist in the current folder', async () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => {
       if (path.toString().endsWith('package.json')) {
         return false;
@@ -119,18 +97,10 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError(`Couldn't find project root folder`, 1));
   });
 
-  it(`correctly handles the case when .yo-rc.json exists but doesn't contain spfx project info`, (done) => {
+  it(`correctly handles the case when .yo-rc.json exists but doesn't contain spfx project info`, async () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((path) => {
       if (path.toString().endsWith('.yo-rc.json') || path.toString().endsWith('package.json')) {
@@ -158,18 +128,11 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    command.action(logger, { options: {} } as any, () => {
-      try {
-        assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.8.1');
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: {} } as any);
+    assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.8.1');
   });
 
-  it('determines the current version from .yo-rc.json when available', (done) => {
+  it('determines the current version from .yo-rc.json when available', async () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((path) => {
       if (path.toString().endsWith('.yo-rc.json')) {
@@ -197,18 +160,11 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    command.action(logger, { options: {} } as any, () => {
-      try {
-        assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '0.4.1');
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {} } as any));
+    assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '0.4.1');
   });
 
-  it('tries to determine the current version from package.json if .yo-rc.json doesn\'t exist', (done) => {
+  it('tries to determine the current version from package.json if .yo-rc.json doesn\'t exist', async () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((path) => {
       if (path.toString().endsWith('.yo-rc.json')) {
@@ -258,18 +214,11 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    command.action(logger, { options: {} } as any, () => {
-      try {
-        assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: {} } as any);
+    assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
   });
 
-  it('shows error if the project version couldn\'t be determined', (done) => {
+  it('shows error if the project version couldn\'t be determined', async () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((path) => {
       if (path.toString().endsWith('.yo-rc.json')) {
@@ -280,18 +229,11 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, 3)));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError(`Unable to determine the version of the current SharePoint Framework project`, 3));
   });
 
-  it('determining project version doesn\'t fail if .yo-rc.json is empty', () => {
+  it('determining project version doesn\'t fail if .yo-rc.json is empty', async () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((path) => {
       if (path.toString().endsWith('.yo-rc.json')) {
@@ -344,26 +286,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    command.action(logger, { options: { toVersion: '1.4.1' } } as any, () => {
-      assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
-    });
-  });
-
-  it('determining project version doesn\'t fail if package.json is empty', () => {
-    const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
-      if (path.toString().endsWith('package.json')) {
-        return '';
-      }
-      else {
-        return originalReadFileSync(path, encoding);
-      }
-    });
-    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
-
-    command.action(logger, { options: { toVersion: '1.4.1' } } as any, () => {
-      assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, undefined);
-    });
+    await command.action(logger, { options: { toVersion: '1.4.1' } } as any);
+    assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
   });
 
   it('loads config.json when available', () => {
@@ -473,7 +397,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   //#region findings
 
-  it('e2e: shows correct number of findings for externalizing react web part 1.8.2 project', (done) => {
+  it('e2e: shows correct number of findings for externalizing react web part 1.8.2 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
@@ -495,19 +419,12 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({ scriptType: 'module' })));
 
-    command.action(logger, { options: { output: 'json', debug: true } } as any, () => {
-      try {
-        const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[logEntryToCheck + 3]; //because debug is enabled
-        assert.strictEqual((findings.externalConfiguration.externals['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js');
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: { output: 'json', debug: true } } as any);
+    const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[logEntryToCheck + 3]; //because debug is enabled
+    assert.strictEqual((findings.externalConfiguration.externals['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js');
   });
 
-  it('returns edit suggestions', (done) => {
+  it('returns edit suggestions', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
@@ -538,19 +455,12 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       return Promise.resolve(JSON.stringify({ scriptType: 'script' }));
     });
 
-    command.action(logger, { options: { output: 'json', debug: false } } as any, () => {
-      try {
-        const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[0];
-        assert.notStrictEqual(findings.edits.length, 0);
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: { output: 'json', debug: false } } as any);
+    const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[0];
+    assert.notStrictEqual(findings.edits.length, 0);
   });
 
-  it('handles failures properly', (done) => {
+  it('handles failures properly', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
@@ -609,47 +519,25 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    command.action(logger, { options: { output: 'json', debug: true } } as any, (err?: any) => {
-      try {
-        assert.notStrictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { output: 'json', debug: true } } as any));
   });
   //#endregion
 
-  it('outputs JSON object with output format json', (done) => {
+  it('outputs JSON object with output format json', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
 
-    command.action(logger, { options: { output: 'json' } } as any, () => {
-      try {
-        assert(JSON.stringify(log[0]).startsWith('{'));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: { output: 'json' } } as any);
+    assert(JSON.stringify(log[0]).startsWith('{'));
   });
 
-  it('returns markdown report with output format md', (done) => {
+  it('returns markdown report with output format md', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
 
-    command.action(logger, { options: { output: 'md' } } as any, () => {
-      try {
-        assert(log[logEntryToCheck].indexOf('## Findings') > -1);
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: { output: 'md' } } as any);
+    assert(log[logEntryToCheck].indexOf('## Findings') > -1);
   });
 
-  it('returns text report with output format default', (done) => {
+  it('returns text report with output format default', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;
     sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
@@ -670,15 +558,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({ scriptType: 'module' })));
-    command.action(logger, { options: {} } as any, () => {
-      try {
-        assert.notStrictEqual(log[1].indexOf('externalConfiguration'), -1);
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: {} } as any);
+    assert.notStrictEqual(log[1].indexOf('externalConfiguration'), -1);
   });
 
   it('covers all text report branches', () => {

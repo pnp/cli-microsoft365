@@ -156,7 +156,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['FileName', 'ServerRelativeUrl']);
   });
 
-  it('returns attachments associated to a list item by listId', (done) => {
+  it('returns attachments associated to a list item by listId', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     const options: any = {
@@ -166,18 +166,11 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
       itemId: itemId
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(jsonOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(jsonOutput));
   });
 
-  it('returns attachments associated to a list item by listTitle', (done) => {
+  it('returns attachments associated to a list item by listTitle', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     const options: any = {
@@ -187,18 +180,11 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
       itemId: itemId
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(jsonOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(jsonOutput));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     const options: any = {
@@ -209,18 +195,10 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
       output: "json"
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles No attachments found (debug)', (done) => {
+  it('correctly handles No attachments found (debug)', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({ AttachmentFiles: [] });
     });
@@ -232,14 +210,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
       itemId: itemId
     };
 
-    command.action(logger, { options: options }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith('No attachments found'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options });
+    assert(loggerLogToStderrSpy.calledWith('No attachments found'));
   });
 });

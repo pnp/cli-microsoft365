@@ -96,34 +96,33 @@ class PlannerPlanAddCommand extends GraphCommand {
     this.optionSets.push(['ownerGroupId', 'ownerGroupName']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
-    this
-      .getGroupId(args)
-      .then((groupId: string): Promise<any> => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans`,
-          headers: {
-            'accept': 'application/json;odata.metadata=none'
-          },
-          responseType: 'json',
-          data: {
-            owner: groupId,
-            title: args.options.title
-          }
-        };
+    try {
+      const groupId = await this.getGroupId(args);
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/planner/plans`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: {
+          owner: groupId,
+          title: args.options.title
+        }
+      };
 
-        return request.post(requestOptions);
-      })
-      .then(newPlan => this.updatePlanDetails(args.options, newPlan))
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const newPlan = await request.post<any>(requestOptions);
+      const result = await this.updatePlanDetails(args.options, newPlan);
+      logger.log(result);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private updatePlanDetails(options: Options, newPlan: PlannerPlan): Promise<PlannerPlan & PlannerPlanDetails> {

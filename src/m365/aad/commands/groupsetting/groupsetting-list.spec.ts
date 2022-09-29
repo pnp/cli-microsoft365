@@ -63,7 +63,7 @@ describe(commands.GROUPSETTING_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName']);
   });
 
-  it('lists group setting templates', (done) => {
+  it('lists group setting templates', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -134,76 +134,69 @@ describe(commands.GROUPSETTING_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
-          "displayName": "Group.Unified",
-          "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
-          "values": [
-            {
-              "name": "CustomBlockedWordsList",
-              "value": ""
-            },
-            {
-              "name": "EnableMSStandardBlockedWords",
-              "value": "false"
-            },
-            {
-              "name": "ClassificationDescriptions",
-              "value": ""
-            },
-            {
-              "name": "DefaultClassification",
-              "value": ""
-            },
-            {
-              "name": "PrefixSuffixNamingRequirement",
-              "value": ""
-            },
-            {
-              "name": "AllowGuestsToBeGroupOwner",
-              "value": "false"
-            },
-            {
-              "name": "AllowGuestsToAccessGroups",
-              "value": "true"
-            },
-            {
-              "name": "GuestUsageGuidelinesUrl",
-              "value": ""
-            },
-            {
-              "name": "GroupCreationAllowedGroupId",
-              "value": ""
-            },
-            {
-              "name": "AllowToAddGuests",
-              "value": "true"
-            },
-            {
-              "name": "UsageGuidelinesUrl",
-              "value": ""
-            },
-            {
-              "name": "ClassificationList",
-              "value": ""
-            },
-            {
-              "name": "EnableGroupCreation",
-              "value": "true"
-            }
-          ]
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith([{
+      "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
+      "displayName": "Group.Unified",
+      "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+      "values": [
+        {
+          "name": "CustomBlockedWordsList",
+          "value": ""
+        },
+        {
+          "name": "EnableMSStandardBlockedWords",
+          "value": "false"
+        },
+        {
+          "name": "ClassificationDescriptions",
+          "value": ""
+        },
+        {
+          "name": "DefaultClassification",
+          "value": ""
+        },
+        {
+          "name": "PrefixSuffixNamingRequirement",
+          "value": ""
+        },
+        {
+          "name": "AllowGuestsToBeGroupOwner",
+          "value": "false"
+        },
+        {
+          "name": "AllowGuestsToAccessGroups",
+          "value": "true"
+        },
+        {
+          "name": "GuestUsageGuidelinesUrl",
+          "value": ""
+        },
+        {
+          "name": "GroupCreationAllowedGroupId",
+          "value": ""
+        },
+        {
+          "name": "AllowToAddGuests",
+          "value": "true"
+        },
+        {
+          "name": "UsageGuidelinesUrl",
+          "value": ""
+        },
+        {
+          "name": "ClassificationList",
+          "value": ""
+        },
+        {
+          "name": "EnableGroupCreation",
+          "value": "true"
+        }
+      ]
+    }]));
   });
 
-  it('lists group setting templates (debug)', (done) => {
+  it('lists group setting templates (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -274,76 +267,69 @@ describe(commands.GROUPSETTING_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
-          "displayName": "Group.Unified",
-          "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
-          "values": [
-            {
-              "name": "CustomBlockedWordsList",
-              "value": ""
-            },
-            {
-              "name": "EnableMSStandardBlockedWords",
-              "value": "false"
-            },
-            {
-              "name": "ClassificationDescriptions",
-              "value": ""
-            },
-            {
-              "name": "DefaultClassification",
-              "value": ""
-            },
-            {
-              "name": "PrefixSuffixNamingRequirement",
-              "value": ""
-            },
-            {
-              "name": "AllowGuestsToBeGroupOwner",
-              "value": "false"
-            },
-            {
-              "name": "AllowGuestsToAccessGroups",
-              "value": "true"
-            },
-            {
-              "name": "GuestUsageGuidelinesUrl",
-              "value": ""
-            },
-            {
-              "name": "GroupCreationAllowedGroupId",
-              "value": ""
-            },
-            {
-              "name": "AllowToAddGuests",
-              "value": "true"
-            },
-            {
-              "name": "UsageGuidelinesUrl",
-              "value": ""
-            },
-            {
-              "name": "ClassificationList",
-              "value": ""
-            },
-            {
-              "name": "EnableGroupCreation",
-              "value": "true"
-            }
-          ]
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith([{
+      "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
+      "displayName": "Group.Unified",
+      "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+      "values": [
+        {
+          "name": "CustomBlockedWordsList",
+          "value": ""
+        },
+        {
+          "name": "EnableMSStandardBlockedWords",
+          "value": "false"
+        },
+        {
+          "name": "ClassificationDescriptions",
+          "value": ""
+        },
+        {
+          "name": "DefaultClassification",
+          "value": ""
+        },
+        {
+          "name": "PrefixSuffixNamingRequirement",
+          "value": ""
+        },
+        {
+          "name": "AllowGuestsToBeGroupOwner",
+          "value": "false"
+        },
+        {
+          "name": "AllowGuestsToAccessGroups",
+          "value": "true"
+        },
+        {
+          "name": "GuestUsageGuidelinesUrl",
+          "value": ""
+        },
+        {
+          "name": "GroupCreationAllowedGroupId",
+          "value": ""
+        },
+        {
+          "name": "AllowToAddGuests",
+          "value": "true"
+        },
+        {
+          "name": "UsageGuidelinesUrl",
+          "value": ""
+        },
+        {
+          "name": "ClassificationList",
+          "value": ""
+        },
+        {
+          "name": "EnableGroupCreation",
+          "value": "true"
+        }
+      ]
+    }]));
   });
 
-  it('includes all properties in output type json', (done) => {
+  it('includes all properties in output type json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -414,78 +400,71 @@ describe(commands.GROUPSETTING_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, output: 'json' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
+    await command.action(logger, { options: { debug: false, output: 'json' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
+        "displayName": "Group.Unified",
+        "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+        "values": [
           {
-            "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
-            "displayName": "Group.Unified",
-            "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
-            "values": [
-              {
-                "name": "CustomBlockedWordsList",
-                "value": ""
-              },
-              {
-                "name": "EnableMSStandardBlockedWords",
-                "value": "false"
-              },
-              {
-                "name": "ClassificationDescriptions",
-                "value": ""
-              },
-              {
-                "name": "DefaultClassification",
-                "value": ""
-              },
-              {
-                "name": "PrefixSuffixNamingRequirement",
-                "value": ""
-              },
-              {
-                "name": "AllowGuestsToBeGroupOwner",
-                "value": "false"
-              },
-              {
-                "name": "AllowGuestsToAccessGroups",
-                "value": "true"
-              },
-              {
-                "name": "GuestUsageGuidelinesUrl",
-                "value": ""
-              },
-              {
-                "name": "GroupCreationAllowedGroupId",
-                "value": ""
-              },
-              {
-                "name": "AllowToAddGuests",
-                "value": "true"
-              },
-              {
-                "name": "UsageGuidelinesUrl",
-                "value": ""
-              },
-              {
-                "name": "ClassificationList",
-                "value": ""
-              },
-              {
-                "name": "EnableGroupCreation",
-                "value": "true"
-              }
-            ]
+            "name": "CustomBlockedWordsList",
+            "value": ""
+          },
+          {
+            "name": "EnableMSStandardBlockedWords",
+            "value": "false"
+          },
+          {
+            "name": "ClassificationDescriptions",
+            "value": ""
+          },
+          {
+            "name": "DefaultClassification",
+            "value": ""
+          },
+          {
+            "name": "PrefixSuffixNamingRequirement",
+            "value": ""
+          },
+          {
+            "name": "AllowGuestsToBeGroupOwner",
+            "value": "false"
+          },
+          {
+            "name": "AllowGuestsToAccessGroups",
+            "value": "true"
+          },
+          {
+            "name": "GuestUsageGuidelinesUrl",
+            "value": ""
+          },
+          {
+            "name": "GroupCreationAllowedGroupId",
+            "value": ""
+          },
+          {
+            "name": "AllowToAddGuests",
+            "value": "true"
+          },
+          {
+            "name": "UsageGuidelinesUrl",
+            "value": ""
+          },
+          {
+            "name": "ClassificationList",
+            "value": ""
+          },
+          {
+            "name": "EnableGroupCreation",
+            "value": "true"
           }
-        ]));
-        done();
+        ]
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.reject({
@@ -505,15 +484,7 @@ describe(commands.GROUPSETTING_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

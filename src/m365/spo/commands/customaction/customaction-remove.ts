@@ -94,42 +94,42 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
   	this.optionSets.push(['id', 'title']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeCustomAction = (): void => {
-      ((): Promise<CustomAction | void> => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeCustomAction: () => Promise<void> = async (): Promise<void> => {
+      try {
+        let customAction: CustomAction | void;
         if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
-          return this.removeScopedCustomAction(args.options);
+          customAction = await this.removeScopedCustomAction(args.options);
+        }
+        else {
+          customAction = await this.searchAllScopes(args.options);
         }
 
-        return this.searchAllScopes(args.options);
-      })()
-        .then((customAction: CustomAction | void): void => {
-          if (this.verbose) {
-            if (customAction && customAction["odata.null"] === true) {
-              logger.logToStderr(`Custom action with id ${args.options.id} not found`);
-            }
+        if (this.verbose) {
+          if (customAction && customAction["odata.null"] === true) {
+            logger.logToStderr(`Custom action with id ${args.options.id} not found`);
           }
-          cb();
-        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        }
+      }
+      catch (err: any) {
+        this.handleRejectedPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeCustomAction();
+      await removeCustomAction();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the ${args.options.id} user custom action?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeCustomAction();
-        }
       });
+
+      if (result.continue) {
+        await removeCustomAction();
+      }
     }
   }
 

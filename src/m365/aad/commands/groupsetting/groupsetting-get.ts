@@ -49,21 +49,22 @@ class AadGroupSettingGetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groupSettings/${args.options.id}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/groupSettings/${args.options.id}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res = await request.get(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

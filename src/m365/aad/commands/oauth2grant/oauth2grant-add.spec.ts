@@ -62,7 +62,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds OAuth2 permission grant (debug)', (done) => {
+  it('adds OAuth2 permission grant (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants`) > -1) {
         if (opts.headers &&
@@ -78,23 +78,14 @@ describe(commands.OAUTH2GRANT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6321', scope: 'user_impersonation' } } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6321', scope: 'user_impersonation' } } as any);
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('adds OAuth2 permission grant', (done) => {
+  it('adds OAuth2 permission grant', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants`) > -1) {
         if (opts.headers &&
-          opts.headers.authorization &&
-          (opts.headers.authorization as string).indexOf('Bearer ') === 0 &&
           opts.headers['content-type'] &&
           (opts.headers['content-type'] as string).indexOf('application/json') === 0 &&
           opts.data.clientId === '6a7b1395-d313-4682-8ed4-65a6265a6320' &&
@@ -107,18 +98,11 @@ describe(commands.OAUTH2GRANT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6321', scope: 'user_impersonation' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6321', scope: 'user_impersonation' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
@@ -132,15 +116,8 @@ describe(commands.OAUTH2GRANT_ADD, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('fails validation if the clientId is not a valid GUID', async () => {

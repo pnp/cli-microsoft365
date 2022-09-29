@@ -179,7 +179,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 
@@ -187,44 +187,35 @@ class PlannerTaskSetCommand extends GraphCommand {
     }
 
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
-    this
-      .getBucketId(args.options)
-      .then(bucketId => {
-        this.bucketId = bucketId;
+    try {
+      this.bucketId = await this.getBucketId(args.options);
+      this.assignments = await this.generateUserAssignments(args.options);
+      const etag = await this.getTaskEtag(args.options.id);
+      const appliedCategories = this.generateAppliedCategories(args.options);
+      const data = this.mapRequestBody(args.options, appliedCategories);
 
-        return this.generateUserAssignments(args.options);
-      })
-      .then(resultAssignments => {
-        this.assignments = resultAssignments;
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/planner/tasks/${args.options.id}`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none',
+          'If-Match': etag,
+          'Prefer': 'return=representation'
+        },
+        responseType: 'json',
+        data: data
+      };
 
-        return this.getTaskEtag(args.options.id);
-      })
-      .then(etag => {
-        const appliedCategories = this.generateAppliedCategories(args.options);
-        const data = this.mapRequestBody(args.options, appliedCategories);
-
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/tasks/${args.options.id}`,
-          headers: {
-            'accept': 'application/json;odata.metadata=none',
-            'If-Match': etag,
-            'Prefer': 'return=representation'
-          },
-          responseType: 'json',
-          data: data
-        };
-
-        return request.patch(requestOptions) as PlannerTask;
-      })
-      .then(newTask => this.updateTaskDetails(args.options, newTask))
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const newTask = await request.patch<PlannerTask>(requestOptions);
+      const result = await this.updateTaskDetails(args.options, newTask);
+      logger.log(result);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private updateTaskDetails(options: Options, newTask: PlannerTask): Promise<PlannerTask & PlannerTaskDetails> {

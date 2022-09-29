@@ -124,28 +124,21 @@ describe(commands.FILE_MOVE, () => {
     assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['targetUrl']);
   });
 
-  it('should command complete successfully', (done) => {
+  it('should command complete successfully', async () => {
     stubAllPostRequests();
     stubAllGetRequests();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.callCount === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.callCount === 0);
   });
 
-  it('should complete successfully in 4 tries', (done) => {
+  it('should complete successfully in 4 tries', async () => {
     let counter = 4;
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/recycle()') > -1) {
@@ -171,55 +164,23 @@ describe(commands.FILE_MOVE, () => {
 
     stubAllGetRequests();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-  it('should fail if source file not found', (done) => {
-    stubAllPostRequests();
-    const rejectFileExists = new Promise<any>((resolve, reject) => {
-      return reject('File not found.');
-    });
-    stubAllGetRequests(rejectFileExists);
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File not found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('should succeed when run with option --deleteIfAlreadyExists and response 404', (done) => {
+  it('should succeed when run with option --deleteIfAlreadyExists and response 404', async () => {
     const recycleFile404 = new Promise<any>((resolve, reject) => {
       return reject({ statusCode: 404 });
     });
     stubAllPostRequests(recycleFile404);
     stubAllGetRequests();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -227,49 +188,33 @@ describe(commands.FILE_MOVE, () => {
         targetUrl: 'abc',
         deleteIfAlreadyExists: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
-  it('should show error when recycleFile rejects with error', (done) => {
+  it('should show error when recycleFile rejects with error', async () => {
     const recycleFile = new Promise<any>((resolve, reject) => {
       return reject('abc');
     });
     stubAllPostRequests(recycleFile);
     stubAllGetRequests();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc',
         deleteIfAlreadyExists: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('abc'));
   });
 
-  it('should recycleFile format target url', (done) => {
+  it('should recycleFile format target url', async () => {
     const recycleFile = new Promise<any>((resolve, reject) => {
       return reject('abc');
     });
     stubAllPostRequests(recycleFile);
     stubAllGetRequests();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -277,52 +222,38 @@ describe(commands.FILE_MOVE, () => {
         targetUrl: '/abc/',
         deleteIfAlreadyExists: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('abc'));
   });
 
-  it('should show error when getRequestDigestForSite rejects with error', (done) => {
+  it('should show error when getRequestDigestForSite rejects with error', async () => {
     stubAllPostRequests();
     stubAllGetRequests();
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('error'));
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc',
-        deleteIfAlreadyExists: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(spo.getRequestDigest);
-        sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
-          FormDigestValue: 'abc',
-          FormDigestTimeoutSeconds: 1800,
-          FormDigestExpiresAt: new Date(),
-          WebFullUrl: 'https://contoso.sharepoint.com'
-        }));
-      }
-    });
+    try {
+      await assert.rejects(command.action(logger, {
+        options: {
+          debug: true,
+          webUrl: 'https://contoso.sharepoint.com',
+          sourceUrl: 'abc/abc.pdf',
+          targetUrl: 'abc',
+          deleteIfAlreadyExists: true
+        }
+      } as any), new CommandError('error'));
+    }
+    finally {
+      sinonUtil.restore(spo.getRequestDigest);
+      sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+        FormDigestValue: 'abc',
+        FormDigestTimeoutSeconds: 1800,
+        FormDigestExpiresAt: new Date(),
+        WebFullUrl: 'https://contoso.sharepoint.com'
+      }));
+    }
   });
 
-  it('should show error when waitForJobResult rejects with JobError', (done) => {
+  it('should show error when waitForJobResult rejects with JobError', async () => {
     const waitForJobResult = new Promise<any>((resolve) => {
       const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
       return resolve({ Logs: [log] });
@@ -330,7 +261,7 @@ describe(commands.FILE_MOVE, () => {
     stubAllPostRequests(null, null, waitForJobResult);
     stubAllGetRequests();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -338,18 +269,10 @@ describe(commands.FILE_MOVE, () => {
         targetUrl: 'abc',
         deleteIfAlreadyExists: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('error1'));
   });
 
-  it('should show error when waitForJobResult rejects with JobFatalError', (done) => {
+  it('should show error when waitForJobResult rejects with JobFatalError', async () => {
     const waitForJobResult = new Promise<any>((resolve) => {
       const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
       return resolve({ JobState: 0, Logs: [log] });
@@ -357,7 +280,7 @@ describe(commands.FILE_MOVE, () => {
     stubAllPostRequests(null, null, waitForJobResult);
     stubAllGetRequests();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -365,156 +288,7 @@ describe(commands.FILE_MOVE, () => {
         targetUrl: 'abc',
         deleteIfAlreadyExists: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error2')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-
-  it('should complete successfully where baseUrl has a trailing /', (done) => {
-    let actual: string = '';
-    const expected: string = JSON.stringify({
-      exportObjectUris: [
-        'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf'
-      ],
-      destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
-      options: {
-        'AllowSchemaMismatch': false,
-        'IgnoreVersionHistory': true,
-        'IsMoveMode': true
-      }
-    });
-
-    sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.data);
-      if (
-        opts.data.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf' &&
-        opts.data.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
-        opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
-      ) {
-        return Promise.resolve();
-
-      }
-      return Promise.reject('Invalid request');
-
-    });
-    stubAllGetRequests();
-
-    command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
-        sourceUrl: 'library/file1.pdf',
-        targetUrl: 'sites/team-b/library2'
-      }
-    }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should complete successfully where sourceUrl and targetUrl has a trailing /', (done) => {
-    let actual: string = '';
-    const expected: string = JSON.stringify({
-      exportObjectUris: [
-        'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf'
-      ],
-      destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
-      options: {
-        'AllowSchemaMismatch': false,
-        'IgnoreVersionHistory': true,
-        'IsMoveMode': true
-      }
-    });
-
-    sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.data);
-      if (
-        opts.data.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf' &&
-        opts.data.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
-        opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
-      ) {
-        return Promise.resolve();
-
-      }
-      return Promise.reject('Invalid request');
-
-    });
-
-    stubAllGetRequests();
-
-    command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
-        sourceUrl: 'library/file1.pdf/',
-        targetUrl: 'sites/team-b/library2/'
-      }
-    }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should complete successfully where sourceUrl and targetUrl has a beginning /', (done) => {
-    let actual: string = '';
-    const expected: string = JSON.stringify({
-      exportObjectUris: [
-        'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf'
-      ],
-      destinationUri: 'https://contoso.sharepoint.com/sites/team-b/library2',
-      options: {
-        'AllowSchemaMismatch': false,
-        'IgnoreVersionHistory': true,
-        'IsMoveMode': true
-      }
-    });
-
-    sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.data);
-      if (
-        opts.data.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/file1.pdf' &&
-        opts.data.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
-        opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
-      ) {
-        return Promise.resolve();
-
-      }
-      return Promise.reject('Invalid request');
-
-    });
-
-    stubAllGetRequests();
-
-    command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
-        sourceUrl: '/library/file1.pdf/',
-        targetUrl: '/sites/team-b/library2/'
-      }
-    }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('error2'));
   });
 
   it('supports debug mode', () => {

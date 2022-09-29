@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -36,9 +36,9 @@ describe(commands.TAB_REMOVE, () => {
       }
     };
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -118,97 +118,69 @@ describe(commands.TAB_REMOVE, () => {
   });
 
 
-  it('prompts before removing the specified tab when confirm option not passed', (done) => {
-    command.action(logger, {
+  it('prompts before removing the specified tab when confirm option not passed', async () => {
+    await command.action(logger, {
       options: {
         debug: false,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('prompts before removing the specified tab when confirm option not passed (debug)', (done) => {
-    command.action(logger, {
+  it('prompts before removing the specified tab when confirm option not passed (debug)', async () => {
+    await command.action(logger, {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('aborts removing the specified tab when confirm option not passed and prompt not confirmed', (done) => {
+  it('aborts removing the specified tab when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(postSpy.notCalled);
   });
 
-  it('aborts removing the specified tab when confirm option not passed and prompt not confirmed (debug)', (done) => {
+  it('aborts removing the specified tab when confirm option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(postSpy.notCalled);
   });
 
-  it('removes the specified tab by id when prompt confirmed (debug)', (done) => {
+  it('removes the specified tab by id when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if ((opts.url as string).indexOf(`tabs/d66b8110-fcad-49e8-8159-0d488ddb7656`) > -1) {
         return Promise.resolve();
@@ -218,29 +190,22 @@ describe(commands.TAB_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await command.action(logger, {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
 
-  it('removes the specified tab without prompting when confirmed specified (debug)', (done) => {
+  it('removes the specified tab without prompting when confirmed specified (debug)', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if ((opts.url as string).indexOf(`tabs/d66b8110-fcad-49e8-8159-0d488ddb7656`) > -1) {
         return Promise.resolve();
@@ -249,7 +214,7 @@ describe(commands.TAB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
@@ -257,12 +222,21 @@ describe(commands.TAB_REMOVE, () => {
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         confirm: true
       }
-    }, (err?: any) => {
-      assert.strictEqual(typeof err, 'undefined');
-      done();
     });
   });
 
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'delete').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: { 
+      debug: false,
+      channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+      teamId: '00000000-0000-0000-0000-000000000000',
+      tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      confirm: true } } as any), new CommandError('An error has occurred'));
+  });
 
   it('supports debug mode', () => {
     const options = command.options;

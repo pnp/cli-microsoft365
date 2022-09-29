@@ -110,7 +110,7 @@ class SpoListItemSetCommand extends SpoCommand {
     this.optionSets.push(['listId', 'listTitle']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
     const listRestUrl: string = (args.options.listId ?
@@ -121,7 +121,7 @@ class SpoListItemSetCommand extends SpoCommand {
     let formDigestValue: string = '';
     let environmentListId: string = '';
 
-    ((): Promise<any> => {
+    try {
       if (args.options.systemUpdate) {
         if (this.verbose) {
           logger.logToStderr(`Getting list id...`);
@@ -135,185 +135,169 @@ class SpoListItemSetCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        return request.get(listRequestOptions);
+        const dataReturned: any = await request.get(listRequestOptions);
+        environmentListId = dataReturned.value;
       }
-      else {
-        return Promise.resolve();
-      }
-    })()
-      .then((dataReturned: any): Promise<void> => {
-        if (dataReturned) {
-          environmentListId = dataReturned.value;
-        }
-
-        if (args.options.contentType) {
-          if (this.verbose) {
-            logger.logToStderr(`Getting content types for list...`);
-          }
-
-          const requestOptions: any = {
-            url: `${listRestUrl}/contenttypes?$select=Name,Id`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-
-          return request.get(requestOptions);
-        }
-        else {
-          return Promise.resolve();
-        }
-      })
-      .then((response: any): Promise<ContextInfo> => {
-        if (args.options.contentType) {
-          if (this.debug) {
-            logger.logToStderr('content type lookup response...');
-            logger.logToStderr(response);
-          }
-
-          const foundContentType: { Name: string; }[] = response.value.filter((ct: any) => {
-            const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
-
-            if (this.debug) {
-              logger.logToStderr(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
-            }
-
-            return contentTypeMatch;
-          });
-
-          if (this.debug) {
-            logger.logToStderr('content type filter output...');
-            logger.logToStderr(foundContentType);
-          }
-
-          if (foundContentType.length > 0) {
-            contentTypeName = foundContentType[0].Name;
-          }
-
-          // After checking for content types, throw an error if the name is blank
-          if (!contentTypeName || contentTypeName === '') {
-            return Promise.reject(`Specified content type '${args.options.contentType}' doesn't exist on the target list`);
-          }
-
-          if (this.debug) {
-            logger.logToStderr(`using content type name: ${contentTypeName}`);
-          }
-        }
-        if (args.options.systemUpdate) {
-          if (this.debug) {
-            logger.logToStderr(`getting request digest for systemUpdate request`);
-          }
-
-          return spo.getRequestDigest(args.options.webUrl);
-        }
-        else {
-          return Promise.resolve(undefined as any);
-        }
-      })
-      .then((res: ContextInfo): Promise<string> => {
+      
+      if (args.options.contentType) {
         if (this.verbose) {
-          logger.logToStderr(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
-        }
-
-        formDigestValue = args.options.systemUpdate ? res['FormDigestValue'] : '';
-
-        if (args.options.systemUpdate) {
-          return this.requestObjectIdentity(args.options.webUrl, logger, formDigestValue);
-        }
-
-        return Promise.resolve('');
-      }).then((objectIdentity: string): Promise<any> => {
-        const additionalContentType: string = (args.options.systemUpdate && args.options.contentType && contentTypeName !== '') ? `
-              <Parameters>
-                <Parameter Type="String">ContentType</Parameter>
-                <Parameter Type="String">${contentTypeName}</Parameter>
-              </Parameters>`
-          : ``;
-
-        const requestBody: any = args.options.systemUpdate ?
-          `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">
-            <Actions>
-              <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">${this.mapRequestBody(args.options).join()}${additionalContentType}
-              </Method>
-              <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />
-            </Actions>
-            <ObjectPaths>
-              <Identity Id="147" Name="${objectIdentity}:list:${environmentListId}:item:${args.options.id},1" />
-            </ObjectPaths>
-          </Request>`
-          : {
-            formValues: this.mapRequestBody(args.options)
-          };
-
-        if (args.options.contentType && contentTypeName !== '' && !args.options.systemUpdate) {
-          if (this.debug) {
-            logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
-          }
-
-          requestBody.formValues.push({
-            FieldName: 'ContentType',
-            FieldValue: contentTypeName
-          });
-        }
-
-        const requestOptions: any = args.options.systemUpdate ?
-          {
-            url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'Content-Type': 'text/xml',
-              'X-RequestDigest': formDigestValue
-            },
-            data: requestBody
-          } :
-          {
-            url: `${listRestUrl}/items(${args.options.id})/ValidateUpdateListItem()`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            data: requestBody,
-            responseType: 'json'
-          };
-
-        return request.post(requestOptions);
-      })
-      .then((response: any): Promise<any> => {
-        let itemId: number = 0;
-
-        if (args.options.systemUpdate) {
-          if (response.indexOf("ErrorMessage") > -1) {
-            return Promise.reject(`Error occurred in systemUpdate operation - ${response}`);
-          }
-          else {
-            itemId = Number(args.options.id);
-          }
-        }
-        else {
-          // Response is from /ValidateUpdateListItem POST call, perform get on updated item to get all field values
-          const returnedData: any = response.value;
-
-          if (!returnedData[0].ItemId) {
-            return Promise.reject(`Item didn't update successfully`);
-          }
-          else {
-            itemId = returnedData[0].ItemId;
-          }
+          logger.logToStderr(`Getting content types for list...`);
         }
 
         const requestOptions: any = {
-          url: `${listRestUrl}/items(${itemId})`,
+          url: `${listRestUrl}/contenttypes?$select=Name,Id`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
 
-        return request.get(requestOptions);
-      })
-      .then((response: any): void => {
-        logger.log(<ListItemInstance>response);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        const contentTypes: any = await request.get(requestOptions);
+
+        if (this.debug) {
+          logger.logToStderr('content type lookup response...');
+          logger.logToStderr(contentTypes);
+        }
+
+        const foundContentType: { Name: string; }[] = contentTypes.value.filter((ct: any) => {
+          const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
+
+          if (this.debug) {
+            logger.logToStderr(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
+          }
+
+          return contentTypeMatch;
+        });
+
+        if (this.debug) {
+          logger.logToStderr('content type filter output...');
+          logger.logToStderr(foundContentType);
+        }
+
+        if (foundContentType.length > 0) {
+          contentTypeName = foundContentType[0].Name;
+        }
+
+        // After checking for content types, throw an error if the name is blank
+        if (!contentTypeName || contentTypeName === '') {
+          throw `Specified content type '${args.options.contentType}' doesn't exist on the target list`;
+        }
+
+        if (this.debug) {
+          logger.logToStderr(`using content type name: ${contentTypeName}`);
+        }
+      }
+
+      let res: ContextInfo = undefined as any;
+
+      if (args.options.systemUpdate) {
+        if (this.debug) {
+          logger.logToStderr(`getting request digest for systemUpdate request`);
+        }
+
+        res = await spo.getRequestDigest(args.options.webUrl);
+      }
+
+      if (this.verbose) {
+        logger.logToStderr(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+      }
+
+      formDigestValue = args.options.systemUpdate ? res['FormDigestValue'] : '';
+      let objectIdentity: string = '';
+
+      if (args.options.systemUpdate) {
+        objectIdentity = await this.requestObjectIdentity(args.options.webUrl, logger, formDigestValue);
+      }
+
+      const additionalContentType: string = (args.options.systemUpdate && args.options.contentType && contentTypeName !== '') ? `
+            <Parameters>
+              <Parameter Type="String">ContentType</Parameter>
+              <Parameter Type="String">${contentTypeName}</Parameter>
+            </Parameters>`
+        : ``;
+
+      const requestBody: any = args.options.systemUpdate ?
+        `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">
+          <Actions>
+            <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">${this.mapRequestBody(args.options).join()}${additionalContentType}
+            </Method>
+            <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />
+          </Actions>
+          <ObjectPaths>
+            <Identity Id="147" Name="${objectIdentity}:list:${environmentListId}:item:${args.options.id},1" />
+          </ObjectPaths>
+        </Request>`
+        : {
+          formValues: this.mapRequestBody(args.options)
+        };
+
+      if (args.options.contentType && contentTypeName !== '' && !args.options.systemUpdate) {
+        if (this.debug) {
+          logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
+        }
+
+        requestBody.formValues.push({
+          FieldName: 'ContentType',
+          FieldValue: contentTypeName
+        });
+      }
+
+      const requestOptions: any = args.options.systemUpdate ?
+        {
+          url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'Content-Type': 'text/xml',
+            'X-RequestDigest': formDigestValue
+          },
+          data: requestBody
+        } :
+        {
+          url: `${listRestUrl}/items(${args.options.id})/ValidateUpdateListItem()`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          data: requestBody,
+          responseType: 'json'
+        };
+
+      const response: any = await request.post(requestOptions);
+      let itemId: number = 0;
+
+      if (args.options.systemUpdate) {
+        if (response.indexOf("ErrorMessage") > -1) {
+          throw `Error occurred in systemUpdate operation - ${response}`;
+        }
+        else {
+          itemId = Number(args.options.id);
+        }
+      }
+      else {
+        // Response is from /ValidateUpdateListItem POST call, perform get on updated item to get all field values
+        const returnedData: any = response.value;
+
+        if (!returnedData[0].ItemId) {
+          throw `Item didn't update successfully`;
+        }
+        else {
+          itemId = returnedData[0].ItemId;
+        }
+      }
+
+      const requestOptionsItems: any = {
+        url: `${listRestUrl}/items(${itemId})`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const itemsResponse = await request.get(requestOptionsItems);
+      logger.log(<ListItemInstance>itemsResponse);
+
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private mapRequestBody(options: Options): any {

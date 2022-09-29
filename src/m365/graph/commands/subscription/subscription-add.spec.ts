@@ -63,7 +63,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds subscription', (done) => {
+  it('adds subscription', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/subscriptions`) {
         return Promise.resolve({
@@ -82,7 +82,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -91,28 +91,21 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
       }
-    }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#subscriptions/$entity",
-          "id": "7f105c7d-2dc5-4530-97cd-4e7ae6534c07",
-          "resource": "me/mailFolders('Inbox')/messages",
-          "applicationId": "24d3b144-21ae-4080-943f-7067b395b913",
-          "changeType": "updated",
-          "clientState": "secretClientValue",
-          "notificationUrl": "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-          "expirationDateTime": "2016-11-20T18:23:45.935Z",
-          "creatorId": "8ee44408-0679-472c-bc2a-692812af3437"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
+      "@odata.context": "https://graph.microsoft.com/beta/$metadata#subscriptions/$entity",
+      "id": "7f105c7d-2dc5-4530-97cd-4e7ae6534c07",
+      "resource": "me/mailFolders('Inbox')/messages",
+      "applicationId": "24d3b144-21ae-4080-943f-7067b395b913",
+      "changeType": "updated",
+      "clientState": "secretClientValue",
+      "notificationUrl": "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+      "expirationDateTime": "2016-11-20T18:23:45.935Z",
+      "creatorId": "8ee44408-0679-472c-bc2a-692812af3437"
+    }));
   });
 
-  it('should use a resource (group) specific default expiration if no expirationDateTime is set (debug)', (done) => {
+  it('should use a resource (group) specific default expiration if no expirationDateTime is set (debug)', async () => {
     sinon.stub(Date, 'now').callsFake(() => mockNowNumber);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/subscriptions`) {
@@ -132,7 +125,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         resource: "groups",
@@ -140,18 +133,11 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith("Matching resource in default values 'groups' => 'groups'"));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.calledWith("Matching resource in default values 'groups' => 'groups'"));
   });
 
-  it('should use a resource (group) specific default expiration if no expirationDateTime is set (verbose)', (done) => {
+  it('should use a resource (group) specific default expiration if no expirationDateTime is set (verbose)', async () => {
     sinon.stub(Date, 'now').callsFake(() => mockNowNumber);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/subscriptions`) {
@@ -171,7 +157,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         verbose: true,
@@ -180,18 +166,11 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith("An expiration maximum delay is resolved for the resource 'groups' : 4230 minutes."));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.calledWith("An expiration maximum delay is resolved for the resource 'groups' : 4230 minutes."));
   });
 
-  it('should use expirationDateTime if set (debug)', (done) => {
+  it('should use expirationDateTime if set (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/subscriptions`) {
         return Promise.resolve({
@@ -210,7 +189,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         resource: "groups",
@@ -219,18 +198,11 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: "2019-01-03T00:00:00Z"
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith("Expiration date time is specified (2019-01-03T00:00:00Z)."));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.calledWith("Expiration date time is specified (2019-01-03T00:00:00Z)."));
   });
 
-  it('should use a group specific default expiration if no expirationDateTime is set', (done) => {
+  it('should use a group specific default expiration if no expirationDateTime is set', async () => {
     sinon.stub(Date, 'now').callsFake(() => mockNowNumber);
     let requestBodyArg: any = null;
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -251,7 +223,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         resource: "groups",
@@ -259,21 +231,14 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
-    }, () => {
-      try {
-        // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
-        const expected = '2019-01-03T22:29:00.000Z';
-        const actual = requestBodyArg.expirationDateTime;
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
+    const expected = '2019-01-03T22:29:00.000Z';
+    const actual = requestBodyArg.expirationDateTime;
+    assert.strictEqual(actual, expected);
   });
 
-  it('should use a generic default expiration if none can be found for the resource and no expirationDateTime is set (verbose)', (done) => {
+  it('should use a generic default expiration if none can be found for the resource and no expirationDateTime is set (verbose)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/subscriptions`) {
         return Promise.resolve({
@@ -291,7 +256,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         // NOTE Teams is not a supported resource and has no default maximum expiration delay
@@ -300,18 +265,11 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith("An expiration maximum delay couldn't be resolved for the resource 'teams'. Will use generic default value: 4230 minutes."));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.calledWith("An expiration maximum delay couldn't be resolved for the resource 'teams'. Will use generic default value: 4230 minutes."));
   });
 
-  it('should use a generic default expiration if none can be found for the resource and no expirationDateTime is set (debug)', (done) => {
+  it('should use a generic default expiration if none can be found for the resource and no expirationDateTime is set (debug)', async () => {
     sinon.stub(Date, 'now').callsFake(() => mockNowNumber);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/subscriptions`) {
@@ -330,7 +288,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         // NOTE Teams is not a supported resource and has no default maximum expiration delay
@@ -339,24 +297,17 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         clientState: 'secretClientValue',
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
-    }, () => {
-      try {
-        // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
-        assert(loggerLogToStderrSpy.calledWith("Actual expiration date time: 2019-01-03T22:29:00.000Z"));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
+    assert(loggerLogToStderrSpy.calledWith("Actual expiration date time: 2019-01-03T22:29:00.000Z"));
   });
 
-  it('handles error correctly', (done) => {
+  it('handles error correctly', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -365,15 +316,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if expirationDateTime is not valid', async () => {

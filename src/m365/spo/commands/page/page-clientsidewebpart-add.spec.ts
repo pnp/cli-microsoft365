@@ -86,7 +86,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('checks out page if not checked out by the current user', (done) => {
+  it('checks out page if not checked out by the current user', async () => {
     let checkedOut = false;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')`) > -1) {
@@ -138,25 +138,18 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
       }
-    }, () => {
-      try {
-        assert.deepEqual(checkedOut, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }));
+    assert.deepEqual(checkedOut, true);
   });
 
-  it('checks out page if not checked out by the current user (debug)', (done) => {
+  it('checks out page if not checked out by the current user (debug)', async () => {
     let checkedOut = false;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')`) > -1) {
@@ -208,25 +201,18 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
       }
-    }, () => {
-      try {
-        assert.deepEqual(checkedOut, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }));
+    assert.deepEqual(checkedOut, true);
   });
 
-  it('doesn\'t check out page if checked out by the current user', (done) => {
+  it('doesn\'t check out page if checked out by the current user', async () => {
     let checkingOut = false;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')`) > -1) {
@@ -278,24 +264,17 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
       }
-    }, () => {
-      try {
-        assert.deepEqual(checkingOut, false);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.deepEqual(checkingOut, false);
   });
 
-  it('adds web part to an empty column when no order specified', (done) => {
+  it('adds web part to an empty column when no order specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -321,7 +300,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -329,68 +308,59 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "layoutIndex": 1,
-                  "controlIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "layoutIndex": 1,
+            "controlIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds web part to an empty column when order 1 specified', (done) => {
+  it('adds web part to an empty column when order 1 specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -416,7 +386,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -425,68 +395,59 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 1
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "layoutIndex": 1,
-                  "controlIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "layoutIndex": 1,
+            "controlIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds web part to an empty column when order 5 specified', (done) => {
+  it('adds web part to an empty column when order 5 specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -512,7 +473,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -521,68 +482,59 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 5
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "layoutIndex": 1,
-                  "controlIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "layoutIndex": 1,
+            "controlIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds web part at the end of the column with one web part when no order specified', (done) => {
+  it('adds web part at the end of the column with one web part when no order specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -608,7 +560,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -616,109 +568,100 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds web part at the beginning of the column with one web part when order 1 specified', (done) => {
+  it('adds web part at the beginning of the column with one web part when order 1 specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -744,7 +687,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -753,109 +696,100 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 1
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+              ]
+            }
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds web part at the end of the column with one web part when order 2 specified', (done) => {
+  it('adds web part at the end of the column with one web part when order 2 specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -881,7 +815,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -890,109 +824,100 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 2
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds web part at the end of the column with multiple web part when no order specified (debug)', (done) => {
+  it('adds web part at the end of the column with multiple web part when no order specified (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -1018,7 +943,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: true,
@@ -1026,149 +951,140 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 1,
-                  "controlIndex": 2,
-                  "layoutIndex": 1,
-                  "sectionFactor": 8
-                },
-                "webPartId": "62cac389-787f-495d-beca-e11786162ef4",
-                "emphasis": {},
-                "reservedHeight": 321,
-                "reservedWidth": 757,
-                "webPartData": {
-                  "id": "62cac389-787f-495d-beca-e11786162ef4",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Countdown Timer",
-                  "description": "This web part is used to allow a site admin to count down/up to an important event.",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {
-                      "buttonURL": null
-                    }
-                  },
-                  "dataVersion": "2.1",
-                  "properties": {
-                    "showButton": false,
-                    "countDate": "Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)",
-                    "title": "",
-                    "description": "",
-                    "countDirection": "COUNT_DOWN",
-                    "dateDisplay": "DAY_HOUR_MINUTE_SECOND",
-                    "buttonText": ""
-                  }
-                }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 3,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 1,
+            "controlIndex": 2,
+            "layoutIndex": 1,
+            "sectionFactor": 8
+          },
+          "webPartId": "62cac389-787f-495d-beca-e11786162ef4",
+          "emphasis": {},
+          "reservedHeight": 321,
+          "reservedWidth": 757,
+          "webPartData": {
+            "id": "62cac389-787f-495d-beca-e11786162ef4",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Countdown Timer",
+            "description": "This web part is used to allow a site admin to count down/up to an important event.",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {
+                "buttonURL": null
               }
-            ])
-          }));
-          done();
+            },
+            "dataVersion": "2.1",
+            "properties": {
+              "showButton": false,
+              "countDate": "Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)",
+              "title": "",
+              "description": "",
+              "countDirection": "COUNT_DOWN",
+              "dateDisplay": "DAY_HOUR_MINUTE_SECOND",
+              "buttonText": ""
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 3,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds web part at the beginning of the column with multiple web part when order 1 specified', (done) => {
+  it('adds web part at the beginning of the column with multiple web part when order 1 specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -1194,7 +1110,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -1203,149 +1119,140 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 1
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 1,
-                  "controlIndex": 3,
-                  "layoutIndex": 1,
-                  "sectionFactor": 8
-                },
-                "webPartId": "62cac389-787f-495d-beca-e11786162ef4",
-                "emphasis": {},
-                "reservedHeight": 321,
-                "reservedWidth": 757,
-                "webPartData": {
-                  "id": "62cac389-787f-495d-beca-e11786162ef4",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Countdown Timer",
-                  "description": "This web part is used to allow a site admin to count down/up to an important event.",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {
-                      "buttonURL": null
-                    }
-                  },
-                  "dataVersion": "2.1",
-                  "properties": {
-                    "showButton": false,
-                    "countDate": "Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)",
-                    "title": "",
-                    "description": "",
-                    "countDirection": "COUNT_DOWN",
-                    "dateDisplay": "DAY_HOUR_MINUTE_SECOND",
-                    "buttonText": ""
-                  }
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 1,
+            "controlIndex": 3,
+            "layoutIndex": 1,
+            "sectionFactor": 8
+          },
+          "webPartId": "62cac389-787f-495d-beca-e11786162ef4",
+          "emphasis": {},
+          "reservedHeight": 321,
+          "reservedWidth": 757,
+          "webPartData": {
+            "id": "62cac389-787f-495d-beca-e11786162ef4",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Countdown Timer",
+            "description": "This web part is used to allow a site admin to count down/up to an important event.",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {
+                "buttonURL": null
               }
-            ])
-          }));
-          done();
+            },
+            "dataVersion": "2.1",
+            "properties": {
+              "showButton": false,
+              "countDate": "Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)",
+              "title": "",
+              "description": "",
+              "countDirection": "COUNT_DOWN",
+              "dateDisplay": "DAY_HOUR_MINUTE_SECOND",
+              "buttonText": ""
+            }
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds web part in the middle of the column with multiple web part when order 2 specified', (done) => {
+  it('adds web part in the middle of the column with multiple web part when order 2 specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -1371,7 +1278,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -1380,149 +1287,140 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 2
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 1,
-                  "controlIndex": 3,
-                  "layoutIndex": 1,
-                  "sectionFactor": 8
-                },
-                "webPartId": "62cac389-787f-495d-beca-e11786162ef4",
-                "emphasis": {},
-                "reservedHeight": 321,
-                "reservedWidth": 757,
-                "webPartData": {
-                  "id": "62cac389-787f-495d-beca-e11786162ef4",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Countdown Timer",
-                  "description": "This web part is used to allow a site admin to count down/up to an important event.",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {
-                      "buttonURL": null
-                    }
-                  },
-                  "dataVersion": "2.1",
-                  "properties": {
-                    "showButton": false,
-                    "countDate": "Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)",
-                    "title": "",
-                    "description": "",
-                    "countDirection": "COUNT_DOWN",
-                    "dateDisplay": "DAY_HOUR_MINUTE_SECOND",
-                    "buttonText": ""
-                  }
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 1,
+            "controlIndex": 3,
+            "layoutIndex": 1,
+            "sectionFactor": 8
+          },
+          "webPartId": "62cac389-787f-495d-beca-e11786162ef4",
+          "emphasis": {},
+          "reservedHeight": 321,
+          "reservedWidth": 757,
+          "webPartData": {
+            "id": "62cac389-787f-495d-beca-e11786162ef4",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Countdown Timer",
+            "description": "This web part is used to allow a site admin to count down/up to an important event.",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {
+                "buttonURL": null
               }
-            ])
-          }));
-          done();
+            },
+            "dataVersion": "2.1",
+            "properties": {
+              "showButton": false,
+              "countDate": "Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)",
+              "title": "",
+              "description": "",
+              "countDirection": "COUNT_DOWN",
+              "dateDisplay": "DAY_HOUR_MINUTE_SECOND",
+              "buttonText": ""
+            }
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds web part at the end of the column with multiple web part when order 5 specified', (done) => {
+  it('adds web part at the end of the column with multiple web part when order 5 specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -1548,7 +1446,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -1557,149 +1455,140 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           order: 5
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 1,
-                  "controlIndex": 2,
-                  "layoutIndex": 1,
-                  "sectionFactor": 8
-                },
-                "webPartId": "62cac389-787f-495d-beca-e11786162ef4",
-                "emphasis": {},
-                "reservedHeight": 321,
-                "reservedWidth": 757,
-                "webPartData": {
-                  "id": "62cac389-787f-495d-beca-e11786162ef4",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Countdown Timer",
-                  "description": "This web part is used to allow a site admin to count down/up to an important event.",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {
-                      "buttonURL": null
-                    }
-                  },
-                  "dataVersion": "2.1",
-                  "properties": {
-                    "showButton": false,
-                    "countDate": "Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)",
-                    "title": "",
-                    "description": "",
-                    "countDirection": "COUNT_DOWN",
-                    "dateDisplay": "DAY_HOUR_MINUTE_SECOND",
-                    "buttonText": ""
-                  }
-                }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 3,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 1,
+            "controlIndex": 2,
+            "layoutIndex": 1,
+            "sectionFactor": 8
+          },
+          "webPartId": "62cac389-787f-495d-beca-e11786162ef4",
+          "emphasis": {},
+          "reservedHeight": 321,
+          "reservedWidth": 757,
+          "webPartData": {
+            "id": "62cac389-787f-495d-beca-e11786162ef4",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Countdown Timer",
+            "description": "This web part is used to allow a site admin to count down/up to an important event.",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {
+                "buttonURL": null
               }
-            ])
-          }));
-          done();
+            },
+            "dataVersion": "2.1",
+            "properties": {
+              "showButton": false,
+              "countDate": "Sun Apr 07 2019 22:00:00 GMT+0200 (Central European Summer Time)",
+              "title": "",
+              "description": "",
+              "countDirection": "COUNT_DOWN",
+              "dateDisplay": "DAY_HOUR_MINUTE_SECOND",
+              "buttonText": ""
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 3,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds a standard web part at the end of the column with one web part when no order specified', (done) => {
+  it('adds a standard web part at the end of the column with one web part when no order specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -1725,7 +1614,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -1733,109 +1622,100 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap'
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds a standard web part in a default section when no section exists on page', (done) => {
+  it('adds a standard web part in a default section when no section exists on page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -1861,7 +1741,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -1869,58 +1749,49 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap'
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "zoneIndex": 1,
-                  "sectionFactor": 12,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "zoneIndex": 1,
+            "sectionFactor": 12,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds a standard web part with properties at the end of the column with one web part when no order specified (debug)', (done) => {
+  it('adds a standard web part with properties at the end of the column with one web part when no order specified (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -1946,7 +1817,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: true,
@@ -1955,110 +1826,101 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           standardWebPart: 'BingMap',
           webPartProperties: '{"title":"Location"}'
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road",
-                    "title": "Location"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road",
+              "title": "Location"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('correctly handles OData error when adding Client Side Web Part to non-existing page', (done) => {
+  it('correctly handles OData error when adding Client Side Web Part to non-existing page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/foo.aspx')`) > -1) {
         return Promise.reject({ error: { 'odata.error': { message: { value: 'The file /sites/team-a/sitepages/foo.aspx does not exist' } } } });
@@ -2067,7 +1929,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -2075,20 +1937,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/sitepages/foo.aspx does not exist')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError('The file /sites/team-a/sitepages/foo.aspx does not exist'));
   });
 
-  it('correctly handles OData error if WebPart API does not respond properly', (done) => {
+  it('correctly handles OData error if WebPart API does not respond properly', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -2104,7 +1956,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -2112,20 +1964,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles OData error when adding Client Side Web Part to modern page', (done) => {
+  it('correctly handles OData error when adding Client Side Web Part to modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -2145,7 +1987,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger,
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -2153,20 +1995,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles WebPart properties error when adding Client Side Web Part to modern page', (done) => {
+  it('correctly handles WebPart properties error when adding Client Side Web Part to modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -2192,7 +2024,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -2201,109 +2033,100 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           webPartProperties: '{"foo", }'
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('correctly handles invalid specified WebPart Id error when adding Client Side Web Part to modern page', (done) => {
+  it('correctly handles invalid specified WebPart Id error when adding Client Side Web Part to modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -2327,7 +2150,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -2335,20 +2158,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-aaaaaaaaaa'
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`There is no available WebPart with Id e377ea37-9047-43b9-8cdb-aaaaaaaaaa.`)));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError(`There is no available WebPart with Id e377ea37-9047-43b9-8cdb-aaaaaaaaaa.`));
   });
 
-  it('correctly handles error if target page is not a modern page', (done) => {
+  it('correctly handles error if target page is not a modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.reject({
@@ -2367,7 +2180,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -2375,20 +2188,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-aaaaaaaaaa'
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`This page does not have the site page content type. Only site pages can be served with this API.`)));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError(`This page does not have the site page content type. Only site pages can be served with this API.`));
   });
 
-  it('correctly handles invalid section error when adding Client Side Web Part to modern page', (done) => {
+  it('correctly handles invalid section error when adding Client Side Web Part to modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -2404,7 +2207,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -2413,20 +2216,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
           section: 8
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid section '8'")));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError("Invalid section '8'"));
   });
 
-  it('correctly handles invalid column error when adding Client Side Web Part to modern page', (done) => {
+  it('correctly handles invalid column error when adding Client Side Web Part to modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -2442,7 +2235,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -2452,20 +2245,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           section: 1,
           column: 7
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid column '7'")));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError("Invalid column '7'"));
   });
 
-  it('adds a web part using web part data', (done) => {
+  it('adds a web part using web part data', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -2491,7 +2274,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -2500,104 +2283,95 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           standardWebPart: 'BingMap',
           webPartData: '{"id": "e377ea37-9047-43b9-8cdb-a761be2f8e09","instanceId": "f2f0ee32-eba5-47f9-9aa1-24f99661ecd1","title": "Bing Maps","description": "Display a key location on a map","serverProcessedContent": {"htmlStrings": {},"searchablePlainTexts": {},"imageSources": {},"links": {}},"properties": {"pushPins": [{"location": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1,"name": "Microsoft Way, Redmond, WA 98052"},"defaultTitle": "One Microsoft Way, Building 32","defaultAddress": "Microsoft Way, Redmond, WA 98052","title": "One Microsoft Way, Building 32","address": "Microsoft Way, Redmond, WA 98052"}],"maxNumberOfPushPins": 1,"shouldShowPushPinTitle": true,"zoomLevel": 12,"mapType": "road","center": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1}}}'
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": { "pushPins": [{ "location": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1, "name": "Microsoft Way, Redmond, WA 98052" }, "defaultTitle": "One Microsoft Way, Building 32", "defaultAddress": "Microsoft Way, Redmond, WA 98052", "title": "One Microsoft Way, Building 32", "address": "Microsoft Way, Redmond, WA 98052" }], "maxNumberOfPushPins": 1, "shouldShowPushPinTitle": true, "zoomLevel": 12, "mapType": "road", "center": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1 } },
-                  "title": "Bing Maps",
-                  "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": {}, "imageSources": {}, "links": {} }
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": { "pushPins": [{ "location": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1, "name": "Microsoft Way, Redmond, WA 98052" }, "defaultTitle": "One Microsoft Way, Building 32", "defaultAddress": "Microsoft Way, Redmond, WA 98052", "title": "One Microsoft Way, Building 32", "address": "Microsoft Way, Redmond, WA 98052" }], "maxNumberOfPushPins": 1, "shouldShowPushPinTitle": true, "zoomLevel": 12, "mapType": "road", "center": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1 } },
+            "title": "Bing Maps",
+            "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": {}, "imageSources": {}, "links": {} }
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds a web part using web part data (debug)', (done) => {
+  it('adds a web part using web part data (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -2623,7 +2397,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: true,
@@ -2632,104 +2406,95 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           standardWebPart: 'BingMap',
           webPartData: '{"id": "e377ea37-9047-43b9-8cdb-a761be2f8e09","instanceId": "f2f0ee32-eba5-47f9-9aa1-24f99661ecd1","title": "Bing Maps","description": "Display a key location on a map","serverProcessedContent": {"htmlStrings": {},"searchablePlainTexts": {},"imageSources": {},"links": {}},"properties": {"pushPins": [{"location": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1,"name": "Microsoft Way, Redmond, WA 98052"},"defaultTitle": "One Microsoft Way, Building 32","defaultAddress": "Microsoft Way, Redmond, WA 98052","title": "One Microsoft Way, Building 32","address": "Microsoft Way, Redmond, WA 98052"}],"maxNumberOfPushPins": 1,"shouldShowPushPinTitle": true,"zoomLevel": 12,"mapType": "road","center": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1}}}'
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": { "pushPins": [{ "location": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1, "name": "Microsoft Way, Redmond, WA 98052" }, "defaultTitle": "One Microsoft Way, Building 32", "defaultAddress": "Microsoft Way, Redmond, WA 98052", "title": "One Microsoft Way, Building 32", "address": "Microsoft Way, Redmond, WA 98052" }], "maxNumberOfPushPins": 1, "shouldShowPushPinTitle": true, "zoomLevel": 12, "mapType": "road", "center": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1 } },
-                  "title": "Bing Maps",
-                  "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": {}, "imageSources": {}, "links": {} }
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": { "pushPins": [{ "location": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1, "name": "Microsoft Way, Redmond, WA 98052" }, "defaultTitle": "One Microsoft Way, Building 32", "defaultAddress": "Microsoft Way, Redmond, WA 98052", "title": "One Microsoft Way, Building 32", "address": "Microsoft Way, Redmond, WA 98052" }], "maxNumberOfPushPins": 1, "shouldShowPushPinTitle": true, "zoomLevel": 12, "mapType": "road", "center": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1 } },
+            "title": "Bing Maps",
+            "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": {}, "imageSources": {}, "links": {} }
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('adds a web part with dynamicDataPaths and dynamicDataValues', (done) => {
+  it('adds a web part with dynamicDataPaths and dynamicDataValues', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -2755,7 +2520,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: true,
@@ -2764,110 +2529,101 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           standardWebPart: 'BingMap',
           webPartData: '{"id": "e377ea37-9047-43b9-8cdb-a761be2f8e09","instanceId": "f2f0ee32-eba5-47f9-9aa1-24f99661ecd1","title": "Bing Maps","description": "Display a key location on a map","dataVersion": "1.0", "dynamicDataPaths":{"dynamicProperty0":"WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText"},"dynamicDataValues":{"dynamicProperty1":""}}'
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                "emphasis": {},
-                "reservedHeight": 127,
-                "reservedWidth": 757,
-                "addedFromPersistedData": true,
-                "webPartData": {
-                  "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "title": "Weather",
-                  "description": "Show current weather conditions on your page",
-                  "serverProcessedContent": {
-                    "htmlStrings": {},
-                    "searchablePlainTexts": {},
-                    "imageSources": {},
-                    "links": {}
-                  },
-                  "dataVersion": "1.2",
-                  "properties": {
-                    "temperatureUnit": "F",
-                    "locations": [
-                      {
-                        "latitude": 47.604,
-                        "longitude": -122.329,
-                        "name": "Seattle, United States",
-                        "showCustomizedDisplayName": false
-                      }
-                    ]
-                  }
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+          "emphasis": {},
+          "reservedHeight": 127,
+          "reservedWidth": 757,
+          "addedFromPersistedData": true,
+          "webPartData": {
+            "id": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "title": "Weather",
+            "description": "Show current weather conditions on your page",
+            "serverProcessedContent": {
+              "htmlStrings": {},
+              "searchablePlainTexts": {},
+              "imageSources": {},
+              "links": {}
+            },
+            "dataVersion": "1.2",
+            "properties": {
+              "temperatureUnit": "F",
+              "locations": [
+                {
+                  "latitude": 47.604,
+                  "longitude": -122.329,
+                  "name": "Seattle, United States",
+                  "showCustomizedDisplayName": false
                 }
-              },
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "controlIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "zoneIndex": 1,
-                  "layoutIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing Maps",
-                  "dynamicDataPaths": { "dynamicProperty0": "WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText" }, "dynamicDataValues": { "dynamicProperty1": "" }
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+              ]
+            }
+          }
+        },
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "controlIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "zoneIndex": 1,
+            "layoutIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing Maps",
+            "dynamicDataPaths": { "dynamicProperty0": "WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText" }, "dynamicDataValues": { "dynamicProperty1": "" }
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
-  it('correctly handles sections in reverse order', (done) => {
+  it('correctly handles sections in reverse order', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')`) > -1) {
         return Promise.resolve({
@@ -2894,7 +2650,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     });
 
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -2902,85 +2658,76 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
         }
-      },
-      () => {
-        try {
-          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
-            CanvasContent1: JSON.stringify([
-              {
-                "controlType": 3,
-                "displayMode": 2,
-                "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                "position": {
-                  "zoneIndex": 2,
-                  "sectionIndex": 1,
-                  "sectionFactor": 8,
-                  "layoutIndex": 1,
-                  "controlIndex": 1
-                },
-                "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                "emphasis": {},
-                "webPartData": {
-                  "dataVersion": "1.0",
-                  "description": "Display a key location on a map",
-                  "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
-                  "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {
-                    "pushPins": [],
-                    "maxNumberOfPushPins": 1,
-                    "shouldShowPushPinTitle": true,
-                    "zoomLevel": 12,
-                    "mapType": "road"
-                  },
-                  "title": "Bing maps"
-                }
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 2,
-                  "sectionIndex": 2,
-                  "sectionFactor": 4,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 1,
-                  "sectionFactor": 6,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "displayMode": 2,
-                "position": {
-                  "zoneIndex": 1,
-                  "sectionIndex": 2,
-                  "sectionFactor": 6,
-                  "layoutIndex": 1
-                },
-                "emphasis": {}
-              },
-              {
-                "controlType": 0,
-                "pageSettingsSlice": {
-                  "isDefaultDescription": true,
-                  "isDefaultThumbnail": true
-                }
-              }
-            ])
-          }));
-          done();
+      });
+    assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
+      CanvasContent1: JSON.stringify([
+        {
+          "controlType": 3,
+          "displayMode": 2,
+          "id": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+          "position": {
+            "zoneIndex": 2,
+            "sectionIndex": 1,
+            "sectionFactor": 8,
+            "layoutIndex": 1,
+            "controlIndex": 1
+          },
+          "webPartId": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+          "emphasis": {},
+          "webPartData": {
+            "dataVersion": "1.0",
+            "description": "Display a key location on a map",
+            "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
+            "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
+            "properties": {
+              "pushPins": [],
+              "maxNumberOfPushPins": 1,
+              "shouldShowPushPinTitle": true,
+              "zoomLevel": 12,
+              "mapType": "road"
+            },
+            "title": "Bing maps"
+          }
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 2,
+            "sectionIndex": 2,
+            "sectionFactor": 4,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 1,
+            "sectionFactor": 6,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "displayMode": 2,
+          "position": {
+            "zoneIndex": 1,
+            "sectionIndex": 2,
+            "sectionFactor": 6,
+            "layoutIndex": 1
+          },
+          "emphasis": {}
+        },
+        {
+          "controlType": 0,
+          "pageSettingsSlice": {
+            "isDefaultDescription": true,
+            "isDefaultThumbnail": true
+          }
         }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      ])
+    }));
   });
 
   it('supports debug mode', () => {

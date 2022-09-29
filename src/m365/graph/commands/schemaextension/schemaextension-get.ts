@@ -35,7 +35,7 @@ class GraphSchemaExtensionGetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Gets the properties of the specified schema extension definition with id '${args.options.id}'...`);
     }
@@ -49,11 +49,13 @@ class GraphSchemaExtensionGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request.get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res = await request.get(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 module.exports = new GraphSchemaExtensionGetCommand();

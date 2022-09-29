@@ -63,7 +63,7 @@ describe(commands.CDN_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves the settings of the public CDN when type set to Public', (done) => {
+  it('retrieves the settings of the public CDN when type set to Public', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -85,28 +85,21 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, type: 'Public' } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Public CDN at') > -1 && l.indexOf('enabled') > -1) {
-          correctLogStatement = true;
-        }
-      });
-      try {
-        assert(correctLogStatement);
-        done();
+    await command.action(logger, { options: { debug: true, type: 'Public' } });
+    let correctLogStatement = false;
+    log.forEach(l => {
+      if (!l || typeof l !== 'string') {
+        return;
       }
-      catch (e) {
-        done(e);
+
+      if (l.indexOf('Public CDN at') > -1 && l.indexOf('enabled') > -1) {
+        correctLogStatement = true;
       }
     });
+    assert(correctLogStatement);
   });
 
-  it('retrieves the settings of the private CDN when type set to Private', (done) => {
+  it('retrieves the settings of the private CDN when type set to Private', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -128,24 +121,17 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, type: 'Private' } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (l === false) {
-          correctLogStatement = true;
-        }
-      });
-      try {
-        assert(correctLogStatement);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: false, type: 'Private' } });
+    let correctLogStatement = false;
+    log.forEach(l => {
+      if (l === false) {
+        correctLogStatement = true;
       }
     });
+    assert(correctLogStatement);
   });
 
-  it('retrieves the settings of the private CDN when type set to Private (debug)', (done) => {
+  it('retrieves the settings of the private CDN when type set to Private (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -167,28 +153,21 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, type: 'Private' } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('disabled') > -1) {
-          correctLogStatement = true;
-        }
-      });
-      try {
-        assert(correctLogStatement);
-        done();
+    await command.action(logger, { options: { debug: true, type: 'Private' } });
+    let correctLogStatement = false;
+    log.forEach(l => {
+      if (!l || typeof l !== 'string') {
+        return;
       }
-      catch (e) {
-        done(e);
+
+      if (l.indexOf('disabled') > -1) {
+        correctLogStatement = true;
       }
     });
+    assert(correctLogStatement);
   });
 
-  it('retrieves the settings of the public CDN when no type set', (done) => {
+  it('retrieves the settings of the public CDN when no type set', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -210,28 +189,22 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('Public CDN at') > -1 && l.indexOf('enabled') > -1) {
-          correctLogStatement = true;
-        }
-      });
-      try {
-        assert(correctLogStatement);
-        done();
+    await command.action(logger, { options: { debug: true } });
+    let correctLogStatement = false;
+    log.forEach(l => {
+      if (!l || typeof l !== 'string') {
+        return;
       }
-      catch (e) {
-        done(e);
+
+      if (l.indexOf('Public CDN at') > -1 && l.indexOf('enabled') > -1) {
+        correctLogStatement = true;
       }
     });
+    
+    assert(correctLogStatement);
   });
 
-  it('correctly handles an error when getting tenant CDN settings', (done) => {
+  it('correctly handles an error when getting tenant CDN settings', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
@@ -261,32 +234,16 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

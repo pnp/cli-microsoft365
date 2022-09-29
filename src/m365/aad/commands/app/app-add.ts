@@ -247,39 +247,38 @@ class AadAppAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .resolveApis(args, logger)
-      .then(apis => this.createAppRegistration(args, apis, logger))
-      .then(appInfo => {
-        // based on the assumption that we're adding AAD app to the current
-        // directory. If we in the future extend the command with allowing
-        // users to create AAD app in a different directory, we'll need to
-        // adjust this
-        appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
-        return Promise.resolve(appInfo);
-      })
-      .then(appInfo => this.updateAppFromManifest(args, appInfo))
-      .then(appInfo => this.grantAdminConsent(appInfo, args.options.grantAdminConsent, logger))
-      .then(appInfo => this.configureUri(args, appInfo, logger))
-      .then(appInfo => this.configureSecret(args, appInfo, logger))
-      .then(appInfo => this.saveAppInfo(args, appInfo, logger))
-      .then((_appInfo: AppInfo): void => {
-        const appInfo: any = {
-          appId: _appInfo.appId,
-          objectId: _appInfo.id,
-          tenantId: _appInfo.tenantId
-        };
-        if (_appInfo.secret) {
-          appInfo.secret = _appInfo.secret;
-        }
-        if (_appInfo.secrets) {
-          appInfo.secrets = _appInfo.secrets;
-        }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const apis = await this.resolveApis(args, logger);
+      let appInfo: any = await this.createAppRegistration(args, apis, logger);
+      // based on the assumption that we're adding AAD app to the current
+      // directory. If we in the future extend the command with allowing
+      // users to create AAD app in a different directory, we'll need to
+      // adjust this
+      appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+      appInfo = await this.updateAppFromManifest(args, appInfo);
+      appInfo = await this.grantAdminConsent(appInfo, args.options.grantAdminConsent, logger);
+      appInfo = await this.configureUri(args, appInfo, logger);
+      appInfo = await this.configureSecret(args, appInfo, logger);
+      const _appInfo = await this.saveAppInfo(args, appInfo, logger);
 
-        logger.log(appInfo);
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      appInfo = {
+        appId: _appInfo.appId,
+        objectId: _appInfo.id,
+        tenantId: _appInfo.tenantId
+      };
+      if (_appInfo.secret) {
+        appInfo.secret = _appInfo.secret;
+      }
+      if (_appInfo.secrets) {
+        appInfo.secrets = _appInfo.secrets;
+      }
+
+      logger.log(appInfo);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private async createAppRegistration(args: CommandArgs, apis: RequiredResourceAccess[], logger: Logger): Promise<AppInfo> {

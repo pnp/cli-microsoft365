@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -61,7 +61,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
-  it('lists schema extensions', (done) => {
+  it('lists schema extensions', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.resolve({
@@ -93,43 +93,38 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "id": "adatumisv_exo2",
-          "description": "sample desccription",
-          "targetTypes": [
-            "Message"
-          ],
-          "status": "Available",
-          "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-          "properties": [
-            {
-              "name": "p1",
-              "type": "String"
-            },
-            {
-              "name": "p2",
-              "type": "String"
-            }
-          ]
-        }]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
     });
+    try {
+      assert(loggerLogSpy.calledWith([{
+        "id": "adatumisv_exo2",
+        "description": "sample desccription",
+        "targetTypes": [
+          "Message"
+        ],
+        "status": "Available",
+        "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+        "properties": [
+          {
+            "name": "p1",
+            "type": "String"
+          },
+          {
+            "name": "p2",
+            "type": "String"
+          }
+        ]
+      }]
+      ));
+    }
+    finally {
+      sinonUtil.restore(request.get);
+    }
   });
-  it('lists two schema extensions', (done) => {
+  it('lists two schema extensions', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.resolve({
@@ -180,24 +175,19 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.lastCall.args[0][1].id === 'adatumisv_exo3');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
     });
+    try {
+      assert(loggerLogSpy.lastCall.args[0][1].id === 'adatumisv_exo3');
+    }
+    finally {
+      sinonUtil.restore(request.get);
+    }
   });
-  it('lists schema extensions with filter options', (done) => {
+  it('lists schema extensions with filter options', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`$filter`) > -1) {
         return Promise.resolve({
@@ -234,51 +224,46 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         owner: '07d21ad2-c8f9-4316-a14a-347db702bd3c'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "adatumisv_courses",
-            "description": "Extension description",
-            "targetTypes": [
-              "User",
-              "Group"
-            ],
-            "status": "Available",
-            "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
-            "properties": [
-              {
-                "name": "id",
-                "type": "Integer"
-              },
-              {
-                "name": "name",
-                "type": "String"
-              },
-              {
-                "name": "type",
-                "type": "String"
-              }
-            ]
-          }
-        ]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
     });
+    try {
+      assert(loggerLogSpy.calledWith([
+        {
+          "id": "adatumisv_courses",
+          "description": "Extension description",
+          "targetTypes": [
+            "User",
+            "Group"
+          ],
+          "status": "Available",
+          "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
+          "properties": [
+            {
+              "name": "id",
+              "type": "Integer"
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "type",
+              "type": "String"
+            }
+          ]
+        }
+      ]
+      ));
+    }
+    finally {
+      sinonUtil.restore(request.get);
+    }
   });
-  it('lists schema extensions on the second page no page size given', (done) => {
+  it('lists schema extensions on the second page no page size given', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`$top`) > -1) {
         return Promise.resolve({
@@ -315,51 +300,46 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         pageNumber: 1
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "adatumisv_courses",
-            "description": "Extension description",
-            "targetTypes": [
-              "User",
-              "Group"
-            ],
-            "status": "Available",
-            "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
-            "properties": [
-              {
-                "name": "id",
-                "type": "Integer"
-              },
-              {
-                "name": "name",
-                "type": "String"
-              },
-              {
-                "name": "type",
-                "type": "String"
-              }
-            ]
-          }
-        ]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
     });
+    try {
+      assert(loggerLogSpy.calledWith([
+        {
+          "id": "adatumisv_courses",
+          "description": "Extension description",
+          "targetTypes": [
+            "User",
+            "Group"
+          ],
+          "status": "Available",
+          "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
+          "properties": [
+            {
+              "name": "id",
+              "type": "Integer"
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "type",
+              "type": "String"
+            }
+          ]
+        }
+      ]
+      ));
+    }
+    finally {
+      sinonUtil.restore(request.get);
+    }
   });
-  it('lists schema extensions on the page size 1 second page', (done) => {
+  it('lists schema extensions on the page size 1 second page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`$top`) > -1) {
         return Promise.resolve({
@@ -396,52 +376,47 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         pageNumber: 1,
         pageSize: 1
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "adatumisv_courses",
-            "description": "Extension description",
-            "targetTypes": [
-              "User",
-              "Group"
-            ],
-            "status": "Available",
-            "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
-            "properties": [
-              {
-                "name": "id",
-                "type": "Integer"
-              },
-              {
-                "name": "name",
-                "type": "String"
-              },
-              {
-                "name": "type",
-                "type": "String"
-              }
-            ]
-          }
-        ]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
     });
+    try {
+      assert(loggerLogSpy.calledWith([
+        {
+          "id": "adatumisv_courses",
+          "description": "Extension description",
+          "targetTypes": [
+            "User",
+            "Group"
+          ],
+          "status": "Available",
+          "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
+          "properties": [
+            {
+              "name": "id",
+              "type": "Integer"
+            },
+            {
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "name": "type",
+              "type": "String"
+            }
+          ]
+        }
+      ]
+      ));
+    }
+    finally {
+      sinonUtil.restore(request.get);
+    }
   });
-  it('lists schema extensions(debug)', (done) => {
+  it('lists schema extensions(debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.resolve({
@@ -473,41 +448,42 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
+    });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "adatumisv_exo2",
+        "description": "sample desccription",
+        "targetTypes": [
+          "Message"
+        ],
+        "status": "Available",
+        "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+        "properties": [
           {
-            "id": "adatumisv_exo2",
-            "description": "sample desccription",
-            "targetTypes": [
-              "Message"
-            ],
-            "status": "Available",
-            "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-            "properties": [
-              {
-                "name": "p1",
-                "type": "String"
-              },
-              {
-                "name": "p2",
-                "type": "String"
-              }
-            ]
+            "name": "p1",
+            "type": "String"
+          },
+          {
+            "name": "p2",
+            "type": "String"
           }
         ]
-        ));
-        done();
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]
+    ));
   });
+
+  it('handles random API error', async () => {
+    const errorMessage = 'Something went wrong';
+    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+
+    await assert.rejects(command.action(logger, { options: { } }), new CommandError(errorMessage));
+  });
+
   it('passes validation if the owner is a valid GUID', async () => {
     const actual = await command.validate({ options: { owner: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, commandInfo);
     assert.strictEqual(actual, true);

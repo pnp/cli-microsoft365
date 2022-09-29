@@ -62,7 +62,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['name', 'displayName']);
   });
 
-  it('retrieves Microsoft Flow environments (debug)', (done) => {
+  it('retrieves Microsoft Flow environments (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -132,75 +132,68 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
-            "location": "europe",
-            "type": "Microsoft.ProcessSimple/environments",
-            "id": "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
-            "properties": {
-              "displayName": "Contoso (default)",
-              "createdTime": "2018-03-22T20:20:46.08653Z",
-              "createdBy": {
-                "id": "SYSTEM",
-                "displayName": "SYSTEM",
-                "type": "NotSpecified"
-              },
-              "provisioningState": "Succeeded",
-              "creationType": "DefaultTenant",
-              "environmentSku": "Default",
-              "environmentType": "Production",
-              "isDefault": true,
-              "azureRegionHint": "westeurope",
-              "runtimeEndpoints": {
-                "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
-                "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
-                "microsoft.PowerApps": "https://europe.api.powerapps.com",
-                "microsoft.Flow": "https://europe.api.flow.microsoft.com"
-              }
-            },
-            "displayName": "Contoso (default)"
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
+        "location": "europe",
+        "type": "Microsoft.ProcessSimple/environments",
+        "id": "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
+        "properties": {
+          "displayName": "Contoso (default)",
+          "createdTime": "2018-03-22T20:20:46.08653Z",
+          "createdBy": {
+            "id": "SYSTEM",
+            "displayName": "SYSTEM",
+            "type": "NotSpecified"
           },
-          {
-            "name": "Test-d87a7535-dd31-4437-bfe1-95340acd55c5",
-            "location": "europe",
-            "type": "Microsoft.ProcessSimple/environments",
-            "id": "/providers/Microsoft.ProcessSimple/environments/Test-d87a7535-dd31-4437-bfe1-95340acd55c5",
-            "properties": {
-              "displayName": "Contoso (test)",
-              "createdTime": "2018-03-22T20:20:46.08653Z",
-              "createdBy": {
-                "id": "SYSTEM",
-                "displayName": "SYSTEM",
-                "type": "NotSpecified"
-              },
-              "provisioningState": "Succeeded",
-              "creationType": "DefaultTenant",
-              "environmentSku": "Default",
-              "environmentType": "Production",
-              "isDefault": false,
-              "azureRegionHint": "westeurope",
-              "runtimeEndpoints": {
-                "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
-                "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
-                "microsoft.PowerApps": "https://europe.api.powerapps.com",
-                "microsoft.Flow": "https://europe.api.flow.microsoft.com"
-              }
-            },
-            "displayName": "Contoso (test)"
+          "provisioningState": "Succeeded",
+          "creationType": "DefaultTenant",
+          "environmentSku": "Default",
+          "environmentType": "Production",
+          "isDefault": true,
+          "azureRegionHint": "westeurope",
+          "runtimeEndpoints": {
+            "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
+            "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
+            "microsoft.PowerApps": "https://europe.api.powerapps.com",
+            "microsoft.Flow": "https://europe.api.flow.microsoft.com"
           }
-        ]));
-        done();
+        },
+        "displayName": "Contoso (default)"
+      },
+      {
+        "name": "Test-d87a7535-dd31-4437-bfe1-95340acd55c5",
+        "location": "europe",
+        "type": "Microsoft.ProcessSimple/environments",
+        "id": "/providers/Microsoft.ProcessSimple/environments/Test-d87a7535-dd31-4437-bfe1-95340acd55c5",
+        "properties": {
+          "displayName": "Contoso (test)",
+          "createdTime": "2018-03-22T20:20:46.08653Z",
+          "createdBy": {
+            "id": "SYSTEM",
+            "displayName": "SYSTEM",
+            "type": "NotSpecified"
+          },
+          "provisioningState": "Succeeded",
+          "creationType": "DefaultTenant",
+          "environmentSku": "Default",
+          "environmentType": "Production",
+          "isDefault": false,
+          "azureRegionHint": "westeurope",
+          "runtimeEndpoints": {
+            "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
+            "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
+            "microsoft.PowerApps": "https://europe.api.powerapps.com",
+            "microsoft.Flow": "https://europe.api.flow.microsoft.com"
+          }
+        },
+        "displayName": "Contoso (test)"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('retrieves Microsoft Flow environments', (done) => {
+  it('retrieves Microsoft Flow environments', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -270,75 +263,68 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
-            "location": "europe",
-            "type": "Microsoft.ProcessSimple/environments",
-            "id": "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
-            "properties": {
-              "displayName": "Contoso (default)",
-              "createdTime": "2018-03-22T20:20:46.08653Z",
-              "createdBy": {
-                "id": "SYSTEM",
-                "displayName": "SYSTEM",
-                "type": "NotSpecified"
-              },
-              "provisioningState": "Succeeded",
-              "creationType": "DefaultTenant",
-              "environmentSku": "Default",
-              "environmentType": "Production",
-              "isDefault": true,
-              "azureRegionHint": "westeurope",
-              "runtimeEndpoints": {
-                "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
-                "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
-                "microsoft.PowerApps": "https://europe.api.powerapps.com",
-                "microsoft.Flow": "https://europe.api.flow.microsoft.com"
-              }
-            },
-            "displayName": "Contoso (default)"
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
+        "location": "europe",
+        "type": "Microsoft.ProcessSimple/environments",
+        "id": "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
+        "properties": {
+          "displayName": "Contoso (default)",
+          "createdTime": "2018-03-22T20:20:46.08653Z",
+          "createdBy": {
+            "id": "SYSTEM",
+            "displayName": "SYSTEM",
+            "type": "NotSpecified"
           },
-          {
-            "name": "Test-d87a7535-dd31-4437-bfe1-95340acd55c5",
-            "location": "europe",
-            "type": "Microsoft.ProcessSimple/environments",
-            "id": "/providers/Microsoft.ProcessSimple/environments/Test-d87a7535-dd31-4437-bfe1-95340acd55c5",
-            "properties": {
-              "displayName": "Contoso (test)",
-              "createdTime": "2018-03-22T20:20:46.08653Z",
-              "createdBy": {
-                "id": "SYSTEM",
-                "displayName": "SYSTEM",
-                "type": "NotSpecified"
-              },
-              "provisioningState": "Succeeded",
-              "creationType": "DefaultTenant",
-              "environmentSku": "Default",
-              "environmentType": "Production",
-              "isDefault": false,
-              "azureRegionHint": "westeurope",
-              "runtimeEndpoints": {
-                "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
-                "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
-                "microsoft.PowerApps": "https://europe.api.powerapps.com",
-                "microsoft.Flow": "https://europe.api.flow.microsoft.com"
-              }
-            },
-            "displayName": "Contoso (test)"
+          "provisioningState": "Succeeded",
+          "creationType": "DefaultTenant",
+          "environmentSku": "Default",
+          "environmentType": "Production",
+          "isDefault": true,
+          "azureRegionHint": "westeurope",
+          "runtimeEndpoints": {
+            "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
+            "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
+            "microsoft.PowerApps": "https://europe.api.powerapps.com",
+            "microsoft.Flow": "https://europe.api.flow.microsoft.com"
           }
-        ]));
-        done();
+        },
+        "displayName": "Contoso (default)"
+      },
+      {
+        "name": "Test-d87a7535-dd31-4437-bfe1-95340acd55c5",
+        "location": "europe",
+        "type": "Microsoft.ProcessSimple/environments",
+        "id": "/providers/Microsoft.ProcessSimple/environments/Test-d87a7535-dd31-4437-bfe1-95340acd55c5",
+        "properties": {
+          "displayName": "Contoso (test)",
+          "createdTime": "2018-03-22T20:20:46.08653Z",
+          "createdBy": {
+            "id": "SYSTEM",
+            "displayName": "SYSTEM",
+            "type": "NotSpecified"
+          },
+          "provisioningState": "Succeeded",
+          "creationType": "DefaultTenant",
+          "environmentSku": "Default",
+          "environmentType": "Production",
+          "isDefault": false,
+          "azureRegionHint": "westeurope",
+          "runtimeEndpoints": {
+            "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
+            "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
+            "microsoft.PowerApps": "https://europe.api.powerapps.com",
+            "microsoft.Flow": "https://europe.api.flow.microsoft.com"
+          }
+        },
+        "displayName": "Contoso (test)"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly handles no environments', (done) => {
+  it('correctly handles no environments', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -353,18 +339,11 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -378,15 +357,8 @@ describe(commands.ENVIRONMENT_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
   it('supports debug mode', () => {

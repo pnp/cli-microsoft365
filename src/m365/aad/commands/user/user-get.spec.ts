@@ -65,7 +65,7 @@ describe(commands.USER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves user using id', (done) => {
+  it('retrieves user using id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
         return Promise.resolve({ value: [resultValue] });
@@ -74,18 +74,11 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: userId } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(resultValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: userId } });
+    assert(loggerLogSpy.calledWith(resultValue));
   });
 
-  it('retrieves user using @userid token', (done) => {
+  it('retrieves user using @userid token', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
         return Promise.resolve({ value: [resultValue] });
@@ -103,18 +96,11 @@ describe(commands.USER_GET, () => {
       };
     }
 
-    command.action(logger, { options: { debug: false, id: '@meid' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(resultValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '@meid' } });
+    assert(loggerLogSpy.calledWith(resultValue));
   });
 
-  it('retrieves user using id (debug)', (done) => {
+  it('retrieves user using id (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
         return Promise.resolve({ value: [resultValue] });
@@ -123,18 +109,11 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: userId } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(resultValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: userId } });
+    assert(loggerLogSpy.calledWith(resultValue));
   });
 
-  it('retrieves user using user name', (done) => {
+  it('retrieves user using user name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'`) > -1) {
         return Promise.resolve({ value: [resultValue] });
@@ -143,18 +122,11 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, userName: userName } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(resultValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, userName: userName } });
+    assert(loggerLogSpy.calledWith(resultValue));
   });
 
-  it('retrieves user using @meusername token', (done) => {
+  it('retrieves user using @meusername token', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'`) > -1) {
         return Promise.resolve({ value: [resultValue] });
@@ -172,18 +144,11 @@ describe(commands.USER_GET, () => {
       };
     }
 
-    command.action(logger, { options: { debug: false, userName: '@meusername' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(resultValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, userName: '@meusername' } });
+    assert(loggerLogSpy.calledWith(resultValue));
   });
 
-  it('retrieves user using email', (done) => {
+  it('retrieves user using email', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=mail eq '${encodeURIComponent(userName)}'`) > -1) {
         return Promise.resolve({ value: [resultValue] });
@@ -192,18 +157,11 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, email: userName } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(resultValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, email: userName } });
+    assert(loggerLogSpy.calledWith(resultValue));
   });
 
-  it('retrieves only the specified properties', (done) => {
+  it('retrieves only the specified properties', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'&$select=id,mail`) {
         return Promise.resolve({ value: [{ "id": "userId", "mail": null }] });
@@ -212,18 +170,11 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, userName: userName, properties: 'id,mail' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "id": "userId", "mail": null }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, userName: userName, properties: 'id,mail' } });
+    assert(loggerLogSpy.calledWith({ "id": "userId", "mail": null }));
   });
 
-  it('correctly handles user not found', (done) => {
+  it('correctly handles user not found', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -237,18 +188,11 @@ describe(commands.USER_GET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, id: '68be84bf-a585-4776-80b3-30aa5207aa22' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '68be84bf-a585-4776-80b3-30aa5207aa22' does not exist or one of its queried reference-property objects are not present.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: '68be84bf-a585-4776-80b3-30aa5207aa22' } } as any),
+      new CommandError(`Resource '68be84bf-a585-4776-80b3-30aa5207aa22' does not exist or one of its queried reference-property objects are not present.`));
   });
 
-  it('fails to get user when user with provided id does not exists', (done) => {
+  it('fails to get user when user with provided id does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
         return Promise.resolve({ value: [] });
@@ -257,18 +201,11 @@ describe(commands.USER_GET, () => {
       return Promise.reject(`The specified user with id ${userId} does not exist`);
     });
 
-    command.action(logger, { options: { debug: false, id: userId } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with id ${userId} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: userId } }),
+      new CommandError(`The specified user with id ${userId} does not exist`));
   });
 
-  it('fails to get user when user with provided user name does not exists', (done) => {
+  it('fails to get user when user with provided user name does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'`) > -1) {
         return Promise.resolve({ value: [] });
@@ -277,18 +214,11 @@ describe(commands.USER_GET, () => {
       return Promise.reject(`The specified user with user name ${userName} does not exist`);
     });
 
-    command.action(logger, { options: { debug: false, userName: userName } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with user name ${userName} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, userName: userName } }),
+      new CommandError(`The specified user with user name ${userName} does not exist`));
   });
 
-  it('fails to get user when user with provided email does not exists', (done) => {
+  it('fails to get user when user with provided email does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=mail eq '${encodeURIComponent(userName)}'`) > -1) {
         return Promise.resolve({ value: [] });
@@ -297,18 +227,11 @@ describe(commands.USER_GET, () => {
       return Promise.reject(`The specified user with email ${userName} does not exist`);
     });
 
-    command.action(logger, { options: { debug: false, email: userName } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with email ${userName} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, email: userName } }),
+      new CommandError(`The specified user with email ${userName} does not exist`));
   });
 
-  it('handles error when multiple users with the specified email found', (done) => {
+  it('handles error when multiple users with the specified email found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter') > -1) {
         return Promise.resolve({
@@ -322,20 +245,12 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         email: userName
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Multiple users with email ${userName} found. Please disambiguate (user names): ${userName}, DebraB@contoso.onmicrosoft.com or (ids): ${userId}, 9b1b1e42-794b-4c71-93ac-5ed92488b67f`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new  CommandError(`Multiple users with email ${userName} found. Please disambiguate (user names): ${userName}, DebraB@contoso.onmicrosoft.com or (ids): ${userId}, 9b1b1e42-794b-4c71-93ac-5ed92488b67f`));
   });
 
   it('fails validation if id or email or userName options are not passed', async () => {

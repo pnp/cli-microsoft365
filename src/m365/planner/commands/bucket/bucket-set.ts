@@ -146,7 +146,7 @@ class PlannerBucketSetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 
@@ -154,34 +154,36 @@ class PlannerBucketSetCommand extends GraphCommand {
     }
 
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
-    this
-      .getBucket(args)
-      .then(bucket => {
-        const requestOptions: AxiosRequestConfig = {
-          url: `${this.resource}/v1.0/planner/buckets/${bucket.id}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'if-match': (bucket as any)['@odata.etag']
-          },
-          responseType: 'json',
-          data: {}
-        };
+    try {
+      const bucket = await this.getBucket(args);
 
-        const { newName, orderHint } = args.options;
-        if (newName) {
-          requestOptions.data.name = newName;
-        }
-        if (orderHint) {
-          requestOptions.data.orderHint = orderHint;
-        }
+      const requestOptions: AxiosRequestConfig = {
+        url: `${this.resource}/v1.0/planner/buckets/${bucket.id}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'if-match': (bucket as any)['@odata.etag']
+        },
+        responseType: 'json',
+        data: {}
+      };
 
-        return request.patch(requestOptions);
-      })
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      const { newName, orderHint } = args.options;
+      if (newName) {
+        requestOptions.data.name = newName;
+      }
+      if (orderHint) {
+        requestOptions.data.orderHint = orderHint;
+      }
+
+      await request.patch(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getBucket(args: CommandArgs): Promise<PlannerBucket> {

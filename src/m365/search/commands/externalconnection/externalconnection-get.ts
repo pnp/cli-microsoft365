@@ -54,7 +54,7 @@ class SearchExternalConnectionGetCommand extends GraphCommand {
     this.optionSets.push(['id', 'name']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let url: string = `${this.resource}/v1.0/external/connections`;
     if (args.options.id) {
       url += `/${encodeURIComponent(args.options.id as string)}`;
@@ -71,23 +71,22 @@ class SearchExternalConnectionGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((res: any): Promise<void> => {
-        if (args.options.name) {
-          if (res.value.length === 0) {
-            return Promise.reject(`External connection with name '${args.options.name}' not found`);
-          }
+    try {
+      let res = await request.get<any>(requestOptions);
 
-          res = res.value[0];
+      if (args.options.name) {
+        if (res.value.length === 0) {
+          throw `External connection with name '${args.options.name}' not found`;
         }
 
-        return Promise.resolve(res);
-      })
-      .then(res => {
-        logger.log(res);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+        res = res.value[0];
+      }
+
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

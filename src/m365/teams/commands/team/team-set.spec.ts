@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -76,57 +76,37 @@ describe(commands.TEAM_SET, () => {
     assert.deepStrictEqual(optionSets, [['id', 'teamId']]);
   });
 
-  it('logs deprecation warning when option teamId is specified', (done) => {
+  it('logs deprecation warning when option teamId is specified', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          visibility: 'Public'
-        })) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee`) {
         return Promise.resolve({});
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' }
-    } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
   });
 
-  it('logs deprecation warning when option displayName is specified', (done) => {
+  it('logs deprecation warning when option displayName is specified', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          visibility: 'Public'
-        })) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee`) {
         return Promise.resolve({});
       }
 
       return Promise.reject('Invalid request');
     });
-
-    command.action(logger, {
+    
+    await command.action(logger, {
       options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', displayName: 'NewName', visibility: 'Public' }
-    } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'displayName' is deprecated. Please use 'name' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'displayName' is deprecated. Please use 'name' instead.`)));
   });
 
-  it('sets the visibility settings correctly', (done) => {
+  it('sets the visibility settings correctly', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -138,20 +118,12 @@ describe(commands.TEAM_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('sets the mailNickName correctly', (done) => {
+  it('sets the mailNickName correctly', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -163,20 +135,12 @@ describe(commands.TEAM_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', mailNickName: 'NewNickName' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('sets the description settings correctly', (done) => {
+  it('sets the description settings correctly', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -187,20 +151,12 @@ describe(commands.TEAM_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', description: 'desc' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('sets the classification settings correctly', (done) => {
+  it('sets the classification settings correctly', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -211,20 +167,12 @@ describe(commands.TEAM_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { debug: true, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', classification: 'MBI' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('should handle Microsoft graph error response', (done) => {
+  it('should handle Microsoft graph error response', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee`) {
         return Promise.reject({
@@ -242,17 +190,10 @@ describe(commands.TEAM_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', name: 'NewName' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false, 
+      id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', 
+      name: 'NewName' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });
 
   it('fails validation if the teamId is not a valid GUID', async () => {
@@ -272,11 +213,6 @@ describe(commands.TEAM_SET, () => {
 
   it('passes validation if the id is a valid GUID', async () => {
     const actual = await command.validate({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if the teamId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

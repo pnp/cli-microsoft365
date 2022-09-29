@@ -65,7 +65,7 @@ describe(commands.USER_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'full_name', 'email', 'job_title', 'state', 'url']);
   });
 
-  it('calls user by e-mail', function (done) {
+  it('calls user by e-mail', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/by_email.json?email=pl%40nubo.eu') {
         return Promise.resolve(
@@ -74,18 +74,11 @@ describe(commands.USER_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { email: "pl@nubo.eu" } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { email: "pl@nubo.eu" } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
-  it('calls user by userId', function (done) {
+  it('calls user by userId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/1496550646.json') {
         return Promise.resolve(
@@ -94,18 +87,11 @@ describe(commands.USER_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { userId: 1496550646 } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { userId: 1496550646 } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646);
   });
 
-  it('calls the current user and json', function (done) {
+  it('calls the current user and json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/current.json') {
         return Promise.resolve(
@@ -114,18 +100,11 @@ describe(commands.USER_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { output: 'json' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { output: 'json' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -134,33 +113,17 @@ describe(commands.USER_GET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
-  it('correctly handles 404 error', (done) => {
+  it('correctly handles 404 error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "statusCode": 404
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Not found (404)")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Not found (404)'));
   });
 
   it('passes validation without parameters', async () => {

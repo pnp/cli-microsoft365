@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteAppPermissionSetCommand extends GraphCommand {
   private siteId: string = '';
+  private roles: string[] = ['read', 'write', 'manage', 'fullcontrol'];
 
   public get name(): string {
     return commands.SITE_APPPERMISSION_SET;
@@ -42,7 +43,8 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         permissionId: typeof args.options.permissionId !== 'undefined',
         appId: typeof args.options.appId !== 'undefined',
-        appDisplayName: typeof args.options.appDisplayName !== 'undefined'
+        appDisplayName: typeof args.options.appDisplayName !== 'undefined',
+        permissions: args.options.permissions
       });
     });
   }
@@ -62,7 +64,8 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
         option: '-n, --appDisplayName [appDisplayName]'
       },
       {
-        option: '-p, --permission <permission>'
+        option: '-p, --permission <permission>',
+        autocomplete: this.roles
       }
     );
   }
@@ -74,8 +77,8 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
           return `${args.options.appId} is not a valid GUID`;
         }
 
-        if (['read', 'write', 'owner'].indexOf(args.options.permission) === -1) {
-          return `${args.options.permission} is not a valid permission value. Allowed values are read|write|owner`;
+        if (this.roles.indexOf(args.options.permission) === -1) {
+          return `${args.options.permission} is not a valid permission value. Allowed values are ${this.roles.join('|')}`;
         }
 
         return validation.isValidSharePointUrl(args.options.siteUrl);
@@ -147,32 +150,28 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this
-      .getSpoSiteId(args)
-      .then((siteId: string): Promise<string> => {
-        this.siteId = siteId;
-        return this.getPermission(args);
-      })
-      .then((sitePermissionId: string) => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/sites/${this.siteId}/permissions/${sitePermissionId}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata=nometadata'
-          },
-          data: {
-            roles: [args.options.permission]
-          },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      this.siteId = await this.getSpoSiteId(args);
+      const sitePermissionId: string = await this.getPermission(args);
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/sites/${this.siteId}/permissions/${sitePermissionId}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json;odata=nometadata'
+        },
+        data: {
+          roles: [args.options.permission]
+        },
+        responseType: 'json'
+      };
 
-        return request.patch(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res = await request.patch(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

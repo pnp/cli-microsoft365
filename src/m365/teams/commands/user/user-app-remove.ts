@@ -66,8 +66,8 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeApp: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeApp: () => Promise<void> = async (): Promise<void> => {
       const endpoint: string = `${this.resource}/v1.0`;
 
       const requestOptions: any = {
@@ -78,31 +78,28 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      request
-        .delete(requestOptions)
-        .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+      try {
+        await request.delete(requestOptions);      
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeApp();
+      await removeApp();
     }
     else {
-      Cli.prompt(
-        {
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to remove the app with id ${args.options.appId} for user ${args.options.userId}?`
-        },
-        (result: { continue: boolean }): void => {
-          if (!result.continue) {
-            cb();
-          }
-          else {
-            removeApp();
-          }
-        }
-      );
+      const result = await Cli.prompt<{ continue: boolean }>({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the app with id ${args.options.appId} for user ${args.options.userId}?`
+      });
+      
+      if (result.continue) {
+        await removeApp();
+      }
     }
   }
 }

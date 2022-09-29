@@ -60,12 +60,12 @@ class FlowRunCancelCommand extends AzmgmtCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.log(`Cancelling run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
     }
 
-    const cancelFlow: () => void = (): void => {
+    const cancelFlow: () => Promise<void> = async (): Promise<void> => {
       const requestOptions: any = {
         url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs/${encodeURIComponent(args.options.name)}/cancel?api-version=2016-11-01`,
         headers: {
@@ -74,28 +74,28 @@ class FlowRunCancelCommand extends AzmgmtCommand {
         responseType: 'json'
       };
 
-      request
-        .post(requestOptions)
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      try {
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      cancelFlow();
+      await cancelFlow();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to cancel the flow run ${args.options.name}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          cancelFlow();
-        }
       });
+     
+      if (result.continue) {
+        await cancelFlow();
+      }
     }
   }
 }

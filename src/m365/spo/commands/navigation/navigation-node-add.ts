@@ -97,7 +97,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     return ['url'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Adding navigation node...`);
     }
@@ -120,12 +120,13 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .post(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+    try {
+      const res = await request.post<any>(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

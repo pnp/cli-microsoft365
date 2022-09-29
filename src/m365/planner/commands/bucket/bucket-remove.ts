@@ -135,7 +135,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 
@@ -143,45 +143,44 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     }
 
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
-    const removeBucket: () => void = (): void => {
-      this
-        .getBucket(args)
-        .then(bucket => {
-          const requestOptions: AxiosRequestConfig = {
-            url: `${this.resource}/v1.0/planner/buckets/${bucket.id}`,
-            headers: {
-              accept: 'application/json;odata.metadata=none',
-              'if-match': (bucket as any)['@odata.etag']
-            },
-            responseType: 'json'
-          };
+    const removeBucket: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const bucket = await this.getBucket(args);
 
-          return request.delete(requestOptions);
-        })
-        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+        const requestOptions: AxiosRequestConfig = {
+          url: `${this.resource}/v1.0/planner/buckets/${bucket.id}`,
+          headers: {
+            accept: 'application/json;odata.metadata=none',
+            'if-match': (bucket as any)['@odata.etag']
+          },
+          responseType: 'json'
+        };
+
+        await request.delete(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeBucket();
+      await removeBucket();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{continue: boolean}>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the bucket ${args.options.id || args.options.name}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeBucket();
-        }
       });
+
+      if (result.continue) {
+        await removeBucket();
+      }
     }
   }
 

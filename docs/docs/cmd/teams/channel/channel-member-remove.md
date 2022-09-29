@@ -1,6 +1,6 @@
 # teams channel member remove
 
-Remove the specified member from the specified Microsoft Teams private team channel
+Remove the specified member from the specified Microsoft Teams private or shared team channel
 
 ## Usage
 

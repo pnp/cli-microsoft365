@@ -67,7 +67,7 @@ describe(commands.ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('uploads file to the root site collection, root site, default document library, root folder', (done) => {
+  it('uploads file to the root site collection, root site, default document library, root folder', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -145,24 +145,16 @@ describe(commands.ADD, () => {
       return Promise.reject(`Invalid PUT request: ${opts}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('uploads empty file to the root site collection, root site, default document library, root folder', (done) => {
+  it('uploads empty file to the root site collection, root site, default document library, root folder', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -225,24 +217,16 @@ describe(commands.ADD, () => {
       return Promise.reject(`Invalid PUT request: ${opts}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('uploads file to the root site collection, root site, default document library, root folder with trailing slash', (done) => {
+  it('uploads file to the root site collection, root site, default document library, root folder with trailing slash', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -320,24 +304,16 @@ describe(commands.ADD, () => {
       return Promise.reject(`Invalid PUT request: ${opts}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents/'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('uploads file to the root site collection, root site, default document library, sub folder', (done) => {
+  it('uploads file to the root site collection, root site, default document library, sub folder', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -415,24 +391,16 @@ describe(commands.ADD, () => {
       return Promise.reject(`Invalid PUT request: ${opts}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents/Folder'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('uploads file to the root site collection, root site, custom document library, root folder', (done) => {
+  it('uploads file to the root site collection, root site, custom document library, root folder', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -510,24 +478,16 @@ describe(commands.ADD, () => {
       return Promise.reject(`Invalid PUT request: ${opts}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/DemoDocs'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('uploads file to One Drive for Business, default doc lib, root folder', (done) => {
+  it('uploads file to One Drive for Business, default doc lib, root folder', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -593,24 +553,16 @@ describe(commands.ADD, () => {
       return Promise.reject(`Invalid PUT request: ${opts}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso-my.sharepoint.com/personal/steve_contoso_com/Documents'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('uploads file to a non-root site collection, doc lib, root folder', (done) => {
+  it('uploads file to a non-root site collection, doc lib, root folder', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -676,24 +628,16 @@ describe(commands.ADD, () => {
       return Promise.reject(`Invalid PUT request: ${opts}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/sites/Contoso/Shared Documents'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', JSON.stringify(err));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('uploads file to a non-root site collection, doc lib, root folder without site lookup with siteUrl specified', (done) => {
+  it('uploads file to a non-root site collection, doc lib, root folder without site lookup with siteUrl specified', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -743,25 +687,17 @@ describe(commands.ADD, () => {
       return Promise.reject(`Invalid PUT request: ${opts}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/sites/Contoso/Shared Documents',
         siteUrl: 'https://contoso.sharepoint.com/sites/Contoso'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', JSON.stringify(err));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it(`returns error when the specified document library doesn't exist`, (done) => {
+  it(`returns error when the specified document library doesn't exist`, async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -815,24 +751,16 @@ describe(commands.ADD, () => {
     sinon.stub(request, 'post').callsFake(_ => Promise.reject('Issued POST request'));
     sinon.stub(request, 'put').callsFake(_ => Promise.reject('Issued PUT request'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Docs'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Drive not found')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('Drive not found'));
   });
 
-  it('returns error when resolving Graph URL for the file to be uploaded failed', (done) => {
+  it('returns error when resolving Graph URL for the file to be uploaded failed', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -851,24 +779,16 @@ describe(commands.ADD, () => {
     sinon.stub(request, 'post').callsFake(_ => Promise.reject('Issued POST request'));
     sinon.stub(request, 'put').callsFake(_ => Promise.reject('Issued PUT request'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('An error has occurred'));
   });
 
-  it('returns error when creating Graph upload session for the file to be uploaded failed', (done) => {
+  it('returns error when creating Graph upload session for the file to be uploaded failed', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -926,24 +846,16 @@ describe(commands.ADD, () => {
     }));
     sinon.stub(request, 'put').callsFake(_ => Promise.reject('Issued PUT request'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         filePath: 'https://contoso.sharepoint.com/Shared Documents/file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('An error has occurred'));
   });
 
-  it('returns error when uploading the file failed', (done) => {
+  it('returns error when uploading the file failed', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -1025,21 +937,13 @@ describe(commands.ADD, () => {
       }
     }));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('An error has occurred'));
   });
 
   it(`fails validation if the specified local source file doesn't exist`, async () => {

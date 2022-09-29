@@ -67,7 +67,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('returns a result', (done) => {
+  it('returns a result', async () => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
@@ -78,19 +78,12 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, verbose: true } }, () => {
-      try {
-        assert.strictEqual(svcListRequest.callCount, 1);
-        assert(loggerLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1']));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, verbose: true } });
+    assert.strictEqual(svcListRequest.callCount, 1);
+    assert(loggerLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1']));
   });
 
-  it('returns array of results', (done) => {
+  it('returns array of results', async () => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
@@ -101,19 +94,12 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, verbose: false } }, () => {
-      try {
-        assert.strictEqual(svcListRequest.callCount, 1);
-        assert(loggerLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1', 'http://contoso.sharepoint.com/sites/site2']));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, verbose: false } });
+    assert.strictEqual(svcListRequest.callCount, 1);
+    assert(loggerLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1', 'http://contoso.sharepoint.com/sites/site2']));
   });
 
-  it('handles error getting request', (done) => {
+  it('handles error getting request', async () => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -131,34 +117,18 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert(svcListRequest.called);
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
+    assert(svcListRequest.called);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

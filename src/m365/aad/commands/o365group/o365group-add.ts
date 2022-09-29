@@ -142,7 +142,7 @@ class AadO365GroupAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let group: Group;
     let ownerIds: string[] = [];
     let memberIds: string[] = [];
@@ -188,50 +188,37 @@ class AadO365GroupAddCommand extends GraphCommand {
       }
     };
 
-    this
-      .getUserIds(logger, args.options.owners)
-      .then((ownerIdsRes: string[]): Promise<string[]> => {
-        ownerIds = ownerIdsRes;
-        return this.getUserIds(logger, args.options.members);
-      })
-      .then((memberIdsRes: string[]): Promise<Group> => {
-        memberIds = memberIdsRes;
-        return request.post<Group>(requestOptions);
-      })
-      .then((res: Group): Promise<void> => {
-        group = res;
+    try {
+      ownerIds = await this.getUserIds(logger, args.options.owners);
+      memberIds = await this.getUserIds(logger, args.options.members);
+      group = await request.post<Group>(requestOptions);
 
-        if (!args.options.logoPath) {
-          if (this.debug) {
-            logger.logToStderr('logoPath not set. Skipping');
-          }
-
-          return Promise.resolve();
+      if (!args.options.logoPath) {
+        if (this.debug) {
+          logger.logToStderr('logoPath not set. Skipping');
         }
-
+      }
+      else {
         const fullPath: string = path.resolve(args.options.logoPath);
         if (this.verbose) {
           logger.logToStderr(`Setting group logo ${fullPath}...`);
         }
-
-        const requestOptions: any = {
+  
+        const requestOptionsPhoto: any = {
           url: `${this.resource}/v1.0/groups/${group.id}/photo/$value`,
           headers: {
             'content-type': this.getImageContentType(fullPath)
           },
           data: fs.readFileSync(fullPath)
         };
-
-        return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
-          this.setGroupLogo(requestOptions, AadO365GroupAddCommand.numRepeat, resolve, reject, logger);
+  
+        await new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
+          this.setGroupLogo(requestOptionsPhoto, AadO365GroupAddCommand.numRepeat, resolve, reject, logger);
         });
-      })
-      .then((): Promise<void[]> => {
-        if (ownerIds.length === 0) {
-          return Promise.resolve([]);
-        }
+      }
 
-        return Promise.all(ownerIds.map(ownerId => request.post<void>({
+      if (ownerIds.length !== 0) {
+        await Promise.all(ownerIds.map(ownerId => request.post<void>({
           url: `${this.resource}/v1.0/groups/${group.id}/owners/$ref`,
           headers: {
             'content-type': 'application/json'
@@ -241,13 +228,10 @@ class AadO365GroupAddCommand extends GraphCommand {
             "@odata.id": `https://graph.microsoft.com/v1.0/users/${ownerId}`
           }
         })));
-      })
-      .then((): Promise<void[]> => {
-        if (memberIds.length === 0) {
-          return Promise.resolve([]);
-        }
-
-        return Promise.all(memberIds.map(memberId => request.post<void>({
+      }
+      
+      if (memberIds.length !== 0) {
+        await Promise.all(memberIds.map(memberId => request.post<void>({
           url: `${this.resource}/v1.0/groups/${group.id}/members/$ref`,
           headers: {
             'content-type': 'application/json'
@@ -257,11 +241,13 @@ class AadO365GroupAddCommand extends GraphCommand {
             "@odata.id": `https://graph.microsoft.com/v1.0/users/${memberId}`
           }
         })));
-      })
-      .then((): void => {
-        logger.log(group);
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      }
+
+      logger.log(group);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getUserIds(logger: Logger, users: string | undefined): Promise<string[]> {

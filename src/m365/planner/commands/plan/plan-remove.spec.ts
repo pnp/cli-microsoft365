@@ -73,9 +73,9 @@ describe(commands.PLAN_REMOVE, () => {
     };
     promptOptions = undefined;
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -169,65 +169,44 @@ describe(commands.PLAN_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified plan when confirm option not passed with id', (done) => {
-    command.action(logger, {
+  it('prompts before removing the specified plan when confirm option not passed with id', async () => {
+    await command.action(logger, {
       options: {
         id: validPlanId
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    
+    assert(promptIssued);
   });
 
-  it('aborts removing the specified plan when confirm option not passed and prompt not confirmed', (done) => {
+  it('aborts removing the specified plan when confirm option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         id: validPlanId
       }
-    }, () => {
-      try {
-        assert(deleteSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteSpy.notCalled);
   });
 
-  it('fails validation when using app only access token', (done) => {
+  it('fails validation when using app only access token', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         id: validPlanId
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('This command does not support application permissions.'));
   });
 
-  it('Correctly deletes plan by id', (done) => {
+  it('Correctly deletes plan by id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}`) {
         return Promise.resolve(singlePlanResponse);
@@ -243,23 +222,15 @@ describe(commands.PLAN_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         id: validPlanId,
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('Correctly deletes plan by title', (done) => {
+  it('Correctly deletes plan by title', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
         return Promise.resolve(singleGroupsResponse);
@@ -278,27 +249,19 @@ describe(commands.PLAN_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         title: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('Correctly deletes plan by title with group id', (done) => {
+  it('Correctly deletes plan by title with group id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve(singlePlansResponse);
@@ -314,44 +277,28 @@ describe(commands.PLAN_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         title: validPlanTitle,
         ownerGroupId: validOwnerGroupId
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.resolve(singlePlanResponse));
     sinon.stub(request, 'delete').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         id: validPlanId,
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError("An error has occurred"));
   });
 
   it('supports debug mode', () => {

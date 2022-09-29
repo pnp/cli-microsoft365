@@ -53,7 +53,7 @@ describe(commands.APPPAGE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it("fails to update the single-part app page if request is rejected", done => {
+  it("fails to update the single-part app page if request is rejected", async () => {
     sinon.stub(request, "post").callsFake(opts => {
       if (
         (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1 &&
@@ -63,7 +63,7 @@ describe(commands.APPPAGE_SET, () => {
       }
       return Promise.reject("Invalid request");
     });
-    command.action(logger, 
+    await assert.rejects(command.action(logger, 
       {
         options: {
           debug: false,
@@ -71,22 +71,27 @@ describe(commands.APPPAGE_SET, () => {
           webUrl: "https://contoso.sharepoint.com/",
           webPartData: JSON.stringify({})
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(
-            JSON.stringify(err),
-            JSON.stringify(
-              new CommandError(`Failed to update the single-part app page`)
-            )
-          );
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
+      }), new CommandError(`Failed to update the single-part app page`));
+  });
+
+  it("Update the single-part app pag", async () => {
+    sinon.stub(request, "post").callsFake(opts => {
+      if (
+        (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1 
+      ) {
+        return Promise.resolve();
       }
-    );
+      return Promise.reject("Invalid request");
+    });
+    await command.action(logger, 
+      {
+        options: {
+          debug: false,
+          pageName: "demo",
+          webUrl: "https://contoso.sharepoint.com/",
+          webPartData: JSON.stringify({})
+        }
+      });
   });
 
   it("supports debug mode", () => {

@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -63,7 +63,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'mailNickname']);
   });
 
-  it('lists deleted Microsoft 365 Groups in the tenant', (done) => {
+  it('lists deleted Microsoft 365 Groups in the tenant', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
         return Promise.resolve({
@@ -125,69 +125,62 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
-            "deletedDateTime": null,
-            "classification": null,
-            "createdDateTime": "2017-12-07T13:58:01Z",
-            "description": "Team 1",
-            "displayName": "Team 1",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "team_1@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "team_1",
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesProvisioningErrors": [],
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "proxyAddresses": [
-              "SMTP:team_1@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2017-12-07T13:58:01Z",
-            "securityEnabled": false,
-            "visibility": "Private"
-          },
-          {
-            "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
-            "deletedDateTime": null,
-            "classification": null,
-            "createdDateTime": "2017-12-17T13:30:42Z",
-            "description": "Team 2",
-            "displayName": "Team 2",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "team_2@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "team_2",
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesProvisioningErrors": [],
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "proxyAddresses": [
-              "SMTP:team_2@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2017-12-17T13:30:42Z",
-            "securityEnabled": false,
-            "visibility": "Private"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: {} });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
+        "deletedDateTime": null,
+        "classification": null,
+        "createdDateTime": "2017-12-07T13:58:01Z",
+        "description": "Team 1",
+        "displayName": "Team 1",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "team_1@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "team_1",
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesProvisioningErrors": [],
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "proxyAddresses": [
+          "SMTP:team_1@contoso.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2017-12-07T13:58:01Z",
+        "securityEnabled": false,
+        "visibility": "Private"
+      },
+      {
+        "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
+        "deletedDateTime": null,
+        "classification": null,
+        "createdDateTime": "2017-12-17T13:30:42Z",
+        "description": "Team 2",
+        "displayName": "Team 2",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "team_2@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "team_2",
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesProvisioningErrors": [],
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "proxyAddresses": [
+          "SMTP:team_2@contoso.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2017-12-17T13:30:42Z",
+        "securityEnabled": false,
+        "visibility": "Private"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists Deleted Microsoft 365 Groups in the tenant (verbose)', (done) => {
+  it('lists Deleted Microsoft 365 Groups in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
         return Promise.resolve({
@@ -249,69 +242,62 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
-            "deletedDateTime": "2018-03-06T01:42:50Z",
-            "classification": null,
-            "createdDateTime": "2017-12-07T13:58:01Z",
-            "description": "Deleted Team 1",
-            "displayName": "Deleted Team 1",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "d_team_1@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "d_team_1",
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesProvisioningErrors": [],
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "proxyAddresses": [
-              "SMTP:d_team_1@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2017-12-07T13:58:01Z",
-            "securityEnabled": false,
-            "visibility": "Private"
-          },
-          {
-            "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
-            "deletedDateTime": "2018-03-06T01:42:50Z",
-            "classification": null,
-            "createdDateTime": "2017-12-17T13:30:42Z",
-            "description": "Deleted Team 2",
-            "displayName": "Deleted Team 2",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "d_team_2@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "d_team_2",
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesProvisioningErrors": [],
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "proxyAddresses": [
-              "SMTP:d_team_2@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2017-12-17T13:30:42Z",
-            "securityEnabled": false,
-            "visibility": "Private"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { verbose: true } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
+        "deletedDateTime": "2018-03-06T01:42:50Z",
+        "classification": null,
+        "createdDateTime": "2017-12-07T13:58:01Z",
+        "description": "Deleted Team 1",
+        "displayName": "Deleted Team 1",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "d_team_1@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "d_team_1",
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesProvisioningErrors": [],
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "proxyAddresses": [
+          "SMTP:d_team_1@contoso.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2017-12-07T13:58:01Z",
+        "securityEnabled": false,
+        "visibility": "Private"
+      },
+      {
+        "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
+        "deletedDateTime": "2018-03-06T01:42:50Z",
+        "classification": null,
+        "createdDateTime": "2017-12-17T13:30:42Z",
+        "description": "Deleted Team 2",
+        "displayName": "Deleted Team 2",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "d_team_2@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "d_team_2",
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesProvisioningErrors": [],
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "proxyAddresses": [
+          "SMTP:d_team_2@contoso.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2017-12-17T13:30:42Z",
+        "securityEnabled": false,
+        "visibility": "Private"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists Deleted Microsoft 365 Groups filtering on displayName', (done) => {
+  it('lists Deleted Microsoft 365 Groups filtering on displayName', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'Deleted')&$top=100`) {
         return Promise.resolve({
@@ -373,69 +359,62 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { displayName: 'Deleted' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
-            "deletedDateTime": "2018-03-06T01:42:50Z",
-            "classification": null,
-            "createdDateTime": "2017-12-07T13:58:01Z",
-            "description": "Deleted Team 1",
-            "displayName": "Deleted Team 1",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "d_team_1@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "d_team_1",
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesProvisioningErrors": [],
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "proxyAddresses": [
-              "SMTP:d_team_1@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2017-12-07T13:58:01Z",
-            "securityEnabled": false,
-            "visibility": "Private"
-          },
-          {
-            "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
-            "deletedDateTime": "2018-03-06T01:42:50Z",
-            "classification": null,
-            "createdDateTime": "2017-12-17T13:30:42Z",
-            "description": "Deleted Team 2",
-            "displayName": "Deleted Team 2",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "d_team_2@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "d_team_2",
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesProvisioningErrors": [],
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "proxyAddresses": [
-              "SMTP:d_team_2@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2017-12-17T13:30:42Z",
-            "securityEnabled": false,
-            "visibility": "Private"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { displayName: 'Deleted' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
+        "deletedDateTime": "2018-03-06T01:42:50Z",
+        "classification": null,
+        "createdDateTime": "2017-12-07T13:58:01Z",
+        "description": "Deleted Team 1",
+        "displayName": "Deleted Team 1",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "d_team_1@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "d_team_1",
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesProvisioningErrors": [],
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "proxyAddresses": [
+          "SMTP:d_team_1@contoso.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2017-12-07T13:58:01Z",
+        "securityEnabled": false,
+        "visibility": "Private"
+      },
+      {
+        "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
+        "deletedDateTime": "2018-03-06T01:42:50Z",
+        "classification": null,
+        "createdDateTime": "2017-12-17T13:30:42Z",
+        "description": "Deleted Team 2",
+        "displayName": "Deleted Team 2",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "d_team_2@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "d_team_2",
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesProvisioningErrors": [],
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "proxyAddresses": [
+          "SMTP:d_team_2@contoso.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2017-12-17T13:30:42Z",
+        "securityEnabled": false,
+        "visibility": "Private"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists Deleted Microsoft 365 Groups filtering on mailNickname', (done) => {
+  it('lists Deleted Microsoft 365 Groups filtering on mailNickname', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(MailNickname,'d_team')&$top=100`) {
         return Promise.resolve({
@@ -497,69 +476,62 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { mailNickname: 'd_team' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
-            "deletedDateTime": "2018-03-06T01:42:50Z",
-            "classification": null,
-            "createdDateTime": "2017-12-07T13:58:01Z",
-            "description": "Deleted Team 1",
-            "displayName": "Deleted Team 1",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "d_team_1@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "d_team_1",
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesProvisioningErrors": [],
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "proxyAddresses": [
-              "SMTP:d_team_1@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2017-12-07T13:58:01Z",
-            "securityEnabled": false,
-            "visibility": "Private"
-          },
-          {
-            "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
-            "deletedDateTime": "2018-03-06T01:42:50Z",
-            "classification": null,
-            "createdDateTime": "2017-12-17T13:30:42Z",
-            "description": "Deleted Team 2",
-            "displayName": "Deleted Team 2",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "d_team_2@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "d_team_2",
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesProvisioningErrors": [],
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "proxyAddresses": [
-              "SMTP:d_team_2@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2017-12-17T13:30:42Z",
-            "securityEnabled": false,
-            "visibility": "Private"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { mailNickname: 'd_team' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
+        "deletedDateTime": "2018-03-06T01:42:50Z",
+        "classification": null,
+        "createdDateTime": "2017-12-07T13:58:01Z",
+        "description": "Deleted Team 1",
+        "displayName": "Deleted Team 1",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "d_team_1@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "d_team_1",
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesProvisioningErrors": [],
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "proxyAddresses": [
+          "SMTP:d_team_1@contoso.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2017-12-07T13:58:01Z",
+        "securityEnabled": false,
+        "visibility": "Private"
+      },
+      {
+        "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
+        "deletedDateTime": "2018-03-06T01:42:50Z",
+        "classification": null,
+        "createdDateTime": "2017-12-17T13:30:42Z",
+        "description": "Deleted Team 2",
+        "displayName": "Deleted Team 2",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "d_team_2@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "d_team_2",
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesProvisioningErrors": [],
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "proxyAddresses": [
+          "SMTP:d_team_2@contoso.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2017-12-17T13:30:42Z",
+        "securityEnabled": false,
+        "visibility": "Private"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists Deleted Microsoft 365 Groups filtering on displayName and mailNickname', (done) => {
+  it('lists Deleted Microsoft 365 Groups filtering on displayName and mailNickname', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'Deleted') and startswith(MailNickname,'d_team')&$top=100`) {
         return Promise.resolve({
@@ -621,66 +593,66 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { displayName: 'Deleted', mailNickname: 'd_team' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
-            "deletedDateTime": "2018-03-06T01:42:50Z",
-            "classification": null,
-            "createdDateTime": "2017-12-07T13:58:01Z",
-            "description": "Deleted Team 1",
-            "displayName": "Deleted Team 1",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "d_team_1@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "d_team_1",
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesProvisioningErrors": [],
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "proxyAddresses": [
-              "SMTP:d_team_1@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2017-12-07T13:58:01Z",
-            "securityEnabled": false,
-            "visibility": "Private"
-          },
-          {
-            "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
-            "deletedDateTime": "2018-03-06T01:42:50Z",
-            "classification": null,
-            "createdDateTime": "2017-12-17T13:30:42Z",
-            "description": "Deleted Team 2",
-            "displayName": "Deleted Team 2",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "d_team_2@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "d_team_2",
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesProvisioningErrors": [],
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "proxyAddresses": [
-              "SMTP:d_team_2@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2017-12-17T13:30:42Z",
-            "securityEnabled": false,
-            "visibility": "Private"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { displayName: 'Deleted', mailNickname: 'd_team' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
+        "deletedDateTime": "2018-03-06T01:42:50Z",
+        "classification": null,
+        "createdDateTime": "2017-12-07T13:58:01Z",
+        "description": "Deleted Team 1",
+        "displayName": "Deleted Team 1",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "d_team_1@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "d_team_1",
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesProvisioningErrors": [],
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "proxyAddresses": [
+          "SMTP:d_team_1@contoso.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2017-12-07T13:58:01Z",
+        "securityEnabled": false,
+        "visibility": "Private"
+      },
+      {
+        "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
+        "deletedDateTime": "2018-03-06T01:42:50Z",
+        "classification": null,
+        "createdDateTime": "2017-12-17T13:30:42Z",
+        "description": "Deleted Team 2",
+        "displayName": "Deleted Team 2",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "d_team_2@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "d_team_2",
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesProvisioningErrors": [],
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "proxyAddresses": [
+          "SMTP:d_team_2@contoso.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2017-12-17T13:30:42Z",
+        "securityEnabled": false,
+        "visibility": "Private"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
+  });
+
+  it('handles random API error', async () => {
+    const errorMessage = 'Something went wrong';
+    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+
+    await assert.rejects(command.action(logger, { options: { mailNickname: 'd_team' } }), new CommandError(errorMessage));
   });
 
   it('supports specifying displayName', () => {
@@ -704,5 +676,4 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
     });
     assert(containsOption);
   });
-
 });

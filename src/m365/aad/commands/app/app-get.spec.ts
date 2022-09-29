@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -64,7 +64,7 @@ describe(commands.APP_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('handles error when the app specified with the appId not found', (done) => {
+  it('handles error when the app specified with the appId not found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
         return Promise.resolve({ value: [] });
@@ -73,23 +73,15 @@ describe(commands.APP_GET, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
   });
 
-  it('handles error when the app with the specified the name not found', (done) => {
+  it('handles error when the app with the specified the name not found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
         return Promise.resolve({ value: [] });
@@ -98,23 +90,15 @@ describe(commands.APP_GET, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         name: 'My app'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `No Azure AD application registration with name My app found`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`No Azure AD application registration with name My app found`));
   });
 
-  it('handles error when multiple apps with the specified name found', (done) => {
+  it('handles error when multiple apps with the specified name found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
         return Promise.resolve({
@@ -128,58 +112,28 @@ describe(commands.APP_GET, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         name: 'My app'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
   });
 
-  it('handles error when retrieving information about app through appId failed', (done) => {
+  it('handles error when retrieving information about app through appId failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `An error has occurred`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error when retrieving information about app through name failed', (done) => {
+  it('handles error when retrieving information about app through name failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: 'My app'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `An error has occurred`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      name: 'My app' } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if appId and objectId specified', async () => {
@@ -227,7 +181,7 @@ describe(commands.APP_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it(`should get an Azure AD app registration by its app (client) ID. Doesn't save the app info if not requested`, (done) => {
+  it(`should get an Azure AD app registration by its app (client) ID. Doesn't save the app info if not requested`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
         return Promise.resolve({
@@ -257,26 +211,19 @@ describe(commands.APP_GET, () => {
     });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
-        assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
-        assert.strictEqual(call.args[0].displayName, 'My App');
-        assert(fsWriteFileSyncSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
+    assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
+    assert.strictEqual(call.args[0].displayName, 'My App');
+    assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`should get an Azure AD app registration by its name. Doesn't save the app info if not requested`, (done) => {
+  it(`should get an Azure AD app registration by its name. Doesn't save the app info if not requested`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
         return Promise.resolve({
@@ -306,26 +253,19 @@ describe(commands.APP_GET, () => {
     });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         name: 'My App'
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
-        assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
-        assert.strictEqual(call.args[0].displayName, 'My App');
-        assert(fsWriteFileSyncSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
+    assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
+    assert.strictEqual(call.args[0].displayName, 'My App');
+    assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`should get an Azure AD app registration by its object ID. Doesn't save the app info if not requested`, (done) => {
+  it(`should get an Azure AD app registration by its object ID. Doesn't save the app info if not requested`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/340a4aa3-1af6-43ac-87d8-189819003952`) {
         return Promise.resolve({
@@ -340,26 +280,19 @@ describe(commands.APP_GET, () => {
     });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         objectId: '340a4aa3-1af6-43ac-87d8-189819003952'
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
-        assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
-        assert.strictEqual(call.args[0].displayName, 'My App');
-        assert(fsWriteFileSyncSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
+    assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
+    assert.strictEqual(call.args[0].displayName, 'My App');
+    assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`should get an Azure AD app registration by its app (client) ID. Creates the file it doesn't exist`, (done) => {
+  it(`should get an Azure AD app registration by its app (client) ID. Creates the file it doesn't exist`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -395,33 +328,26 @@ describe(commands.APP_GET, () => {
       fileContents = contents as string;
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         save: true
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
-        assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
-        assert.strictEqual(call.args[0].displayName, 'My App');
-        assert.strictEqual(filePath, '.m365rc.json');
-        assert.strictEqual(fileContents, JSON.stringify({
-          apps: [{
-            appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
-            name: 'My App'
-          }]
-        }, null, 2));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
+    assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
+    assert.strictEqual(call.args[0].displayName, 'My App');
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [{
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        name: 'My App'
+      }]
+    }, null, 2));
   });
 
-  it(`should get an Azure AD app registration by its app (client) ID. Writes to the existing empty file`, (done) => {
+  it(`should get an Azure AD app registration by its app (client) ID. Writes to the existing empty file`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -458,33 +384,26 @@ describe(commands.APP_GET, () => {
       fileContents = contents as string;
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         save: true
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
-        assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
-        assert.strictEqual(call.args[0].displayName, 'My App');
-        assert.strictEqual(filePath, '.m365rc.json');
-        assert.strictEqual(fileContents, JSON.stringify({
-          apps: [{
-            appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
-            name: 'My App'
-          }]
-        }, null, 2));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
+    assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
+    assert.strictEqual(call.args[0].displayName, 'My App');
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [{
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        name: 'My App'
+      }]
+    }, null, 2));
   });
 
-  it(`should get an Azure AD app registration by its app (client) ID. Adds to the existing file contents`, (done) => {
+  it(`should get an Azure AD app registration by its app (client) ID. Adds to the existing file contents`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -528,38 +447,31 @@ describe(commands.APP_GET, () => {
       fileContents = contents as string;
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         save: true
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
-        assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
-        assert.strictEqual(call.args[0].displayName, 'My App');
-        assert.strictEqual(filePath, '.m365rc.json');
-        assert.strictEqual(fileContents, JSON.stringify({
-          apps: [
-            {
-              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
-              "name": "M365 app"
-            },
-            {
-              appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
-              name: 'My App'
-            }]
-        }, null, 2));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
+    assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
+    assert.strictEqual(call.args[0].displayName, 'My App');
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        },
+        {
+          appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+          name: 'My App'
+        }]
+    }, null, 2));
   });
 
-  it(`should get an Azure AD app registration by its app (client) ID. Adds to the existing file contents (Debug)`, (done) => {
+  it(`should get an Azure AD app registration by its app (client) ID. Adds to the existing file contents (Debug)`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -603,39 +515,32 @@ describe(commands.APP_GET, () => {
       fileContents = contents as string;
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         save: true
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
-        assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
-        assert.strictEqual(call.args[0].displayName, 'My App');
-        assert.strictEqual(filePath, '.m365rc.json');
-        assert.strictEqual(fileContents, JSON.stringify({
-          apps: [
-            {
-              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
-              "name": "M365 app"
-            },
-            {
-              appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
-              name: 'My App'
-            }]
-        }, null, 2));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
+    assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
+    assert.strictEqual(call.args[0].displayName, 'My App');
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        },
+        {
+          appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+          name: 'My App'
+        }]
+    }, null, 2));
   });
 
-  it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, (done) => {
+  it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
         return Promise.resolve({
@@ -667,24 +572,16 @@ describe(commands.APP_GET, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         save: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(fsWriteFileSyncSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, (done) => {
+  it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
         return Promise.resolve({
@@ -716,24 +613,16 @@ describe(commands.APP_GET, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => '{');
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         save: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(fsWriteFileSyncSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`doesn't fail execution when error occurred while saving app info`, (done) => {
+  it(`doesn't fail execution when error occurred while saving app info`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
         return Promise.resolve({
@@ -765,18 +654,10 @@ describe(commands.APP_GET, () => {
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('Error occurred while saving app info'); });
 
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         save: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });

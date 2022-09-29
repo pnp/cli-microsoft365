@@ -1,12 +1,7 @@
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli';
-import GlobalOptions from '../../../../GlobalOptions';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import commands from '../../commands';
-
-interface CommandArgs {
-  options: GlobalOptions;
-}
 
 class CliCompletionPwshUpdateCommand extends AnonymousCommand {
   public get name(): string {
@@ -17,14 +12,12 @@ class CliCompletionPwshUpdateCommand extends AnonymousCommand {
     return 'Updates command completion for PowerShell';
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     if (this.debug) {
       logger.logToStderr('Generating command completion...');
     }
 
     autocomplete.generateShCompletion();
-
-    cb();
   }
 }
 

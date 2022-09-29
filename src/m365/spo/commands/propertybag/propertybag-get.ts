@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
-import { ContextInfo, IdentityResponse, spo, validation } from '../../../../utils';
+import { spo, validation } from '../../../../utils';
 import commands from '../../commands';
 import { Property, SpoPropertyBagBaseCommand } from './propertybag-base';
 
@@ -59,33 +59,33 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    spo
-      .getRequestDigest(args.options.webUrl)
-      .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
-        this.formDigestValue = contextResponse.FormDigestValue;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const contextResponse = await spo.getRequestDigest(args.options.webUrl);
+      this.formDigestValue = contextResponse.FormDigestValue;
 
-        return spo.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
-      })
-      .then((identityResp: IdentityResponse): Promise<any> => {
-        const opts: Options = args.options;
-        if (opts.folder) {
-          return this.getFolderPropertyBag(identityResp, opts.webUrl, opts.folder, logger);
-        }
+      const identityResp = await spo.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
 
-        return this.getWebPropertyBag(identityResp, opts.webUrl, logger);
-      })
-      .then((propertyBagData: any): void => {
-        const property = this.filterByKey(propertyBagData, args.options.key);
+      let propertyBagData: any;
+      const opts: Options = args.options;
+      if (opts.folder) {
+        propertyBagData = await this.getFolderPropertyBag(identityResp, opts.webUrl, opts.folder, logger);
+      }
+      else {
+        propertyBagData = await this.getWebPropertyBag(identityResp, opts.webUrl, logger);
+      }
+      const property = this.filterByKey(propertyBagData, args.options.key);
 
-        if (property) {
-          logger.log(property.value);
-        }
-        else if (this.verbose) {
-          logger.logToStderr('Property not found.');
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      if (property) {
+        logger.log(property.value);
+      }
+      else if (this.verbose) {
+        logger.logToStderr('Property not found.');
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   private filterByKey(propertyBag: any, key: string): Property | null {

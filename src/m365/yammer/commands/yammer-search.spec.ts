@@ -242,7 +242,7 @@ describe(commands.SEARCH, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async() => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -251,15 +251,7 @@ describe(commands.SEARCH, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
   it('does not pass validation without parameters', async () => {
@@ -321,41 +313,36 @@ describe(commands.SEARCH, () => {
     assert(containsOption);
   });
 
-  it('returns all items', function (done) {
+  it('returns all items', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(searchResults);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents" } } as any, () => {
-      try {
-        const result = loggerLogSpy.lastCall.args[0];
-        assert.strictEqual(result.length, 15);
-        assert.strictEqual(result[0].id, 11111);
-        assert.strictEqual(result[1].id, 11112);
-        assert.strictEqual(result[2].id, 11113);
-        assert.strictEqual(result[3].id, 11114);
-        assert.strictEqual(result[4].id, 3331);
-        assert.strictEqual(result[5].id, 3332);
-        assert.strictEqual(result[6].id, 3333);
-        assert.strictEqual(result[7].id, 3334);
-        assert.strictEqual(result[8].id, 3335);
-        assert.strictEqual(result[9].id, 4441);
-        assert.strictEqual(result[10].id, 4442);
-        assert.strictEqual(result[11].id, 4443);
-        assert.strictEqual(result[12].id, 4444);
-        assert.strictEqual(result[13].id, 2221);
-        assert.strictEqual(result[14].id, 2222);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { queryText: "contents" } } as any);
+    
+    const result = loggerLogSpy.lastCall.args[0];
+    assert.strictEqual(result.length, 15);
+    assert.strictEqual(result[0].id, 11111);
+    assert.strictEqual(result[1].id, 11112);
+    assert.strictEqual(result[2].id, 11113);
+    assert.strictEqual(result[3].id, 11114);
+    assert.strictEqual(result[4].id, 3331);
+    assert.strictEqual(result[5].id, 3332);
+    assert.strictEqual(result[6].id, 3333);
+    assert.strictEqual(result[7].id, 3334);
+    assert.strictEqual(result[8].id, 3335);
+    assert.strictEqual(result[9].id, 4441);
+    assert.strictEqual(result[10].id, 4442);
+    assert.strictEqual(result[11].id, 4443);
+    assert.strictEqual(result[12].id, 4444);
+    assert.strictEqual(result[13].id, 2221);
+    assert.strictEqual(result[14].id, 2222);
   });
 
-  it('returns long search result', function (done) {
+  it('returns long search result', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(longSearchResult);
@@ -365,210 +352,163 @@ describe(commands.SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents", show: "messages" } } as any, () => {
-      try {
-        const result = loggerLogSpy.lastCall.args[0];
-        assert.strictEqual(result.length, 24);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { queryText: "contents", show: "messages" } } as any);
+
+    const result = loggerLogSpy.lastCall.args[0];
+    assert.strictEqual(result.length, 24);
   });
 
-  it('returns the summary', function (done) {
+  it('returns the summary', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(searchResults);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents", show: "summary" } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].messages, 4);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].groups, 2);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].topics, 5);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].users, 4);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { queryText: "contents", show: "summary" } } as any);
+
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].messages, 4);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].groups, 2);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].topics, 5);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].users, 4);
   });
 
-  it('trims the output message', function (done) {
+  it('trims the output message', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(messageTrimming);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents" } } as any, () => {
-      try {
 
-        const result = loggerLogSpy.lastCall.args[0];
-        assert.strictEqual(result.length, 4);
-        assert.strictEqual(result[0].id, 11111);
-        assert.strictEqual(result[0].description.length, 83);
-        assert.strictEqual(result[1].id, 11112);
-        assert.strictEqual(result[1].description.length, 5);
-        assert.strictEqual(result[2].id, 11113);
-        assert.strictEqual(result[3].id, 11114);
-        assert.strictEqual(result[3].description.length, 12);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { queryText: "contents" } } as any);
+
+    const result = loggerLogSpy.lastCall.args[0];
+    assert.strictEqual(result.length, 4);
+    assert.strictEqual(result[0].id, 11111);
+    assert.strictEqual(result[0].description.length, 83);
+    assert.strictEqual(result[1].id, 11112);
+    assert.strictEqual(result[1].description.length, 5);
+    assert.strictEqual(result[2].id, 11113);
+    assert.strictEqual(result[3].id, 11114);
+    assert.strictEqual(result[3].description.length, 12);
   });
 
-  it('trims the output message with message filter', function (done) {
+  it('trims the output message with message filter', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(messageTrimming);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents", show: "messages" } } as any, () => {
-      try {
 
-        const result = loggerLogSpy.lastCall.args[0];
-        assert.strictEqual(result.length, 4);
-        assert.strictEqual(result[0].id, 11111);
-        assert.strictEqual(result[0].description.length, 83);
-        assert.strictEqual(result[1].id, 11112);
-        assert.strictEqual(result[1].description.length, 5);
-        assert.strictEqual(result[2].id, 11113);
-        assert.strictEqual(result[3].id, 11114);
-        assert.strictEqual(result[3].description.length, 12);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { queryText: "contents", show: "messages" } } as any);
+
+    const result = loggerLogSpy.lastCall.args[0];
+    assert.strictEqual(result.length, 4);
+    assert.strictEqual(result[0].id, 11111);
+    assert.strictEqual(result[0].description.length, 83);
+    assert.strictEqual(result[1].id, 11112);
+    assert.strictEqual(result[1].description.length, 5);
+    assert.strictEqual(result[2].id, 11113);
+    assert.strictEqual(result[3].id, 11114);
+    assert.strictEqual(result[3].description.length, 12);
   });
 
-  it('returns message output', function (done) {
+  it('returns message output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(searchResults);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents", show: "messages" } } as any, () => {
-      try {
-        const result = loggerLogSpy.lastCall.args[0];
-        assert.strictEqual(result.length, 4);
-        assert.strictEqual(result[0].id, 11111);
-        assert.strictEqual(result[1].id, 11112);
-        assert.strictEqual(result[2].id, 11113);
-        assert.strictEqual(result[3].id, 11114);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { queryText: "contents", show: "messages" } } as any);
+
+    const result = loggerLogSpy.lastCall.args[0];
+    assert.strictEqual(result.length, 4);
+    assert.strictEqual(result[0].id, 11111);
+    assert.strictEqual(result[1].id, 11112);
+    assert.strictEqual(result[2].id, 11113);
+    assert.strictEqual(result[3].id, 11114);
   });
 
-  it('returns topic output', function (done) {
+  it('returns topic output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(searchResults);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents", show: "topics" } } as any, () => {
-      try {
-        const result = loggerLogSpy.lastCall.args[0];
-        assert.strictEqual(result.length, 5);
-        assert.strictEqual(result[0].id, 3331);
-        assert.strictEqual(result[1].id, 3332);
-        assert.strictEqual(result[2].id, 3333);
-        assert.strictEqual(result[3].id, 3334);
-        assert.strictEqual(result[4].id, 3335);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { queryText: "contents", show: "topics" } } as any);
+
+    const result = loggerLogSpy.lastCall.args[0];
+    assert.strictEqual(result.length, 5);
+    assert.strictEqual(result[0].id, 3331);
+    assert.strictEqual(result[1].id, 3332);
+    assert.strictEqual(result[2].id, 3333);
+    assert.strictEqual(result[3].id, 3334);
+    assert.strictEqual(result[4].id, 3335);
   });
 
-  it('returns groups output', function (done) {
+  it('returns groups output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(searchResults);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents", show: "groups" } } as any, () => {
-      try {
-        const result = loggerLogSpy.lastCall.args[0];
-        assert.strictEqual(result.length, 2);
-        assert.strictEqual(result[0].id, 2221);
-        assert.strictEqual(result[1].id, 2222);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { queryText: "contents", show: "groups" } } as any);
+
+    const result = loggerLogSpy.lastCall.args[0];
+    assert.strictEqual(result.length, 2);
+    assert.strictEqual(result[0].id, 2221);
+    assert.strictEqual(result[1].id, 2222);
   });
 
-  it('returns users output', function (done) {
+  it('returns users output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(searchResults);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents", show: "users" } } as any, () => {
-      try {
-        const result = loggerLogSpy.lastCall.args[0];
-        assert.strictEqual(result.length, 4);
-        assert.strictEqual(result[0].id, 4441);
-        assert.strictEqual(result[1].id, 4442);
-        assert.strictEqual(result[2].id, 4443);
-        assert.strictEqual(result[3].id, 4444);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { queryText: "contents", show: "users" } } as any);
+
+    const result = loggerLogSpy.lastCall.args[0];
+    assert.strictEqual(result.length, 4);
+    assert.strictEqual(result[0].id, 4441);
+    assert.strictEqual(result[1].id, 4442);
+    assert.strictEqual(result[2].id, 4443);
+    assert.strictEqual(result[3].id, 4444);
   });
 
-  it('returns limited results', function (done) {
+  it('returns limited results', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(searchResults);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents", limit: 1, output: "json" } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.messages, 4, "summary returns 4 messages");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.groups, 2, "sumamry returns 2 groups");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.topics, 5, "summary return two topics");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.users, 4, "summary returns 4 users");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].messages.length, 1, "message arary returns 1 message");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].groups.length, 1, "groups array returns 1 group");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].topics.length, 1, "topics array returns 1 topic");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].users.length, 1, "users array returns 1 user");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { queryText: "contents", limit: 1, output: "json" } } as any);
+
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.messages, 4, "summary returns 4 messages");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.groups, 2, "sumamry returns 2 groups");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.topics, 5, "summary return two topics");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.users, 4, "summary returns 4 users");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].messages.length, 1, "message arary returns 1 message");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].groups.length, 1, "groups array returns 1 group");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].topics.length, 1, "topics array returns 1 topic");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].users.length, 1, "users array returns 1 user");
   });
 
-  it('returns all results', (done) => {
+  it('returns all results', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(searchResults);
@@ -578,25 +518,20 @@ describe(commands.SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents", output: "json" } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.messages, 4, "summary returns 4 messages");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.groups, 2, "sumamry returns 2 groups");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.topics, 5, "summary return two topics");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.users, 4, "summary returns 4 users");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].messages.length, 4, "message arary returns 4 entries");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].groups.length, 2, "groups array returns 2 groups");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].topics.length, 5, "topics array returns 2 topics");
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].users.length, 4, "users array returns 4 users");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { queryText: "contents", output: "json" } } as any);
+
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.messages, 4, "summary returns 4 messages");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.groups, 2, "sumamry returns 2 groups");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.topics, 5, "summary return two topics");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.users, 4, "summary returns 4 users");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].messages.length, 4, "message arary returns 4 entries");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].groups.length, 2, "groups array returns 2 groups");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].topics.length, 5, "topics array returns 2 topics");
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].users.length, 4, "users array returns 4 users");
   });
 
-  it('handles error in loop', (done) => {
+  it('handles error in loop', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(longSearchResult);
@@ -611,14 +546,7 @@ describe(commands.SEARCH, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { queryText: "contents", output: "json" } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: { queryText: "contents", output: "json" } } as any), new CommandError('An error has occurred.'));
   });
 }); 

@@ -90,7 +90,7 @@ describe(commands.FILE_RENAME, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('forcefully renames file from a non-root site in the root folder of a document library when a file with the same name exists (or it doesn\'t?)', (done) => {
+  it('forcefully renames file from a non-root site in the root folder of a document library when a file with the same name exists (or it doesn\'t?)', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args) : Promise<any> => {
       if (command === fileRemoveCommand) {
         if (args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal') {
@@ -121,24 +121,17 @@ describe(commands.FILE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: 
+    await command.action(logger, { options: 
       { 
         webUrl: 'https://contoso.sharepoint.com/sites/portal', 
         sourceUrl: '/Shared Documents/abc.pdf',
         force: true,
         targetFileName: 'def.pdf'
-      } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(renameResponseJson));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+      } });
+    assert(loggerLogSpy.calledWith(renameResponseJson));
   });
 
-  it('renames file from a non-root site in the root folder of a document library when a file with the same name doesn\'t exist', (done) => {
+  it('renames file from a non-root site in the root folder of a document library when a file with the same name doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string) === 'https://contoso.sharepoint.com/sites/portal/_api/web/GetFileByServerRelativeUrl(\'%2Fsites%2Fportal%2FShared%20Documents%2Fabc.pdf\')/ListItemAllFields/ValidateUpdateListItem()') {
         return Promise.resolve(renameValue);
@@ -153,25 +146,18 @@ describe(commands.FILE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         sourceUrl: 'Shared Documents/abc.pdf',
         targetFileName: 'def.pdf'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(renameResponseJson));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(renameResponseJson));
   });
 
-  it('continues if file cannot be recycled because it does not exist', (done) => {
+  it('continues if file cannot be recycled because it does not exist', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === fileRemoveCommand) {
         if (args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal') {
@@ -200,7 +186,7 @@ describe(commands.FILE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
@@ -208,18 +194,11 @@ describe(commands.FILE_RENAME, () => {
         force: true,
         targetFileName: 'def.pdf'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(renameResponseJson));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(renameResponseJson));
   });
 
-  it('throws error if file cannot be recycled', (done) => {
+  it('throws error if file cannot be recycled', async () => {
     const fileDeleteError: FileDeleteError = {
       error: {
         message: 'Locked for use'
@@ -236,7 +215,7 @@ describe(commands.FILE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options:
       {
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
@@ -244,15 +223,7 @@ describe(commands.FILE_RENAME, () => {
         force: true,
         targetFileName: 'def.pdf'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(fileDeleteError.error));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(fileDeleteError.error.message));
   });
 
   it('supports debug mode', () => {

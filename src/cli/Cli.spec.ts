@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as sinon from 'sinon';
 import { Cli, CommandOutput } from '.';
 import appInsights from '../appInsights';
-import Command, { CommandArgs, CommandError } from '../Command';
+import Command, { CommandError } from '../Command';
 import AnonymousCommand from '../m365/base/AnonymousCommand';
 import { settingsNames } from '../settingsNames';
 import { md, sinonUtil } from '../utils';
@@ -36,9 +36,8 @@ class MockCommand extends AnonymousCommand {
     this.types.string.push('x');
     this.types.boolean.push('y');
   }
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: any): Promise<void> {
     logger.log(args.options.parameterX);
-    cb();
   }
 }
 
@@ -62,8 +61,7 @@ class MockCommandWithOptionSets extends AnonymousCommand {
     );
     this.optionSets.push(['opt1', 'opt2']);
   }
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
-    cb();
+  public async commandAction(): Promise<void> {
   }
 }
 
@@ -77,8 +75,7 @@ class MockCommandWithAlias extends AnonymousCommand {
   public alias(): string[] {
     return ['cli mock alt'];
   }
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
-    cb();
+  public async commandAction(): Promise<void> {
   }
 }
 
@@ -101,8 +98,7 @@ class MockCommandWithValidation extends AnonymousCommand {
       }
     );
   }
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
-    cb();
+  public async commandAction(): Promise<void> {
   }
 }
 
@@ -113,14 +109,12 @@ class MockCommandWithPrompt extends AnonymousCommand {
   public get description(): string {
     return 'Mock command with prompt';
   }
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
-    Cli.prompt({
+  public async commandAction(): Promise<void> {
+    await Cli.prompt({
       type: 'confirm',
       name: 'continue',
       default: false,
       message: `Continue?`
-    }, (): void => {
-      cb();
     });
   }
 }
@@ -132,9 +126,8 @@ class MockCommandWithOutput extends AnonymousCommand {
   public get description(): string {
     return 'Mock command with output';
   }
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     logger.log('Command output');
-    cb();
   }
 }
 
@@ -145,13 +138,12 @@ class MockCommandWithRawOutput extends AnonymousCommand {
   public get description(): string {
     return 'Mock command with output';
   }
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     if (this.debug) {
       logger.logToStderr('Debug output');
     }
 
     logger.logRaw('Raw output');
-    cb();
   }
 }
 
@@ -803,7 +795,7 @@ describe('Cli', () => {
   });
 
   it('correctly handles error when executing command', (done) => {
-    sinon.stub(mockCommand, 'commandAction').callsFake((logger: Logger, args: CommandArgs, cb: (err?: any) => void) => { cb('Error'); });
+    sinon.stub(mockCommand, 'commandAction').callsFake(() => { throw 'Error'; });
     Cli
       .executeCommand(mockCommand, { options: { _: [] } })
       .then(_ => {
@@ -820,7 +812,7 @@ describe('Cli', () => {
   });
 
   it('correctly handles error when executing command with output', (done) => {
-    sinon.stub(mockCommand, 'commandAction').callsFake((logger: Logger, args: CommandArgs, cb: (err?: any) => void) => { cb('Error'); });
+    sinon.stub(mockCommand, 'commandAction').callsFake(() => { throw 'Error'; });
     Cli
       .executeCommandWithOutput(mockCommand, { options: { _: [] } })
       .then(_ => {

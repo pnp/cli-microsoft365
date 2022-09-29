@@ -78,7 +78,7 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving all items from recycle bin at ${args.options.siteUrl}...`);
     }
@@ -102,12 +102,13 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: any[] }>(requestOptions)
-      .then((response): void => {
-        logger.log(response.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const response = await request.get<{ value: any[] }>(requestOptions);
+      logger.log(response.value);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private static recycleBinItemType: { id: number, value: string }[] = [

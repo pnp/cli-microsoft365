@@ -50,29 +50,28 @@ class SpoSiteDesignTaskGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((spoUrl: string): Promise<SiteDesignTask> => {
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTask`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          data: {
-            taskId: args.options.taskId
-          },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTask`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        data: {
+          taskId: args.options.taskId
+        },
+        responseType: 'json'
+      };
 
-        return request.post(requestOptions);
-      })
-      .then((res: SiteDesignTask): void => {
-        if (!res["odata.null"]) {
-          logger.log(res);
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res: SiteDesignTask = await request.post(requestOptions);
+      if (!res["odata.null"]) {
+        logger.log(res);
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

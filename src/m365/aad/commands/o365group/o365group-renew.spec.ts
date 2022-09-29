@@ -66,7 +66,7 @@ describe(commands.O365GROUP_RENEW, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('renews expiration the specified group', (done) => {
+  it('renews expiration the specified group', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848/renew/') {
         return Promise.resolve();
@@ -75,18 +75,11 @@ describe(commands.O365GROUP_RENEW, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('renews expiration the specified group (debug)', (done) => {
+  it('renews expiration the specified group (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848/renew/') {
         return Promise.resolve();
@@ -95,31 +88,17 @@ describe(commands.O365GROUP_RENEW, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('correctly handles error when group is not found', (done) => {
+  it('correctly handles error when group is not found', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'The remote server returned an error: (404) Not Found.' } } } });
     });
 
-    command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The remote server returned an error: (404) Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
+      new CommandError('The remote server returned an error: (404) Not Found.'));
   });
 
   it('supports debug mode', () => {

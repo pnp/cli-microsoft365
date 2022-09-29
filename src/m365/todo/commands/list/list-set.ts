@@ -58,32 +58,34 @@ class TodoListSetCommand extends GraphCommand {
     this.optionSets.push(['name', 'id']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0`;
     const data: any = {
       displayName: args.options.newName
     };
 
-    this
-      .getListId(args)
-      .then(listId => {
-        if (!listId) {
-          return Promise.reject(`The list ${args.options.name} cannot be found`);
-        }
+    try {
+      const listId: string = await this.getListId(args);
 
-        const requestOptions: any = {
-          url: `${endpoint}/me/todo/lists/${listId}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json'
-          },
-          data,
-          responseType: 'json'
-        };
+      if (!listId) {
+        throw `The list ${args.options.name} cannot be found`;
+      }
 
-        return request.patch(requestOptions);
-      })
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const requestOptions: any = {
+        url: `${endpoint}/me/todo/lists/${listId}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json'
+        },
+        data,
+        responseType: 'json'
+      };
+
+      await request.patch(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getListId(args: CommandArgs): Promise<string> {

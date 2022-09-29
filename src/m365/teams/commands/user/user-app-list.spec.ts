@@ -115,7 +115,7 @@ describe(commands.USER_APP_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('list apps from the catalog for the specified user (userId)', (done) => {
+  it('list apps from the catalog for the specified user (userId)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps?$expand=teamsAppDefinition`) {
         return Promise.resolve({
@@ -155,35 +155,28 @@ describe(commands.USER_APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         userId: '5c705288-ed7f-44fc-af0a-ac164419901c'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
-            "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
-            "displayName": "Whiteboard",
-            "version": "1.0.5"
-          },
-          {
-            "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
-            "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
-            "displayName": "Evernote",
-            "version": "1.0.1"
-          }
-        ]));
-        done();
+    } as any);
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
+        "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+        "displayName": "Whiteboard",
+        "version": "1.0.5"
+      },
+      {
+        "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
+        "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+        "displayName": "Evernote",
+        "version": "1.0.1"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('list apps from the catalog for the specified user (userName)', (done) => {
+  it('list apps from the catalog for the specified user (userName)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps?$expand=teamsAppDefinition`) {
         return Promise.resolve({
@@ -227,35 +220,28 @@ describe(commands.USER_APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         userName: 'admin@contoso.com'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
-            "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
-            "displayName": "Whiteboard",
-            "version": "1.0.5"
-          },
-          {
-            "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
-            "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
-            "displayName": "Evernote",
-            "version": "1.0.1"
-          }
-        ]));
-        done();
+    } as any);
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
+        "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+        "displayName": "Whiteboard",
+        "version": "1.0.5"
+      },
+      {
+        "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
+        "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+        "displayName": "Evernote",
+        "version": "1.0.1"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('list apps from the catalog for the specified user (debug)', (done) => {
+  it('list apps from the catalog for the specified user (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps?$expand=teamsAppDefinition`) {
         return Promise.resolve({
@@ -295,36 +281,29 @@ describe(commands.USER_APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         userId: '5c705288-ed7f-44fc-af0a-ac164419901c',
         debug: true
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
-            "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
-            "displayName": "Whiteboard",
-            "version": "1.0.5"
-          },
-          {
-            "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
-            "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
-            "displayName": "Evernote",
-            "version": "1.0.1"
-          }
-        ]));
-        done();
+    } as any);
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
+        "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+        "displayName": "Whiteboard",
+        "version": "1.0.5"
+      },
+      {
+        "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
+        "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+        "displayName": "Evernote",
+        "version": "1.0.1"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('list apps from the catalog for the specified user (json)', (done) => {
+  it('list apps from the catalog for the specified user (json)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps?$expand=teamsAppDefinition`) {
         return Promise.resolve({
@@ -364,72 +343,53 @@ describe(commands.USER_APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         userId: '5c705288-ed7f-44fc-af0a-ac164419901c',
         output: 'json'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
-            "teamsAppDefinition": {
-              "id": "MzT1NWIxZjktODUwNy00ZjU3LWLmNDktZGI5YXRiNGMyZWRkIyMxLjAuMS4wIyNQpWJsaXNoZDQ=",
-              "teamsAppId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
-              "displayName": "Whiteboard",
-              "version": "1.0.5",
-              "publishingState": "published",
-              "shortDescription": "Use Microsoft Whiteboard to collaborate, visualize ideas, and work creatively",
-              "description": "Create a new whiteboard and collaborate with others in real time.",
-              "lastModifiedDateTime": null,
-              "createdBy": null
-            },
-            "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef"
-          },
-          {
-            "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
-            "teamsAppDefinition": {
-              "id": "MoT1NVIxZjktODUwNy033ZjU3LWLmNDktZGI5YXTiNGMyZWRkIyMxLjAuMS4wIyNQpWJsqXNoZLQ=",
-              "teamsAppId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
-              "displayName": "Evernote",
-              "version": "1.0.1",
-              "publishingState": "published",
-              "shortDescription": "Capture, organize, and share notes",
-              "description": "Unlock the power of teamwork—collect, organize and share the information, documents and ideas you encounter every day.",
-              "lastModifiedDateTime": null,
-              "createdBy": null
-            },
-            "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a"
-          }
-        ]));
-        done();
+    } as any);
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
+        "teamsAppDefinition": {
+          "id": "MzT1NWIxZjktODUwNy00ZjU3LWLmNDktZGI5YXRiNGMyZWRkIyMxLjAuMS4wIyNQpWJsaXNoZDQ=",
+          "teamsAppId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+          "displayName": "Whiteboard",
+          "version": "1.0.5",
+          "publishingState": "published",
+          "shortDescription": "Use Microsoft Whiteboard to collaborate, visualize ideas, and work creatively",
+          "description": "Create a new whiteboard and collaborate with others in real time.",
+          "lastModifiedDateTime": null,
+          "createdBy": null
+        },
+        "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef"
+      },
+      {
+        "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
+        "teamsAppDefinition": {
+          "id": "MoT1NVIxZjktODUwNy033ZjU3LWLmNDktZGI5YXTiNGMyZWRkIyMxLjAuMS4wIyNQpWJsqXNoZLQ=",
+          "teamsAppId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+          "displayName": "Evernote",
+          "version": "1.0.1",
+          "publishingState": "published",
+          "shortDescription": "Capture, organize, and share notes",
+          "description": "Unlock the power of teamwork—collect, organize and share the information, documents and ideas you encounter every day.",
+          "lastModifiedDateTime": null,
+          "createdBy": null
+        },
+        "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly handles error while listing teams apps', (done) => {
+  it('correctly handles error while listing teams apps', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
 
     });
 
-    command.action(logger, {
-      options: {
-        userId: '5c705288-ed7f-44fc-af0a-ac164419901c'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { userId: '5c705288-ed7f-44fc-af0a-ac164419901c' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

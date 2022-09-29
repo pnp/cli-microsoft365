@@ -116,7 +116,7 @@ class PlannerTaskListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 
@@ -124,7 +124,7 @@ class PlannerTaskListCommand extends GraphCommand {
     }
 
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
@@ -135,48 +135,38 @@ class PlannerTaskListCommand extends GraphCommand {
     let taskItems: PlannerTask[] = [];
 
     if (bucketId || bucketName) {
-      this
-        .getBucketId(args)
-        .then((retrievedBucketId: string): Promise<PlannerTask[]> => {
-          bucketId = retrievedBucketId;
-          return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`);
-        })
-        .then((tasks): Promise<PlannerTask[]> => {
-          taskItems = tasks;
-          return odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`);
-        })
-        .then((betaTasks): void => {
-          logger.log(this.mergeTaskPriority(taskItems, betaTasks));
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        bucketId = await this.getBucketId(args);
+        taskItems = await odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`);
+        const betaTasks = await odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`);
+
+        logger.log(this.mergeTaskPriority(taskItems, betaTasks));
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     }
     else if (planId || planTitle) {
-      this
-        .getPlanId(args)
-        .then((retrievedPlanId: string): Promise<PlannerTask[]> => {
-          planId = retrievedPlanId;
-          return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/plans/${planId}/tasks`);
-        })
-        .then((tasks): Promise<PlannerTask[]> => {
-          taskItems = tasks;
-          return odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`);
-        })
-        .then((betaTasks): void => {
-          logger.log(this.mergeTaskPriority(taskItems, betaTasks));
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        planId = await this.getPlanId(args);
+        taskItems = await odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/plans/${planId}/tasks`);
+        const betaTasks = await odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`);
+
+        logger.log(this.mergeTaskPriority(taskItems, betaTasks));
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     }
     else {
-      odata
-        .getAllItems<PlannerTask>(`${this.resource}/v1.0/me/planner/tasks`)
-        .then((tasks): Promise<PlannerTask[]> => {
-          taskItems = tasks;
-          return odata.getAllItems<PlannerTask>(`${this.resource}/beta/me/planner/tasks`);
-        })
-        .then((betaTasks): void => {
-          logger.log(this.mergeTaskPriority(taskItems, betaTasks));
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        taskItems = await odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/me/planner/tasks`);
+        const betaTasks = await odata.getAllItems<PlannerTask>(`${this.resource}/beta/me/planner/tasks`);
+        logger.log(this.mergeTaskPriority(taskItems, betaTasks));
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     }
   }
 

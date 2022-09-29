@@ -41,9 +41,9 @@ class PlannerTaskChecklistItemListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
@@ -55,20 +55,20 @@ class PlannerTaskChecklistItemListCommand extends GraphCommand {
       responseType: "json"
     };
 
-    request.get(requestOptions).then(
-      (res: any): void => {
-        if (!args.options.output || args.options.output === 'json') {
-          logger.log(res.checklist);
-        }
-        else {
-          //converted to text friendly output
-          const output = Object.getOwnPropertyNames(res.checklist).map(prop => ({ id: prop, ...(res.checklist as any)[prop] }));
-          logger.log(output);
-        }
-        cb();
-      },
-      (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb)
-    );
+    try {
+      const res = await request.get<any>(requestOptions);
+      if (!args.options.output || args.options.output === 'json') {
+        logger.log(res.checklist);
+      }
+      else {
+        //converted to text friendly output
+        const output = Object.getOwnPropertyNames(res.checklist).map(prop => ({ id: prop, ...(res.checklist as any)[prop] }));
+        logger.log(output);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

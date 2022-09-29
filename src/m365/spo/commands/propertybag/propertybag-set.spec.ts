@@ -160,7 +160,7 @@ describe(commands.PROPERTYBAG_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should call setProperty when folder is not specified', (done) => {
+  it('should call setProperty when folder is not specified', async () => {
     stubAllPostRequests();
     const setPropertySpy = sinon.spy((command as any), 'setProperty');
     const options = {
@@ -168,26 +168,18 @@ describe(commands.PROPERTYBAG_SET, () => {
       key: 'key1',
       value: 'value1',
       debug: true
-
     };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002fsites\u002fabc"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(setPropertySpy.calledWith(objIdentity, options));
-        assert(setPropertySpy.calledOnce === true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(setPropertySpy.calledWith(objIdentity, options));
+    assert(setPropertySpy.calledOnce === true);
   });
 
-  it('should call setProperty when folder is specified', (done) => {
+  it('should call setProperty when folder is specified', async () => {
     stubAllPostRequests(new Promise(resolve => {
       return resolve(JSON.stringify([{
         "SchemaVersion": "15.0.0.0",
@@ -213,20 +205,12 @@ describe(commands.PROPERTYBAG_SET, () => {
       serverRelativeUrl: "/"
     };
 
-    command.action(logger, { options: options } as any, () => {
-
-      try {
-        assert(setPropertySpy.calledWith(objIdentity, options));
-        assert(setPropertySpy.calledOnce === true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(setPropertySpy.calledWith(objIdentity, options));
+    assert(setPropertySpy.calledOnce === true);
   });
 
-  it('should call setProperty when list folder is specified', (done) => {
+  it('should call setProperty when list folder is specified', async () => {
     stubAllPostRequests();
     const setPropertySpy = sinon.spy((command as any), 'setProperty');
     const options = {
@@ -241,20 +225,12 @@ describe(commands.PROPERTYBAG_SET, () => {
       serverRelativeUrl: "/sites/abc/Shared Documents"
     };
 
-    command.action(logger, { options: options } as any, () => {
-
-      try {
-        assert(setPropertySpy.calledWith(objIdentity, options));
-        assert(setPropertySpy.calledOnce === true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(setPropertySpy.calledWith(objIdentity, options));
+    assert(setPropertySpy.calledOnce === true);
   });
 
-  it('should send correct property set request data when folder is not specified', (done) => {
+  it('should send correct property set request data when folder is not specified', async () => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -267,19 +243,12 @@ describe(commands.PROPERTYBAG_SET, () => {
       serverRelativeUrl: "\u002fsites\u002fabc"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="String">${(options as any).value}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="AllProperties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
-        assert(requestStub.calledWith(sinon.match({ data: bodyPayload })));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="String">${(options as any).value}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="AllProperties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
+    assert(requestStub.calledWith(sinon.match({ data: bodyPayload })));
   });
 
-  it('should send correct property set request data when folder is specified', (done) => {
+  it('should send correct property set request data when folder is specified', async () => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -292,19 +261,12 @@ describe(commands.PROPERTYBAG_SET, () => {
       serverRelativeUrl: "/"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="String">${(options as any).value}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="Properties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
-        assert(requestStub.calledWith(sinon.match({ data: bodyPayload })));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="String">${(options as any).value}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="Properties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
+    assert(requestStub.calledWith(sinon.match({ data: bodyPayload })));
   });
 
-  it('should correctly handle requestObjectIdentity reject promise', (done) => {
+  it('should correctly handle requestObjectIdentity reject promise', async () => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('requestObjectIdentity error'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -313,18 +275,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       folder: '/'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('requestObjectIdentity error'));
   });
 
-  it('should correctly handle requestObjectIdentity ClientSvc error response', (done) => {
+  it('should correctly handle requestObjectIdentity ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]);
     stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -334,18 +289,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       folder: '/'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('requestObjectIdentity ClientSvc error'));
   });
 
-  it('should correctly handle requestFolderObjectIdentity reject promise', (done) => {
+  it('should correctly handle requestFolderObjectIdentity reject promise', async () => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -355,18 +303,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       debug: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('abc'));
   });
 
-  it('should correctly handle requestFolderObjectIdentity ClientSvc error response', (done) => {
+  it('should correctly handle requestFolderObjectIdentity ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestFolderObjectIdentity error" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -377,18 +318,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('requestFolderObjectIdentity error'));
   });
 
-  it('should correctly handle requestFolderObjectIdentity ClientSvc empty error response', (done) => {
+  it('should correctly handle requestFolderObjectIdentity ClientSvc empty error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -399,18 +333,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       debug: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('ClientSvc unknown error'));
   });
 
-  it('should requestFolderObjectIdentity reject promise if _ObjectIdentity_ not found', (done) => {
+  it('should requestFolderObjectIdentity reject promise if _ObjectIdentity_ not found', async () => {
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve('[{}]'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -419,18 +346,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       value: 'value1'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found'));
   });
 
-  it('should correctly handle isNoScriptSite = true', (done) => {
+  it('should correctly handle isNoScriptSite = true', async () => {
     stubAllPostRequests(null, null, null, new Promise<any>((resolve) => {
       return resolve(JSON.stringify([
         {
@@ -456,18 +376,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       debug: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Site has NoScript enabled, and setting property bag values is not supported')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('Site has NoScript enabled, and setting property bag values is not supported'));
   });
 
-  it('should correctly handle getEffectiveBasePermissions reject promise', (done) => {
+  it('should correctly handle getEffectiveBasePermissions reject promise', async () => {
     stubAllPostRequests(null, null, null, new Promise<any>((resolve, reject) => { return reject('getEffectiveBasePermissions abc'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -477,18 +390,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       debug: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getEffectiveBasePermissions abc')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('getEffectiveBasePermissions abc'));
   });
 
-  it('should correctly handle getEffectiveBasePermissions ClientSvc error response', (done) => {
+  it('should correctly handle getEffectiveBasePermissions ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getEffectiveBasePermissions error" } }]);
     stubAllPostRequests(null, null, null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -499,18 +405,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getEffectiveBasePermissions error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('getEffectiveBasePermissions error'));
   });
 
-  it('should correctly handle getEffectiveBasePermissions ClientSvc empty error response', (done) => {
+  it('should correctly handle getEffectiveBasePermissions ClientSvc empty error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, null, null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -521,18 +420,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       debug: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('ClientSvc unknown error'));
   });
 
-  it('should getEffectiveBasePermissions reject promise if EffectiveBasePermissions not found', (done) => {
+  it('should getEffectiveBasePermissions reject promise if EffectiveBasePermissions not found', async () => {
     stubAllPostRequests(null, null, null, new Promise<any>((resolve) => { return resolve('[{}]'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -541,18 +433,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       value: 'value1'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. EffectiveBasePermissions not found')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('Cannot proceed. EffectiveBasePermissions not found'));
   });
 
-  it('should correctly handle setProperty reject promise response', (done) => {
+  it('should correctly handle setProperty reject promise response', async () => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('setProperty promise error'); }));
     const setPropertySpy = sinon.spy((command as any), 'setProperty');
     const options = {
@@ -563,19 +448,12 @@ describe(commands.PROPERTYBAG_SET, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert(setPropertySpy.calledOnce === true);
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('setProperty promise error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('setProperty promise error'));
+    assert(setPropertySpy.calledOnce === true);
   });
 
-  it('should correctly handle setProperty ClientSvc error response', (done) => {
+  it('should correctly handle setProperty ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "setProperty error" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -586,18 +464,11 @@ describe(commands.PROPERTYBAG_SET, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('setProperty error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('setProperty error'));
   });
 
-  it('should correctly handle setProperty ClientSvc empty error response', (done) => {
+  it('should correctly handle setProperty ClientSvc empty error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -608,15 +479,8 @@ describe(commands.PROPERTYBAG_SET, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('ClientSvc unknown error'));
   });
 
   it('supports debug mode', () => {

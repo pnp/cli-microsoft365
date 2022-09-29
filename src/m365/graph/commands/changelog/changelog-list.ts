@@ -112,29 +112,30 @@ class GraphChangelogListCommand extends AnonymousCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const allowedChangeType = args.options.changeType && this.allowedChangeTypes.find(x => x.toLocaleLowerCase() === args.options.changeType!.toLocaleLowerCase());
-    const searchParam = args.options.changeType ? `/?filterBy=${allowedChangeType}` : '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const allowedChangeType = args.options.changeType && this.allowedChangeTypes.find(x => x.toLocaleLowerCase() === args.options.changeType!.toLocaleLowerCase());
+      const searchParam = args.options.changeType ? `/?filterBy=${allowedChangeType}` : '';
+  
+      const requestOptions: any = {
+        url: `https://developer.microsoft.com/en-us/graph/changelog/rss${searchParam}`,
+        headers: {
+          'accept': 'text/xml',
+          'x-anonymous': 'true'
+        }
+      };
+      
+      const output: any = await request.get(requestOptions);
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(output.toString(), "text/xml");
 
-    const requestOptions: any = {
-      url: `https://developer.microsoft.com/en-us/graph/changelog/rss${searchParam}`,
-      headers: {
-        'accept': 'text/xml',
-        'x-anonymous': 'true'
-      }
-    };
-
-    request
-      .get(requestOptions)
-      .then((output: any) => {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(output.toString(), "text/xml");
-
-        const changelog = this.filterThroughOptions(args.options, this.mapChangelog(xmlDoc, args));
-        
-        logger.log(changelog.items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const changelog = this.filterThroughOptions(args.options, this.mapChangelog(xmlDoc, args));
+      
+      logger.log(changelog.items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private filterThroughOptions(options: Options, changelog: Changelog): Changelog {

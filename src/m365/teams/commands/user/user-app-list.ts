@@ -73,40 +73,35 @@ class TeamsUserAppListCommand extends GraphCommand {
     this.optionSets.push(['userId', 'userName']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let userId: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const userId: string = (await this.getUserId(args)).value;
+      const endpoint: string = `${this.resource}/v1.0/users/${encodeURIComponent(userId)}/teamwork/installedApps?$expand=teamsAppDefinition`;
 
-    this
-      .getUserId(args)
-      .then((_userId): Promise<TeamsAppInstallation[]> => {
-        userId = _userId.value;
-        const endpoint: string = `${this.resource}/v1.0/users/${encodeURIComponent(userId)}/teamwork/installedApps?$expand=teamsAppDefinition`;
+      const items = await odata.getAllItems<TeamsAppInstallation>(endpoint);
+      items.forEach(i => {
+        const userAppId: string = Buffer.from(i.id as string, 'base64').toString('ascii');
+        const appId: string = userAppId.substr(userAppId.indexOf("##") + 2, userAppId.length - userId.length - 2);
+        (i as any).appId = appId;
+      });
 
-        return odata.getAllItems<TeamsAppInstallation>(endpoint);
-      })
-      .then((items): void => {
-        items.forEach(i => {
-          const userAppId: string = Buffer.from(i.id as string, 'base64').toString('ascii');
-          const appId: string = userAppId.substr(userAppId.indexOf("##") + 2, userAppId.length - userId.length - 2);
-          (i as any).appId = appId;
-        });
-
-        if (args.options.output === 'json') {
-          logger.log(items);
-        }
-        else {
-          logger.log(items.map(i => {
-            return {
-              id: i.id,
-              appId: (i as any).appId,
-              displayName: (i.teamsAppDefinition as TeamsAppDefinition).displayName,
-              version: (i.teamsAppDefinition as TeamsAppDefinition).version
-            };
-          }));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      if (args.options.output === 'json') {
+        logger.log(items);
+      }
+      else {
+        logger.log(items.map(i => {
+          return {
+            id: i.id,
+            appId: (i as any).appId,
+            displayName: (i.teamsAppDefinition as TeamsAppDefinition).displayName,
+            version: (i.teamsAppDefinition as TeamsAppDefinition).version
+          };
+        }));
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getUserId(args: CommandArgs): Promise<{ value: string }> {

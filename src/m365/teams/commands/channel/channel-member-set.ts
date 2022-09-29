@@ -36,7 +36,7 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Updates the role of the specified member in the specified Microsoft Teams private team channel';
+    return 'Updates the role of the specified member in the specified Microsoft Teams private or shared team channel';
   }
 
   constructor() {
@@ -124,37 +124,30 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getTeamId(args)
-      .then((teamId: string): Promise<string> => {
-        this.teamId = teamId;
-        return this.getChannelId(args);
-      })
-      .then((channelId: string): Promise<string> => {
-        this.channelId = channelId;
-        return this.getMemberId(args);
-      })
-      .then((memberId: string) => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/teams/${this.teamId}/channels/${this.channelId}/members/${memberId}`,
-          headers: {
-            'accept': 'application/json;odata.metadata=none',
-            'Prefer': 'return=representation'
-          },
-          responseType: 'json',
-          data: {
-            '@odata.type': '#microsoft.graph.aadUserConversationMember',
-            roles: [args.options.role]
-          }
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      this.teamId = await this.getTeamId(args);
+      this.channelId = await this.getChannelId(args);
+      const memberId: string = await this.getMemberId(args);
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/teams/${this.teamId}/channels/${this.channelId}/members/${memberId}`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none',
+          'Prefer': 'return=representation'
+        },
+        responseType: 'json',
+        data: {
+          '@odata.type': '#microsoft.graph.aadUserConversationMember',
+          roles: [args.options.role]
+        }
+      };
 
-        return request.patch(requestOptions);
-      })
-      .then((member): void => {
-        logger.log(member);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const member = await request.patch(requestOptions);
+      logger.log(member);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {

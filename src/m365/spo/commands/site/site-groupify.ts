@@ -79,7 +79,7 @@ class SpoSiteGroupifyCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const optionalParams: any = {};
     const payload: any = {
       displayName: args.options.displayName,
@@ -109,12 +109,13 @@ class SpoSiteGroupifyCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .post(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res: any = await request.post(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

@@ -89,7 +89,7 @@ describe(commands.GROUP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly adds group to site', (done) => {
+  it('correctly adds group to site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `${validSharePointUrl}/_api/web/sitegroups`) {
         return Promise.resolve(groupAddedResponse);
@@ -98,36 +98,21 @@ describe(commands.GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: validSharePointUrl,
         name: validName
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(groupAddedResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(groupAddedResponse));
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject("An error has occurred.");
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError("An error has occurred."));
   });
 
   it('supports debug mode', () => {

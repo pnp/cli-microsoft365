@@ -97,7 +97,7 @@ describe(commands.O365GROUP_CONVERSATION_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('Retrieve conversations for the specified group by groupId in the tenant (verbose)', (done) => {
+  it('Retrieve conversations for the specified group by groupId in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/conversations`) {
         return Promise.resolve(
@@ -107,36 +107,22 @@ describe(commands.O365GROUP_CONVERSATION_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true, groupId: "00000000-0000-0000-0000-000000000000"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
   });
-  it('correctly handles error when listing conversations', (done) => {
+  it('correctly handles error when listing conversations', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } } as any), 
+      new CommandError('An error has occurred'));
   });
   it('supports debug mode', () => {
     const options = command.options;

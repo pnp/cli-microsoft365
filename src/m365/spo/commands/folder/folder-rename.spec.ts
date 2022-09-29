@@ -134,7 +134,7 @@ describe(commands.FOLDER_RENAME, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should send correct folder remove request data', (done) => {
+  it('should send correct folder remove request data', async () => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
     const options = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
@@ -145,19 +145,12 @@ describe(commands.FOLDER_RENAME, () => {
     };
     const folderObjectIdentity: string = "e52c649e-a019-5000-c38d-8d334a079fd2|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:7f1c42fe-5933-430d-bafb-6c839aa87a5c:web:30a3906a-a55e-4f48-aaae-ecf45346bf53:folder:10c46485-5035-475f-a40f-d842bab30708";
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="MoveTo" Id="32" ObjectPathId="26"><Parameters><Parameter Type="String">/sites/abc/Shared Documents/test1</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="26" Name="${folderObjectIdentity}" /></ObjectPaths></Request>`;
-        assert.strictEqual(requestStub.lastCall.args[0].data, bodyPayload);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="MoveTo" Id="32" ObjectPathId="26"><Parameters><Parameter Type="String">/sites/abc/Shared Documents/test1</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="26" Name="${folderObjectIdentity}" /></ObjectPaths></Request>`;
+    assert.strictEqual(requestStub.lastCall.args[0].data, bodyPayload);
   });
 
-  it('should not display anything when folder removed, but not verbose', (done) => {
+  it('should not display anything when folder removed, but not verbose', async () => {
     stubAllPostRequests();
     const options = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
@@ -165,18 +158,11 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.called, false);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(loggerLogSpy.called, false);
   });
 
-  it('should correctly handle requestObjectIdentity reject promise', (done) => {
+  it('should correctly handle requestObjectIdentity reject promise', async () => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('requestObjectIdentity error'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -184,18 +170,10 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     };
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('requestObjectIdentity error'));
   });
 
-  it('should correctly handle requestObjectIdentity ClientSvc error response', (done) => {
+  it('should correctly handle requestObjectIdentity ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]);
     stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -204,18 +182,10 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     };
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('requestObjectIdentity ClientSvc error'));
   });
 
-  it('should correctly handle requestFolderObjectIdentity reject promise', (done) => {
+  it('should correctly handle requestFolderObjectIdentity reject promise', async () => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc 1'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -223,18 +193,10 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     };
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc 1')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('abc 1'));
   });
 
-  it('should correctly handle requestFolderObjectIdentity ClientSvc error response', (done) => {
+  it('should correctly handle requestFolderObjectIdentity ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestFolderObjectIdentity error" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -243,18 +205,10 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     };
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('requestFolderObjectIdentity error'));
   });
 
-  it('should correctly handle requestFolderObjectIdentity ClientSvc empty error response', (done) => {
+  it('should correctly handle requestFolderObjectIdentity ClientSvc empty error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -264,18 +218,10 @@ describe(commands.FOLDER_RENAME, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('ClientSvc unknown error'));
   });
 
-  it('should requestFolderObjectIdentity reject promise if _ObjectIdentity_ not found', (done) => {
+  it('should requestFolderObjectIdentity reject promise if _ObjectIdentity_ not found', async () => {
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve('[{}]'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -283,18 +229,10 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'abc'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found'));
   });
 
-  it('should correctly handle folder remove reject promise response', (done) => {
+  it('should correctly handle folder remove reject promise response', async () => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('folder remove promise error'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -302,18 +240,10 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'abc'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('folder remove promise error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('folder remove promise error'));
   });
 
-  it('should correctly handle folder rename ClientSvc error response', (done) => {
+  it('should correctly handle folder rename ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "File Not Found" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -322,18 +252,11 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'abc'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('File Not Found'));
   });
 
-  it('should correctly handle ClientSvc empty error response', (done) => {
+  it('should correctly handle ClientSvc empty error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
@@ -343,15 +266,8 @@ describe(commands.FOLDER_RENAME, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('ClientSvc unknown error'));
   });
 
   it('supports debug mode', () => {

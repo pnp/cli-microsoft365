@@ -36,9 +36,9 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
     requests = [];
   });
 
@@ -66,7 +66,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('sets the value of the HideDefaultThemes setting', (done) => {
+  it('sets the value of the HideDefaultThemes setting', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('/_api/thememanager/SetHideDefaultThemes') > -1) {
@@ -76,32 +76,25 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         hideDefaultThemes: true
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/thememanager/SetHideDefaultThemes`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
+    });
 
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/thememanager/SetHideDefaultThemes`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('sets the value of the HideDefaultThemes setting (debug)', (done) => {
+  it('sets the value of the HideDefaultThemes setting (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('/_api/thememanager/SetHideDefaultThemes') > -1) {
@@ -111,32 +104,25 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         hideDefaultThemes: true
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/thememanager/SetHideDefaultThemes`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/thememanager/SetHideDefaultThemes`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('handles error when setting the value of the HideDefaultThemes setting', (done) => {
+  it('handles error when setting the value of the HideDefaultThemes setting', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('/_api/thememanager/SetHideDefaultThemes') > -1) {
@@ -147,24 +133,16 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         hideDefaultThemes: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

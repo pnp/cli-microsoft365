@@ -86,14 +86,15 @@ class TeamsChatGetCommand extends GraphCommand {
     this.optionSets.push(['id', 'participants', 'name']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getChatId(args)
-      .then(chatId => this.getChatDetailsById(chatId as string))
-      .then((chat: Chat) => {
-        logger.log(chat);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const chatId = await this.getChatId(args);
+      const chat: Chat = await this.getChatDetailsById(chatId as string);
+      logger.log(chat);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private async getChatId(args: CommandArgs): Promise<string> {

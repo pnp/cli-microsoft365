@@ -104,47 +104,45 @@ class TeamsTeamRemoveCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.teamId) {
       args.options.id = args.options.teamId;
 
       this.warn(logger, `Option 'teamId' is deprecated. Please use 'id' instead.`);
     }
 
-    const removeTeam: () => void = (): void => {
-      this
-        .getTeamId(args)
-        .then((teamId: string): Promise<void> => {
-          const requestOptions: any = {
-            url: `${this.resource}/v1.0/groups/${encodeURIComponent(teamId)}`,
-            headers: {
-              accept: 'application/json;odata.metadata=none'
-            },
-            responseType: 'json'
-          };
+    const removeTeam: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const teamId: string = await this.getTeamId(args);
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/groups/${encodeURIComponent(teamId)}`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
 
-          return request.delete(requestOptions);
-        })
-        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+        await request.delete(requestOptions);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeTeam();
+      await removeTeam();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the team ${args.options.teamId}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeTeam();
-        }
       });
+      
+      if (result.continue) {
+        await removeTeam();
+      }
     }
   }
 }

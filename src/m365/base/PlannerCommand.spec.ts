@@ -10,7 +10,7 @@ class MockCommand extends PlannerCommand {
     return 'Mock command';
   }
 
-  public commandAction(): void {
+  public async commandAction(): Promise<void> {
   }
 
   public commandHelp(): void {

@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -59,7 +59,7 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets details of office 365 subscription user counts', (done) => {
+  it('gets details of office 365 subscription user counts', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserCounts`) {
         return Promise.resolve(`Report Refresh Date,Product Type,Assigned,Activated,Shared Computer Activation
@@ -70,19 +70,12 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserCounts");
-        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserCounts");
+    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
 
-  it('gets details of office 365 subscription user counts (json)', (done) => {
+  it('gets details of office 365 subscription user counts (json)', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserCounts`) {
         return Promise.resolve(`Report Refresh Date,Product Type,Assigned,Activated,Shared Computer Activation
@@ -93,17 +86,17 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, output: 'json' } }, () => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserCounts");
-        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert(loggerLogSpy.calledWith([{ "Report Refresh Date": "2021-05-24", "Product Type": "MICROSOFT 365 APPS FOR ENTERPRISE", "Assigned": 3, "Activated": 2, "Shared Computer Activation": 0 }, { "Report Refresh Date": "2021-05-24", "Product Type": "MICROSOFT EXCEL ADVANCED ANALYTICS", "Assigned": 3, "Activated": 0, "Shared Computer Activation": 0 }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, output: 'json' } });
+    assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserCounts");
+    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+    assert(loggerLogSpy.calledWith([{ "Report Refresh Date": "2021-05-24", "Product Type": "MICROSOFT 365 APPS FOR ENTERPRISE", "Assigned": 3, "Activated": 2, "Shared Computer Activation": 0 }, { "Report Refresh Date": "2021-05-24", "Product Type": "MICROSOFT EXCEL ADVANCED ANALYTICS", "Assigned": 3, "Activated": 0, "Shared Computer Activation": 0 }])); 
   });
 
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+  });
 });

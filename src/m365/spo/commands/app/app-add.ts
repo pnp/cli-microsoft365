@@ -97,44 +97,42 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     const overwrite: boolean = args.options.overwrite || false;
 
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((spoUrl: string): Promise<string> => {
-        return this.getAppCatalogSiteUrl(logger, spoUrl, args);
-      })
-      .then((appCatalogUrl: string): Promise<string> => {
-        const fullPath: string = path.resolve(args.options.filePath);
-        if (this.verbose) {
-          logger.logToStderr(`Adding app '${fullPath}' to app catalog...`);
-        }
+    try {
+      const spoUrl = await spo.getSpoUrl(logger, this.debug);
+      const appCatalogUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
 
-        const fileName: string = path.basename(fullPath);
-        const requestOptions: any = {
-          url: `${appCatalogUrl}/_api/web/${scope}appcatalog/Add(overwrite=${(overwrite.toString().toLowerCase())}, url='${fileName}')`,
-          headers: {
-            accept: 'application/json;odata=nometadata',
-            binaryStringRequestBody: 'true'
-          },
-          data: fs.readFileSync(fullPath)
-        };
+      const fullPath: string = path.resolve(args.options.filePath);
+      if (this.verbose) {
+        logger.logToStderr(`Adding app '${fullPath}' to app catalog...`);
+      }
 
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        const json: { UniqueId: string; } = JSON.parse(res);
-        if (args.options.output === 'json') {
-          logger.log(json);
-        }
-        else {
-          logger.log(json.UniqueId);
-        }
+      const fileName: string = path.basename(fullPath);
+      const requestOptions: any = {
+        url: `${appCatalogUrl}/_api/web/${scope}appcatalog/Add(overwrite=${(overwrite.toString().toLowerCase())}, url='${fileName}')`,
+        headers: {
+          accept: 'application/json;odata=nometadata',
+          binaryStringRequestBody: 'true'
+        },
+        data: fs.readFileSync(fullPath)
+      };
 
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
+      const res = await request.post<string>(requestOptions);
+
+      const json: { UniqueId: string; } = JSON.parse(res);
+      if (args.options.output === 'json') {
+        logger.log(json);
+      }
+      else {
+        logger.log(json.UniqueId);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataPromise(err);
+    }
   }
 }
 

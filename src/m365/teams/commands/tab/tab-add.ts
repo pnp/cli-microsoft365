@@ -94,7 +94,7 @@ class TeamsTabAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const data: any = this.mapRequestBody(args.options);
     const requestOptions: any = {
       url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${args.options.channelId}/tabs`,
@@ -105,12 +105,14 @@ class TeamsTabAddCommand extends GraphCommand {
       data: data,
       responseType: 'json'
     };
-    request
-      .post(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    
+    try {
+      const res = await request.post(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private mapRequestBody(options: Options): any {

@@ -22,22 +22,23 @@ class OneDriveListCommand extends SpoCommand {
     return ['Title', 'Url'];
   }
 
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
-    spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((spoAdminUrl: string): Promise<void> => {
-        if (this.verbose) {
-          logger.logToStderr(`Retrieving list of OneDrive sites...`);
-        }
+  public async commandAction(logger: Logger): Promise<void> {
+    try {
+      const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
 
-        this.allSites = [];
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving list of OneDrive sites...`);
+      }
 
-        return this.getAllSites(spoAdminUrl, '0', undefined, logger);
-      })
-      .then(_ => {
-        logger.log(this.allSites);
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      this.allSites = [];
+
+      await this.getAllSites(spoAdminUrl, '0', undefined, logger);
+
+      logger.log(this.allSites);
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   private getAllSites(spoAdminUrl: string, startIndex: string | undefined, formDigest: FormDigestInfo | undefined, logger: Logger): Promise<void> {

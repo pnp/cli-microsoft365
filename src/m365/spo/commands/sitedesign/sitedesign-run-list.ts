@@ -74,7 +74,7 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const data: any = {};
     if (args.options.siteDesignId) {
       data.siteDesignId = args.options.siteDesignId;
@@ -89,18 +89,20 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
       data: data,
       responseType: 'json'
     };
+    
+    try {
+      const res: { value: SiteDesignRun[] } = await request.post<{ value: SiteDesignRun[] }>(requestOptions);
+      if (args.options.output !== 'json') {
+        res.value.forEach(d => {
+          d.StartTime = new Date(parseInt(d.StartTime)).toLocaleString();
+        });
+      }
 
-    request.post<{ value: SiteDesignRun[] }>(requestOptions)
-      .then((res: { value: SiteDesignRun[] }): void => {
-        if (args.options.output !== 'json') {
-          res.value.forEach(d => {
-            d.StartTime = new Date(parseInt(d.StartTime)).toLocaleString();
-          });
-        }
-
-        logger.log(res.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(res.value);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

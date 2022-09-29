@@ -97,7 +97,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('handles Microsoft 365 Tenant siteclassification has not been enabled', (done) => {
+  it('handles Microsoft 365 Tenant siteclassification has not been enabled', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -108,18 +108,11 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("There is no previous defined site classification which can updated.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any),
+      new CommandError("There is no previous defined site classification which can updated."));
   });
 
-  it('updates Microsoft 365 Tenant usage guidelines url and guest usage guidelines url (debug)', (done) => {
+  it('updates Microsoft 365 Tenant usage guidelines url and guest usage guidelines url (debug)', async () => {
     let updateRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -203,18 +196,11 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: true, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, () => {
-      try {
-        assert(updateRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    assert(updateRequestIssued);
   });
 
-  it('updates Microsoft 365 Tenant usage guidelines url and guest usage guidelines url', (done) => {
+  it('updates Microsoft 365 Tenant usage guidelines url and guest usage guidelines url', async () => {
     let updateRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -298,18 +284,11 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, () => {
-      try {
-        assert(updateRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    assert(updateRequestIssued);
   });
 
-  it('updates Microsoft 365 Tenant usage guidelines url', (done) => {
+  it('updates Microsoft 365 Tenant usage guidelines url', async () => {
     let updateRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -393,18 +372,11 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { usageGuidelinesUrl: "http://aka.ms/pnp" } } as any, () => {
-      try {
-        assert(updateRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { usageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    assert(updateRequestIssued);
   });
 
-  it('updates Microsoft 365 Tenant guest usage guidelines url', (done) => {
+  it('updates Microsoft 365 Tenant guest usage guidelines url', async () => {
     let updateRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -488,18 +460,11 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, () => {
-      try {
-        assert(updateRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    assert(updateRequestIssued);
   });
 
-  it('updates Microsoft 365 Tenant siteclassification', (done) => {
+  it('updates Microsoft 365 Tenant siteclassification', async () => {
     let updateRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -583,18 +548,11 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { classifications: "top secret,high,middle,low" } } as any, () => {
-      try {
-        assert(updateRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { classifications: "top secret,high,middle,low" } } as any);
+    assert(updateRequestIssued);
   });
 
-  it('updates Microsoft 365 Tenant default classification', (done) => {
+  it('updates Microsoft 365 Tenant default classification', async () => {
     let updateRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -677,18 +635,11 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { defaultClassification: "low" } } as any, () => {
-      try {
-        assert(updateRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { defaultClassification: "low" } } as any);
+    assert(updateRequestIssued);
   });
 
-  it('updates Microsoft 365 Tenant siteclassification and default classification', (done) => {
+  it('updates Microsoft 365 Tenant siteclassification and default classification', async () => {
     let updateRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -772,18 +723,11 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high" } } as any, () => {
-      try {
-        assert(updateRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high" } } as any);
+    assert(updateRequestIssued);
   });
 
-  it('updates Microsoft 365 Tenant siteclassification, default classification, usage guidelines url and guest usage guidelines url', (done) => {
+  it('updates Microsoft 365 Tenant siteclassification, default classification, usage guidelines url and guest usage guidelines url', async () => {
     let updateRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -867,14 +811,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high", usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, () => {
-      try {
-        assert(updateRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high", usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    assert(updateRequestIssued);
   });
 });

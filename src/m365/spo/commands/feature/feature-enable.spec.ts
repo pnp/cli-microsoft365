@@ -72,7 +72,7 @@ describe(commands.FEATURE_ENABLE, () => {
     });
   });
 
-  it('Enable web feature (scope not defined, so defaults to web), no force', (done) => {
+  it('Enable web feature (scope not defined, so defaults to web), no force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/web/features/add(featureId=guid'b2307a39-e878-458b-bc90-03bc578531d6',force=false)`;
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -88,27 +88,22 @@ describe(commands.FEATURE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, featureId: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } }, () => {
+    try {
+      await command.action(logger, { options: { debug: true, featureId: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
           correctRequestIssued = true;
         }
       });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+      assert(correctRequestIssued);
+    }
+    finally {
+      sinonUtil.restore(request.post);
+    }
   });
 
-  it('Enable site feature, force', (done) => {
+  it('Enable site feature, force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/site/features/add(featureId=guid'915c240e-a6cc-49b8-8b2c-0bff8b553ed3',force=true)`;
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -124,27 +119,22 @@ describe(commands.FEATURE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, featureId: '915c240e-a6cc-49b8-8b2c-0bff8b553ed3', url: 'https://contoso.sharepoint.com', scope: 'site', force: true } }, () => {
+    try {
+      await command.action(logger, { options: { debug: true, featureId: '915c240e-a6cc-49b8-8b2c-0bff8b553ed3', url: 'https://contoso.sharepoint.com', scope: 'site', force: true } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
           correctRequestIssued = true;
         }
       });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+      assert(correctRequestIssued);
+    }
+    finally {
+      sinonUtil.restore(request.post);
+    }
   });
 
-  it('correctly handles enable feature reject request', (done) => {
+  it('correctly handles enable feature reject request', async () => {
     const err = 'Invalid enable feature reject request';
     const requestUrl = `https://contoso.sharepoint.com/_api/web/features/add(featureId=guid'b2307a39-e878-458b-bc90-03bc578531d6',force=false)`;
 
@@ -156,22 +146,14 @@ describe(commands.FEATURE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         url: 'https://contoso.sharepoint.com',
         featureId: "b2307a39-e878-458b-bc90-03bc578531d6",
         scope: 'web'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
   it('supports specifying scope', () => {

@@ -49,33 +49,27 @@ class SpoSiteScriptGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let spoUrl: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const formDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata`,
+        headers: {
+          'X-RequestDigest': formDigest.FormDigestValue,
+          'content-type': 'application/json;charset=utf-8',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: { id: args.options.id },
+        responseType: 'json'
+      };
 
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((_spoUrl: string): Promise<ContextInfo> => {
-        spoUrl = _spoUrl;
-        return spo.getRequestDigest(spoUrl);
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue,
-            'content-type': 'application/json;charset=utf-8',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: { id: args.options.id },
-          responseType: 'json'
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res: any = await request.post(requestOptions);
+      logger.log(res);      
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

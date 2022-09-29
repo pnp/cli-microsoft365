@@ -91,7 +91,7 @@ class SpoListGetCommand extends SpoCommand {
     this.optionSets.push(['id', 'title']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information for list in site at ${args.options.webUrl}...`);
     }
@@ -116,18 +116,19 @@ class SpoListGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<ListInstance>(requestOptions)
-      .then((listInstance: ListInstance): void => {
-        if (args.options.withPermissions) {
-          listInstance.RoleAssignments.forEach(r => {
-            r.Member.PrincipalTypeString = ListPrincipalType[r.Member.PrincipalType];
-          });
-        }
+    try {
+      const listInstance = await request.get<ListInstance>(requestOptions);
+      if (args.options.withPermissions) {
+        listInstance.RoleAssignments.forEach(r => {
+          r.Member.PrincipalTypeString = ListPrincipalType[r.Member.PrincipalType];
+        });
+      }
 
-        logger.log(listInstance);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(listInstance);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

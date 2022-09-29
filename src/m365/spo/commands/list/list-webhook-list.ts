@@ -110,7 +110,7 @@ class SpoListWebhookListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.title && this.verbose) {
       logger.logToStderr(chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead`));
     }
@@ -148,24 +148,24 @@ class SpoListWebhookListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: [{ id: string, clientState: string, expirationDateTime: Date, resource: string }] }>(requestOptions)
-      .then((res: { value: [{ id: string, clientState: string, expirationDateTime: Date, resource: string }] }): void => {
-        if (res.value && res.value.length > 0) {
-          res.value.forEach(w => {
-            w.clientState = w.clientState || '';
-          });
+    try {
+      const res = await request.get<{ value: [{ id: string, clientState: string, expirationDateTime: Date, resource: string }] }>(requestOptions);
+      if (res.value && res.value.length > 0) {
+        res.value.forEach(w => {
+          w.clientState = w.clientState || '';
+        });
 
-          logger.log(res.value);
+        logger.log(res.value);
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr('No webhooks found');
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr('No webhooks found');
-          }
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

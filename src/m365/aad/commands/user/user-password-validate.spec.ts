@@ -59,7 +59,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('password is too short', (done) => {
+  it('password is too short', async () => {
     sinon.stub(request, 'post').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/beta/users/validatePassword' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -80,27 +80,20 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, { options: { debug: false, password: 'cli365' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "isValid": false,
-          "validationResults": [
-            {
-              "ruleName": "password_too_short",
-              "validationPassed": false,
-              "message": "Password is too short, length: 6."
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, password: 'cli365' } });
+    assert(loggerLogSpy.calledWith({
+      "isValid": false,
+      "validationResults": [
+        {
+          "ruleName": "password_too_short",
+          "validationPassed": false,
+          "message": "Password is too short, length: 6."
+        }
+      ]
+    }));
   });
 
-  it('password complexity is not met', (done) => {
+  it('password complexity is not met', async () => {
     sinon.stub(request, 'post').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/beta/users/validatePassword' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -122,27 +115,20 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, { options: { debug: false, password: 'cli365password' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "isValid": false,
-          "validationResults": [
-            {
-              "ruleName": "password_not_meet_complexity",
-              "validationPassed": false,
-              "message": "Password does not meet complexity requirements."
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, password: 'cli365password' } });
+    assert(loggerLogSpy.calledWith({
+      "isValid": false,
+      "validationResults": [
+        {
+          "ruleName": "password_not_meet_complexity",
+          "validationPassed": false,
+          "message": "Password does not meet complexity requirements."
+        }
+      ]
+    }));
   });
 
-  it('password is too weak', (done) => {
+  it('password is too weak', async () => {
     sinon.stub(request, 'post').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/beta/users/validatePassword' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -164,27 +150,20 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, { options: { debug: false, password: 'MyP@ssW0rd' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "isValid": false,
-          "validationResults": [
-            {
-              "ruleName": "password_banned",
-              "validationPassed": false,
-              "message": "Password is too weak and can not be used."
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, password: 'MyP@ssW0rd' } });
+    assert(loggerLogSpy.calledWith({
+      "isValid": false,
+      "validationResults": [
+        {
+          "ruleName": "password_banned",
+          "validationPassed": false,
+          "message": "Password is too weak and can not be used."
+        }
+      ]
+    }));
   });
 
-  it('password meets all requirements', (done) => {
+  it('password meets all requirements', async () => {
     sinon.stub(request, 'post').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/beta/users/validatePassword' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -206,27 +185,20 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, { options: { debug: false, password: 'cli365P@ssW0rd' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "isValid": true,
-          "validationResults": [
-            {
-              "ruleName": "AllChecks",
-              "validationPassed": true,
-              "message": "Password meets all validation requirements."
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, password: 'cli365P@ssW0rd' } });
+    assert(loggerLogSpy.calledWith({
+      "isValid": true,
+      "validationResults": [
+        {
+          "ruleName": "AllChecks",
+          "validationPassed": true,
+          "message": "Password meets all validation requirements."
+        }
+      ]
+    }));
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -240,15 +212,8 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, password: 'cli365P@ssW0rd079654' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, password: 'cli365P@ssW0rd079654' } } as any), 
+      new CommandError(`An error has occurred`));
   });
 
   it('supports debug mode', () => {

@@ -118,11 +118,10 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.projectRootPath = this.getProjectRoot(process.cwd());
     if (this.projectRootPath === null) {
-      cb(new CommandError(`Couldn't find project root folder`, SpfxProjectDoctorCommand.ERROR_NO_PROJECT_ROOT_FOLDER));
-      return;
+      throw new CommandError(`Couldn't find project root folder`, SpfxProjectDoctorCommand.ERROR_NO_PROJECT_ROOT_FOLDER);
     }
 
     this.packageManager = args.options.packageManager || 'npm';
@@ -139,13 +138,11 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
 
     project.version = this.getProjectVersion();
     if (!project.version) {
-      cb(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, SpfxProjectDoctorCommand.ERROR_NO_VERSION));
-      return;
+      throw new CommandError(`Unable to determine the version of the current SharePoint Framework project`, SpfxProjectDoctorCommand.ERROR_NO_VERSION);
     }
 
     if (!this.supportedVersions.includes(project.version)) {
-      cb(new CommandError(`CLI for Microsoft 365 doesn't support validating projects built using SharePoint Framework v${project.version}`, SpfxProjectDoctorCommand.ERROR_UNSUPPORTED_VERSION));
-      return;
+      throw new CommandError(`CLI for Microsoft 365 doesn't support validating projects built using SharePoint Framework v${project.version}`, SpfxProjectDoctorCommand.ERROR_UNSUPPORTED_VERSION);
     }
 
     if (this.verbose) {
@@ -159,8 +156,7 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
       rules.push(...versionRules);
     }
     catch (e: any) {
-      cb(new CommandError(e.message));
-      return;
+      throw new CommandError(e.message);
     }
 
     rules.forEach(r => {
@@ -238,8 +234,6 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
       default:
         logger.log(findingsToReport);
     }
-
-    cb();
   }
 
   private writeReportTourFolder(findingsToReport: any): void {

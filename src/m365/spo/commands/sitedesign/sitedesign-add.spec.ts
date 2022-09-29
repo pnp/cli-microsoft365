@@ -69,7 +69,7 @@ describe(commands.SITEDESIGN_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds new site design for a team site', (done) => {
+  it('adds new site design for a team site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -95,28 +95,21 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Contoso",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Contoso",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
-  it('adds new site design for a team site (debug)', (done) => {
+  it('adds new site design for a team site (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -142,28 +135,21 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Contoso",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Contoso",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
-  it('adds new team site site design wilt multiple site script IDs', (done) => {
+  it('adds new team site site design wilt multiple site script IDs', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -189,18 +175,11 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25" } }, () => {
-      try {
-        assert(loggerLogSpy.calledOnce);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25" } });
+    assert(loggerLogSpy.calledOnce);
   });
 
-  it('adds new site design for a communication site', (done) => {
+  it('adds new site design for a communication site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -226,28 +205,21 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'CommunicationSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Contoso",
-          "Version": 1,
-          "WebTemplate": 68
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'CommunicationSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Contoso",
+      "Version": 1,
+      "WebTemplate": 68
+    }));
   });
 
-  it('adds new team site site design with description', (done) => {
+  it('adds new team site site design with description', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -274,28 +246,21 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": "Contoso team site",
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Contoso",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": "Contoso team site",
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Contoso",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
-  it('adds new team site site design with previewImageUrl', (done) => {
+  it('adds new team site site design with previewImageUrl', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -322,28 +287,21 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageUrl: 'https://contoso.com/assets/team-site-preview.png' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": 'https://contoso.com/assets/team-site-preview.png',
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Contoso",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageUrl: 'https://contoso.com/assets/team-site-preview.png' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": 'https://contoso.com/assets/team-site-preview.png',
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Contoso",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
-  it('adds new team site site design with previewImageAltText', (done) => {
+  it('adds new team site site design with previewImageAltText', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -370,28 +328,21 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageAltText: 'Contoso team site preview' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": 'Contoso team site preview',
-          "PreviewImageUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Contoso",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageAltText: 'Contoso team site preview' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": 'Contoso team site preview',
+      "PreviewImageUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Contoso",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
-  it('adds new default team site site design', (done) => {
+  it('adds new default team site site design', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -418,28 +369,21 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", isDefault: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": true,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Contoso",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", isDefault: true } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": true,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Contoso",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
-  it('adds new team site site design with all options specified', (done) => {
+  it('adds new team site site design with all options specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -469,41 +413,30 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', previewImageAltText: 'Contoso team site preview', isDefault: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": 'Contoso team site',
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": true,
-          "PreviewImageAltText": 'Contoso team site preview',
-          "PreviewImageUrl": 'https://contoso.com/assets/team-site-preview.png',
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Contoso",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', previewImageAltText: 'Contoso team site preview', isDefault: true } });
+    assert(loggerLogSpy.calledWith({
+      "Description": 'Contoso team site',
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": true,
+      "PreviewImageAltText": 'Contoso team site preview',
+      "PreviewImageUrl": 'https://contoso.com/assets/team-site-preview.png',
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Contoso",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
-  it('correctly handles OData error when creating site script', (done) => {
+  it('correctly handles OData error when creating site script', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { 
+      debug: false, 
+      title: 'Contoso', 
+      webTemplate: 'TeamSite', 
+      siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

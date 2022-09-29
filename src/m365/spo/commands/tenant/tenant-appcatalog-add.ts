@@ -84,33 +84,28 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr('Checking for existing app catalog URL...');
     }
 
-    Cli
-      .executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } })
-      .then((spoTenantAppCatalogUrlGetCommandOutput: CommandOutput): Promise<void> => {
-        const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
-        if (!appCatalogUrl) {
-          if (this.verbose) {
-            logger.logToStderr('No app catalog URL found');
-          }
+    const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } });
+    const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
+    if (!appCatalogUrl) {
+      if (this.verbose) {
+        logger.logToStderr('No app catalog URL found');
+      }
+    } 
+    else {
+      if (this.verbose) {
+        logger.logToStderr(`Found app catalog URL ${appCatalogUrl}`);
+      }
 
-          return Promise.resolve();
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(`Found app catalog URL ${appCatalogUrl}`);
-        }
-
-        //Using JSON.parse
-        return this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger);
-      })
-      .then(() => this.ensureNoExistingSite(args.options.url, args.options.force, logger))
-      .then(() => this.createAppCatalog(args.options, logger))
-      .then(_ => cb(), (err: CommandError): void => cb(err));
+      //Using JSON.parse
+      await this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger); 
+    }
+    await this.ensureNoExistingSite(args.options.url, args.options.force, logger);
+    await this.createAppCatalog(args.options, logger);  
   }
 
   private ensureNoExistingSite(url: string, force: boolean, logger: Logger): Promise<void> {

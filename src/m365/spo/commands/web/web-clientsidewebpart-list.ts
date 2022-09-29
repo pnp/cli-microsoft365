@@ -44,7 +44,7 @@ class SpoWebClientSideWebPartListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: any = {
       url: `${args.options.webUrl}/_api/web/GetClientSideWebParts`,
       headers: {
@@ -53,30 +53,31 @@ class SpoWebClientSideWebPartListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<GetClientSideWebPartsRsp>(requestOptions)
-      .then((res: GetClientSideWebPartsRsp): void => {
-        const clientSideWebParts: any[] = [];
-        res.value.forEach(component => {
-          if (component.ComponentType === 1) {
-            clientSideWebParts.push({
-              Id: component.Id.replace("{", "").replace("}", ""),
-              Name: component.Name,
-              Title: JSON.parse(component.Manifest).preconfiguredEntries[0].title.default
-            });
-          }
-        });
+    try {
+      const res: GetClientSideWebPartsRsp = await request.get<GetClientSideWebPartsRsp>(requestOptions);
 
-        if (clientSideWebParts.length === 0 && this.verbose) {
-          logger.logToStderr("No client-side web parts available for this site");
+      const clientSideWebParts: any[] = [];
+      res.value.forEach(component => {
+        if (component.ComponentType === 1) {
+          clientSideWebParts.push({
+            Id: component.Id.replace("{", "").replace("}", ""),
+            Name: component.Name,
+            Title: JSON.parse(component.Manifest).preconfiguredEntries[0].title.default
+          });
         }
+      });
 
-        if (clientSideWebParts.length > 0) {
-          logger.log(clientSideWebParts);
-        }
+      if (clientSideWebParts.length === 0 && this.verbose) {
+        logger.logToStderr("No client-side web parts available for this site");
+      }
 
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      if (clientSideWebParts.length > 0) {
+        logger.log(clientSideWebParts);
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

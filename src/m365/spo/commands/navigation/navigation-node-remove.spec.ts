@@ -45,9 +45,9 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -55,6 +55,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.delete,
+      request.post,
       Cli.prompt
     ]);
   });
@@ -76,7 +77,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes navigation node from the top navigation', (done) => {
+  it('removes navigation node from the top navigation', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
         return Promise.resolve();
@@ -85,18 +86,11 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('removes navigation node from the top navigation (debug)', (done) => {
+  it('removes navigation node from the top navigation (debug)', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
         return Promise.resolve();
@@ -105,54 +99,33 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('prompts before removing navigation node when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing navigation node when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts removing app when prompt not confirmed', (done) => {
+  it('aborts removing app when prompt not confirmed', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject('Invalid request');
     });
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } }, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } });
   });
 
-  it('removes the navigation node when prompt confirmed', (done) => {
+  it('removes the navigation node when prompt confirmed', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar/getbyid(2003)`) > -1) {
         return Promise.resolve();
@@ -162,53 +135,27 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
     });
     
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({ error: 'An error has occurred' });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles random API error (string error)', (done) => {
+  it('correctly handles random API error (string error)', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003', confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

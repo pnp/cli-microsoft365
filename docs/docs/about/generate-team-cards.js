@@ -69,6 +69,12 @@ const contributors = [
     twitter: 'aakash_316'
   },
   {
+    name: 'Aaron Sotelo',
+    company: '',
+    github: 'AaronS16',
+    twitter: ''
+  },
+  {
     name: 'Abderahman Moujahid',
     company: '',
     github: 'Abderahman88',
@@ -175,6 +181,12 @@ const contributors = [
     company: '',
     github: 'karfau',
     twitter: ''
+  },
+  {
+    name: 'Cyril C Kurian',
+    company: '',
+    github: 'cyrilckurian',
+    twitter: 'chirackalcyril'
   },
   {
     name: 'Daniel Laskewitz',
@@ -379,6 +391,12 @@ const contributors = [
     company: '',
     github: 'nickhonen',
     twitter: 'nickhonen4'
+  },
+  {
+    name: 'Otto',
+    company: '',
+    github: 'berot3',
+    twitter: ''
   },
   {
     name: 'Patrick Lamber',

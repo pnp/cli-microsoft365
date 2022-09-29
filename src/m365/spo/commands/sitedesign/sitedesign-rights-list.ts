@@ -50,37 +50,30 @@ class SpoSiteDesignRightsListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let spoUrl: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const requestDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRights`,
+        headers: {
+          'X-RequestDigest': requestDigest.FormDigestValue,
+          'content-type': 'application/json;charset=utf-8',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: { id: args.options.id },
+        responseType: 'json'
+      };
 
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((_spoUrl: string): Promise<ContextInfo> => {
-        spoUrl = _spoUrl;
-        return spo.getRequestDigest(spoUrl);
-      })
-      .then((res: ContextInfo): Promise<{ value: SiteDesignPrincipal[] }> => {
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignRights`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue,
-            'content-type': 'application/json;charset=utf-8',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: { id: args.options.id },
-          responseType: 'json'
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: { value: SiteDesignPrincipal[] }): void => {
-        logger.log(res.value.map(p => {
-          p.Rights = p.Rights === "1" ? "View" : p.Rights;
-          return p;
-        }));
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res: { value: SiteDesignPrincipal[] } = await request.post(requestOptions);
+      logger.log(res.value.map(p => {
+        p.Rights = p.Rights === "1" ? "View" : p.Rights;
+        return p;
+      }));
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

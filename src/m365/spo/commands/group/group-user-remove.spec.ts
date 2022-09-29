@@ -64,7 +64,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('Removes user from SharePoint group using Group ID - Without Confirmation Prompt', (done) => {
+  it('Removes user from SharePoint group using Group ID - Without Confirmation Prompt', async () => {
     sinon.stub(request, 'post').callsFake(opts => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
         return Promise.resolve(UserRemovalJSONResponse);
@@ -72,7 +72,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -80,18 +80,10 @@ describe(commands.GROUP_USER_REMOVE, () => {
         userName : "Alex.Wilber@contoso.com",
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('Removes user from SharePoint group using Group ID - Without Confirmation Prompt (Debug)', (done) => {
+  it('Removes user from SharePoint group using Group ID - Without Confirmation Prompt (Debug)', async () => {
     sinon.stub(request, 'post').callsFake(opts => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
         return Promise.resolve(UserRemovalJSONResponse);
@@ -99,7 +91,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -107,18 +99,10 @@ describe(commands.GROUP_USER_REMOVE, () => {
         userName : "Alex.Wilber@contoso.com",
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('Removes user from SharePoint group using Group Name - Without Confirmation Prompt (Debug)', (done) => {
+  it('Removes user from SharePoint group using Group Name - Without Confirmation Prompt (Debug)', async () => {
     sinon.stub(request, 'post').callsFake(opts => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetByName') > -1) {
         return Promise.resolve(UserRemovalJSONResponse);
@@ -126,7 +110,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -134,22 +118,14 @@ describe(commands.GROUP_USER_REMOVE, () => {
         userName : "Alex.Wilber@contoso.com",
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('Removes user from SharePoint group using Group ID - With Confirmation Prompt', (done) => {
+  it('Removes user from SharePoint group using Group ID - With Confirmation Prompt', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
     sinon.stub(request, 'post').callsFake(opts => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
         return Promise.resolve(UserRemovalJSONResponse);
@@ -157,7 +133,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -165,25 +141,17 @@ describe(commands.GROUP_USER_REMOVE, () => {
         userName : "Alex.Wilber@contoso.com",
         confirm: false
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('Aborts Removal of user from SharePoint group using Group Id - With Confirmation Prompt', (done) => {
+  it('Aborts Removal of user from SharePoint group using Group Id - With Confirmation Prompt', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -191,18 +159,11 @@ describe(commands.GROUP_USER_REMOVE, () => {
         userName : "Alex.Wilber@contoso.com",
         confirm: false
       }
-    }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(postSpy.notCalled);
   });
 
-  it('Correctly Handles Error when removing user from the group using Group Id', (done) => {
+  it('Correctly Handles Error when removing user from the group using Group Id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
         return Promise.reject('The user does not exist or is not unique.');
@@ -211,7 +172,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -219,15 +180,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
         userName : "Alex.Wilber@invalidcontoso.com",
         confirm: true
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError('The user does not exist or is not unique.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('The user does not exist or is not unique.'));
   });
 
   it('fails validation if webURL is Invalid', async () => {

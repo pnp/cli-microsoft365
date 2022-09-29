@@ -60,27 +60,28 @@ class SpoContentTypeListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let requestUrl: string = `${args.options.webUrl}/_api/web/ContentTypes`;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      let requestUrl: string = `${args.options.webUrl}/_api/web/ContentTypes`;
 
-    if (args.options.category){
-      requestUrl += `?$filter=Group eq '${encodeURIComponent(args.options.category as string)}'`;
+      if (args.options.category){
+        requestUrl += `?$filter=Group eq '${encodeURIComponent(args.options.category as string)}'`;
+      }
+
+      const requestOptions: any = {
+        url: requestUrl,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const res = await request.get<any>(requestOptions);
+      logger.log(res.value);
     }
-
-    const requestOptions: any = {
-      url: requestUrl,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

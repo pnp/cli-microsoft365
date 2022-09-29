@@ -80,8 +80,8 @@ class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
     this.optionSets.push(['id', 'displayName', 'mailNickname']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeGroup: () => void = async (): Promise<void> => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeGroup: () => Promise<void> = async (): Promise<void> => {
       try {
         const groupId = await this.getGroupId(args.options);
 
@@ -94,30 +94,26 @@ class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
         };
 
         await request.delete(requestOptions);
-        cb();
       }
       catch (err: any) {
-        this.handleRejectedODataJsonPromise(err, logger, cb);
+        this.handleRejectedODataJsonPromise(err);
       }
     };
 
     if (args.options.confirm) {
-      removeGroup();
+      await removeGroup();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the group '${args.options.id || args.options.displayName || args.options.mailNickname}'?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeGroup();
-        }
       });
+
+      if (result.continue) {
+        await removeGroup();
+      }
     }
   }
 

@@ -37,10 +37,10 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
-    });
+      return { continue: false };
+    });    
   });
 
   afterEach(() => {
@@ -67,7 +67,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -76,15 +76,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation with parameters', async () => {
@@ -123,25 +115,19 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     assert(containsOption);
   });
 
-  it('prompts when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: false, id: 1231231, enable: 'false' } }, () => {
-      let promptIssued = false;
+  it('prompts when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { debug: false, id: 1231231, enable: 'false' } });
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    let promptIssued = false;
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('calls the service when liking a message', (done) => {
+  it('calls the service when liking a message', async () => {
     const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
         return Promise.resolve();
@@ -149,18 +135,11 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 1231231 } }, () => {
-      try {
-        assert(requestPostedStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 1231231 } } );
+    assert(requestPostedStub.called);
   });
 
-  it('calls the service when liking a message and confirm passed', (done) => {
+  it('calls the service when liking a message and confirm passed', async () => {
     const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
         return Promise.resolve();
@@ -168,18 +147,11 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 1231231, confirm: 'true' } }, () => {
-      try {
-        assert(requestPostedStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 1231231, confirm: 'true' } });
+    assert(requestPostedStub.called);
   });
 
-  it('calls the service when liking a message and enabled set to true', (done) => {
+  it('calls the service when liking a message and enabled set to true', async () => {
     const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
         return Promise.resolve();
@@ -187,18 +159,11 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 1231231, enable: 'true' } }, () => {
-      try {
-        assert(requestPostedStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 1231231, enable: 'true' } });
+    assert(requestPostedStub.called);
   });
 
-  it('calls the service when disliking a message and confirming', (done) => {
+  it('calls the service when disliking a message and confirming', async () => {
     const requestPostedStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
         return Promise.resolve();
@@ -206,36 +171,23 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 1231231, enable: 'false', confirm: true } }, () => {
-      try {
-        assert(requestPostedStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 1231231, enable: 'false', confirm: true } });
+    assert(requestPostedStub.called);
   });
 
-  it('prompts when disliking and confirmation parameter is denied', (done) => {
-    command.action(logger, { options: { debug: false, id: 1231231, enable: 'false', confirm: false } }, () => {
-      let promptIssued = false;
+  it('prompts when disliking and confirmation parameter is denied', async () => {
+    await command.action(logger, { options: { debug: false, id: 1231231, enable: 'false', confirm: false } });
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    let promptIssued = false;
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('calls the service when disliking a message and confirmation is hit', (done) => {
+  it('calls the service when disliking a message and confirmation is hit', async () => {
     const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/liked_by/current.json') {
         return Promise.resolve();
@@ -244,34 +196,21 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, { options: { debug: true, id: 1231231, enable: 'false' } }, () => {
-      try {
-        assert(requestDeleteStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 1231231, enable: 'false' } });
+    assert(requestDeleteStub.called);
   });
 
-  it('Aborts execution when enabled set to false and confirmation is not given', (done) => {
+  it('Aborts execution when enabled set to false and confirmation is not given', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false, id: 1231231, enable: 'false' } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+
+    await command.action(logger, { options: { debug: false, id: 1231231, enable: 'false' } });
+    assert(requests.length === 0);
   });
 }); 

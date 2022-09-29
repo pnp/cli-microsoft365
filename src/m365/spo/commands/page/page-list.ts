@@ -47,57 +47,57 @@ class SpoPageListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (this.verbose) {
-      logger.logToStderr(`Retrieving client-side pages...`);
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving client-side pages...`);
+      }
+  
+      let requestOptions: any = {
+        url: `${args.options.webUrl}/_api/sitepages/pages?$orderby=Title`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+  
+      let pages: any[] = [];
+
+      const pagesList = await request.get<{ value: any[] }>(requestOptions);
+
+      requestOptions = {
+        url: `${args.options.webUrl}/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      if (pagesList.value && pagesList.value.length > 0) {
+        pages = pagesList.value;
+      }
+
+      const res = await request.get<{ value: any[] }>(requestOptions);
+      if (res.value && res.value.length > 0) {
+        const clientSidePages: any[] = res.value.filter(p => p.ListItemAllFields.ClientSideApplicationId === 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec');
+        pages = pages.map(p => {
+          const clientSidePage = clientSidePages.find(cp => cp && cp.ListItemAllFields && cp.ListItemAllFields.Id === p.Id);
+          if (clientSidePage) {
+            return {
+              ...clientSidePage,
+              ...p
+            };
+          }
+
+          return p;
+        });
+
+        logger.log(pages);
+      }
     }
-
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/sitepages/pages?$orderby=Title`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    let pages: any[] = [];
-
-    request
-      .get<{ value: any[] }>(requestOptions)
-      .then((res: { value: any[] }): Promise<any> => {
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        if (res.value && res.value.length > 0) {
-          pages = res.value;
-        }
-
-        return request.get(requestOptions);
-      })
-      .then((res: { value: any[] }): void => {
-        if (res.value && res.value.length > 0) {
-          const clientSidePages: any[] = res.value.filter(p => p.ListItemAllFields.ClientSideApplicationId === 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec');
-          pages = pages.map(p => {
-            const clientSidePage = clientSidePages.find(cp => cp && cp.ListItemAllFields && cp.ListItemAllFields.Id === p.Id);
-            if (clientSidePage) {
-              return {
-                ...clientSidePage,
-                ...p
-              };
-            }
-
-            return p;
-          });
-
-          logger.log(pages);
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

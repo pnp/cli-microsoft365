@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -61,7 +61,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('handles error when the app specified with the objectId not found', (done) => {
+  it('handles error when the app specified with the objectId not found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=id eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=appId`) {
         return Promise.resolve({ value: [] });
@@ -70,23 +70,15 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
   });
 
-  it('handles error when the app with the specified the name not found', (done) => {
+  it('handles error when the app with the specified the name not found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=appId`) {
         return Promise.resolve({ value: [] });
@@ -95,23 +87,15 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         name: 'My app'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `No Azure AD application registration with name My app found`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`No Azure AD application registration with name My app found`));
   });
 
-  it('handles error when multiple apps with the specified name found', (done) => {
+  it('handles error when multiple apps with the specified name found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=appId`) {
         return Promise.resolve({
@@ -125,58 +109,34 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         name: 'My app'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Multiple Azure AD application registration with name My app found. Please disambiguate (app IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
   });
 
-  it('handles error when retrieving information about app through appId failed', (done) => {
+  it('handles error when retrieving information about app through appId failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `An error has occurred`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`An error has occurred`));
   });
 
-  it('handles error when retrieving information about app through name failed', (done) => {
+  it('handles error when retrieving information about app through name failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         name: 'My app'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `An error has occurred`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`An error has occurred`));
   });
 
   it('fails validation if appId and objectId specified', async () => {
@@ -224,7 +184,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('successfully registers app as managementapp when passing appId', (done) => {
+  it('successfully registers app as managementapp when passing appId', async () => {
     sinon.stub(request, 'put').callsFake((opts) => {
       if ((opts.url as string).indexOf('providers/Microsoft.BusinessAppPlatform/adminApplications/9b1b1e42-794b-4c71-93ac-5ed92488b67f?api-version=2020-06-01') > -1) {
         return Promise.resolve({
@@ -235,23 +195,16 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].applicationId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].applicationId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
   });
 
-  it('successfully registers app as managementapp when passing name ', (done) => {
+  it('successfully registers app as managementapp when passing name ', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20Test%20App'&$select=appId`) {
         return Promise.resolve({
@@ -280,20 +233,13 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         name: 'My Test App', debug: true
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].applicationId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].applicationId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
   });
 
   it('supports debug mode', () => {

@@ -59,7 +59,7 @@ describe(commands.APPPAGE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates a single-part app page', (done) => {
+  it('creates a single-part app page', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/sitepages/Pages/CreateAppPage`) > -1 &&
         opts.data.webPartDataAsJson ===
@@ -144,18 +144,10 @@ describe(commands.APPPAGE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: "{\"id\": \"e84a4f44-30d2-4962-b203-f8bf42114860\", \"instanceId\": \"15353e8b-cb55-4794-b871-4cd74abf78b4\", \"title\": \"Milestone Tracking\", \"description\": \"A tool used for tracking project milestones\", \"serverProcessedContent\": { \"htmlStrings\": {}, \"searchablePlainTexts\": {}, \"imageSources\": {}, \"links\": {} }, \"dataVersion\": \"1.0\", \"properties\": {\"description\": \"Milestone Tracking\"}}" } }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: "{\"id\": \"e84a4f44-30d2-4962-b203-f8bf42114860\", \"instanceId\": \"15353e8b-cb55-4794-b871-4cd74abf78b4\", \"title\": \"Milestone Tracking\", \"description\": \"A tool used for tracking project milestones\", \"serverProcessedContent\": { \"htmlStrings\": {}, \"searchablePlainTexts\": {}, \"imageSources\": {}, \"links\": {} }, \"dataVersion\": \"1.0\", \"properties\": {\"description\": \"Milestone Tracking\"}}" } });
   });
 
-  it('creates a single-part app page showing on quicklaunch', (done) => {
+  it('creates a single-part app page showing on quicklaunch', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/sitepages/Pages/CreateAppPage`) > -1 &&
         opts.data.webPartDataAsJson ===
@@ -241,18 +233,10 @@ describe(commands.APPPAGE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, addToQuickLaunch: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: "{\"id\": \"e84a4f44-30d2-4962-b203-f8bf42114860\", \"instanceId\": \"15353e8b-cb55-4794-b871-4cd74abf78b4\", \"title\": \"Milestone Tracking\", \"description\": \"A tool used for tracking project milestones\", \"serverProcessedContent\": { \"htmlStrings\": {}, \"searchablePlainTexts\": {}, \"imageSources\": {}, \"links\": {} }, \"dataVersion\": \"1.0\", \"properties\": {\"description\": \"Milestone Tracking\"}}" } }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, addToQuickLaunch: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: "{\"id\": \"e84a4f44-30d2-4962-b203-f8bf42114860\", \"instanceId\": \"15353e8b-cb55-4794-b871-4cd74abf78b4\", \"title\": \"Milestone Tracking\", \"description\": \"A tool used for tracking project milestones\", \"serverProcessedContent\": { \"htmlStrings\": {}, \"searchablePlainTexts\": {}, \"imageSources\": {}, \"links\": {} }, \"dataVersion\": \"1.0\", \"properties\": {\"description\": \"Milestone Tracking\"}}" } });
   });
 
-  it('fails to create a single-part app page if creating page failed', (done) => {
+  it('fails to create a single-part app page if creating page failed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/sitepages/Pages/CreateAppPage`) > -1) {
         return Promise.reject('Failed to create a single-part app page');
@@ -260,18 +244,11 @@ describe(commands.APPPAGE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Failed to create a single-part app page`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
+      new CommandError(`Failed to create a single-part app page`));
   });
 
-  it('fails to create a single-part app page if retrieving the created page failed', (done) => {
+  it('fails to create a single-part app page if retrieving the created page failed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/sitepages/Pages/CreateAppPage`) > -1) {
         return Promise.resolve({
@@ -289,18 +266,11 @@ describe(commands.APPPAGE_ADD, () => {
     });
 
 
-    command.action(logger, { options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Page not found`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
+      new CommandError(`Page not found`));
   });
 
-  it('fails to create a single-part app page if updating the created page failed', (done) => {
+  it('fails to create a single-part app page if updating the created page failed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/sitepages/Pages/CreateAppPage`) > -1) {
         return Promise.resolve({
@@ -376,15 +346,8 @@ describe(commands.APPPAGE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

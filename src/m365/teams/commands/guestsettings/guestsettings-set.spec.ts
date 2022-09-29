@@ -69,7 +69,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('sets the allowDeleteChannels setting to true', (done) => {
+  it('sets the allowDeleteChannels setting to true', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402` &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -83,20 +83,12 @@ describe(commands.GUESTSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'true' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('sets allowCreateUpdateChannels and allowDeleteChannels to true', (done) => {
+  it('sets allowCreateUpdateChannels and allowDeleteChannels to true', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402` &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -111,35 +103,17 @@ describe(commands.GUESTSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: 'true', allowDeleteChannels: 'true' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('correctly handles error when updating guest settings', (done) => {
+  it('correctly handles error when updating guest settings', async () => {
     sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
-
-    command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'true' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'true' } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the teamId is not a valid GUID', async () => {
