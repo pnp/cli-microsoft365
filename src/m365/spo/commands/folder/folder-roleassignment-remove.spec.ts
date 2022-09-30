@@ -127,7 +127,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
 
   it('remove role assignment from folder by Url', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'/sites/Test_Site/Shared%20Documents/FolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
         return Promise.resolve();
       }
 
@@ -147,7 +147,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
 
   it('remove role assignment from folder get principal id by upn', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'/sites/Test_Site/Shared%20Documents/FolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
         return Promise.resolve();
       }
 
@@ -177,7 +177,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
 
   it('correctly handles error when upn does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'/sites/Test_Site/Shared%20Documents/FolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
         return Promise.resolve();
       }
 
@@ -203,7 +203,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
 
   it('remove role assignment from folder get principal id by group name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'/sites/Test_Site/Shared%20Documents/FolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
         return Promise.resolve();
       }
 
@@ -233,7 +233,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
 
   it('correctly handles error when group does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'/sites/Test_Site/Shared%20Documents/FolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
         return Promise.resolve();
       }
 
@@ -289,7 +289,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
 
   it('removes role assignment when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'/sites/Test_Site/Shared%20Documents/FolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
         return Promise.resolve();
       }
 
