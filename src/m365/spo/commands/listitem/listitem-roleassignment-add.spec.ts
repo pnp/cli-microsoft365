@@ -173,7 +173,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('add role assignment to listitem in list by title and role definition id', (done) => {
+  it('add role assignment to listitem in list by title and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_api/web/lists/getByTitle(\'test\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -182,7 +182,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -191,18 +191,10 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         principalId: 11,
         roleDefinitionId: 1073741827
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('add role assignment to listitem in list by id and role definition id', (done) => {
+  it('add role assignment to listitem in list by id and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -220,18 +212,10 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         principalId: 11,
         roleDefinitionId: 1073741827
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('add role assignment to listitem in list by url and role definition id', (done) => {
+  it('add role assignment to listitem in list by url and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetList(\'%2Fsites%2Fdocuments\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -249,18 +233,10 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         principalId: 11,
         roleDefinitionId: 1073741827
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('add role assignment to listitem in list get principal id by upn', (done) => {
+  it('add role assignment to listitem in list get principal id by upn', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -288,18 +264,10 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         upn: 'someaccount@tenant.onmicrosoft.com',
         roleDefinitionId: 1073741827
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly handles error when upn does not exist', (done) => {
+  it('correctly handles error when upn does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -326,18 +294,10 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         upn: 'someaccount@tenant.onmicrosoft.com',
         roleDefinitionId: 1073741827
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('add role assignment to listitem in list get principal id by group name', (done) => {
+  it('add role assignment to listitem in list get principal id by group name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -365,18 +325,10 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         groupName: 'someGroup',
         roleDefinitionId: 1073741827
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly handles error when group does not exist', (done) => {
+  it('correctly handles error when group does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -403,18 +355,10 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         groupName: 'someGroup',
         roleDefinitionId: 1073741827
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('add role assignment to listitem in list get role definition id by role definition name', (done) => {
+  it('add role assignment to listitem in list get role definition id by role definition name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -442,18 +386,10 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         principalId: 11,
         roleDefinitionName: 'Full Control'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly handles error when role definition does not exist', (done) => {
+  it('correctly handles error when role definition does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -479,14 +415,6 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         listItemId: 1,
         principalId: 11,
         roleDefinitionName: 'Full Control'
-      }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)));
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });

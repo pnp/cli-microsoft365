@@ -153,49 +153,45 @@ class SpoListItemRoleAssignmentAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Adding role assignment to listitem in site at ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
-    if (args.options.listId) {
-      requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
-    }
-    else if (args.options.listTitle) {
-      requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/`;
-    }
-    else if (args.options.listUrl) {
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-      requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
-    }
+    try {
+      let requestUrl: string = `${args.options.webUrl}/_api/web/`;
+      if (args.options.listId) {
+        requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
+      }
+      else if (args.options.listTitle) {
+        requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/`;
+      }
+      else if (args.options.listUrl) {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
+      }
 
-    requestUrl += `items(${args.options.listItemId})/`;
+      requestUrl += `items(${args.options.listItemId})/`;
 
-    this.GetRoleDefinitionId(args.options)
-      .then((roleDefinitionId: number) => {
-        args.options.roleDefinitionId = roleDefinitionId;
-        if (args.options.upn) {
-          this.GetUserPrincipalId(args.options)
-            .then((userPrincipalId: number) => {
-              args.options.principalId = userPrincipalId;
-              this.AddRoleAssignment(requestUrl, logger, args.options, cb);
-            }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-        }
-        else if (args.options.groupName) {
-          this.GetGroupPrincipalId(args.options)
-            .then((groupPrincipalId: number) => {
-              args.options.principalId = groupPrincipalId;
-              this.AddRoleAssignment(requestUrl, logger, args.options, cb);
-            }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-        }
-        else {
-          this.AddRoleAssignment(requestUrl, logger, args.options, cb);
-        }
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      args.options.roleDefinitionId = await this.GetRoleDefinitionId(args.options);
+      if (args.options.upn) {
+        args.options.principalId = await this.GetUserPrincipalId(args.options);
+        await this.AddRoleAssignment(requestUrl, logger, args.options);
+      }
+      else if (args.options.groupName) {
+        args.options.principalId = await this.GetGroupPrincipalId(args.options);
+        await this.AddRoleAssignment(requestUrl, logger, args.options);
+      }
+      else {
+        await this.AddRoleAssignment(requestUrl, logger, args.options);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
-  private AddRoleAssignment(requestUrl: string, logger: Logger, options: Options, cb: () => void): void {
+  private AddRoleAssignment(requestUrl: string, logger: Logger, options: Options): void {
     const requestOptions: any = {
       url: `${requestUrl}roleassignments/addroleassignment(principalid='${options.principalId}',roledefid='${options.roleDefinitionId}')`,
       method: 'POST',
@@ -208,7 +204,8 @@ class SpoListItemRoleAssignmentAddCommand extends SpoCommand {
 
     request
       .post(requestOptions)
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => Promise.resolve())
+      .catch((err: any) => Promise.reject(err));
   }
 
   private GetRoleDefinitionId(options: Options): Promise<number> {
