@@ -170,7 +170,7 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
       }
       else if (args.options.groupName) {
         args.options.principalId = await this.GetGroupPrincipalId(args.options);
-        this.AddRoleAssignment(requestUrl, logger, args.options);
+        await this.AddRoleAssignment(requestUrl, logger, args.options);
       }
       else {
         await this.AddRoleAssignment(requestUrl, logger, args.options);
