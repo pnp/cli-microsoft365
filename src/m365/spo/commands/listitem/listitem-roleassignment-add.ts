@@ -191,7 +191,7 @@ class SpoListItemRoleAssignmentAddCommand extends SpoCommand {
     }
   }
 
-  private AddRoleAssignment(requestUrl: string, logger: Logger, options: Options): void {
+  private AddRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
     const requestOptions: any = {
       url: `${requestUrl}roleassignments/addroleassignment(principalid='${options.principalId}',roledefid='${options.roleDefinitionId}')`,
       method: 'POST',
@@ -202,7 +202,7 @@ class SpoListItemRoleAssignmentAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
+    return request
       .post(requestOptions)
       .then(_ => Promise.resolve())
       .catch((err: any) => Promise.reject(err));
