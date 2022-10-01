@@ -137,7 +137,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
         return;
       }
 
-      return 'Invalid request';
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -153,12 +153,12 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   it('reset role inheritance on file by Id when prompt confirmed', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoFileGetCommand) {
-        return Promise.resolve({
+        return ({
           stdout: '{"LinkingUri": "https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/project-x/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}'
         });
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw new CommandError('Unknown case');
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -166,7 +166,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
         return;
       }
 
-      return 'Invalid request';
+      throw 'Invalid request';
     });
 
     sinonUtil.restore(Cli.prompt);

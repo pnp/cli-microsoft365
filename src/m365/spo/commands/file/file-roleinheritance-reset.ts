@@ -43,7 +43,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         fileUrl: typeof args.options.fileUrl !== 'undefined',
         fileId: typeof args.options.fileId !== 'undefined',
-        confirm: typeof args.options.confirm !== 'undefined'
+        confirm: !!args.options.confirm
       });
     });
   }
@@ -122,7 +122,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
       }
     }
   }
-  
+
   private async getFileURL(args: CommandArgs): Promise<string> {
     if (args.options.fileUrl) {
       return args.options.fileUrl;
