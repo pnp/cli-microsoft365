@@ -5,6 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./storageentity-get');
@@ -85,7 +86,8 @@ describe(commands.STORAGEENTITY_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       request.get,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
     auth.service.spoUrl = undefined;

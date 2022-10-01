@@ -1,10 +1,12 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command = require('./user-hibp');
@@ -17,6 +19,8 @@ describe(commands.USER_HIBP, () => {
 
   before(() => {
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
   });
 
   beforeEach(() => {
@@ -41,6 +45,12 @@ describe(commands.USER_HIBP, () => {
     ]);
   });
 
+  after(() => {
+    sinonUtil.restore([
+      appInsights.trackEvent,
+      pid.getProcessName
+    ]);
+  });
 
   it('has correct name', () => {
     assert.strictEqual(command.name.startsWith(commands.USER_HIBP), true);

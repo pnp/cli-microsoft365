@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./funsettings-set');
@@ -49,6 +50,7 @@ describe(commands.FUNSETTINGS_SET, () => {
   after(() => {
     sinonUtil.restore([
       appInsights.trackEvent,
+      pid.getProcessName,
       auth.restoreAuth
     ]);
     auth.service.connected = false;

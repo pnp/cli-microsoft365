@@ -1,14 +1,15 @@
 import sinon = require("sinon");
-import commands from "../commands";
+import appInsights from "../../../appInsights";
 import auth from "../../../Auth";
+import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from "../../../Command";
+import config from "../../../config";
+import request from "../../../request";
+import { pid } from "../../../utils/pid";
 import { sinonUtil } from "../../../utils/sinonUtil";
 import { spo } from "../../../utils/spo";
-import request from "../../../request";
-import appInsights from "../../../appInsights";
+import commands from "../commands";
 import assert = require("assert");
-import { Logger } from '../../../cli/Logger';
-import config from "../../../config";
 const command: Command = require('./onedrive-list');
 
 describe(commands.LIST, () => {
@@ -49,7 +50,8 @@ describe(commands.LIST, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.ensureFormDigest,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
     auth.service.spoUrl = undefined;

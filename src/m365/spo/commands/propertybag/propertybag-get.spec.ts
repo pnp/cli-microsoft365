@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { IdentityResponse, spo } from '../../../../utils/spo';
 import commands from '../../commands';
@@ -91,6 +92,7 @@ describe(commands.PROPERTYBAG_GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc',
       FormDigestTimeoutSeconds: 1800,
@@ -132,6 +134,7 @@ describe(commands.PROPERTYBAG_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
+      pid.getProcessName,
       spo.getRequestDigest
     ]);
     auth.service.connected = false;

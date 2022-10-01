@@ -14,6 +14,7 @@ import { md } from '../utils/md';
 import { sinonUtil } from '../utils/sinonUtil';
 import { Logger } from './Logger';
 import Table = require('easy-table');
+import { pid } from '../utils/pid';
 const packageJSON = require('../../package.json');
 
 class MockCommand extends AnonymousCommand {
@@ -164,6 +165,7 @@ describe('Cli', () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
 
     cliLogStub = sinon.stub((Cli as any), 'log').callsFake(_ => { });
     cliErrorStub = sinon.stub((Cli as any), 'error');
@@ -226,6 +228,7 @@ describe('Cli', () => {
       process.exit,
       md.md2plain,
       appInsights.trackEvent,
+      pid.getProcessName,
       cli.getSettingWithDefaultValue
     ]);
   });

@@ -6,6 +6,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./task-checklistitem-add');
@@ -36,6 +37,7 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -72,7 +74,8 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
     auth.service.accessTokens = {};

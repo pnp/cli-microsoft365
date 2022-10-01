@@ -7,6 +7,7 @@ import appInsights from '../../../../appInsights';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./completion-pwsh-setup');
@@ -19,6 +20,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(autocomplete, 'generateShCompletion').callsFake(() => { });
   });
 
@@ -50,6 +52,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   after(() => {
     sinonUtil.restore([
       appInsights.trackEvent,
+      pid.getProcessName,
       autocomplete.generateShCompletion
     ]);
   });

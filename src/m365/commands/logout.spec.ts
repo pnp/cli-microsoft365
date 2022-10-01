@@ -4,6 +4,7 @@ import appInsights from '../../appInsights';
 import auth from '../../Auth';
 import { Logger } from '../../cli/Logger';
 import Command, { CommandError } from '../../Command';
+import { pid } from '../../utils/pid';
 import { sinonUtil } from '../../utils/sinonUtil';
 import commands from './commands';
 const command: Command = require('./logout');
@@ -17,6 +18,7 @@ describe(commands.LOGOUT, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     authClearConnectionInfoStub = sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
   });
 
   beforeEach(() => {
@@ -37,7 +39,8 @@ describe(commands.LOGOUT, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 

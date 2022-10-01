@@ -1,10 +1,12 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import { settingsNames } from '../../../../settingsNames';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./config-set');
@@ -16,6 +18,8 @@ describe(commands.CONFIG_SET, () => {
 
   before(() => {
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
   });
 
   beforeEach(() => {
@@ -35,6 +39,13 @@ describe(commands.CONFIG_SET, () => {
 
   afterEach(() => {
     sinonUtil.restore(Cli.getInstance().config.set);
+  });
+  
+  after(() => {
+    sinonUtil.restore([
+      appInsights.trackEvent,
+      pid.getProcessName
+    ]);
   });
 
   it('has correct name', () => {

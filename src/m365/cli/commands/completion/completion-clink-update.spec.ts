@@ -4,6 +4,7 @@ import appInsights from '../../../../appInsights';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./completion-clink-update');
@@ -15,6 +16,7 @@ describe(commands.COMPLETION_CLINK_UPDATE, () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     generateClinkCompletionStub = sinon.stub(autocomplete, 'getClinkCompletion').callsFake(() => '');
   });
 
@@ -40,6 +42,7 @@ describe(commands.COMPLETION_CLINK_UPDATE, () => {
   after(() => {
     sinonUtil.restore([
       appInsights.trackEvent,
+      pid.getProcessName,
       autocomplete.getClinkCompletion
     ]);
   });

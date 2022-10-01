@@ -5,6 +5,7 @@ import auth from '../../../Auth';
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
+import { pid } from '../../../utils/pid';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./flow-enable');
@@ -16,6 +17,7 @@ describe(commands.ENABLE, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
 
@@ -43,7 +45,8 @@ describe(commands.ENABLE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
   });
