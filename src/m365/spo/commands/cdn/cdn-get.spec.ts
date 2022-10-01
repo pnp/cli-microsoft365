@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./cdn-get');
@@ -50,6 +51,7 @@ describe(commands.CDN_GET, () => {
   after(() => {
     sinonUtil.restore([
       appInsights.trackEvent,
+      pid.getProcessName,
       auth.restoreAuth
     ]);
     auth.service.connected = false;

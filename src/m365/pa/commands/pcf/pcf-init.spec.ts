@@ -7,6 +7,7 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import TemplateInstantiator from '../../template-instantiator';
@@ -53,7 +54,8 @@ describe(commands.PCF_INIT, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 

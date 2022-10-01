@@ -8,6 +8,7 @@ import * as appInsights from 'applicationinsights';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
+import { pid } from './utils/pid';
 
 const config = appInsights.setup('6b908c80-d09f-4cf6-8274-e54349a0149a');
 config.setInternalLogging(false, false);
@@ -19,9 +20,11 @@ const env: string = process.env.CLIMICROSOFT365_ENV !== undefined ? process.env.
 appInsights.defaultClient.commonProperties = {
   version: version,
   node: process.version,
+  shell: pid.getProcessName(process.ppid) || '',
   env: env,
   ci: Boolean(process.env.CI).toString()
 };
+
 appInsights.defaultClient.context.tags['ai.session.id'] = crypto.randomBytes(24).toString('base64');
 appInsights.defaultClient.context.tags['ai.cloud.roleInstance'] = crypto.createHash('sha256').update(appInsights.defaultClient.context.tags['ai.cloud.roleInstance']).digest('hex');
 delete appInsights.defaultClient.context.tags['ai.cloud.role'];

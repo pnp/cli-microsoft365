@@ -4,6 +4,7 @@ import appInsights from '../../appInsights';
 import auth from '../../Auth';
 import { Logger } from '../../cli/Logger';
 import { CommandError } from '../../Command';
+import { pid } from '../../utils/pid';
 import { sinonUtil } from '../../utils/sinonUtil';
 import YammerCommand from './YammerCommand';
 
@@ -30,6 +31,7 @@ class MockCommand extends YammerCommand {
 describe('YammerCommand', () => {
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
   });
 
   afterEach(() => {
@@ -37,7 +39,10 @@ describe('YammerCommand', () => {
   });
 
   after(() => {
-    sinonUtil.restore(appInsights.trackEvent);
+    sinonUtil.restore([
+      appInsights.trackEvent,
+      pid.getProcessName
+    ]);
   });
 
   it('correctly reports an error while restoring auth info', async () => {

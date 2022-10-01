@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { FileDeleteError } from './file-rename';
@@ -37,6 +38,7 @@ describe(commands.FILE_RENAME, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -69,6 +71,7 @@ describe(commands.FILE_RENAME, () => {
   after(() => {
     sinonUtil.restore([
       appInsights.trackEvent,
+      pid.getProcessName,
       auth.restoreAuth
     ]);
     auth.service.connected = false;

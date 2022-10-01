@@ -6,6 +6,7 @@ import { Cli } from '../../../cli/Cli';
 import { CommandInfo } from '../../../cli/CommandInfo';
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
+import { pid } from '../../../utils/pid';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./spo-set');
@@ -46,7 +47,8 @@ describe(commands.SET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       auth.storeConnectionInfo,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
   });

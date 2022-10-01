@@ -8,6 +8,7 @@ import { CommandInfo } from '../../../cli/CommandInfo';
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
+import { pid } from '../../../utils/pid';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./file-add');
@@ -20,6 +21,7 @@ describe(commands.ADD, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -56,6 +58,7 @@ describe(commands.ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
+      pid.getProcessName,
       fs.readFileSync
     ]);
     auth.service.connected = false;

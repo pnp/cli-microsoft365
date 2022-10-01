@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./folder-remove');
@@ -73,7 +74,8 @@ describe(commands.FOLDER_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
   });
