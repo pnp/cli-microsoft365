@@ -5,13 +5,13 @@ import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { formatting, sinonUtil } from '../../../../utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./file-roleinheritance-reset');
 import * as SpoFileGetCommand from './file-get';
 
 describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
-  const webUrl = 'https://contoso.sharepoint.com';
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const fileUrl = '/sites/project-x/documents/Test1.docx';
   const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
@@ -133,7 +133,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
 
   it('reset role inheritance on file by relative URL (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/resetroleinheritance`) {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${fileUrl}')/ListItemAllFields/resetroleinheritance`) {
         return;
       }
 
@@ -162,7 +162,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/resetroleinheritance`) {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${fileUrl}')/ListItemAllFields/resetroleinheritance`) {
         return;
       }
 
