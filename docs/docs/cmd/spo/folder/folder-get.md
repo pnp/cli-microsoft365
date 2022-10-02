@@ -13,8 +13,11 @@ m365 spo folder get [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the folder is located
 
-`-f, --folderUrl <folderUrl>`
-: Site-relative URL of the folder
+`-f, --folderUrl [folderUrl]`
+: The server-relative URL of the folder to retrieve. Specify either `folderUrl` or `id` but not both
+
+`-i, --id [id]`
+: The UniqueId (GUID) of the folder to retrieve. Specify either `folderUrl` or `id` but not both
 
 --8<-- "docs/cmd/_global.md"
 
@@ -24,8 +27,14 @@ If no folder exists at the specified URL, you will get a `Please check the folde
 
 ## Examples
 
-Get folder properties for folder with site-relative url _'/Shared Documents'_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get folder properties for folder with server-relative url _'/Shared Documents'_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents'
+m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl "/Shared Documents"
+```
+
+Get folder properties for folder with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/project-x --id "b2307a39-e878-458b-bc90-03bc578531d6"
 ```
