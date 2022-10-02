@@ -13,7 +13,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  folderUrl: string;
+  folderUrl?: string;
+  id?: string;
 }
 
 class SpoFolderGetCommand extends SpoCommand {
@@ -27,26 +28,57 @@ class SpoFolderGetCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
-  
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: (!(!args.options.id)).toString(),
+        folderUrl: (!(!args.options.folderUrl)).toString()
+      });
+    });
+  }
+
   #initOptions(): void {
     this.options.unshift(
       {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folderUrl <folderUrl>'
+        option: '-f, --folderUrl [folderUrl]'
+      },
+      {
+        option: '-i, --id [id]'
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.id) {
+          if (!validation.isValidGuid(args.options.id)) {
+            return `${args.options.id} is not a valid GUID`;
+          }
+        }
+
+        return true;
+      }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['folderUrl', 'id']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -54,8 +86,16 @@ class SpoFolderGetCommand extends SpoCommand {
       logger.logToStderr(`Retrieving folder from site ${args.options.webUrl}...`);
     }
 
-    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
-    const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')`;
+    let requestUrl: string = '';
+
+    if (args.options.id) {
+      requestUrl = `${args.options.webUrl}/_api/web/GetFolderById('${encodeURIComponent(args.options.id)}')`;
+    }
+    else if (args.options.folderUrl) {
+      const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
+      requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')`;
+    }
+
     const requestOptions: any = {
       url: requestUrl,
       headers: {

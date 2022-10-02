@@ -18,7 +18,7 @@ describe(commands.FOLDER_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
 
     stubGetResponses = (getResp: any = null) => {
@@ -31,7 +31,7 @@ describe(commands.FOLDER_GET, () => {
             return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/test1", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
           }
         }
-  
+
         return Promise.reject('Invalid request');
       });
     };
@@ -76,6 +76,37 @@ describe(commands.FOLDER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [['folderUrl', 'id']]);
+  });
+
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: '/Shared Documents' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the id option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '12345' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if the webUrl option is a valid SharePoint site URL and folderUrl specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('supports specifying URL', () => {
+    const options = command.options;
+    let containsTypeOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('<webUrl>') > -1) {
+        containsTypeOption = true;
+      }
+    });
+    assert(containsTypeOption);
+  });
+
   it('should correctly handle folder get reject request', async () => {
     stubGetResponses(new Promise((resolve, reject) => { reject('error1'); }));
 
@@ -109,6 +140,21 @@ describe(commands.FOLDER_GET, () => {
       }
     });
     assert(loggerLogSpy.lastCall.calledWith({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/test1", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" }));
+  });
+
+  it('should pass the correct id params to request', async () => {
+    const request = stubGetResponses();
+
+    await command.action(logger, {
+      options: {
+        debug: false,
+        output: 'json',
+        webUrl: 'https://contoso.sharepoint.com',
+        id: 'b2307a39-e878-458b-bc90-03bc578531d6'
+      }
+    });
+    const lastCall: any = request.lastCall.args[0];
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderById(\'b2307a39-e878-458b-bc90-03bc578531d6\')');
   });
 
   it('should pass the correct url params to request', async () => {
@@ -150,26 +196,5 @@ describe(commands.FOLDER_GET, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
-  });
-
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: '/Shared Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the webUrl option is a valid SharePoint site URL and folderUrl specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } }, commandInfo);
-    assert.strictEqual(actual, true);
   });
 });
