@@ -23,7 +23,7 @@ describe(commands.FOLDER_GET, () => {
 
     stubGetResponses = (getResp: any = null) => {
       return sinon.stub(request, 'get').callsFake((opts) => {
-        if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1) {
+        if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1 || (opts.url as string).indexOf('GetFolderById') > -1) {
           if (getResp) {
             return getResp;
           }
