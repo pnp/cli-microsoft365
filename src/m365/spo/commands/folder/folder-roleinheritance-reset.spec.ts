@@ -2,16 +2,18 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, CommandInfo, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { CommandInfo } from '../../../../cli/CommandInfo';
+import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./folder-roleinheritance-reset');
 
 describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
-  const folderUrl = '/Shared Documents';
+  const folderUrl = 'Shared Documents/TestFolder';
 
   let log: any[];
   let logger: Logger;
@@ -121,7 +123,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
 
   it('reset role inheritance on folder by site-relative URL (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl(${folderUrl})/ListItemAllFields/resetroleinheritance`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${folderUrl}')/ListItemAllFields/resetroleinheritance`) {
         return;
       }
 
@@ -140,7 +142,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
 
   it('reset role inheritance on folder by site-relative URL when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl(${folderUrl})/ListItemAllFields/resetroleinheritance`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${folderUrl}')/ListItemAllFields/resetroleinheritance`) {
         return;
       }
 
