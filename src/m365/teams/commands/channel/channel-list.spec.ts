@@ -110,6 +110,12 @@ describe(commands.CHANNEL_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('rejects invalid channel type', async () => {
+    const type = 'foo';
+    const actual = await command.validate({ options: { teamId: '00000000-0000-0000-0000-000000000000', type: type } }, commandInfo);
+    assert.strictEqual(actual, `${type} is not a valid type value. Allowed values standard|private|shared`);
+  });
+
   it('correctly lists all channels in a Microsoft teams team by team id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
@@ -480,9 +486,12 @@ describe(commands.CHANNEL_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: '00000000-0000-0000-0000-000000000000' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        teamId: '00000000-0000-0000-0000-000000000000'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

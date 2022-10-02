@@ -61,7 +61,7 @@ class TeamsChannelListCommand extends GraphCommand {
       },
       {
         option: '--type [type]',
-        autocomplete: ['standard', 'private']
+        autocomplete: ['standard', 'private', 'shared']
       }
     );
   }
@@ -73,8 +73,8 @@ class TeamsChannelListCommand extends GraphCommand {
           return `${args.options.teamId} is not a valid GUID`;
         }
 
-        if (args.options.type && ['standard', 'private'].indexOf(args.options.type.toLowerCase()) === -1) {
-          return `${args.options.type} is not a valid type value. Allowed values standard|private`;
+        if (args.options.type && ['standard', 'private', 'shared'].indexOf(args.options.type.toLowerCase()) === -1) {
+          return `${args.options.type} is not a valid type value. Allowed values standard|private|shared`;
         }
 
         return true;
@@ -106,13 +106,14 @@ class TeamsChannelListCommand extends GraphCommand {
     try {
       const teamId: string = await this.getTeamId(args);
       let endpoint: string = `${this.resource}/v1.0/teams/${teamId}/channels`;
+
       if (args.options.type) {
         endpoint += `?$filter=membershipType eq '${args.options.type}'`;
       }
 
       const items = await odata.getAllItems<Channel>(endpoint);
       logger.log(items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
