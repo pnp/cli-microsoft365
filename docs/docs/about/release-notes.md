@@ -1,5 +1,11 @@
 # Release notes
 
+## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
+
+### Changes
+
+- removed barrels [#3736](https://github.com/pnp/cli-microsoft365/pull/3736)
+
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
 ### New commands

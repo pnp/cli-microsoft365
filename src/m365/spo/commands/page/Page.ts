@@ -1,6 +1,6 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import request from '../../../../request';
-import { urlUtil } from '../../../../utils';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
 import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './clientsidepages';
 import { PageItem } from './PageItem';

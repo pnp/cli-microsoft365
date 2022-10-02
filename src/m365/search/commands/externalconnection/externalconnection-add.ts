@@ -1,5 +1,5 @@
 import { ExternalConnectors } from '@microsoft/microsoft-graph-types/microsoft-graph';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';

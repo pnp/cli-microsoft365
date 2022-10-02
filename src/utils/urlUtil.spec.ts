@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { urlUtil } from '../utils';
+import { urlUtil } from '../utils/urlUtil';
 
 describe('urlUtil/urlUtil', () => {
   it('should get server relative path when https://contoso.sharepoint.com/sites/team1', () => {

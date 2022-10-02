@@ -3,10 +3,13 @@ import * as os from 'os';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, CommandInfo, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { CommandInfo } from '../../../../cli/CommandInfo';
+import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken, sinonUtil } from '../../../../utils';
+import { accessToken } from '../../../../utils/accessToken';
+import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./chat-message-send');
 

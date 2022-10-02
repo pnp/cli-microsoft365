@@ -11,10 +11,11 @@ import { Auth, AuthType, CertificateType, InteractiveAuthorizationCodeResponse, 
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import authServer from './AuthServer';
-import { Cli, Logger } from './cli';
+import { Cli } from './cli/Cli';
+import { Logger } from './cli/Logger';
 import { CommandError } from './Command';
 import request from './request';
-import { sinonUtil } from './utils';
+import { sinonUtil } from './utils/sinonUtil';
 
 class MockTokenStorage implements TokenStorage {
   public get(): Promise<string> {

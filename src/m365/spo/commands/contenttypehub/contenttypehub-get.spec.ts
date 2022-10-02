@@ -2,10 +2,12 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
-import { sinonUtil, spo } from '../../../../utils';
+import { sinonUtil } from '../../../../utils/sinonUtil';
+import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
 
 const command: Command = require('./contenttypehub-get');
@@ -104,7 +106,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    const bodyPayload = `<Request xmlns=\"http://schemas.microsoft.com/sharepoint/clientquery/2009\" AddExpandoFieldTypeSuffix=\"true\" SchemaVersion=\"15.0.0.0\" LibraryVersion=\"16.0.0.0\" ApplicationName=\"CLI for Microsoft 365 v5.8.0\">\n<Actions>\n  <ObjectPath Id=\"2\" ObjectPathId=\"1\" />\n  <ObjectIdentityQuery Id=\"3\" ObjectPathId=\"1\" />\n  <ObjectPath Id=\"5\" ObjectPathId=\"4\" />\n  <ObjectIdentityQuery Id=\"6\" ObjectPathId=\"4\" />\n  <Query Id=\"7\" ObjectPathId=\"4\">\n    <Query SelectAllProperties=\"false\">\n      <Properties>\n        <Property Name=\"ContentTypePublishingHub\" ScalarProperty=\"true\" />\n      </Properties>\n    </Query>\n  </Query>\n</Actions>\n<ObjectPaths>\n  <StaticMethod Id=\"1\" Name=\"GetTaxonomySession\" TypeId=\"{981cbc68-9edc-4f8d-872f-71146fcbb84f}\" />\n  <Method Id=\"4\" ParentId=\"1\" Name=\"GetDefaultSiteCollectionTermStore\" />\n</ObjectPaths>\n</Request>`;
+    const bodyPayload = `<Request xmlns=\"http://schemas.microsoft.com/sharepoint/clientquery/2009\" AddExpandoFieldTypeSuffix=\"true\" SchemaVersion=\"15.0.0.0\" LibraryVersion=\"16.0.0.0\" ApplicationName=\"${config.applicationName}\">\n<Actions>\n  <ObjectPath Id=\"2\" ObjectPathId=\"1\" />\n  <ObjectIdentityQuery Id=\"3\" ObjectPathId=\"1\" />\n  <ObjectPath Id=\"5\" ObjectPathId=\"4\" />\n  <ObjectIdentityQuery Id=\"6\" ObjectPathId=\"4\" />\n  <Query Id=\"7\" ObjectPathId=\"4\">\n    <Query SelectAllProperties=\"false\">\n      <Properties>\n        <Property Name=\"ContentTypePublishingHub\" ScalarProperty=\"true\" />\n      </Properties>\n    </Query>\n  </Query>\n</Actions>\n<ObjectPaths>\n  <StaticMethod Id=\"1\" Name=\"GetTaxonomySession\" TypeId=\"{981cbc68-9edc-4f8d-872f-71146fcbb84f}\" />\n  <Method Id=\"4\" ParentId=\"1\" Name=\"GetDefaultSiteCollectionTermStore\" />\n</ObjectPaths>\n</Request>`;
     assert.strictEqual(requestStub.lastCall.args[0].data, bodyPayload);
     assert(loggerLogSpy.calledWith({ "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub" }));
   });

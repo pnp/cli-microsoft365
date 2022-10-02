@@ -1,6 +1,7 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import { spo, validation } from '../../../../utils';
+import { spo } from '../../../../utils/spo';
+import { validation } from '../../../../utils/validation';
 import commands from '../../commands';
 import { Property, SpoPropertyBagBaseCommand } from './propertybag-base';
 

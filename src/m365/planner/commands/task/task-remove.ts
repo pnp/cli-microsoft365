@@ -1,10 +1,13 @@
 import { PlannerBucket, PlannerTask } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
 import * as os from 'os';
-import { Cli, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { aadGroup, odata, validation } from '../../../../utils';
+import { aadGroup } from '../../../../utils/aadGroup';
+import { odata } from '../../../../utils/odata';
+import { validation } from '../../../../utils/validation';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';

@@ -1,7 +1,9 @@
-import { Cli, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { spo, validation } from '../../../../utils';
+import { spo } from '../../../../utils/spo';
+import { validation } from '../../../../utils/validation';
 import commands from '../../commands';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 

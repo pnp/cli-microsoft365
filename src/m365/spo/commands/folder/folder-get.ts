@@ -1,8 +1,9 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { urlUtil, validation } from '../../../../utils';
+import { urlUtil } from '../../../../utils/urlUtil';
+import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { FolderProperties } from './FolderProperties';

@@ -1,5 +1,5 @@
 import { lt, valid, validRange } from 'semver';
-import { Hash } from '../../../../../../utils';
+import { Hash } from '../../../../../../utils/types';
 import { JsonRule } from '../../JsonRule';
 import { Project } from '../../project-model';
 import { Finding } from '../../report-model';

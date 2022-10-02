@@ -1,7 +1,7 @@
 import * as chalk from 'chalk';
 import * as child_process from 'child_process';
 import { satisfies } from 'semver';
-import { Logger } from '../../../cli';
+import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import commands from '../commands';

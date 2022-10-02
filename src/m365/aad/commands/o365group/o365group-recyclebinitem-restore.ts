@@ -1,9 +1,10 @@
 import { Group } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { formatting, validation } from '../../../../utils';
+import { formatting } from '../../../../utils/formatting';
+import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 

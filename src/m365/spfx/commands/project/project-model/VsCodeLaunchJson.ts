@@ -1,5 +1,5 @@
 import { JsonFile } from '.';
-import { Hash } from '../../../../../utils';
+import { Hash } from '../../../../../utils/types';
 
 export interface VsCodeLaunchJson extends JsonFile {
   version: string;

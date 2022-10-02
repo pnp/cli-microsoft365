@@ -2,7 +2,7 @@ import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
 import { v4 } from 'uuid';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';

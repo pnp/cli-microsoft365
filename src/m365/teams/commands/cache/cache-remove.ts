@@ -1,5 +1,6 @@
 import * as util from 'util';
-import { Cli, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { Logger } from '../../../../cli/Logger';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';

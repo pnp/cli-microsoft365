@@ -1,6 +1,6 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import request from '../../../../request';
-import { spo, ContextInfo } from '../../../../utils';
+import { spo, ContextInfo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 

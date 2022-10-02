@@ -4,7 +4,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { AuthType, CertificateType, Service } from '../Auth';
-import { sinonUtil } from '../utils';
+import { sinonUtil } from '../utils/sinonUtil';
 import { FileTokenStorage } from './FileTokenStorage';
 
 describe('FileTokenStorage', () => {

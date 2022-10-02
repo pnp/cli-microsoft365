@@ -1,6 +1,6 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils';
+import { odata } from '../../../../utils/odata';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import flowCommands from '../../../flow/commands';
 import commands from '../../commands';

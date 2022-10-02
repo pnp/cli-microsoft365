@@ -1,4 +1,4 @@
-import { Logger } from '../../../cli';
+import { Logger } from '../../../cli/Logger';
 import config from '../../../config';
 import GlobalOptions from '../../../GlobalOptions';
 import AnonymousCommand from '../../base/AnonymousCommand';

@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { aadGroup } from '../../../../utils/aadGroup';

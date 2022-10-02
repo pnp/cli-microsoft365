@@ -1,10 +1,11 @@
 import * as fs from 'fs';
 import { v4 } from 'uuid';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { accessToken, odata } from '../../../../utils';
+import { accessToken } from '../../../../utils/accessToken';
+import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import { M365RcJson } from '../../../base/M365RcJson';
 import commands from '../../commands';

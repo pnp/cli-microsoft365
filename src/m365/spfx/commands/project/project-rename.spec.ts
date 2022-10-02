@@ -3,9 +3,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
-import { sinonUtil } from '../../../../utils';
+import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./project-rename');
 

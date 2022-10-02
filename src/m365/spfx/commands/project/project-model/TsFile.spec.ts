@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import * as ts from 'typescript';
 import { TsFile } from ".";
-import { sinonUtil } from '../../../../../utils';
+import { sinonUtil } from '../../../../../utils/sinonUtil';
 
 describe('TsFile', () => {
   let tsFile: TsFile;

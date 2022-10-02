@@ -1,4 +1,4 @@
-import { Logger } from '../../cli';
+import { Logger } from '../../cli/Logger';
 import Command, { CommandArgs } from '../../Command';
 
 export default abstract class AnonymousCommand extends Command {
