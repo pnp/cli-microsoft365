@@ -5,6 +5,9 @@
 ### Changes
 
 - removed barrels [#3736](https://github.com/pnp/cli-microsoft365/pull/3736)
+- fixed examples for web roleassignment 'verb' that mentioned list roleassignment 'verb' instead [#3706](https://github.com/pnp/cli-microsoft365/issues/3706)
+- extended 'teams channel list' command with support for filtering shared teams channels [#3690](https://github.com/pnp/cli-microsoft365/issues/3690)
+- extended 'spo folder get' command with support to get folder by id [#3605](https://github.com/pnp/cli-microsoft365/issues/3605)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
