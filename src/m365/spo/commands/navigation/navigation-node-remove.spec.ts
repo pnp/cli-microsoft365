@@ -2,10 +2,13 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, CommandInfo, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { CommandInfo } from '../../../../cli/CommandInfo';
+import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil, spo } from '../../../../utils';
+import { sinonUtil } from '../../../../utils/sinonUtil';
+import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
 const command: Command = require('./navigation-node-remove');
 

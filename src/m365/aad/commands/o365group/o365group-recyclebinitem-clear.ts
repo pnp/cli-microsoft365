@@ -1,8 +1,9 @@
 import { DirectoryObject } from '@microsoft/microsoft-graph-types';
-import { Cli, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { odata } from '../../../../utils';
+import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 

@@ -1,5 +1,5 @@
 import type * as ACData from 'adaptivecards-templating';
-import { Logger } from '../../../cli';
+import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
 import AnonymousCommand from '../../base/AnonymousCommand';

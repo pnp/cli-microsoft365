@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import auth, { AuthType } from '../../Auth';
-import { Logger } from '../../cli';
+import { Logger } from '../../cli/Logger';
 import Command, {
   CommandError
 } from '../../Command';

@@ -1,4 +1,4 @@
-import { spfx } from '../../../../../../utils';
+import { spfx } from '../../../../../../utils/spfx';
 import { Project } from "../../project-model";
 import { Finding } from "../../report-model";
 import { FileAddRemoveRule } from "./FileAddRemoveRule";

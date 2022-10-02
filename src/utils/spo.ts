@@ -1,7 +1,8 @@
 import * as url from 'url';
-import { urlUtil, validation } from ".";
+import { urlUtil } from "./urlUtil";
+import { validation } from "./validation";
 import auth from '../Auth';
-import { Logger } from "../cli";
+import { Logger } from "../cli/Logger";
 import config from "../config";
 import { BasePermissions } from '../m365/spo/base-permissions';
 import request from "../request";

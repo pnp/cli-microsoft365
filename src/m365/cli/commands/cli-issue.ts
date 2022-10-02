@@ -1,6 +1,6 @@
 import { ChildProcess } from 'child_process';
 import * as open from 'open';
-import { Logger } from '../../../cli';
+import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import commands from '../commands';

@@ -1,10 +1,11 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Dictionary, Hash, packageManager } from '../../../../utils';
+import { packageManager } from '../../../../utils/packageManager';
+import { Dictionary, Hash } from '../../../../utils/types';
 import commands from '../../commands';
 import { BaseProjectCommand } from './base-project-command';
 import { rules as genericRules } from './project-doctor/generic-rules';

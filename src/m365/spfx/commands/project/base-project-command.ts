@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { formatting, fsUtil } from '../../../../utils';
+import { formatting } from '../../../../utils/formatting';
+import { fsUtil } from '../../../../utils/fsUtil';
 import AnonymousCommand from "../../../base/AnonymousCommand";
 import { Manifest, Project, ScssFile, TsFile } from "./project-model";
 

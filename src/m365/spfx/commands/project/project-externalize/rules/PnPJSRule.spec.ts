@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { sinonUtil } from '../../../../../../utils';
+import { sinonUtil } from '../../../../../../utils/sinonUtil';
 import { Project } from '../../project-model';
 import { PnPJsRule } from './PnPJsRule';
 

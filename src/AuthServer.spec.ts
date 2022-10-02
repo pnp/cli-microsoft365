@@ -3,7 +3,7 @@ import Axios from 'axios';
 import { AddressInfo } from 'net';
 import { Auth } from './Auth';
 import authServer from './AuthServer';
-import { Logger } from './cli';
+import { Logger } from './cli/Logger';
 import sinon = require('sinon');
 
 describe('AuthServer', () => {

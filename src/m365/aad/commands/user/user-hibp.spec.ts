@@ -1,9 +1,11 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Cli, CommandInfo, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { CommandInfo } from '../../../../cli/CommandInfo';
+import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command = require('./user-hibp');
 

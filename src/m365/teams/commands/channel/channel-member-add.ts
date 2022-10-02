@@ -1,9 +1,9 @@
 import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import * as os from 'os';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';

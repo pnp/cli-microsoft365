@@ -2,10 +2,11 @@ import { AadUserConversationMember, Chat, ConversationMember } from '@microsoft/
 import { AxiosRequestConfig } from 'axios';
 import * as os from 'os';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { accessToken, validation } from '../../../../utils';
+import { accessToken } from '../../../../utils/accessToken';
+import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { chatUtil } from './chatUtil';

@@ -1,4 +1,4 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import request from '../../../../request';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';

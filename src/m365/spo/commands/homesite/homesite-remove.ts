@@ -1,8 +1,9 @@
-import { Cli, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 

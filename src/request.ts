@@ -1,8 +1,8 @@
 import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Stream } from 'stream';
 import auth, { Auth } from './Auth';
-import { Logger } from './cli';
-import { formatting } from './utils';
+import { Logger } from './cli/Logger';
+import { formatting } from './utils/formatting';
 const packageJSON = require('../package.json');
 
 class Request {

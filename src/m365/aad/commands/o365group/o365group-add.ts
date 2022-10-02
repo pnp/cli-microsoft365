@@ -1,10 +1,10 @@
 import { Group, User } from '@microsoft/microsoft-graph-types';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { formatting } from '../../../../utils';
+import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 

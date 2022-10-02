@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { spfx } from '../../../../../../utils';
+import { spfx } from '../../../../../../utils/spfx';
 import { Project, ScssFile } from '../../project-model';
 import { Finding } from '../../report-model';
 import { FN022002_SCSS_add_fabric_react } from './FN022002_SCSS_add_fabric_react';

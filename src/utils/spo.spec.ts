@@ -1,9 +1,10 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import auth from '../Auth';
-import { Logger } from '../cli';
+import { Logger } from '../cli/Logger';
 import request from '../request';
-import { FormDigestInfo, sinonUtil, spo } from '../utils';
+import { sinonUtil } from '../utils/sinonUtil';
+import { FormDigestInfo, spo } from '../utils/spo';
 
 const stubPostResponses: any = (
   folderAddResp: any = null

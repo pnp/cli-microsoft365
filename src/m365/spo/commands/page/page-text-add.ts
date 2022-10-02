@@ -1,8 +1,10 @@
 import { isNumber } from 'util';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { spo, urlUtil, validation } from '../../../../utils';
+import { spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
+import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import {

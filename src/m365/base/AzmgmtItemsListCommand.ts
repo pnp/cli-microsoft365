@@ -1,7 +1,7 @@
 import * as url from 'url';
-import { Logger } from "../../cli";
+import { Logger } from '../../cli/Logger';
 import request from '../../request';
-import { ODataResponse } from '../../utils';
+import { ODataResponse } from '../../utils/odata';
 import AzmgmtCommand from "./AzmgmtCommand";
 
 export abstract class AzmgmtItemsListCommand<T> extends AzmgmtCommand {

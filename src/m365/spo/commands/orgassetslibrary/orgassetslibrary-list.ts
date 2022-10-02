@@ -1,7 +1,7 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { OrgAssets, OrgAssetsResponse } from './OrgAssets';

@@ -1,5 +1,5 @@
 import { autocomplete } from '../../../../autocomplete';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import commands from '../../commands';
 

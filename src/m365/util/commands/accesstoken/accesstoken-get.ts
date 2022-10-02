@@ -1,5 +1,5 @@
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
