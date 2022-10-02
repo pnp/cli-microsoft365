@@ -3,9 +3,10 @@ import * as os from 'os';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-import { Cli, Logger } from '../../../cli';
+import { Cli } from '../../../cli/Cli';
+import { Logger } from '../../../cli/Logger';
 import Command from '../../../Command';
-import { sinonUtil } from '../../../utils';
+import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const packageJSON = require('../../../../package.json');
 

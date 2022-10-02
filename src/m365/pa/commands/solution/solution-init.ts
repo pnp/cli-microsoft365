@@ -2,12 +2,12 @@ import * as chalk from 'chalk';
 import * as fs from "fs";
 import * as path from 'path';
 import { v4 } from 'uuid';
-import { Logger } from "../../../../cli";
+import { Logger } from "../../../../cli/Logger";
 import {
   CommandError
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils';
+import { validation } from '../../../../utils/validation';
 import AnonymousCommand from "../../../base/AnonymousCommand";
 import commands from '../../commands';
 import TemplateInstantiator from "../../template-instantiator";

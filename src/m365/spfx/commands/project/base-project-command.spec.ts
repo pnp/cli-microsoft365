@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { sinonUtil } from '../../../../utils';
+import { sinonUtil } from '../../../../utils/sinonUtil';
 import { BaseProjectCommand } from "./base-project-command";
 import { Project } from "./project-model";
 

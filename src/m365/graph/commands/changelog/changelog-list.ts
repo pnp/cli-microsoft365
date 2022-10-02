@@ -1,6 +1,7 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import { md, validation } from '../../../../utils';
+import { md } from '../../../../utils/md';
+import { validation } from '../../../../utils/validation';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import { Changelog, ChangelogItem } from '../../Changelog';
 import commands from '../../commands';

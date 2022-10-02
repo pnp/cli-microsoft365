@@ -1,8 +1,12 @@
-import { Cli, CommandOutput, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { CommandOutput } from '../../../../cli/Cli';
+import { Logger } from '../../../../cli/Logger';
 import Command, { CommandErrorWithOutput } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { formatting, urlUtil, validation } from '../../../../utils';
+import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
+import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import * as SpoUserGetCommand from '../user/user-get';

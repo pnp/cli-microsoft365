@@ -3,12 +3,15 @@ import type { Inquirer } from 'inquirer';
 import * as os from 'os';
 import appInsights from './appInsights';
 import auth from './Auth';
-import { Cli, CommandInfo, CommandOptionInfo } from './cli';
+import { Cli } from './cli/Cli';
+import { CommandInfo } from './cli/CommandInfo';
+import { CommandOptionInfo } from './cli/CommandOptionInfo';
 import { Logger } from './cli/Logger';
 import GlobalOptions from './GlobalOptions';
 import request from './request';
 import { settingsNames } from './settingsNames';
-import { accessToken, GraphResponseError } from './utils';
+import { accessToken } from './utils/accessToken';
+import { GraphResponseError } from './utils/odata';
 
 export interface CommandOption {
   option: string;

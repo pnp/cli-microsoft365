@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { sinonUtil } from '../../../../../../utils';
+import { sinonUtil } from '../../../../../../utils/sinonUtil';
 import { Project, TsFile } from '../../project-model';
 import { Finding } from '../../report-model/Finding';
 import { FN016002_TS_msgraphclient_instance } from './FN016002_TS_msgraphclient_instance';

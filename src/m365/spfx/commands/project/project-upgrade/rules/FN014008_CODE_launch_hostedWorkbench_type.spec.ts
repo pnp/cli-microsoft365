@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
-import { sinonUtil } from '../../../../../../utils';
+import { sinonUtil } from '../../../../../../utils/sinonUtil';
 import { Project } from '../../project-model';
 import { Finding } from '../../report-model/Finding';
 import { FN014008_CODE_launch_hostedWorkbench_type } from './FN014008_CODE_launch_hostedWorkbench_type';

@@ -3,8 +3,8 @@ import * as fs from "fs";
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { v4 } from 'uuid';
-import { Logger } from '../../cli';
-import { sinonUtil } from '../../utils';
+import { Logger } from '../../cli/Logger';
+import { sinonUtil } from '../../utils/sinonUtil';
 import { PcfInitVariables } from './commands/pcf/pcf-init/pcf-init-variables';
 import TemplateInstantiator from './template-instantiator';
 

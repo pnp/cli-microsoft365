@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import request from '../../../../../../request';
-import { sinonUtil } from '../../../../../../utils';
+import { sinonUtil } from '../../../../../../utils/sinonUtil';
 import { Project } from '../../project-model';
 import { DynamicRule } from './DynamicRule';
 

@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Logger } from "../../cli";
+import { Logger } from "../../cli/Logger";
 import { PcfInitVariables } from "./commands/pcf/pcf-init/pcf-init-variables";
 import { SolutionInitVariables } from "./commands/solution/solution-init/solution-init-variables";
 

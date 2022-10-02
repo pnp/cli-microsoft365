@@ -1,9 +1,11 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
-import { Cli, CommandInfo, Logger } from '../../../cli';
+import { Cli } from '../../../cli/Cli';
+import { CommandInfo } from '../../../cli/CommandInfo';
+import { Logger } from '../../../cli/Logger';
 import Command from '../../../Command';
-import { sinonUtil } from '../../../utils';
+import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 import Sinon = require('sinon');
 

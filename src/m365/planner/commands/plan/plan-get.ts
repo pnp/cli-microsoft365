@@ -1,9 +1,10 @@
 import { PlannerPlan, PlannerPlanDetails } from '@microsoft/microsoft-graph-types';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { accessToken, validation } from '../../../../utils';
+import { accessToken } from '../../../../utils/accessToken';
+import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';

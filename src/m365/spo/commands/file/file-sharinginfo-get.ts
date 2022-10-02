@@ -1,7 +1,8 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { formatting, validation } from '../../../../utils';
+import { formatting } from '../../../../utils/formatting';
+import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { FileSharingPrincipalType } from './FileSharingPrincipalType';

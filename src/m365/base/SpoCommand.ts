@@ -1,5 +1,5 @@
 import auth, { AuthType } from '../../Auth';
-import { Logger } from '../../cli';
+import { Logger } from '../../cli/Logger';
 import Command, { CommandArgs, CommandError } from '../../Command';
 const csomDefs = require('../../../csom.json');
 

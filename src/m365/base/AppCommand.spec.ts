@@ -1,7 +1,9 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
-import { Cli, CommandInfo, Logger } from '../../cli';
-import { sinonUtil } from '../../utils';
+import { Cli } from '../../cli/Cli';
+import { CommandInfo } from '../../cli/CommandInfo';
+import { Logger } from '../../cli/Logger';
+import { sinonUtil } from '../../utils/sinonUtil';
 import AppCommand from './AppCommand';
 import sinon = require('sinon');
 import Command, { CommandError } from '../../Command';

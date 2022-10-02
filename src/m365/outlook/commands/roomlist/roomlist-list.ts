@@ -1,6 +1,6 @@
 import { RoomList } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli';
-import { odata } from '../../../../utils';
+import { Logger } from '../../../../cli/Logger';
+import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 

@@ -1,7 +1,7 @@
 import auth, { AuthType } from '../../Auth';
-import { Logger } from '../../cli';
+import { Logger } from '../../cli/Logger';
 import Command, { CommandArgs, CommandError } from '../../Command';
-import { accessToken } from '../../utils';
+import { accessToken } from '../../utils/accessToken';
 import commands from './commands';
 
 class StatusCommand extends Command {
