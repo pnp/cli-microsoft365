@@ -13,17 +13,8 @@ m365 spo folder roleassignment remove [options]
 `-u, --webUrl <webUrl>`
 : URL of the site where the folder is located
 
-`-i, --listId [listId]`
-: ID of the list. Specify either listId, listTitle or listUrl but not multiple.
-
-`-t, --listTitle [listTitle]`
-: Title of the list. Specify either listId, listTitle or listUrl but not multiple.
-
-`--listUrl [listUrl]`
-: Relative URL of the list. Specify either listId, listTitle or listUrl but not multiple.
-
-`--folderId <folderId>`
-: Id of the folder to remove the role from.
+`--folderUrl [folderUrl]`
+: Relative URL of the folder.
 
 `--principalId [principalId]`
 : SharePoint ID of principal it may be either user id or group id we want to remove permissions Specify principalId only when upn or groupName are not used.
@@ -41,27 +32,26 @@ m365 spo folder roleassignment remove [options]
 
 ## Examples
 
-Remove roleassignment from folder getting list by title based on group name
+Remove roleassignment from folder based on group name
 
 ```sh
-m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --listTitle "someList" --folderId 1 --groupName "saleGroup"
+m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl  "/Shared Documents/FolderPermission" --groupName "saleGroup"
 ```
 
-Remove roleassignment from folder getting list by title based on principal Id
+Remove roleassignment from folder based on principal Id
 
 ```sh
-m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --listTitle "Events" --folderId 1 --principalId 2
+m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents/FolderPermission" --principalId 2
 ```
 
-Remove roleassignment from folder getting list by url based on principal Id
+Remove roleassignment from folder based on principal Id without prompting for confirmation
 
 ```sh
-m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --listUrl '/sites/contoso-sales/lists/Events' --folderId 1 --principalId 2
+m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents/FolderPermission" --principalId 2 --confirm
 ```
 
-
-Remove roleassignment from folder getting list by url based on principal Id without prompting for confirmation
+Remove roleassignment from folder based on upn
 
 ```sh
-m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --listUrl '/sites/contoso-sales/lists/Events' --folderId 1 --principalId 2 --confirm
+m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents/FolderPermission" --upn "test@contoso.onmicrosoft.com" 
 ```
