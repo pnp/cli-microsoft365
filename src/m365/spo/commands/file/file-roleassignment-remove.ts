@@ -119,23 +119,24 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
       try {
         const fileURL: string = await this.getFileURL(args);
 
-        if (args.options.upn) {
-          args.options.principalId = await this.GetUserPrincipalId(args.options);
-        }
-        else if (args.options.groupName) {
+        if (args.options.groupName) {
           args.options.principalId = await this.GetGroupPrincipalId(args.options);
+        }
+        else if (args.options.upn) {
+          args.options.principalId = await this.GetUserPrincipalId(args.options);
         }
 
         const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, fileURL);
         const requestOptions: AxiosRequestConfig = {
           url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${args.options.principalId}')`,
+          method: 'POST',
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
         };
 
-        await request.post(requestOptions);
+        return request.post(requestOptions);
       }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
@@ -173,7 +174,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
     };
 
     const output = await Cli.executeCommandWithOutput(SpoFileGetCommand as Command, { options: { ...options, _: [] } });
-    const getFileOutput = JSON.parse(output.stdout);
+    const getFileOutput = JSON.parse(output.stdout);    
     return getFileOutput.ServerRelativeUrl;
   }
 
