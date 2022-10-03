@@ -13,7 +13,7 @@ m365 spo folder roleassignment remove [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the folder is located.
 
-`--folderUrl [folderUrl]`
+`-f, --folderUrl [folderUrl]`
 : The server- or site-relative URL of the folder.
 
 `--principalId [principalId]`
