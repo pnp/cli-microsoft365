@@ -215,8 +215,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('/sites/contoso-sales/documents/Test1.docx')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
         return;
       }
 
@@ -226,7 +225,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     await command.action(logger, {
       options: {
         webUrl: webUrl,
-        fileUrl: fileUrl,
+        fileId: fileId,
         upn: upn,
         confirm: true
       }
