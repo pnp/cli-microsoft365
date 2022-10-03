@@ -11,8 +11,8 @@ import { urlUtil } from '../../../../utils/urlUtil';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as SpoFileGetCommand from './file-get';
-import * as SpoUserGetCommand from '../user/user-get';
 import * as SpoGroupGetCommand from '../group/group-get';
+import * as SpoUserGetCommand from '../user/user-get';
 const command: Command = require('./file-roleassignment-remove');
 
 describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
@@ -162,52 +162,17 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     });
   });
 
-  it('remove role assignment from the file by relative URL and group name', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
+  it('remove role assignment from the file by Id and upn', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoGroupGetCommand) {
+      if (command === SpoFileGetCommand) {
         return {
-          stdout: '{"Id": 2,"IsHiddenInUI": false,"LoginName": "saleGroup","Title": "saleGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
+          stdout: `{"LinkingUri": "https://contoso.sharepoint.com/sites/contoso-sales/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/contoso-sales/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}`
         };
       }
 
-      throw new CommandError('Unknown case');
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: webUrl,
-        fileUrl: fileUrl,
-        groupName: groupName,
-        confirm: true
-      }
-    });
-  });
-
-  it('remove role assignment from the file by uniqueId and upn', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoFileGetCommand) {
-        return ({
-          stdout: `{"LinkingUri": "https://contoso.sharepoint.com/sites/contoso-sales/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/contoso-sales/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}`
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
-
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoUserGetCommand) {
         return {
-          stdout: '{"Id": 2,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|user1@contoso.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "user1@contoso.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "user1@contoso.onmicrosoft.com"}'
+          stdout: '{"Id": 2,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|user1@contoso.onmicrosoft.com","Title": "User1","PrincipalType": 1,"Email": "user1@contoso.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "user1@contoso.onmicrosoft.com"}'
         };
       }
 
@@ -224,9 +189,46 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
 
     await command.action(logger, {
       options: {
+        debug: true,
         webUrl: webUrl,
         fileId: fileId,
         upn: upn,
+        confirm: true
+      }
+    });
+  });
+
+  it('remove role assignment from the file by Id and group name', async () => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoFileGetCommand) {
+        return {
+          stdout: `{"LinkingUri": "https://contoso.sharepoint.com/sites/contoso-sales/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/contoso-sales/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}`
+        };
+      }
+
+      if (command === SpoGroupGetCommand) {
+        return {
+          stdout: '{"Id": 2,"IsHiddenInUI": false,"LoginName": "saleGroup","Title": "saleGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
+        };
+      }
+
+      throw new CommandError('Unknown case');
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('/sites/contoso-sales/documents/Test1.docx')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: webUrl,
+        fileId: fileId,
+        groupName: groupName,
         confirm: true
       }
     });
