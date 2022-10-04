@@ -58,6 +58,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       Cli.prompt,
+      Cli.executeCommandWithOutput,
       request.post
     ]);
   });
@@ -104,6 +105,11 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the principalId option is not a number', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 'Hi', confirm: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if webUrl and fileId are valid', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', principalId: principalId, confirm: true } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -141,7 +147,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
-  it('remove role assignment from the file by relative URL and principal Id (debug)', async () => {
+  it('remove role assignment from the file by relative URL and principal Id when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
       if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
@@ -151,13 +157,17 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
       throw 'Invalid request';
     });
 
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
     await command.action(logger, {
       options: {
         debug: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
-        principalId: principalId,
-        confirm: true
+        principalId: principalId
       }
     });
   });
