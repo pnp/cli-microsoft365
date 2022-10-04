@@ -627,6 +627,12 @@ const contributors = [
     twitter: 'vipulkelkar'
   },
   {
+    name: 'Vividh Pandey ',
+    company: '',
+    github: 'VividhPandey003',
+    twitter: 'VividhPandey13'
+  },
+  {
     name: 'Waldek Mastykarz',
     company: 'Microsoft',
     github: 'waldekmastykarz',
