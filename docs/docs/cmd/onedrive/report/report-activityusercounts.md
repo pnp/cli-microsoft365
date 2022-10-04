@@ -1,4 +1,4 @@
-# onerive report activityusercounts
+# onedrive report activityusercounts
 
 Gets the trend in the number of active OneDrive users
 

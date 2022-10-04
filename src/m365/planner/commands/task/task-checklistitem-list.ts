@@ -1,8 +1,8 @@
 import auth from "../../../../Auth";
-import { Logger } from "../../../../cli";
+import { Logger } from "../../../../cli/Logger";
 import GlobalOptions from "../../../../GlobalOptions";
 import request from "../../../../request";
-import { accessToken } from "../../../../utils";
+import { accessToken } from "../../../../utils/accessToken";
 import GraphCommand from "../../../base/GraphCommand";
 import commands from "../../commands";
 

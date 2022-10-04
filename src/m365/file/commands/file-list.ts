@@ -1,9 +1,10 @@
 import { Drive, DriveItem, Site } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
-import { Logger } from '../../../cli';
+import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
-import { odata, validation } from '../../../utils';
+import { odata } from '../../../utils/odata';
+import { validation } from '../../../utils/validation';
 import GraphCommand from '../../base/GraphCommand';
 import commands from '../commands';
 

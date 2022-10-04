@@ -1,5 +1,6 @@
 import type * as open from 'open';
-import { Cli, Logger } from '../../../cli';
+import { Cli } from '../../../cli/Cli';
+import { Logger } from '../../../cli/Logger';
 import config from '../../../config';
 import { settingsNames } from '../../../settingsNames';
 import AnonymousCommand from '../../base/AnonymousCommand';

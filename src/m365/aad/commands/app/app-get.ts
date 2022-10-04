@@ -1,9 +1,9 @@
 import { Application } from '@microsoft/microsoft-graph-types';
 import * as fs from 'fs';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import { M365RcJson } from '../../../base/M365RcJson';
 import commands from '../../commands';

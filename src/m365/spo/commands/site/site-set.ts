@@ -1,11 +1,15 @@
-import { Cli, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { Logger } from '../../../../cli/Logger';
 import Command, {
   CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, formatting, FormDigestInfo, spo, SpoOperation, urlUtil, validation } from '../../../../utils';
+import { formatting } from '../../../../utils/formatting';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo, SpoOperation } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
+import { validation } from '../../../../utils/validation';
 import * as aadO365GroupSetCommand from '../../../aad/commands/o365group/o365group-set';
 import { Options as AadO365GroupSetCommandOptions } from '../../../aad/commands/o365group/o365group-set';
 import SpoCommand from '../../../base/SpoCommand';

@@ -1,4 +1,4 @@
-import { Logger } from '../../cli';
+import { Logger } from '../../cli/Logger';
 import GlobalOptions from '../../GlobalOptions';
 import PeriodBasedReport from './PeriodBasedReport';
 

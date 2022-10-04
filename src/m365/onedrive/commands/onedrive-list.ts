@@ -1,7 +1,7 @@
-import { Logger } from "../../../cli";
+import { Logger } from '../../../cli/Logger';
 import config from "../../../config";
 import request from "../../../request";
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from "../../../utils";
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from "../../../utils/spo";
 import SpoCommand from "../../base/SpoCommand";
 import { SiteProperties } from "../../spo/commands/site/SiteProperties";
 import { SPOSitePropertiesEnumerable } from "../../spo/commands/site/SPOSitePropertiesEnumerable";

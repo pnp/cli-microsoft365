@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { sinonUtil } from '../../../../utils/sinonUtil';
 import { Page } from './Page';
 
 describe('Page', () => {

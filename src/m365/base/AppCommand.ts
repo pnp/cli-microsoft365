@@ -1,8 +1,9 @@
 import * as fs from 'fs';
-import { Cli, Logger } from '../../cli';
+import { Cli } from '../../cli/Cli';
+import { Logger } from '../../cli/Logger';
 import Command, { CommandArgs, CommandError } from '../../Command';
 import GlobalOptions from '../../GlobalOptions';
-import { validation } from '../../utils';
+import { validation } from '../../utils/validation';
 import { M365RcJson, M365RcJsonApp } from './M365RcJson';
 
 export interface AppCommandArgs {

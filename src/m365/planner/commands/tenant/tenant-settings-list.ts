@@ -1,4 +1,4 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import { AxiosRequestConfig } from 'axios';
 import request from '../../../../request';
 import PlannerCommand from '../../../base/PlannerCommand';

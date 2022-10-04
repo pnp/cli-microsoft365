@@ -1,5 +1,5 @@
-import { Logger } from '../../../../cli';
-import { odata } from '../../../../utils';
+import { Logger } from '../../../../cli/Logger';
+import { odata } from '../../../../utils/odata';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
 

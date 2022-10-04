@@ -35,23 +35,23 @@ m365 spo web roleassignment add [options]
 add role assignment to site _https://contoso.sharepoint.com/sites/project-x_for principal id _11_ and role definition id _1073741829_
 
 ```sh
-m365 spo list roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --principalId 11 --roleDefinitionId 1073741829
+m365 spo web roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --principalId 11 --roleDefinitionId 1073741829
 ```
 
 add role assignment to site _https://contoso.sharepoint.com/sites/project-x_for upn _someaccount@tenant.onmicrosoft.com_ and role definition id _1073741829_
 
 ```sh
-m365 spo list roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --upn "someaccount@tenant.onmicrosoft.com" --roleDefinitionId 1073741829
+m365 spo web roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --upn "someaccount@tenant.onmicrosoft.com" --roleDefinitionId 1073741829
 ```
 
 add role assignment to site _https://contoso.sharepoint.com/sites/project-x_for group _someGroup_ and role definition id _1073741829_
 
 ```sh
-m365 spo list roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --groupName "someGroup" --roleDefinitionId 1073741829
+m365 spo web roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --groupName "someGroup" --roleDefinitionId 1073741829
 ```
 
 add role assignment to site _https://contoso.sharepoint.com/sites/project-x_for principal id _11_ and role definition name _Full Control_
 
 ```sh
-m365 spo list roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --principalId 11 --roleDefinitionName "Full Control"
+m365 spo web roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --principalId 11 --roleDefinitionName "Full Control"
 ```

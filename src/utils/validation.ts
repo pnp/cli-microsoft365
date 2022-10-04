@@ -1,4 +1,4 @@
-import { FormDigestInfo } from ".";
+import { FormDigestInfo } from "./spo";
 
 export const validation = {
   isValidGuidArray(guids: string[]): boolean {

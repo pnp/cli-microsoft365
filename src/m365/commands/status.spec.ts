@@ -2,9 +2,10 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../appInsights';
 import auth, { AuthType } from '../../Auth';
-import { Logger } from '../../cli';
+import { Logger } from '../../cli/Logger';
 import Command, { CommandError } from '../../Command';
-import { accessToken, sinonUtil } from '../../utils';
+import { accessToken } from '../../utils/accessToken';
+import { sinonUtil } from '../../utils/sinonUtil';
 import commands from './commands';
 const command: Command = require('./status');
 

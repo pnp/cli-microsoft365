@@ -1,4 +1,4 @@
-import { spfx } from '../../../../../../utils';
+import { spfx } from '../../../../../../utils/spfx';
 import { Project, ScssFile } from '../../project-model';
 import { Finding, Occurrence } from '../../report-model';
 import { ScssRule } from './ScssRule';

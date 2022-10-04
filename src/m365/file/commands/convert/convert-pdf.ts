@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as url from 'url';
 import { v4 } from 'uuid';
 import auth, { Auth } from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';

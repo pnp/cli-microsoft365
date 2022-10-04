@@ -352,6 +352,7 @@ nav:
         - file move: 'cmd/spo/file/file-move.md'
         - file remove: 'cmd/spo/file/file-remove.md'
         - file rename: 'cmd/spo/file/file-rename.md'
+        - file roleinheritance reset: 'cmd/spo/file/file-roleinheritance-reset.md'
         - file sharinginfo get: 'cmd/spo/file/file-sharinginfo-get.md'
       - folder:
         - folder add: 'cmd/spo/folder/folder-add.md'
@@ -833,9 +834,6 @@ theme:
     logo: 'images/pnp-cli-microsoft365-white.svg'
     features:
         - navigation.tabs
-google_analytics:
-    - 'UA-110480857-1'
-    - 'auto'
 extra_css:
     - 'css/styles2.css'
 markdown_extensions:
@@ -854,15 +852,18 @@ markdown_extensions:
           emoji_generator: !!python/name:materialx.emoji.to_svg
     - def_list
 extra:
-    social:
-        - icon: fontawesome/brands/github
-          link: 'https://github.com/pnp/cli-microsoft365'
-        - icon: fontawesome/brands/twitter
-          link: 'https://twitter.com/climicrosoft365'
-        - icon: fontawesome/brands/youtube
-          link: 'http://aka.ms/sppnp-videos'
-        - icon: fontawesome/solid/link
-          link: 'https://aka.ms/sppnp'
+  analytics:
+    provider: google
+    property: UA-110480857-1
+  social:
+    - icon: fontawesome/brands/github
+      link: 'https://github.com/pnp/cli-microsoft365'
+    - icon: fontawesome/brands/twitter
+      link: 'https://twitter.com/climicrosoft365'
+    - icon: fontawesome/brands/youtube
+      link: 'http://aka.ms/sppnp-videos'
+    - icon: fontawesome/solid/link
+      link: 'https://aka.ms/sppnp'
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs
 plugins:

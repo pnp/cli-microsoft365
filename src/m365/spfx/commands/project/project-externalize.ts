@@ -1,6 +1,6 @@
 import * as os from 'os';
 import * as path from 'path';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';

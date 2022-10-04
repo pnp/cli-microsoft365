@@ -1,6 +1,6 @@
 import { AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from 'axios';
 import * as fs from 'fs';
-import { Logger } from '../../cli';
+import { Logger } from '../../cli/Logger';
 import Command from '../../Command';
 import GlobalOptions from '../../GlobalOptions';
 import request from '../../request';

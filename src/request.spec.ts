@@ -4,9 +4,9 @@ import { ClientRequest } from 'http';
 import * as https from 'https';
 import * as sinon from 'sinon';
 import auth from './Auth';
-import { Logger } from './cli';
+import { Logger } from './cli/Logger';
 import _request from './request';
-import { sinonUtil } from './utils';
+import { sinonUtil } from './utils/sinonUtil';
 
 describe('Request', () => {
   const logger: Logger = {

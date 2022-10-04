@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type * as UpdateNotifier from 'update-notifier';
 import appInsights from './appInsights';
-import { Cli } from './cli';
+import { Cli } from './cli/Cli';
 
 const packageJSON = require('../package.json');
 

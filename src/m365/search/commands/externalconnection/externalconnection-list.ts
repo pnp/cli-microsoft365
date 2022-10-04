@@ -1,6 +1,6 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GraphCommand from '../../../base/GraphCommand';
-import { odata } from '../../../../utils';
+import { odata } from '../../../../utils/odata';
 import commands from '../../commands';
 
 class SearchExternalConnectionListCommand extends GraphCommand {

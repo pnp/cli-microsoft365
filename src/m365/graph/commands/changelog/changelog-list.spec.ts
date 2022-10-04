@@ -1,12 +1,14 @@
-import { sinonUtil } from './../../../../utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, CommandInfo, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { CommandInfo } from '../../../../cli/CommandInfo';
+import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
-import commands from '../../commands';
 import request from '../../../../request';
+import commands from '../../commands';
+import { sinonUtil } from './../../../../utils/sinonUtil';
 const command: Command = require('./changelog-list');
 
 describe(commands.CHANGELOG_LIST, () => {

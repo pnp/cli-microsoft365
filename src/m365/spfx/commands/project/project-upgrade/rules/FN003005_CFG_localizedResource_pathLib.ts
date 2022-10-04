@@ -1,4 +1,4 @@
-import { Hash } from '../../../../../../utils';
+import { Hash } from '../../../../../../utils/types';
 import { JsonRule } from '../../JsonRule';
 import { ConfigJson, JsonFile, Project } from '../../project-model';
 import { Finding, Occurrence } from '../../report-model';

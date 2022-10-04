@@ -2,11 +2,12 @@ import sinon = require("sinon");
 import commands from "../commands";
 import auth from "../../../Auth";
 import Command, { CommandError } from "../../../Command";
-import { sinonUtil, spo } from "../../../utils";
+import { sinonUtil } from "../../../utils/sinonUtil";
+import { spo } from "../../../utils/spo";
 import request from "../../../request";
 import appInsights from "../../../appInsights";
 import assert = require("assert");
-import { Logger } from "../../../cli";
+import { Logger } from '../../../cli/Logger';
 import config from "../../../config";
 const command: Command = require('./onedrive-list');
 
