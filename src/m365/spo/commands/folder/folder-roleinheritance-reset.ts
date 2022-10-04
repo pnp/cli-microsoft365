@@ -37,7 +37,6 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        folderUrl: typeof args.options.folderUrl !== 'undefined',
         confirm: !!args.options.confirm
       });
     });
