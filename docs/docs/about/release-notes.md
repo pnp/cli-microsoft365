@@ -7,6 +7,7 @@
 **SharePoint:**
 
 - [spo file roleinheritance reset](../cmd/spo/file/file-roleinheritance-reset.md) - restores the role inheritance of a file [#3595](https://github.com/pnp/cli-microsoft365/issues/3595)
+- [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
 
 ### Changes
 
