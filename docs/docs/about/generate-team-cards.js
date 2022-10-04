@@ -297,6 +297,12 @@ const contributors = [
     twitter: 'JosephVelliah'
   },
   {
+    name: 'Karnail Singh Choudhary',
+    company: '',
+    github: 'nightfury-crypto',
+    twitter: '3_karnail'
+  },
+  {
     name: 'Kevin McDonnell',
     company: 'CPS',
     github: 'kevmcdonk',
@@ -311,7 +317,7 @@ const contributors = [
   {
     name: 'Laurent Sittler',
     company: '',
-    github: '',
+    github: 'Laul0',
     twitter: ''
   },
   {
