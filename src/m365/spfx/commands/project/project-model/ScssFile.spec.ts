@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
-import { sinonUtil } from '../../../../../utils';
+import { sinonUtil } from '../../../../../utils/sinonUtil';
 import { ScssFile } from './ScssFile';
 
 describe('ScssFile', () => {

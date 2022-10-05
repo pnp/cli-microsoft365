@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import {
   CommandArgs
 } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils';
+import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { DeletedSitePropertiesEnumerable } from './DeletedSitePropertiesEnumerable';

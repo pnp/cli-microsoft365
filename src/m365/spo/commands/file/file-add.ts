@@ -1,10 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { v4 } from 'uuid';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { fsUtil, spo, urlUtil, validation } from '../../../../utils';
+import { fsUtil } from '../../../../utils/fsUtil';
+import { spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
+import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 

@@ -32,23 +32,23 @@ m365 spo web roleassignment remove [options]
 Remove roleassignment from web based on group name
 
 ```sh
-m365 spo list roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --groupName "saleGroup"
+m365 spo web roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --groupName "saleGroup"
 ```
 
 Remove roleassignment from web based on principal Id
 
 ```sh
-m365 spo list roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --principalId 2
+m365 spo web roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --principalId 2
 ```
 
 Remove roleassignment from web based on upn
 
 ```sh
-m365 spo list roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --upn "someaccount@tenant.onmicrosoft.com"
+m365 spo web roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --upn "someaccount@tenant.onmicrosoft.com"
 ```
 
 Remove roleassignment from web based on principal Id without prompting for confirmation
 
 ```sh
-m365 spo list roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --principalId 2 --confirm
+m365 spo web roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --principalId 2 --confirm
 ```

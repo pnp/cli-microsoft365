@@ -2,9 +2,10 @@ import * as assert from 'assert';
 import * as open from 'open';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
-import { Cli, Logger } from '../../../cli';
+import { Cli } from '../../../cli/Cli';
+import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
-import { sinonUtil } from '../../../utils';
+import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./cli-reconsent');
 

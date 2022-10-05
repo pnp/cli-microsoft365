@@ -231,6 +231,12 @@ const contributors = [
     twitter: ''
   },
   {
+    name: 'Dushyant Sharma',
+    company: '',
+    github: 'techsnap',
+    twitter: ''
+  },
+  {
     name: 'Elio Struyf',
     company: 'Struyf Consulting',
     github: 'estruyf',
@@ -297,6 +303,12 @@ const contributors = [
     twitter: 'JosephVelliah'
   },
   {
+    name: 'Karnail Singh Choudhary',
+    company: '',
+    github: 'nightfury-crypto',
+    twitter: '3_karnail'
+  },
+  {
     name: 'Kevin McDonnell',
     company: 'CPS',
     github: 'kevmcdonk',
@@ -311,7 +323,7 @@ const contributors = [
   {
     name: 'Laurent Sittler',
     company: '',
-    github: '',
+    github: 'Laul0',
     twitter: ''
   },
   {
@@ -619,6 +631,12 @@ const contributors = [
     company: 'Rapid Circle',
     github: 'vipulkelkar',
     twitter: 'vipulkelkar'
+  },
+  {
+    name: 'Vividh Pandey ',
+    company: '',
+    github: 'VividhPandey003',
+    twitter: 'VividhPandey13'
   },
   {
     name: 'Waldek Mastykarz',

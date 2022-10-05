@@ -3,12 +3,12 @@ import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from './appInsights';
 import auth from './Auth';
-import { Cli } from './cli';
+import { Cli } from './cli/Cli';
 import { Logger } from './cli/Logger';
 import Command, {
   CommandError
 } from './Command';
-import { sinonUtil } from './utils';
+import { sinonUtil } from './utils/sinonUtil';
 
 class MockCommand1 extends Command {
   public get name(): string {

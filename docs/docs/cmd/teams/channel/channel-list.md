@@ -17,7 +17,7 @@ m365 teams channel list [options]
 : The display name of the team to list the channels of. Specify either `teamId` or `teamName` but not both
 
 `--type [type]`
-: Filter the results to only channels of a given type: `standard, private`. By default all channels are listed.
+: Filter the results to only channels of a given type: `standard`, `private`, `shared`. By default all channels are listed.
 
 --8<-- "docs/cmd/_global.md"
 

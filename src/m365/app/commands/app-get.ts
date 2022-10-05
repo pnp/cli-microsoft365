@@ -1,4 +1,5 @@
-import { Cli, Logger } from '../../../cli';
+import { Cli } from '../../../cli/Cli';
+import { Logger } from '../../../cli/Logger';
 import Command from '../../../Command';
 import * as AadAppGetCommand from '../../aad/commands/app/app-get';
 import { Options as AadAppGetCommandOptions } from '../../aad/commands/app/app-get';

@@ -1,8 +1,11 @@
-import { Cli, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, formatting, IdentityResponse, spo, validation } from '../../../../utils';
+import { formatting } from '../../../../utils/formatting';
+import { ClientSvcResponse, ClientSvcResponseContents, IdentityResponse, spo } from '../../../../utils/spo';
+import { validation } from '../../../../utils/validation';
 import commands from '../../commands';
 import { SpoPropertyBagBaseCommand } from './propertybag-base';
 

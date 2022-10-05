@@ -1,4 +1,4 @@
-# aad o365group restore
+# aad o365group recyclebinitem restore
 
 Restores a deleted Microsoft 365 Group
 

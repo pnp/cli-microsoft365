@@ -1,7 +1,8 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, formatting, IdentityResponse, spo } from '../../../../utils';
+import { formatting } from '../../../../utils/formatting';
+import { ClientSvcResponse, ClientSvcResponseContents, IdentityResponse, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import { BasePermissions, PermissionKind } from '../../base-permissions';
 

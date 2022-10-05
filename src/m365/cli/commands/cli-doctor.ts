@@ -1,8 +1,9 @@
 import * as os from 'os';
 import auth, { AuthType } from '../../../Auth';
-import { Cli, Logger } from '../../../cli';
+import { Cli } from '../../../cli/Cli';
+import { Logger } from '../../../cli/Logger';
 import Command from '../../../Command';
-import { validation } from '../../../utils';
+import { validation } from '../../../utils/validation';
 import commands from '../commands';
 const packageJSON = require('../../../../package.json');
 

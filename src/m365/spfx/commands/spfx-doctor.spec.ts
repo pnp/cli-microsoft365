@@ -3,9 +3,11 @@ import * as child_process from 'child_process';
 import * as sinon from 'sinon';
 import { SinonSandbox } from 'sinon';
 import appInsights from '../../../appInsights';
-import { Cli, CommandInfo, Logger } from '../../../cli';
+import { Cli } from '../../../cli/Cli';
+import { CommandInfo } from '../../../cli/CommandInfo';
+import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
-import { sinonUtil } from '../../../utils';
+import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./spfx-doctor');
 

@@ -3,10 +3,12 @@ import * as os from 'os';
 import * as path from 'path';
 // uncomment to support upgrading to preview releases
 import { prerelease } from 'semver';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { Dictionary, fsUtil, Hash, packageManager } from '../../../../utils';
+import { fsUtil } from '../../../../utils/fsUtil';
+import { packageManager } from '../../../../utils/packageManager';
+import { Dictionary, Hash } from '../../../../utils/types';
 import commands from '../../commands';
 import { BaseProjectCommand } from './base-project-command';
 import { Project } from './project-model';

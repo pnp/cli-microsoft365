@@ -2,10 +2,12 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, CommandInfo, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
+import { CommandInfo } from '../../../../cli/CommandInfo';
+import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./channel-list');
 
@@ -108,6 +110,12 @@ describe(commands.CHANNEL_LIST, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('rejects invalid channel type', async () => {
+    const type = 'foo';
+    const actual = await command.validate({ options: { teamId: '00000000-0000-0000-0000-000000000000', type: type } }, commandInfo);
+    assert.strictEqual(actual, `${type} is not a valid type value. Allowed values standard|private|shared`);
   });
 
   it('correctly lists all channels in a Microsoft teams team by team id', async () => {
@@ -480,9 +488,12 @@ describe(commands.CHANNEL_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: '00000000-0000-0000-0000-000000000000' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        teamId: '00000000-0000-0000-0000-000000000000'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

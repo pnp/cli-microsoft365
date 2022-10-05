@@ -1,4 +1,4 @@
-# tenant service announcement health get
+# tenant serviceannouncement health get
 
 Get the health report of a specified service for a tenant
 

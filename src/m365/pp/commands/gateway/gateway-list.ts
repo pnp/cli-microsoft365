@@ -1,4 +1,4 @@
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import request from '../../../../request';
 import PowerBICommand from '../../../base/PowerBICommand';
 import commands from '../../commands';

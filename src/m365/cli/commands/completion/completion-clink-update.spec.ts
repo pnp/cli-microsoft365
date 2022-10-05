@@ -2,9 +2,9 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { autocomplete } from '../../../../autocomplete';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
-import { sinonUtil } from '../../../../utils';
+import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./completion-clink-update');
 

@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from 'path';
-import { Logger } from "../../../../cli";
+import { Logger } from "../../../../cli/Logger";
 import {
   CommandError
 } from '../../../../Command';

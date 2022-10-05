@@ -1,5 +1,24 @@
 # Release notes
 
+## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo file roleinheritance reset](../cmd/spo/file/file-roleinheritance-reset.md) - restores the role inheritance of a file [#3595](https://github.com/pnp/cli-microsoft365/issues/3595)
+- [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
+
+### Changes
+
+- removed barrels [#3736](https://github.com/pnp/cli-microsoft365/pull/3736)
+- fixed examples for web roleassignment 'verb' that mentioned list roleassignment 'verb' instead [#3706](https://github.com/pnp/cli-microsoft365/issues/3706)
+- extended 'teams channel list' command with support for filtering shared teams channels [#3690](https://github.com/pnp/cli-microsoft365/issues/3690)
+- extended 'spo folder get' command with support to get folder by id [#3605](https://github.com/pnp/cli-microsoft365/issues/3605)
+- fixes docs not ending on an empty line [#3700](https://github.com/pnp/cli-microsoft365/issues/3700)
+- fixes incorrect docs titles [#3699](https://github.com/pnp/cli-microsoft365/issues/3699)
+- extends `spfx doctor` command with support for version 1.16.0-beta.1 [#3633](https://github.com/pnp/cli-microsoft365/issues/3633)
+
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
 ### New commands

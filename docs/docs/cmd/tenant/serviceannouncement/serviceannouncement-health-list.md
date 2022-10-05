@@ -1,4 +1,4 @@
-# tenant service announcement health list
+# tenant serviceannouncement health list
 
 Gets the health report of all subscribed services for a tenant
 

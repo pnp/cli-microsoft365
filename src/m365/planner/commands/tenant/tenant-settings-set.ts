@@ -1,8 +1,8 @@
 import { AxiosRequestConfig } from 'axios';
-import { Logger } from '../../../../cli';
+import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { validation } from '../../../../utils/validation';
 import PlannerCommand from '../../../base/PlannerCommand';
 import commands from '../../commands';
 

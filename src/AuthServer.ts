@@ -5,7 +5,7 @@ import * as open from 'open';
 import { ParsedUrlQuery } from 'querystring';
 import * as url from "url";
 import { InteractiveAuthorizationCodeResponse, Service, InteractiveAuthorizationErrorResponse } from './Auth';
-import { Logger } from './cli';
+import { Logger } from './cli/Logger';
 
 export class AuthServer {
   // assigned through this.initializeServer() hence !
