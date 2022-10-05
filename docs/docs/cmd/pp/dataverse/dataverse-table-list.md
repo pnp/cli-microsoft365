@@ -1,6 +1,6 @@
 # pp dataverse table list
 
-Lists dataverse tables in given environment
+Lists dataverse tables in a given environment
 
 ## Usage
 
@@ -10,7 +10,7 @@ pp dataverse table list [options]
 
 ## Options
 
-`-e, --environment<environment>`
+`-e, --environment <environment>`
 The name of the environment to list all tables for
 
 `-a, --asAdmin`

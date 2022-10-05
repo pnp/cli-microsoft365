@@ -60,11 +60,9 @@ describe('utils/powerPlatform', () => {
 
     const actual = await powerPlatform.getDynamicsInstanceApiUrl('someRandomGuid', false);
     assert.strictEqual(actual, 'https://contoso-dev.api.crm4.dynamics.com');
-
   });
 
   it('handles no environment found', async () => {
-
     sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/someRandomGuid?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         throw Error('The environment \'someRandomGuid\' could not be found');

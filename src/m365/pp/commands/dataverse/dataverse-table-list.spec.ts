@@ -4,144 +4,145 @@ import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
-
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./dataverse-table-list');
 
-const envResponse: any = { "properties": { "linkedEnvironmentMetadata": { "instanceApiUrl": "https://contoso-dev.api.crm4.dynamics.com" } } };
-const dataverseResponse: any = {
-  "value": {
-    "@odata.context": "https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/$metadata#EntityDefinitions(MetadataId,IsCustomEntity,IsManaged,SchemaName,IconVectorName,LogicalName,EntitySetName,IsActivity,DataProviderId,IsRenameable,IsCustomizable,CanCreateForms,CanCreateViews,CanCreateCharts,CanCreateAttributes,CanChangeTrackingBeEnabled,CanModifyAdditionalSettings,CanChangeHierarchicalRelationship,CanEnableSyncToExternalSearchIndex)",
-    "value": [
-      {
-        "MetadataId": "27774349-6c36-44ab-8d5d-360df562cdd8",
-        "IsCustomEntity": true,
-        "IsManaged": true,
-        "SchemaName": "aaduser",
-        "IconVectorName": null,
-        "LogicalName": "aaduser",
-        "EntitySetName": "aadusers",
-        "IsActivity": false,
-        "DataProviderId": "54629ed7-0cd3-4c85-9b6c-ea5f8548a9aa",
-        "IsRenameable": {
-          "Value": true,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "isrenameable"
-        },
-        "IsCustomizable": {
-          "Value": true,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "iscustomizable"
-        },
-        "CanCreateForms": {
-          "Value": true,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "cancreateforms"
-        },
-        "CanCreateViews": {
-          "Value": true,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "cancreateviews"
-        },
-        "CanCreateCharts": {
-          "Value": false,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "cancreatecharts"
-        },
-        "CanCreateAttributes": {
-          "Value": true,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "cancreateattributes"
-        },
-        "CanChangeTrackingBeEnabled": {
-          "Value": false,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "canchangetrackingbeenabled"
-        },
-        "CanModifyAdditionalSettings": {
-          "Value": true,
-          "CanBeChanged": true,
-          "ManagedPropertyLogicalName": "canmodifyadditionalsettings"
-        },
-        "CanChangeHierarchicalRelationship": {
-          "Value": true,
-          "CanBeChanged": true,
-          "ManagedPropertyLogicalName": "canchangehierarchicalrelationship"
-        },
-        "CanEnableSyncToExternalSearchIndex": {
-          "Value": true,
-          "CanBeChanged": true,
-          "ManagedPropertyLogicalName": "canenablesynctoexternalsearchindex"
-        }
-      },
-      {
-        "MetadataId": "70816501-edb9-4740-a16c-6a5efbc05d84",
-        "IsCustomEntity": false,
-        "IsManaged": true,
-        "SchemaName": "Account",
-        "IconVectorName": null,
-        "LogicalName": "account",
-        "EntitySetName": "accounts",
-        "IsActivity": false,
-        "DataProviderId": null,
-        "IsRenameable": {
-          "Value": true,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "isrenameable"
-        },
-        "IsCustomizable": {
-          "Value": true,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "iscustomizable"
-        },
-        "CanCreateForms": {
-          "Value": true,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "cancreateforms"
-        },
-        "CanCreateViews": {
-          "Value": true,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "cancreateviews"
-        },
-        "CanCreateCharts": {
-          "Value": true,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "cancreatecharts"
-        },
-        "CanCreateAttributes": {
-          "Value": true,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "cancreateattributes"
-        },
-        "CanChangeTrackingBeEnabled": {
-          "Value": true,
-          "CanBeChanged": true,
-          "ManagedPropertyLogicalName": "canchangetrackingbeenabled"
-        },
-        "CanModifyAdditionalSettings": {
-          "Value": true,
-          "CanBeChanged": true,
-          "ManagedPropertyLogicalName": "canmodifyadditionalsettings"
-        },
-        "CanChangeHierarchicalRelationship": {
-          "Value": false,
-          "CanBeChanged": false,
-          "ManagedPropertyLogicalName": "canchangehierarchicalrelationship"
-        },
-        "CanEnableSyncToExternalSearchIndex": {
-          "Value": true,
-          "CanBeChanged": true,
-          "ManagedPropertyLogicalName": "canenablesynctoexternalsearchindex"
-        }
-      }
-    ]
-  }
-};
-
 describe(commands.DATAVERSE_TABLE_LIST, () => {
+  //#region Mocked Responses
+  const envResponse: any = { "properties": { "linkedEnvironmentMetadata": { "instanceApiUrl": "https://contoso-dev.api.crm4.dynamics.com" } } };
+  const dataverseResponse: any = {
+    "value": {
+      "@odata.context": "https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/$metadata#EntityDefinitions(MetadataId,IsCustomEntity,IsManaged,SchemaName,IconVectorName,LogicalName,EntitySetName,IsActivity,DataProviderId,IsRenameable,IsCustomizable,CanCreateForms,CanCreateViews,CanCreateCharts,CanCreateAttributes,CanChangeTrackingBeEnabled,CanModifyAdditionalSettings,CanChangeHierarchicalRelationship,CanEnableSyncToExternalSearchIndex)",
+      "value": [
+        {
+          "MetadataId": "27774349-6c36-44ab-8d5d-360df562cdd8",
+          "IsCustomEntity": true,
+          "IsManaged": true,
+          "SchemaName": "aaduser",
+          "IconVectorName": null,
+          "LogicalName": "aaduser",
+          "EntitySetName": "aadusers",
+          "IsActivity": false,
+          "DataProviderId": "54629ed7-0cd3-4c85-9b6c-ea5f8548a9aa",
+          "IsRenameable": {
+            "Value": true,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "isrenameable"
+          },
+          "IsCustomizable": {
+            "Value": true,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "iscustomizable"
+          },
+          "CanCreateForms": {
+            "Value": true,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "cancreateforms"
+          },
+          "CanCreateViews": {
+            "Value": true,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "cancreateviews"
+          },
+          "CanCreateCharts": {
+            "Value": false,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "cancreatecharts"
+          },
+          "CanCreateAttributes": {
+            "Value": true,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "cancreateattributes"
+          },
+          "CanChangeTrackingBeEnabled": {
+            "Value": false,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "canchangetrackingbeenabled"
+          },
+          "CanModifyAdditionalSettings": {
+            "Value": true,
+            "CanBeChanged": true,
+            "ManagedPropertyLogicalName": "canmodifyadditionalsettings"
+          },
+          "CanChangeHierarchicalRelationship": {
+            "Value": true,
+            "CanBeChanged": true,
+            "ManagedPropertyLogicalName": "canchangehierarchicalrelationship"
+          },
+          "CanEnableSyncToExternalSearchIndex": {
+            "Value": true,
+            "CanBeChanged": true,
+            "ManagedPropertyLogicalName": "canenablesynctoexternalsearchindex"
+          }
+        },
+        {
+          "MetadataId": "70816501-edb9-4740-a16c-6a5efbc05d84",
+          "IsCustomEntity": false,
+          "IsManaged": true,
+          "SchemaName": "Account",
+          "IconVectorName": null,
+          "LogicalName": "account",
+          "EntitySetName": "accounts",
+          "IsActivity": false,
+          "DataProviderId": null,
+          "IsRenameable": {
+            "Value": true,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "isrenameable"
+          },
+          "IsCustomizable": {
+            "Value": true,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "iscustomizable"
+          },
+          "CanCreateForms": {
+            "Value": true,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "cancreateforms"
+          },
+          "CanCreateViews": {
+            "Value": true,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "cancreateviews"
+          },
+          "CanCreateCharts": {
+            "Value": true,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "cancreatecharts"
+          },
+          "CanCreateAttributes": {
+            "Value": true,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "cancreateattributes"
+          },
+          "CanChangeTrackingBeEnabled": {
+            "Value": true,
+            "CanBeChanged": true,
+            "ManagedPropertyLogicalName": "canchangetrackingbeenabled"
+          },
+          "CanModifyAdditionalSettings": {
+            "Value": true,
+            "CanBeChanged": true,
+            "ManagedPropertyLogicalName": "canmodifyadditionalsettings"
+          },
+          "CanChangeHierarchicalRelationship": {
+            "Value": false,
+            "CanBeChanged": false,
+            "ManagedPropertyLogicalName": "canchangehierarchicalrelationship"
+          },
+          "CanEnableSyncToExternalSearchIndex": {
+            "Value": true,
+            "CanBeChanged": true,
+            "ManagedPropertyLogicalName": "canenablesynctoexternalsearchindex"
+          }
+        }
+      ]
+    }
+  };
+  //#endregion
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -194,7 +195,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['SchemaName', 'EntitySetName', 'IsManaged']);
   });
 
-  it('Retrieves retrieves data from dataverse', async () => {
+  it('retrieves data from dataverse', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
@@ -219,7 +220,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     assert(loggerLogSpy.calledWith(dataverseResponse.value));
   });
 
-  it('Retrieves retrieves data from dataverse as admin', async () => {
+  it('retrieves data from dataverse as admin', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
@@ -244,7 +245,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     assert(loggerLogSpy.calledWith(dataverseResponse.value));
   });
 
-  it('correctly handles API OData error', async () => {
+  it.only('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
@@ -267,12 +268,12 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: false, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+      await assert.rejects(command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } } as any),
+        new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present"));
     }
     catch (ex) {
       assert(ex, (new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present")).message);
     }
-
   });
 
   it('supports debug mode', () => {
