@@ -245,7 +245,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     assert(loggerLogSpy.calledWith(dataverseResponse.value));
   });
 
-  it.only('correctly handles API OData error', async () => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
@@ -268,8 +268,8 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     });
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } } as any),
-        new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present"));
+      await command.action(logger, { options: { debug: false, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+      assert.fail('No error message thrown.');
     }
     catch (ex) {
       assert(ex, (new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present")).message);

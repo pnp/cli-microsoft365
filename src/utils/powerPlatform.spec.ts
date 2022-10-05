@@ -65,7 +65,7 @@ describe('utils/powerPlatform', () => {
   it('handles no environment found', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/someRandomGuid?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
-        throw Error('The environment \'someRandomGuid\' could not be found');
+        throw Error('Random Error');
       }
 
       return 'Invalid request';
@@ -76,7 +76,7 @@ describe('utils/powerPlatform', () => {
       assert.fail('No error message thrown.');
     }
     catch (ex) {
-      assert.deepStrictEqual(ex, Error(`The environment 'someRandomGuid' could not be found`));
+      assert.deepStrictEqual(ex, Error(`The environment 'someRandomGuid' could not be retrieved. See the inner exception for more details: Random Error`));
     }
   });
 });

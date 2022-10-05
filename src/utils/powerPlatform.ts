@@ -25,8 +25,8 @@ export const powerPlatform = {
 
       return Promise.resolve(response.properties.linkedEnvironmentMetadata.instanceApiUrl);
     }
-    catch (ex) {
-      throw Error(`The environment '${environment}' could not be found`);
+    catch (ex: any) {
+      throw Error(`The environment '${environment}' could not be retrieved. See the inner exception for more details: ${ex.message}`);
     }
   }
 };
