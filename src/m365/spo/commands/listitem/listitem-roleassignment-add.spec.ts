@@ -2,14 +2,16 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, CommandInfo, Logger } from '../../../../cli';
+import { Cli } from '../../../../cli/Cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as SpoUserGetCommand from '../user/user-get';
 import * as SpoGroupGetCommand from '../group/group-get';
 import * as SpoRoleDefinitionListCommand from '../roledefinition/roledefinition-list';
+import { Logger } from '../../../../cli/Logger';
+import { CommandInfo } from '../../../../cli/CommandInfo';
 const command: Command = require('./listitem-roleassignment-add');
 
 describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {

@@ -1,8 +1,6 @@
-import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { formatting, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import * as SpoUserGetCommand from '../user/user-get';
@@ -12,6 +10,11 @@ import { Options as SpoGroupGetCommandOptions } from '../group/group-get';
 import * as SpoRoleDefinitionListCommand from '../roledefinition/roledefinition-list';
 import { Options as SpoRoleDefinitionListCommandOptions } from '../roledefinition/roledefinition-list';
 import { RoleDefinition } from '../roledefinition/RoleDefinition';
+import { validation } from '../../../../utils/validation';
+import { Logger } from '../../../../cli/Logger';
+import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
+import { Cli, CommandOutput } from '../../../../cli/Cli';
 
 interface CommandArgs {
   options: Options;
