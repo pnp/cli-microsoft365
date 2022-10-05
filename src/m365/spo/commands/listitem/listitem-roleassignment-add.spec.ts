@@ -175,7 +175,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
 
   it('add role assignment to listitem in list by title and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('_api/web/lists/getByTitle(\'test\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if (opts.url as string === 'https://contoso.sharepoint.com/_api/web/lists/getByTitle(\'test\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
 
@@ -196,7 +196,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
 
   it('add role assignment to listitem in list by id and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if (opts.url as string === 'https://contoso.sharepoint.com/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
 
@@ -217,7 +217,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
 
   it('add role assignment to listitem in list by url and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetList(\'%2Fsites%2Fdocuments\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if (opts.url as string === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
 
@@ -238,7 +238,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
 
   it('add role assignment to listitem in list get principal id by upn', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if (opts.url as string === 'https://contoso.sharepoint.com/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
 
@@ -269,7 +269,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when upn does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if (opts.url as string === 'https://contoso.sharepoint.com/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
 
@@ -299,7 +299,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
 
   it('add role assignment to listitem in list get principal id by group name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if (opts.url as string === 'https://contoso.sharepoint.com/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
 
@@ -330,7 +330,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when group does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if (opts.url as string === 'https://contoso.sharepoint.com/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
 
@@ -360,7 +360,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
 
   it('add role assignment to listitem in list get role definition id by role definition name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if (opts.url as string === 'https://contoso.sharepoint.com/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
 
@@ -391,7 +391,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when role definition does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if (opts.url as string === 'https://contoso.sharepoint.com/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
 
@@ -417,5 +417,26 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         roleDefinitionName: 'Full Control'
       }
     });
+  });
+
+  it('correctly handles error when adding role definition fails', async () => {
+    const error = 'error in adding role definition';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url as string === 'https://contoso.sharepoint.com/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/items(1)/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
+        return Promise.reject(error);
+      }
+
+      return Promise.reject(new CommandError('Unknown case'));
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+        listItemId: 1,
+        principalId: 11,
+        roleDefinitionId: 1073741827
+      } } as any), new CommandError(error));
   });
 });
