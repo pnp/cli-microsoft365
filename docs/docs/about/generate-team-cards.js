@@ -231,6 +231,12 @@ const contributors = [
     twitter: ''
   },
   {
+    name: 'Dushyant Sharma',
+    company: '',
+    github: 'techsnap',
+    twitter: ''
+  },
+  {
     name: 'Elio Struyf',
     company: 'Struyf Consulting',
     github: 'estruyf',
