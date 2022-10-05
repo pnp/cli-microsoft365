@@ -89,12 +89,12 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         }
 
         const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
-        if (principalOptions.some(item => item !== undefined) && principalOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either principalId id, upn or groupName`;
+        if (!principalOptions.some(item => item !== undefined)) {
+          return `Specify either principalId, upn or groupName`;
         }
-
-        if (principalOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least principalId id, upn or groupName`;
+        
+        if (principalOptions.filter(item => item !== undefined).length > 1) {
+          return `Specify either principalId, upn or groupName but not multiple`;
         }
 
         return true;
