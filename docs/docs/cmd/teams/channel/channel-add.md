@@ -23,10 +23,10 @@ m365 teams channel add [options]
 : The description of the channel to add
 
 `--type [type]`
-: Type of channel to create: `standard,private`. Default `standard`.
+: Type of channel to create: `standard`, `private`, `shared`. Default `standard`.
 
 `--owner [owner]`
-: User with this ID or UPN will be added as owner of the private channel. This option is required when type is `private`.
+: User with this ID or UPN will be added as owner of the private channel. This option is required when type is `private` or `shared`.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -54,8 +54,8 @@ Add private channel to the specified Microsoft Teams team with owner UPN
 m365 teams channel add --teamName "Team Name" --name climicrosoft365 --type private --owner john.doe@contoso.com
 ```
 
-Add private channel to the specified Microsoft Teams team with owner ID
+Add shared channel to the specified Microsoft Teams team with owner ID
 
 ```sh
-m365 teams channel add --teamId 6703ac8a-c49b-4fd4-8223-28f0ac3a6402 --name climicrosoft365 --type private --owner cc693a7d-4833-4911-a89a-f0fe6e49bf69
+m365 teams channel add --teamId 6703ac8a-c49b-4fd4-8223-28f0ac3a6402 --name climicrosoft365 --type shared --owner cc693a7d-4833-4911-a89a-f0fe6e49bf69
 ```

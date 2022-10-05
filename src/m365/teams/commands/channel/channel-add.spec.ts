@@ -130,6 +130,28 @@ describe(commands.CHANNEL_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if owner is not specified when creating shared channel.', async () => {
+    const actual = await command.validate({
+      options: {
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture Discussion',
+        type: 'shared'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if owner is specified when not creating shared channel.', async () => {
+    const actual = await command.validate({
+      options: {
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture Discussion',
+        owner: 'John.Doe@contoso.com'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+  
   it('validates for a correct general channel input.', async () => {
     const actual = await command.validate({
       options: {
@@ -148,6 +170,19 @@ describe(commands.CHANNEL_ADD, () => {
         name: 'Architecture',
         description: 'Architecture meeting',
         type: 'private',
+        owner: 'john.doe@contoso.com'
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('validates for a correct shared channel input.', async () => {
+    const actual = await command.validate({
+      options: {
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture',
+        description: 'Architecture meeting',
+        type: 'shared',
         owner: 'john.doe@contoso.com'
       }
     }, commandInfo);
@@ -300,10 +335,40 @@ describe(commands.CHANNEL_ADD, () => {
         owner: 'john.doe@contoso.com'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
       "displayName": "Architecture Discussion",
       "membershipType": "private"
+    }));
+  });
+
+  it('creates shared channel within the Microsoft Teams team by team id', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
+        return Promise.resolve({
+          "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
+          "displayName": "Architecture Discussion",
+          "membershipType": "shared"
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: false,
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture Discussion',
+        type: 'shared',
+        owner: 'john.doe@contoso.com'
+      }
+    });
+    
+    assert(loggerLogSpy.calledWith({
+      "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
+      "displayName": "Architecture Discussion",
+      "membershipType": "shared"
     }));
   });
 
