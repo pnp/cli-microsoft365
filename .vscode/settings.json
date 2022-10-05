@@ -22,5 +22,8 @@
       "template": "docker run --rm -it ${exposedPorts} -v ${workspaceFolder}/docs:/docs ${tag}",
       "match": "squidfunk"
     }
-  ]
+  ],
+  "[markdown]": {
+    "files.insertFinalNewline": true
+  }
 }
