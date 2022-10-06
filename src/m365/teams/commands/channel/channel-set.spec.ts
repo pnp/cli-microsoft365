@@ -12,13 +12,20 @@ import commands from '../../commands';
 const command: Command = require('./channel-set');
 
 describe(commands.CHANNEL_SET, () => {
+  const channelId = '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype';
+  const channelName = 'channelName';
+  const teamId = 'd66b8110-fcad-49e8-8159-0d488ddb7656';
+  const teamName = 'Team Name';
+  const newChannelName = 'New Review';
+  const description = 'This is a new description';
+
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -65,10 +72,10 @@ describe(commands.CHANNEL_SET, () => {
   it('correctly validates the arguments', async () => {
     const actual = await command.validate({
       options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        channelName: 'Reviews',
-        newChannelName: 'Gen',
-        description: 'this is a new description'
+        teamId: teamId,
+        channelName: channelName,
+        newChannelName: newChannelName,
+        description: description
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -78,9 +85,21 @@ describe(commands.CHANNEL_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: 'invalid',
-        channelName: 'Reviews',
-        newChannelName: 'Gen',
-        description: 'this is a new description'
+        channelName: channelId,
+        newChannelName: newChannelName,
+        description: description
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the channelId is not valid channelId', async () => {
+    const actual = await command.validate({
+      options: {
+        teamId: teamId,
+        channelId: 'invalid',
+        newChannelName: newChannelName,
+        description: description
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -89,64 +108,146 @@ describe(commands.CHANNEL_SET, () => {
   it('fails validation when channelName is General', async () => {
     const actual = await command.validate({
       options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: teamId,
         channelName: 'General',
-        newChannelName: 'Reviews',
-        description: 'this is a new description'
+        newChannelName: newChannelName,
+        description: description
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails to patch channel updates for the Microsoft Teams team when channel does not exists', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'Latest'`) > -1) {
-        return Promise.resolve({ value: [] });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelName: 'Latest',
-      newChannelName: 'New Review',
-      description: 'New Review' } } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [
+      ['channelId', 'channelName'],
+      ['teamId', 'teamName']
+    ]);
   });
 
-  it('correctly patches channel updates for the Microsoft Teams team', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'Review'`) > -1) {
-        return Promise.resolve({
+  it('fails to patch channel when channel does not exists', async () => {
+    const errorMessage = 'The specified channel does not exist in the Microsoft Teams team';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(channelName)}'`) {
+        return { value: [] };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        teamId: teamId,
+        channelName: channelName,
+        newChannelName: newChannelName,
+        description: description
+      }
+    }), new CommandError(errorMessage));
+  });
+
+  it('correctly patches channel updates for the Microsoft Teams team by teamId and channelName', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(channelName)}'`) {
+        return {
           value:
             [
               {
-                "id": "19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype",
+                "id": channelId,
                 "displayName": "Review",
                 "description": "Updated by CLI"
               }]
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (((opts.url as string).indexOf(`channels/19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype`) > -1) &&
-        JSON.stringify(opts.data) === JSON.stringify({ displayName: "New Review", description: "New Review" })
+
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}`) &&
+        JSON.stringify(opts.data) === JSON.stringify({ displayName: newChannelName, description: description })
       ) {
-        return Promise.resolve({});
+        return;
       }
-      return Promise.reject('Invalid request');
+
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
       options: {
         debug: false,
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: 'Review',
-        newChannelName: 'New Review',
-        description: 'New Review'
+        teamId: teamId,
+        channelName: channelName,
+        newChannelName: newChannelName,
+        description: description
       }
-    } as any);
+    });
+  });
+
+  it('correctly patches channel updates for the Microsoft Teams team by teamName and channelId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(teamName)}'`) {
+        return {
+          value: [
+            {
+              "id": teamId,
+              "displayName": teamName,
+              "resourceProvisioningOptions": ["Team"]
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}`) &&
+        JSON.stringify(opts.data) === JSON.stringify({ displayName: newChannelName, description: description })
+      ) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: false,
+        teamName: teamName,
+        channelId: channelId,
+        newChannelName: newChannelName,
+        description: description
+      }
+    });
+  });
+
+  it('fails when team name does not exist', async () => {
+    const errorMessage = 'The specified team does not exist in the Microsoft Teams';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(teamName)}'`) {
+        return {
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
+          "@odata.count": 1,
+          "value": [
+            {
+              "id": "00000000-0000-0000-0000-000000000000",
+              "resourceProvisioningOptions": []
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        channelId: channelId,
+        teamName: teamName,
+        confirm: true
+      }
+    }), new CommandError(errorMessage));
   });
 
   it('supports debug mode', () => {
