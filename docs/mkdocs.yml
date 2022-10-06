@@ -261,6 +261,7 @@ nav:
       - dataverse:
         - dataverse table list: 'cmd/pp/dataverse/dataverse-table-list.md'
       - environment:
+        - environment get: 'cmd/pp/environment/environment-get.md'
         - environment list: 'cmd/pp/environment/environment-list.md'
       - gateway:
         - gateway list: 'cmd/pp/gateway/gateway-list.md'
