@@ -37,6 +37,7 @@ export default {
   CUSTOMACTION_REMOVE: `${prefix} customaction remove`,
   EVENTRECEIVER_GET: `${prefix} eventreceiver get`,
   EVENTRECEIVER_LIST: `${prefix} eventreceiver list`,
+  EVENTRECEIVER_REMOVE: `${prefix} eventreceiver remove`,
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
   FEATURE_DISABLE: `${prefix} feature disable`,
   FEATURE_ENABLE: `${prefix} feature enable`,
