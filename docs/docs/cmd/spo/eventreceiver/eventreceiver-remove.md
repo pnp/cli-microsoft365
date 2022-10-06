@@ -14,7 +14,7 @@ m365 spo eventreceiver remove [options]
 : The URL of the web from which to remove the event receiver.
 
 `--listTitle [listTitle]`
-: The title of the list from which to remove the event receivers, _if the event receiver should be removed from a list_.
+: The title of the list from which to remove the event receiver, _if the event receiver should be removed from a list_.
 Specify either `listTitle`, `listId` or `listUrl`.
 
 `--listId [listId]`
