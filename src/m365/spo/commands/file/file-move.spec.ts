@@ -19,18 +19,10 @@ describe(commands.FILE_MOVE, () => {
   let commandInfo: CommandInfo;
 
   const stubAllPostRequests: any = (
-    recycleFile: any = null,
     createCopyJobs: any = null,
     waitForJobResult: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/recycle()') > -1) {
-        if (recycleFile) {
-          return recycleFile;
-        }
-        return Promise.resolve();
-      }
-
       if ((opts.url as string).indexOf('/_api/site/CreateCopyJobs') > -1) {
         if (createCopyJobs) {
           return createCopyJobs;
@@ -100,6 +92,7 @@ describe(commands.FILE_MOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      Cli.executeCommand,
       request.post,
       request.get
     ]);
@@ -177,11 +170,16 @@ describe(commands.FILE_MOVE, () => {
   });
 
   it('should succeed when run with option --deleteIfAlreadyExists and response 404', async () => {
-    const recycleFile404 = new Promise<any>((resolve, reject) => {
-      return reject({ statusCode: 404 });
-    });
-    stubAllPostRequests(recycleFile404);
+    stubAllPostRequests();
     stubAllGetRequests();
+    const fileDeleteError: any = {
+      error: {
+        message: 'does not exist'
+      },
+      stderr: ''
+    };
+
+    sinon.stub(Cli, 'executeCommand').returns(Promise.reject(fileDeleteError));
 
     await command.action(logger, {
       options: {
@@ -194,11 +192,17 @@ describe(commands.FILE_MOVE, () => {
     });
   });
   it('should show error when recycleFile rejects with error', async () => {
-    const recycleFile = new Promise<any>((resolve, reject) => {
-      return reject('abc');
-    });
-    stubAllPostRequests(recycleFile);
+    stubAllPostRequests();
     stubAllGetRequests();
+
+    const fileDeleteError: any = {
+      error: {
+        message: 'Locked for use'
+      },
+      stderr: ''
+    };
+
+    sinon.stub(Cli, 'executeCommand').returns(Promise.reject(fileDeleteError));
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -207,16 +211,13 @@ describe(commands.FILE_MOVE, () => {
         targetUrl: 'abc',
         deleteIfAlreadyExists: true
       }
-    } as any), new CommandError('abc'));
+    }), new CommandError(fileDeleteError.error.message));
   });
 
   it('should recycleFile format target url', async () => {
-    const recycleFile = new Promise<any>((resolve, reject) => {
-      return reject('abc');
-    });
-    stubAllPostRequests(recycleFile);
+    stubAllPostRequests();
     stubAllGetRequests();
-
+    sinon.stub(Cli, 'executeCommand').returns(Promise.reject('abc'));
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
@@ -231,6 +232,7 @@ describe(commands.FILE_MOVE, () => {
   it('should show error when getRequestDigestForSite rejects with error', async () => {
     stubAllPostRequests();
     stubAllGetRequests();
+    sinon.stub(Cli, 'executeCommand');
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('error'));
 
@@ -261,9 +263,9 @@ describe(commands.FILE_MOVE, () => {
       const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
       return resolve({ Logs: [log] });
     });
-    stubAllPostRequests(null, null, waitForJobResult);
+    stubAllPostRequests(null, waitForJobResult);
     stubAllGetRequests();
-
+    sinon.stub(Cli, 'executeCommand');
     await assert.rejects(command.action(logger, {
       options: {
         verbose: true,
@@ -280,9 +282,9 @@ describe(commands.FILE_MOVE, () => {
       const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
       return resolve({ JobState: 0, Logs: [log] });
     });
-    stubAllPostRequests(null, null, waitForJobResult);
+    stubAllPostRequests(null, waitForJobResult);
     stubAllGetRequests();
-
+    sinon.stub(Cli, 'executeCommand');
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
