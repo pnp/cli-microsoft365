@@ -19,7 +19,7 @@ m365 spo folder roleinheritance reset [options]
 `--confirm`
 : Don't prompt for confirmation to reset role inheritance of the folder.
 
---8<-- "docs/cmd/_global.md"
+--8<-- "docs/cmd/\_global.md"
 
 ## Examples
 
@@ -32,5 +32,5 @@ m365 spo folder roleinheritance reset --webUrl "https://contoso.sharepoint.com/s
 Reset inheritance of folder with site-relative url _Shared Documents/TestFolder_ located in site _https://contoso.sharepoint.com/sites/project-x_. It will **not** prompt for confirmation before resetting.
 
 ```sh
-m365 spo folder roleinheritance reset --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "Shared Documents/TestFolder" --confirm
+m365 spo folder roleinheritance reset --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "/sites/project-x/Shared Documents/TestFolder" --confirm
 ```
