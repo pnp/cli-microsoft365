@@ -362,6 +362,7 @@ nav:
         - folder move: 'cmd/spo/folder/folder-move.md'
         - folder remove: 'cmd/spo/folder/folder-remove.md'
         - folder rename: 'cmd/spo/folder/folder-rename.md'
+        - folder roleinheritance break: 'cmd/spo/folder/folder-roleinheritance-break.md'
         - folder roleinheritance reset: 'cmd/spo/folder/folder-roleinheritance-reset.md'
       - group:
         - group add: 'cmd/spo/group/group-add.md'
