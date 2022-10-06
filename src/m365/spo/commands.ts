@@ -55,6 +55,7 @@ export default {
   FILE_MOVE: `${prefix} file move`,
   FILE_REMOVE: `${prefix} file remove`,
   FILE_RENAME: `${prefix} file rename`,
+  FILE_ROLEINHERITANCE_BREAK: `${prefix} file roleinheritance break`,
   FILE_ROLEINHERITANCE_RESET: `${prefix} file roleinheritance reset`,
   FILE_SHARINGINFO_GET: `${prefix} file sharinginfo get`,
   FOLDER_ADD: `${prefix} folder add`,
