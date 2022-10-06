@@ -1,6 +1,7 @@
 const prefix: string = 'pp';
 
 export default {
+  ENVIRONMENT_GET: `${prefix} environment get`,
   ENVIRONMENT_LIST: `${prefix} environment list`,
   GATEWAY_LIST: `${prefix} gateway list`,
   MANAGEMENTAPP_ADD: `${prefix} managementapp add`,

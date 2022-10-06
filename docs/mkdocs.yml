@@ -257,6 +257,7 @@ nav:
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
       - environment:
+        - environment get: 'cmd/pp/environment/environment-get.md'
         - environment list: 'cmd/pp/environment/environment-list.md'
       - gateway:
         - gateway list: 'cmd/pp/gateway/gateway-list.md'
