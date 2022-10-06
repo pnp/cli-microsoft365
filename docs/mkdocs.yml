@@ -330,6 +330,7 @@ nav:
       - eventreceiver:
         - eventreceiver get: 'cmd/spo/eventreceiver/eventreceiver-get.md'
         - eventreceiver list: 'cmd/spo/eventreceiver/eventreceiver-list.md'
+        - eventreceiver remove: 'cmd/spo/eventreceiver/eventreceiver-remove.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - feature:
