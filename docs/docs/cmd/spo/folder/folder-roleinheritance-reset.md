@@ -19,7 +19,7 @@ m365 spo folder roleinheritance reset [options]
 `--confirm`
 : Don't prompt for confirmation to reset role inheritance of the folder.
 
---8<-- "docs/cmd/\_global.md"
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 
