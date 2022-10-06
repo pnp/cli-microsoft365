@@ -310,7 +310,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        channelName: channelName,
+        channelId: channelId,
         teamId: teamId,
         confirm: true
       }
