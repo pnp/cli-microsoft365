@@ -1,6 +1,6 @@
 # pp tenant settings list
 
-Lists the global power platform tenant settings
+Lists the global Power Platform tenant settings
 
 ## Usage
 

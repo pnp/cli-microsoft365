@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import request from '../../../../request';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
@@ -9,11 +10,11 @@ class PpTenantSettingsListCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Lists the global power platform tenant settings';
+    return 'Lists the global Power Platform tenant settings';
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    const requestOptions: any = {
+    const requestOptions: AxiosRequestConfig  = {
       url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/listtenantsettings?api-version=2020-10-01`,
       headers: {
         accept: 'application/json'

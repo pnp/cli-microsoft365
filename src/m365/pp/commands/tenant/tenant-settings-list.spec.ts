@@ -95,11 +95,11 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   });
 
   it('successfully retrieves tenant settings', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/listtenantsettings?api-version=2020-10-01") {
-        return Promise.resolve(successResponse);
+        return successResponse;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: {} } as any);
@@ -107,11 +107,11 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   });
 
   it('handles error correctly', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('An error has occurred');
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw 'An error has occurred';
     });
 
-    await assert.rejects(command.action(logger, { options: { } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {
