@@ -4,13 +4,8 @@
   "files.insertFinalNewline": false,
   "editor.insertSpaces": true,
   "editor.detectIndentation": false,
-  "editor.guides.bracketPairs": true,
-  "editor.accessibilitySupport": "off",
   "editor.inlineSuggest.enabled": true,
   "editor.formatOnSave": true,
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
   "typescript.tsdk": "node_modules/typescript/lib",
   "docker.commands.runInteractive": [
     {
