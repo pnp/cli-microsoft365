@@ -40,4 +40,14 @@ CLI for Microsoft 365 is a [Microsoft 365 Platform Community](https://pnp.github
 
 The project is built and managed publicly on GitHub at [https://github.com/pnp/cli-microsoft365](https://github.com/pnp/cli-microsoft365) and accepts community contributions. We would encourage you to try it and [tell us what you think](https://github.com/pnp/cli-microsoft365/issues). We would also love your help! We have a number of feature requests that are a [good starting point](https://github.com/pnp/cli-microsoft365/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to contribute to the project.
 
+### Community Discord server
+
 We also have a [community Discord server](https://discord.com/invite/7rfW4kg6B5) where you can hang out, share, collaborate, and discuss more about the CLI for Microsoft 365!
+
+<br/>
+<p align="center">
+  <a href="https://discord.com/invite/7rfW4kg6B5">
+    <img src="https://img.shields.io/badge/Discord-invite/7rfW4kg6B5-7289da?style=for-the-badge"
+      alt="Discord" />
+  </a>
+</p>
