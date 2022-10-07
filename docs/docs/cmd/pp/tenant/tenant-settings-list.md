@@ -19,7 +19,7 @@ m365 pp tenant settings list [options]
 
 ## Examples
 
-Lists the global power platform settings of the tenant
+Lists the global Power Platform settings of the tenant
 
 ```sh
 m365 pp tenant settings list
