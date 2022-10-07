@@ -352,6 +352,7 @@ nav:
         - file move: 'cmd/spo/file/file-move.md'
         - file remove: 'cmd/spo/file/file-remove.md'
         - file rename: 'cmd/spo/file/file-rename.md'
+        - file roleassignment add: 'cmd/spo/file/file-roleassignment-add.md'
         - file roleinheritance reset: 'cmd/spo/file/file-roleinheritance-reset.md'
         - file sharinginfo get: 'cmd/spo/file/file-sharinginfo-get.md'
       - folder:
