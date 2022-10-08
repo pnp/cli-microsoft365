@@ -58,7 +58,7 @@ describe(commands.FILE_RENAME, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get, 
+      request.get,
       request.post,
       Cli.executeCommand
     ]);
@@ -107,13 +107,15 @@ describe(commands.FILE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: 
-      { 
-        webUrl: 'https://contoso.sharepoint.com/sites/portal', 
+    await command.action(logger, {
+      options:
+      {
+        webUrl: 'https://contoso.sharepoint.com/sites/portal',
         sourceUrl: '/Shared Documents/abc.pdf',
         force: true,
         targetFileName: 'def.pdf'
-      } });
+      }
+    });
     assert(loggerLogSpy.calledWith(renameResponseJson));
   });
 
@@ -145,9 +147,7 @@ describe(commands.FILE_RENAME, () => {
 
   it('continues if file cannot be recycled because it does not exist', async () => {
     const fileDeleteError = {
-      error: {
-        message: 'File does not exist'
-      }
+      message: 'File does not exist'
     };
     sinon.stub(Cli, 'executeCommand').returns(Promise.reject(fileDeleteError));
 

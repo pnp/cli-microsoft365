@@ -206,11 +206,8 @@ describe(commands.FILE_COPY, () => {
     stubAllPostRequests();
     stubAllGetRequests();
 
-    const fileDeleteError: any = {
-      error: {
-        message: 'does not exist'
-      },
-      stderr: ''
+    const fileDeleteError = {
+      message: 'File does not exist'
     };
 
     sinon.stub(Cli, 'executeCommand').returns(Promise.reject(fileDeleteError));
