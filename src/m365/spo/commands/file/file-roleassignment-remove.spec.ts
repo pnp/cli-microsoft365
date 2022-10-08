@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { urlUtil } from '../../../../utils/urlUtil';
+import { formatting } from '../../../../utils/formatting';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as SpoFileGetCommand from './file-get';
@@ -79,17 +80,6 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
-  });
-
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['fileUrl', 'fileId'], ['upn', 'groupName', 'principalId']]);
@@ -150,7 +140,7 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
   it('remove role assignment from the file by relative URL and principal Id when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
         return;
       }
 
@@ -190,7 +180,8 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('/sites/contoso-sales/documents/Test1.docx')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
+      const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
         return;
       }
 
@@ -226,7 +217,8 @@ describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
     });
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('/sites/contoso-sales/documents/Test1.docx')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
+      const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
         return;
       }
 
