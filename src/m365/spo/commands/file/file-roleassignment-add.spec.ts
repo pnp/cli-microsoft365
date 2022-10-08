@@ -136,12 +136,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly adds role assignment specifying principalId and role definition name', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='10',roledefid='1073741827')`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
@@ -165,12 +165,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly adds role assignment specifying principalId and role definition name, retrieving file by the ID', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='10',roledefid='1073741827')`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
@@ -180,12 +180,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
         });
       }
       if (command === SpoRoleDefinitionListCommand) {
-        return Promise.resolve({
+        return {
           stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
-        });
+        };
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Unknown case';
     });
 
     await command.action(logger, {
@@ -199,22 +199,22 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly adds role assignment specifying upn and role definition id', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='11',roledefid='1073741827')`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoUserGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|someaccount@tenant.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "someaccount@tenant.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "someaccount@tenant.onmicrosoft.com"}'
-        });
+        };
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Unknown case';
     });
 
     await command.action(logger, {
@@ -229,12 +229,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when upn does not exist', async () => {
     const error = 'no user found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoUserGetCommand) {
-        return Promise.reject(error);
+        throw error;
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw 'Unknown case';
     });
 
     await assert.rejects(command.action(logger, {
@@ -248,22 +248,22 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('correctly adds role assignment specifying groupName and role definition id', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url as string === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2Fdocuments%2FTest1.docx')/ListItemAllFields/roleassignments/addroleassignment(principalid='5',roledefid='1073741827')`) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoGroupGetCommand) {
-        return Promise.resolve({
+        return {
           stdout: '{"Id": 5,"IsHiddenInUI": false,"LoginName": "Group A","Title": "Group A","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
-        });
+        };
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Unknown case';
     });
 
     await command.action(logger, {
@@ -278,12 +278,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when role definition does not exist', async () => {
     const error = 'no role definition found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command) => {
       if (command === SpoRoleDefinitionListCommand) {
-        return Promise.reject(error);
+        throw error;
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw 'Unknown case';
     });
 
     await assert.rejects(command.action(logger, {
@@ -298,12 +298,12 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when group does not exist', async () => {
     const error = 'no group found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoGroupGetCommand) {
-        return Promise.reject(error);
+        throw error;
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw 'Unknown case';
     });
 
     await assert.rejects(command.action(logger, {
