@@ -201,11 +201,8 @@ class SpoFileMoveCommand extends SpoCommand {
       await Cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
     } 
     catch (err: any) {
-      if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {
-        
-      }
-      else {
-        throw err;
+      if (!(err !== undefined && err.message !== undefined && err.message.includes('does not exist'))) {
+        throw err;        
       }
     }
   }

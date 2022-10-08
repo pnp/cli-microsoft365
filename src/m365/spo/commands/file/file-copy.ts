@@ -96,7 +96,7 @@ class SpoFileCopyCommand extends SpoCommand {
       // then there are edge cases when deleteIfAlreadyExists flag is set
       // the user can receive misleading error message.
       await this.fileExists(tenantUrl, webUrl, args.options.sourceUrl);
-
+      
       if (args.options.deleteIfAlreadyExists) {
         // try delete target file, if deleteIfAlreadyExists flag is set
         const filename = args.options.sourceUrl.replace(/^.*[\\\/]/, '');
@@ -200,11 +200,8 @@ class SpoFileCopyCommand extends SpoCommand {
       await Cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
     }
     catch (err: any) {
-      if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {
-        
-      } 
-      else {
-        throw err;
+      if (!(err !== undefined && err.message !== undefined && err.message.includes('does not exist'))) {
+        throw err;        
       }
     }
   }
