@@ -5,6 +5,7 @@ import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { urlUtil } from '../../../../utils/urlUtil';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -35,7 +36,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Removes role assignment from a file';
+    return 'Removes a role assignment from a file.';
   }
 
   constructor() {
@@ -55,7 +56,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
         principalId: typeof args.options.principalId !== 'undefined',
         upn: typeof args.options.upn !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        confirm: !!args.options.confirm
       });
     });
   }
@@ -118,20 +119,20 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
     const removeRoleAssignment: () => Promise<void> = async (): Promise<void> => {
       try {
         const fileURL: string = await this.getFileURL(args);
+        let principalId: number = args.options.principalId!;
 
         if (args.options.groupName) {
-          args.options.principalId = await this.GetGroupPrincipalId(args.options);
+          principalId = await this.GetGroupPrincipalId(args.options);
         }
         else if (args.options.upn) {
-          args.options.principalId = await this.GetUserPrincipalId(args.options);
+          principalId = await this.GetUserPrincipalId(args.options);
         }
 
         const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, fileURL);
         const requestOptions: AxiosRequestConfig = {
-          url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${serverRelativeUrl}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${args.options.principalId}')`,
-          method: 'POST',
+          url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`,
           headers: {
-            accept: 'application/json;odata.metadata=none'
+            accept: 'application/json'
           },
           responseType: 'json'
         };

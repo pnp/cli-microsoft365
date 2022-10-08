@@ -7,16 +7,22 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { formatting } from '../../../../utils/formatting';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-const command: Command = require('./file-roleinheritance-reset');
 import * as SpoFileGetCommand from './file-get';
+import * as SpoGroupGetCommand from '../group/group-get';
+import * as SpoUserGetCommand from '../user/user-get';
+const command: Command = require('./file-roleassignment-remove');
 
-describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
-  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
-  const fileUrl = '/sites/project-x/documents/Test1.docx';
+describe(commands.FILE_ROLEASSIGNMENT_REMOVE, () => {
+  const webUrl = 'https://contoso.sharepoint.com/sites/contoso-sales';
+  const fileUrl = '/sites/contoso-sales/documents/Test1.docx';
   const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+  const principalId = 2;
+  const upn = 'user1@contoso.onmicrosoft.com';
+  const groupName = 'saleGroup';
 
   let log: any[];
   let logger: Logger;
@@ -53,6 +59,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   afterEach(() => {
     sinonUtil.restore([
       Cli.prompt,
+      Cli.executeCommandWithOutput,
       request.post
     ]);
   });
@@ -66,7 +73,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FILE_ROLEINHERITANCE_RESET), true);
+    assert.strictEqual(command.name.startsWith(commands.FILE_ROLEASSIGNMENT_REMOVE), true);
   });
 
   it('has a description', () => {
@@ -75,29 +82,35 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['fileId', 'fileUrl']]);
+    assert.deepStrictEqual(optionSets, [['fileUrl', 'fileId'], ['upn', 'groupName', 'principalId']]);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, principalId: principalId, confirm: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the fileId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: 'foo', principalId: principalId, confirm: true } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the principalId option is not a number', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 'Hi', confirm: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if webUrl and fileId are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', confirm: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, fileId: '0cd891ef-afce-4e55-b836-fce03286cccf', principalId: principalId, confirm: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before resetting role inheritance for the file when confirm option not passed', async () => {
+  it('prompts before removing role assignment from the file when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
         webUrl: webUrl,
-        fileId: fileId
+        fileId: fileId,
+        principalId: principalId
       }
     });
 
@@ -110,51 +123,24 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     assert(promptIssued);
   });
 
-  it('aborts resetting role inheritance for the file when confirm option is not passed and prompt not confirmed', async () => {
+  it('aborts removing role assignment from the file when confirm option is not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
     await command.action(logger, {
       options: {
         webUrl: webUrl,
-        fileId: fileId
+        fileId: fileId,
+        principalId: principalId
       }
     });
 
     assert(postSpy.notCalled);
   });
 
-  it('resets role inheritance on file by relative URL (debug)', async () => {
+  it('remove role assignment from the file by relative URL and principal Id when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/resetroleinheritance`) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: webUrl,
-        fileUrl: fileUrl,
-        confirm: true
-      }
-    });
-  });
-
-  it('resets role inheritance on file by Id when prompt confirmed', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoFileGetCommand) {
-        return ({
-          stdout: '{"LinkingUri": "https://contoso.sharepoint.com/sites/project-x/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/project-x/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}'
-        });
-      }
-
-      throw new CommandError('Unknown case');
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/resetroleinheritance`) {
+      const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
         return;
       }
 
@@ -168,13 +154,89 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        fileId: fileId
+        debug: true,
+        webUrl: webUrl,
+        fileUrl: fileUrl,
+        principalId: principalId
       }
     });
   });
 
-  it('correctly handles error when resetting file role inheritance', async () => {
+  it('remove role assignment from the file by Id and upn', async () => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoFileGetCommand) {
+        return {
+          stdout: `{"LinkingUri": "https://contoso.sharepoint.com/sites/contoso-sales/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/contoso-sales/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}`
+        };
+      }
+
+      if (command === SpoUserGetCommand) {
+        return {
+          stdout: '{"Id": 2,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|user1@contoso.onmicrosoft.com","Title": "User1","PrincipalType": 1,"Email": "user1@contoso.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "user1@contoso.onmicrosoft.com"}'
+        };
+      }
+
+      throw new CommandError('Unknown case');
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: webUrl,
+        fileId: fileId,
+        upn: upn,
+        confirm: true
+      }
+    });
+  });
+
+  it('remove role assignment from the file by Id and group name', async () => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoFileGetCommand) {
+        return {
+          stdout: `{"LinkingUri": "https://contoso.sharepoint.com/sites/contoso-sales/documents/Test1.docx?d=wc39926a80d2c4067afa6cff9902eb866","Name": "Test1.docx","ServerRelativeUrl": "/sites/contoso-sales/documents/Test1.docx","UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"}`
+        };
+      }
+
+      if (command === SpoGroupGetCommand) {
+        return {
+          stdout: '{"Id": 2,"IsHiddenInUI": false,"LoginName": "saleGroup","Title": "saleGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
+        };
+      }
+
+      throw new CommandError('Unknown case');
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: webUrl,
+        fileId: fileId,
+        groupName: groupName,
+        confirm: true
+      }
+    });
+  });
+
+  it('correctly handles error when removing file role assignment', async () => {
     const errorMessage = 'request rejected';
     sinon.stub(request, 'post').callsFake(async () => { throw errorMessage; });
 
@@ -183,6 +245,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
         debug: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
+        principalId: principalId,
         confirm: true
       }
     }), new CommandError(errorMessage));
