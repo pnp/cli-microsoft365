@@ -131,17 +131,17 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields`;
 
     try {
-      args.options.roleDefinitionId = await this.getRoleDefinitionId(args.options);
+      const roleDefinitionId = await this.getRoleDefinitionId(args.options);
       if (args.options.upn) {
-        args.options.principalId = await this.getUserPrincipalId(args.options);
-        await this.addRoleAssignment(requestUrl, logger, args.options);
+        const upnPrincipalId = await this.getUserPrincipalId(args.options);
+        await this.addRoleAssignment(requestUrl, upnPrincipalId, roleDefinitionId);
       }
       else if (args.options.groupName) {
-        args.options.principalId = await this.getGroupPrincipalId(args.options);
-        this.addRoleAssignment(requestUrl, logger, args.options);
+        const groupPrincipalId = await this.getGroupPrincipalId(args.options);
+        this.addRoleAssignment(requestUrl, groupPrincipalId, roleDefinitionId);
       }
       else {
-        await this.addRoleAssignment(requestUrl, logger, args.options);
+        await this.addRoleAssignment(requestUrl, args.options.principalId!, roleDefinitionId);
       }
     }
     catch (err: any) {
@@ -149,9 +149,9 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     }
   }
 
-  private async addRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
+  private async addRoleAssignment(requestUrl: string, principalId: number, roleDefinitionId: number): Promise<void> {
     const requestOptions: any = {
-      url: `${requestUrl}/roleassignments/addroleassignment(principalid='${options.principalId}',roledefid='${options.roleDefinitionId}')`,
+      url: `${requestUrl}/roleassignments/addroleassignment(principalid='${principalId}',roledefid='${roleDefinitionId}')`,
       method: 'POST',
       headers: {
         'accept': 'application/json;odata=nometadata',

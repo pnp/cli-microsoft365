@@ -81,7 +81,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission',principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -126,7 +126,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('fails validation neither roleDefinitionId nor roleDefinitionName is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', groupName: 'someGroup'} }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/FolderPermission', groupName: 'someGroup' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -149,6 +149,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
+        upn: 'someaccount@tenant.onmicrosoft.com',
         roleDefinitionId: 1073741827
       }
     });
@@ -202,12 +203,15 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/FolderPermission',
-      upn: 'someaccount@tenant.onmicrosoft.com',
-      roleDefinitionId: 1073741827 } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        folderUrl: '/Shared Documents/FolderPermission',
+        upn: 'someaccount@tenant.onmicrosoft.com',
+        roleDefinitionId: 1073741827
+      }
+    } as any), new CommandError(error));
   });
 
   it('add role assignment on folder get principal id by group name', async () => {
@@ -258,12 +262,15 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/FolderPermission',
-      groupName: 'someGroup',
-      roleDefinitionId: 1073741827 } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        folderUrl: '/Shared Documents/FolderPermission',
+        groupName: 'someGroup',
+        roleDefinitionId: 1073741827
+      }
+    } as any), new CommandError(error));
   });
 
   it('add role assignment on folder get role definition id by role definition name', async () => {
@@ -314,11 +321,14 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/FolderPermission',
-      principalId: 11,
-      roleDefinitionName: 'Full Control' } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        folderUrl: '/Shared Documents/FolderPermission',
+        principalId: 11,
+        roleDefinitionName: 'Full Control'
+      }
+    } as any), new CommandError(error));
   });
 });
