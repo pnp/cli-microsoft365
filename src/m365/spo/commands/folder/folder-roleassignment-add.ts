@@ -114,7 +114,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
           return `Specify either roleDefinitionId id or roleDefinitionName`;
         }
 
-        if (roleDefinitionOptions.filter(item => item !== undefined).length > 1 ) {
+        if (roleDefinitionOptions.filter(item => item !== undefined).length > 1) {
           return `Specify either roleDefinitionId id or roleDefinitionName but not both`;
         }
 
@@ -130,7 +130,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
     const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields`;
 
-    try {      
+    try {
       args.options.roleDefinitionId = await this.getRoleDefinitionId(args.options);
       if (args.options.upn) {
         args.options.principalId = await this.getUserPrincipalId(args.options);
@@ -142,8 +142,8 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
       }
       else {
         await this.addRoleAssignment(requestUrl, logger, args.options);
-      } 
-    } 
+      }
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -151,7 +151,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
 
   private async addRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
     const requestOptions: any = {
-      url: `${requestUrl}/roleassignments/addroleassignment(principalid='${options.principalId}',roleDefId='${options.roleDefinitionId}')`,
+      url: `${requestUrl}/roleassignments/addroleassignment(principalid='${options.principalId}',roledefid='${options.roleDefinitionId}')`,
       method: 'POST',
       headers: {
         'accept': 'application/json;odata=nometadata',
@@ -178,7 +178,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     const output = await Cli.executeCommandWithOutput(SpoRoleDefinitionFolderCommand as Command, { options: { ...roleDefinitionFolderCommandOptions, _: [] } });
     const getRoleDefinitionFolderOutput = JSON.parse(output.stdout);
     const roleDefinitionId: number = getRoleDefinitionFolderOutput.find((role: RoleDefinition) => role.Name === options.roleDefinitionName).Id;
-    return roleDefinitionId; 
+    return roleDefinitionId;
   }
 
   private async getGroupPrincipalId(options: Options): Promise<number> {
@@ -192,7 +192,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
 
     const output = await Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
     const getGroupOutput = JSON.parse(output.stdout);
-    return getGroupOutput.Id as number; 
+    return getGroupOutput.Id as number;
   }
 
   private async getUserPrincipalId(options: Options): Promise<number> {
