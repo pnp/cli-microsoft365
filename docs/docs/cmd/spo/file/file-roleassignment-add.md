@@ -38,19 +38,19 @@ m365 spo file roleassignment add [options]
 
 ## Examples
 
-Add role assignment to file with id _b2307a39-e878-458b-bc90-03bc578531d6_ in site _https://contoso.sharepoint.com/sites/project-x_ for a principal with id _11_ and role definition id _1073741829_.
+Adds a role assignment to a file with a specified id. It will use a principal id and a specific role definition id.
 
 ```sh
 m365 spo file roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileId "b2307a39-e878-458b-bc90-03bc578531d6" --principalId 11 --roleDefinitionId 1073741829
 ```
 
-Add role assignment to file with id _b2307a39-e878-458b-bc90-03bc578531d6_ in site _https://contoso.sharepoint.com/sites/project-x_ for upn _testuser@tenant.onmicrosoft.com_ and role definition name _Read_.
+Adds a role assignment to a file with a specified site-relative URL for a specific upn and a role definition name.
 
 ```sh
-m365 spo file roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileId "b2307a39-e878-458b-bc90-03bc578531d6" --upn "testuser@tenant.onmicrosoft.com" --roleDefinitionName "Read"
+m365 spo file roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileUrl "Shared Documents/Test1.docx" --upn "testuser@tenant.onmicrosoft.com" --roleDefinitionName "Full Control"
 ```
 
-Add role assignment to file with server-relative url _/sites/project-x/documents/Test1.docx_ in site _https://contoso.sharepoint.com/sites/project-x_ for group _demoGroup__ and role definition name _Read_.
+Adds a role assignment to a file with a specified server-relative URL the for a specific group  and a role definition name.
 
 ```sh
 m365 spo file roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileUrl "/sites/project-x/documents/Test1.docx" --upn "testuser@tenant.onmicrosoft.com" --roleDefinitionName "Read"

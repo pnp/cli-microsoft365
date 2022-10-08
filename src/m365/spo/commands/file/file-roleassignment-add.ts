@@ -148,29 +148,28 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
 
     try {
       const fileUrl: string = await this.getFileURL(args);
-      args.options.roleDefinitionId = await this.getRoleDefinitionId(args.options);
+      const roleDefinitionId = await this.getRoleDefinitionId(args.options);
       if (args.options.upn) {
-        args.options.principalId = await this.getUserPrincipalId(args.options);
-        await this.addRoleAssignment(fileUrl, args.options, logger);
+        const upnPrincipalId = await this.getUserPrincipalId(args.options);
+        await this.addRoleAssignment(fileUrl, args.options.webUrl, upnPrincipalId, roleDefinitionId);
       }
       else if (args.options.groupName) {
-        args.options.principalId = await this.getGroupPrincipalId(args.options);
-        await this.addRoleAssignment(fileUrl, args.options, logger);
+        const groupPrincipalId = await this.getGroupPrincipalId(args.options);
+        await this.addRoleAssignment(fileUrl, args.options.webUrl, groupPrincipalId, roleDefinitionId);
       }
       else {
-        await this.addRoleAssignment(fileUrl, args.options, logger);
+        await this.addRoleAssignment(fileUrl, args.options.webUrl, args.options.principalId!, roleDefinitionId);
       }
-
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async addRoleAssignment(fileUrl: string, options: Options, logger: Logger): Promise<void> {
+  private async addRoleAssignment(fileUrl: string, webUrl: string, principalId: number, roleDefinitionId: number): Promise<void> {
     try {
       const requestOptions: any = {
-        url: `${options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/roleassignments/addroleassignment(principalid='${options.principalId}',roledefid='${options.roleDefinitionId}')`,
+        url: `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')/ListItemAllFields/roleassignments/addroleassignment(principalid='${principalId}',roledefid='${roleDefinitionId}')`,
         method: 'POST',
         headers: {
           'accept': 'application/json;odata=nometadata',
@@ -178,7 +177,6 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
         },
         responseType: 'json'
       };
-      logger.log(requestOptions.url);
       await request.post(requestOptions);
     }
     catch (err: any) {
