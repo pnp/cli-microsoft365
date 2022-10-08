@@ -25,7 +25,7 @@ class SpoFolderRoleInheritanceBreakCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Breaks the role inheritance of a folder';
+    return 'Breaks the role inheritance of a folder. Keeping existing permissions is the default behavior.';
   }
 
   constructor() {
@@ -39,6 +39,7 @@ class SpoFolderRoleInheritanceBreakCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        clearExistingPermissions: !!args.options.clearExistingPermissions,
         confirm: !!args.options.confirm
       });
     });
@@ -68,17 +69,14 @@ class SpoFolderRoleInheritanceBreakCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let keepExistingPermissions: boolean = true;
-    if (args.options.clearExistingPermissions) {
-      keepExistingPermissions = !args.options.clearExistingPermissions;
-    }
+    const keepExistingPermissions: boolean = !args.options.clearExistingPermissions;
 
     const breakFolderRoleInheritance: () => Promise<void> = async (): Promise<void> => {
       try {
         const requestOptions: AxiosRequestConfig = {
           url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.folderUrl)}')/ListItemAllFields/breakroleinheritance(${keepExistingPermissions})`,
           headers: {
-            accept: 'application/json;odata.metadata=none'
+            accept: 'application/json'
           },
           responseType: 'json'
         };

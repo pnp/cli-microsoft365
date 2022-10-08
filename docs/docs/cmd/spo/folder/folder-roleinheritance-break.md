@@ -17,7 +17,7 @@ m365 spo folder roleinheritance break [options]
 : The site-relative URL or server-relative URL of the folder.
 
 `-c, --clearExistingPermissions`
-: Set to clear existing roles from the list item
+: Clear all existing permissions from the folder.
 
 `--confirm`
 : Don't prompt for confirmation to breaking role inheritance of the folder.
@@ -26,14 +26,14 @@ m365 spo folder roleinheritance break [options]
 
 ## Examples
 
-Breaks inheritance of folder with site-relative url _Shared Documents/TestFolder_ located in site _https://contoso.sharepoint.com/sites/project-x_ keeping the existing permissions of the folder.
+Break the inheritance of a folder with a specified site-relative URL.
 
 ```sh
 m365 spo folder roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "Shared Documents/TestFolder"
 ```
 
-Breaks inheritance of folder with server-relative url _/sites/project-x/Shared Documents/TestFolder_ located in site _https://contoso.sharepoint.com/sites/project-x_. It will **not** prompt for confirmation before breaking the inheritance.
+Break the inheritance of a folder with a specified server-relative URL. It will clear the existing permissions of the folder. It will **not** prompt for confirmation before breaking the inheritance.
 
 ```sh
-m365 spo folder roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "/sites/project-x/Shared Documents/TestFolder" --confirm
+m365 spo folder roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "/sites/project-x/Shared Documents/TestFolder" --clearExistingPermissions --confirm
 ```
