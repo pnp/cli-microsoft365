@@ -94,6 +94,10 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['disableCapacityAllocationByEnvironmentAdmins', 'disableEnvironmentCreationByNonAdminUsers', 'disableNPSCommentsReachout', 'disablePortalsCreationByNonAdminUsers', 'disableSupportTicketsVisibleByAllUsers', 'disableSurveyFeedback', 'disableTrialEnvironmentCreationByNonAdminUsers', 'walkMeOptOut']);
+  });
+
   it('successfully retrieves tenant settings', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/listtenantsettings?api-version=2020-10-01") {
