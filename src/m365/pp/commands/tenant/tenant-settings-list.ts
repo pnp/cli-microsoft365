@@ -13,6 +13,10 @@ class PpTenantSettingsListCommand extends PowerPlatformCommand {
     return 'Lists the global Power Platform tenant settings';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['disableCapacityAllocationByEnvironmentAdmins', 'disableEnvironmentCreationByNonAdminUsers', 'disableNPSCommentsReachout', 'disablePortalsCreationByNonAdminUsers', 'disableSupportTicketsVisibleByAllUsers', 'disableSurveyFeedback', 'disableTrialEnvironmentCreationByNonAdminUsers', 'walkMeOptOut'];
+  }
+
   public async commandAction(logger: Logger): Promise<void> {
     const requestOptions: AxiosRequestConfig  = {
       url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/listtenantsettings?api-version=2020-10-01`,
