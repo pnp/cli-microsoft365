@@ -96,7 +96,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
         const requestOptions: AxiosRequestConfig = {
           url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileURL)}')/ListItemAllFields/resetroleinheritance`,
           headers: {
-            accept: 'application/json;odata.metadata=none'
+            accept: 'application/json'
           },
           responseType: 'json'
         };
