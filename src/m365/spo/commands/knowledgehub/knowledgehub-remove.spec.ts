@@ -7,6 +7,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
@@ -21,6 +22,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -77,6 +79,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       auth.restoreAuth,
       request.post,
       appInsights.trackEvent,
+      pid.getProcessName,
       spo.getRequestDigest
     ]);
     auth.service.connected = false;

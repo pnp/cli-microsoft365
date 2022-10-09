@@ -8,6 +8,7 @@ import { Logger } from './cli/Logger';
 import Command, {
   CommandError
 } from './Command';
+import { pid } from './utils/pid';
 import { sinonUtil } from './utils/sinonUtil';
 
 class MockCommand1 extends Command {
@@ -159,6 +160,7 @@ describe('Command', () => {
   after(() => {
     sinonUtil.restore([
       appInsights.trackEvent,
+      pid.getProcessName,
       auth.restoreAuth
     ]);
   });

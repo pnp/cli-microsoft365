@@ -9,6 +9,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./chat-get');
@@ -38,6 +39,7 @@ describe(commands.CHAT_GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return 'MeganB@M365x214355.onmicrosoft.com'; });    
     auth.service.connected = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
@@ -102,6 +104,7 @@ describe(commands.CHAT_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
+      pid.getProcessName,
       accessToken.getUserNameFromAccessToken
     ]);
     auth.service.connected = false;

@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import { accessToken } from '../utils/accessToken';
 
-describe('accessToken/accessToken', () => {
+describe('utils/accessToken', () => {
   it('isAppOnlyAccessToken returns false when access token is undefined', () => {
     const actual = accessToken.isAppOnlyAccessToken(undefined as any);
     assert.strictEqual(actual, false);

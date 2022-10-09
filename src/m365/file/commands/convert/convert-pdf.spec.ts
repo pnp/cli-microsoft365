@@ -9,6 +9,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./convert-pdf');
@@ -25,6 +26,7 @@ describe(commands.CONVERT_PDF, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     unlinkSyncStub = sinon.stub(fs, 'unlinkSync').callsFake(_ => { });
     commandInfo = Cli.getCommandInfo(command);
@@ -74,6 +76,7 @@ describe(commands.CONVERT_PDF, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
+      pid.getProcessName,
       fs.unlinkSync
     ]);
     auth.service.connected = false;

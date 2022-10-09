@@ -9,6 +9,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import flowCommands from '../../../flow/commands';
 import commands from '../../commands';
@@ -25,6 +26,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     mkdirSyncStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
     writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     auth.service.connected = true;
@@ -60,6 +62,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
+      pid.getProcessName,
       fs.mkdirSync,
       fs.writeFileSync
     ]);

@@ -7,6 +7,7 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./connections-app-create');
@@ -27,6 +28,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     (command as any).archive = admZipMock;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -59,7 +61,8 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   after(() => {
     (command as any).archive = undefined;
     sinonUtil.restore([
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 

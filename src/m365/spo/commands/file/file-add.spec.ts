@@ -8,6 +8,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
@@ -181,6 +182,7 @@ describe(commands.FILE_ADD, () => {
     ensureFolderStub = sinon.stub(spo, 'ensureFolder').resolves();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(Buffer, 'alloc').returns(Buffer.from('abc'));
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -226,6 +228,7 @@ describe(commands.FILE_ADD, () => {
       fs.existsSync,
       spo.ensureFolder,
       appInsights.trackEvent,
+      pid.getProcessName,
       Buffer.alloc
     ]);
     auth.service.connected = false;

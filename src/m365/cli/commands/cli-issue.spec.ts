@@ -5,6 +5,7 @@ import { Cli } from '../../../cli/Cli';
 import { CommandInfo } from '../../../cli/CommandInfo';
 import { Logger } from '../../../cli/Logger';
 import Command from '../../../Command';
+import { pid } from '../../../utils/pid';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 import Sinon = require('sinon');
@@ -19,6 +20,7 @@ describe(commands.ISSUE, () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     (command as any).open = () => { };
     openBrowserSpy = sinon.spy(command as any, 'openBrowser');
     commandInfo = Cli.getCommandInfo(command);
@@ -45,7 +47,8 @@ describe(commands.ISSUE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 
