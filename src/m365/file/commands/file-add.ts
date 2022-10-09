@@ -226,7 +226,7 @@ class FileAddCommand extends GraphCommand {
       },
       responseType: 'json'
     };
-    const getResult = (id: string, serverRelativeUrl: string) => {
+    const getResult = (id: string, serverRelativeUrl: string): { id: string, serverRelativeUrl: string } => {
       return {
         id,
         serverRelativeUrl

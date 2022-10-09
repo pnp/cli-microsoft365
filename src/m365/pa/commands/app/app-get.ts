@@ -141,7 +141,7 @@ class PaAppGetCommand extends PowerAppsCommand {
     return Cli.executeCommandWithOutput(paAppListCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private setProperties(app: any) {
+  private setProperties(app: any): any {
     app.displayName = app.properties.displayName;
     app.description = app.properties.description || '';
     app.appVersion = app.properties.appVersion;

@@ -70,7 +70,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeDeletedSite = async () => {
+    const removeDeletedSite = async (): Promise<void> => {
       try {
         const adminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
         const res: FormDigestInfo = await spo.ensureFormDigest(adminUrl, logger, this.context, this.debug);

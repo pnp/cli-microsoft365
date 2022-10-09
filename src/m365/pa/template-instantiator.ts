@@ -32,7 +32,7 @@ export default class TemplateInstantiator {
     }
   }
 
-  private static instantiateTemplate(templatePath: string, destinationPath: string, variables: PcfInitVariables | SolutionInitVariables) {
+  private static instantiateTemplate(templatePath: string, destinationPath: string, variables: PcfInitVariables | SolutionInitVariables): void {
     let isTemplateFile: boolean = false;
     let fileName: string = path.basename(templatePath);
 

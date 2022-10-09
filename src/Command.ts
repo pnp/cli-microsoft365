@@ -439,7 +439,7 @@ export default abstract class Command {
     });
   }
 
-  private loadValuesFromAccessToken(args: CommandArgs) {
+  private loadValuesFromAccessToken(args: CommandArgs): void {
     if (!auth.service.accessTokens[auth.defaultResource]) {
       return;
     }

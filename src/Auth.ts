@@ -273,7 +273,7 @@ export class Auth {
     };
   }
 
-  private getPublicClient(logger: Logger, debug: boolean) {
+  private getPublicClient(logger: Logger, debug: boolean): Msal.PublicClientApplication {
     const msal: typeof Msal = require('@azure/msal-node');
     const { PublicClientApplication } = msal;
 
@@ -287,7 +287,7 @@ export class Auth {
     return new PublicClientApplication(this.getAuthClientConfiguration(logger, debug));
   }
 
-  private getConfidentialClient(logger: Logger, debug: boolean, certificateThumbprint?: string, certificatePrivateKey?: string, clientSecret?: string) {
+  private getConfidentialClient(logger: Logger, debug: boolean, certificateThumbprint?: string, certificatePrivateKey?: string, clientSecret?: string): Msal.ConfidentialClientApplication {
     const msal: typeof Msal = require('@azure/msal-node');
     const { ConfidentialClientApplication } = msal;
 

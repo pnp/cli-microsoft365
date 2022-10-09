@@ -223,7 +223,7 @@ class PlannerTaskListCommand extends GraphCommand {
   }
 
   private mergeTaskPriority(taskItems: PlannerTask[], betaTaskItems: PlannerTask[]): PlannerTask[] {
-    const findBetaTask = (id: string) => betaTaskItems.find(task => task.id === id);
+    const findBetaTask = (id: string): PlannerTask | undefined => betaTaskItems.find(task => task.id === id);
 
     taskItems.forEach(task => {
       const betaTaskItem = findBetaTask(task.id as string);

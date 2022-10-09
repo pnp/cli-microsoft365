@@ -822,7 +822,7 @@ class AadAppAddCommand extends GraphCommand {
     return resolvedApis;
   }
 
-  private updateAppPermissions(spId: string, resourceAccessPermission: ResourceAccess, oAuth2PermissionValue?: string) {
+  private updateAppPermissions(spId: string, resourceAccessPermission: ResourceAccess, oAuth2PermissionValue?: string): void {
     // During API resolution, we store globally both app role assignments and oauth2permissions
     // So that we'll be able to parse them during the admin consent process
     let existingPermission = this.appPermissions.find(oauth => oauth.resourceId === spId);
