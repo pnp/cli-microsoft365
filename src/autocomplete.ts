@@ -187,7 +187,7 @@ class Autocomplete {
     return commandsInfo;
   }
 
-  private static processCommand(commandName: string, commandInfo: CommandInfo, autocomplete: any) {
+  private static processCommand(commandName: string, commandInfo: CommandInfo, autocomplete: any): void {
     const chunks: string[] = commandName.split(' ');
     let parent: any = autocomplete;
     for (let i: number = 0; i < chunks.length; i++) {

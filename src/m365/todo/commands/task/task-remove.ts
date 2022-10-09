@@ -83,7 +83,7 @@ class TodoTaskRemoveCommand extends GraphCommand {
       return Promise.resolve(args.options.listId as string);
     };
 
-    const removeToDoTask = async () => {
+    const removeToDoTask = async (): Promise<void> => {
       try {
         const toDoListId: string | undefined = await getToDoListId();
 

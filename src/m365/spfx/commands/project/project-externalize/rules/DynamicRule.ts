@@ -115,7 +115,7 @@ export class DynamicRule extends BasicDependencyRule {
       });
   }
 
-  private getFileUrl(packageName: string, version: string, filePath: string) {
+  private getFileUrl(packageName: string, version: string, filePath: string): string {
     return `https://unpkg.com/${packageName}@${version}/${filePath}`;
   }
 
