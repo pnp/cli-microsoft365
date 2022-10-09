@@ -35,21 +35,21 @@ m365 spo folder roleassignment add [options]
 
 ## Examples
 
-Add the role assignment to the specified folder based on the group name.
+Add the role assignment to the specified folder based on the group name and role definition name.
 
 ```sh
-m365 spo folder roleassignment add --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl  "/Shared Documents/FolderPermission" --groupName "saleGroup"
+m365 spo folder roleassignment add --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl  "/Shared Documents/FolderPermission" --groupName "saleGroup" --roleDefinitionName "Edit"
 ```
 
-Add the role assignment to the specified folder based on the principal Id.
+Add the role assignment to the specified folder based on the principal Id and role definition id
 
 ```sh
-m365 spo folder roleassignment add --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents/FolderPermission" --principalId 2
+m365 spo folder roleassignment add --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents/FolderPermission" --principalId 2 --roleDefinitionId 1073741827 
 ```
 
 
-Add the role assignment to the specified folder based on the upn.
+Add the role assignment to the specified folder based on the upn and role definition name
 
 ```sh
-m365 spo folder roleassignment add --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents/FolderPermission" --upn "test@contoso.onmicrosoft.com" 
+m365 spo folder roleassignment add --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents/FolderPermission" --upn "test@contoso.onmicrosoft.com" --roleDefinitionName "Edit"
 ```

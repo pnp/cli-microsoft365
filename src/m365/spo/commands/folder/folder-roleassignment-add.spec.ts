@@ -135,27 +135,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('add role assignment on folder with role definition id', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        folderUrl: '/Shared Documents/FolderPermission',
-        upn: 'someaccount@tenant.onmicrosoft.com',
-        roleDefinitionId: 1073741827
-      }
-    });
-  });
-
-  it('add role assignment on folder get principal id by upn', async () => {
+  it('add the role assignment to the specified folder based on the upn and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
@@ -214,7 +194,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     } as any), new CommandError(error));
   });
 
-  it('add role assignment on folder get principal id by group name', async () => {
+  it('add the role assignment to the specified folder based on the group name and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
@@ -273,7 +253,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     } as any), new CommandError(error));
   });
 
-  it('add role assignment on folder get role definition id by role definition name', async () => {
+  it('add the role assignment to the specified folder based on the principal id and role definition name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
