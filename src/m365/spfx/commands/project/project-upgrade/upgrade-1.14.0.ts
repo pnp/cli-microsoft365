@@ -23,7 +23,6 @@ import { FN002009_DEVDEP_microsoft_sp_tslint_rules } from "./rules/FN002009_DEVD
 import { FN002019_DEVDEP_spfx_fast_serve_helpers } from "./rules/FN002019_DEVDEP_spfx_fast_serve_helpers";
 import { FN006004_CFG_PS_developer } from "./rules/FN006004_CFG_PS_developer";
 import { FN006005_CFG_PS_metadata } from "./rules/FN006005_CFG_PS_metadata";
-import { FN006006_CFG_PS_features } from "./rules/FN006006_CFG_PS_features";
 import { FN010001_YORC_version } from "./rules/FN010001_YORC_version";
 import { FN014008_CODE_launch_hostedWorkbench_type } from "./rules/FN014008_CODE_launch_hostedWorkbench_type";
 
@@ -53,7 +52,6 @@ module.exports = [
   new FN002019_DEVDEP_spfx_fast_serve_helpers('1.14.0'),
   new FN006004_CFG_PS_developer('1.14.0'),
   new FN006005_CFG_PS_metadata(),
-  new FN006006_CFG_PS_features(),
   new FN010001_YORC_version('1.14.0'),
   new FN014008_CODE_launch_hostedWorkbench_type('pwa-chrome')
 ];
