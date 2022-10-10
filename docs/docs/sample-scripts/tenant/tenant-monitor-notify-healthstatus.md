@@ -36,28 +36,32 @@ If you want to schedule the script directly, you can go ahead without the need o
       Write-Host "List does not exist. Hence creating the SharePoint List"
 
       #Creating the list - Conventional
-      $CurrentList = m365 spo list add  --baseTemplate GenericList --title $listName --webUrl  $webURL
+      $CurrentList = m365 spo list add --baseTemplate GenericList --title $listName --webUrl $webURL
+
       #Adding the fields
       $FieldLists = @(
         @{fieldname = "Workload"; fieldtype = "Text"; }, @{fieldname = "FirstIdentifiedDate"; fieldtype = "DateTime"; }, @{fieldname = "WorkflowJSONData"; fieldtype = "Note"; }
       )
+
       Foreach ($field in $FieldLists) {
-        $addedField = m365 spo field add --webUrl $webURL --listTitle $listName --xml "<Field Type='$($field.fieldtype)' DisplayName='$($field.fieldname)' Required='FALSE' EnforceUniqueValues='FALSE' Indexed='FALSE' StaticName='$($field.fieldname)' Name='$($field.fieldname)'></Field>" --options  AddFieldToDefaultView
+        $addedField = m365 spo field add --webUrl $webURL --listTitle $listName --xml "<Field Type='$($field.fieldtype)' DisplayName='$($field.fieldname)' Required='FALSE' EnforceUniqueValues='FALSE' Indexed='FALSE' StaticName='$($field.fieldname)' Name='$($field.fieldname)'></Field>" --options AddFieldToDefaultView
       }
+
       Write-Host "Created SharePoint List $listName for logging the Outages."
     }
 
     #Getting current Tenant Status and do the needed operations
     $workLoads = m365 tenant serviceannouncement health list --issues --query "[?status != 'serviceOperational']" --output json | ConvertFrom-Json
-    $currentOutageServices = (m365 spo listitem list --webUrl $webURL --title $listName --fields "Title, Workload, Id"  --output json).Replace("ID", "_ID") | ConvertFrom-Json
+    $currentOutageServices = (m365 spo listitem list --webUrl $webURL --listTitle $listName --fields "Title, Workload, Id" --output json).Replace("ID", "_ID") | ConvertFrom-Json
 
     #Checking for any new outages
     $updateSinceLastExecution = $false
     Write-Host "`n### New Outages ###"
+
     Foreach ($workload in $workLoads) {
       if ($workload.id -notin $currentOutageServices.Workload) {
         #Add outage information to SharePoint List
-        $addedWorkLoad = m365 spo listitem add --webUrl $webURL --listTitle $listName --contentType Item --Title $workload.service --Workload $workload.id --FirstIdentifiedDate (Get-Date -Date $workload.issues[$workload.issues.Count -1].startDateTime -Format "MM/dd/yyyy HH:mm") --WorkflowJSONData (Out-String -InputObject $workload -Width 400)
+        $addedWorkLoad = m365 spo listitem add --webUrl $webURL --listTitle $listName --contentType Item --Title $workload.service --Workload $workload.id --FirstIdentifiedDate (Get-Date -Date $workload.issues[$workload.issues.Count -1].startDateTime) --WorkflowJSONData (Out-String -InputObject $workload -Width 400)
 
         #Send notification using CLI Commands
         m365 outlook mail send --to $notifyEmail --subject "Outage Reported in $($workload.service)" --bodyContents "An outage has been reported for the Service : $($workload.service) <a href='$webURL/Lists/$listName'>Access the Health Status List</a>" --bodyContentType HTML --saveToSentItems false
@@ -66,6 +70,7 @@ If you want to schedule the script directly, you can go ahead without the need o
         $updateSinceLastExecution = $true
       }
     }
+
     if ($updateSinceLastExecution -eq $false) {
       Write-Host "NO New Outages are reported yet."
     }
@@ -73,11 +78,11 @@ If you want to schedule the script directly, you can go ahead without the need o
     #Checking whether any existing outages are resolved
     $updateSinceLastExecution = $false
     Write-Host "`n### Resolved Outages ###"
+
     Foreach ($Service in $currentOutageServices) {
       if ($Service.Workload -notin $workLoads.id) {
-
         #Removing the outage information from SharePoint List
-        $removedRecord = m365 spo listitem remove --webUrl $webURL --listTitle $listName --id  $Service.Id --confirm
+        $removedRecord = m365 spo listitem remove --webUrl $webURL --listTitle $listName --id $Service.Id --confirm
 
         #Send notification using CLI Commands
         m365 outlook mail send --to $notifyEmail --subject "Outage RESOLVED for $($Service.Title)" --bodyContents "Outage which was reported for the Service : $($Service.Title) is RESOLVED." --bodyContentType HTML --saveToSentItems false
@@ -86,6 +91,7 @@ If you want to schedule the script directly, you can go ahead without the need o
         $updateSinceLastExecution = $true
       }
     }
+
     if ($updateSinceLastExecution -eq $false) {
       Write-Host "No further updates on the existing outages"
     }

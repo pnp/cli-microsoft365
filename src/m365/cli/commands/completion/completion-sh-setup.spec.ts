@@ -4,6 +4,7 @@ import appInsights from '../../../../appInsights';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./completion-sh-setup');
@@ -17,6 +18,7 @@ describe(commands.COMPLETION_SH_SETUP, () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     generateShCompletionStub = sinon.stub(autocomplete, 'generateShCompletion').callsFake(() => { });
     setupShCompletionStub = sinon.stub(autocomplete, 'setupShCompletion').callsFake(() => { });
   });
@@ -45,6 +47,7 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   after(() => {
     sinonUtil.restore([
       appInsights.trackEvent,
+      pid.getProcessName,
       autocomplete.generateShCompletion,
       autocomplete.setupShCompletion
     ]);

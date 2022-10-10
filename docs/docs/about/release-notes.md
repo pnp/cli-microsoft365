@@ -4,8 +4,14 @@
 
 ### New commands
 
+**Power Platform:**
+
+- [pp tenant settings list](../cmd/pp/tenant/tenant-settings-list.md) - lists the global Power Platform tenant settings [#3657](https://github.com/pnp/cli-microsoft365/issues/3657)
+- [pp dataverse table list](../cmd/pp/dataverse/table-list.md) - lists dataverse tables in a given environment [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
+
 **SharePoint:**
 
+- [spo file roleassignment remove](../cmd/spo/file/file-roleassignment-remove.md) - removes a role assignment from a file [#3693](https://github.com/pnp/cli-microsoft365/issues/3693)
 - [spo file roleinheritance reset](../cmd/spo/file/file-roleinheritance-reset.md) - restores the role inheritance of a file [#3595](https://github.com/pnp/cli-microsoft365/issues/3595)
 - [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
 
@@ -15,9 +21,14 @@
 - fixed examples for web roleassignment 'verb' that mentioned list roleassignment 'verb' instead [#3706](https://github.com/pnp/cli-microsoft365/issues/3706)
 - extended 'teams channel list' command with support for filtering shared teams channels [#3690](https://github.com/pnp/cli-microsoft365/issues/3690)
 - extended 'spo folder get' command with support to get folder by id [#3605](https://github.com/pnp/cli-microsoft365/issues/3605)
-- fixes docs not ending on an empty line [#3700](https://github.com/pnp/cli-microsoft365/issues/3700)
-- fixes incorrect docs titles [#3699](https://github.com/pnp/cli-microsoft365/issues/3699)
-- extends `spfx doctor` command with support for version 1.16.0-beta.1 [#3633](https://github.com/pnp/cli-microsoft365/issues/3633)
+- fixed docs not ending on an empty line [#3700](https://github.com/pnp/cli-microsoft365/issues/3700)
+- fixed incorrect docs titles [#3699](https://github.com/pnp/cli-microsoft365/issues/3699)
+- extended `spfx doctor` command with support for version 1.16.0-beta.1 [#3633](https://github.com/pnp/cli-microsoft365/issues/3633)
+- added additional vscode settings [#3084](https://github.com/pnp/cli-microsoft365/issues/3084)
+- added tracking shell to telemetry [#3769](https://github.com/pnp/cli-microsoft365/pull/3769)
+- updates example in 'spo folder roleinheritance reset' docs. [#3751](https://github.com/pnp/cli-microsoft365/issues/3751)
+- fixes 'spo hubsite' docs typos. [#3762](https://github.com/pnp/cli-microsoft365/issues/3762)
+- updates health status monitoring sample. [#3713](https://github.com/pnp/cli-microsoft365/issues/3713)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 

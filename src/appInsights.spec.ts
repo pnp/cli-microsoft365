@@ -1,14 +1,17 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
+import { pid } from './utils/pid';
 import { sinonUtil } from './utils/sinonUtil';
 
 const env = Object.assign({}, process.env);
 
 describe('appInsights', () => {
-
   afterEach(() => {
-    sinonUtil.restore(fs.existsSync);
+    sinonUtil.restore([
+      fs.existsSync,
+      pid.getProcessName
+    ]);
     delete require.cache[require.resolve('./appInsights')];
     process.env = env;
   });
@@ -30,5 +33,11 @@ describe('appInsights', () => {
     process.env.CLIMICROSOFT365_ENV = 'docker';
     const i: any = require('./appInsights');
     assert(i.default.commonProperties.env === 'docker');
+  });
+
+  it(`sets shell to empty string if couldn't resolve name from pid`, () => {
+    sinon.stub(pid, 'getProcessName').callsFake(() => undefined);
+    const i: any = require('./appInsights');
+    assert.strictEqual(i.default.commonProperties.shell, '');
   });
 });

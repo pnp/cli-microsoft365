@@ -5,6 +5,7 @@ import auth, { AuthType } from '../../Auth';
 import { Logger } from '../../cli/Logger';
 import Command, { CommandError } from '../../Command';
 import { accessToken } from '../../utils/accessToken';
+import { pid } from '../../utils/pid';
 import { sinonUtil } from '../../utils/sinonUtil';
 import commands from './commands';
 const command: Command = require('./status');
@@ -18,6 +19,7 @@ describe(commands.STATUS, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
   });
 
   beforeEach(() => {
@@ -47,7 +49,8 @@ describe(commands.STATUS, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 

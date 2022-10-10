@@ -1,6 +1,6 @@
 # spo hubsite disconnect
 
-Disconnects the specifies site collection from its hub site
+Disconnects the specified site collection from its hub site
 
 ## Usage
 
