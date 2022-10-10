@@ -127,7 +127,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('remove role assignment from folder by folderUrl', async () => {
+  it('remove the role assignment from the specified folder', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') {
         return Promise.resolve();
@@ -147,7 +147,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     });
   });
 
-  it('remove role assignment from folder and get principal id by upn', async () => {
+  it('remove the role assignment from the specified folder based on upn', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') {
         return Promise.resolve();
@@ -195,15 +195,18 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/FolderPermission',
-      upn: 'someaccount@tenant.onmicrosoft.com',
-      confirm: true } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        folderUrl: '/Shared Documents/FolderPermission',
+        upn: 'someaccount@tenant.onmicrosoft.com',
+        confirm: true
+      }
+    } as any), new CommandError(error));
   });
 
-  it('remove role assignment from folder and get principal id by group name', async () => {
+  it('remove the role assignment from specified folder based on the group name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/removeroleassignment(principalid=\'11\')') {
         return Promise.resolve();
@@ -251,12 +254,15 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/FolderPermission',
-      groupName: 'someGroup',
-      confirm: true } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        folderUrl: '/Shared Documents/FolderPermission',
+        groupName: 'someGroup',
+        confirm: true
+      }
+    } as any), new CommandError(error));
   });
 
   it('aborts removing role assignment when prompt not confirmed', async () => {
