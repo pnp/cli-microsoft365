@@ -176,17 +176,19 @@ class SpoListItemRoleAssignmentAddCommand extends SpoCommand {
 
       requestUrl += `items(${args.options.listItemId})/`;
 
-      args.options.roleDefinitionId = await this.getRoleDefinitionId(args.options);
+      const roleDefinitionId: number = await this.getRoleDefinitionId(args.options);
+      let principalId: number = 0;
       if (args.options.upn) {
-        args.options.principalId = await this.getUserPrincipalId(args.options);
-        await this.addRoleAssignment(requestUrl, args.options);
+        principalId = await this.getUserPrincipalId(args.options);
+        await this.addRoleAssignment(requestUrl, roleDefinitionId, principalId);
       }
       else if (args.options.groupName) {
-        args.options.principalId = await this.getGroupPrincipalId(args.options);
-        await this.addRoleAssignment(requestUrl, args.options);
+        principalId = await this.getGroupPrincipalId(args.options);
+        await this.addRoleAssignment(requestUrl, roleDefinitionId, principalId);
       }
       else {
-        await this.addRoleAssignment(requestUrl, args.options);
+        principalId = args.options.principalId as number;
+        await this.addRoleAssignment(requestUrl, roleDefinitionId, principalId);
       }
     }
     catch (err: any) {
@@ -194,10 +196,10 @@ class SpoListItemRoleAssignmentAddCommand extends SpoCommand {
     }
   }
 
-  private async addRoleAssignment(requestUrl: string, options: Options): Promise<void> {
+  private async addRoleAssignment(requestUrl: string, roleDefinitionId: number, principalId: number): Promise<void> {
     try {
       const requestOptions: any = {
-        url: `${requestUrl}roleassignments/addroleassignment(principalid='${options.principalId}',roledefid='${options.roleDefinitionId}')`,
+        url: `${requestUrl}roleassignments/addroleassignment(principalid='${principalId}',roledefid='${roleDefinitionId}')`,
         method: 'POST',
         headers: {
           'accept': 'application/json;odata=nometadata',
