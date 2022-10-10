@@ -35,14 +35,38 @@ m365 planner bucket add [options]
 
 ## Examples
 
-Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the ID _xqQg5FS2LkCp935s-FIFm2QAFkHM_ with order hint
+### Add a bucket with a name and an order hint.
 
-```sh
+Adds a new Microsoft Planner bucket with a name and an order hint. This will be created in a Planner plan based on its id.
+
+
+``` sh title="Command"
 m365 planner bucket add --name "My Planner Bucket" --planId "xqQg5FS2LkCp935s-FIFm2QAFkHM" --orderHint " !"
 ```
 
-Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the title _My Planner Plan_ owned by group _My Planner Group_
+``` json title="Output"
+{
+  "name": "My Planner Bucket",
+  "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
+  "orderHint": "8585363889524958496",
+  "id": "ttEB_Uj690STdR3GC1MIDZgANq1U"
+}
+```
 
-```sh
+### Add a bucket based on plan title and group name.
+
+Adds a new Microsoft Planner bucket with a name This will be created in a Planner plan based on its title and the plans group name.
+
+
+``` sh title="Command"
 m365 planner bucket add --name "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
+```
+
+``` json title="Output"
+{
+  "name": "My Planner Bucket",
+  "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
+  "orderHint": "8585363889524958496",
+  "id": "ttEB_Uj690STdR3GC1MIDZgANq1U"
+}
 ```

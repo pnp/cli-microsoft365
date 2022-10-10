@@ -856,6 +856,7 @@ markdown_extensions:
     - meta
     - toc:
           permalink: true
+    - pymdownx.details
     - pymdownx.highlight
     - pymdownx.snippets
     - pymdownx.superfences
