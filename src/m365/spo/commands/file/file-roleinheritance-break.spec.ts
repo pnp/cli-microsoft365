@@ -190,7 +190,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: webUrl,
         fileId: fileId
       }
     });

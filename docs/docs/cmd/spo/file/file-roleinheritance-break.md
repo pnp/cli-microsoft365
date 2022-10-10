@@ -1,6 +1,6 @@
 # spo file roleinheritance break
 
-Breaks inheritance of file. Keeping existing permissions is the default behavior.
+Breaks inheritance of a file. Keeping existing permissions is the default behavior.
 
 ## Usage
 
@@ -11,16 +11,16 @@ m365 spo file roleinheritance break [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the item for which to break role inheritance is located
+: URL of the site where the file is located
 
 `--fileUrl [fileUrl]`
-: The server-relative URL of the file to retrieve. Specify either url or id but not both
+: The server-relative URL of the file. Specify either `fileUrl` or `fileId` but not both
 
 `i, --fileId [fileId]`
-: The UniqueId (GUID) of the file to retrieve. Specify either url or id but not both
+: The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both
 
 `-c, --clearExistingPermissions`
-: Set to clear existing roles from the list item
+: Clear all existing permissions from the file
 
 `--confirm`
 : Don't prompt for confirmation
@@ -29,25 +29,25 @@ m365 spo file roleinheritance break [options]
 
 ## Examples
 
-Break inheritance of file with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Break the inheritance of a file with a specific id (UniqueId).
 
 ```sh
 m365 spo file roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileId "b2307a39-e878-458b-bc90-03bc578531d6"
 ```
 
-Break inheritance of file with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_ with clearing permissions 
+Break the inheritance of a file with a specific id (UniqueId) and clear all existing permissions.
 
 ```sh
 m365 spo file roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileId "b2307a39-e878-458b-bc90-03bc578531d6" --clearExistingPermissions
 ```
 
-Break inheritance of file with server-relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Break the inheritance of a file with a specific server-relative URL.
 
 ```sh
 m365 spo file roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileUrl "/sites/project-x/documents/Test1.docx"
 ```
 
-Break inheritance of file with server-relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_ with clearing permissions 
+Break the inheritance of a file with a specific server-relative URL and clear all existing permissions.
 
 ```sh
 m365 spo file roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --fileUrl "/sites/project-x/documents/Test1.docx" --clearExistingPermissions

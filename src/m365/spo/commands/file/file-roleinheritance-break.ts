@@ -29,7 +29,7 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Breaks inheritance of file. Keeping existing permissions is the default behavior.';
+    return 'Breaks inheritance of a file. Keeping existing permissions is the default behavior.';
   }
 
   constructor() {
@@ -98,15 +98,12 @@ class SpoFileRoleInheritanceBreakCommand extends SpoCommand {
       try {
         const fileURL: string = await this.getFileURL(args);
 
-        let keepExistingPermissions: boolean = true;
-        if (args.options.clearExistingPermissions) {
-          keepExistingPermissions = !args.options.clearExistingPermissions;
-        }
+        const keepExistingPermissions: boolean = !args.options.clearExistingPermissions;
 
         const requestOptions: AxiosRequestConfig = {
           url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileURL)}')/ListItemAllFields/breakroleinheritance(${keepExistingPermissions})`,
           headers: {
-            accept: 'application/json;odata.metadata=none'
+            accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
