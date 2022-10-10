@@ -32,7 +32,7 @@ m365 spo folder roleassignment remove [options]
 
 ## Examples
 
-Remove roleassignment from folder based on group name
+Remove the role assignment from the specified folder based on group name.
 
 ```sh
 m365 spo folder roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl  "/Shared Documents/FolderPermission" --groupName "saleGroup"
