@@ -9,7 +9,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import { Options as SpoEventReceiverGetOptions } from './eventreceiver-get';
 import commands from '../../commands';
 import request from '../../../../request';
-import { EventReceiver } from './eventreceiver';
+import { EventReceiver } from './EventReceiver';
 
 const getCommand: Command = require('./eventreceiver-get');
 

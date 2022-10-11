@@ -11,7 +11,7 @@ m365 spo eventreceiver remove [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: The URL of the web from which to remove the event receiver.
+: The URL of the web.
 
 `--listTitle [listTitle]`
 : The title of the list, _if the event receiver should be removed from a list_. Specify either `listTitle`, `listId` or `listUrl`.
@@ -23,10 +23,10 @@ m365 spo eventreceiver remove [options]
 : The url of the list, _if the event receiver should be retrieved from a list_. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-n, --name [name]`
-The name of the event receiver Specify either `name` or `id` but not both.
+The name. Specify either `name` or `id` but not both.
 
 `-i, --id [id]`
-The id of the event receiver. Specify either `name` or `id` but not both.
+The id. Specify either `name` or `id` but not both.
 
 `-s, --scope [scope]`
 : The scope. Can be either "site" or "web". Defaults to "web". Only applicable when not specifying any of the list properties.

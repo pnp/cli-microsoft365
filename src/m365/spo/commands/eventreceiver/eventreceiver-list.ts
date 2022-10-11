@@ -6,7 +6,7 @@ import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { EventReceiver } from './eventreceiver';
+import { EventReceiver } from './EventReceiver';
 
 interface CommandArgs {
   options: Options;
