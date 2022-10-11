@@ -1,6 +1,6 @@
 # spo eventreceiver remove
 
-Gets a specific event receiver attached to the web, site or list (if any of the list options are filled in) by receiver name of id and removes this one.
+Removes event receivers for the specified web, site, or list.
 
 ## Usage
 
@@ -14,16 +14,13 @@ m365 spo eventreceiver remove [options]
 : The URL of the web from which to remove the event receiver.
 
 `--listTitle [listTitle]`
-: The title of the list from which to remove the event receiver, _if the event receiver should be removed from a list_.
-Specify either `listTitle`, `listId` or `listUrl`.
+: The title of the list from which to remove the event receiver, _if the event receiver should be removed from a list_. Specify either `listTitle`, `listId` or `listUrl`.
 
 `--listId [listId]`
-: The id of the list from which to remove the event receiver, _if the event receiver should be retrieved from a list_.
-Specify either `listTitle`, `listId` or `listUrl`.
+: The id of the list from which to remove the event receiver, _if the event receiver should be retrieved from a list_. Specify either `listTitle`, `listId` or `listUrl`.
 
 `--listUrl [listUrl]`
-: The url of the list from which to remove the event receiver, _if the event receiver should be retrieved from a list_.
-Specify either `listTitle`, `listId` or `listUrl`.
+: The url of the list from which to remove the event receiver, _if the event receiver should be retrieved from a list_. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-n, --name [name]`
 The name of the event receiver to remove. Specify either `name` or `id` but not both.

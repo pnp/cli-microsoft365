@@ -9,6 +9,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import { Options as SpoEventReceiverGetOptions } from './eventreceiver-get';
 import commands from '../../commands';
 import request from '../../../../request';
+import { EventReceiver } from './eventreceiver';
 
 const getCommand: Command = require('./eventreceiver-get');
 
@@ -33,11 +34,7 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Gets a specific event receiver attached to the web, site or list (if any of the list options are filled in) by receiver name of id and removes this one';
-  }
-
-  public defaultProperties(): string[] | undefined {
-    return ['ReceiverId', 'ReceiverName'];
+    return 'Removes event receivers for the specified web, site, or list.';
   }
 
   constructor() {
@@ -130,14 +127,14 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const getEventReceiversOutput = await this.getEventReceivers(args.options);
-      const eventReceivers: any = JSON.parse(getEventReceiversOutput.stdout);
+      const eventReceivers: EventReceiver[] = JSON.parse(getEventReceiversOutput.stdout);
 
       if (!eventReceivers.length) { 
         throw Error(`Specified event receiver with ${args.options.id !== undefined ? `id ${args.options.id}` : `name ${args.options.name}`} cannot be found`); 
       }
 
       if (eventReceivers.length > 1) { 
-        throw Error(`Multiple eventreceivers with ${args.options.id !== undefined ? `id ${args.options.id}` : `name ${args.options.name}`} found`); 
+        throw Error(`Multiple eventreceivers with ${args.options.id !== undefined ? `id ${args.options.id} found` : `name ${args.options.name}, ids: ${eventReceivers.map(x => x.ReceiverId)} found`}`); 
       }
 
       if (args.options.confirm) {

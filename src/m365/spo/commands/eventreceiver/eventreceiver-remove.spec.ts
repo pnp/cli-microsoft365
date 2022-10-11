@@ -119,10 +119,6 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['ReceiverId', 'ReceiverName']);
-  });
-
   it('passes validation when all required parameters are valid', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Event Receiver' } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -359,7 +355,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
         scope: 'site', 
         name: 'PnP Test Receiver' 
       }
-    }), new CommandError(`Multiple eventreceivers with name PnP Test Receiver found`));
+    }), new CommandError(`Multiple eventreceivers with name PnP Test Receiver, ids: 625b1f4c-2869-457f-8b41-bed72059bb2b,41ad359e-ac6a-4a5e-8966-a85492ca4f52 found`));
   });
 
   it('shows error when multiple event receivers are found by id', async () => {

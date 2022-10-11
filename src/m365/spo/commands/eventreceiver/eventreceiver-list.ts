@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -5,6 +6,7 @@ import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { EventReceiver } from './eventreceiver';
 
 interface CommandArgs {
   options: Options;
@@ -123,7 +125,7 @@ class SpoEventreceiverListCommand extends SpoCommand {
       requestUrl += 'site/eventreceivers';
     }
 
-    const requestOptions: any = {
+    const requestOptions: AxiosRequestConfig = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -132,7 +134,7 @@ class SpoEventreceiverListCommand extends SpoCommand {
     };
 
     try {
-      const res = await request.get<{ value: any[] }>(requestOptions);
+      const res = await request.get<{ value: EventReceiver[] }>(requestOptions);
       logger.log(res.value);
     }
     catch (err: any) {
