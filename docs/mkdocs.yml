@@ -256,6 +256,8 @@ nav:
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
+      - dataverse:
+        - dataverse table list: 'cmd/pp/dataverse/dataverse-table-list.md'
       - environment:
         - environment list: 'cmd/pp/environment/environment-list.md'
       - gateway:
@@ -354,6 +356,7 @@ nav:
         - file move: 'cmd/spo/file/file-move.md'
         - file remove: 'cmd/spo/file/file-remove.md'
         - file rename: 'cmd/spo/file/file-rename.md'
+        - file roleassignment add: 'cmd/spo/file/file-roleassignment-add.md'
         - file roleassignment remove: 'cmd/spo/file/file-roleassignment-remove.md'
         - file roleinheritance reset: 'cmd/spo/file/file-roleinheritance-reset.md'
         - file sharinginfo get: 'cmd/spo/file/file-sharinginfo-get.md'
@@ -365,6 +368,7 @@ nav:
         - folder move: 'cmd/spo/folder/folder-move.md'
         - folder remove: 'cmd/spo/folder/folder-remove.md'
         - folder rename: 'cmd/spo/folder/folder-rename.md'
+        - folder roleinheritance break: 'cmd/spo/folder/folder-roleinheritance-break.md'
         - folder roleinheritance reset: 'cmd/spo/folder/folder-roleinheritance-reset.md'
       - group:
         - group add: 'cmd/spo/group/group-add.md'

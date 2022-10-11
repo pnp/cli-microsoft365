@@ -11,13 +11,13 @@ m365 spo hubsite get [options]
 ## Options
 
 `-i, --id [id]`
-: ID of the hubsite. Specify either `id`, `title` or `url` but not multiple.
+: ID of the hub site. Specify either `id`, `title` or `url` but not multiple.
 
 `-t, --title [title]`
-: Title of the hubsite. Specify either `id`, `title` or `url` but not multiple.
+: Title of the hub site. Specify either `id`, `title` or `url` but not multiple.
 
 `-u, --url [url]`
-: URL of the hubsite. Specify either `id`, `title` or `url` but not multiple.
+: URL of the hub site. Specify either `id`, `title` or `url` but not multiple.
 
 `--includeAssociatedSites`
 : Include the associated sites in the result (only in JSON output)

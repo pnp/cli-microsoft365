@@ -7,12 +7,15 @@
 **Power Platform:**
 
 - [pp tenant settings list](../cmd/pp/tenant/tenant-settings-list.md) - lists the global Power Platform tenant settings [#3657](https://github.com/pnp/cli-microsoft365/issues/3657)
+- [pp dataverse table list](../cmd/pp/dataverse/table-list.md) - lists dataverse tables in a given environment [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
 
 **SharePoint:**
 
 - [spo file roleassignment remove](../cmd/spo/file/file-roleassignment-remove.md) - removes a role assignment from a file [#3693](https://github.com/pnp/cli-microsoft365/issues/3693)
 - [spo file roleinheritance reset](../cmd/spo/file/file-roleinheritance-reset.md) - restores the role inheritance of a file [#3595](https://github.com/pnp/cli-microsoft365/issues/3595)
 - [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
+- [spo file roleassignment add](../cmd/spo/file/file-roleassignment-add.md) - adds role assignment to a file [#3702](https://github.com/pnp/cli-microsoft365/issues/3702)
+- [spo folder roleinheritance break](../cmd/spo/folder/folder-roleinheritance-break.md) - breaks the role inheritance of a folder [#3598](https://github.com/pnp/cli-microsoft365/issues/3598)
 
 ### Changes
 
@@ -25,6 +28,10 @@
 - extended `spfx doctor` command with support for version 1.16.0-beta.1 [#3633](https://github.com/pnp/cli-microsoft365/issues/3633)
 - added additional vscode settings [#3084](https://github.com/pnp/cli-microsoft365/issues/3084)
 - added tracking shell to telemetry [#3769](https://github.com/pnp/cli-microsoft365/pull/3769)
+- updates example in 'spo folder roleinheritance reset' docs. [#3751](https://github.com/pnp/cli-microsoft365/issues/3751)
+- fixes 'spo hubsite' docs typos. [#3762](https://github.com/pnp/cli-microsoft365/issues/3762)
+- updates health status monitoring sample. [#3713](https://github.com/pnp/cli-microsoft365/issues/3713)
+- fixes 'spo folder roleinheritance reset' and 'spo file roleinheritance reset' commands. [#3750](https://github.com/pnp/cli-microsoft365/issues/3750)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
