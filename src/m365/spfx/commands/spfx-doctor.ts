@@ -12,6 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   env?: string;
+  spfxVersion?: string;
 }
 
 /**
@@ -470,13 +471,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-    this.#initTypes();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        env: args.options.env
+        env: args.options.env,
+        spfxVersion: args.options.spfxVersion
       });
     });
   }
@@ -486,6 +487,10 @@ class SpfxDoctorCommand extends AnonymousCommand {
       {
         option: '-e, --env [env]',
         autocomplete: ['sp2016', 'sp2019', 'spo']
+      },
+      {
+        option: '-v, --spfxVersion [spfxVersion]',
+        autocomplete: Object.keys(this.versions)
       }
     );
   }
@@ -500,6 +505,12 @@ class SpfxDoctorCommand extends AnonymousCommand {
           }
         }
 
+        if (args.options.spfxVersion) {
+          if (!this.versions[args.options.spfxVersion]) {
+            return `${args.options.spfxVersion} is not a supported SharePoint Framework version. Supported versions are ${Object.keys(this.versions).join(', ')}`;
+          }
+        }
+
         if (args.options.output && args.options.output !== 'text') {
           return `The output option only accepts the type 'text'`;
         }
@@ -507,10 +518,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         return true;
       }
     );
-  }
-
-  #initTypes(): void {
-    this.types.string.push('e', 'env');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -526,9 +533,9 @@ class SpfxDoctorCommand extends AnonymousCommand {
     let spfxVersion: string = '';
     let prerequisites: SpfxVersionPrerequisites;
     const fixes: string[] = [];
-    
+
     try {
-      spfxVersion = await this.getSharePointFrameworkVersion(logger);
+      spfxVersion = args.options.spfxVersion ?? await this.getSharePointFrameworkVersion(logger);
 
       if (!spfxVersion) {
         logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework`));
@@ -541,7 +548,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         throw `spfx doctor doesn't support SPFx v${spfxVersion} at this moment`;
       }
 
-      logger.log(this.getStatus(CheckStatus.Success, `SharePoint Framework v${spfxVersion}`));
+      if (args.options.spfxVersion) {
+        await this.checkSharePointFrameworkVersion(args.options.spfxVersion, fixes, logger);
+      }
+      else {
+        // spfx was detected and if we are here, it means that we support it
+        logger.log(this.getStatus(CheckStatus.Success, `SharePoint Framework v${spfxVersion}`));
+      }
 
       await this.checkSharePointCompatibility(spfxVersion, prerequisites, args, fixes, logger);
       await this.checkNodeVersion(prerequisites, fixes, logger);
@@ -557,7 +570,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
         fixes.forEach(f => logger.log(`- ${f}`));
         logger.log(' ');
       }
-    } 
+    }
     catch (err: any) {
       logger.log(' ');
 
@@ -596,6 +609,24 @@ class SpfxDoctorCommand extends AnonymousCommand {
       .resolve(this.getNodeVersion())
       .then((nodeVersion: string): void => {
         this.checkStatus('Node', nodeVersion, prerequisites.node, OptionalOrRequired.Required, fixes, logger);
+      });
+  }
+
+  private checkSharePointFrameworkVersion(spfxVersionRequested: string, fixes: string[], logger: Logger): Promise<void> {
+    return this
+      .getPackageVersion('@microsoft/generator-sharepoint', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger)
+      .then((spfxVersionDetected: string): void => {
+        const versionCheck: VersionCheck = {
+          range: spfxVersionRequested,
+          fix: `npm i -g @microsoft/generator-sharepoint@${spfxVersionRequested}`
+        };
+        if (spfxVersionDetected) {
+          this.checkStatus(`SharePoint Framework`, spfxVersionDetected, versionCheck, OptionalOrRequired.Required, fixes, logger);
+        }
+        else {
+          logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework v${spfxVersionRequested} not found`));
+          fixes.push(versionCheck.fix);
+        }
       });
   }
 
