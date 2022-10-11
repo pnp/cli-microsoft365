@@ -14,6 +14,8 @@
 - [spo file roleassignment remove](../cmd/spo/file/file-roleassignment-remove.md) - removes a role assignment from a file [#3693](https://github.com/pnp/cli-microsoft365/issues/3693)
 - [spo file roleinheritance reset](../cmd/spo/file/file-roleinheritance-reset.md) - restores the role inheritance of a file [#3595](https://github.com/pnp/cli-microsoft365/issues/3595)
 - [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
+- [spo file roleassignment add](../cmd/spo/file/file-roleassignment-add.md) - adds role assignment to a file [#3702](https://github.com/pnp/cli-microsoft365/issues/3702)
+- [spo folder roleinheritance break](../cmd/spo/folder/folder-roleinheritance-break.md) - breaks the role inheritance of a folder [#3598](https://github.com/pnp/cli-microsoft365/issues/3598)
 
 ### Changes
 
@@ -29,6 +31,7 @@
 - updates example in 'spo folder roleinheritance reset' docs. [#3751](https://github.com/pnp/cli-microsoft365/issues/3751)
 - fixes 'spo hubsite' docs typos. [#3762](https://github.com/pnp/cli-microsoft365/issues/3762)
 - updates health status monitoring sample. [#3713](https://github.com/pnp/cli-microsoft365/issues/3713)
+- fixes 'spo folder roleinheritance reset' and 'spo file roleinheritance reset' commands. [#3750](https://github.com/pnp/cli-microsoft365/issues/3750)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
