@@ -256,6 +256,8 @@ nav:
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
+      - card:
+        - card list: 'cmd/pp/card/card-list.md'
       - dataverse:
         - dataverse table list: 'cmd/pp/dataverse/dataverse-table-list.md'
       - environment:
