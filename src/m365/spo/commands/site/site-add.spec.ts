@@ -10,6 +10,7 @@ import Command, {
 } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
@@ -25,6 +26,7 @@ describe(commands.SITE_ADD, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -63,7 +65,8 @@ describe(commands.SITE_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
     auth.service.spoUrl = undefined;

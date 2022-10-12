@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./o365group-recyclebinitem-restore');
@@ -91,7 +92,8 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
   });

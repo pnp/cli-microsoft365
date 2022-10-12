@@ -8,6 +8,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import { fsUtil } from '../../../../utils/fsUtil';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { FindingToReport } from './report-model';
@@ -62,7 +63,8 @@ describe(commands.PROJECT_DOCTOR, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 

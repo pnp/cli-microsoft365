@@ -6,6 +6,7 @@ import auth from '../../../Auth';
 import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
 import Command from '../../../Command';
+import { pid } from '../../../utils/pid';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const packageJSON = require('../../../../package.json');
@@ -20,6 +21,7 @@ describe(commands.DOCTOR, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     sinon.stub(Cli.getInstance().config, 'all').value({});
   });
@@ -53,6 +55,7 @@ describe(commands.DOCTOR, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
+      pid.getProcessName,
       Cli.getInstance().config.all
     ]);
     auth.service.connected = false;

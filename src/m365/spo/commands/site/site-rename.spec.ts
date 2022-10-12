@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
@@ -22,6 +23,7 @@ describe(commands.SITE_RENAME, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
@@ -64,6 +66,7 @@ describe(commands.SITE_RENAME, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
+      pid.getProcessName,
       global.setTimeout
     ]);
     auth.service.connected = false;

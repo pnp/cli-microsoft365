@@ -5,6 +5,7 @@ import appInsights from '../../../appInsights';
 import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
+import { pid } from '../../../utils/pid';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./cli-reconsent');
@@ -19,6 +20,7 @@ describe(commands.RECONSENT, () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
   });
 
   beforeEach(() => {
@@ -49,7 +51,8 @@ describe(commands.RECONSENT, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 

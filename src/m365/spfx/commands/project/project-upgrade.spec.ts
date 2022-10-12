@@ -9,6 +9,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import { fsUtil } from '../../../../utils/fsUtil';
 import { packageManager } from '../../../../utils/packageManager';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { Manifest, Project, VsCode } from './project-model';
@@ -74,7 +75,8 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 
@@ -2453,7 +2455,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.14.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading react web part 1.13.1 project to 1.14.0', async () => {
@@ -2461,7 +2463,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.14.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 13);
+    assert.strictEqual(findings.length, 12);
   });
 
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.13.1 project to 1.14.0', async () => {
@@ -2469,7 +2471,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await command.action(logger, { options: { toVersion: '1.14.0', output: 'json' } } as any);
     const findings: FindingToReport[] = log[0];
-    assert.strictEqual(findings.length, 24);
+    assert.strictEqual(findings.length, 23);
   });
   //#endregion
 
@@ -2592,23 +2594,23 @@ describe(commands.PROJECT_UPGRADE, () => {
   //#region 1.15.2
   it('e2e: shows correct number of findings for upgrading ace 1.15.2 project to 1.16.0-beta.1', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1152-ace'));
-  
+
     await command.action(logger, { options: { toVersion: '1.16.0-beta.1', output: 'json', preview: true } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 11);
   });
-  
+
   it('e2e: shows correct number of findings for upgrading application customizer 1.15.2 project to 1.16.0-beta.1', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1152-applicationcustomizer'));
-  
+
     await command.action(logger, { options: { toVersion: '1.16.0-beta.1', output: 'json', preview: true } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 13);
   });
-  
+
   it('e2e: shows correct number of findings for upgrading field customizer react 1.15.2 project to 1.16.0-beta.1', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1152-fieldcustomizer-react'));
-  
+
     await command.action(logger, { options: { toVersion: '1.16.0-beta.1', output: 'json', preview: true } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 13);
@@ -2616,39 +2618,39 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('e2e: shows correct number of findings for upgrading form customizer react 1.15.2 project to 1.16.0-beta.1', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1152-formcustomizer-react'));
-  
+
     await command.action(logger, { options: { toVersion: '1.16.0-beta.1', output: 'json', preview: true } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 15);
   });
-  
+
   it('e2e: shows correct number of findings for upgrading list view command set 1.15.2 project to 1.16.0-beta.1', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1152-listviewcommandset'));
-  
+
     await command.action(logger, { options: { toVersion: '1.16.0-beta.1', output: 'json', preview: true } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 13);
   });
-  
+
   it('e2e: shows correct number of findings for upgrading no framework web part 1.15.2 project to 1.16.0-beta.1', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1152-webpart-nolib'));
-  
+
     await command.action(logger, { options: { toVersion: '1.16.0-beta.1', output: 'json', preview: true } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 14);
   });
-  
+
   it('e2e: shows correct number of findings for upgrading react web part 1.15.2 project to 1.16.0-beta.1', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1152-webpart-react'));
-  
+
     await command.action(logger, { options: { toVersion: '1.16.0-beta.1', output: 'json', preview: true } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 15);
   });
-  
+
   it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.15.2 project to 1.16.0-beta.1', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1152-webpart-optionaldeps'));
-  
+
     await command.action(logger, { options: { toVersion: '1.16.0-beta.1', output: 'json', preview: true } } as any);
     const findings: FindingToReport[] = log[0];
     assert.strictEqual(findings.length, 24);

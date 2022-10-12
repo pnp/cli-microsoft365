@@ -1,12 +1,16 @@
 import * as url from 'url';
+import Command from '../../../../Command';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, spo } from '../../../../utils/spo';
+import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { Options as SpoFileRemoveOptions } from './file-remove';
+const removeCommand: Command = require('./file-remove');
 
 interface CommandArgs {
   options: Options;
@@ -170,57 +174,40 @@ class SpoFileMoveCommand extends SpoCommand {
   /**
    * Moves file in the site recycle bin
    */
-  private recycleFile(tenantUrl: string, targetUrl: string, filename: string, logger: Logger): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const targetFolderAbsoluteUrl: string = urlUtil.urlCombine(tenantUrl, targetUrl);
+  private async recycleFile(tenantUrl: string, targetUrl: string, filename: string, logger: Logger) : Promise<void> {
+    const targetFolderAbsoluteUrl: string = urlUtil.urlCombine(tenantUrl, targetUrl);
 
-      // since the target WebFullUrl is unknown we can use getRequestDigest
-      // to get it from target folder absolute url.
-      // Similar approach used here Microsoft.SharePoint.Client.Web.WebUrlFromFolderUrlDirect
-      spo.getRequestDigest(targetFolderAbsoluteUrl)
-        .then((contextResponse: ContextInfo): void => {
-          if (this.debug) {
-            logger.logToStderr(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
-          }
+    // since the target WebFullUrl is unknown we can use getRequestDigest
+    // to get it from target folder absolute url.
+    // Similar approach used here Microsoft.SharePoint.Client.Web.WebUrlFromFolderUrlDirect
+    const contextResponse = await spo.getRequestDigest(targetFolderAbsoluteUrl);
 
-          if (targetUrl.charAt(0) !== '/') {
-            targetUrl = `/${targetUrl}`;
-          }
-          if (targetUrl.lastIndexOf('/') !== targetUrl.length - 1) {
-            targetUrl = `${targetUrl}/`;
-          }
+    if (this.debug) {
+      logger.logToStderr(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
+    }
 
-          const requestUrl: string = `${contextResponse.WebFullUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(`${targetUrl}${filename}`)}')/recycle()`;
-          const requestOptions: any = {
-            url: requestUrl,
-            method: 'POST',
-            headers: {
-              'X-HTTP-Method': 'DELETE',
-              'If-Match': '*',
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
+    const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(contextResponse.WebFullUrl, targetUrl)}/${filename}`;
 
-          request.post(requestOptions)
-            .then((): void => {
-              resolve();
-            })
-            .catch((err: any): any => {
-              if (err.statusCode === 404) {
-                // file does not exist so can proceed
-                return resolve();
-              }
+    const removeOptions: SpoFileRemoveOptions = {
+      webUrl: contextResponse.WebFullUrl,
+      url: targetFileServerRelativeUrl,
+      recycle: true,
+      confirm: true,
+      debug: this.debug,
+      verbose: this.verbose
+    };
 
-              if (this.debug) {
-                logger.logToStderr(`recycleFile error...`);
-                logger.logToStderr(err);
-              }
-
-              reject(err);
-            });
-        }, (e: any) => reject(e));
-    });
+    try {
+      await Cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
+    } 
+    catch (err: any) {
+      if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {
+        
+      }
+      else {
+        throw err;
+      }
+    }
   }
 }
 

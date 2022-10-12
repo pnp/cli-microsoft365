@@ -1,13 +1,14 @@
 import * as assert from 'assert';
+import Axios from 'axios';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import Axios from 'axios';
 import appInsights from '../../appInsights';
 import auth, { AuthType } from '../../Auth';
 import { Cli } from '../../cli/Cli';
 import { CommandInfo } from '../../cli/CommandInfo';
 import { Logger } from '../../cli/Logger';
 import Command, { CommandError } from '../../Command';
+import { pid } from '../../utils/pid';
 import { sinonUtil } from '../../utils/sinonUtil';
 import commands from './commands';
 const command: Command = require('./login');
@@ -22,6 +23,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -56,7 +58,8 @@ describe(commands.LOGIN, () => {
       auth.clearConnectionInfo,
       auth.storeConnectionInfo,
       Axios.post,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 

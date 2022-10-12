@@ -7,6 +7,7 @@ import appInsights from '../../../../appInsights';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { External, ExternalConfiguration, Project } from './project-model';
@@ -59,7 +60,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 

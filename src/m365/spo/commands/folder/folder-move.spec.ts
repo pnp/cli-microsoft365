@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./folder-move');
@@ -69,6 +70,7 @@ describe(commands.FOLDER_MOVE, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
@@ -104,6 +106,7 @@ describe(commands.FOLDER_MOVE, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
+      pid.getProcessName,
       global.setTimeout
     ]);
     auth.service.connected = false;

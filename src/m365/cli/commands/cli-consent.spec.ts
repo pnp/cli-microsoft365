@@ -6,6 +6,7 @@ import { CommandInfo } from '../../../cli/CommandInfo';
 import { Logger } from '../../../cli/Logger';
 import Command from '../../../Command';
 import config from '../../../config';
+import { pid } from '../../../utils/pid';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./cli-consent');
@@ -19,7 +20,8 @@ describe(commands.CONSENT, () => {
   let originalAadAppId: string;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     originalTenant = config.tenant;
     originalAadAppId = config.cliAadAppId;
     commandInfo = Cli.getCommandInfo(command);
@@ -48,7 +50,8 @@ describe(commands.CONSENT, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 

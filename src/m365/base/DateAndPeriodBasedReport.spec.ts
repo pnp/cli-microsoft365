@@ -8,6 +8,7 @@ import { CommandInfo } from '../../cli/CommandInfo';
 import { Logger } from '../../cli/Logger';
 import { CommandError } from '../../Command';
 import request from '../../request';
+import { pid } from '../../utils/pid';
 import { sinonUtil } from '../../utils/sinonUtil';
 import DateAndPeriodBasedReport from './DateAndPeriodBasedReport';
 
@@ -37,6 +38,7 @@ describe('PeriodBasedReport', () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(mockCommand);
   });
@@ -67,6 +69,7 @@ describe('PeriodBasedReport', () => {
   after(() => {
     sinonUtil.restore([
       appInsights.trackEvent,
+      pid.getProcessName,
       auth.restoreAuth
     ]);
     auth.service.connected = false;

@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import { fsUtil } from '../../../../utils/fsUtil';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./package-generate');
@@ -27,6 +28,7 @@ describe(commands.PACKAGE_GENERATE, () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     (command as any).archive = admZipMock;
     commandInfo = Cli.getCommandInfo(command);
     Cli.getInstance().config;
@@ -79,7 +81,8 @@ describe(commands.PACKAGE_GENERATE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
   });
 

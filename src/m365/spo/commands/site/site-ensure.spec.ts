@@ -6,6 +6,7 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as spoWebGetCommand from '../web/web-get';
@@ -21,6 +22,7 @@ describe(commands.SITE_ENSURE, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -50,7 +52,8 @@ describe(commands.SITE_ENSURE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
   });
