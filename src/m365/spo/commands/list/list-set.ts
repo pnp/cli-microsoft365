@@ -1,6 +1,9 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -12,9 +15,11 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  title?: string;
-  id: string;
   webUrl: string;
+  id?: string;
+  title?: string;
+  url?: string;
+  newTitle?: string;
   allowDeletion?: string;
   allowEveryoneViewItems?: string;
   allowMultiResponses?: string;
@@ -176,7 +181,10 @@ class SpoListSetCommand extends SpoCommand {
 
       // add properties with identifiable data
       [
+        'id',
         'title',
+        'url',
+        'newTitle',
         'description',
         'templateFeatureId',
         'schemaXml',
@@ -226,13 +234,19 @@ class SpoListSetCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
-      },
-      {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-t, --title [title]'
+        option: '--id [id]'
+      },
+      {
+        option: '--url [url]'
+      },
+      {
+        option: '--title [title]'
+      },
+      {
+        option: '--newTitle [newTitle]'
       },
       {
         option: '--allowDeletion [allowDeletion]',
@@ -472,7 +486,16 @@ class SpoListSetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (!validation.isValidGuid(args.options.id)) {
+        const listOptions: any[] = [args.options.id, args.options.title, args.options.url];
+        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
+          return `Specify either list id or title or list url`;
+        }
+
+        if (listOptions.filter(item => item !== undefined).length === 0) {
+          return `Specify at least list id or title or list url`;
+        }
+
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
@@ -563,9 +586,20 @@ class SpoListSetCommand extends SpoCommand {
     }
 
     const requestBody: any = this.mapRequestBody(args.options);
+    let requestUrl = `${args.options.webUrl}/_api/web/`;
+    if (args.options.id) {
+      requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.id)}')/`;
+    }
+    else if (args.options.title) {
+      requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.title)}')/`;
+    }
+    else if (args.options.url) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
+      requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
+    }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')`,
+    const requestOptions: AxiosRequestConfig = {
+      url: requestUrl,
       method: 'POST',
       headers: {
         'X-HTTP-Method': 'MERGE',
@@ -588,8 +622,8 @@ class SpoListSetCommand extends SpoCommand {
   private mapRequestBody(options: Options): any {
     const requestBody: any = {};
 
-    if (options.title) {
-      requestBody.Title = options.title;
+    if (options.newTitle) {
+      requestBody.Title = options.newTitle;
     }
 
     if (options.description) {
