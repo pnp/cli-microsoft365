@@ -1,9 +1,11 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
+import { Publisher, Solution } from './Solution';
 
 interface CommandArgs {
   options: Options;
@@ -20,11 +22,11 @@ class PpSolutionListCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Lists dataverse tables in a given environment';
+    return 'Lists solutions in a given environment.';
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['SchemaName', 'EntitySetName', 'IsManaged'];
+    return ['uniquename', 'version', 'publisher'];
   }
 
   constructor() {
@@ -55,22 +57,35 @@ class PpSolutionListCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of tables for which the user is an admin...`);
+      logger.logToStderr(`Retrieving list of solutions for which the user is an admin...`);
     }
 
-    const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
-
-    const requestOptions: any = {
-      url: `${dynamicsApiUrl}/api/data/v9.0/EntityDefinitions?$select=MetadataId,IsCustomEntity,IsManaged,SchemaName,IconVectorName,LogicalName,EntitySetName,IsActivity,DataProviderId,IsRenameable,IsCustomizable,CanCreateForms,CanCreateViews,CanCreateCharts,CanCreateAttributes,CanChangeTrackingBeEnabled,CanModifyAdditionalSettings,CanChangeHierarchicalRelationship,CanEnableSyncToExternalSearchIndex&$filter=(IsIntersect eq false and IsLogicalEntity eq false and%0APrimaryNameAttribute ne null and PrimaryNameAttribute ne %27%27 and ObjectTypeCode gt 0 and%0AObjectTypeCode ne 4712 and ObjectTypeCode ne 4724 and ObjectTypeCode ne 9933 and ObjectTypeCode ne 9934 and%0AObjectTypeCode ne 9935 and ObjectTypeCode ne 9947 and ObjectTypeCode ne 9945 and ObjectTypeCode ne 9944 and%0AObjectTypeCode ne 9942 and ObjectTypeCode ne 9951 and ObjectTypeCode ne 2016 and ObjectTypeCode ne 9949 and%0AObjectTypeCode ne 9866 and ObjectTypeCode ne 9867 and ObjectTypeCode ne 9868) and (IsCustomizable/Value eq true or IsCustomEntity eq true or IsManaged eq false or IsMappable/Value eq true or IsRenameable/Value eq true)&api-version=9.1`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const res = await request.get<{ value: any[] }>(requestOptions);
-      logger.log(res.value);
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+
+      const requestOptions: AxiosRequestConfig = {
+        url: `${dynamicsApiUrl}/api/data/v9.0/solutions?$filter=isvisible eq true&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+
+      const res = await request.get<{ value: Solution[] }>(requestOptions);
+
+      if (!args.options.output || args.options.output === 'json') {
+        logger.log(res.value);
+      }
+      else {
+        //converted to text friendly output
+        logger.log(res.value.map(i => {
+          return {
+            uniquename: i.uniquename,
+            version: i.version,
+            publisher: (i.publisherid as Publisher).friendlyname
+          };
+        }));
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

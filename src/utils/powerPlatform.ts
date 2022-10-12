@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from "axios";
 import request from "../request";
 
 const powerPlatformResource = 'https://api.bap.microsoft.com';
@@ -12,7 +13,7 @@ export const powerPlatform = {
       url = `${powerPlatformResource}/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(environment)}`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: AxiosRequestConfig = {
       url: `${url}?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`,
       headers: {
         accept: 'application/json;odata.metadata=none'
