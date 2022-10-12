@@ -13,6 +13,9 @@ m365 spfx doctor [options]
 `-e, --env [env]`
 : Version of SharePoint for which to check compatibility: `sp2016|sp2019|spo`
 
+`-v, --spfxVersion [spfxVersion]`
+: Version of the SharePoint Framework Yeoman generator to check compatibility for without `v`, eg. `1.11.0`
+
 `-h, --help`
 : output usage information
 
@@ -48,7 +51,7 @@ Next to verifying the readiness of your environment to use a particular version 
 
 ## Examples
 
-Verify if your environment meets the requirements to work with the SharePoint Framework
+Verify if your environment meets the requirements to work with SharePoint Framework based on the globally installed version of the SharePoint Framework Yeoman generator or the current project
 
 ```sh
 m365 spfx doctor --output text
@@ -58,4 +61,10 @@ Verify if your environment meets the requirements to work with the SharePoint Fr
 
 ```sh
 m365 spfx doctor --env sp2019 --output text
+```
+
+Verify if your environment meets the requirements to work with SharePoint Framework v1.11.0
+
+```sh
+m365 spfx doctor --spfxVersion 1.11.0 --output text
 ```
