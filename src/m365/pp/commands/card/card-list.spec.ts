@@ -5,6 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./card-list');
@@ -75,6 +76,7 @@ describe(commands.CARD_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
 
@@ -117,16 +119,16 @@ describe(commands.CARD_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['name', 'cardid', 'publishdate']);
+    assert.deepStrictEqual(command.defaultProperties(), ['name', 'cardid', 'publishdate', 'createdon', 'modifiedon']);
   });
 
   it('retrieves cards', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(envResponse);
+          return envResponse;
         }
       }
 
@@ -134,24 +136,25 @@ describe(commands.CARD_LIST, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(cardResponse);
+          return cardResponse;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
     assert(loggerLogSpy.calledWith(cardResponse.value));
+
   });
 
   it('retrieves cards as admin', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(envResponse);
+          return envResponse;
         }
       }
 
@@ -159,11 +162,11 @@ describe(commands.CARD_LIST, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(cardResponse);
+          return cardResponse;
         }
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', asAdmin: true } });
@@ -171,34 +174,19 @@ describe(commands.CARD_LIST, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(envResponse);
+          return envResponse;
         }
       }
 
-      return Promise.reject({
-        error: {
-          'odata.error': {
-            code: '-1, InvalidOperationException',
-            message: {
-              value: `Resource '' does not exist or one of its queried reference-property objects are not present`
-            }
-          }
-        }
-      });
+      throw `Resource '' does not exist or one of its queried reference-property objects are not present`;
     });
 
-    try {
-      await command.action(logger, { options: { debug: false, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
-      assert.fail('No error message thrown.');
-    }
-    catch (ex) {
-      assert(ex, (new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present")).message);
-    }
+    await assert.rejects(command.action(logger, { options: { debug: false, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } }), new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present"));
   });
 
   it('supports debug mode', () => {

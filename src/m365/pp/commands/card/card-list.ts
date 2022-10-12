@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
@@ -11,7 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   environment: string;
-  asAdmin: boolean;
+  asAdmin?: boolean;
 }
 
 class PpCardListCommand extends PowerPlatformCommand {
@@ -24,7 +24,7 @@ class PpCardListCommand extends PowerPlatformCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['name', 'cardid', 'publishdate'];
+    return ['name', 'cardid', 'publishdate', 'createdon', 'modifiedon'];
   }
 
   constructor() {
@@ -55,22 +55,14 @@ class PpCardListCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of cards `);
+      logger.logToStderr(`Retrieving list of cards`);
     }
 
     const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
-    const requestOptions: any = {
-      url: `${dynamicsApiUrl}/api/data/v9.1/cards?$expand=owninguser($select=azureactivedirectoryobjectid,fullname)`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const res = await request.get<{ value: any[] }>(requestOptions);
-      logger.log(res.value);
+      const items: any = await odata.getAllItems(`${dynamicsApiUrl}/api/data/v9.1/cards?$expand=owninguser($select=azureactivedirectoryobjectid,fullname)`);
+      logger.log(items);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
