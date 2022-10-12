@@ -1,8 +1,6 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command, {
-  CommandError
-} from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -22,11 +20,6 @@ interface Options extends GlobalOptions {
   sourceUrl: string;
   targetFileName: string;
   force?: boolean;
-}
-
-export interface FileDeleteError {
-  error: CommandError;
-  stderr: string;
 }
 
 interface RenameResponse {
@@ -137,10 +130,10 @@ class SpoFileRenameCommand extends SpoCommand {
     return request.get(requestOptions);
   }
 
-  private deleteFile(webUrl: string, sourceUrl: string, targetFileName: string): Promise<void> {
+  private async deleteFile(webUrl: string, sourceUrl: string, targetFileName: string): Promise<void> {
     const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webUrl, sourceUrl.substring(0, sourceUrl.lastIndexOf('/')))}/${targetFileName}`;
 
-    const options: SpoFileRemoveOptions = {
+    const removeOptions: SpoFileRemoveOptions = {
       webUrl: webUrl,
       url: targetFileServerRelativeUrl,
       recycle: true,
@@ -148,15 +141,17 @@ class SpoFileRenameCommand extends SpoCommand {
       debug: this.debug,
       verbose: this.verbose
     };
-    return Cli.executeCommandWithOutput(removeCommand as Command, { options: { ...options, _: [] } })
-      .then(_ => {
-        return Promise.resolve();
-      }, (err: FileDeleteError) => {
-        if (err.error !== null && err.error.message !== null && err.error.message.includes('does not exist')) {
-          return Promise.resolve();
-        }
-        return Promise.reject(err);
-      });
+    try {
+      await Cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
+    } 
+    catch (err: any) {
+      if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {
+        
+      }
+      else {
+        throw err;
+      }
+    }
   }
 }
 

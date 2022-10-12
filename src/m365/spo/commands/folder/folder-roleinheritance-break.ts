@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger';
 import { AxiosRequestConfig } from 'axios';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -14,16 +15,17 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   folderUrl: string;
+  clearExistingPermissions?: boolean;
   confirm?: boolean;
 }
 
-class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
+class SpoFolderRoleInheritanceBreakCommand extends SpoCommand {
   public get name(): string {
-    return commands.FOLDER_ROLEINHERITANCE_RESET;
+    return commands.FOLDER_ROLEINHERITANCE_BREAK;
   }
 
   public get description(): string {
-    return 'Restores the role inheritance of a folder';
+    return 'Breaks the role inheritance of a folder. Keeping existing permissions is the default behavior.';
   }
 
   constructor() {
@@ -37,6 +39,7 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        clearExistingPermissions: !!args.options.clearExistingPermissions,
         confirm: !!args.options.confirm
       });
     });
@@ -51,6 +54,9 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
         option: '-f, --folderUrl <folderUrl>'
       },
       {
+        option: '-c, --clearExistingPermissions'
+      },
+      {
         option: '--confirm'
       }
     );
@@ -63,16 +69,17 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const resetFolderRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+    const keepExistingPermissions: boolean = !args.options.clearExistingPermissions;
+
+    const breakFolderRoleInheritance: () => Promise<void> = async (): Promise<void> => {
       try {
         const requestOptions: AxiosRequestConfig = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${args.options.folderUrl}')/ListItemAllFields/resetroleinheritance`,
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.folderUrl)}')/ListItemAllFields/breakroleinheritance(${keepExistingPermissions})`,
           headers: {
-            accept: 'application/json;odata=nometadata'
+            accept: 'application/json'
           },
           responseType: 'json'
         };
-
         await request.post(requestOptions);
       }
       catch (err: any) {
@@ -81,21 +88,21 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
     };
 
     if (args.options.confirm) {
-      await resetFolderRoleInheritance();
+      await breakFolderRoleInheritance();
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to reset the role inheritance of folder ${args.options.folderUrl} located in site ${args.options.webUrl}?`
+        message: `Are you sure you want to break the role inheritance of folder ${args.options.folderUrl} located in site ${args.options.webUrl}?`
       });
 
       if (result.continue) {
-        await resetFolderRoleInheritance();
+        await breakFolderRoleInheritance();
       }
     }
   }
 }
 
-module.exports = new SpoFolderRoleInheritanceResetCommand();
+module.exports = new SpoFolderRoleInheritanceBreakCommand();
