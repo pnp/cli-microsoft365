@@ -11,13 +11,16 @@ m365 teams channel remove [options]
 ## Options
 
 `-c, --channelId [channelId]`
-: The ID of the channel to remove
+: The ID of the channel to remove. Specify either `channelId` or `channelName` but not both
 
 `-n, --channelName [channelName]`
-: The name of the channel to remove. Specify channelId or channelName but not both
+: The name of the channel to remove. Specify either `channelId` or `channelName` but not both
 
-`-i, --teamId <teamId>`
-: The ID of the team to which the channel to remove belongs
+`-i, --teamId [teamId]`
+: The ID of the team to which the channel to remove belongs. Specify either `teamId` or `teamName` but not both
+
+`--teamName [teamName]`
+: The display name of the team to which the channel to remove belongs to. Specify either `teamId` or `teamName` but not both
 
 `--confirm`
 : Don't prompt for confirmation
@@ -45,15 +48,16 @@ m365 teams channel remove --channelId 19:f3dcbb1674574677abcae89cb626f1e6@thread
 Remove the specified Microsoft Teams channel by Name
 
 ```sh
-m365 teams channel remove --channelName 'channelName' --teamId d66b8110-fcad-49e8-8159-0d488ddb7656
+m365 teams channel remove --channelName 'channelName' --teamName "Team Name"
 ```
 
 Remove the specified Microsoft Teams channel by Name without confirmation
 
 ```sh
-m365 teams channel remove --channelName 'channelName' --teamId d66b8110-fcad-49e8-8159-0d488ddb7656 --confirm 
+m365 teams channel remove --channelName 'channelName' --teamName "Team Name" --confirm 
 ```
 
 ## More information
 
 - directory resource type (deleted items): [https://docs.microsoft.com/en-us/graph/api/resources/directory?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/resources/directory?view=graph-rest-1.0)
+
