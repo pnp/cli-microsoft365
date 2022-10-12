@@ -24,6 +24,10 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
     return 'Gets information about the specified Power Platform environment';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['name', 'id'];
+  }
+
   constructor() {
     super();
 
@@ -51,16 +55,13 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let url: string = '';
+    let url: string = `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments`;
     if (args.options.asAdmin) {
       url = `${this.resource}/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments`;
     }
-    else {
-      url = `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments`;
-    }
 
     const requestOptions: AxiosRequestConfig = {
-      url: `${url}?api-version=2020-10-01&$filter=name eq '${args.options.name}'`,
+      url: `${url}?api-version=2020-10-01`,
       headers: {
         accept: 'application/json'
       },
@@ -68,7 +69,9 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
     };
 
     const res: { value: Environment[] } = await request.get<{ value: Environment[] }>(requestOptions);
-    const environmentItem: Environment | undefined = res.value[0];
+    const environmentItem: Environment | undefined = res.value.filter((env: Environment) => {
+      return env.name === args.options.name;
+    })[0];
 
     if (!environmentItem) {
       throw `The specified Power Platform environment does not exist`;

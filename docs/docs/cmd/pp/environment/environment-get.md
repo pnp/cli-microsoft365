@@ -25,13 +25,13 @@ m365 pp environment get [options]
 
 ## Examples
 
-Get information about the Power Platform environment named _Default-d87a7535-dd31-4437-bfe1-95340acd55c5_
+Get information about the Power Platform environment by name
 
 ```sh
 m365 pp environment get --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 ```
 
-Get information about the Power Platform environment named _Default-d87a7535-dd31-4437-bfe1-95340acd55c5_ as Admin
+Get information as admin about the Power Platform environment by name 
 
 ```sh
 m365 pp environment get --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
