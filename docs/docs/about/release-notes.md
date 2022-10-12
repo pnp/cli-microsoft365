@@ -7,6 +7,7 @@
 **Power Platform:**
 
 - [pp dataverse table list](../cmd/pp/dataverse/table-list.md) - lists dataverse tables in a given environment [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
+- [pp solution list](../cmd/pp/solution/solution-list.md) - lists solutions in a given environment [#3711](https://github.com/pnp/cli-microsoft365/issues/3711)
 - [pp tenant settings list](../cmd/pp/tenant/tenant-settings-list.md) - lists the global Power Platform tenant settings [#3657](https://github.com/pnp/cli-microsoft365/issues/3657)
 
 **SharePoint:**
@@ -34,6 +35,7 @@
 - fixed 'spo folder roleinheritance reset' and 'spo file roleinheritance reset' commands [#3750](https://github.com/pnp/cli-microsoft365/issues/3750)
 - fixed issue with upgrading SPFx projects to v1.14 [#3665](https://github.com/pnp/cli-microsoft365/issues/3665)
 - extended spfx doctor to allow specifying version of SPFx to check compatibility for [#3780](https://github.com/pnp/cli-microsoft365/issues/3780)
+- Replace recycleFile() in spo file copy and spo file move [#3370](https://github.com/pnp/cli-microsoft365/issues/3370)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
