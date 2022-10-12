@@ -81,7 +81,7 @@ class TeamsChannelAddCommand extends GraphCommand {
         }
 
         if (args.options.type && ['standard', 'private', 'shared'].indexOf(args.options.type) === -1) {
-          return `${args.options.type} is not a valid type value. Allowed values standard|private.`;
+          return `${args.options.type} is not a valid type value. Allowed values standard|private|shared.`;
         }
 
         if ((args.options.type === 'private' || args.options.type === 'shared') && !args.options.owner) {
@@ -89,7 +89,7 @@ class TeamsChannelAddCommand extends GraphCommand {
         }
 
         if ((args.options.type !== 'private' && args.options.type !== 'shared') && args.options.owner) {
-          return `Specify owner only when creating a ${args.options.type} channel.`;
+          return `Specify owner only when creating a private or shared channel.`;
         }
 
         return true;

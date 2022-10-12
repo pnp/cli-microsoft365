@@ -26,7 +26,7 @@ m365 teams channel add [options]
 : Type of channel to create: `standard`, `private`, `shared`. Default `standard`.
 
 `--owner [owner]`
-: User with this ID or UPN will be added as owner of the private channel. This option is required when type is `private` or `shared`.
+: User with this ID or UPN will be added as owner of the channel. This option is required when type is `private` or `shared`.
 
 --8<-- "docs/cmd/_global.md"
 
