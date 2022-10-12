@@ -12,6 +12,7 @@ import * as SpoGroupGetCommand from '../group/group-get';
 import * as SpoRoleDefinitionListCommand from '../roledefinition/roledefinition-list';
 import { Logger } from '../../../../cli/Logger';
 import { CommandInfo } from '../../../../cli/CommandInfo';
+import { pid } from '../../../../utils/pid';
 const command: Command = require('./listitem-roleassignment-add');
 
 describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
@@ -22,6 +23,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -51,7 +53,8 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
   });
@@ -151,7 +154,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('fails validation neither roleDefinitionId nor roleDefinitionName is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listItemId: 1, groupName: 'someGroup'} }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listItemId: 1, groupName: 'someGroup' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -439,6 +442,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
         listItemId: 1,
         principalId: 11,
         roleDefinitionId: 1073741827
-      } } as any), new CommandError(error));
+      }
+    } as any), new CommandError(error));
   });
 });
