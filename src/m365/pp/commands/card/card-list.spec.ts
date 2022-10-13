@@ -105,7 +105,8 @@ describe(commands.CARD_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
   });
