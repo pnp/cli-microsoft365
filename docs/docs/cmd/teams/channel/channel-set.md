@@ -16,13 +16,13 @@ m365 teams channel set [options]
 `--teamName [teamName]`
 : The display name of the team where the channel to update is located. Specify either `teamId` or `teamName` but not both
 
-`-c, --channelId [channelId]`
+`-c, --id [id]`
 : The ID of the channel to update. Specify either `channelId` or `channelName` but not both
 
-`-n, --channelName [channelName]`
+`--name [name]`
 : The name of the channel to update. Specify either `channelId` or `channelName` but not both
 
-`--newChannelName [newChannelName]`
+`--newName [newName]`
 : The new name of the channel
 
 `--description [description]`
@@ -32,15 +32,15 @@ m365 teams channel set [options]
 
 ## Examples
   
-Set new description and display name for the channel with id _19:f3dcbb1674574677abcae89cb626f1e6@thread.skype_ in the Microsoft Teams team with id _00000000-0000-0000-0000-000000000000_
+Set new description and display name for the specified channel in the given Microsoft Teams team
 
 ```sh
-m365 teams channel set --teamId "00000000-0000-0000-0000-000000000000" --channelId 19:f3dcbb1674574677abcae89cb626f1e6@thread.skype --newChannelName Projects --description "Channel for new projects"
+m365 teams channel set --teamId "00000000-0000-0000-0000-000000000000" --name Reviews --newName Projects --description "Channel for new projects"
 ```
 
-Set new display name for the channel with name _Reviews_ in the Microsoft Teams team with name _Team Name_
+Set new display name for the specified channel in the given Microsoft Teams team
 
 ```sh
-m365 teams channel set --teamName "Team Name" --channelName Reviews --newChannelName Projects
+m365 teams channel set --teamId "00000000-0000-0000-0000-000000000000" --name Reviews --newName Projects
 ```
 
