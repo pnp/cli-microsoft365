@@ -259,7 +259,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
     assert(loggerLogSpy.calledWith(response));
   });
 
-  it('retrieves all content types of the specific list if listUrl option is passed', async () => {
+  it('adds contenttype to list when list url is used', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/ContentTypes/AddAvailableContentType') {
         return response;
@@ -279,6 +279,25 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
     assert(loggerLogSpy.calledWith(response));
   });
 
+  it('adds contenttype to list when list url is used (debug)', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/ContentTypes/AddAvailableContentType') {
+        return response;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listUrl: 'sites/documents',
+        contentTypeId: '0x0120'
+      }
+    });
+    assert(loggerLogSpy.calledWith(response));
+  });
 
   it('fails validation if both listId and listTitle options are not passed', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', contentTypeId: '0x0120' } }, commandInfo);
