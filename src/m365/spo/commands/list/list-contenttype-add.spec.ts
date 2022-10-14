@@ -236,6 +236,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         contentTypeId: '0x0120'
       }
     });
+    assert(loggerLogSpy.calledWith(response));
   });
 
   it('uses correct API url when listId option is passed', async () => {
@@ -255,7 +256,29 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         contentTypeId: '0x0120'
       }
     });
+    assert(loggerLogSpy.calledWith(response));
   });
+
+  it('retrieves all content types of the specific list if listUrl option is passed', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/ContentTypes/AddAvailableContentType') {
+        return response;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com',
+        listUrl: 'sites/documents',
+        contentTypeId: '0x0120'
+      }
+    });
+    assert(loggerLogSpy.calledWith(response));
+  });
+
 
   it('fails validation if both listId and listTitle options are not passed', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', contentTypeId: '0x0120' } }, commandInfo);
@@ -294,6 +317,21 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
   it('fails validation if the contentTypeId option is not passed', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if listId and listUrl are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: '/sites/Documents' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if listTitle and listUrl are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listUrl: '/sites/Documents' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation neither listTitle nor listId or listUrl is specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -15,6 +16,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   contentTypeId: string;
 }
 
@@ -43,15 +45,14 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-    this.#initTypes();
-    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined'
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined'
       });
     });
   }
@@ -68,6 +69,9 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
         option: '-t, --listTitle [listTitle]'
       },
       {
+        option: '--listUrl [listUrl]'
+      },
+      {
         option: '-c, --contentTypeId <contentTypeId>'
       }
     );
@@ -81,6 +85,15 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
+        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
+        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
+          return `Specify either list id or list title or list url`;
+        }
+
+        if (listOptions.filter(item => item !== undefined).length === 0) {
+          return `Specify at least list id or list title or list url`;
+        }
+
         if (args.options.listId) {
           if (!validation.isValidGuid(args.options.listId)) {
             return `${args.options.listId} is not a valid GUID`;
@@ -92,18 +105,19 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
     );
   }
 
-  #initTypes(): void {
-    this.types.string.push('contentTypeId', 'c');
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const baseUrl: string = args.options.listId ?
-      `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')` :
-      `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+
+    let baseUrl: string = `${args.options.webUrl}/_api/web/`;
+    if (args.options.listId) {
+      baseUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+    }
+    else if (args.options.listTitle) {
+      baseUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      baseUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
 
     if (this.verbose) {
       logger.logToStderr('Retrieving content type order...');
@@ -115,7 +129,6 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
       // see if the specified content type is among the registered content types
       // if it is, it means it's visible
       const contentTypeIndex: number = contentTypeOrder.findIndex(ct => ct.StringValue.toUpperCase() === args.options.contentTypeId.toUpperCase());
-      let res: any;
 
       if (contentTypeIndex > -1) {
         if (this.debug) {
@@ -132,22 +145,22 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
           if (this.verbose) {
             logger.logToStderr(`Setting content type ${args.options.contentTypeId} as default...`);
           }
-  
+
           // remove content type from the order array so that we can put it at
           // the beginning to make it default content type          
           contentTypeOrder.splice(contentTypeIndex, 1);
           contentTypeOrder.unshift({
             StringValue: args.options.contentTypeId
           });
-  
-          res = await this.updateContentTypeOrder(baseUrl, contentTypeOrder);
+
+          await this.updateContentTypeOrder(baseUrl, contentTypeOrder);
         }
       }
       else {
         if (this.debug) {
           logger.logToStderr(`Content type ${args.options.contentTypeId} is not visible in the list`);
         }
-  
+
         if (this.verbose) {
           logger.logToStderr('Retrieving list content types...');
         }
@@ -165,17 +178,15 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
           StringValue: args.options.contentTypeId
         });
 
-        res = await this.updateContentTypeOrder(baseUrl, contentTypeOrder);
+        await this.updateContentTypeOrder(baseUrl, contentTypeOrder);
       }
-
-      logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private getContentTypeOrder(baseUrl: string, logger: Logger): Promise<StringValue[]> {
+  private async getContentTypeOrder(baseUrl: string, logger: Logger): Promise<StringValue[]> {
     const requestOptions: AxiosRequestConfig = {
       url: `${baseUrl}/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`,
       headers: {
@@ -184,27 +195,23 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ ContentTypeOrder: StringValue[]; UniqueContentTypeOrder: StringValue[] | null }>(requestOptions)
-      .then(contentTypeOrder => {
-        let uniqueContentTypeOrder = contentTypeOrder.ContentTypeOrder;
-        if (contentTypeOrder.UniqueContentTypeOrder !== null) {
-          if (this.debug) {
-            logger.logToStderr('Using unique content type order');
-          }
-          uniqueContentTypeOrder = contentTypeOrder.UniqueContentTypeOrder as StringValue[];
-        }
-        else {
-          if (this.debug) {
-            logger.logToStderr('Unique content type order not defined. Using content type order');
-          }
-        }
-
-        return Promise.resolve(uniqueContentTypeOrder);
-      }, err => Promise.reject(err));
+    const response = await request.get<{ ContentTypeOrder: StringValue[]; UniqueContentTypeOrder: StringValue[] | null }>(requestOptions);
+    let uniqueContentTypeOrder = response.ContentTypeOrder;
+    if (response.UniqueContentTypeOrder !== null) {
+      if (this.debug) {
+        logger.logToStderr('Using unique content type order');
+      }
+      uniqueContentTypeOrder = response.UniqueContentTypeOrder as StringValue[];
+    }
+    else {
+      if (this.debug) {
+        logger.logToStderr('Unique content type order not defined. Using content type order');
+      }
+    }
+    return uniqueContentTypeOrder;
   }
 
-  private updateContentTypeOrder(baseUrl: string, contentTypeOrder: StringValue[]): Promise<void> {
+  private async updateContentTypeOrder(baseUrl: string, contentTypeOrder: StringValue[]): Promise<void> {
     const requestOptions: AxiosRequestConfig = {
       url: `${baseUrl}/RootFolder`,
       headers: {
@@ -218,10 +225,10 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    return request.post(requestOptions);
+    await request.post(requestOptions);
   }
 
-  private getListContentTypes(baseUrl: string): Promise<string[]> {
+  private async getListContentTypes(baseUrl: string): Promise<string[]> {
     const requestOptions: AxiosRequestConfig = {
       url: `${baseUrl}/ContentTypes?$select=Id`,
       headers: {
@@ -229,11 +236,8 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
       },
       responseType: 'json'
     };
-
-    return request
-      .get<ContentTypes>(requestOptions)
-      .then(contentTypes => contentTypes.value.map(ct => ct.Id.StringValue),
-        err => Promise.reject(err));
+    const response = await request.get<ContentTypes>(requestOptions);
+    return response.value.map(ct => ct.Id.StringValue);
   }
 }
 
