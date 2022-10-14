@@ -35,8 +35,9 @@
 - fixed 'spo folder roleinheritance reset' and 'spo file roleinheritance reset' commands [#3750](https://github.com/pnp/cli-microsoft365/issues/3750)
 - fixed issue with upgrading SPFx projects to v1.14 [#3665](https://github.com/pnp/cli-microsoft365/issues/3665)
 - extended spfx doctor to allow specifying version of SPFx to check compatibility for [#3780](https://github.com/pnp/cli-microsoft365/issues/3780)
-- replace recycleFile() in spo file copy and spo file move [#3370](https://github.com/pnp/cli-microsoft365/issues/3370)
-- update docs with our community Discord server [#3707](https://github.com/pnp/cli-microsoft365/issues/3707)
+- replaced recycleFile() in spo file copy and spo file move [#3370](https://github.com/pnp/cli-microsoft365/issues/3370)
+- updated docs with our community Discord server [#3707](https://github.com/pnp/cli-microsoft365/issues/3707)
+- added eslint rule to validate method naming [#3749](https://github.com/pnp/cli-microsoft365/issues/3749)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
