@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -14,6 +15,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   clearExistingPermissions?: boolean;
 }
 
@@ -32,7 +34,6 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -40,6 +41,7 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
         clearExistingPermissions: args.options.clearExistingPermissions === true
       });
     });
@@ -51,10 +53,13 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --listId [listId]'
+        option: '--listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]'
+        option: '--listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       },
       {
         option: '-c, --clearExistingPermissions'
@@ -70,6 +75,15 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
+        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
+        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
+          return `Specify either list id or list title or list url`;
+        }
+
+        if (listOptions.filter(item => item !== undefined).length === 0) {
+          return `Specify at least list id or list title or list url`;
+        }
+
         if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
           return `${args.options.listId} is not a valid GUID`;
         }
@@ -79,22 +93,21 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
     );
   }
 
-  #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Breaking role inheritance of list in site at ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = `${args.options.webUrl}/_api/web/lists`;
-
+    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
     if (args.options.listId) {
-      requestUrl += `(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+      requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
     }
-    else {
-      requestUrl += `/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+    else if (args.options.listTitle) {
+      requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
     }
 
     let keepExistingPermissions: boolean = true;
@@ -103,7 +116,7 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${requestUrl}/breakroleinheritance(${keepExistingPermissions})`,
+      url: `${requestUrl}breakroleinheritance(${keepExistingPermissions})`,
       method: 'POST',
       headers: {
         'accept': 'application/json;odata=nometadata',

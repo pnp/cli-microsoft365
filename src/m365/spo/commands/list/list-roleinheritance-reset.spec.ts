@@ -85,13 +85,28 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
     assert(containsTypeOption);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['listId', 'listTitle']]);
-  });
-
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if listId and listTitle are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if listId and listUrl are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: '/sites/Documents' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if listTitle and listUrl are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listUrl: '/sites/Documents' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation neither listTitle nor listId or listUrl is specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -111,12 +126,12 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
   });
 
   it('reset role inheritance on list by title', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/resetroleinheritance') > -1) {
-        return Promise.resolve();
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/lists/getByTitle(\'test\')/resetroleinheritance') {
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -128,13 +143,31 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
     });
   });
 
-  it('reset role inheritance on list by id', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'202b8199-b9de-43fd-9737-7f213f51c991\')/resetroleinheritance') > -1) {
-        return Promise.resolve();
+  it('reset role inheritance on list by list url', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/resetroleinheritance') {
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listUrl: 'sites/documents'
+      }
+    });
+  });
+
+  it('reset role inheritance on list by id', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/lists(guid\'202b8199-b9de-43fd-9737-7f213f51c991\')/resetroleinheritance') {
+        return;
+      }
+
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -148,12 +181,12 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
 
   it('list role inheritance reset command handles reject request correctly', async () => {
     const err = 'request rejected';
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/resetroleinheritance') > -1) {
-        return Promise.reject(err);
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/lists/getByTitle(\'test\')/resetroleinheritance') {
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
