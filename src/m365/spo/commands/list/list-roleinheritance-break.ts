@@ -53,10 +53,10 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--listId [listId]'
+        option: '-i, --listId [listId]'
       },
       {
-        option: '--listTitle [listTitle]'
+        option: '-t, --listTitle [listTitle]'
       },
       {
         option: '--listUrl [listUrl]'
