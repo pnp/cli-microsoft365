@@ -14,7 +14,7 @@ m365 spo list roleinheritance break [options]
 : URL of the site.
 
 `-i, --listId [listId]`
-: ID of the list. . Specify either `listTitle`, `listId` or `listUrl`.
+: ID of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-t, --listTitle [listTitle]`
 : Title of the list. Specify either `listTitle`, `listId` or `listUrl`.
