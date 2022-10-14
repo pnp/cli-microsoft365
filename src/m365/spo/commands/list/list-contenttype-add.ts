@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -14,6 +15,11 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
+  contentTypeId: string;
+}
+
+interface ContentTypeAddRequestBody {
   contentTypeId: string;
 }
 
@@ -40,7 +46,8 @@ class SpoListContentTypeAddCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined'
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined'
       });
     });
   }
@@ -57,6 +64,9 @@ class SpoListContentTypeAddCommand extends SpoCommand {
         option: '-t, --listTitle [listTitle]'
       },
       {
+        option: '--listUrl [listUrl]'
+      },
+      {
         option: '-c, --contentTypeId <contentTypeId>'
       }
     );
@@ -69,13 +79,11 @@ class SpoListContentTypeAddCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
-        if (args.options.listId) {
-          if (!validation.isValidGuid(args.options.listId)) {
-            return `${args.options.listId} is not a valid GUID`;
-          }
+
+        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -86,28 +94,33 @@ class SpoListContentTypeAddCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
+      const list: string = (args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl) as string;
       logger.logToStderr(`Adding content type ${args.options.contentTypeId} to list ${list} in site at ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = '';
-
+    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
     if (args.options.listId) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/ContentTypes/AddAvailableContentType`;
+      requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
     }
-    else {
-      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/ContentTypes/AddAvailableContentType`;
+    else if (args.options.listTitle) {
+      requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
 
-    const requestBody: any = this.mapRequestBody(args.options);
+    const requestBody: ContentTypeAddRequestBody = {
+      contentTypeId: args.options.contentTypeId
+    };
 
     const requestOptions: any = {
-      url: requestUrl,
+      url: `${requestUrl}/ContentTypes/AddAvailableContentType`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -122,12 +135,6 @@ class SpoListContentTypeAddCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private mapRequestBody(options: Options): any {
-    return {
-      contentTypeId: options.contentTypeId
-    };
   }
 }
 
