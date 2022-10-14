@@ -1,14 +1,15 @@
 [
   {
     "name": "cleanup-completed-todos",
-    "version": null,
     "source": "pnp",
     "title": "Cleanup completed Microsoft To Do tasks",
     "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/todo/cleanup-completed-todos",
     "creationDateTime": "2021-04-09",
     "updateDateTime": "2021-04-09",
     "shortDescription": "This script iterates across all of the task lists and removes the tasks that have been marked as complete.",
-    "longDescription": "Microsoft To Do is my task management tool of choice, I use it for tracking everything I do, which means I generate and complete a lot of tasks during a working week. This script iterates across all of the task lists and removes the tasks that have been marked as complete.",
+    "longDescription": [
+      "Microsoft To Do is my task management tool of choice, I use it for tracking everything I do, which means I generate and complete a lot of tasks during a working week. This script iterates across all of the task lists and removes the tasks that have been marked as complete."
+    ],
     "products": [
       "Microsoft To Do"
     ],
@@ -30,8 +31,7 @@
         "type": "image",
         "order": 100,
         "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/todo/cleanup-completed-todos/assets/preview.png",
-        "alt": "preview image for the sample",
-        "slides": null
+        "alt": "preview image for the sample"
       }
     ],
     "authors": [
