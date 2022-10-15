@@ -125,7 +125,7 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('reset role inheritance on list by title', async () => {
+  it('resets role inheritance on list by title', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/lists/getByTitle(\'test\')/resetroleinheritance') {
         return;
@@ -143,7 +143,7 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
     });
   });
 
-  it('reset role inheritance on list by list url', async () => {
+  it('resets role inheritance on list by list url', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/resetroleinheritance') {
         return;
@@ -161,7 +161,7 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
     });
   });
 
-  it('reset role inheritance on list by id', async () => {
+  it('resets role inheritance on list by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/lists(guid\'202b8199-b9de-43fd-9737-7f213f51c991\')/resetroleinheritance') {
         return;

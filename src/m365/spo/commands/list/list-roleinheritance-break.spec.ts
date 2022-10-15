@@ -105,7 +105,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation neither listTitle nor listId or listUrl is specified', async () => {
+  it('fails validation if neither listTitle nor listId or listUrl is specified', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

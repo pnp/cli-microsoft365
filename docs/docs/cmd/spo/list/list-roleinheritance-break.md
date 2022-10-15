@@ -11,7 +11,7 @@ m365 spo list roleinheritance break [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site.
+: URL of the site where the list is located.
 
 `-i, --listId [listId]`
 : ID of the list. Specify either `listTitle`, `listId` or `listUrl`.
@@ -20,7 +20,7 @@ m365 spo list roleinheritance break [options]
 : Title of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `--listUrl [listUrl]`
-: Relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`.
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-c, --clearExistingPermissions`
 : Flag if used clears all roles from the list
