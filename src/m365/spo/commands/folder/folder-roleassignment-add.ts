@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import { formatting } from '../../../../utils/formatting';
 import request from '../../../../request';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -127,10 +128,19 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     if (this.verbose) {
       logger.logToStderr(`Adding role assignment to folder in site at ${args.options.webUrl}...`);
     }
-    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
-    const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields`;
 
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
+    const roleFolderUrl = args.options.folderUrl[0] === '/' ? args.options.folderUrl : `'/'${args.options.folderUrl}'`;
     try {
+      let requestUrl: string = `${args.options.webUrl}/_api/web/`;
+
+      if (roleFolderUrl.split('/').length === 2) {
+        requestUrl += `GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+      }
+      else {
+        requestUrl += `GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields`;
+      }
+
       const roleDefinitionId = await this.getRoleDefinitionId(args.options);
       if (args.options.upn) {
         const upnPrincipalId = await this.getUserPrincipalId(args.options);

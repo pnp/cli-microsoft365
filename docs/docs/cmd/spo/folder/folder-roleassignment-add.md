@@ -47,9 +47,13 @@ Add the role assignment to the specified folder based on the principal Id and ro
 m365 spo folder roleassignment add --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents/FolderPermission" --principalId 2 --roleDefinitionId 1073741827 
 ```
 
-
 Add the role assignment to the specified folder based on the upn and role definition name
 
 ```sh
 m365 spo folder roleassignment add --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents/FolderPermission" --upn "test@contoso.onmicrosoft.com" --roleDefinitionName "Edit"
+```
+Add the role assignment to the root folder based on the upn and role definition name
+
+```sh
+m365 spo folder roleassignment add --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --folderUrl "/Shared Documents" --upn "test@contoso.onmicrosoft.com" --roleDefinitionName "Edit"
 ```
