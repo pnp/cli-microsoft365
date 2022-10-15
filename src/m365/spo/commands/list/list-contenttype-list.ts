@@ -37,6 +37,7 @@ class SpoListContentTypeListCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -74,15 +75,6 @@ class SpoListContentTypeListCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
-        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either list id or list title or list url`;
-        }
-
-        if (listOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least list id or list title or list url`;
-        }
-
         if (args.options.listId) {
           if (!validation.isValidGuid(args.options.listId)) {
             return `${args.options.listId} is not a valid GUID`;
@@ -92,6 +84,10 @@ class SpoListContentTypeListCommand extends SpoCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
