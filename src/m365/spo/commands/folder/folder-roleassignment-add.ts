@@ -130,7 +130,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     }
 
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
-    const roleFolderUrl = args.options.folderUrl[0] === '/' ? args.options.folderUrl : `'/'${args.options.folderUrl}'`;
+    const roleFolderUrl: string = urlUtil.getWebRelativePath(args.options.webUrl, args.options.folderUrl);
     try {
       let requestUrl: string = `${args.options.webUrl}/_api/web/`;
 
