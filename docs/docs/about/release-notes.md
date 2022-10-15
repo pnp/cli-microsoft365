@@ -12,6 +12,7 @@
 
 **SharePoint:**
 
+- [spo eventreceiver remove](../cmd/spo/eventreceiver/eventreceiver-remove.md) - removes event receivers for the specified web, site, or list. [#3307](https://github.com/pnp/cli-microsoft365/issues/3307)
 - [spo file roleassignment add](../cmd/spo/file/file-roleassignment-add.md) - adds role assignment to a file [#3702](https://github.com/pnp/cli-microsoft365/issues/3702)
 - [spo file roleassignment remove](../cmd/spo/file/file-roleassignment-remove.md) - removes a role assignment from a file [#3693](https://github.com/pnp/cli-microsoft365/issues/3693)
 - [spo file roleinheritance reset](../cmd/spo/file/file-roleinheritance-reset.md) - restores the role inheritance of a file [#3595](https://github.com/pnp/cli-microsoft365/issues/3595)
@@ -38,6 +39,8 @@
 - replaced recycleFile() in spo file copy and spo file move [#3370](https://github.com/pnp/cli-microsoft365/issues/3370)
 - updated docs with our community Discord server [#3707](https://github.com/pnp/cli-microsoft365/issues/3707)
 - added eslint rule to validate method naming [#3749](https://github.com/pnp/cli-microsoft365/issues/3749)
+- fixed formatting in pp documentation [#3815](https://github.com/pnp/cli-microsoft365/issues/3815)
+- extended 'spo group list' with associated groups output [#3546](https://github.com/pnp/cli-microsoft365/issues/3546)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
