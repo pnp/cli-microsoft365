@@ -59,13 +59,13 @@ class TeamsChannelGetCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --teamId [teamId]'
+        option: '--teamId [teamId]'
       },
       {
         option: '--teamName [teamName]'
       },
       {
-        option: '-c, --id [id]'
+        option: '-i, --id [id]'
       },
       {
         option: '--name [name]'
@@ -167,7 +167,7 @@ class TeamsChannelGetCommand extends GraphCommand {
 
       const res: Channel = await request.get<Channel>(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

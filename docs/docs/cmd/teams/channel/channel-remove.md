@@ -10,20 +10,20 @@ m365 teams channel remove [options]
 
 ## Options
 
-`-c, --id [id]`
-: The ID of the channel to remove
+`-i, --id [id]`
+: The ID of the channel to remove. Specify `id` or `name` but not both.
 
 `-n, --name [name]`
-: The name of the channel to remove. Specify id or name but not both
+: The name of the channel to remove. Specify `id` or `name` but not both.
 
-`-i, --teamId [teamId]`
-: The ID of the team to which the channel to remove belongs. Specify either `teamId` or `teamName` but not both
+`--teamId [teamId]`
+: The ID of the team to which the channel to remove belongs. Specify either `teamId` or `teamName` but not both.
 
 `--teamName [teamName]`
-: The display name of the team to which the channel to remove belongs. Specify either `teamId` or `teamName` but not both
+: The display name of the team to which the channel to remove belongs. Specify either `teamId` or `teamName` but not both.
 
 `--confirm`
-: Don't prompt for confirmation
+: Don't prompt for confirmation.
 
 --8<-- "docs/cmd/_global.md"
 

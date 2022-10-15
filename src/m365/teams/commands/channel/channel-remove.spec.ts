@@ -125,7 +125,7 @@ describe(commands.CHANNEL_REMOVE, () => {
   });
 
   it('fails to remove channel when channel does not exists', async () => {
-    const errorMessage = 'The specified channel does not exist in the Microsoft Teams team';
+    const errorMessage = 'The specified channel does not exist in this Microsoft Teams team';
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(name)}'`) {
         return { value: [] };
@@ -176,7 +176,7 @@ describe(commands.CHANNEL_REMOVE, () => {
   });
 
   it('fails when team name does not exist', async () => {
-    const errorMessage = 'The specified team does not exist in the Microsoft Teams';
+    const errorMessage = 'The specified team does not exist';
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(teamName)}'`) {
         return {
@@ -211,6 +211,29 @@ describe(commands.CHANNEL_REMOVE, () => {
         id: id,
         teamId: teamId,
         confirm: true
+      }
+    });
+  });
+
+  it('removes the specified channel by id when prompt confirmed (debug)', async () => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(id)}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        id: id,
+        teamId: teamId
       }
     });
   });

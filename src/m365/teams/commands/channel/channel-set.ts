@@ -60,13 +60,13 @@ class TeamsChannelSetCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-c, --id [id]'
+        option: '-i, --id [id]'
       },
       {
         option: '-n, --name [name]'
       },
       {
-        option: '-i, --teamId [teamId]'
+        option: '--teamId [teamId]'
       },
       {
         option: '--teamName [teamName]'
@@ -151,7 +151,7 @@ class TeamsChannelSetCommand extends GraphCommand {
     const group: Group = await aadGroup.getGroupByDisplayName(args.options.teamName!);
 
     if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
-      throw 'The specified team does not exist in the Microsoft Teams';
+      throw 'The specified team does not exist';
     }
     else {
       return group.id!;
@@ -164,7 +164,7 @@ class TeamsChannelSetCommand extends GraphCommand {
     }
 
     const channelRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.name as string)}'`,
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.name!)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -175,7 +175,7 @@ class TeamsChannelSetCommand extends GraphCommand {
     const channelItem: Channel | undefined = res.value[0];
 
     if (!channelItem) {
-      throw `The specified channel does not exist in the Microsoft Teams team`;
+      throw `The specified channel does not exist in this Microsoft Teams team`;
     }
 
     return channelItem.id;
