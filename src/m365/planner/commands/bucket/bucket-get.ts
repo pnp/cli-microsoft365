@@ -206,7 +206,7 @@ class PlannerBucketGetCommand extends GraphCommand {
     const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/planner/buckets/${id}`,
       headers: {
-        accept: 'application/json'
+        accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
