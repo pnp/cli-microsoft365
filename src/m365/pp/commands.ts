@@ -1,10 +1,11 @@
-const prefix: string = 'pp';
+const prefix: string = "pp";
 
 export default {
   CARD_LIST: `${prefix} card list`,
   DATAVERSE_TABLE_LIST: `${prefix} dataverse table list`,
   ENVIRONMENT_LIST: `${prefix} environment list`,
   GATEWAY_LIST: `${prefix} gateway list`,
+  GATEWAY_GET: `${prefix} gateway get`,
   MANAGEMENTAPP_ADD: `${prefix} managementapp add`,
   MANAGEMENTAPP_LIST: `${prefix} managementapp list`,
   SOLUTION_LIST: `${prefix} solution list`,

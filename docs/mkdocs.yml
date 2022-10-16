@@ -264,6 +264,7 @@ nav:
         - environment list: 'cmd/pp/environment/environment-list.md'
       - gateway:
         - gateway list: 'cmd/pp/gateway/gateway-list.md'
+        - gateway get: 'cmd/pp/gateway/gateway-get.md'
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
         - managementapp list: 'cmd/pp/managementapp/managementapp-list.md'
