@@ -1,10 +1,12 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { GroupPropertiesCollection } from "./GroupPropertiesCollection";
+import { AssociatedGroupPropertiesCollection } from './AssociatedGroupPropertiesCollection';
+import { GroupPropertiesCollection } from './GroupPropertiesCollection';
 
 interface CommandArgs {
   options: Options;
@@ -12,6 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
+  associatedGroupsOnly: boolean;
 }
 
 class SpoGroupListCommand extends SpoCommand {
@@ -24,20 +27,32 @@ class SpoGroupListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['Id', 'Title', 'LoginName', 'IsHiddenInUI', 'PrincipalType'];
+    return ['Id', 'Title', 'LoginName', 'IsHiddenInUI', 'PrincipalType', 'Type'];
   }
 
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        associatedGroupsOnly: (!(!args.options.associatedGroupsOnly)).toString()
+      });
+    });
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
         option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--associatedGroupsOnly'
       }
     );
   }
@@ -53,22 +68,50 @@ class SpoGroupListCommand extends SpoCommand {
       logger.logToStderr(`Retrieving list of groups for specified web at ${args.options.webUrl}...`);
     }
 
-    const requestUrl = `${args.options.webUrl}/_api/web/sitegroups`;
+    const baseUrl = `${args.options.webUrl}/_api/web`;
 
-    const requestOptions: any = {
-      url: requestUrl,
+    try {
+      if (!args.options.associatedGroupsOnly) {
+        await this.getSiteGroups(baseUrl, logger);
+      }
+      else {
+        await this.getAssociatedGroups(baseUrl, args.options, logger);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private async getSiteGroups(baseUrl: string, logger: Logger): Promise<void> {
+    const requestOptions: AxiosRequestConfig = {
+      url: baseUrl + '/sitegroups',
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    try {
-      const groupProperties = await request.get<GroupPropertiesCollection>(requestOptions);
-      logger.log(groupProperties.value);
+    const groupProperties = await request.get<GroupPropertiesCollection>(requestOptions);
+    logger.log(groupProperties.value);
+  }
+
+  private async getAssociatedGroups(baseUrl: string, options: Options, logger: Logger): Promise<void> {
+    const requestOptions: AxiosRequestConfig = {
+      url: baseUrl + '?$expand=AssociatedOwnerGroup,AssociatedMemberGroup,AssociatedVisitorGroup&$select=AssociatedOwnerGroup,AssociatedMemberGroup,AssociatedVisitorGroup',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+    const groupProperties = await request.get<AssociatedGroupPropertiesCollection>(requestOptions);
+    if (!options.output || options.output === 'json') {
+      logger.log(groupProperties);
     }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+    else {
+      //converted to text friendly output
+      const output = Object.getOwnPropertyNames(groupProperties).map(prop => ({ Type: prop, ...(groupProperties as any)[prop] }));
+      logger.log(output);
     }
   }
 }

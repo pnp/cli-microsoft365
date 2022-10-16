@@ -15,6 +15,11 @@
       alt="GitHub" />
   </a>
 
+  <a href="https://discord.com/invite/7rfW4kg6B5">
+    <img src="https://img.shields.io/badge/Discord-Join-7289da?style=flat-square"
+      alt="Discord" />
+  </a>
+
   <a href="https://twitter.com/climicrosoft365">
     <img src="https://img.shields.io/badge/Twitter-%40climicrosoft365-blue?style=flat-square"
       alt="Twitter" />

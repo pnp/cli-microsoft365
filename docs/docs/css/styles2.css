@@ -173,6 +173,15 @@
   display: block;
 }
 
+.cli-announcement {
+  color: #fff !important;
+}
+
+.cli-announcement:hover {
+  color: #fff !important;
+  text-decoration: none;
+}
+
 [data-md-color-scheme="slate"] .cli-grid-item-link-img {
   filter: invert(1);
 }

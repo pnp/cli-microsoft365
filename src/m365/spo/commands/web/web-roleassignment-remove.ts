@@ -106,17 +106,17 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
 
       try {
         if (args.options.upn) {
-          args.options.principalId = await this.GetUserPrincipalId(args.options);
-          await this.RemoveRoleAssignment(logger, args.options);
+          args.options.principalId = await this.getUserPrincipalId(args.options);
+          await this.removeRoleAssignment(logger, args.options);
         }
         else if (args.options.groupName) {
-          args.options.principalId = await this.GetGroupPrincipalId(args.options);
-          await this.RemoveRoleAssignment(logger, args.options);
+          args.options.principalId = await this.getGroupPrincipalId(args.options);
+          await this.removeRoleAssignment(logger, args.options);
         }
         else {
-          await this.RemoveRoleAssignment(logger, args.options);
-        }      
-      } 
+          await this.removeRoleAssignment(logger, args.options);
+        }
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -132,14 +132,14 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
         default: false,
         message: `Are you sure you want to remove role assignment from web ${args.options.webUrl}?`
       });
-      
+
       if (result.continue) {
         await removeRoleAssignment();
       }
     }
   }
 
-  private RemoveRoleAssignment(logger: Logger, options: Options): Promise<void> {
+  private removeRoleAssignment(logger: Logger, options: Options): Promise<void> {
     const requestOptions: any = {
       url: `${options.webUrl}/_api/web/roleassignments/removeroleassignment(principalid='${options.principalId}')`,
       method: 'POST',
@@ -156,7 +156,7 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
       .catch((err: any): Promise<void> => Promise.reject(err));
   }
 
-  private GetGroupPrincipalId(options: Options): Promise<number> {
+  private getGroupPrincipalId(options: Options): Promise<number> {
     const groupGetCommandOptions: SpoGroupGetCommandOptions = {
       webUrl: options.webUrl,
       name: options.groupName,
@@ -174,7 +174,7 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
       });
   }
 
-  private GetUserPrincipalId(options: Options): Promise<number> {
+  private getUserPrincipalId(options: Options): Promise<number> {
     const userGetCommandOptions: SpoUserGetCommandOptions = {
       webUrl: options.webUrl,
       email: options.upn,

@@ -6,14 +6,17 @@
 
 **Power Platform:**
 
-- [pp dataverse table list](../cmd/pp/dataverse/table-list.md) - lists dataverse tables in a given environment [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
+- [pp card list](../cmd/pp/card/card-list.md) - lists Microsoft Power Platform cards in the specified Power Platform environment [#3767](https://github.com/pnp/cli-microsoft365/issues/3767)
+- [pp dataverse table list](../cmd/pp/dataverse/dataverse-table-list.md) - lists dataverse tables in a given environment [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
 - [pp solution list](../cmd/pp/solution/solution-list.md) - lists solutions in a given environment [#3711](https://github.com/pnp/cli-microsoft365/issues/3711)
 - [pp tenant settings list](../cmd/pp/tenant/tenant-settings-list.md) - lists the global Power Platform tenant settings [#3657](https://github.com/pnp/cli-microsoft365/issues/3657)
 
 **SharePoint:**
 
+- [spo eventreceiver remove](../cmd/spo/eventreceiver/eventreceiver-remove.md) - removes event receivers for the specified web, site, or list. [#3307](https://github.com/pnp/cli-microsoft365/issues/3307)
 - [spo file roleassignment add](../cmd/spo/file/file-roleassignment-add.md) - adds role assignment to a file [#3702](https://github.com/pnp/cli-microsoft365/issues/3702)
 - [spo file roleassignment remove](../cmd/spo/file/file-roleassignment-remove.md) - removes a role assignment from a file [#3693](https://github.com/pnp/cli-microsoft365/issues/3693)
+- [spo file roleinheritance break](../cmd/spo/file/file-roleinheritance-break.md) - breaks inheritance of file [#3593](https://github.com/pnp/cli-microsoft365/issues/3593)
 - [spo file roleinheritance reset](../cmd/spo/file/file-roleinheritance-reset.md) - restores the role inheritance of a file [#3595](https://github.com/pnp/cli-microsoft365/issues/3595)
 - [spo folder roleinheritance break](../cmd/spo/folder/folder-roleinheritance-break.md) - breaks the role inheritance of a folder [#3598](https://github.com/pnp/cli-microsoft365/issues/3598)
 - [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
@@ -35,7 +38,13 @@
 - fixed 'spo folder roleinheritance reset' and 'spo file roleinheritance reset' commands [#3750](https://github.com/pnp/cli-microsoft365/issues/3750)
 - fixed issue with upgrading SPFx projects to v1.14 [#3665](https://github.com/pnp/cli-microsoft365/issues/3665)
 - extended spfx doctor to allow specifying version of SPFx to check compatibility for [#3780](https://github.com/pnp/cli-microsoft365/issues/3780)
-- Replace recycleFile() in spo file copy and spo file move [#3370](https://github.com/pnp/cli-microsoft365/issues/3370)
+- replaced recycleFile() in spo file copy and spo file move [#3370](https://github.com/pnp/cli-microsoft365/issues/3370)
+- updated docs with our community Discord server [#3707](https://github.com/pnp/cli-microsoft365/issues/3707)
+- added eslint rule to validate method naming [#3749](https://github.com/pnp/cli-microsoft365/issues/3749)
+- fixed formatting in pp documentation [#3815](https://github.com/pnp/cli-microsoft365/issues/3815)
+- extended 'spo group list' with associated groups output [#3546](https://github.com/pnp/cli-microsoft365/issues/3546)
+- extended 'teams channel add' command with support for adding shared channels [#3691](https://github.com/pnp/cli-microsoft365/issues/3691)
+- fixed pagination for 'pp dataverse table list' command [#3803](https://github.com/pnp/cli-microsoft365/issues/3803)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 

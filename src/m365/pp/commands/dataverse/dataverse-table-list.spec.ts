@@ -5,6 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./dataverse-table-list');
@@ -150,6 +151,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
 
@@ -178,7 +180,8 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
   });
@@ -192,7 +195,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['SchemaName', 'EntitySetName', 'IsManaged']);
+    assert.deepStrictEqual(command.defaultProperties(), ['SchemaName', 'EntitySetName', 'LogicalName', 'IsManaged']);
   });
 
   it('retrieves data from dataverse', async () => {

@@ -154,21 +154,21 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
           const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
           requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
         }
-  
+
         requestUrl += `items(${args.options.listItemId})/`;
-  
+
         if (args.options.upn) {
-          args.options.principalId = await this.GetUserPrincipalId(args.options);
-          await this.RemoveRoleAssignment(requestUrl, logger, args.options);
+          args.options.principalId = await this.getUserPrincipalId(args.options);
+          await this.removeRoleAssignment(requestUrl, logger, args.options);
         }
         else if (args.options.groupName) {
-          args.options.principalId = await this.GetGroupPrincipalId(args.options);
-          await this.RemoveRoleAssignment(requestUrl, logger, args.options);
+          args.options.principalId = await this.getGroupPrincipalId(args.options);
+          await this.removeRoleAssignment(requestUrl, logger, args.options);
         }
         else {
-          await this.RemoveRoleAssignment(requestUrl, logger, args.options);
+          await this.removeRoleAssignment(requestUrl, logger, args.options);
         }
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -184,14 +184,14 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
         default: false,
         message: `Are you sure you want to remove role assignment from listitem ${args.options.listItemId} from list ${args.options.listId || args.options.listTitle} from site ${args.options.webUrl}?`
       });
-      
+
       if (result.continue) {
         await removeRoleAssignment();
       }
     }
   }
 
-  private RemoveRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
+  private removeRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
     const requestOptions: any = {
       url: `${requestUrl}roleassignments/removeroleassignment(principalid='${options.principalId}')`,
       method: 'POST',
@@ -208,7 +208,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
       .catch((err: any) => Promise.reject(err));
   }
 
-  private GetGroupPrincipalId(options: Options): Promise<number> {
+  private getGroupPrincipalId(options: Options): Promise<number> {
     const groupGetCommandOptions: SpoGroupGetCommandOptions = {
       webUrl: options.webUrl,
       name: options.groupName,
@@ -226,7 +226,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
       });
   }
 
-  private GetUserPrincipalId(options: Options): Promise<number> {
+  private getUserPrincipalId(options: Options): Promise<number> {
     const userGetCommandOptions: SpoUserGetCommandOptions = {
       webUrl: options.webUrl,
       email: options.upn,
