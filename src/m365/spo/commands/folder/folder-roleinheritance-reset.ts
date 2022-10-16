@@ -67,7 +67,7 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
     const roleFolderUrl: string = urlUtil.getWebRelativePath(args.options.webUrl, args.options.folderUrl);
-    let requestUrl: string = "${args.options.webUrl }/_api/web/";
+    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
 
     const resetFolderRoleInheritance: () => Promise<void> = async (): Promise<void> => {
       try {
