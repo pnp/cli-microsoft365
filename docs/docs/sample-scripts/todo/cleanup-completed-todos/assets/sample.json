@@ -1,6 +1,6 @@
 [
   {
-    "name": "cleanup-completed-todos",
+    "name": "pnp-cli-microsoft365-cleanup-completed-todos",
     "source": "pnp",
     "title": "Cleanup completed Microsoft To Do tasks",
     "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/todo/cleanup-completed-todos",
