@@ -2,13 +2,14 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { formatting } from '../../../../utils/formatting';
 import { Cli } from '../../../../cli/Cli';
+import { formatting } from '../../../../utils/formatting';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils/sinonUtil';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 import { pid } from '../../../../utils/pid';
 const command: Command = require('./folder-roleinheritance-break');
@@ -16,6 +17,7 @@ const command: Command = require('./folder-roleinheritance-break');
 describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const folderUrl = '/Shared Documents/TestFolder';
+  const rootFolderUrl = '/Shared Documents';
 
   let log: any[];
   let logger: Logger;
@@ -115,8 +117,9 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
   });
 
   it('breaks role inheritance on folder by site-relative URL (debug)', async () => {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, folderUrl);
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')/ListItemAllFields/breakroleinheritance(true)`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields/breakroleinheritance(true)`) {
         return;
       }
 
@@ -134,8 +137,9 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
   });
 
   it('breaks role inheritance on folder by site-relative URL when prompt confirmed', async () => {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, folderUrl);
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')/ListItemAllFields/breakroleinheritance(true)`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields/breakroleinheritance(true)`) {
         return;
       }
 
@@ -155,9 +159,32 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
     });
   });
 
-  it('breaks role inheritance and clears existing scopes on folder by site-relative URL when prompt confirmed', async () => {
+  it('breaks role inheritance on root folder URL of a library when prompt confirmed', async () => {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, rootFolderUrl);
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')/ListItemAllFields/breakroleinheritance(false)`) {
+      if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')/breakroleinheritance(true)`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        folderUrl: rootFolderUrl
+      }
+    });
+  });
+  it('breaks role inheritance and clears existing scopes on folder by site-relative URL when prompt confirmed', async () => {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, rootFolderUrl);
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields/breakroleinheritance(false)`) {
         return;
       }
 
