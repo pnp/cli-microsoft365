@@ -39,6 +39,10 @@ m365 planner bucket set [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Response
+
+The command won't return a response on success.
+
 ## Examples
 
 Updates the Microsoft Planner bucket with ID _vncYUXCRBke28qMLB-d4xJcACtNz_

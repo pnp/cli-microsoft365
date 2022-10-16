@@ -27,6 +27,41 @@ m365 planner bucket list [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Response
+
+!!! note
+    The response object shown belown might be shortened for readability.
+
+Here is an example of the response from this command.
+
+=== "JSON"
+
+    ``` json
+    [
+      {
+        "name": "My Planner Bucket",
+        "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
+        "orderHint": "8585363889524958496",
+        "id": "ttEB_Uj690STdR3GC1MIDZgANq1U"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ``` text
+    id                            name               planId                        orderHint
+    ----------------------------  -----------------  ----------------------------  -------------------
+    ttEB_Uj690STdR3GC1MIDZgANq1U  My Planner Bucket  xqQg5FS2LkCp935s-FIFm2QAFkHM  8585363889524958496
+    ```
+
+=== "CSV"
+
+    ``` CSV
+    id,name,planId,orderHint
+    ttEB_Uj690STdR3GC1MIDZgANq1U,My Planner Bucket,xqQg5FS2LkCp935s-FIFm2QAFkHM,8585363889524958496
+    ```
+
 ## Examples
 
 Lists the Microsoft Planner buckets in the Plan _xqQg5FS2LkCp935s-FIFm2QAFkHM_

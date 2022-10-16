@@ -33,6 +33,40 @@ m365 planner bucket get [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Response
+
+!!! note
+    The response object shown belown might be shortened for readability.
+
+Here is an example of the response from this command.
+
+=== "JSON"
+
+    ``` json
+    {
+      "name": "My Planner Bucket",
+      "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
+      "orderHint": "8585363889524958496",
+      "id": "ttEB_Uj690STdR3GC1MIDZgANq1U"
+    }
+    ```
+
+=== "Text"
+
+    ``` text
+    id       : ttEB_Uj690STdR3GC1MIDZgANq1U
+    name     : My Planner Bucket
+    orderHint: 8585363889524958496
+    planId   : xqQg5FS2LkCp935s-FIFm2QAFkHM
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,name,planId,orderHint
+    ttEB_Uj690STdR3GC1MIDZgANq1U,My Planner Bucket,xqQg5FS2LkCp935s-FIFm2QAFkHM,8585363889524958496
+    ```
+
 ## Examples
 
 Gets the specified Microsoft Planner bucket 

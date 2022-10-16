@@ -36,6 +36,10 @@ m365 planner bucket remove [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Response
+
+The command won't return a response on success.
+
 ## Examples
 
 Removes the Microsoft Planner bucket by ID

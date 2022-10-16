@@ -31,6 +31,111 @@ m365 planner plan add [options]
 
 Related to the options `--shareWithUserIds` and `--shareWithUserNames`. If you are leveraging Microsoft 365 groups, use the `aad o365group user` commands to manage group membership to share the [group's](https://pnp.github.io/cli-microsoft365/cmd/aad/o365group/o365group-user-add/) plan. You can also add existing members of the group to this collection though it is not required for them to access the plan owned by the group.
 
+## Response
+
+!!! note
+    The response object shown belown might be shortened for readability.
+
+### Standard response
+
+Here is an example of the response from this command.
+
+=== "JSON"
+
+    ``` json
+    {
+      "createdDateTime": "2015-03-30T18:36:49.2407981Z",
+      "owner": "ebf3b108-5234-4e22-b93d-656d7dae5874",
+      "title": "My Planner Plan",
+      "id": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
+      "createdBy": {
+        "user": {
+          "displayName": null,
+          "id": "95e27074-6c4a-447a-aa24-9d718a0b86fa"
+        },
+        "application": {
+          "displayName": null,
+          "id": "ebf3b108-5234-4e22-b93d-656d7dae5874"
+        }
+      },
+      "container": {
+        "containerId": "ebf3b108-5234-4e22-b93d-656d7dae5874",
+        "type": "group",
+        "url": "https://graph.microsoft.com/v1.0/groups/ebf3b108-5234-4e22-b93d-656d7dae5874"
+      }
+    }
+    ```
+
+=== "Text"
+
+    ``` text
+    createdDateTime: 2015-03-30T18:36:49.2407981Z
+    id             : xqQg5FS2LkCp935s-FIFm2QAFkHM
+    owner          : ebf3b108-5234-4e22-b93d-656d7dae5874
+    title          : My Planner Plan
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,title,createdDateTime,owner
+    xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
+    ```
+
+### `shareWithUserIds`, `shareWithUserNames` response
+
+When we make use of the option `shareWithUserIds` or `shareWithUserNames` the response will differ. Here is an example of the response.
+
+=== "JSON"
+
+    ``` json
+    {
+      "createdDateTime": "2015-03-30T18:36:49.2407981Z",
+      "owner": "ebf3b108-5234-4e22-b93d-656d7dae5874",
+      "title": "My Planner Plan",
+      "id": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
+      "createdBy": {
+        "user": {
+          "displayName": null,
+          "id": "95e27074-6c4a-447a-aa24-9d718a0b86fa"
+        },
+        "application": {
+          "displayName": null,
+          "id": "ebf3b108-5234-4e22-b93d-656d7dae5874"
+        }
+      },
+      "container": {
+        "containerId": "ebf3b108-5234-4e22-b93d-656d7dae5874",
+        "type": "group",
+        "url": "https://graph.microsoft.com/v1.0/groups/ebf3b108-5234-4e22-b93d-656d7dae5874"
+      },
+      "sharedWith": {
+        "ebf3b108-5234-4e22-b93d-656d7dae5874": true,
+        "6463a5ce-2119-4198-9f2a-628761df4a62": true
+      },
+      "categoryDescriptions": {
+        "category1": null,
+        "category25": null
+      }
+    }
+    ```
+
+=== "Text"
+
+    ``` text
+    createdDateTime: 2015-03-30T18:36:49.2407981Z
+    id             : xqQg5FS2LkCp935s-FIFm2QAFkHM
+    owner          : ebf3b108-5234-4e22-b93d-656d7dae5874
+    title          : My Planner Plan
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,title,createdDateTime,owner
+    xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
+    ```
+
 ## Examples
 
 Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_

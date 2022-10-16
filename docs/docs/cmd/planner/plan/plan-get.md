@@ -36,6 +36,63 @@ m365 planner plan details get [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Response
+
+!!! note
+    The response object shown belown might be shortened for readability.
+
+Here is an example of the response from this command.
+
+=== "JSON"
+
+    ``` json
+    {
+      "createdDateTime": "2015-03-30T18:36:49.2407981Z",
+      "owner": "ebf3b108-5234-4e22-b93d-656d7dae5874",
+      "title": "My Planner Plan",
+      "id": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
+      "createdBy": {
+        "user": {
+          "displayName": null,
+          "id": "95e27074-6c4a-447a-aa24-9d718a0b86fa"
+        },
+        "application": {
+          "displayName": null,
+          "id": "ebf3b108-5234-4e22-b93d-656d7dae5874"
+        }
+      },
+      "container": {
+        "containerId": "ebf3b108-5234-4e22-b93d-656d7dae5874",
+        "type": "group",
+        "url": "https://graph.microsoft.com/v1.0/groups/ebf3b108-5234-4e22-b93d-656d7dae5874"
+      },
+      "sharedWith": {
+        "ebf3b108-5234-4e22-b93d-656d7dae5874": true,
+        "6463a5ce-2119-4198-9f2a-628761df4a62": true
+      },
+      "categoryDescriptions": {
+        "category1": null,
+        "category25": null
+      }
+    }
+    ```
+
+=== "Text"
+
+    ``` text
+    createdDateTime: 2015-03-30T18:36:49.2407981Z
+    id             : xqQg5FS2LkCp935s-FIFm2QAFkHM
+    owner          : ebf3b108-5234-4e22-b93d-656d7dae5874
+    title          : My Planner Plan
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,title,createdDateTime,owner
+    xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
+    ```
+
 ## Examples
 
 Returns the Microsoft Planner plan with id _gndWOTSK60GfPQfiDDj43JgACDCb_

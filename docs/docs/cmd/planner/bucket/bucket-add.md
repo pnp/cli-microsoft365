@@ -33,40 +33,50 @@ m365 planner bucket add [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Response
+
+!!! note
+    The response object shown belown might be shortened for readability.
+
+Here is an example of the response from this command.
+
+=== "JSON"
+
+    ``` json
+    {
+      "name": "My Planner Bucket",
+      "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
+      "orderHint": "8585363889524958496",
+      "id": "ttEB_Uj690STdR3GC1MIDZgANq1U"
+    }
+    ```
+
+=== "Text"
+
+    ``` text
+    id       : ttEB_Uj690STdR3GC1MIDZgANq1U
+    name     : My Planner Bucket
+    orderHint: 8585363889524958496
+    planId   : xqQg5FS2LkCp935s-FIFm2QAFkHM
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,name,planId,orderHint
+    ttEB_Uj690STdR3GC1MIDZgANq1U,My Planner Bucket,xqQg5FS2LkCp935s-FIFm2QAFkHM,8585363889524958496
+    ```
+
 ## Examples
 
-### Add a bucket with a name and an order hint.
+Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the ID _xqQg5FS2LkCp935s-FIFm2QAFkHM_ with order hint
 
-Adds a new Microsoft Planner bucket with a name and an order hint. This will be created in a Planner plan based on its id.
-
-
-``` sh title="Command"
+```sh
 m365 planner bucket add --name "My Planner Bucket" --planId "xqQg5FS2LkCp935s-FIFm2QAFkHM" --orderHint " !"
 ```
 
-``` json title="Output"
-{
-  "name": "My Planner Bucket",
-  "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
-  "orderHint": "8585363889524958496",
-  "id": "ttEB_Uj690STdR3GC1MIDZgANq1U"
-}
-```
+Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the title _My Planner Plan_ owned by group _My Planner Group_
 
-### Add a bucket based on plan title and group name.
-
-Adds a new Microsoft Planner bucket with a name This will be created in a Planner plan based on its title and the plans group name.
-
-
-``` sh title="Command"
+```sh
 m365 planner bucket add --name "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
-```
-
-``` json title="Output"
-{
-  "name": "My Planner Bucket",
-  "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
-  "orderHint": "8585363889524958496",
-  "id": "ttEB_Uj690STdR3GC1MIDZgANq1U"
-}
 ```
