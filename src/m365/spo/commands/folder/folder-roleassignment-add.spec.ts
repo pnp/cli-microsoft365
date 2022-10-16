@@ -137,6 +137,10 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('add the role assignment to the specified folder based on the upn and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/breakroleinheritance(true)') {
+        return Promise.resolve();
+      }
+
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
@@ -167,6 +171,9 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('add the role assignment to the specified root folder based on the upn and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2FShared%20Documents\')/breakroleinheritance(true)') {
+        return Promise.resolve();
+      }
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2FShared%20Documents\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
@@ -195,38 +202,12 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     });
   });
 
-  it('add the role assignment to the specified root folder not beginning with / based on the upn and role definition id', async () => {
+  it('correctly handles error when upn does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2FShared%20Documents\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents\')/ListItemAllFields/breakroleinheritance(true)') {
         return Promise.resolve();
       }
 
-      return Promise.reject('Invalid request');
-    });
-
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
-      if (command === SpoUserGetCommand) {
-        return Promise.resolve({
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|someaccount@tenant.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "someaccount@tenant.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "someaccount@tenant.onmicrosoft.com"}'
-        });
-      }
-
-      return Promise.reject(new CommandError('Unknown case'));
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        folderUrl: 'Shared Documents',
-        upn: 'someaccount@tenant.onmicrosoft.com',
-        roleDefinitionId: 1073741827
-      }
-    });
-  });
-
-  it('correctly handles error when upn does not exist', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
@@ -256,12 +237,17 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('add the role assignment to the specified folder based on the group name and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/breakroleinheritance(true)') {
+        return Promise.resolve();
+      }
+
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
     });
+
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === SpoGroupGetCommand) {
@@ -286,6 +272,10 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when group does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/breakroleinheritance(true)') {
+        return Promise.resolve();
+      }
+
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
@@ -315,6 +305,10 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('add the role assignment to the specified folder based on the principal id and role definition name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/breakroleinheritance(true)') {
+        return Promise.resolve();
+      }
+
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
@@ -345,6 +339,10 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when role definition does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/breakroleinheritance(true)') {
+        return Promise.resolve();
+      }
+
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }

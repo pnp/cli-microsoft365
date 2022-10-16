@@ -144,19 +144,36 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
       const roleDefinitionId = await this.getRoleDefinitionId(args.options);
       if (args.options.upn) {
         const upnPrincipalId = await this.getUserPrincipalId(args.options);
+        await this.breakRoleAssignment(requestUrl);
         await this.addRoleAssignment(requestUrl, upnPrincipalId, roleDefinitionId);
       }
       else if (args.options.groupName) {
         const groupPrincipalId = await this.getGroupPrincipalId(args.options);
-        this.addRoleAssignment(requestUrl, groupPrincipalId, roleDefinitionId);
+        await this.breakRoleAssignment(requestUrl);
+        await this.addRoleAssignment(requestUrl, groupPrincipalId, roleDefinitionId);
       }
       else {
+        await this.breakRoleAssignment(requestUrl);
         await this.addRoleAssignment(requestUrl, args.options.principalId!, roleDefinitionId);
       }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async breakRoleAssignment(requestUrl: string): Promise<void> {
+    const requestOptions: any = {
+      url: `${requestUrl}/breakroleinheritance(true)`,
+      method: 'POST',
+      headers: {
+        'accept': 'application/json;odata=nometadata',
+        'content-type': 'application/json'
+      },
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
   }
 
   private async addRoleAssignment(requestUrl: string, principalId: number, roleDefinitionId: number): Promise<void> {
