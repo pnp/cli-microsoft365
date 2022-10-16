@@ -1,4 +1,4 @@
-const prefix: string = "pp";
+const prefix: string = 'pp';
 
 export default {
   CARD_LIST: `${prefix} card list`,
