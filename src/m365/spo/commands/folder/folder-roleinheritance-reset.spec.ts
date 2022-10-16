@@ -2,11 +2,13 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
+import { formatting } from '../../../../utils/formatting';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./folder-roleinheritance-reset');
@@ -14,6 +16,7 @@ const command: Command = require('./folder-roleinheritance-reset');
 describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const folderUrl = 'Shared Documents/TestFolder';
+  const rootFolderUrl = '/Shared Documents';
 
   let log: any[];
   let logger: Logger;
@@ -122,8 +125,9 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
   });
 
   it('reset role inheritance on folder by site-relative URL (debug)', async () => {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, folderUrl);
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${folderUrl}')/ListItemAllFields/resetroleinheritance`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields/resetroleinheritance`) {
         return;
       }
 
@@ -141,8 +145,9 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
   });
 
   it('reset role inheritance on folder by site-relative URL when prompt confirmed', async () => {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, folderUrl);
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${folderUrl}')/ListItemAllFields/resetroleinheritance`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields/resetroleinheritance`) {
         return;
       }
 
@@ -162,6 +167,28 @@ describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
     });
   });
 
+  it('reset role inheritance on root folder URL of a library when prompt confirmed', async () => {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, rootFolderUrl);
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')/resetroleinheritance`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await command.action(logger, {
+      options: {
+        webUrl: webUrl,
+        folderUrl: rootFolderUrl
+      }
+    });
+  });
   it('correctly handles error when resetting folder role inheritance', async () => {
     const errorMessage = 'request rejected';
     sinon.stub(request, 'post').callsFake(async () => { throw errorMessage; });
