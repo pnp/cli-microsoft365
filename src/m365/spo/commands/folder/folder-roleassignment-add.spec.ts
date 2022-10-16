@@ -137,7 +137,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
   it('add the role assignment to the specified folder based on the upn and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/breakroleinheritance(true)') {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolderPermission\')/ListItemAllFields/breakroleinheritance(true)') {
         return Promise.resolve();
       }
 
