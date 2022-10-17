@@ -257,7 +257,7 @@ class AadAppAddCommand extends GraphCommand {
       // users to create AAD app in a different directory, we'll need to
       // adjust this
       appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
-      appInfo = await this.updateAppFromManifest(args, appInfo, logger);
+      appInfo = await this.updateAppFromManifest(args, appInfo);
       appInfo = await this.grantAdminConsent(appInfo, args.options.grantAdminConsent, logger);
       appInfo = await this.configureUri(args, appInfo, logger);
       appInfo = await this.configureSecret(args, appInfo, logger);
@@ -431,7 +431,7 @@ class AadAppAddCommand extends GraphCommand {
     return request.post<ServicePrincipalInfo>(requestOptions);
   }
 
-  private updateAppFromManifest(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
+  private updateAppFromManifest(args: CommandArgs, appInfo: AppInfo): Promise<AppInfo> {
     if (!args.options.manifest) {
       return Promise.resolve(appInfo);
     }
@@ -444,12 +444,8 @@ class AadAppAddCommand extends GraphCommand {
     delete v2Manifest.publisherDomain;
     
     // extract secrets from the manifest. Store them in a separate variable
-    let secrets: { name: string, expirationDate: Date }[] = this.getSecretsFromManifest(v2Manifest);
+    const secrets: { name: string, expirationDate: Date }[] = this.getSecretsFromManifest(v2Manifest);
 
-    if (args.options.withSecret) {
-      secrets = [];
-    }
-    
     // Azure Portal returns v2 manifest whereas the Graph API expects a v1.6
 
     if (args.options.apisApplication || args.options.apisDelegated) {
@@ -461,13 +457,13 @@ class AadAppAddCommand extends GraphCommand {
     if (args.options.redirectUris) {
       // take submitted redirectUris/platform as options
       // otherwise, they will be removed from the app
-      v2Manifest.replyUrlsWithType = [];
-      
-      args.options.redirectUris.split(',').map(u => u.trim()).forEach(u => {
-        v2Manifest.replyUrlsWithType.push({ url: u, type: this.translatePlatformToType(args.options.platform!) });
+      v2Manifest.replyUrlsWithType = args.options.redirectUris.split(',').map(u => {
+        return {
+          url: u.trim(),
+          type: this.translatePlatformToType(args.options.platform!)
+        };
       });
     }
-    logger.logToStderr(JSON.stringify(v2Manifest));
 
     if (args.options.multitenant) {
       // override manifest setting when using multitenant flag
@@ -475,9 +471,9 @@ class AadAppAddCommand extends GraphCommand {
     }
 
     if (args.options.implicitFlow) {
-      // override manifest setting when using implicitFlow flag
-      v2Manifest.oauth2AllowIdTokenImplicitFlow = true;
-      v2Manifest.oauth2AllowImplicitFlow = true;
+      // remove manifest settings when using implicitFlow flag
+      delete v2Manifest.oauth2AllowIdTokenImplicitFlow;
+      delete v2Manifest.oauth2AllowImplicitFlow;
     }
     
     if (args.options.scopeName) {
@@ -763,7 +759,7 @@ class AadAppAddCommand extends GraphCommand {
               }
             });
           }
-          else if (this.manifest.requiredResourceAccess.length > 0) {
+          else {
             const manifestApis = (this.manifest.requiredResourceAccess as RequiredResourceAccess[]);
 
             manifestApis.forEach(manifestApi => {
@@ -874,7 +870,7 @@ class AadAppAddCommand extends GraphCommand {
   }
 
   private configureSecret(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
-    if (!args.options.withSecret) {
+    if (!args.options.withSecret || (appInfo.secrets && appInfo.secrets.length > 0)) {
       return Promise.resolve(appInfo);
     }
 

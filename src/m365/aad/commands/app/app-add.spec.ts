@@ -122,6 +122,22 @@ describe(commands.APP_ADD, () => {
       }
     ] 
   };
+
+  const manifestWithSecret = {
+    ...basicManifest,  
+    "passwordCredentials": [
+      {
+        "customKeyIdentifier": null,
+        "endDate": "2022-09-14T17:30:13.968Z",
+        "keyId": "5d7f98e2-5847-4d20-ad25-82e30f2ec6e0",
+        "startDate": "2022-03-14T18:30:13.968Z",
+        "value": null,
+        "createdOn": "2022-03-14T18:30:33.2818539Z",
+        "hint": "zC7",
+        "displayName": "mysecret"
+      }
+    ]
+  };
   //#endregion
 
 
@@ -7062,7 +7078,6 @@ describe(commands.APP_ADD, () => {
             "countriesBlockedForMinors": [],
             "legalAgeGroupRule": "Allow"
           },
-          "passwordCredentials": [],
           "requiredResourceAccess": [],
           "serviceManagementReference": null,
           "signInAudience": "AzureADMyOrg",
@@ -7180,12 +7195,12 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    (command as any).manifest = basicManifest;
+    (command as any).manifest = manifestWithSecret;
     await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
-        manifest: JSON.stringify(basicManifest),
+        manifest: JSON.stringify(manifestWithSecret),
         withSecret: true
       }
     });
@@ -7194,10 +7209,9 @@ describe(commands.APP_ADD, () => {
       appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
       objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
       tenantId: '',
-      secret: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5',
       secrets: [
         {
-          displayName: 'Default',
+          displayName: 'mysecret',
           value: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5'
         }
       ]
@@ -7549,10 +7563,7 @@ describe(commands.APP_ADD, () => {
             "logoUrl": null
           },
           "web": {
-            "implicitGrantSettings": {
-              "enableAccessTokenIssuance": true,
-              "enableIdTokenIssuance": true
-            },
+            "implicitGrantSettings": {},
             "redirectUris": [],
             "logoutUrl": null,
             "homePageUrl": null
