@@ -100,7 +100,7 @@ class OutlookMailSendCommand extends GraphCommand {
         if (args.options.bodyContentType &&
           args.options.bodyContentType !== 'Text' &&
           args.options.bodyContentType !== 'HTML') {
-          return `${args.options.bodyContents} is not a valid value for the bodyContents option. Allowed values are Text|HTML`;
+          return `${args.options.bodyContentType} is not a valid value for the bodyContentType option. Allowed values are Text|HTML`;
         }
 
         if (args.options.saveToSentItems &&
@@ -120,12 +120,11 @@ class OutlookMailSendCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-    
       const isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[this.resource].accessToken);
       if (isAppOnlyAuth === true && !args.options.sender) {
         throw `Specify a upn or user id in the 'sender' option when using app only authentication.`;
       }
-  
+
       const requestOptions: any = {
         url: `${this.resource}/v1.0/${args.options.sender ? 'users/' + encodeURIComponent(args.options.sender) : 'me'}/sendMail`,
         headers: {
@@ -148,7 +147,7 @@ class OutlookMailSendCommand extends GraphCommand {
           saveToSentItems: args.options.saveToSentItems
         }
       };
-  
+
       if (args.options.mailbox) {
         requestOptions.data.message.from = {
           emailAddress: {
@@ -156,9 +155,9 @@ class OutlookMailSendCommand extends GraphCommand {
           }
         };
       }
-  
+
       await request.post(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
