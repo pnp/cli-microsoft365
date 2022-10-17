@@ -33,5 +33,5 @@ m365 spo web roleinheritance break --webUrl https://contoso.sharepoint.com/sites
 Break inheritance of web in site _https://contoso.sharepoint.com/sites/project-x_ with clearing permissions --confirm
 
 ```sh
-m365 spo web roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x --clearExistingPermissions --confirm
+m365 spo web roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x --clearExistingPermissions --confirm 
 ```
