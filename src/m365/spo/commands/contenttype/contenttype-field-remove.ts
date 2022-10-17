@@ -1,9 +1,11 @@
+import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -16,7 +18,9 @@ interface Options extends GlobalOptions {
   contentTypeId: string;
   fieldLinkId: string;
   webUrl: string;
+  listId?: string;
   listTitle?: string;
+  listUrl?: string;
   updateChildContentTypes?: boolean;
   confirm?: boolean;
 }
@@ -42,9 +46,11 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        listTitle: (!(!args.options.listTitle)).toString(),
-        updateChildContentTypes: (!(!args.options.updateChildContentTypes)).toString(),
-        confirm: (!(!args.options.confirm)).toString()
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listId: typeof args.options.listId !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        updateChildContentTypes: !!args.options.updateChildContentTypes,
+        confirm: !!args.options.confirm
       });
     });
   }
@@ -56,6 +62,12 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
       },
       {
         option: '-l, --listTitle [listTitle]'
+      },
+      {
+        option: '--listId [listId]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       },
       {
         option: '-i, --contentTypeId <contentTypeId>'
@@ -78,7 +90,13 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         if (!validation.isValidGuid(args.options.fieldLinkId)) {
           return `${args.options.fieldLinkId} is not a valid GUID`;
         }
-    
+
+        if (args.options.listId) {
+          if (!validation.isValidGuid(args.options.listId)) {
+            return `${args.options.listId} is not a valid GUID`;
+          }
+        }
+
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
@@ -94,9 +112,9 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         if (this.debug) {
           logger.logToStderr(`Get SiteId required by ProcessQuery endpoint.`);
         }
-  
+
         // GET SiteId
-        let requestOptions: any = {
+        let requestOptions: AxiosRequestConfig = {
           url: `${args.options.webUrl}/_api/site?$select=Id`,
           headers: {
             accept: 'application/json;odata=nometadata'
@@ -129,35 +147,30 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         }
 
         let listId: string | undefined = undefined;
-        // If ListTitle is provided
-        if (args.options.listTitle) {
-          // Request for the ListId
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')?$select=Id`,
-            headers: {
-              accept: 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
 
-          const list = await request.get<{ Id: string }>(requestOptions);
-          listId = list.Id;
-
-          if (this.debug) {
-            logger.logToStderr(`ListId: ${listId}`);
-          }
+        if (args.options.listId) {
+          listId = args.options.listId;
         }
-        
+        else if (args.options.listTitle) {
+          listId = await this.getListIdFromListTitle(args.options.webUrl, args.options.listTitle);
+        }
+        else if (args.options.listUrl) {
+          listId = await this.getListIdFromListUrl(args.options.webUrl, args.options.listUrl);
+        }
+
+        if (this.debug) {
+          logger.logToStderr(`ListId: ${listId}`);
+        }
+
         const reqDigest = await spo.getRequestDigest(args.options.webUrl);
         const requestDigest: string = reqDigest.FormDigestValue;
 
-        const updateChildContentTypes: boolean = args.options.listTitle ? false : args.options.updateChildContentTypes === true;
+        const updateChildContentTypes: boolean = args.options.listTitle || args.options.listId || args.options.listUrl ? false : args.options.updateChildContentTypes === true;
 
         if (this.debug) {
-          const additionalLog = args.options.listTitle ? `; ListTitle='${args.options.listTitle}'` : ` ; UpdateChildContentTypes='${updateChildContentTypes}`;
+          const additionalLog = args.options.listTitle ? `; ListTitle='${args.options.listTitle}'` : args.options.listId ? `; ListId='${args.options.listId}'` : args.options.listUrl ? `; ListUrl='${args.options.listUrl}'` : ` ; UpdateChildContentTypes='${updateChildContentTypes}`;
           logger.logToStderr(`Remove FieldLink from ContentType. FieldLinkId='${args.options.fieldLinkId}' ; ContentTypeId='${args.options.contentTypeId}' ${additionalLog}`);
           logger.logToStderr(`Execute ProcessQuery.`);
-          logger.logToStderr('');
         }
 
         let requestBody: string = '';
@@ -203,6 +216,32 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         await removeFieldLink();
       }
     }
+  }
+  private async getListIdFromListTitle(webUrl: string, listTitle: string): Promise<string> {
+    const requestOptions: AxiosRequestConfig = {
+      url: `${webUrl}/_api/lists/GetByTitle('${formatting.encodeQueryParameter(listTitle)}')?$select=Id`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const list = await request.get<{ Id: string }>(requestOptions);
+    return list.Id;
+  }
+
+  private async getListIdFromListUrl(webUrl: string, listUrl: string): Promise<string> {
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+    const requestOptions: AxiosRequestConfig = {
+      url: `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const list = await request.get<{ Id: string }>(requestOptions);
+    return list.Id;
   }
 }
 

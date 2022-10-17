@@ -14,7 +14,13 @@ m365 spo contenttype add [options]
 : Absolute URL of the site where the content type should be created
 
 `-l, --listTitle [listTitle]`
-: Title of the list where the content type should be created (if it should be created as a list content type)
+: Title of the list (if it is a list content type). Specify either `listTitle`, `listId` or `listUrl`.
+
+`--listId [listId]`
+: ID of the list (if it is a list content type). Specify either `listTitle`, `listId` or `listUrl`.
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list (if it is a list content type). Specify either `listTitle`, `listId` or `listUrl`.
 
 `-i, --id <id>`
 : The ID of the content type. Determines the parent content type
@@ -44,10 +50,22 @@ Create a site content type that inherits from the List item content type
 m365 spo contenttype add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D --group 'PnP Content Types'
 ```
 
-Create a list content type that inherits from the List item content type
+Create a list (retrieved by Title) content type that inherits from the List item content type
 
 ```sh
 m365 spo contenttype add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Alerts --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D
+```
+
+Create a list (retrieved by ID) content type that inherits from the List item content type
+
+```sh
+m365 spo contenttype add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listId '8c7a0fcd-9d64-4634-85ea-ce2b37b2ec0c' --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D
+```
+
+Create a list (retrieved by URL) content type that inherits from the List item content type
+
+```sh
+m365 spo contenttype add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl '/Shared Documents' --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D
 ```
 
 ## More information

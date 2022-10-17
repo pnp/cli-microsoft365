@@ -1,7 +1,9 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -10,9 +12,11 @@ interface CommandArgs {
   options: Options;
 }
 
-export interface  Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   webUrl: string;
   listTitle?: string;
+  listId?: string;
+  listUrl?: string;
   id?: string;
   name?: string;
 }
@@ -28,24 +32,26 @@ class SpoContentTypeGetCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
     this.#initTypes();
     this.#initOptionSets();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         name: typeof args.options.name !== 'undefined'
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -55,6 +61,12 @@ class SpoContentTypeGetCommand extends SpoCommand {
         option: '-l, --listTitle [listTitle]'
       },
       {
+        option: '--listId [listId]'
+      },
+      {
+        option: '--listUrl [listUrl]'
+      },
+      {
         option: '-i, --id [id]'
       },
       {
@@ -62,7 +74,7 @@ class SpoContentTypeGetCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -70,7 +82,13 @@ class SpoContentTypeGetCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
+        if (args.options.listId) {
+          if (!validation.isValidGuid(args.options.listId)) {
+            return `${args.options.listId} is not a valid GUID`;
+          }
+        }
+
         return true;
       }
     );
@@ -85,24 +103,36 @@ class SpoContentTypeGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    let requestUrl: string = `${args.options.webUrl}/_api/web`;
+    if (args.options.listId) {
+      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+    }
+    else if (args.options.listTitle) {
+      requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
+
+    requestUrl += "/contenttypes";
+
+    if (args.options.id) {
+      requestUrl += `('${encodeURIComponent(args.options.id)}')`;
+    }
+    else if (args.options.name) {
+      requestUrl += `?$filter=Name eq '${encodeURIComponent(args.options.name)}'`;
+    }
+
+    const requestOptions: AxiosRequestConfig = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
     try {
-      let requestUrl: string = `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/` : '')}contenttypes`;
-
-      if (args.options.id) {
-        requestUrl += `('${encodeURIComponent(args.options.id)}')`;
-      }
-      else if (args.options.name) {
-        requestUrl += `?$filter=Name eq '${encodeURIComponent(args.options.name)}'`;
-      }
-
-      const requestOptions: any = {
-        url: requestUrl,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
       let res = await request.get<any>(requestOptions);
       let errorMessage: string = '';
 
@@ -110,7 +140,7 @@ class SpoContentTypeGetCommand extends SpoCommand {
         if (res.value.length === 0) {
           errorMessage = `Content type with name ${args.options.name} not found`;
         }
-        else{
+        else {
           res = res.value[0];
         }
       }
