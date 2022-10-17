@@ -172,8 +172,8 @@ class SpoListSetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-    this.#initOptionSets();
     this.#initTypes();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -565,7 +565,7 @@ class SpoListSetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['listId', 'listTitle', 'listUrl']
+      ['id', 'title', 'url']
     );
   }
 
