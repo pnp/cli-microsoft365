@@ -2,7 +2,13 @@
 
 Author: [Garry Trinder](https://github.com/garrytrinder)
 
-Obtain a new access token for the Microsoft Graph and use it an HTTP request.
+Calling the Microsoft Graph can be done using the `m365 request` command.
+
+```sh
+m365 request --url https://graph.microsoft.com/v1.0/me
+```
+
+Another route would be to use shell-specific webrequest tooling. To do this, obtain a new access token for the Microsoft Graph and use it in an HTTP request.
 
 === "PowerShell"
 
