@@ -609,6 +609,7 @@ nav:
         - web remove: 'cmd/spo/web/web-remove.md'
         - web roleassignment add: 'cmd/spo/web/web-roleassignment-add.md'
         - web roleassignment remove: 'cmd/spo/web/web-roleassignment-remove.md'
+        - web roleinheritance break: 'cmd/spo/web/web-roleinheritance-break.md'
         - web roleinheritance reset: 'cmd/spo/web/web-roleinheritance-reset.md'
         - web set: 'cmd/spo/web/web-set.md'
     - Teams (teams):
