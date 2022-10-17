@@ -172,6 +172,7 @@ class SpoListSetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
     this.#initTypes();
   }
 
@@ -486,15 +487,6 @@ class SpoListSetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        const listOptions: any[] = [args.options.id, args.options.title, args.options.url];
-        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either list id or title or list url`;
-        }
-
-        if (listOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least list id or title or list url`;
-        }
-
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
@@ -567,6 +559,13 @@ class SpoListSetCommand extends SpoCommand {
 
         return true;
       }
+    );
+  }
+
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['listId', 'listTitle', 'listUrl']
     );
   }
 
