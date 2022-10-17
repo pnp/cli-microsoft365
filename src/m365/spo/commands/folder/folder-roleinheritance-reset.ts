@@ -2,12 +2,10 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import { AxiosRequestConfig } from 'axios';
 import { formatting } from '../../../../utils/formatting';
-import { formatting } from '../../../../utils/formatting';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
-import { urlUtil } from '../../../../utils/urlUtil';
 import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 

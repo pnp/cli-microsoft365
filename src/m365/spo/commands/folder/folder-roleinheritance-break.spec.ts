@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
-import { Cli } from '../../../../cli/Cli';
 import { formatting } from '../../../../utils/formatting';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
