@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import { AxiosRequestConfig } from 'axios';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -16,6 +17,7 @@ describe(commands.TASK_SET, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let patchStub: sinon.SinonStub<[options: AxiosRequestConfig<any>]>;
 
   const getRequestData = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",
@@ -66,7 +68,7 @@ describe(commands.TASK_SET, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(request, 'patch').callsFake((opts: any) => {
+    patchStub = sinon.stub(request, 'patch').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==/tasks/abc`) {
         return Promise.resolve(patchRequestData);
       }
@@ -131,7 +133,82 @@ describe(commands.TASK_SET, () => {
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(patchRequestData));
   });
 
+  it('updates tasks for list with bodyContent and bodyContentType', async () => {
+    const bodyText = '<h3>Lorem ipsum</h3>';
+    await command.action(logger, {
+      options: {
+        id: 'abc',
+        title: 'New task',
+        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
+        status: "notStarted",
+        bodyContent: bodyText,
+        bodyContentType: 'html'
+      }
+    } as any);
 
+    assert.strictEqual(patchStub.lastCall.args[0].data.body.content, bodyText);
+    assert.strictEqual(patchStub.lastCall.args[0].data.body.contentType, 'html');
+  });
+
+  it('updates tasks for list with bodyContent and no bodyContentType', async () => {
+    const bodyText = 'Lorem ipsum';
+    await command.action(logger, {
+      options: {
+        id: 'abc',
+        title: 'New task',
+        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
+        status: "notStarted",
+        bodyContent: bodyText
+      }
+    } as any);
+
+    assert.strictEqual(patchStub.lastCall.args[0].data.body.content, bodyText);
+    assert.strictEqual(patchStub.lastCall.args[0].data.body.contentType, 'text');
+  });
+
+  it('updates tasks for list with importance', async () => {
+    await command.action(logger, {
+      options: {
+        id: 'abc',
+        title: 'New task',
+        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
+        status: "notStarted",
+        importance: 'high'
+      }
+    } as any);
+
+    assert.strictEqual(patchStub.lastCall.args[0].data.importance, 'high');
+  });
+
+  it('updates tasks for list with dueDateTime', async () => {
+    const dateTime = '2023-01-01';
+    await command.action(logger, {
+      options: {
+        id: 'abc',
+        title: 'New task',
+        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
+        status: "notStarted",
+        dueDateTime: dateTime
+      }
+    } as any);
+
+    assert.deepStrictEqual(patchStub.lastCall.args[0].data.dueDateTime, { dateTime: dateTime, timeZone: 'Etc/GMT' });
+  });
+
+  it('updates tasks for list with reminderDateTime', async () => {
+    const dateTime = '2023-01-01T12:00:00';
+    await command.action(logger, {
+      options: {
+        id: 'abc',
+        title: 'New task',
+        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
+        status: "notStarted",
+        reminderDateTime: dateTime
+      }
+    } as any);
+
+    assert.deepStrictEqual(patchStub.lastCall.args[0].data.reminderDateTime, { dateTime: dateTime, timeZone: 'Etc/GMT' });
+  });
 
   it('rejects if no tasks list is found with the specified list name', async () => {
     sinonUtil.restore(request.get);
@@ -208,6 +285,58 @@ describe(commands.TASK_SET, () => {
     };
     const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(actual, 'test is not a valid value. Allowed values are notStarted|inProgress|completed|waitingOnOthers|deferred');
+  });
+
+  it('fails validation when invalid bodyContentType is passed', async () => {
+    const actual = await command.validate({
+      options: {
+        title: 'New task',
+        id: 'abc',
+        status: "notStarted",
+        listName: 'Tasks List',
+        bodyContentType: 'invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when invalid importance is passed', async () => {
+    const actual = await command.validate({
+      options: {
+        title: 'New task',
+        id: 'abc',
+        status: "notStarted",
+        listName: 'Tasks List',
+        importance: 'invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when invalid dueDateTime is passed', async () => {
+    const actual = await command.validate({
+      options: {
+        title: 'New task',
+        id: 'abc',
+        status: "notStarted",
+        listName: 'Tasks List',
+        dueDateTime: '01/01/2022'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when invalid reminderDateTime is passed', async () => {
+    const actual = await command.validate({
+      options: {
+        title: 'New task',
+        id: 'abc',
+        status: "notStarted",
+        listName: 'Tasks List',
+        reminderDateTime: '01/01/2022'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('correctly validates the arguments', async () => {
