@@ -11,13 +11,16 @@ m365 spo list webhook add [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the list to add the webhook to is located
+: URL of the site where the list is located
 
 `-l, --listId [listId]`
-: ID of the list to which the webhook which should be added. Specify either `listId` or `listTitle` but not both
+: ID of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-t, --listTitle [listTitle]`
-: Title of the list to which the webhook which should be added. Specify either `listId` or `listTitle` but not both
+: Title of the list. Specify either `listTitle`, `listId` or `listUrl`.
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-n, --notificationUrl <notificationUrl>`
 : The notification url
@@ -32,25 +35,21 @@ m365 spo list webhook add [options]
 
 ## Examples
 
-Add a web hook to the list Documents located in site _https://contoso.sharepoint.com/sites/ninja_ with the notification url
-_https://contoso-funcions.azurewebsites.net/webhook_ and the default expiration
-date
+Add a web hook to the list retrieved by Title located in a specific site with a specific notification url and the default expiration date.
 
 ```sh
 m365 spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-funcions.azurewebsites.net/webhook
 ```
 
-Add a web hook to the list Documents located in site _https://contoso.sharepoint.com/sites/ninja_ with the notification url
-_https://contoso-funcions.azurewebsites.net/webhook_ and an expiration date of _January 21st, 2019_
+Add a web hook to the list retrieved by URL located in a specific site with a specific notification url and a specific expiration date
 
 ```sh
-m365 spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-funcions.azurewebsites.net/webhook --expirationDateTime 2019-01-21
+m365 spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listUrl '/sites/ninja/Documents' --notificationUrl https://contoso-funcions.azurewebsites.net/webhook --expirationDateTime 2019-01-21
 ```
 
-Add a web hook to the list Documents located in site _https://contoso.sharepoint.com/sites/ninja_ with the notification url
-_https://contoso-funcions.azurewebsites.net/webhook_, a very specific expiration date of _6:15 PM on March 2nd, 2019_ and
-a client state
+Add a web hook to the list retrieved by ID located in a specific site with a specific notification url, a specific expiration date and a client state
+
 
 ```sh
-m365 spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-funcions.azurewebsites.net/webhook --expirationDateTime '2019-03-02T18:15' --clientState "Hello State!"
+m365 spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listId '3d6aefa0-f438-4789-b0cd-6e865f5d65b5' --notificationUrl https://contoso-funcions.azurewebsites.net/webhook --expirationDateTime '2019-03-02T18:15' --clientState "Hello State!"
 ```

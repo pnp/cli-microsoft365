@@ -1,7 +1,9 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -38,9 +40,10 @@ class SpoListWebhookGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        listId: (!(!args.options.listId)).toString(),
-        listTitle: (!(!args.options.listTitle)).toString(),
-        id: (!(!args.options.id)).toString()
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        id: typeof args.options.id !== 'undefined'
       });
     });
   }
@@ -55,6 +58,9 @@ class SpoListWebhookGetCommand extends SpoCommand {
       },
       {
         option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       },
       {
         option: '-i, --id [id]'
@@ -86,7 +92,7 @@ class SpoListWebhookGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -95,16 +101,20 @@ class SpoListWebhookGetCommand extends SpoCommand {
       logger.logToStderr(`Retrieving information for webhook ${args.options.id} belonging to list ${list} in site at ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = '';
+    let requestUrl: string = `${args.options.webUrl}/_api/web`;
 
     if (args.options.listId) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/Subscriptions('${formatting.encodeQueryParameter(args.options.id)}')`;
+      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/Subscriptions('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
-    else {
-      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/Subscriptions('${formatting.encodeQueryParameter(args.options.id)}')`;
+    else if (args.options.listTitle) {
+      requestUrl += `/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/Subscriptions('${formatting.encodeQueryParameter(args.options.id)}')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Subscriptions('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: AxiosRequestConfig = {
       url: requestUrl,
       method: 'GET',
       headers: {

@@ -13,6 +13,14 @@ import commands from '../../commands';
 const command: Command = require('./list-webhook-get');
 
 describe(commands.LIST_WEBHOOK_GET, () => {
+  const webhookGetResponse = {
+    "clientState": null,
+    "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
+    "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
+    "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
+    "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+    "resourceData": null
+  };
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -20,7 +28,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -70,14 +78,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
-            "clientState": null,
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          });
+          return Promise.resolve(webhookGetResponse);
         }
       }
 
@@ -92,14 +93,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'
       }
     });
-    assert(loggerLogSpy.calledWith({
-      "clientState": null,
-      "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-      "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-      "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-      "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-      "resourceData": null
-    }));
+    assert(loggerLogSpy.calledWith(webhookGetResponse));
   });
 
   it('retrieves specified webhook of the given list if title option is passed', async () => {
@@ -108,14 +102,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
-            "clientState": null,
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          });
+          return Promise.resolve(webhookGetResponse);
         }
       }
 
@@ -130,30 +117,64 @@ describe(commands.LIST_WEBHOOK_GET, () => {
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'
       }
     });
-    assert(loggerLogSpy.calledWith({
-      "clientState": null,
-      "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-      "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-      "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-      "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-      "resourceData": null
-    }));
+    assert(loggerLogSpy.calledWith(webhookGetResponse));
   });
 
-  it('retrieves all webhooks of the specific list if id option is passed (debug)', async () => {
+  it('retrieves specified webhook of the given list if url option is passed', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('%2Fsites%2Fninja%2Flists%2FDocuments')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e85')`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
+          return webhookGetResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        listUrl: '/sites/ninja/lists/Documents',
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'
+      }
+    });
+    assert(loggerLogSpy.calledWith(webhookGetResponse));
+  });
+
+  it('retrieves specified webhook of the given list if url option is passed (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('%2Fsites%2Fninja%2Flists%2FDocuments')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e85')`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
+          return webhookGetResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        listUrl: '/sites/ninja/lists/Documents',
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'
+      }
+    });
+    assert(loggerLogSpy.calledWith(webhookGetResponse));
+  });
+
+  it('retrieves specific webhook of the specific list if id option is passed (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e85')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
-            "clientState": null,
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          });
+          return Promise.resolve(webhookGetResponse);
         }
       }
 
@@ -168,30 +189,16 @@ describe(commands.LIST_WEBHOOK_GET, () => {
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'
       }
     });
-    assert(loggerLogSpy.calledWith({
-      "clientState": null,
-      "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-      "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-      "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-      "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-      "resourceData": null
-    }));
+    assert(loggerLogSpy.calledWith(webhookGetResponse));
   });
 
-  it('retrieves all webhooks of the specific list if id option is passed', async () => {
+  it('retrieves specific webhook of the specific list if id option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e85')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
-            "clientState": null,
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          });
+          return Promise.resolve(webhookGetResponse);
         }
       }
 
@@ -206,14 +213,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'
       }
     });
-    assert(loggerLogSpy.calledWith({
-      "clientState": null,
-      "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-      "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-      "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-      "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-      "resourceData": null
-    }));
+    assert(loggerLogSpy.calledWith(webhookGetResponse));
   });
 
   it('correctly handles error when getting information for a site that doesn\'t exist', async () => {
@@ -229,7 +229,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { 
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
@@ -278,13 +278,13 @@ describe(commands.LIST_WEBHOOK_GET, () => {
     });
   });
 
-  it('fails validation if both list id and title options are not passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'} }, commandInfo);
+  it('fails validation if none of the list options are not passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webhook id option is not passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF'} }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -318,8 +318,8 @@ describe(commands.LIST_WEBHOOK_GET, () => {
     assert(actual);
   });
 
-  it('fails validation if both id and title options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', id: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
+  it('fails validation if all the list options are passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', listUrl: '/Documents', id: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

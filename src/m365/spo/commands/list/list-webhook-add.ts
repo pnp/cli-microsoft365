@@ -1,7 +1,9 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -19,6 +21,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   notificationUrl: string;
   expirationDateTime?: string;
   clientState?: string;
@@ -45,10 +48,11 @@ class SpoListWebhookAddCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        listId: (!(!args.options.listId)).toString(),
-        listTitle: (!(!args.options.listTitle)).toString(),
-        expirationDateTime: (!(!args.options.expirationDateTime)).toString(),
-        clientState: (!(!args.options.clientState)).toString()
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        expirationDateTime: typeof args.options.expirationDateTime !== 'undefined',
+        clientState: typeof args.options.clientState !== 'undefined'
       });
     });
   }
@@ -63,6 +67,9 @@ class SpoListWebhookAddCommand extends SpoCommand {
       },
       {
         option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       },
       {
         option: '-n, --notificationUrl <notificationUrl>'
@@ -109,7 +116,7 @@ class SpoListWebhookAddCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -117,13 +124,17 @@ class SpoListWebhookAddCommand extends SpoCommand {
       logger.logToStderr(`Adding webhook to list ${args.options.listId ? args.options.listId : args.options.listTitle} located at site ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = '';
+    let requestUrl: string = `${args.options.webUrl}/_api/web`;
 
     if (args.options.listId) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/Subscriptions')`;
+      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/Subscriptions')`;
     }
-    else {
-      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/Subscriptions')`;
+    else if (args.options.listTitle) {
+      requestUrl += `/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/Subscriptions')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Subscriptions`;
     }
 
     const requestBody: any = {};
@@ -138,7 +149,7 @@ class SpoListWebhookAddCommand extends SpoCommand {
       requestBody.clientState = args.options.clientState;
     }
 
-    const requestOptions: any = {
+    const requestOptions: AxiosRequestConfig = {
       url: requestUrl,
       method: 'POST',
       headers: {
