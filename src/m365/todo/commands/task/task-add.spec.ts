@@ -157,7 +157,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('adds To Do task with dueDateTime', async () => {
-    const dateTime = '2023-01-01T12:00:00';
+    const dateTime = '2023-01-01';
     await command.action(logger, {
       options: {
         title: 'New task',

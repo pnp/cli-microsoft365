@@ -26,7 +26,7 @@ m365 todo task add [options]
 : The type of the body content. Possible values are `text` and `html`. Default is `text`.
 
 `--dueDateTime [dueDateTime]`
-: The date and time when the task is due. This should be defined as a valid ISO 8601 string in the UTC time zone.
+: The date when the task is due. This should be defined as a valid ISO 8601 string in the UTC time zone. Only date value is needed, time value is always ignored.
 
 `--importance [importance]`
 : The importance of the task. Possible values are: `low`, `normal`, `high`. Default is `normal`.
@@ -53,11 +53,11 @@ m365 todo task add --title "New task" --listId "AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04
 Create a new task with bodyContent and reminder and flag it as important
 
 ```sh
-m365 todo task add --title "New task" --listName "My task list" --bodyContent "I should not forget this" --reminderDateTime 2023-01-01T12:00:00 --importance high
+m365 todo task add --title "New task" --listName "My task list" --bodyContent "I should not forget this" --reminderDateTime 2023-01-01T12:00:00Z --importance high
 ```
 
 Create a new task with a specific due date
 
 ```sh
-m365 todo task add --title "New task" --listId "AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==" --dueDateTime 2023-01-01T12:00:00
+m365 todo task add --title "New task" --listId "AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==" --dueDateTime 2023-01-01
 ```
