@@ -36,6 +36,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
     this.#initOptionSets();
   }
 
@@ -90,6 +91,10 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('contentTypeId', 'c');
   }
 
   #initOptionSets(): void {

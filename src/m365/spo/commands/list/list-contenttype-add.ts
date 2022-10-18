@@ -19,6 +19,10 @@ interface Options extends GlobalOptions {
   contentTypeId: string;
 }
 
+interface ContentTypeAddRequestBody {
+  contentTypeId: string;
+}
+
 class SpoListContentTypeAddCommand extends SpoCommand {
   public get name(): string {
     return commands.LIST_CONTENTTYPE_ADD;
@@ -34,6 +38,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
     this.#initOptionSets();
   }
 
@@ -84,6 +89,10 @@ class SpoListContentTypeAddCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.string.push('contentTypeId', 'c');
+  }
+
   #initOptionSets(): void {
     this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
@@ -106,7 +115,9 @@ class SpoListContentTypeAddCommand extends SpoCommand {
       requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
 
-    const requestBody: any = this.mapRequestBody(args.options);
+    const requestBody: ContentTypeAddRequestBody = {
+      contentTypeId: args.options.contentTypeId
+    };
 
     const requestOptions: any = {
       url: `${requestUrl}/ContentTypes/AddAvailableContentType`,
@@ -124,12 +135,6 @@ class SpoListContentTypeAddCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private mapRequestBody(options: Options): any {
-    return {
-      contentTypeId: options.contentTypeId
-    };
   }
 }
 

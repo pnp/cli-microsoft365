@@ -45,6 +45,7 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
     this.#initOptionSets();
   }
 
@@ -95,6 +96,10 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
         return true;
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('contentTypeId', 'c');
   }
 
   #initOptionSets(): void {
