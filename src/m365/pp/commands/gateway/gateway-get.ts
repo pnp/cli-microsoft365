@@ -16,31 +16,19 @@ class PpGatewayGetCommand extends PowerBICommand {
 
   constructor() {
     super();
-    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
 
   #initOptions(): void {
     this.options.unshift({
-      option: "-i, --id [id]"
-    });
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== "undefined"
-      });
+      option: "-i, --id <id>"
     });
   }
 
   #initValidators(): void {
     this.validators.push(async (args: CommandArgs) => {
-      if (
-        args.options.id &&
-        !validation.isValidGuid(args.options.id as string)
-      ) {
+      if (!validation.isValidGuid(args.options.id as string)) {
         return `${args.options.id} is not a valid GUID`;
       }
       return true;
@@ -51,8 +39,7 @@ class PpGatewayGetCommand extends PowerBICommand {
     try {
       const gateway = await this.getGateway(args.options.id);
       logger.log(gateway);
-    }
-    catch (error) {
+    } catch (error) {
       this.handleRejectedODataJsonPromise(error);
     }
   }
@@ -63,7 +50,7 @@ class PpGatewayGetCommand extends PowerBICommand {
         gatewayId
       )}`,
       headers: {
-        accept: "application/json;odata.metadata=none"
+        accept: "application/json;odata.metadata=none",
       },
       responseType: "json"
     };

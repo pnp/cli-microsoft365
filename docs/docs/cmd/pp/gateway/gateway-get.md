@@ -1,12 +1,17 @@
 # pp gateway get
 
-Gets the gateway information by Id
+Get information about the specified gateway
 
 ## Usage
 
 ```sh
 m365 pp gateway get [options]
 ```
+
+## Options
+
+`-i, --id [id]`
+: ID of the Gateway.
 
 ## Examples
 
