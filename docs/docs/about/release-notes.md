@@ -18,6 +18,7 @@
 - [spo file roleassignment remove](../cmd/spo/file/file-roleassignment-remove.md) - removes a role assignment from a file [#3693](https://github.com/pnp/cli-microsoft365/issues/3693)
 - [spo file roleinheritance break](../cmd/spo/file/file-roleinheritance-break.md) - breaks inheritance of file [#3593](https://github.com/pnp/cli-microsoft365/issues/3593)
 - [spo file roleinheritance reset](../cmd/spo/file/file-roleinheritance-reset.md) - restores the role inheritance of a file [#3595](https://github.com/pnp/cli-microsoft365/issues/3595)
+- [spo folder roleassignment remove](../cmd/spo/folder/folder-roleassignment-remove.md) - removes a role assignment from the specified folder [#3701](https://github.com/pnp/cli-microsoft365/issues/3701)
 - [spo folder roleinheritance break](../cmd/spo/folder/folder-roleinheritance-break.md) - breaks the role inheritance of a folder [#3598](https://github.com/pnp/cli-microsoft365/issues/3598)
 - [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
 
@@ -45,6 +46,8 @@
 - extended 'spo group list' with associated groups output [#3546](https://github.com/pnp/cli-microsoft365/issues/3546)
 - extended 'teams channel add' command with support for adding shared channels [#3691](https://github.com/pnp/cli-microsoft365/issues/3691)
 - fixed pagination for 'pp dataverse table list' command [#3803](https://github.com/pnp/cli-microsoft365/issues/3803)
+- extended 'spo list contenttype' with option 'listUrl' [#3810](https://github.com/pnp/cli-microsoft365/issues/3810)
+- updated the Microsoft Graph sample to include a 'm365 request' section [#3712](https://github.com/pnp/cli-microsoft365/issues/3712)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
