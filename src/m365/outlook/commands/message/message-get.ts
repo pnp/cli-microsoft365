@@ -1,9 +1,8 @@
-import auth from '../../../../Auth';
+import auth, { Auth } from '../../../../Auth';
 import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -57,24 +56,29 @@ class OutlookMessageGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let requestUrl = '';
-
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      if (args.options.userId === undefined || args.options.userPrincipalName === undefined) {
-        throw `The option 'userId' or 'userPrincipalName' is required when retrieving an email using app only credentials`;
-      }
-      if (args.options.userId && args.options.userPrincipalName) {
-        throw `Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using app only credentials`;
-      }
-      requestUrl += `users/${args.options.userId !== undefined ? args.options.userId : args.options.userPrincipalName}`;
-    }
-    else {
-      requestUrl += 'me';
-    }
-
-    requestUrl += `/messages/${args.options.id}`;
-
     try {
+      const isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[this.resource].accessToken);
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving message with id ${args.options.id} using ${isAppOnlyAuth ? 'app only permissions' : 'delegated permissions'}`);
+      }
+
+      let requestUrl = '';
+
+      if (isAppOnlyAuth) {
+        if (!args.options.userId && !args.options.userPrincipalName) {
+          throw `The option 'userId' or 'userPrincipalName' is required when retrieving an email using app only credentials`;
+        }
+        if (args.options.userId && args.options.userPrincipalName) {
+          throw `Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using app only credentials`;
+        }
+        requestUrl += `users/${args.options.userId ? args.options.userId : args.options.userPrincipalName}`;
+      }
+      else {
+        requestUrl += 'me';
+      }
+
+      requestUrl += `/messages/${args.options.id}`;
+
       const requestOptions: AxiosRequestConfig = {
         url: `${this.resource}/v1.0/${requestUrl}`,
         headers: {
