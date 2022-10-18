@@ -35,9 +35,9 @@ m365 graph schemaextension set [options]
 The lifecycle state of the schema extension. The initial state upon creation is `InDevelopment`.
 Possible states transitions are from `InDevelopment` to `Available` and `Available` to `Deprecated`.
 The target types are the set of Microsoft Graph resource types (that support schema extensions) that this schema extension definition can be applied to. This option is specified as a comma-separated list.
-When specifying the JSON string of properties on Windows, you have to escape double quotes in a specific way. Considering the following value for the _properties_ option: `{"Foo":"Bar"}`,
-you should specify the value as <code>\`"{""Foo"":""Bar""}"\`</code>.
-In addition, when using PowerShell, you should use the `--%` argument.
+
+!!! warning "Escaping JSON in PowerShell"
+    When using the `--properties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../user-guide/using-cli.md#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../user-guide/using-cli.md#passing-complex-content-into-cli-options) instead.
 
 ## Examples
 
@@ -50,13 +50,7 @@ m365 graph schemaextension set --id MySchemaExtension --owner 62375ab9-6b52-47ed
 Update the target types and properties of a schema extension
 
 ```sh
-m365 graph schemaextension set --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --targetTypes "Group,User" --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
-```
-
-Update the properties of a schema extension in PowerShell
-
-```PowerShell
-graph schemaextension set --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties --% \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
+m365 graph schemaextension set --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --targetTypes "Group,User" --properties '[{"name":"myProp1","type":"Integer"},{"name":"myProp2","type":"String"}]'
 ```
 
 Change the status of a schema extension to 'Available'
