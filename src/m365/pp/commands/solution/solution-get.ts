@@ -13,8 +13,12 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   environment: string;
+<<<<<<< HEAD
   id?: string;
   name?: string;
+=======
+  name: string;
+>>>>>>> 9881501e (solution-get)
   asAdmin: boolean;
 }
 
@@ -36,8 +40,11 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+<<<<<<< HEAD
     // this.#initValidators();
     this.#initOptionSets();
+=======
+>>>>>>> 9881501e (solution-get)
   }
 
   #initTelemetry(): void {
@@ -54,10 +61,14 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
         option: '-e, --environment <environment>'
       },
       {
+<<<<<<< HEAD
         option: '-i, --id'
       },
       {
         option: '-n, --name'
+=======
+        option: '-n, --name <name>'
+>>>>>>> 9881501e (solution-get)
       },
       {
         option: '-a, --asAdmin'
@@ -65,6 +76,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
     );
   }
 
+<<<<<<< HEAD
 
   // #initValidators(): void {
   //   this.validators.push(
@@ -88,12 +100,15 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
     );
   }
 
+=======
+>>>>>>> 9881501e (solution-get)
   public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving a specific solutions for which the user is an admin...`);
     }
 
     try {
+<<<<<<< HEAD
       const res: Solution = await this.getSolution(args.options);
       if (!args.options.output || args.options.output === 'json') {
         logger.log(res);
@@ -117,12 +132,19 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
     if (options.id) {
       const requestOptions: AxiosRequestConfig = {
         url: `${dynamicsApiUrl}/api/data/v9.0/solutions(${options.id})?$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`,
+=======
+      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+
+      const requestOptions: AxiosRequestConfig = {
+        url: `${dynamicsApiUrl}/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq \'${args.options.name}\'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`,
+>>>>>>> 9881501e (solution-get)
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
         responseType: 'json'
       };
 
+<<<<<<< HEAD
       const r = await request.get<Solution>(requestOptions);
       return r;
     }
@@ -137,6 +159,28 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
 
     const r = await request.get<{ value: Solution[] }>(requestOptions);
     return r.value[0];
+=======
+      const res = await request.get<{ value: Solution[] }>(requestOptions);
+
+      if (!args.options.output || args.options.output === 'json') {
+        logger.log(res.value[0]);
+      }
+      else {
+        //converted to text friendly output
+        if (res.value.length > 0) {
+          const i = res.value[0];
+          logger.log({
+            uniquename: i.uniquename,
+            version: i.version,
+            publisher: (i.publisherid as Publisher).friendlyname
+          });
+        }
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+>>>>>>> 9881501e (solution-get)
   }
 }
 

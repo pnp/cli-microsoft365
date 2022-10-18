@@ -2,8 +2,11 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
+<<<<<<< HEAD
 // import { Cli } from '../../../../cli/Cli';
 // import { CommandInfo } from '../../../../cli/CommandInfo';
+=======
+>>>>>>> 9881501e (solution-get)
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
@@ -13,10 +16,13 @@ import commands from '../../commands';
 const command: Command = require('./solution-get');
 
 describe(commands.SOLUTION_GET, () => {
+<<<<<<< HEAD
   // let commandInfo: CommandInfo;
   // const validSolutionId = ' ee62fd63-e49e-4c09-80de-8fae1b9a427e';
   // const validSolutionName = 'Solution name';
   // const validEnvironmentId = 'Default-0cac6cda-2e04-4a3d-9c16-9c91470d7022';
+=======
+>>>>>>> 9881501e (solution-get)
   const envResponse: any = { "properties": { "linkedEnvironmentMetadata": { "instanceApiUrl": "https://contoso-dev.api.crm4.dynamics.com" } } };
   const solutionResponse: any = {
     "value": [
@@ -50,7 +56,10 @@ describe(commands.SOLUTION_GET, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+<<<<<<< HEAD
     // commandInfo = Cli.getCommandInfo(command);
+=======
+>>>>>>> 9881501e (solution-get)
   });
 
   beforeEach(() => {
@@ -96,6 +105,7 @@ describe(commands.SOLUTION_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['uniquename', 'version', 'publisher']);
   });
 
+<<<<<<< HEAD
   // it('fails validation when environment is used with both id and name', async () => {
   //   const actual = await command.validate({
   //     options: {
@@ -108,6 +118,9 @@ describe(commands.SOLUTION_GET, () => {
   // });
 
   it('retrieve specific solution from power platform environment with the name parameter', async () => {
+=======
+  it('retrieve specific solution from power platform environment', async () => {
+>>>>>>> 9881501e (solution-get)
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
@@ -132,7 +145,11 @@ describe(commands.SOLUTION_GET, () => {
     assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
   });
 
+<<<<<<< HEAD
   it('retrieve specific solution from power platform environment with the name parameter in format json', async () => {
+=======
+  it('retrieve specific solution from power platform environment in format json', async () => {
+>>>>>>> 9881501e (solution-get)
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
@@ -157,7 +174,11 @@ describe(commands.SOLUTION_GET, () => {
     assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
   });
 
+<<<<<<< HEAD
   it('retrieve specific solution from power platform environment with the name parameter in format json as admin', async () => {
+=======
+  it('retrieve specific solution from power platform environment in format json as admin', async () => {
+>>>>>>> 9881501e (solution-get)
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
@@ -183,7 +204,11 @@ describe(commands.SOLUTION_GET, () => {
   });
 
 
+<<<<<<< HEAD
   it('retrieve specific solution from power platform environment with name parameter in format text', async () => {
+=======
+  it('retrieve specific solution from power platform environment in format text', async () => {
+>>>>>>> 9881501e (solution-get)
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
@@ -208,6 +233,7 @@ describe(commands.SOLUTION_GET, () => {
     assert(loggerLogSpy.calledWith(solutionResponseText));
   });
 
+<<<<<<< HEAD
   it('retrieve specific solution from power platform environment with the id parameter', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
@@ -309,6 +335,8 @@ describe(commands.SOLUTION_GET, () => {
     assert(loggerLogSpy.calledWith(solutionResponseText));
   });
 
+=======
+>>>>>>> 9881501e (solution-get)
   it('correctly handles no environments', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/providers/Microsoft.BusinessAppPlatform/environments?api-version=2020-10-01`) > -1) {
