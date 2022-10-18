@@ -8,5 +8,6 @@ export default {
   MANAGEMENTAPP_ADD: `${prefix} managementapp add`,
   MANAGEMENTAPP_LIST: `${prefix} managementapp list`,
   SOLUTION_LIST: `${prefix} solution list`,
+  SOLUTION_GET: `${prefix} solution get`,
   TENANT_SETTINGS_LIST: `${prefix} tenant settings list`
 };
