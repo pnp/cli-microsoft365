@@ -257,6 +257,7 @@ nav:
               - run resubmit: "cmd/flow/run/run-resubmit.md"
       - Power Platform (pp):
           - card:
+              - card get: "cmd/pp/card/card-get.md"
               - card list: "cmd/pp/card/card-list.md"
           - dataverse:
               - dataverse table list: "cmd/pp/dataverse/dataverse-table-list.md"
