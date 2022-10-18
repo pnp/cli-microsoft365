@@ -285,6 +285,14 @@ describe(commands.MESSAGE_GET, () => {
       new CommandError(`Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using app only credentials`));
   });
 
+  it('throws an error when the upn or userprincipalname is filled in when signed in using delegated authentication', async () => {
+    sinonUtil.restore([Auth.isAppOnlyAuth]);
+    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => false);
+
+    await assert.rejects(command.action(logger, { options: { debug: false, id: messageId, userId: userId, userPrincipalName: userPrincipalName } } as any),
+      new CommandError(`Option 'userId' or 'userPrincipalName' is not allowed when using delegated credentials`));
+  });
+
   it('supports debug mode', () => {
     const options = command.options;
     let containsOption = false;
