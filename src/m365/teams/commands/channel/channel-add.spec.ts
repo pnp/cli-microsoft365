@@ -133,6 +133,28 @@ describe(commands.CHANNEL_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if owner is not specified when creating shared channel.', async () => {
+    const actual = await command.validate({
+      options: {
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture Discussion',
+        type: 'shared'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if owner is specified when not creating a private or shared channel.', async () => {
+    const actual = await command.validate({
+      options: {
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture Discussion',
+        owner: 'John.Doe@contoso.com'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+  
   it('validates for a correct general channel input.', async () => {
     const actual = await command.validate({
       options: {
@@ -157,12 +179,26 @@ describe(commands.CHANNEL_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails to get team when team does not exists', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/joinedTeams`) > -1) {
-        return Promise.resolve({ value: [] });
+  it('validates for a correct shared channel input.', async () => {
+    const actual = await command.validate({
+      options: {
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture',
+        description: 'Architecture meeting',
+        type: 'shared',
+        owner: 'john.doe@contoso.com'
       }
-      return Promise.reject('The specified team does not exist in the Microsoft Teams');
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails to get team when team does not exists', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/me/joinedTeams') {
+        return { value: [] };
+      }
+
+      throw 'The specified team does not exist in the Microsoft Teams';
     });
 
     await assert.rejects(command.action(logger, { options: {
@@ -173,9 +209,9 @@ describe(commands.CHANNEL_ADD, () => {
   });
 
   it('fails when multiple teams with same name exists', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/joinedTeams`) > -1) {
-        return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/me/joinedTeams') {
+        return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 2,
           "value": [
@@ -216,10 +252,10 @@ describe(commands.CHANNEL_ADD, () => {
               "discoverySettings": null
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: {
@@ -230,13 +266,13 @@ describe(commands.CHANNEL_ADD, () => {
   });
 
   it('creates channel within the Microsoft Teams team in the tenant with description by team id', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
-        return Promise.resolve({
+        return {
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
           "description": "Architecture"
-        });
+        };
       }
       return Promise.reject('Invalid request');
     });
@@ -249,6 +285,7 @@ describe(commands.CHANNEL_ADD, () => {
         description: 'Architecture'
       }
     });
+    
     assert(loggerLogSpy.calledWith({
       "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
       "displayName": "Architecture Discussion",
@@ -257,15 +294,16 @@ describe(commands.CHANNEL_ADD, () => {
   });
 
   it('creates channel within the Microsoft Teams team in the tenant without description by team id', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
-        return Promise.resolve({
+        return {
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
           "description": null
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -275,6 +313,7 @@ describe(commands.CHANNEL_ADD, () => {
         name: 'Architecture Discussion'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
       "displayName": "Architecture Discussion",
@@ -283,15 +322,16 @@ describe(commands.CHANNEL_ADD, () => {
   });
 
   it('creates private channel within the Microsoft Teams team by team id', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
-        return Promise.resolve({
+        return{
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
           "membershipType": "private"
-        });
+        };
       }
-      return Promise.reject('Invalid request');
+
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -303,6 +343,7 @@ describe(commands.CHANNEL_ADD, () => {
         owner: 'john.doe@contoso.com'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
       "displayName": "Architecture Discussion",
@@ -310,10 +351,40 @@ describe(commands.CHANNEL_ADD, () => {
     }));
   });
 
+  it('creates shared channel within the Microsoft Teams team by team id', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
+        return {
+          "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
+          "displayName": "Architecture Discussion",
+          "membershipType": "shared"
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: false,
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture Discussion',
+        type: 'shared',
+        owner: 'john.doe@contoso.com'
+      }
+    });
+    
+    assert(loggerLogSpy.calledWith({
+      "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
+      "displayName": "Architecture Discussion",
+      "membershipType": "shared"
+    }));
+  });
+
   it('creates channel within the Microsoft Teams team in the tenant by team name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/joinedTeams`) > -1) {
-        return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/me/joinedTeams') {
+        return {
           "value": [
             {
               "id": "00000000-0000-0000-0000-000000000000",
@@ -334,22 +405,22 @@ describe(commands.CHANNEL_ADD, () => {
               "discoverySettings": null
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/channels`) > -1) {
-        return Promise.resolve({
+        return {
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
           "description": null
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -359,6 +430,7 @@ describe(commands.CHANNEL_ADD, () => {
         name: 'Architecture Discussion'
       }
     });
+
     assert(loggerLogSpy.calledWith({
       "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
       "displayName": "Architecture Discussion",
@@ -367,8 +439,8 @@ describe(commands.CHANNEL_ADD, () => {
   });
 
   it('correctly handles error when adding a channel', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('An error has occurred');
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw 'An error has occurred';
     });
 
     await assert.rejects(command.action(logger, { options: {

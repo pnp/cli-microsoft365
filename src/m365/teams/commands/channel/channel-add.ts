@@ -65,7 +65,7 @@ class TeamsChannelAddCommand extends GraphCommand {
       },
       {
         option: '--type [type]',
-        autocomplete: ['standard', 'private']
+        autocomplete: ['standard', 'private', 'shared']
       },
       {
         option: '--owner [owner]'
@@ -80,16 +80,16 @@ class TeamsChannelAddCommand extends GraphCommand {
           return `${args.options.teamId} is not a valid GUID`;
         }
 
-        if (args.options.type && ['standard', 'private'].indexOf(args.options.type) === -1) {
-          return `${args.options.type} is not a valid type value. Allowed values standard|private.`;
+        if (args.options.type && ['standard', 'private', 'shared'].indexOf(args.options.type) === -1) {
+          return `${args.options.type} is not a valid type value. Allowed values standard|private|shared.`;
         }
 
-        if (args.options.type === 'private' && !args.options.owner) {
-          return 'Specify owner when creating a private channel.';
+        if ((args.options.type === 'private' || args.options.type === 'shared') && !args.options.owner) {
+          return `Specify owner when creating a ${args.options.type} channel.`;
         }
 
-        if (args.options.type !== 'private' && args.options.owner) {
-          return 'Specify owner only when creating a private channel.';
+        if ((args.options.type !== 'private' && args.options.type !== 'shared') && args.options.owner) {
+          return `Specify owner only when creating a private or shared channel.`;
         }
 
         return true;
@@ -147,8 +147,8 @@ class TeamsChannelAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    if (args.options.type === 'private') {
-      // Private channels must have at least 1 owner
+    if (args.options.type === 'private' || args.options.type === 'shared') {
+      // Private and Shared channels must have at least 1 owner
       requestOptions.data.members = [
         {
           '@odata.type': '#microsoft.graph.aadUserConversationMember',
@@ -166,7 +166,7 @@ class TeamsChannelAddCommand extends GraphCommand {
       const teamId: string = await this.getTeamId(args);
       const res: any = await this.createChannel(args, teamId);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

@@ -1,12 +1,10 @@
 import { Cli } from '../../../../cli/Cli';
-import { CommandOutput } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandErrorWithOutput } from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
+import { Logger } from '../../../../cli/Logger';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import * as SpoUserGetCommand from '../user/user-get';
@@ -20,23 +18,20 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  listItemId: number;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
+  folderUrl: string;
   principalId?: number;
   upn?: string;
   groupName?: string;
   confirm?: boolean;
 }
 
-class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
+class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
   public get name(): string {
-    return commands.LISTITEM_ROLEASSIGNMENT_REMOVE;
+    return commands.FOLDER_ROLEASSIGNMENT_REMOVE;
   }
 
   public get description(): string {
-    return 'Removes a role assignment from list item permissions';
+    return 'Removes a role assignment from the specified folder';
   }
 
   constructor() {
@@ -50,9 +45,6 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
         principalId: typeof args.options.principalId !== 'undefined',
         upn: typeof args.options.upn !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
@@ -67,16 +59,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '--listItemId <listItemId>'
+        option: '-f, --folderUrl <folderUrl>'
       },
       {
         option: '--principalId [principalId]'
@@ -100,35 +83,18 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
-
-        if (args.options.listItemId && isNaN(args.options.listItemId)) {
-          return `Specified listItemId ${args.options.listItemId} is not a number`;
-        }
-
+     
         if (args.options.principalId && isNaN(args.options.principalId)) {
           return `Specified principalId ${args.options.principalId} is not a number`;
         }
 
-        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
-        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either list id or title or list url`;
-        }
-
-        if (listOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least list id or title or list url`;
-        }
-
         const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
         if (principalOptions.some(item => item !== undefined) && principalOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either principalId id or upn or groupName`;
+          return `Specify either principalId id, upn or groupName`;
         }
 
         if (principalOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least principalId id or upn or groupName`;
+          return `Specify at least principalId id, upn or groupName`;
         }
 
         return true;
@@ -139,24 +105,12 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeRoleAssignment: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Removing role assignment from listitem in site at ${args.options.webUrl}...`);
+        logger.logToStderr(`Removing role assignment from folder in site at ${args.options.webUrl}...`);
       }
+      const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
+      const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields`;
 
-      try {
-        let requestUrl: string = `${args.options.webUrl}/_api/web/`;
-        if (args.options.listId) {
-          requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
-        }
-        else if (args.options.listTitle) {
-          requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/`;
-        }
-        else if (args.options.listUrl) {
-          const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-          requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
-        }
-
-        requestUrl += `items(${args.options.listItemId})/`;
-
+      try { 
         if (args.options.upn) {
           args.options.principalId = await this.getUserPrincipalId(args.options);
           await this.removeRoleAssignment(requestUrl, logger, args.options);
@@ -168,7 +122,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
         else {
           await this.removeRoleAssignment(requestUrl, logger, args.options);
         }
-      }
+      } 
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -182,18 +136,18 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove role assignment from listitem ${args.options.listItemId} from list ${args.options.listId || args.options.listTitle} from site ${args.options.webUrl}?`
+        message: `Are you sure you want to remove a role assignment from the folder with url '${args.options.folderUrl}'?`
       });
-
+      
       if (result.continue) {
         await removeRoleAssignment();
       }
     }
   }
 
-  private removeRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
+  private async removeRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
     const requestOptions: any = {
-      url: `${requestUrl}roleassignments/removeroleassignment(principalid='${options.principalId}')`,
+      url: `${requestUrl}/roleassignments/removeroleassignment(principalid='${options.principalId}')`,
       method: 'POST',
       headers: {
         'accept': 'application/json;odata=nometadata',
@@ -201,14 +155,11 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
       },
       responseType: 'json'
     };
-
-    return request
-      .post(requestOptions)
-      .then(_ => Promise.resolve())
-      .catch((err: any) => Promise.reject(err));
+    
+    await request.post(requestOptions);
   }
 
-  private getGroupPrincipalId(options: Options): Promise<number> {
+  private async getGroupPrincipalId(options: Options): Promise<number> {
     const groupGetCommandOptions: SpoGroupGetCommandOptions = {
       webUrl: options.webUrl,
       name: options.groupName,
@@ -217,16 +168,12 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    return Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } })
-      .then((output: CommandOutput): Promise<number> => {
-        const getGroupOutput = JSON.parse(output.stdout);
-        return Promise.resolve(getGroupOutput.Id);
-      }, (err: CommandErrorWithOutput) => {
-        return Promise.reject(err);
-      });
+    const output = await Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
+    const getGroupOutput = JSON.parse(output.stdout);
+    return getGroupOutput.Id as number;  
   }
 
-  private getUserPrincipalId(options: Options): Promise<number> {
+  private async getUserPrincipalId(options: Options): Promise<number> {
     const userGetCommandOptions: SpoUserGetCommandOptions = {
       webUrl: options.webUrl,
       email: options.upn,
@@ -236,14 +183,10 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    return Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } })
-      .then((output: CommandOutput): Promise<number> => {
-        const getUserOutput = JSON.parse(output.stdout);
-        return Promise.resolve(getUserOutput.Id);
-      }, (err: CommandErrorWithOutput) => {
-        return Promise.reject(err);
-      });
+    const output = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
+    const getUserOutput = JSON.parse(output.stdout);
+    return getUserOutput.Id as number;
   }
 }
 
-module.exports = new SpoListItemRoleAssignmentRemoveCommand();
+module.exports = new SpoFolderRoleAssignmentRemoveCommand();

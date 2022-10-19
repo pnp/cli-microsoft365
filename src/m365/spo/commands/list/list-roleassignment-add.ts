@@ -167,26 +167,25 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
         requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
       }
 
-      args.options.roleDefinitionId = await this.GetRoleDefinitionId(args.options);
+      args.options.roleDefinitionId = await this.getRoleDefinitionId(args.options);
       if (args.options.upn) {
-        args.options.principalId = await this.GetUserPrincipalId(args.options);
-        await this.AddRoleAssignment(requestUrl, logger, args.options);
+        args.options.principalId = await this.getUserPrincipalId(args.options);
+        await this.addRoleAssignment(requestUrl, logger, args.options);
       }
       else if (args.options.groupName) {
-        args.options.principalId = await this.GetGroupPrincipalId(args.options);
-        await this.AddRoleAssignment(requestUrl, logger, args.options);
+        args.options.principalId = await this.getGroupPrincipalId(args.options);
+        await this.addRoleAssignment(requestUrl, logger, args.options);
       }
       else {
-        await this.AddRoleAssignment(requestUrl, logger, args.options);
+        await this.addRoleAssignment(requestUrl, logger, args.options);
       }
-      
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private AddRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
+  private addRoleAssignment(requestUrl: string, logger: Logger, options: Options): Promise<void> {
     const requestOptions: any = {
       url: `${requestUrl}roleassignments/addroleassignment(principalid='${options.principalId}',roledefid='${options.roleDefinitionId}')`,
       method: 'POST',
@@ -203,7 +202,7 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
       .catch((err: any) => Promise.reject(err));
   }
 
-  private GetRoleDefinitionId(options: Options): Promise<number> {
+  private getRoleDefinitionId(options: Options): Promise<number> {
     if (!options.roleDefinitionName) {
       return Promise.resolve(options.roleDefinitionId as number);
     }
@@ -225,7 +224,7 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
       });
   }
 
-  private GetGroupPrincipalId(options: Options): Promise<number> {
+  private getGroupPrincipalId(options: Options): Promise<number> {
     const groupGetCommandOptions: SpoGroupGetCommandOptions = {
       webUrl: options.webUrl,
       name: options.groupName,
@@ -243,7 +242,7 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
       });
   }
 
-  private GetUserPrincipalId(options: Options): Promise<number> {
+  private getUserPrincipalId(options: Options): Promise<number> {
     const userGetCommandOptions: SpoUserGetCommandOptions = {
       webUrl: options.webUrl,
       email: options.upn,

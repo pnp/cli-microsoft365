@@ -174,6 +174,17 @@ module.exports = {
     "eqeqeq": [
       "error",
       "always"
+    ],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": [
+          "method"
+        ],
+        "format": [
+          "camelCase"
+        ]
+      }
     ]
   },
   "overrides": [
