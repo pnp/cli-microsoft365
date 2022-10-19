@@ -10,6 +10,7 @@
 - [pp dataverse table list](../cmd/pp/dataverse/dataverse-table-list.md) - lists dataverse tables in a given environment [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
 - [pp solution list](../cmd/pp/solution/solution-list.md) - lists solutions in a given environment [#3711](https://github.com/pnp/cli-microsoft365/issues/3711)
 - [pp tenant settings list](../cmd/pp/tenant/tenant-settings-list.md) - lists the global Power Platform tenant settings [#3657](https://github.com/pnp/cli-microsoft365/issues/3657)
+- [pp environment get](../cmd/pp/environment/environment-get.md) - gets information about the specified Power Platform environment. [#3710](https://github.com/pnp/cli-microsoft365/issues/3710)
 
 **SharePoint:**
 
