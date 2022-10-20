@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -89,52 +90,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'clientState', 'expirationDateTime', 'resource']);
   });
 
-  it('retrieves all webhooks of the specific list if title option is passed (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(webhookListResponse);
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        title: 'Documents',
-        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
-      }
-    });
-    assert(loggerLogSpy.calledWith(webhookListResponse.value));
-  });
-
-  it('retrieves all webhooks of the specific list if listTitle option is passed (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(webhookListResponse);
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        listTitle: 'Documents',
-        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
-      }
-    });
-    assert(loggerLogSpy.calledWith(webhookListResponse.value));
-  });
-
   it('retrieves all webhooks of the specific list if title option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
@@ -175,52 +130,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       options: {
         debug: false,
         listTitle: 'Documents',
-        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
-      }
-    });
-    assert(loggerLogSpy.calledWith(webhookListResponse.value));
-  });
-
-  it('retrieves all webhooks of the specific list if id option is passed (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(webhookListResponse);
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        id: 'dfddade1-4729-428d-881e-7fedf3cae50d',
-        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
-      }
-    });
-    assert(loggerLogSpy.calledWith(webhookListResponse.value));
-  });
-
-  it('retrieves all webhooks of the specific list if listId option is passed (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve(webhookListResponse);
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
     });
@@ -275,7 +184,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   it('retrieves all webhooks of the specific list if listUrl option is passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('%2Fsites%2Fninja%2Flists%2FDocuments')/Subscriptions`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('${formatting.encodeQueryParameter('/sites/ninja/lists/Documents')}')/Subscriptions`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -289,29 +198,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
     await command.action(logger, {
       options: {
         debug: false,
-        listUrl: '/sites/ninja/lists/Documents',
-        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
-      }
-    });
-    assert(loggerLogSpy.calledWith(webhookListResponse.value));
-  });
-
-  it('retrieves all webhooks of the specific list if listUrl option is passed (debug)', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('%2Fsites%2Fninja%2Flists%2FDocuments')/Subscriptions`) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return webhookListResponse;
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
         listUrl: '/sites/ninja/lists/Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
@@ -475,16 +361,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('passes validation if the listId option is a valid GUID', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert(actual);
-  });
-
-  it('fails validation if all of the list options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', title: 'Documents', listTitle: 'Documents', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: '/Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if none of the list options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {

@@ -13,7 +13,7 @@ m365 spo list webhook list [options]
 `-u, --webUrl <webUrl>`
 : URL of the site where the list is located
 
-`-l, --listId [listId]`
+`-i, --listId [listId]`
 : ID of the list. Specify either `id`, `title`, `listTitle`, `listId` or `listUrl`.
 
 `-t, --listTitle [listTitle]`

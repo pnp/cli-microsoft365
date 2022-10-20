@@ -14,13 +14,13 @@ m365 spo list webhook set [options]
 : URL of the site where the list is located.
 
 `-l, --listId [listId]`
-: ID of the list. Specify either `id`, `title`, `listTitle`, `listId` or `listUrl`.
+: ID of the list. Specify either `listId`, `listTitle` or `listUrl`.
 
 `-t, --listTitle [listTitle]`
-: Title of the list. Specify either `id`, `title`, `listTitle`, `listId` or `listUrl`.
+: Title of the list. Specify either `listId`, `listTitle` or `listUrl`.
 
 `--listUrl [listUrl]`
-: Server- or site-relative URL of the list. Specify either `id`, `title`, `listTitle`, `listId` or `listUrl`.
+: Server- or site-relative URL of the list. Specify either `listId`, `listTitle` or `listUrl`.
 
 `-i, --id [id]`
 : ID of the webhook to update
@@ -45,13 +45,13 @@ Update the notification url of a webhook with a specific ID attached to a list w
 m365 spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook
 ```
 
-Update the expiration date of a webhook with a specific Title attached to a list with a specific ID in a specific site to a specfic date
+Update the expiration date of a webhook with a specific ID attached to a list with a specific title in a specific site to a specfic date
 
 ```sh
 m365 spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime 2018-10-09T18:15
 ```
 
-Update the notification url of a webhook with a specific URL attached to a list with a specific ID in a specific site to a specific URL and the expiration date to a specific date
+Update the notification url of a webhook with a specific ID attached to a list with a specific URL in a specific site to a specific URL and the expiration date to a specific date
 
 ```sh
 m365 spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listUrl '/sites/ninja/Documents' --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-03-02

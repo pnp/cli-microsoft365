@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -268,7 +269,7 @@ describe(commands.LIST_WEBHOOK_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       requests.push(opts);
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('%2Fsites%2Fninja%2Flists%2FDocuments')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('${formatting.encodeQueryParameter('/sites/ninja/lists/Documents')}')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -282,7 +283,7 @@ describe(commands.LIST_WEBHOOK_REMOVE, () => {
     await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listUrl: '/sites/ninja/lists/Documents', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81', confirm: true } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('%2Fsites%2Fninja%2Flists%2FDocuments')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')` &&
+      if (r.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('${formatting.encodeQueryParameter('/sites/ninja/lists/Documents')}')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')` &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;
@@ -295,7 +296,7 @@ describe(commands.LIST_WEBHOOK_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       requests.push(opts);
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('%2Fsites%2Fninja%2Flists%2FDocuments')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('${formatting.encodeQueryParameter('/sites/ninja/lists/Documents')}')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -326,7 +327,7 @@ describe(commands.LIST_WEBHOOK_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       requests.push(opts);
 
-      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('%2Fsites%2Fninja%2Flists%2FDocuments')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('${formatting.encodeQueryParameter('/sites/ninja/lists/Documents')}')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -344,7 +345,7 @@ describe(commands.LIST_WEBHOOK_REMOVE, () => {
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listUrl: '/sites/ninja/lists/Documents', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('%2Fsites%2Fninja%2Flists%2FDocuments')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')` &&
+      if (r.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('${formatting.encodeQueryParameter('/sites/ninja/lists/Documents')}')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')` &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;
@@ -391,11 +392,6 @@ describe(commands.LIST_WEBHOOK_REMOVE, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if none of the list options are not passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if webhook id option is not passed', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -429,10 +425,5 @@ describe(commands.LIST_WEBHOOK_REMOVE, () => {
   it('passes validation if the listid option is a valid GUID', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
     assert(actual);
-  });
-
-  it('fails validation if all of the list options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listUrl: '/Documents', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', listTitle: 'Documents', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 });
