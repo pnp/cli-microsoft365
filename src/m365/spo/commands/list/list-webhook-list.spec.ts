@@ -130,7 +130,8 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       options: {
         debug: false,
         listTitle: 'Documents',
-        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        verbose: true
       }
     });
     assert(loggerLogSpy.calledWith(webhookListResponse.value));
@@ -176,7 +177,8 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       options: {
         debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
-        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        verbose: true
       }
     });
     assert(loggerLogSpy.calledWith(webhookListResponse.value));

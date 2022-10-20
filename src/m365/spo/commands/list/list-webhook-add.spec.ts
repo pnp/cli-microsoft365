@@ -161,7 +161,8 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        verbose: true
       }
     });
     assert(loggerLogSpy.calledWith({
