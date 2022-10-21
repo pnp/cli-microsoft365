@@ -967,6 +967,7 @@ nav:
       - dataverse:
         - dataverse table list: 'cmd/pp/dataverse/dataverse-table-list.md'
       - environment:
+        - environment get: 'cmd/pp/environment/environment-get.md'
         - environment list: 'cmd/pp/environment/environment-list.md'
       - gateway:
         - gateway list: 'cmd/pp/gateway/gateway-list.md'
@@ -1080,6 +1081,7 @@ nav:
         - folder move: 'cmd/spo/folder/folder-move.md'
         - folder remove: 'cmd/spo/folder/folder-remove.md'
         - folder rename: 'cmd/spo/folder/folder-rename.md'
+        - folder roleassignment remove: 'cmd/spo/folder/folder-roleassignment-remove.md'
         - folder roleinheritance break: 'cmd/spo/folder/folder-roleinheritance-break.md'
         - folder roleinheritance reset: 'cmd/spo/folder/folder-roleinheritance-reset.md'
       - group:
