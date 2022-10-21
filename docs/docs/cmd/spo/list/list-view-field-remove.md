@@ -14,10 +14,13 @@ m365 spo list view field remove [options]
 : URL of the site where the list is located
 
 `--listId [listId]`
-: ID of the list where the view is located. Specify `listTitle` or `listId` but not both
+: ID of the list where the view is located. Specify either `listId`, `listTitle`, or `listUrl`.
 
 `--listTitle [listTitle]`
-: Title of the list where the view is located. Specify `listTitle` or `listId` but not both
+: Title of the list where the view is located. Specify either `listId`, `listTitle`, or `listUrl`.
+
+ `--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listId` , `listTitle` or `listUrl`.
 
 `--viewId [viewId]`
 : ID of the view to update. Specify `viewTitle` or `viewId` but not both
@@ -46,3 +49,10 @@ Remove field with title _Custom field_ from view with title _Custom view_ from t
 ```sh
 m365 spo list view field remove --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'Custom view'
 ```
+
+Remove field with title _Custom field_ from view with title _Custom view_ from the list with url _/sites/project-x/lists/Events_ located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo list view field remove --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listUrl '/sites/project-x/lists/Events' --viewTitle 'Custom view'
+```
+

@@ -14,10 +14,13 @@ m365 spo list view set [options]
 : URL of the site where the list is located
 
 `--listId [listId]`
-: ID of the list where the view is located. Specify `listTitle` or `listId` but not both
+: ID of the list where the view is located. Specify either `listId`, `listTitle`, or `listUrl`.
 
 `--listTitle [listTitle]`
-: Title of the list where the view is located. Specify `listTitle` or `listId` but not both
+: Title of the list where the view is located. Specify either `listId`, `listTitle`, or `listUrl`.
+
+ `--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listId` , `listTitle` or `listUrl`.
 
 `--viewId [viewId]`
 : ID of the view to update. Specify `viewTitle` or `viewId` but not both
@@ -44,7 +47,7 @@ m365 spo list view set --webUrl https://contoso.sharepoint.com/sites/project-x -
 Update the title of the list view specified by its ID
 
 ```sh
-m365 spo list view set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --viewId 330f29c5-5c4c-465f-9f4b-7903020ae1ce --Title 'All events'
+m365 spo list view set --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/lists/Events'  --viewId 330f29c5-5c4c-465f-9f4b-7903020ae1ce --Title 'All events'
 ```
 
 Update view formatting of the specified list view
