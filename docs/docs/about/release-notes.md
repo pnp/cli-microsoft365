@@ -49,6 +49,8 @@
 - fixed pagination for 'pp dataverse table list' command [#3803](https://github.com/pnp/cli-microsoft365/issues/3803)
 - extended 'spo list contenttype' with option 'listUrl' [#3810](https://github.com/pnp/cli-microsoft365/issues/3810)
 - updated the Microsoft Graph sample to include a 'm365 request' section [#3712](https://github.com/pnp/cli-microsoft365/issues/3712)
+- extended 'spo list webhook' with option 'listUrl' [#3812](https://github.com/pnp/cli-microsoft365/issues/3812)
+- extended 'todo task set' with extra options [#3835](https://github.com/pnp/cli-microsoft365/issues/3835)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
