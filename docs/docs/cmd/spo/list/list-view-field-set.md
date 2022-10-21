@@ -14,10 +14,13 @@ m365 spo list view field set [options]
 : URL of the site where the list is located
 
 `--listId [listId]`
-: ID of the list where the view is located. Specify `listTitle` or `listId` but not both
+: ID of the list where the view is located. Specify either `listId`, `listTitle`, or `listUrl`.
 
 `--listTitle [listTitle]`
-: Title of the list where the view is located. Specify `listTitle` or `listId` but not both
+: Title of the list where the view is located. Specify either `listId`, `listTitle`, or `listUrl`.
+
+ `--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listId` , `listTitle` or `listUrl`.
 
 `--viewId [viewId]`
 : ID of the view to update. Specify `viewTitle` or `viewId` but not both
@@ -48,4 +51,11 @@ Move field with title _Custom field_ to position _1_ in view with title _All Doc
 
 ```sh
 m365 spo list view field set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle 'All Documents' --fieldTitle 'Custom field' --fieldPosition 1
+```
+
+
+Move field with title _Custom field_ to position _1_ in view with title _All Documents_ of the list with url _/sites/project-x/lists/Events_ located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo list view field set --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/lists/Events' --viewTitle 'All Documents' --fieldTitle 'Custom field' --fieldPosition 1
 ```
