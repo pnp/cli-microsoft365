@@ -13,7 +13,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   environment: string;
-  name: string;
+  id?: string;
+  name?: string;
   asAdmin: boolean;
 }
 
@@ -35,6 +36,8 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    // this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -51,11 +54,37 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
         option: '-e, --environment <environment>'
       },
       {
-        option: '-n, --name <name>'
+        option: '-i, --id'
+      },
+      {
+        option: '-n, --name'
       },
       {
         option: '-a, --asAdmin'
       }
+    );
+  }
+
+
+  // #initValidators(): void {
+  //   this.validators.push(
+  //     async (args: CommandArgs) => {
+  //       if (args.options.id && args.options.name) {
+  //         return 'Specify either Id or Name but not both';
+  //       }
+
+  //       if (!args.options.id && !args.options.name) {
+  //         return 'Specify either Id or Name';
+  //       }
+
+  //       return true;
+  //     }
+  //   );
+  // }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['id', 'name']
     );
   }
 
@@ -65,36 +94,49 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
     }
 
     try {
-      const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const res: Solution = await this.getSolution(args.options);
+      if (!args.options.output || args.options.output === 'json') {
+        logger.log(res);
+      }
+      else {
+        //converted to text friendly output
+        logger.log({
+          uniquename: res.uniquename,
+          version: res.version,
+          publisher: (res.publisherid as Publisher).friendlyname
+        });
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+  }
 
+  private async getSolution(options: Options) {
+    const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(options.environment, options.asAdmin);
+    if (options.id) {
       const requestOptions: AxiosRequestConfig = {
-        url: `${dynamicsApiUrl}/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq \'${args.options.name}\'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`,
+        url: `${dynamicsApiUrl}/api/data/v9.0/solutions(${options.id})?$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
         responseType: 'json'
       };
 
-      const res = await request.get<{ value: Solution[] }>(requestOptions);
+      const r = await request.get<Solution>(requestOptions);
+      return r;
+    }
 
-      if (!args.options.output || args.options.output === 'json') {
-        logger.log(res.value[0]);
-      }
-      else {
-        //converted to text friendly output
-        if (res.value.length > 0) {
-          const i = res.value[0];
-          logger.log({
-            uniquename: i.uniquename,
-            version: i.version,
-            publisher: (i.publisherid as Publisher).friendlyname
-          });
-        }
-      }
-    }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
-    }
+    const requestOptions: AxiosRequestConfig = {
+      url: `${dynamicsApiUrl}/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq \'${options.name}\'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const r = await request.get<{ value: Solution[] }>(requestOptions);
+    return r.value[0];
   }
 }
 

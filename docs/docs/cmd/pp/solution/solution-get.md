@@ -13,7 +13,10 @@ m365 pp solution get [options]
 `-e, --environment <environment>`
 : The name of the environment
 
-`-n, --name <name>`
+`-i --id`
+: The id of the card
+
+`-n, --name`
 : The unique name of the card
 
 `-a, --asAdmin`
@@ -23,14 +26,26 @@ m365 pp solution get [options]
 
 ## Examples
 
-List a specific solution in a specific environment
+List a specific solution in a specific environment based on the name
 
 ```sh
 m365 pp solution list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "Default"
 ```
 
-List a specific solution in a specific environment as Admin
+List a specific solution in a specific environment based on the name as Admin
 
 ```sh
 m365 pp solution list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "Default" --asAdmin
+```
+
+List a specific solution in a specific environment based on the id
+
+```sh
+m365 pp solution list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e"
+```
+
+List a specific solution in a specific environment based on the id as Admin
+
+```sh
+m365 pp solution list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e" --asAdmin
 ```
