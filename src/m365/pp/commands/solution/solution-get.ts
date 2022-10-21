@@ -36,7 +36,6 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
 
     this.#initTelemetry();
     this.#initOptions();
-    // this.#initValidators();
     this.#initOptionSets();
   }
 
@@ -64,23 +63,6 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
       }
     );
   }
-
-
-  // #initValidators(): void {
-  //   this.validators.push(
-  //     async (args: CommandArgs) => {
-  //       if (args.options.id && args.options.name) {
-  //         return 'Specify either Id or Name but not both';
-  //       }
-
-  //       if (!args.options.id && !args.options.name) {
-  //         return 'Specify either Id or Name';
-  //       }
-
-  //       return true;
-  //     }
-  //   );
-  // }
 
   #initOptionSets(): void {
     this.optionSets.push(
