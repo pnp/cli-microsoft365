@@ -24,7 +24,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Lists a specific solution in a given environment.';
+    return 'Gets a specific solution in a given environment.';
   }
 
   public defaultProperties(): string[] | undefined {
