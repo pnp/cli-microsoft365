@@ -16,8 +16,8 @@ m365 pp solution get [options]
 `-i --id`
 : The id of the card
 
-`-n, --name`
-: The unique name of the card
+`-n, --name [name]`
+: The name of the solution. Specify either `id` or `name` but not both.
 
 `-a, --asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
