@@ -46,9 +46,6 @@ m365 spo site add [options]
 `--siteDesignId [siteDesignId]`
 : Id of the custom site design to use to create the site. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies to type CommunicationSite)
 
-`--allowFileSharingForGuestUsers`
-: (deprecated. Use `shareByEmailEnabled` instead) Determines whether it's allowed to share file with guests (applies to type CommunicationSite)
-
 `--shareByEmailEnabled`
 : Determines whether it's allowed to share file with guests (applies to type CommunicationSite)
 
