@@ -269,6 +269,7 @@ nav:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
         - managementapp list: 'cmd/pp/managementapp/managementapp-list.md'
       - solution:
+        - solution get: 'cmd/pp/solution/solution-get.md'
         - solution list: 'cmd/pp/solution/solution-list.md'
       - tenant:
         - tenant settings list: 'cmd/pp/tenant/tenant-settings-list.md'
