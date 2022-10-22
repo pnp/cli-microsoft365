@@ -1,6 +1,7 @@
 const prefix: string = 'pp';
 
 export default {
+  CARD_GET: `${prefix} card get`,
   CARD_LIST: `${prefix} card list`,
   DATAVERSE_TABLE_LIST: `${prefix} dataverse table list`,
   ENVIRONMENT_GET: `${prefix} environment get`,
