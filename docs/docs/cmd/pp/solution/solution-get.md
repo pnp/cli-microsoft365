@@ -13,8 +13,8 @@ m365 pp solution get [options]
 `-e, --environment <environment>`
 : The name of the environment
 
-`-i --id`
-: The id of the card
+`-i --id [id]`
+: The ID of the solution. Specify either `id` or `name` but not both.
 
 `-n, --name [name]`
 : The name of the solution. Specify either `id` or `name` but not both.
