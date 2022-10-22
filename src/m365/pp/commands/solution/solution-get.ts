@@ -53,7 +53,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
         option: '-e, --environment <environment>'
       },
       {
-        option: '-i, --id'
+        option: '-i, --id [id]'
       },
       {
         option: '-n, --name [name]'
