@@ -394,7 +394,6 @@ nav:
         - homesite remove: 'cmd/spo/homesite/homesite-remove.md'
         - homesite set: 'cmd/spo/homesite/homesite-set.md'
       - hubsite:
-        - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
         - hubsite data get: 'cmd/spo/hubsite/hubsite-data-get.md'
         - hubsite disconnect: 'cmd/spo/hubsite/hubsite-disconnect.md'
         - hubsite get: 'cmd/spo/hubsite/hubsite-get.md'
@@ -518,6 +517,7 @@ nav:
         - site ensure: 'cmd/spo/site/site-ensure.md'
         - site get: 'cmd/spo/site/site-get.md'
         - site groupify: 'cmd/spo/site/site-groupify.md'
+        - site hubsite connect: 'cmd/spo/site/site-hubsite-connect.md'
         - site list: 'cmd/spo/site/site-list.md'
         - site recyclebinitem list: 'cmd/spo/site/site-recyclebinitem-list.md'
         - site recyclebinitem restore: 'cmd/spo/site/site-recyclebinitem-restore.md'

@@ -15,9 +15,9 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class SpoHubSiteConnectCommand extends SpoCommand {
+class SpoSiteHubSiteConnectCommand extends SpoCommand {
   public get name(): string {
-    return commands.HUBSITE_CONNECT;
+    return commands.SITE_HUBSITE_CONNECT;
   }
 
   public get description(): string {
@@ -79,4 +79,4 @@ class SpoHubSiteConnectCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoHubSiteConnectCommand();
+module.exports = new SpoSiteHubSiteConnectCommand();
