@@ -56,7 +56,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
         option: '-i, --id'
       },
       {
-        option: '-n, --name'
+        option: '-n, --name [name]'
       },
       {
         option: '-a, --asAdmin'
