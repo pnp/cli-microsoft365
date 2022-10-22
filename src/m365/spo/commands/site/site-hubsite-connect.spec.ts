@@ -11,9 +11,9 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
-const command: Command = require('./hubsite-connect');
+const command: Command = require('./site-hubsite-connect');
 
-describe(commands.HUBSITE_CONNECT, () => {
+describe(commands.SITE_HUBSITE_CONNECT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -65,7 +65,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.HUBSITE_CONNECT), true);
+    assert.strictEqual(command.name.startsWith(commands.SITE_HUBSITE_CONNECT), true);
   });
 
   it('has a description', () => {

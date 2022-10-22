@@ -1,11 +1,11 @@
-# spo hubsite connect
+# spo site hubsite connect
 
 Connects the specified site collection to the given hub site
 
 ## Usage
 
 ```sh
-m365 spo hubsite connect [options]
+m365 spo site hubsite connect [options]
 ```
 
 ## Options
@@ -29,10 +29,10 @@ If the specified `id` doesn't point to a valid hub site, you will get a `Resourc
 
 ## Examples
 
-Connect the site collection with URL _https://contoso.sharepoint.com/sites/contoso-sales_ to the hub site with ID _255a50b2-527f-4413-8485-57f4c17a24d1_
+Connect a specific site collection to a hub site
 
 ```sh
-m365 spo hubsite connect --siteUrl https://contoso.sharepoint.com/sites/contoso-sales --id 255a50b2-527f-4413-8485-57f4c17a24d1
+m365 spo site hubsite connect --siteUrl https://contoso.sharepoint.com/sites/contoso-sales --id 255a50b2-527f-4413-8485-57f4c17a24d1
 ```
 
 ## More information
