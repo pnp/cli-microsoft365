@@ -1,4 +1,4 @@
-# pp solution list
+# pp solution get
 
 Lists a specific solution in a given environment.
 
