@@ -16,9 +16,9 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class SpoHubSiteDisconnectCommand extends SpoCommand {
+class SpoSiteHubSiteDisconnectCommand extends SpoCommand {
   public get name(): string {
-    return commands.HUBSITE_DISCONNECT;
+    return commands.SITE_HUBSITE_DISCONNECT;
   }
 
   public get description(): string {
@@ -68,7 +68,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${args.options.url}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`,
+          url: `${args.options.siteUrl}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`,
           headers: {
             'X-RequestDigest': res.FormDigestValue,
             accept: 'application/json;odata=nometadata'
@@ -101,4 +101,4 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoHubSiteDisconnectCommand();
+module.exports = new SpoSiteHubSiteDisconnectCommand();

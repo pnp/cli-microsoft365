@@ -11,9 +11,9 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
-const command: Command = require('./hubsite-disconnect');
+const command: Command = require('./site-hubsite-disconnect');
 
-describe(commands.HUBSITE_DISCONNECT, () => {
+describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -74,7 +74,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.HUBSITE_DISCONNECT), true);
+    assert.strictEqual(command.name.startsWith(commands.SITE_HUBSITE_DISCONNECT), true);
   });
 
   it('has a description', () => {
@@ -83,7 +83,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   it('disconnects the site from its hub site without prompting for confirmation when confirm option specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) {
         return Promise.resolve({
           "odata.null": true
         });
@@ -98,7 +98,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   it('disconnects the site from its hub site without prompting for confirmation when confirm option specified (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) {
         return Promise.resolve({
           "odata.null": true
         });
