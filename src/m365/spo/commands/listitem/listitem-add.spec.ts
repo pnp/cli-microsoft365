@@ -39,7 +39,7 @@ describe(commands.LISTITEM_ADD, () => {
     return Promise.reject('Invalid request');
   };
 
-  const getFakes = (opts: any) => {
+  const getFakes = async (opts: any) => {
     if ((opts.url as string).indexOf('contenttypes') > -1) {
       return Promise.resolve({ value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] });
     }
@@ -218,6 +218,21 @@ describe(commands.LISTITEM_ADD, () => {
     await command.action(logger, { options: options } as any);
     assert.strictEqual(actualId, expectedId);
   });
+
+  it('creates list item in the list specified using URL', async () => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    const options: any = {
+      listUrl: '/sites/project-x/Documents',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      Title: expectedTitle
+    };
+
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(actualId, expectedId);
+  });
+
 
   it('attempts to create the listitem with the contenttype of \'Item\' when content type option 0x01 is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);

@@ -1,8 +1,10 @@
+import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -41,10 +43,11 @@ class SpoListItemRemoveCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        listId: (!(!args.options.listId)).toString(),
-        listTitle: (!(!args.options.listTitle)).toString(),
-        recycle: (!(!args.options.recycle)).toString(),
-        confirm: (!(!args.options.confirm)).toString()
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        recycle: !!args.options.recycle,
+        confirm: !!args.options.confirm
       });
     });
   }
@@ -62,6 +65,9 @@ class SpoListItemRemoveCommand extends SpoCommand {
       },
       {
         option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       },
       {
         option: '--recycle'
@@ -96,22 +102,26 @@ class SpoListItemRemoveCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeListItem: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Removing list item in site at ${args.options.webUrl}...`);
+        logger.logToStderr(`Removing list from list ${args.options.listId || args.options.listTitle || args.options.listUrl} item in site at ${args.options.webUrl}...`);
       }
 
-      let requestUrl: string = '';
+      let requestUrl = `${args.options.webUrl}/_api/web`;
 
       if (args.options.listId) {
-        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+        requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
       }
-      else {
-        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+      else if (args.options.listTitle) {
+        requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+      }
+      else if (args.options.listUrl) {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
       }
 
       requestUrl += `/items(${args.options.id})`;
@@ -120,7 +130,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
         requestUrl += `/recycle()`;
       }
 
-      const requestOptions: any = {
+      const requestOptions: AxiosRequestConfig = {
         url: requestUrl,
         method: 'POST',
         headers: {
@@ -135,7 +145,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
         await request.post(requestOptions);
         // REST post call doesn't return anything
       }
-      catch (err: any){
+      catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
     };
@@ -148,7 +158,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the list item ${args.options.id} from list ${args.options.listId || args.options.listTitle} located in site ${args.options.webUrl}?`
+        message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the list item ${args.options.id} from list ${args.options.listId || args.options.listTitle || args.options.listUrl} located in site ${args.options.webUrl}?`
       });
 
       if (result.continue) {
