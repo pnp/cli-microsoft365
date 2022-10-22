@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   environment: string;
   id?: string;
   name?: string;
-  asAdmin: boolean;
+  asAdmin?: boolean;
 }
 
 class PpSolutionGetCommand extends PowerPlatformCommand {
