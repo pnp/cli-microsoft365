@@ -53,6 +53,9 @@
 - extended 'todo task set' with extra options [#3835](https://github.com/pnp/cli-microsoft365/issues/3835)
 - fixed 'outlook mail send' command for wrong validation message [#3833](https://github.com/pnp/cli-microsoft365/issues/3833)
 - fixed documentation for eventreceiver get and eventreceiver remove [#3852](https://github.com/pnp/cli-microsoft365/issues/3852)
+- removed odata output from 'planner bucket get' [#3825](https://github.com/pnp/cli-microsoft365/issues/3825)
+- updated GitHub actions [#3799](https://github.com/pnp/cli-microsoft365/issues/3799)
+- Enables @typescript-eslint/explicit-function-return-type [#3777](https://github.com/pnp/cli-microsoft365/issues/3777)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
