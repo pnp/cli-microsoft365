@@ -7,83 +7,71 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 const command: Command = require('./listitem-isrecord');
 
 describe(commands.LISTITEM_ISRECORD, () => {
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
+  const listUrl = 'sites/project-x/documents';
+  const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+  const currentWebIdentity = JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7618.1204", "ErrorInfo": null, "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021" }, { "_ObjectType_": "SP.Web", "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7", "ServerRelativeUrl": "\\u002fsites\\u002fprojectx" }]);
+  const itemDoesNotExistError = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "Item does not exist. It may have been deleted by another user.", "ErrorValue": null, "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32", "ErrorCode": -2130575338, "ErrorTypeName": "Microsoft.SharePoint.SPException" }, "LibraryVersion": "16.0.9005.1214", "SchemaVersion": "15.0.0.0", "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32" }]);
+  const listIdResponse = { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
+
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
-  const postFakes = (opts: any) => {
+  const postFakes = async (opts: any) => {
     // requestObjectIdentity mock
     if (opts.data.indexOf('Name="Current"') > -1) {
       if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
         logger.log("Returns error from requestObjectIdentity");
-        return Promise.reject("error occurred");
+        throw 'error occurred';
       }
-
-      return Promise.resolve(JSON.stringify(
-        [
-          {
-            "SchemaVersion": "15.0.0.0",
-            "LibraryVersion": "16.0.7618.1204",
-            "ErrorInfo": null,
-            "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021"
-          },
-          {
-            "_ObjectType_": "SP.Web",
-            "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
-            "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
-          }
-        ])
-      );
+      if (opts.url === `${webUrl}/_vti_bin/client.svc/ProcessQuery`) {
+        return currentWebIdentity;
+      }
     }
 
     // IsRecord request mocks
-    if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-      // Unsuccessful response for when the item does not exist
-      if ((opts.url as string).indexOf('itemdoesnotexist.sharepoint.com') > -1) {
-        return Promise.resolve(JSON.stringify(
-          [
-            {
-              "ErrorInfo": { "ErrorMessage": "Item does not exist. It may have been deleted by another user.", "ErrorValue": null, "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32", "ErrorCode": -2130575338, "ErrorTypeName": "Microsoft.SharePoint.SPException" },
-              "LibraryVersion": "16.0.9005.1214",
-              "SchemaVersion": "15.0.0.0",
-              "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32"
-            }]));
-      }
-
-      // Successful response
-      return Promise.resolve(JSON.stringify(
+    if (opts.url === `${webUrl}/_vti_bin/client.svc/ProcessQuery`) {
+      return JSON.stringify(
         [
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.9005.1214", "ErrorInfo": null, "TraceCorrelationId": "9ec8e69e-d001-8000-f13a-d5e03849cd96"
           }, 32, true
         ]
-      ));
+      );
     }
-    return Promise.reject('Invalid request');
+
+    if (opts.url === 'https://itemdoesnotexist.sharepoint.com/sites/project-y/_vti_bin/client.svc/ProcessQuery') {
+      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="CLI for Microsoft 365 v5.9.0" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
+        return currentWebIdentity;
+      }
+      return itemDoesNotExistError;
+    }
+    throw 'Invalid request';
   };
 
-  const getFakes = (opts: any) => {
+  const getFakes = async (opts: any) => {
     // Get list mock
     if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
       (opts.url as string).indexOf('$select=Id') > -1) {
       logger.log('faked!');
-      return Promise.resolve({
-        Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
-      });
+      return listIdResponse;
     }
-    if ((opts.url as string).indexOf('?select=Id') > -1) {
-      return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`) {
+      return listIdResponse;
     }
-    return Promise.reject('Invalid request');
+    throw 'Invalid request';
   };
 
   before(() => {
@@ -150,7 +138,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
       debug: true,
       listTitle: 'Test List',
       id: 147,
-      webUrl: `https://itemdoesnotexist.sharepoint.com/sites/project-y/`,
+      webUrl: `https://itemdoesnotexist.sharepoint.com/sites/project-y`,
       verbose: true
     };
 
@@ -165,12 +153,12 @@ describe(commands.LISTITEM_ISRECORD, () => {
       debug: true,
       listTitle: 'Test List',
       id: 147,
-      webUrl: `https://contoso.sharepoint.com/sites/project-y/`,
+      webUrl: webUrl,
       verbose: true
     };
 
     await command.action(logger, { options: options } as any);
-    assert(loggerLogToStderrSpy.calledWith("Getting list id..."));
+    assert(loggerLogToStderrSpy.calledWith(`Getting list id for list Test List`));
   });
 
   it('test a record with list id passed in as an option', async () => {
@@ -180,13 +168,29 @@ describe(commands.LISTITEM_ISRECORD, () => {
     const options: any = {
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
       id: 147,
-      webUrl: `https://contoso.sharepoint.com/sites/project-y/`,
+      webUrl: webUrl,
       debug: true,
       verbose: true
     };
 
     await command.action(logger, { options: options } as any);
     assert(loggerLogToStderrSpy.calledWith("List Id passed in as an argument."));
+  });
+
+  it('test a record with list url passed in as an option', async () => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    const options: any = {
+      listUrl: listUrl,
+      id: 147,
+      webUrl: webUrl,
+      debug: true,
+      verbose: true
+    };
+
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogToStderrSpy.calledWith(`Getting list id for list ${listUrl}`));
   });
 
   it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request', async () => {
@@ -198,7 +202,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
       id: 147,
       date: '2019-03-14',
-      webUrl: `https://returnerror.sharepoint.com/sites/project-y/`
+      webUrl: `https://returnerror.sharepoint.com/sites/project-y`
     };
 
     await assert.rejects(command.action(logger, { options: options } as any), new CommandError('error occurred'));
@@ -227,13 +231,13 @@ describe(commands.LISTITEM_ISRECORD, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if listTitle and listId option not specified', async () => {
+  it('fails validation if listTitle, listId and listUrl option not specified', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if listTitle and listId are specified together', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
+  it('fails validation if listTitle, listId and listUrl are specified together', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: listUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

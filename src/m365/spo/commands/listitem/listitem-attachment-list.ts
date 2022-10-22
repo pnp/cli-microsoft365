@@ -1,7 +1,9 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -14,6 +16,7 @@ interface Options extends GlobalOptions {
   itemId: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   webUrl: string;
 }
 
@@ -39,7 +42,8 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined'
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined'
       });
     });
   }
@@ -57,6 +61,9 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
       },
       {
         option: '--listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       }
     );
   }
@@ -83,7 +90,7 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public defaultProperties(): string[] | undefined {
@@ -91,14 +98,21 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const listIdArgument = args.options.listId || '';
-    const listTitleArgument = args.options.listTitle || '';
-    const listRestUrl: string = (args.options.listId ?
-      `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
+    let requestUrl = `${args.options.webUrl}/_api/web`;
 
-    const requestOptions: any = {
-      url: `${listRestUrl}/items(${args.options.itemId})?$select=AttachmentFiles&$expand=AttachmentFiles`,
+    if (args.options.listId) {
+      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+    }
+    else if (args.options.listTitle) {
+      requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
+
+    const requestOptions: AxiosRequestConfig = {
+      url: `${requestUrl}/items(${args.options.itemId})?$select=AttachmentFiles&$expand=AttachmentFiles`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'

@@ -17,6 +17,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   contentType?: string;
   folder?: string;
 }
@@ -57,6 +58,7 @@ class SpoListItemAddCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
         contentType: typeof args.options.contentType !== 'undefined',
         folder: typeof args.options.folder !== 'undefined'
       });
@@ -73,6 +75,9 @@ class SpoListItemAddCommand extends SpoCommand {
       },
       {
         option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       },
       {
         option: '-c, --contentType [contentType]'
@@ -106,31 +111,41 @@ class SpoListItemAddCommand extends SpoCommand {
       'webUrl',
       'listId',
       'listTitle',
+      'listUrl',
       'contentType',
       'folder'
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const listIdArgument = args.options.listId || '';
-      const listTitleArgument = args.options.listTitle || '';
-      const listRestUrl: string = (args.options.listId ?
-        `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
-        : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
+
+      let requestUrl = `${args.options.webUrl}/_api/web`;
+
+      if (args.options.listId) {
+        requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+      }
+      else if (args.options.listTitle) {
+        requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+      }
+      else if (args.options.listUrl) {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+      }
+
       let contentTypeName: string = '';
       let targetFolderServerRelativeUrl: string = '';
 
       if (this.verbose) {
-        logger.logToStderr(`Getting content types for list...`);
+        logger.logToStderr(`Getting content types for list ${args.options.listId || args.options.listTitle || args.options.listUrl}...`);
       }
 
       let requestOptions: any = {
-        url: `${listRestUrl}/contenttypes?$select=Name,Id`,
+        url: `${requestUrl}/contenttypes?$select=Name,Id`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -174,7 +189,7 @@ class SpoListItemAddCommand extends SpoCommand {
         }
 
         requestOptions = {
-          url: `${listRestUrl}/rootFolder`,
+          url: `${requestUrl}/rootFolder`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -187,7 +202,7 @@ class SpoListItemAddCommand extends SpoCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Creating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+        logger.logToStderr(`Creating item in list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}...`);
       }
 
       const requestBody: any = {
@@ -214,7 +229,7 @@ class SpoListItemAddCommand extends SpoCommand {
       }
 
       requestOptions = {
-        url: `${listRestUrl}/AddValidateUpdateItemUsingPath()`,
+        url: `${requestUrl}/AddValidateUpdateItemUsingPath()`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -237,11 +252,11 @@ class SpoListItemAddCommand extends SpoCommand {
       }
 
       if (idField.length === 0) {
-        return Promise.reject(`Item didn't add successfully`);
+        throw `Item didn't add successfully`;
       }
 
       requestOptions = {
-        url: `${listRestUrl}/items(${idField[0].FieldValue})`,
+        url: `${requestUrl}/items(${idField[0].FieldValue})`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -261,6 +276,7 @@ class SpoListItemAddCommand extends SpoCommand {
     const excludeOptions: string[] = [
       'listTitle',
       'listId',
+      'listUrl',
       'webUrl',
       'contentType',
       'folder',
