@@ -12,7 +12,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   name?: string;
-  displayName?: string;
   description?: string;
   mailNickName?: string;
   classification?: string;
@@ -21,7 +20,6 @@ interface Options extends GlobalOptions {
 
 class TeamsTeamSetCommand extends GraphCommand {
   private static props: string[] = [
-    'displayName',
     'description',
     'mailNickName',
     'classification',
@@ -59,9 +57,6 @@ class TeamsTeamSetCommand extends GraphCommand {
       },
       {
         option: '-n, --name [name]'
-      },
-      {
-        option: '--displayName [displayName]'
       },
       {
         option: '--description [description]'
@@ -118,12 +113,6 @@ class TeamsTeamSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.displayName) {
-      args.options.name = args.options.displayName;
-
-      this.warn(logger, `Option 'displayName' is deprecated. Please use 'name' instead.`);
-    }
-
     const data: any = this.mapRequestBody(args.options);
 
     const requestOptions: any = {
@@ -137,7 +126,7 @@ class TeamsTeamSetCommand extends GraphCommand {
 
     try {
       await request.patch(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

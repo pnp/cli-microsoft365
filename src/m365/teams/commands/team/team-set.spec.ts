@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -16,7 +15,6 @@ const command: Command = require('./team-set');
 describe(commands.TEAM_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -40,7 +38,6 @@ describe(commands.TEAM_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -74,21 +71,6 @@ describe(commands.TEAM_SET, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('logs deprecation warning when option displayName is specified', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee`) {
-        return Promise.resolve({});
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    
-    await command.action(logger, {
-      options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', displayName: 'NewName', visibility: 'Public' }
-    } as any);
-    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'displayName' is deprecated. Please use 'name' instead.`)));
   });
 
   it('sets the visibility settings correctly', async () => {
@@ -175,10 +157,13 @@ describe(commands.TEAM_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', 
-      name: 'NewName' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
+        name: 'NewName'
+      }
+    } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });
 
   it('fails validation if the id is not a valid GUID', async () => {

@@ -16,9 +16,6 @@ m365 teams team clone [options]
 `-n, --name [name]`
 : The display name for the new Microsoft Teams Team to clone
 
-`--displayName [displayName]`
-: (deprecated. Use `name` instead) The display name for the new Microsoft Teams Team to clone
-
 `-p, --partsToClone <partsToClone>`
 : A comma-separated list of the parts to clone. Allowed values are `apps,channels,members,settings,tabs`
 
