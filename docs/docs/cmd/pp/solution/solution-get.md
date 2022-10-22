@@ -1,6 +1,6 @@
 # pp solution get
 
-Lists a specific solution in a given environment.
+Gets a specific solution in a given environment.
 
 ## Usage
 
