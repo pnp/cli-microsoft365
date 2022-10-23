@@ -63,9 +63,9 @@ class TodoTaskGetCommand extends GraphCommand {
     this.optionSets.push(['listId', 'listName']);
   }
 
-  private getTodoListId(args: CommandArgs): Promise<string> {
+  private async getTodoListId(args: CommandArgs): Promise<string> {
     if (args.options.listId) {
-      return Promise.resolve(args.options.listId);
+      return args.options.listId;
     }
 
     const requestOptions: any = {
@@ -76,16 +76,13 @@ class TodoTaskGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get<{ value: [{ id: string }] }>(requestOptions)
-      .then(response => {
-        const taskList: { id: string } | undefined = response.value[0];
+    const response = await request.get<{ value: [{ id: string }] }>(requestOptions);
+    const taskList = response.value[0];
+    if (!taskList) {
+      throw `The specified task list does not exist`;
+    }
 
-        if (!taskList) {
-          return Promise.reject(`The specified task list does not exist`);
-        }
-
-        return Promise.resolve(taskList.id);
-      });
+    return taskList.id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -98,7 +95,7 @@ class TodoTaskGetCommand extends GraphCommand {
         },
         responseType: 'json'
       };
-      logger.log(requestOptions.url);
+
       const item: ToDoTask = await request.get(requestOptions);
 
       if (args.options.output === 'json') {
