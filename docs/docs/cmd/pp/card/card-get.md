@@ -1,4 +1,4 @@
-# pp card list
+# pp card get
 
 Lists a specific Microsoft Power Platform card in the specified Power Platform environment.
 
