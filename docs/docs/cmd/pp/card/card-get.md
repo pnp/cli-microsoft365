@@ -14,7 +14,7 @@ pp card get [options]
 : The name of the environment.
 
 `-i, --id [id]`
-: The id of the card.
+: The id of the card. Specify either `id` or `name` but not both.
 
 `-n, --name [name]`
 : The name of the card. Specify either `id` or `name` but not both.
