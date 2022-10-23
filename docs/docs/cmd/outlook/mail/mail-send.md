@@ -43,12 +43,19 @@ m365 outlook sendmail [options]
 `--importance [importance]`
 : The importance of the message. Available options: `low`, `normal` or `high`. Default is `normal`.
 
+`--attachment [attachment]`
+: Path to the file that will be added as attachment to the email. This option can be used multiple times to attach multiple attachments.
+
 `--saveToSentItems [saveToSentItems]`
 : Save email in the sent items folder. Default `true`.
 
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
+
+### Attachments
+
+When using the `attachment` option, note that the total size of all attachment files cannot exceed 3 MB.
 
 ### If you are connected using app only authentication
 
@@ -115,4 +122,10 @@ Send an email with cc and bcc recipients marked as important
 
 ```sh
 m365 outlook mail send --to chris@contoso.com --cc claire@contoso.com --bcc randy@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site" --importance high
+```
+
+Send an email with multiple attachments
+
+```sh
+m365 outlook mail send --to chris@contoso.com --subject "Monthly reports" --bodyContents "Here are the reports of this month." --attachment "C:/Reports/File1.jpg" --attachment "C:/Reports/File2.docx" --attachment "C:/Reports/File3.xlsx"
 ```
