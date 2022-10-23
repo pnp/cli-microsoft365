@@ -1,6 +1,8 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -14,6 +16,11 @@ interface Options extends GlobalOptions {
   listId?: string;
   title?: string;
   status?: string;
+  bodyContent?: string;
+  bodyContentType?: string;
+  dueDateTime?: string;
+  importance?: string;
+  reminderDateTime?: string;
 }
 
 class TodoTaskSetCommand extends GraphCommand {
@@ -40,7 +47,12 @@ class TodoTaskSetCommand extends GraphCommand {
         listId: typeof args.options.listId !== 'undefined',
         listName: typeof args.options.listName !== 'undefined',
         status: typeof args.options.status !== 'undefined',
-        title: typeof args.options.title !== 'undefined'
+        title: typeof args.options.title !== 'undefined',
+        bodyContent: typeof args.options.bodyContent !== 'undefined',
+        bodyContentType: args.options.bodyContentType,
+        dueDateTime: typeof args.options.dueDateTime !== 'undefined',
+        importance: args.options.importance,
+        reminderDateTime: typeof args.options.reminderDateTime !== 'undefined'
       });
     });
   }
@@ -62,6 +74,23 @@ class TodoTaskSetCommand extends GraphCommand {
       },
       {
         option: '--listId [listId]'
+      },
+      {
+        option: '--bodyContent [bodyContent]'
+      },
+      {
+        option: '--bodyContentType [bodyContentType]',
+        autocomplete: ['text', 'html']
+      },
+      {
+        option: '--dueDateTime [dueDateTime]'
+      },
+      {
+        option: '--importance [importance]',
+        autocomplete: ['low', 'normal', 'high']
+      },
+      {
+        option: '--reminderDateTime [reminderDateTime]'
       }
     );
   }
@@ -76,6 +105,22 @@ class TodoTaskSetCommand extends GraphCommand {
           args.options.status !== 'waitingOnOthers' &&
           args.options.status !== 'deferred') {
           return `${args.options.status} is not a valid value. Allowed values are notStarted|inProgress|completed|waitingOnOthers|deferred`;
+        }
+
+        if (args.options.bodyContentType && ['text', 'html'].indexOf(args.options.bodyContentType.toLowerCase()) === -1) {
+          return `'${args.options.bodyContentType}' is not a valid value for the bodyContentType option. Allowed values are text|html`;
+        }
+
+        if (args.options.importance && ['low', 'normal', 'high'].indexOf(args.options.importance.toLowerCase()) === -1) {
+          return `'${args.options.importance}' is not a valid value for the importance option. Allowed values are low|normal|high`;
+        }
+
+        if (args.options.dueDateTime && !validation.isValidISODateTime(args.options.dueDateTime)) {
+          return `'${args.options.dueDateTime}' is not a valid ISO date string`;
+        }
+
+        if (args.options.reminderDateTime && !validation.isValidISODateTime(args.options.reminderDateTime)) {
+          return `'${args.options.reminderDateTime}' is not a valid ISO date string`;
         }
 
         return true;
@@ -93,7 +138,7 @@ class TodoTaskSetCommand extends GraphCommand {
 
     try {
       const listId: string = await this.getTodoListId(args);
-      const requestOptions: any = {
+      const requestOptions: AxiosRequestConfig = {
         url: `${endpoint}/me/todo/lists/${listId}/tasks/${encodeURIComponent(args.options.id)}`,
         headers: {
           accept: 'application/json;odata.metadata=none',
@@ -103,7 +148,7 @@ class TodoTaskSetCommand extends GraphCommand {
         responseType: 'json'
       };
 
-      const res: any = await request.patch(requestOptions);
+      const res = await request.patch<any>(requestOptions);
       logger.log(res);
     } 
     catch (err: any) {
@@ -136,6 +181,13 @@ class TodoTaskSetCommand extends GraphCommand {
       });
   }
 
+  private getDateTimeTimeZone(dateTime: string) : { dateTime: string, timeZone: string } {
+    return {
+      dateTime: dateTime,
+      timeZone: 'Etc/GMT'
+    };
+  }
+
   private mapRequestBody(options: Options): any {
     const requestBody: any = {};
 
@@ -147,9 +199,27 @@ class TodoTaskSetCommand extends GraphCommand {
       requestBody.title = options.title;
     }
 
+    if (options.importance) {
+      requestBody.importance = options.importance.toLowerCase();
+    }
+
+    if (options.bodyContentType || options.bodyContent) {
+      requestBody.body = {
+        content: options.bodyContent,
+        contentType: options.bodyContentType?.toLowerCase() || 'text'
+      };
+    }
+
+    if (options.dueDateTime) {
+      requestBody.dueDateTime = this.getDateTimeTimeZone(options.dueDateTime);
+    }
+
+    if (options.reminderDateTime) {
+      requestBody.reminderDateTime = this.getDateTimeTimeZone(options.reminderDateTime);
+    }
+
     return requestBody;
   }
 }
-
 
 module.exports = new TodoTaskSetCommand();

@@ -1,3 +1,8 @@
+---
+tags:
+  - reports
+---
+
 # List all failed site design for all sites
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/failed-sitedesigns-clim365/)
@@ -22,8 +27,3 @@ The following script iterates through all site collections and lists all site de
         }
     }
     ```
-
-Keywords:
-
-- SharePoint Online
-- Site Design

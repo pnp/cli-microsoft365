@@ -731,99 +731,99 @@ nav:
   - Sample Scripts:
     - 'Introduction': 'sample-scripts/index.md'
     - Azure Active Directory:
-      - 'Analyze users for known data breaches with have i been pwned' : 'sample-scripts/aad/analyze-users-haveibeenpwnd.md'
-      - 'Analyze User Profile Photos using Azure Computer Vision API' : 'sample-scripts/aad/analyze-user-profile-photos.md'
-      - 'Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups' : 'sample-scripts/aad/manage-group-users.md'
-      - 'Delete all Microsoft 365 groups' : 'sample-scripts/aad/delete-m365-groups.md'
-      - 'Delete all Microsoft 365 groups and SharePoint Online sites' : 'sample-scripts/aad/delete-m365-groups-and-sharepoint-sites.md'
-      - 'Replace a user''s membership in selected Microsoft 365 Groups or Teams' : 'sample-scripts/aad/replace-membership-of-selected-groups.md'
-      - 'Replace an owner in a Microsoft 365 Group or Microsoft Team' : 'sample-scripts/aad/replace-owner-with-a-different-one.md'
-      - 'Scan for Microsoft 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
+      - sample-scripts/aad/analyze-users-haveibeenpwnd.md
+      - sample-scripts/aad/analyze-user-profile-photos.md
+      - sample-scripts/aad/manage-group-users.md
+      - sample-scripts/aad/delete-m365-groups.md
+      - sample-scripts/aad/delete-m365-groups-and-sharepoint-sites.md
+      - sample-scripts/aad/replace-membership-of-selected-groups.md
+      - sample-scripts/aad/replace-owner-with-a-different-one.md
+      - sample-scripts/aad/flag-groups-with-user-names.md
     - Microsoft Graph:
-      - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
+      - sample-scripts/graph/call-graph.md
     - Planner:
-      - 'Add multiple tasks': sample-scripts/planner/add-multiple-tasks.md
-      - 'Planner migration to SharePoint list': 'sample-scripts/spo/planner-migrate-sharepoint-list.md'
+      - sample-scripts/planner/add-multiple-tasks.md
+      - sample-scripts/spo/planner-migrate-sharepoint-list.md
     - Power Automate:
-      - 'Cancel all running flow runs for a flow in an environment': 'sample-scripts/flow/cancel-all-running-flow-runs.md'
-      - 'Export a single Flow to a Logic App' : 'sample-scripts/flow/export-flow-logicapp.md'
-      - 'Export all Flows in environment' : 'sample-scripts/flow/export-all-flows-in-environment.md'
-      - 'Flow runs current day summary' : 'sample-scripts/flow/flow-runs-day-summary.md'
-      - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
-      - 'Resubmit all failed flow runs for a flow in an environment': 'sample-scripts/flow/resubmit-all-failed-flow-runs.md'
-      - 'Search flows for connections' : 'sample-scripts/flow/search-flows-for-connection.md'
+      - sample-scripts/flow/cancel-all-running-flow-runs.md
+      - sample-scripts/flow/export-flow-logicapp.md
+      - sample-scripts/flow/export-all-flows-in-environment.md
+      - sample-scripts/flow/flow-runs-day-summary.md
+      - sample-scripts/flow/inventory-flows-by-author.md
+      - sample-scripts/flow/resubmit-all-failed-flow-runs.md
+      - sample-scripts/flow/search-flows-for-connection.md
     - Power Platform:
-      - 'List all Power Platform Environments and their Flows and Apps': 'sample-scripts/powerplatform/list-environments-flows-apps.md'
+      - sample-scripts/powerplatform/list-environments-flows-apps.md
     - SharePoint Online:
-      - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
-      - 'Add custom client-side web part to modern page': 'sample-scripts/spo/add-custom-clientside-webpart-to-modern-page.md'
-      - 'Add a Site Collection Admin using a csv file': 'sample-scripts/spo/add-site-collection-admin-using-csv-file.md'
-      - 'Add multiple folders in libraries using a csv file': 'sample-scripts/spo/add-multiple-folders-in-libraries-using-csv-file.md'
-      - 'Add multiple lists in multiple sites': 'sample-scripts/spo/add-multiple-lists-in-multiple-sites.md'
-      - 'Add users to the Associated SharePoint Groups from a CSV File': 'sample-scripts/spo/add-users-associatedspgroup-site-csv-file.md'
-      - 'Change group membership of all SharePoint Online sites': 'sample-scripts/spo/change-owner-group-membership.md'
-      - 'Copy files to another SharePoint Library in another site': 'sample-scripts/spo/copy-files-to-another-library.md'
-      - 'Copy list items between SharePoint lists': 'sample-scripts/spo/copy-listitems-sharepointlist.md'
-      - 'Delete all (non-group connected) modern SharePoint sites': 'sample-scripts/spo/delete-non-group-connected-modern-sites.md'
-      - 'Delete custom color themes from SharePoint': 'sample-scripts/spo/remove-custom-themes.md'
-      - 'Delete custom SharePoint site designs': 'sample-scripts/spo/remove-site-designs.md'
-      - 'Delete custom SharePoint site scripts': 'sample-scripts/spo/remove-site-scripts.md'
-      - 'Detecting PII exists in SharePoint List using AWS Comprehend': 'sample-scripts/spo/detecting-pii-exists-in-sharepointlist-column.md'
-      - 'Disable the specified Tenant Wide Extension ': 'sample-scripts/spo/disable-tenant-wide-extension.md'
-      - 'Empty the tenant recycle bin': 'sample-scripts/spo/empty-tenant-recyclebin.md'
-      - 'Ensure the Site Assets Library is created': 'sample-scripts/spo/ensure-siteassets-library.md'
-      - 'Export configurations of Tenant Wide Extensions': 'sample-scripts/spo/export-configs-tenant-wide-extensions.md'
-      - 'Grant API permissions to SharePoint Azure AD Application': 'sample-scripts/spo/grant-api-permissions-aad.md'
-      - 'Hide SharePoint list from Site Contents': 'sample-scripts/spo/hide-list-from-site-contents.md'
-      - 'Insert pictures in a SharePoint Document Library into a Word document': 'sample-scripts/spo/insert-sp-library-pictures-into-word.md'
-      - 'List attachment names from SharePoint lists for a site': 'sample-scripts/spo/list-attachment-names-from-spo-lists.md'
-      - 'List site collections and their lists': 'sample-scripts/spo/list-site-collection-lists.md'
-      - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
-      - 'Lists all application customizers in the tenant': 'sample-scripts/spo/list-all-application-customizers.md'
-      - 'List all checked out files': 'sample-scripts/spo/list-all-checked-out-files.md'
-      - 'List all documents with a specific name within a SharePoint site': 'sample-scripts/spo/list-all-files-specific-name.md'
-      - 'Lists all external users in all site collections': 'sample-scripts/spo/list-site-externalusers.md'
-      - 'List all external users in site groups across all site collections': 'sample-scripts/spo/list-externalusers-in-sitegroups.md'
-      - 'Lists all failed site designs': 'sample-scripts/spo/list-failed-sitedesigns.md'
-      - 'List all items with unique permissions': 'sample-scripts/spo/list-all-items-with-unique-permissions.md'
-      - 'List all large files within a SharePoint Site': 'sample-scripts/spo/list-large-files-within-a-site.md'
-      - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
-      - 'Lists number of files in all lists and folders for the given site': 'sample-scripts/spo/list-all-list-folders-itemcount.md'
-      - 'Lists site collection owners': 'sample-scripts/spo/list-site-collection-owners.md'
-      - 'Monitor site collections storage usage': 'sample-scripts/spo/monitor-site-collection-storage-usage.md'
-      - 'How to perform operations not covered by the CLI for Microsoft 365': 'sample-scripts/spo/perform-operations-not-covered-by-cli-for-microsoft-365.md'
-      - 'Planner migration to SharePoint list': 'sample-scripts/spo/planner-migrate-sharepoint-list.md'
-      - 'Remove a Site Collection Admin User from all Site Collections': 'sample-scripts/spo/remove-siteCollection-admin-user.md'
-      - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
-      - 'Remove pending SharePoint API permission requests': 'sample-scripts/spo/remove-pending-api-permission-requests.md'
-      - 'Remove SharePoint API permissions': 'sample-scripts/spo/remove-api-permissions.md'
-      - 'Replace site collection admin with another user': 'sample-scripts/spo/replace-site-collection-admin.md'
-      - 'Setup example site': 'sample-scripts/spo/setup-example-site.md'
-      - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
-      - 'Upload local files and folders to SharePoint Online': 'sample-scripts/spo/upload-local-files-and-folder.md'
+      - sample-scripts/spo/add-app-catalog.md
+      - sample-scripts/spo/add-custom-clientside-webpart-to-modern-page.md
+      - sample-scripts/spo/add-site-collection-admin-using-csv-file.md
+      - sample-scripts/spo/add-multiple-folders-in-libraries-using-csv-file.md
+      - sample-scripts/spo/add-multiple-lists-in-multiple-sites.md
+      - sample-scripts/spo/add-users-associatedspgroup-site-csv-file.md
+      - sample-scripts/spo/change-owner-group-membership.md
+      - sample-scripts/spo/copy-files-to-another-library.md
+      - sample-scripts/spo/copy-listitems-sharepointlist.md
+      - sample-scripts/spo/delete-non-group-connected-modern-sites.md
+      - sample-scripts/spo/remove-custom-themes.md
+      - sample-scripts/spo/remove-site-designs.md
+      - sample-scripts/spo/remove-site-scripts.md
+      - sample-scripts/spo/detecting-pii-exists-in-sharepointlist-column.md
+      - sample-scripts/spo/disable-tenant-wide-extension.md
+      - sample-scripts/spo/empty-tenant-recyclebin.md
+      - sample-scripts/spo/ensure-siteassets-library.md
+      - sample-scripts/spo/export-configs-tenant-wide-extensions.md
+      - sample-scripts/spo/grant-api-permissions-aad.md
+      - sample-scripts/spo/hide-list-from-site-contents.md
+      - sample-scripts/spo/insert-sp-library-pictures-into-word.md
+      - sample-scripts/spo/list-attachment-names-from-spo-lists.md
+      - sample-scripts/spo/list-site-collection-lists.md
+      - sample-scripts/spo/list-site-app-catalogs.md
+      - sample-scripts/spo/list-all-application-customizers.md
+      - sample-scripts/spo/list-all-checked-out-files.md
+      - sample-scripts/spo/list-all-files-specific-name.md
+      - sample-scripts/spo/list-site-externalusers.md
+      - sample-scripts/spo/list-externalusers-in-sitegroups.md
+      - sample-scripts/spo/list-failed-sitedesigns.md
+      - sample-scripts/spo/list-all-items-with-unique-permissions.md
+      - sample-scripts/spo/list-large-files-within-a-site.md
+      - sample-scripts/spo/list-tenant-wide-extensions.md
+      - sample-scripts/spo/list-all-list-folders-itemcount.md
+      - sample-scripts/spo/list-site-collection-owners.md
+      - sample-scripts/spo/monitor-site-collection-storage-usage.md
+      - sample-scripts/spo/perform-operations-not-covered-by-cli-for-microsoft-365.md
+      - sample-scripts/spo/planner-migrate-sharepoint-list.md
+      - sample-scripts/spo/remove-siteCollection-admin-user.md
+      - sample-scripts/spo/remove-orphaned-redirect-sites.md
+      - sample-scripts/spo/remove-pending-api-permission-requests.md
+      - sample-scripts/spo/remove-api-permissions.md
+      - sample-scripts/spo/replace-site-collection-admin.md
+      - sample-scripts/spo/setup-example-site.md
+      - sample-scripts/spo/sync-splib-into-az-storage-container.md
+      - sample-scripts/spo/upload-local-files-and-folder.md
     - Microsoft Teams:
-      - 'Bulk add members to Microsoft Teams team from CSV file': 'sample-scripts/teams/add-bulk-users-teams.md'
-      - 'Create a Microsoft Team with channels from a Microsoft 365 Group': 'sample-scripts/teams/create-team-from-group.md'
-      - 'Create a Microsoft Teams team and bulk add members from CSV file': 'sample-scripts/teams/create-team-and-add-members-and-owners.md'
-      - 'Deploy a Microsoft Teams personal app and add it to users': 'sample-scripts/teams/install-personal-app.md'
-      - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
-      - 'Export all channels from a Microsoft Teams team': 'sample-scripts/teams/export-all-channels-teams.md'
-      - 'Export conversations from Microsoft Teams Channels': 'sample-scripts/teams/export-teams-conversations.md'
-      - 'Get all the Teams a specific user is part of': 'sample-scripts/teams/get-all-teams-specific-user-is-part-of.md'
-      - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
-      - 'List all tabs in Microsoft Teams teams in the tenant': 'sample-scripts/teams/list-all-tabs-teams.md'
-      - 'List all Microsoft Teams team''s Owners and Members': 'sample-scripts/teams/list-teams-owners-and-members.md'
-      - 'List app usage in Microsoft Teams': 'sample-scripts/teams/list-teams-app-usage.md'
-      - 'List all team members in Microsoft Teams team': 'sample-scripts/teams/list-all-teammembers-teams.md'
-      - 'List Microsoft Teams teams, channels, and tabs in the tenant': 'sample-scripts/teams/list-teams-channels-tabs-for-tenant.md'
-      - 'Recognize most active users for a specific Team': 'sample-scripts/teams/recognize-most-active-users-specific-team.md'
-      - 'Remove a Microsoft Teams personal app': 'sample-scripts/teams/remove-personal-app.md'
-      - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'
-      - 'Share social champions to Teams': 'sample-scripts/teams/share-socialchampions.md'
+      - sample-scripts/teams/add-bulk-users-teams.md
+      - sample-scripts/teams/create-team-from-group.md
+      - sample-scripts/teams/create-team-and-add-members-and-owners.md
+      - sample-scripts/teams/install-personal-app.md
+      - sample-scripts/teams/deploy-teams-app.md
+      - sample-scripts/teams/export-all-channels-teams.md
+      - sample-scripts/teams/export-teams-conversations.md
+      - sample-scripts/teams/get-all-teams-specific-user-is-part-of.md
+      - sample-scripts/teams/govern-orphan-teams.md
+      - sample-scripts/teams/list-all-tabs-teams.md
+      - sample-scripts/teams/list-teams-owners-and-members.md
+      - sample-scripts/teams/list-teams-app-usage.md
+      - sample-scripts/teams/list-all-teammembers-teams.md
+      - sample-scripts/teams/list-teams-channels-tabs-for-tenant.md
+      - sample-scripts/teams/recognize-most-active-users-specific-team.md
+      - sample-scripts/teams/remove-personal-app.md
+      - sample-scripts/teams/remove-wikitab-teams.md
+      - sample-scripts/teams/share-socialchampions.md
     - Microsoft To Do:
-      - 'Cleanup completed Microsoft To Do tasks': 'sample-scripts/todo/cleanup-completed-todos/index.md'
+      - sample-scripts/todo/cleanup-completed-todos/index.md
     - Microsoft 365 tenant:
-      - 'Monitor and notify Microsoft 365 health status': 'sample-scripts/tenant/tenant-monitor-notify-healthstatus.md'
+      - sample-scripts/tenant/tenant-monitor-notify-healthstatus.md
   - About:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint and Microsoft 365 PowerShell': 'about/comparison-powershell.md'
@@ -888,4 +888,4 @@ edit_uri: blob/main/docs/docs
 plugins:
     - search
     - tags:
-        tags_file: doc-tags.md
+        tags_file: sample-scripts/index.md

@@ -1,3 +1,8 @@
+---
+tags:
+  - cleanup
+---
+
 # Empty the tenant recycle bin
 
 Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powershell-scripts-for-keeping-your-development-environment-tidy-and-spotless/#empty-the-tenant-recycle-bin)
@@ -52,6 +57,3 @@ Your deleted modern SharePoint sites are not going to disappear from the UI befo
     done
     ```
 
-Keywords:
-
-- SharePoint Online

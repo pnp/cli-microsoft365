@@ -49,6 +49,17 @@
 - fixed pagination for 'pp dataverse table list' command [#3803](https://github.com/pnp/cli-microsoft365/issues/3803)
 - extended 'spo list contenttype' with option 'listUrl' [#3810](https://github.com/pnp/cli-microsoft365/issues/3810)
 - updated the Microsoft Graph sample to include a 'm365 request' section [#3712](https://github.com/pnp/cli-microsoft365/issues/3712)
+- extended 'spo list webhook' with option 'listUrl' [#3812](https://github.com/pnp/cli-microsoft365/issues/3812)
+- extended 'todo task set' with extra options [#3835](https://github.com/pnp/cli-microsoft365/issues/3835)
+- fixed 'outlook mail send' command for wrong validation message [#3833](https://github.com/pnp/cli-microsoft365/issues/3833)
+- fixed documentation for eventreceiver get and eventreceiver remove [#3852](https://github.com/pnp/cli-microsoft365/issues/3852)
+- removed odata output from 'planner bucket get' [#3825](https://github.com/pnp/cli-microsoft365/issues/3825)
+- updated GitHub actions [#3799](https://github.com/pnp/cli-microsoft365/issues/3799)
+- enabled @typescript-eslint/explicit-function-return-type [#3777](https://github.com/pnp/cli-microsoft365/issues/3777)
+- added tags to samples [#3640](https://github.com/pnp/cli-microsoft365/issues/3640)
+- fixed options overriding aad app add with manifest [#3555](https://github.com/pnp/cli-microsoft365/issues/3555)
+- added 'listUrl' to spo roleinheritance break and -reset [#3809](https://github.com/pnp/cli-microsoft365/issues/3809)
+- extended 'outlook mail send' command with attachments support [#3832](https://github.com/pnp/cli-microsoft365/issues/3832)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 

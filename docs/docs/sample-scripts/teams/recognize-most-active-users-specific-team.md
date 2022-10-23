@@ -1,3 +1,9 @@
+---
+tags:
+  - adoption
+  - users
+---
+
 # Recognize most active users for a specific Team
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/recognize-active-team-members-cli-microsoft-365/)
@@ -114,8 +120,3 @@ Retrieves all activities for a specific Microsoft Teams Team and shares the top 
 
     m365 adaptivecard send --url $webhookUrl --card $card
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Adoption

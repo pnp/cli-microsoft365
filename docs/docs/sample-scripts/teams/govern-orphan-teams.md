@@ -1,3 +1,11 @@
+---
+tags:
+  - reports
+  - security
+  - teams
+  - users
+---
+
 # Govern orphaned Microsoft Teams
 
 Author: [Matti Paukkonen](https://mattipaukkonen.com/2019/10/09/govern-orphaned-teams-with-powershell/)
@@ -86,8 +94,3 @@ Every team needs an owner, at least one. Common best practice is that you should
 
     exit 1
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Governance

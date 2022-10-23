@@ -1,3 +1,10 @@
+---
+tags:
+  - guests
+  - security
+  - users
+---
+
 # List all external users in all site collections
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/migration-report-external-users/)
@@ -51,9 +58,3 @@ This script helps you to list all external users in all SharePoint Online sites.
     $results | Export-Csv -Path $fileExportPath -NoTypeInformation
     Write-Host "Completed."
     ```
-
-Keywords:
-
-- SharePoint Online
-- Governance
-- External Users

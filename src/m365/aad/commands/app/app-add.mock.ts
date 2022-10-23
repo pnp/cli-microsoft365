@@ -4930,6 +4930,7 @@ export const aadSp = {
   "oauth2PermissionScopes": [],
   "appRoles": []
 };
+
 export const mockCrmSp = {
 
   "servicePrincipalNames": [

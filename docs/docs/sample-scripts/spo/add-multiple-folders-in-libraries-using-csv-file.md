@@ -1,3 +1,10 @@
+---
+tags:
+  - files
+  - provisioning
+  - libraries
+---
+
 # Add multiple folders in libraries using a csv file
 
 Author: [Veronique Lengelle](https://twitter.com/veronicageek)
@@ -101,8 +108,3 @@ Below is an example of the format needed for your .csv file:
         }
     }
     ```
-
-Keywords
-
-- SharePoint Online
-- Governance

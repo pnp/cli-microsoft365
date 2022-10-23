@@ -1,3 +1,9 @@
+---
+tags:
+  - files
+  - reports
+---
+
 # List all checked out files in SharePoint
 
 Author: [Veronique Lengelle](https://veronicageek.com/2020/find-checked-out-files-across-multiple-site-collections/)
@@ -116,8 +122,3 @@ This script will loop through each site from your CSV file, and retrieve all the
     }
     $resultsForEachSC
     ```
-
-Keywords
-
-- SharePoint Online
-- Governance

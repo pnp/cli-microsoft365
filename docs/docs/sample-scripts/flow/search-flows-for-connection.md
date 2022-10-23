@@ -1,3 +1,9 @@
+---
+tags:  
+  - flows
+  - reports
+---
+
 # Search flows for connections
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/search-flows-connections/)
@@ -35,7 +41,3 @@ Search all flows as, an administrator, for a specific search string and report r
         }
     }
     ```
-
-Keywords:
-
-- Power Automate

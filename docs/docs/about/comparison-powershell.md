@@ -706,7 +706,7 @@ Set-PnPAzureADGroup|PnP.PowerShell|
 Set-PnPBrowserIdleSignout|PnP.PowerShell|
 Set-PnPBuiltInDesignPackageVisibility|PnP.PowerShell|
 Set-PnPBuiltInSiteTemplateSettings|PnP.PowerShell|
-Set-PnPContentType|PnP.PowerShell|[spo contenttype set](../cmd/contenttype/contenttype-set.md)
+Set-PnPContentType|PnP.PowerShell|[spo contenttype set](../cmd/spo/contenttype/contenttype-set.md)
 Set-PnPContext|PnP.PowerShell|
 Set-PnPDefaultColumnValues|PnP.PowerShell|
 Set-PnPDefaultContentTypeToList|PnP.PowerShell|[spo list contenttype default set](../cmd/spo/list/list-contenttype-default-set.md)

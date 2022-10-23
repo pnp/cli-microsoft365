@@ -1,3 +1,10 @@
+---
+tags:
+  - lists
+  - reports
+  - sites
+---
+
 # List site collections and their lists
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/migration-report-climicrosoft365)
@@ -55,8 +62,3 @@ This script helps you to list and export all site collection and their lists Sha
     $results | Export-Csv -Path $fileExportPath -NoTypeInformation
     Write-Host "Completed."
     ```
-
-Keywords:
-
-- SharePoint Online
-- Governance

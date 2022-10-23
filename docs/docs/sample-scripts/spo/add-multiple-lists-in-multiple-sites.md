@@ -1,3 +1,9 @@
+---
+tags:
+  - provisioning
+  - libraries
+---
+
 # Add multiple lists in multiple sites
 
 Author: [Sudharsan Kesavanarayanan](https://twitter.com/sudharsank)
@@ -60,9 +66,3 @@ Author: [Sudharsan Kesavanarayanan](https://twitter.com/sudharsank)
       m365 login --authType browser
     }
     ```
-
-Keywords
-
-- SharePoint Online
-- Lists & Libraries
-- Content Type
