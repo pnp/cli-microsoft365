@@ -29,8 +29,7 @@ Get a specific card in a specific environment.
 m365 pp card get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "408e3f42-4c9e-4c93-8aaf-3cbdea9179aa"
 ```
 
-List a specific card in a specific environment as admin.
+Get a specific card in a specific environment as admin.
 
 ```sh
-m365 pp card list --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "408e3f42-4c9e-4c93-8aaf-3cbdea9179aa" --asAdmin
-```
+m365 pp card get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "408e3f42-4c9e-4c93-8aaf-3cbdea9179aa" --asAdmin
