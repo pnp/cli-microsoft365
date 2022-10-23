@@ -2,16 +2,24 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
+import { Cli } from '../../../../cli/Cli';
+import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { powerPlatform } from '../../../../utils/powerPlatform';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./solution-get');
 
 describe(commands.SOLUTION_GET, () => {
-  const envResponse: any = { "properties": { "linkedEnvironmentMetadata": { "instanceApiUrl": "https://contoso-dev.api.crm4.dynamics.com" } } };
+  let commandInfo: CommandInfo;
+  const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
+  const validId = 'ee62fd63-e49e-4c09-80de-8fae1b9a427e';
+  const validName = 'Default';
+  const invalidId = 'Invalid GUID';
+  const envUrl: any = "https://contoso-dev.api.crm4.dynamics.com";
   const solutionResponse: any = {
     "value": [
       {
@@ -44,6 +52,7 @@ describe(commands.SOLUTION_GET, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -64,7 +73,8 @@ describe(commands.SOLUTION_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      powerPlatform.getDynamicsInstanceApiUrl
     ]);
   });
 
@@ -89,16 +99,53 @@ describe(commands.SOLUTION_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['uniquename', 'version', 'publisher']);
   });
 
-  it('retrieve specific solution from power platform environment with the name parameter', async () => {
+  it('fails validation when no solution found', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').returns(envUrl);
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq 'Default'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return envResponse;
+          return ({ "value": [] });
         }
       }
 
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        environment: validEnvironment,
+        name: validName
+      }
+    }), new CommandError(`The specified solution '${validName}' does not exist.`));
+  });
+
+  it('fails validation if the id is not a valid guid.', async () => {
+    const actual = await command.validate({
+      options: {
+        environment: validEnvironment,
+        id: invalidId
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if required options specified (id)', async () => {
+    const actual = await command.validate({ options: { environment: validEnvironment, id: validId } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if required options specified (name)', async () => {
+    const actual = await command.validate({ options: { environment: validEnvironment, name: validName } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('retrieve a specific solution from power platform environment with the name parameter', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').returns(envUrl);
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq 'Default'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if (opts.headers &&
           opts.headers.accept &&
@@ -114,16 +161,9 @@ describe(commands.SOLUTION_GET, () => {
     assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
   });
 
-  it('retrieve specific solution from power platform environment with the name parameter in format json', async () => {
+  it('retrieve a specific solution from power platform environment with the name parameter as admin', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').returns(envUrl);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return envResponse;
-        }
-      }
-
       if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq 'Default'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if (opts.headers &&
           opts.headers.accept &&
@@ -135,46 +175,15 @@ describe(commands.SOLUTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default', output: 'json' } });
-    assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
-  });
-
-  it('retrieve specific solution from power platform environment with the name parameter in format json as admin', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return envResponse;
-        }
-      }
-
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq 'Default'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return solutionResponse;
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default', asAdmin: true, output: 'json' } });
+    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default', asAdmin: true } });
     assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
   });
 
 
-  it('retrieve specific solution from power platform environment with name parameter in format text', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return envResponse;
-        }
-      }
+  it('retrieve a specific solution from power platform environment with name parameter in format text', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').returns(envUrl);
 
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq 'Default'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if (opts.headers &&
           opts.headers.accept &&
@@ -190,16 +199,10 @@ describe(commands.SOLUTION_GET, () => {
     assert(loggerLogSpy.calledWith(solutionResponseText));
   });
 
-  it('retrieve specific solution from power platform environment with the id parameter', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return envResponse;
-        }
-      }
+  it('retrieve a specific solution from power platform environment with the id parameter', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').returns(envUrl);
 
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions(ee62fd63-e49e-4c09-80de-8fae1b9a427e)?$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if (opts.headers &&
           opts.headers.accept &&
@@ -215,16 +218,10 @@ describe(commands.SOLUTION_GET, () => {
     assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
   });
 
-  it('retrieve specific solution from power platform environment with the id parameter in format json', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return envResponse;
-        }
-      }
+  it('retrieve a specific solution from power platform environment with the id parameter as admin', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').returns(envUrl);
 
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions(ee62fd63-e49e-4c09-80de-8fae1b9a427e)?$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if (opts.headers &&
           opts.headers.accept &&
@@ -236,46 +233,15 @@ describe(commands.SOLUTION_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', id: 'ee62fd63-e49e-4c09-80de-8fae1b9a427e', output: 'json' } });
-    assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
-  });
-
-  it('retrieve specific solution from power platform environment with the id parameter in format json as admin', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return envResponse;
-        }
-      }
-
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions(ee62fd63-e49e-4c09-80de-8fae1b9a427e)?$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return solutionResponse.value[0];
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', id: 'ee62fd63-e49e-4c09-80de-8fae1b9a427e', asAdmin: true, output: 'json' } });
+    await command.action(logger, { options: { debug: true, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', id: 'ee62fd63-e49e-4c09-80de-8fae1b9a427e', asAdmin: true } });
     assert(loggerLogSpy.calledWith(solutionResponse.value[0]));
   });
 
 
-  it('retrieve specific solution from power platform environment with id parameter in format text', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return envResponse;
-        }
-      }
+  it('retrieve a specific solution from power platform environment with id parameter in format text', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').returns(envUrl);
 
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions(ee62fd63-e49e-4c09-80de-8fae1b9a427e)?$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if (opts.headers &&
           opts.headers.accept &&
@@ -291,32 +257,10 @@ describe(commands.SOLUTION_GET, () => {
     assert(loggerLogSpy.calledWith(solutionResponseText));
   });
 
-  it('correctly handles no environments', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/providers/Microsoft.BusinessAppPlatform/environments?api-version=2020-10-01`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return { value: [] };
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, { options: { debug: false } }),
-      new CommandError(`The environment 'undefined' could not be retrieved. See the inner exception for more details: undefined`));
-  });
-
   it('correctly handles API OData error', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').returns(envUrl);
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return envResponse;
-        }
-      }
       if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq 'Default'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
         if (opts.headers &&
           opts.headers.accept &&

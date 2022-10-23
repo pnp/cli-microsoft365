@@ -17,7 +17,7 @@ m365 pp solution get [options]
 : The ID of the solution. Specify either `id` or `name` but not both.
 
 `-n, --name [name]`
-: The name of the solution. Specify either `id` or `name` but not both.
+: The unique name of the solution, not the friendly name. Specify either `id` or `name` but not both.
 
 `-a, --asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
@@ -29,23 +29,23 @@ m365 pp solution get [options]
 List a specific solution in a specific environment based on the name
 
 ```sh
-m365 pp solution list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "Default"
+m365 pp solution get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "Default"
 ```
 
 List a specific solution in a specific environment based on the name as Admin
 
 ```sh
-m365 pp solution list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "Default" --asAdmin
+m365 pp solution get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "Default" --asAdmin
 ```
 
 List a specific solution in a specific environment based on the id
 
 ```sh
-m365 pp solution list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e"
+m365 pp solution get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e"
 ```
 
 List a specific solution in a specific environment based on the id as Admin
 
 ```sh
-m365 pp solution list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e" --asAdmin
+m365 pp solution get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e" --asAdmin
 ```
