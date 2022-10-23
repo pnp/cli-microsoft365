@@ -23,7 +23,7 @@ pp card get [options]
 
 ## Examples
 
-List a specific card in a specific environment.
+Get a specific card in a specific environment.
 
 ```sh
 m365 pp card get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "408e3f42-4c9e-4c93-8aaf-3cbdea9179aa"
