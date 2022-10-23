@@ -188,6 +188,12 @@ class SpoListItemListCommand extends SpoCommand {
     else if (args.options.listTitle) {
       requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
     }
+    else if (args.options.id) {
+      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.id)}')`;
+    }
+    else if (args.options.title) {
+      requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.title)}')`;
+    }
     else if (args.options.listUrl) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
       requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;

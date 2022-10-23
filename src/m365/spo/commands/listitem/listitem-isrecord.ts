@@ -140,7 +140,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
       }
       else {
         if (this.verbose) {
-          logger.logToStderr(`Getting list id for list ${args.options.listTitle ? args.options.listTitle : args.options.listId}`);
+          logger.logToStderr(`Getting list id for list ${args.options.listTitle ? args.options.listTitle : args.options.listUrl}`);
         }
         const requestOptions: AxiosRequestConfig = {
           url: `${requestUrl}?$select=Id`,

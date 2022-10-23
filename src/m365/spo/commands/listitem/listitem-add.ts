@@ -111,6 +111,7 @@ class SpoListItemAddCommand extends SpoCommand {
       'webUrl',
       'listId',
       'listTitle',
+      'listUrl',
       'contentType',
       'folder'
     );
@@ -275,6 +276,7 @@ class SpoListItemAddCommand extends SpoCommand {
     const excludeOptions: string[] = [
       'listTitle',
       'listId',
+      'listUrl',
       'webUrl',
       'contentType',
       'folder',

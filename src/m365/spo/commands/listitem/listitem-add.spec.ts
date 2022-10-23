@@ -7,9 +7,11 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 const command: Command = require('./listitem-add');
 
@@ -18,7 +20,9 @@ describe(commands.LISTITEM_ADD, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let ensureFolderStub: sinon.SinonStub;
-
+  const listUrl = 'sites/project-x/documents';
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
+  const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
   const expectedTitle = `List Item 1`;
 
   const expectedId = 147;
@@ -27,29 +31,37 @@ describe(commands.LISTITEM_ADD, () => {
   const expectedContentType = 'Item';
   let actualContentType = '';
 
-  const postFakes = (opts: any) => {
-    if ((opts.url as string).indexOf('AddValidateUpdateItemUsingPath') > -1) {
+  const postFakes = async (opts: any) => {
+    if (opts.url.indexOf('/_api/web/lists') > -1) {
+      if ((opts.url as string).indexOf('AddValidateUpdateItemUsingPath') > -1) {
+        const bodyString = JSON.stringify(opts.data);
+        const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
+        actualContentType = ctMatch ? ctMatch[1] : "";
+        if (bodyString.indexOf("fail adding me") > -1) { return Promise.resolve({ value: [] }); }
+        return { value: [{ FieldName: "Id", FieldValue: expectedId }] };
+      }
+    }
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/AddValidateUpdateItemUsingPath()`) {
       const bodyString = JSON.stringify(opts.data);
       const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
       actualContentType = ctMatch ? ctMatch[1] : "";
       if (bodyString.indexOf("fail adding me") > -1) { return Promise.resolve({ value: [] }); }
-      return Promise.resolve({ value: [{ FieldName: "Id", FieldValue: expectedId }] });
+      return { value: [{ FieldName: "Id", FieldValue: expectedId }] };
     }
-
-    return Promise.reject('Invalid request');
+    throw 'Invalid request';
   };
 
   const getFakes = async (opts: any) => {
-    if ((opts.url as string).indexOf('contenttypes') > -1) {
-      return Promise.resolve({ value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] });
-    }
-    if ((opts.url as string).indexOf('rootFolder') > -1) {
-      return Promise.resolve({ ServerRelativeUrl: '/sites/project-xxx/Lists/Demo%20List' });
-    }
-    if ((opts.url as string).indexOf('/items(') > -1) {
-      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
-      return Promise.resolve(
-        {
+    if (opts.url.indexOf('/_api/web/lists') > -1) {
+      if ((opts.url as string).indexOf('contenttypes') > -1) {
+        return { value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] };
+      }
+      if ((opts.url as string).indexOf('rootFolder') > -1) {
+        return { ServerRelativeUrl: '/sites/project-xxx/Lists/Demo%20List' };
+      }
+      if ((opts.url as string).indexOf('/items(') > -1) {
+        actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
+        return {
           "Attachments": false,
           "AuthorId": 3,
           "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
@@ -59,10 +71,27 @@ describe(commands.LISTITEM_ADD, () => {
           "ID": actualId,
           "Modified": "2018-03-15T10:43:10Z",
           "Title": expectedTitle
-        }
-      );
+        };
+      }
     }
-    return Promise.reject('Invalid request');
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/contenttypes?$select=Name,Id`) {
+      return { value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] };
+    }
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(147)`) {
+      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
+      return {
+        "Attachments": false,
+        "AuthorId": 3,
+        "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+        "Created": "2018-03-15T10:43:10Z",
+        "EditorId": 3,
+        "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
+        "ID": actualId,
+        "Modified": "2018-03-15T10:43:10Z",
+        "Title": expectedTitle
+      };
+    }
+    throw 'Invalid request';
   };
 
   before(() => {
@@ -180,7 +209,7 @@ describe(commands.LISTITEM_ADD, () => {
     const options: any = {
       debug: false,
       listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      webUrl: webUrl,
       Title: "fail adding me"
     };
 
@@ -197,7 +226,7 @@ describe(commands.LISTITEM_ADD, () => {
     const options: any = {
       debug: true,
       listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      webUrl: webUrl,
       Title: expectedTitle
     };
 
@@ -211,7 +240,7 @@ describe(commands.LISTITEM_ADD, () => {
 
     const options: any = {
       listId: 'cf8c72a1-0207-40ee-aebd-fca67d20bc8a',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      webUrl: webUrl,
       Title: expectedTitle
     };
 
@@ -224,8 +253,9 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      listUrl: '/sites/project-x/Documents',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      verbose: true,
+      listUrl: listUrl,
+      webUrl: webUrl,
       Title: expectedTitle
     };
 
@@ -241,7 +271,7 @@ describe(commands.LISTITEM_ADD, () => {
     const options: any = {
       debug: true,
       listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
+      webUrl: webUrl,
       contentType: expectedContentType,
       Title: expectedTitle
     };
@@ -257,7 +287,7 @@ describe(commands.LISTITEM_ADD, () => {
     const options: any = {
       debug: false,
       listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-y',
+      webUrl: webUrl,
       contentType: "Unexpected content type",
       Title: expectedTitle
     };
@@ -273,7 +303,7 @@ describe(commands.LISTITEM_ADD, () => {
       options: {
         debug: false,
         listTitle: 'Demo List',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: webUrl,
         Title: expectedTitle,
         contentType: expectedContentType,
         folder: "InsideFolder2"
@@ -291,7 +321,7 @@ describe(commands.LISTITEM_ADD, () => {
       options: {
         debug: true,
         listTitle: 'Demo List',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: webUrl,
         Title: expectedTitle,
         contentType: expectedContentType,
         folder: "InsideFolder2/Folder3"
@@ -309,7 +339,7 @@ describe(commands.LISTITEM_ADD, () => {
       options: {
         debug: true,
         listTitle: 'Demo List',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: webUrl,
         Title: expectedTitle,
         contentType: expectedContentType,
         folder: "InsideFolder2/Folder3/"
@@ -330,7 +360,7 @@ describe(commands.LISTITEM_ADD, () => {
         verbose: true,
         output: "text",
         listTitle: 'Demo List',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: webUrl,
         Title: expectedTitle,
         contentType: expectedContentType,
         folder: "InsideFolder2/Folder3/"
