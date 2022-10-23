@@ -14,7 +14,7 @@ pp card get [options]
 : The name of the environment.
 
 `-i, --id <id>`
-: The id of the card
+: The id of the card.
 
 `-a, --asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
