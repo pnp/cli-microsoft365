@@ -59,6 +59,7 @@
 - added tags to samples [#3640](https://github.com/pnp/cli-microsoft365/issues/3640)
 - fixed options overriding aad app add with manifest [#3555](https://github.com/pnp/cli-microsoft365/issues/3555)
 - added 'listUrl' to spo roleinheritance break and -reset [#3809](https://github.com/pnp/cli-microsoft365/issues/3809)
+- extended 'outlook mail send' command with attachments support [#3832](https://github.com/pnp/cli-microsoft365/issues/3832)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
