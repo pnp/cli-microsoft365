@@ -176,7 +176,6 @@ describe(commands.CARD_GET, () => {
   it('retrieves a specific card with the name parameter', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').returns(envUrl);
 
-
     sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards?$filter=name eq 'CLI 365 Card'`)) {
         if (opts.headers &&
