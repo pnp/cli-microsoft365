@@ -14,7 +14,13 @@ m365 spo field add [options]
 : Absolute URL of the site where the field should be created
 
 `-l, --listTitle [listTitle]`
-: Title of the list where the field should be created (if it should be created as a list column)
+: Title of the list where the field should be created (if it should be created as a list column). Specify either `listTitle`, `listId` or `listUrl`
+
+`-l, --listTitle [listTitle]`
+: ID of the list where the field should be created (if it should be created as a list column). Specify either `listTitle`, `listId` or `listUrl`
+
+`-l, --listTitle [listTitle]`
+: Server- or site-relative URL of the list where the field should be created (if it should be created as a list column). Specify either `listTitle`, `listId` or `listUrl`
 
 `-x, --xml <xml>`
 : CAML field definition
@@ -36,7 +42,7 @@ Create a date time site column
 m365 spo field add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --xml '`<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>`'
 ```
 
-Create a URL list column
+Create a URL list column to a list retrieved by Title
 
 ```sh
 m365 spo field add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --xml '`<Field Type="URL" DisplayName="More information link" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="Hyperlink" Group="PnP Columns" ID="{6085e32a-339b-4da7-ab6d-c1e013e5ab27}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertMoreInformation" Name="PnPAlertMoreInformation"></Field>`'
@@ -46,6 +52,18 @@ Create a URL list column and add it to all content types
 
 ```sh
 m365 spo field add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --xml '`<Field Type="URL" DisplayName="More information link" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="Hyperlink" Group="PnP Columns" ID="{6085e32a-339b-4da7-ab6d-c1e013e5ab27}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertMoreInformation" Name="PnPAlertMoreInformation"></Field>`' --options AddToAllContentTypes
+```
+
+Create a URL list column to a list retrieved by ID
+
+```sh
+m365 spo field add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listId e785fe80-2ca1-409e-b9d1-19055a85cd38 --xml '`<Field Type="URL" DisplayName="More information link" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="Hyperlink" Group="PnP Columns" ID="{6085e32a-339b-4da7-ab6d-c1e013e5ab27}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertMoreInformation" Name="PnPAlertMoreInformation"></Field>`'
+```
+
+Create a date time list column to a list retrieved by URL
+
+```sh
+m365 spo field add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl /sites/contoso-sales/lists/Events --xml '`<Field Type="DateTime" DisplayName="Start date-time" Required="FALSE" EnforceUniqueValues="FALSE" Indexed="FALSE" Format="DateTime" Group="PnP Columns" FriendlyDisplayFormat="Disabled" ID="{5ee2dd25-d941-455a-9bdb-7f2c54aed11b}" SourceID="{4f118c69-66e0-497c-96ff-d7855ce0713d}" StaticName="PnPAlertStartDateTime" Name="PnPAlertStartDateTime"><Default>[today]</Default></Field>`'
 ```
 
 ## More information
