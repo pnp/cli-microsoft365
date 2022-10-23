@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   environment: string;
   id?: string;
   name?: string;
-  asAdmin: boolean;
+  asAdmin?: boolean;
 }
 
 class PpSolutionGetCommand extends PowerPlatformCommand {
@@ -25,7 +25,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Lists a specific solution in a given environment.';
+    return 'Gets a specific solution in a given environment.';
   }
 
   public defaultProperties(): string[] | undefined {
@@ -57,7 +57,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
         option: '-e, --environment <environment>'
       },
       {
-        option: '-i, --id'
+        option: '-i, --id [id]'
       },
       {
         option: '-n, --name [name]'
