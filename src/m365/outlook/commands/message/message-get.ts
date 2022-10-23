@@ -74,10 +74,16 @@ class OutlookMessageGetCommand extends GraphCommand {
         requestUrl += `users/${args.options.userId ? args.options.userId : args.options.userPrincipalName}`;
       }
       else {
-        if (args.options.userId || args.options.userPrincipalName) {
-          throw `Option 'userId' or 'userPrincipalName' is not allowed when using delegated credentials`;
+        if (args.options.userId && args.options.userPrincipalName) {
+          throw `Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using delegated credentials`;
         }
-        requestUrl += 'me';
+
+        if (args.options.userId || args.options.userPrincipalName) {
+          requestUrl += `users/${args.options.userId ? args.options.userId : args.options.userPrincipalName}`;
+        }
+        else {
+          requestUrl += 'me';
+        }
       }
 
       requestUrl += `/messages/${args.options.id}`;

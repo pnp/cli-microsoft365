@@ -139,20 +139,33 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { debug: false, id: messageId } });
+    await command.action(logger, { options: { verbose: true, id: messageId } });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
-  it('retrieves specific message using delegated permissions (debug)', async () => {
+  it('retrieves specific message using delegated permissions from a shared mailbox using userPrincipalName as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/messages/${messageId}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/messages/${messageId}`) {
         return emailResponse;
       }
 
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { debug: true, id: messageId } });
+    await command.action(logger, { options: { verbose: true, id: messageId, userPrincipalName: userPrincipalName } });
+    assert(loggerLogSpy.calledWith(emailResponse));
+  });
+
+  it('retrieves specific message using delegated permissions from a shared mailbox using userId as option', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/messages/${messageId}`) {
+        return emailResponse;
+      }
+
+      throw `Invalid request`;
+    });
+
+    await command.action(logger, { options: { verbose: true, id: messageId, userId: userId } });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -180,7 +193,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { debug: false, id: messageId, userPrincipalName: userPrincipalName } });
+    await command.action(logger, { options: { verbose: true, id: messageId, userPrincipalName: userPrincipalName } });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -195,37 +208,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { debug: false, id: messageId, userId: userId } });
-    assert(loggerLogSpy.calledWith(emailResponse));
-  });
-
-  it('retrieves specific message using application permissions and using userPrincipalName as option (debug)', async () => {
-    sinonUtil.restore([Auth.isAppOnlyAuth]);
-    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/messages/${messageId}`) {
-        return emailResponse;
-      }
-
-      throw `Invalid request`;
-    });
-
-    await command.action(logger, { options: { debug: true, id: messageId, userPrincipalName: userPrincipalName } });
-    assert(loggerLogSpy.calledWith(emailResponse));
-  });
-
-  it('retrieves specific message using application permissions and using userId as option (debug)', async () => {
-    sinonUtil.restore([Auth.isAppOnlyAuth]);
-    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/messages/${messageId}`) {
-        return emailResponse;
-      }
-
-      throw `Invalid request`;
-    });
-
-    await command.action(logger, { options: { debug: true, id: messageId, userId: userId } });
+    await command.action(logger, { options: { verbose: true, id: messageId, userId: userId } });
     assert(loggerLogSpy.calledWith(emailResponse));
   });
 
@@ -285,12 +268,12 @@ describe(commands.MESSAGE_GET, () => {
       new CommandError(`Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using app only credentials`));
   });
 
-  it('throws an error when the upn or userprincipalname is filled in when signed in using delegated authentication', async () => {
+  it('throws an error when the upn and userprincipalname are both filled in when signed in using delegated authentication', async () => {
     sinonUtil.restore([Auth.isAppOnlyAuth]);
     sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => false);
 
     await assert.rejects(command.action(logger, { options: { debug: false, id: messageId, userId: userId, userPrincipalName: userPrincipalName } } as any),
-      new CommandError(`Option 'userId' or 'userPrincipalName' is not allowed when using delegated credentials`));
+      new CommandError(`Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using delegated credentials`));
   });
 
   it('supports debug mode', () => {
