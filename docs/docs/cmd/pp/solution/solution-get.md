@@ -26,25 +26,25 @@ m365 pp solution get [options]
 
 ## Examples
 
-List a specific solution in a specific environment based on the name
+Gets a specific solution in a specific environment based on the name
 
 ```sh
 m365 pp solution get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "Default"
 ```
 
-List a specific solution in a specific environment based on the name as Admin
+Gets a specific solution in a specific environment based on the name as Admin
 
 ```sh
 m365 pp solution get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "Default" --asAdmin
 ```
 
-List a specific solution in a specific environment based on the id
+Gets a specific solution in a specific environment based on the id
 
 ```sh
 m365 pp solution get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e"
 ```
 
-List a specific solution in a specific environment based on the id as Admin
+Gets a specific solution in a specific environment based on the id as Admin
 
 ```sh
 m365 pp solution get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e" --asAdmin
