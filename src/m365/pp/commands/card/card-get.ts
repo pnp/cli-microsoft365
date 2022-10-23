@@ -93,7 +93,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
-      const res = await this.getCard(dynamicsApiUrl, args.options, logger);
+      const res = await this.getCard(dynamicsApiUrl, args.options);
       logger.log(res);
     }
     catch (err: any) {
@@ -101,7 +101,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
     }
   }
 
-  private async getCard(dynamicsApiUrl: string, options: Options, logger: Logger): Promise<any> {
+  private async getCard(dynamicsApiUrl: string, options: Options): Promise<any> {
     const requestOptions: any = {
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -117,7 +117,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
 
     requestOptions.url = `${dynamicsApiUrl}/api/data/v9.1/cards?$filter=name eq '${options.name}'`;
     const r = await request.get<{ value: any[] }>(requestOptions);
-    logger.log(r);
+
     if (!r.value[0]) {
       throw `The specified card '${options.name}' does not exist.`;
     }
