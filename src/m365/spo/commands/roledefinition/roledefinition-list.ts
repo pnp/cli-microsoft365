@@ -73,7 +73,7 @@ class SpoRoleDefinitionListCommand extends SpoCommand {
     }
   }
 
-  private setFriendlyPermissions(response: any[]) {
+  private setFriendlyPermissions(response: any[]): any[] {
     response.forEach((r: RoleDefinition) => {
       const permissions: BasePermissions = new BasePermissions();
       permissions.high = r.BasePermissions.High as number;
