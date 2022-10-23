@@ -4,6 +4,7 @@ import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
 import request from '../../../../request';
+import { validation } from '../../../../utils/validation';
 
 interface CommandArgs {
   options: Options;
@@ -11,7 +12,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   environment: string;
-  id: string;
+  id?: string;
+  name?: string;
   asAdmin?: boolean;
 }
 
@@ -34,12 +36,16 @@ class PpCardGetCommand extends PowerPlatformCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initOptionSets();
+    this.#initValidators();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        asAdmin: !!args.options.asAdmin
+        asAdmin: !!args.options.asAdmin,
+        name: typeof args.options.name !== 'undefined',
+        id: typeof args.options.id !== 'undefined'
       });
     });
   }
@@ -50,7 +56,10 @@ class PpCardGetCommand extends PowerPlatformCommand {
         option: '-e, --environment <environment>'
       },
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --name [name]'
       },
       {
         option: '-a, --asAdmin'
@@ -58,28 +67,61 @@ class PpCardGetCommand extends PowerPlatformCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['id', 'name']
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
+  }
+
   public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr('');
+      logger.logToStderr(`Retrieving a specific card '${args.options.id ? args.options.id : args.options.name}'`);
     }
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
-      const requestOptions: any = {
-        url: `${dynamicsApiUrl}/api/data/v9.1/cards(${args.options.id})`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      const res = await request.get(requestOptions);
+      const res = await this.getCard(dynamicsApiUrl, args.options, logger);
       logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async getCard(dynamicsApiUrl: string, options: Options, logger: Logger): Promise<any> {
+    const requestOptions: any = {
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    if (options.id) {
+      requestOptions.url = `${dynamicsApiUrl}/api/data/v9.1/cards(${options.id})`;
+      const r = await request.get(requestOptions);
+      return r;
+    }
+
+    requestOptions.url = `${dynamicsApiUrl}/api/data/v9.1/cards?$filter=name eq '${options.name}'`;
+    const r = await request.get<{ value: any[] }>(requestOptions);
+    logger.log(r);
+    if (!r.value[0]) {
+      throw `The specified card '${options.name}' does not exist.`;
+    }
+    return r.value[0];
   }
 
 }
