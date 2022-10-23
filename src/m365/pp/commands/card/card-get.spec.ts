@@ -116,7 +116,7 @@ describe(commands.CARD_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['name', 'cardid', 'publishdate', 'createdon', 'modifiedon']);
   });
 
-  it('retrieves specific card', async () => {
+  it('retrieves a specific card', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
