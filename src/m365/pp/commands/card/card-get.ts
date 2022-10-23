@@ -74,7 +74,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
         responseType: 'json'
       };
 
-      const res = await request.get(requestOptions);
+      const res = await request.get<any>(requestOptions);
       logger.log(res);
     }
     catch (err: any) {
