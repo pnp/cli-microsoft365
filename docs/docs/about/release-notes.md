@@ -6,8 +6,11 @@
 
 **Power Platform:**
 
+- [pp card get](../cmd/pp/card//card-get.md) - gets a specific Microsoft Power Platform card in the specified Power Platform environment [#3770](https://github.com/pnp/cli-microsoft365/issues/3770)
 - [pp card list](../cmd/pp/card/card-list.md) - lists Microsoft Power Platform cards in the specified Power Platform environment [#3767](https://github.com/pnp/cli-microsoft365/issues/3767)
 - [pp dataverse table list](../cmd/pp/dataverse/dataverse-table-list.md) - lists dataverse tables in a given environment [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
+- [pp gateway get](../cmd/pp/gateway/gateway-get.md) - gets information about the specified gateway [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
+- [pp solution get](../cmd/pp/solution/solution-get.md) - gets a specific solution in a given environment [#3722](https://github.com/pnp/cli-microsoft365/issues/3722)
 - [pp solution list](../cmd/pp/solution/solution-list.md) - lists solutions in a given environment [#3711](https://github.com/pnp/cli-microsoft365/issues/3711)
 - [pp tenant settings list](../cmd/pp/tenant/tenant-settings-list.md) - lists the global Power Platform tenant settings [#3657](https://github.com/pnp/cli-microsoft365/issues/3657)
 - [pp environment get](../cmd/pp/environment/environment-get.md) - gets information about the specified Power Platform environment. [#3710](https://github.com/pnp/cli-microsoft365/issues/3710)
@@ -60,6 +63,8 @@
 - fixed options overriding aad app add with manifest [#3555](https://github.com/pnp/cli-microsoft365/issues/3555)
 - added 'listUrl' to spo roleinheritance break and -reset [#3809](https://github.com/pnp/cli-microsoft365/issues/3809)
 - extended 'outlook mail send' command with attachments support [#3832](https://github.com/pnp/cli-microsoft365/issues/3832)
+- added cookie consent to MKDocs [#3832](https://github.com/pnp/cli-microsoft365/issues/3765)
+- extended 'todo task add' with extra options [#3832](https://github.com/pnp/cli-microsoft365/issues/3827)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 

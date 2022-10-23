@@ -257,6 +257,7 @@ nav:
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
       - card:
+        - card get: 'cmd/pp/card/card-get.md'
         - card list: 'cmd/pp/card/card-list.md'
       - dataverse:
         - dataverse table list: 'cmd/pp/dataverse/dataverse-table-list.md'
@@ -264,11 +265,13 @@ nav:
         - environment get: 'cmd/pp/environment/environment-get.md'
         - environment list: 'cmd/pp/environment/environment-list.md'
       - gateway:
+        - gateway get: 'cmd/pp/gateway/gateway-get.md'
         - gateway list: 'cmd/pp/gateway/gateway-list.md'
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
         - managementapp list: 'cmd/pp/managementapp/managementapp-list.md'
       - solution:
+        - solution get: 'cmd/pp/solution/solution-get.md'
         - solution list: 'cmd/pp/solution/solution-list.md'
       - tenant:
         - tenant settings list: 'cmd/pp/tenant/tenant-settings-list.md'
@@ -872,6 +875,16 @@ extra:
   analytics:
     provider: google
     property: UA-110480857-1
+  consent:
+    actions:
+      - manage
+      - accept
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
   social:
     - icon: fontawesome/brands/github
       link: 'https://github.com/pnp/cli-microsoft365'
@@ -883,6 +896,8 @@ extra:
       link: 'http://aka.ms/sppnp-videos'
     - icon: fontawesome/solid/link
       link: 'https://aka.ms/sppnp'
+copyright: >
+  <a href="#__consent">Modify cookie settings</a>
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs
 plugins:
