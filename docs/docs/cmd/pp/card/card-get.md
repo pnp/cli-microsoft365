@@ -1,6 +1,6 @@
 # pp card get
 
-Lists a specific Microsoft Power Platform card in the specified Power Platform environment.
+Gets a specific Microsoft Power Platform card in the specified Power Platform environment.
 
 ## Usage
 
