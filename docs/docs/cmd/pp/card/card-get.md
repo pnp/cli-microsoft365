@@ -1,6 +1,6 @@
-# pp card list
+# pp card get
 
-Lists a specific Microsoft Power Platform card in the specified Power Platform environment.
+Gets a specific Microsoft Power Platform card in the specified Power Platform environment.
 
 ## Usage
 
@@ -14,7 +14,7 @@ pp card get [options]
 : The name of the environment.
 
 `-i, --id <id>`
-: The id of the card
+: The id of the card.
 
 `-a, --asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
@@ -23,14 +23,13 @@ pp card get [options]
 
 ## Examples
 
-List a specific card in a specific environment.
+Get a specific card in a specific environment.
 
 ```sh
 m365 pp card get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "408e3f42-4c9e-4c93-8aaf-3cbdea9179aa"
 ```
 
-List a specific card in a specific environment as admin.
+Get a specific card in a specific environment as admin.
 
 ```sh
-m365 pp card list --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "408e3f42-4c9e-4c93-8aaf-3cbdea9179aa" --asAdmin
-```
+m365 pp card get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "408e3f42-4c9e-4c93-8aaf-3cbdea9179aa" --asAdmin
