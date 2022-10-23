@@ -83,10 +83,8 @@ class SpoContentTypeGetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (args.options.listId) {
-          if (!validation.isValidGuid(args.options.listId)) {
-            return `${args.options.listId} is not a valid GUID`;
-          }
+        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
         }
 
         return true;

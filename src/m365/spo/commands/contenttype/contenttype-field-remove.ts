@@ -91,10 +91,8 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           return `${args.options.fieldLinkId} is not a valid GUID`;
         }
 
-        if (args.options.listId) {
-          if (!validation.isValidGuid(args.options.listId)) {
-            return `${args.options.listId} is not a valid GUID`;
-          }
+        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
         }
 
         return validation.isValidSharePointUrl(args.options.webUrl);
@@ -217,6 +215,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
       }
     }
   }
+
   private async getListIdFromListTitle(webUrl: string, listTitle: string): Promise<string> {
     const requestOptions: AxiosRequestConfig = {
       url: `${webUrl}/_api/lists/GetByTitle('${formatting.encodeQueryParameter(listTitle)}')?$select=Id`,

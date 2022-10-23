@@ -61,6 +61,7 @@ Remove fieldLink with a specific ID from a list (obtained by ID) content type wi
 ```sh
 m365 spo contenttype field remove  --contentTypeId "0x0100CA0FA0F5DAEF784494B9C6020C3020A60062F089A38C867747942DB2C3FC50FF6A" --fieldLinkId "880d2f46-fccb-43ca-9def-f88e722cef80" --webUrl https://contoso.sharepoint.com --listId "8c7a0fcd-9d64-4634-85ea-ce2b37b2ec0c"
 ```
+
 Remove fieldLink with a specific ID from a list (obtained by URL) content type with a specific ID on a spefici site.
 
 ```sh
