@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -19,7 +20,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -218,6 +219,32 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     assert.strictEqual(actual, expected);
   });
 
+  it('updates notification url of the webhook by passing list url', async () => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
+    });
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('${formatting.encodeQueryParameter('/sites/ninja/lists/Documents')}')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) {
+        actual = JSON.stringify(opts.data);
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        listUrl: '/sites/ninja/lists/Documents',
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
+      }
+    });
+    assert.strictEqual(actual, expected);
+  });
+
   it('updates expiration date of the webhook by passing list title', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
@@ -245,6 +272,33 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     assert.strictEqual(actual, expected);
   });
 
+  it('updates expiration date of the webhook by passing list url', async () => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      expirationDateTime: '2019-03-02'
+    });
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('${formatting.encodeQueryParameter('/sites/ninja/lists/Documents')}')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) {
+        actual = JSON.stringify(opts.data);
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        verbose: true,
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        listUrl: '/sites/ninja/lists/Documents',
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
+        expirationDateTime: '2019-03-02'
+      }
+    });
+    assert.strictEqual(actual, expected);
+  });
+
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
@@ -260,19 +314,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         expirationDateTime: '2019-03-02'
       }
     } as any), new CommandError('An error has occurred'));
-  });
-
-  it('fails validation if both list id and title options are not passed', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-10-09'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webhook id option is not passed', async () => {
@@ -370,21 +411,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if both id and title options are passed', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com',
-        listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        listTitle: 'Documents',
-        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
-        expirationDateTime: '2018-10-09'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both notificationUrl and expirationDateTime options are not passed', async () => {

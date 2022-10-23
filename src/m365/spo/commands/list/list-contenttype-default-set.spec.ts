@@ -15,6 +15,7 @@ const command: Command = require('./list-contenttype-default-set');
 describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   let log: any[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
@@ -40,6 +41,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -67,16 +69,16 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   });
 
   it('configures specified visible content type as default. List specified using Title. UniqueContentTypeOrder null', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder`) {
-        return Promise.resolve('');
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/RootFolder`) {
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
-        return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
+        return {
           "ContentTypeOrder": [
             {
               "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
@@ -86,11 +88,11 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
             }
           ],
           "UniqueContentTypeOrder": null
-        });
+        };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/ContentTypes?$select=Id`) {
-        return Promise.resolve({
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/ContentTypes?$select=Id`) {
+        return {
           value: [
             {
               Id: { "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E" }
@@ -99,10 +101,10 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
               Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -112,19 +114,20 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
   it('configures specified visible content type as default. List specified using Title. UniqueContentTypeOrder null. Debug', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder`) {
-        return Promise.resolve('');
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/RootFolder`) {
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
-        return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
+        return {
           "ContentTypeOrder": [
             {
               "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
@@ -134,11 +137,11 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
             }
           ],
           "UniqueContentTypeOrder": null
-        });
+        };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/ContentTypes?$select=Id`) {
-        return Promise.resolve({
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/ContentTypes?$select=Id`) {
+        return {
           value: [
             {
               Id: { "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E" }
@@ -147,10 +150,10 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
               Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -162,19 +165,20 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       }
     });
     assert(loggerLogToStderrSpy.called);
+    assert(loggerLogSpy.notCalled);
   });
 
   it('configures specified visible content type as default. List specified using ID. UniqueContentTypeOrder not null', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder`) {
-        return Promise.resolve('');
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
-        return Promise.resolve({
+        return {
           "ContentTypeOrder": [
             {
               "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
@@ -191,11 +195,11 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
               "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes?$select=Id`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               Id: { "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E" }
@@ -204,10 +208,10 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
               Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -217,19 +221,76 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
     });
+    assert(loggerLogSpy.notCalled);
+  });
+
+  it('configures specified visible content type as default. List specified using URL. UniqueContentTypeOrder not null', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/RootFolder`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
+        return {
+          "ContentTypeOrder": [
+            {
+              "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
+            },
+            {
+              "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E"
+            }
+          ],
+          "UniqueContentTypeOrder": [
+            {
+              "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
+            },
+            {
+              "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E"
+            }
+          ]
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(\'%2Fsites%2Fdocuments\')/ContentTypes?$select=Id`) {
+        return {
+          value: [
+            {
+              Id: { "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E" }
+            },
+            {
+              Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        listUrl: 'sites/documents',
+        webUrl: 'https://contoso.sharepoint.com',
+        contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
+      }
+    });
+    assert(loggerLogSpy.notCalled);
   });
 
   it('configures specified visible content type as default. List specified using ID. UniqueContentTypeOrder not null. Debug', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder`) {
-        return Promise.resolve('');
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
-        return Promise.resolve({
+        return {
           "ContentTypeOrder": [
             {
               "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
@@ -246,11 +307,11 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
               "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E"
             }
           ]
-        });
+        };
       }
 
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes?$select=Id`) {
-        return Promise.resolve({
+        return {
           value: [
             {
               Id: { "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E" }
@@ -259,10 +320,10 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
               Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -274,11 +335,12 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       }
     });
     assert(loggerLogToStderrSpy.called);
+    assert(loggerLogSpy.notCalled);
   });
 
   it('configures specified invisible content type as default. List specified using Title. UniqueContentTypeOrder null', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/RootFolder` &&
         opts.headers &&
         opts.headers['x-http-method'] === 'MERGE' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -291,25 +353,25 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
             }
           ]
         })) {
-        return Promise.resolve('');
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
-        return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
+        return {
           "ContentTypeOrder": [
             {
               "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
             }
           ],
           "UniqueContentTypeOrder": null
-        });
+        };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/ContentTypes?$select=Id`) {
-        return Promise.resolve({
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/ContentTypes?$select=Id`) {
+        return {
           value: [
             {
               Id: { "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E" }
@@ -318,10 +380,10 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
               Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -331,11 +393,12 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
   it('configures specified invisible content type as default. List specified using Title. UniqueContentTypeOrder null. Debug', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/RootFolder` &&
         opts.headers &&
         opts.headers['x-http-method'] === 'MERGE' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -348,25 +411,25 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
             }
           ]
         })) {
-        return Promise.resolve('');
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
-        return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
+        return {
           "ContentTypeOrder": [
             {
               "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
             }
           ],
           "UniqueContentTypeOrder": null
-        });
+        };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/ContentTypes?$select=Id`) {
-        return Promise.resolve({
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/ContentTypes?$select=Id`) {
+        return {
           value: [
             {
               Id: { "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E" }
@@ -375,10 +438,10 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
               Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -390,15 +453,16 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       }
     });
     assert(loggerLogToStderrSpy.called);
+    assert(loggerLogSpy.notCalled);
   });
 
   it(`doesn't configure content type as default if it's already set as default`, async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('Invalid request');
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
-        return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
+        return {
           "ContentTypeOrder": [
             {
               "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E"
@@ -408,10 +472,10 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
             }
           ],
           "UniqueContentTypeOrder": null
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -424,12 +488,12 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   });
 
   it(`doesn't configure content type as default if it's already set as default. Debug`, async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('Invalid request');
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
-        return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
+        return {
           "ContentTypeOrder": [
             {
               "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E"
@@ -439,10 +503,10 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
             }
           ],
           "UniqueContentTypeOrder": null
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -453,15 +517,14 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
     });
-    assert(loggerLogToStderrSpy.called);
   });
 
   it(`fails, if the specified web doesn't exist`, async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('Invalid request');
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('Request failed with status code 404');
+    sinon.stub(request, 'get').callsFake(async () => {
+      throw 'Request failed with status code 404';
     });
 
     await assert.rejects(command.action(logger, {
@@ -474,11 +537,11 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   });
 
   it(`fails, if the list specified by title doesn't exist`, async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('Invalid request');
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('Request failed with status code 404');
+    sinon.stub(request, 'get').callsFake(async () => {
+      throw 'Request failed with status code 404';
     });
 
     await assert.rejects(command.action(logger, {
@@ -491,32 +554,32 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   });
 
   it(`fails, if the specified content type not found in the list`, async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('Invalid request');
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
-        return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`) {
+        return {
           "ContentTypeOrder": [
             {
               "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
             }
           ],
           "UniqueContentTypeOrder": null
-        });
+        };
       }
 
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/ContentTypes?$select=Id`) {
-        return Promise.resolve({
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('My%20List')/ContentTypes?$select=Id`) {
+        return {
           value: [
             {
               Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -528,8 +591,13 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
     }), new CommandError('Content type 0x0104001A75DCE30BAC754AA5134C183CF7A92E missing in the list. Add the content type to the list first and try again.'));
   });
 
-  it('fails validation if neither listId nor listTitle are not passed', async () => {
+  it('fails validation if neither listId nor listTitle nor listUrl are passed', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', contentTypeId: '0x0120' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if all of the list properties are passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', listUrl: 'sites/documents', contentTypeId: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -579,10 +647,4 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('configures contentTypeId as string option', () => {
-    const types = command.types;
-    ['c', 'contentTypeId'].forEach(o => {
-      assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
-    });
-  });
 });

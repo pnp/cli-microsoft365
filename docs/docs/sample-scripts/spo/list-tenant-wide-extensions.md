@@ -1,3 +1,9 @@
+---
+tags:
+  - customizations
+  - reports
+---
+
 # List all tenant-wide extensions
 
 Author: [Shantha Kumar T](https://www.ktskumar.com/2020/04/manage-tenant-wide-extensions-using-office-365-cli/)
@@ -40,8 +46,3 @@ Location|TenantWideExtensionLocation|Location of the extension. There are differ
 Sequence|TenantWideExtensionSequence|The sequence of the extension in rendering.
 Host Properties|TenantWideExtensionHostProperties|Additional server-side configuration, like pre-allocated height for placeholders.
 Disabled|TenantWideExtensionDisabled|Is the extension enabled or disabled?
-
-Keywords:
-
-- SharePoint Online
-- Tenant Wide Extension

@@ -442,10 +442,10 @@ class AadAppAddCommand extends GraphCommand {
     delete v2Manifest.id;
     delete v2Manifest.appId;
     delete v2Manifest.publisherDomain;
+
     // extract secrets from the manifest. Store them in a separate variable
-    // and remove them from the manifest because we need to create them
-    // separately
     const secrets: { name: string, expirationDate: Date }[] = this.getSecretsFromManifest(v2Manifest);
+
     // Azure Portal returns v2 manifest whereas the Graph API expects a v1.6
 
     if (args.options.apisApplication || args.options.apisDelegated) {
@@ -453,7 +453,39 @@ class AadAppAddCommand extends GraphCommand {
       // otherwise, they will be skipped in the app update
       v2Manifest.requiredResourceAccess = appInfo.requiredResourceAccess;
     }
-    
+
+    if (args.options.redirectUris) {
+      // take submitted redirectUris/platform as options
+      // otherwise, they will be removed from the app
+      v2Manifest.replyUrlsWithType = args.options.redirectUris.split(',').map(u => {
+        return {
+          url: u.trim(),
+          type: this.translatePlatformToType(args.options.platform!)
+        };
+      });
+    }
+
+    if (args.options.multitenant) {
+      // override manifest setting when using multitenant flag
+      v2Manifest.signInAudience = 'AzureADMultipleOrgs';
+    }
+
+    if (args.options.implicitFlow) {
+      // remove manifest settings when using implicitFlow flag
+      delete v2Manifest.oauth2AllowIdTokenImplicitFlow;
+      delete v2Manifest.oauth2AllowImplicitFlow;
+    }
+
+    if (args.options.scopeName) {
+      // override manifest setting when using options.
+      delete v2Manifest.oauth2Permissions;
+    }
+
+    if (args.options.certificateFile || args.options.certificateBase64Encoded) {
+      // override manifest setting when using options.
+      delete v2Manifest.keyCredentials;
+    }
+
     const graphManifest = this.transformManifest(v2Manifest);
 
     const updateAppRequestOptions: any = {
@@ -692,7 +724,7 @@ class AadAppAddCommand extends GraphCommand {
   }
 
   private resolveApis(args: CommandArgs, logger: Logger): Promise<RequiredResourceAccess[]> {
-    if (!args.options.apisDelegated && !args.options.apisApplication 
+    if (!args.options.apisDelegated && !args.options.apisApplication
       && (typeof this.manifest?.requiredResourceAccess === 'undefined' || this.manifest.requiredResourceAccess.length === 0)) {
       return Promise.resolve([]);
     }
@@ -727,19 +759,11 @@ class AadAppAddCommand extends GraphCommand {
               }
             });
           }
-          
-          if (typeof this.manifest?.requiredResourceAccess !== 'undefined' && this.manifest.requiredResourceAccess.length > 0) {
+          else {
             const manifestApis = (this.manifest.requiredResourceAccess as RequiredResourceAccess[]);
 
             manifestApis.forEach(manifestApi => {
-              const requiredResource = resolvedApis.find(api => api.resourceAppId === manifestApi.resourceAppId);
-              if (requiredResource) {
-                // exclude if any duplicate required resources in both manifest and submitted options
-                requiredResource.resourceAccess.push(...manifestApi.resourceAccess.filter(manRes => !requiredResource.resourceAccess.some(res => res.id === manRes.id)));
-              }
-              else {
-                resolvedApis.push(manifestApi);
-              }
+              resolvedApis.push(manifestApi);
 
               const app = servicePrincipals.find(servicePrincipals => servicePrincipals.appId === manifestApi.resourceAppId);
 
@@ -822,7 +846,7 @@ class AadAppAddCommand extends GraphCommand {
     return resolvedApis;
   }
 
-  private updateAppPermissions(spId: string, resourceAccessPermission: ResourceAccess, oAuth2PermissionValue?: string) {
+  private updateAppPermissions(spId: string, resourceAccessPermission: ResourceAccess, oAuth2PermissionValue?: string): void {
     // During API resolution, we store globally both app role assignments and oauth2permissions
     // So that we'll be able to parse them during the admin consent process
     let existingPermission = this.appPermissions.find(oauth => oauth.resourceId === spId);
@@ -846,7 +870,7 @@ class AadAppAddCommand extends GraphCommand {
   }
 
   private configureSecret(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
-    if (!args.options.withSecret) {
+    if (!args.options.withSecret || (appInfo.secrets && appInfo.secrets.length > 0)) {
       return Promise.resolve(appInfo);
     }
 
@@ -858,6 +882,7 @@ class AadAppAddCommand extends GraphCommand {
       .createSecret({ appObjectId: appInfo.id })
       .then(secret => {
         appInfo.secret = secret.value;
+        appInfo.secrets = [{ displayName: secret.displayName, value: secret.value }];
         return Promise.resolve(appInfo);
       });
   }
@@ -956,6 +981,14 @@ class AadAppAddCommand extends GraphCommand {
     }
 
     return Promise.resolve(appInfo);
+  }
+
+  private translatePlatformToType(platform: string): string {
+    if (platform === 'publicClient') {
+      return 'InstalledClient';
+    }
+
+    return platform.charAt(0).toUpperCase() + platform.substring(1);
   }
 }
 

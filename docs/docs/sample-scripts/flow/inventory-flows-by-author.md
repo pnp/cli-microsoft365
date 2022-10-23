@@ -1,3 +1,10 @@
+---
+tags:  
+  - flows
+  - reports
+  - users
+---
+
 # Inventory Flows By Creator  
 
 Author: [Pete Skelly](https://peteskelly.com/lightweight-reports-using-the-office-365-cli-and-jq/)
@@ -184,8 +191,3 @@ The `bash` version of this script uses an external file to process owner mapping
     # Output each flow, append owner information from each entry using flow creator.userId property as the key
     | $flows |.[].properties.creator |= . + $dict[.userId]
     ```
-
-Keywords:
-
-- Power Automate
-- Azure Active Directory

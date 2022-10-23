@@ -173,7 +173,7 @@ class SpoFileCopyCommand extends SpoCommand {
   /**
    * Moves file in the site recycle bin
    */
-  private async recycleFile(tenantUrl: string, targetUrl: string, filename: string, logger: Logger) {
+  private async recycleFile(tenantUrl: string, targetUrl: string, filename: string, logger: Logger): Promise<void> {
     const targetFolderAbsoluteUrl: string = urlUtil.urlCombine(tenantUrl, targetUrl);
 
     // since the target WebFullUrl is unknown we can use getRequestDigest

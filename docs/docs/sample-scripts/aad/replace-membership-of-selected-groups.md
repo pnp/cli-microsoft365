@@ -1,3 +1,12 @@
+---
+tags:  
+  - cleanup
+  - groups
+  - security
+  - teams
+  - users
+---
+
 # Replace a user's membership in selected Microsoft 365 Groups or Teams
 
 Inspired by: [Alan Eardley](https://blog.eardley.org.uk/2021/04/managing-teams-movers-and-leavers/), [Patrick Lamber](https://www.nubo.eu/Replace-Membership-In-A-Microsoft-Group-Or-Team/)
@@ -119,9 +128,3 @@ This script can be used to replace the membership of a user for a selected list 
     <groupId>
     <groupId>
     ```
-
-Keywords:
-
-- Microsoft 365 Groups
-- Microsoft Teams
-- Governance

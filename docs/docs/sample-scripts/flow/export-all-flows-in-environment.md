@@ -1,3 +1,9 @@
+---
+tags:  
+  - flows
+  - migration
+---
+
 # Export all flows in environment
 
 Author: [Garry Trinder](https://garrytrinder.github.io/2021/01/export-all-flows-from-environment-cli-microsoft365)

@@ -1,3 +1,11 @@
+---
+tags:
+  - cleanup    
+  - security
+  - sites
+  - users
+---
+
 # Remove a Site Collection Admin User from all Site Collections
 
 Inspired By: [Salaudeen Rajack](https://www.sharepointdiary.com/2017/02/sharepoint-online-remove-site-collection-administrator-using-powershell.html)
@@ -58,8 +66,3 @@ Inspired By: [Salaudeen Rajack](https://www.sharepointdiary.com/2017/02/sharepoi
         }
     }
     ```
-
-Keywords
-
-- SharePoint Online
-- Governance

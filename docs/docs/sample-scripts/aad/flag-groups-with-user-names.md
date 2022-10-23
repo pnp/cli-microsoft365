@@ -1,3 +1,10 @@
+---
+tags:  
+  - users
+  - reports
+  - groups
+---
+
 # Scan for Microsoft 365 Groups created with user's first or last name
 
 Author: [Joseph Velliah](https://sprider.blog/governance-scan-office-365-groups-created-with-user-first-or-last-name-using-office-365-cli-commands)
@@ -77,8 +84,3 @@ Note: The filter condition can be changed as per your requirement.
     IFS=defaultIFS
     exit 1
     ```
-
-Keywords:
-
-- Microsoft 365 Group
-- Governance

@@ -185,7 +185,8 @@ module.exports = {
           "camelCase"
         ]
       }
-    ]
+    ],
+    "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }]
   },
   "overrides": [
     {
@@ -196,7 +197,8 @@ module.exports = {
         "no-console": "error",
         "@typescript-eslint/no-empty-function": "off",
         "cli-microsoft365/correct-command-class-name": "off",
-        "cli-microsoft365/correct-command-name": "off"
+        "cli-microsoft365/correct-command-name": "off",
+        "@typescript-eslint/explicit-function-return-type": "off"
       }
     },
     {

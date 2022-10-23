@@ -1,3 +1,10 @@
+---
+tags:
+  - files  
+  - lists
+  - reports
+---
+
 # List Attachment Names From SharePoint Lists For A Site
 
 Author: [Veronique Lengelle](https://twitter.com/veronicageek)
@@ -29,7 +36,3 @@ Author: [Veronique Lengelle](https://twitter.com/veronicageek)
     }
     $results
     ```
-
-Keywords
-
-- SharePoint Online
