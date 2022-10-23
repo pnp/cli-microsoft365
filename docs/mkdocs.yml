@@ -406,7 +406,6 @@ nav:
         - hubsite rights grant: 'cmd/spo/hubsite/hubsite-rights-grant.md'
         - hubsite rights revoke: 'cmd/spo/hubsite/hubsite-rights-revoke.md'
         - hubsite set: 'cmd/spo/hubsite/hubsite-set.md'
-        - hubsite theme sync: 'cmd/spo/hubsite/hubsite-theme-sync.md'
         - hubsite unregister: 'cmd/spo/hubsite/hubsite-unregister.md'
       - knowledgehub:
         - knowledgehub get: 'cmd/spo/knowledgehub/knowledgehub-get.md'
@@ -522,8 +521,9 @@ nav:
         - site ensure: 'cmd/spo/site/site-ensure.md'
         - site get: 'cmd/spo/site/site-get.md'
         - site groupify: 'cmd/spo/site/site-groupify.md'
-        - site hubsite disconnect: 'cmd/spo/site/site-hubsite-disconnect.md'
         - site hubsite connect: 'cmd/spo/site/site-hubsite-connect.md'
+        - site hubsite disconnect: 'cmd/spo/site/site-hubsite-disconnect.md'
+        - site hubsite theme sync: 'cmd/spo/site/site-hubsite-theme-sync.md'
         - site list: 'cmd/spo/site/site-list.md'
         - site recyclebinitem list: 'cmd/spo/site/site-recyclebinitem-list.md'
         - site recyclebinitem restore: 'cmd/spo/site/site-recyclebinitem-restore.md'
