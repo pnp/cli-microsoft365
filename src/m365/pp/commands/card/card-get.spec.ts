@@ -142,7 +142,7 @@ describe(commands.CARD_GET, () => {
 
   });
 
-  it('retrieves cards as admin', async () => {
+  it('retrieves a card as admin', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if ((opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/4be50206-9576-4237-8b17-38d8aadfaa36?api-version=2020-10-01&$select=properties.linkedEnvironmentMetadata.instanceApiUrl`)) {
         if (opts.headers &&
