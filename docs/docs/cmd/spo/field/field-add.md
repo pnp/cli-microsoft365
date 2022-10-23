@@ -16,10 +16,10 @@ m365 spo field add [options]
 `-l, --listTitle [listTitle]`
 : Title of the list where the field should be created (if it should be created as a list column). Specify either `listTitle`, `listId` or `listUrl`
 
-`-l, --listTitle [listTitle]`
+`--listId [listId]`
 : ID of the list where the field should be created (if it should be created as a list column). Specify either `listTitle`, `listId` or `listUrl`
 
-`-l, --listTitle [listTitle]`
+`--listUrl [listUrl]`
 : Server- or site-relative URL of the list where the field should be created (if it should be created as a list column). Specify either `listTitle`, `listId` or `listUrl`
 
 `-x, --xml <xml>`
