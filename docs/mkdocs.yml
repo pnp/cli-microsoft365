@@ -688,6 +688,7 @@ nav:
         - list set: 'cmd/todo/list/list-set.md'
       - task:
         - task add: 'cmd/todo/task/task-add.md'
+        - task get: 'cmd/todo/task/task-get.md'
         - task list: 'cmd/todo/task/task-list.md'
         - task remove: 'cmd/todo/task/task-remove.md'
         - task set: 'cmd/todo/task/task-set.md'
