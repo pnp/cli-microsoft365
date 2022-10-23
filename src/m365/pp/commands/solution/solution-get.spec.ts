@@ -147,7 +147,9 @@ describe(commands.SOLUTION_GET, () => {
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/solutions?$filter=isvisible eq true and uniquename eq 'Default'&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`)) {
-        if (opts.headers?.accept?.indexOf('application/json') === 0) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return solutionResponse;
         }
       }
