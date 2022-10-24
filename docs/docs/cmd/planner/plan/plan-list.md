@@ -34,8 +34,6 @@ m365 planner plan list --ownerGroupName "My Planner Group"
 
 ## Response
 
-Here is an example of the response from this command.
-
 === "JSON"
 
     ``` json

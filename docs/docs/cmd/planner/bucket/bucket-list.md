@@ -43,8 +43,6 @@ m365 planner bucket list --planTitle "My Plan" --ownerGroupName "My Group"
 
 ## Response
 
-Here is an example of the response from this command.
-
 === "JSON"
 
     ``` json

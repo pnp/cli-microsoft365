@@ -49,8 +49,6 @@ m365 planner bucket add --name "My Planner Bucket" --planTitle "My Planner Plan"
 
 ## Response
 
-Here is an example of the response from this command.
-
 === "JSON"
 
     ``` json

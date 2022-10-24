@@ -61,8 +61,6 @@ m365 planner bucket get --name "Planner Bucket A" --planTitle "My Plan" --ownerG
 
 ## Response
 
-Here is an example of the response from this command.
-
 === "JSON"
 
     ``` json

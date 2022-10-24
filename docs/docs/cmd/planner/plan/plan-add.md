@@ -55,8 +55,6 @@ m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Gro
 
 ### Standard response
 
-Here is an example of the response from this command.
-
 === "JSON"
 
     ``` json
@@ -101,7 +99,7 @@ Here is an example of the response from this command.
 
 ### `shareWithUserIds`, `shareWithUserNames` response
 
-When we make use of the option `shareWithUserIds` or `shareWithUserNames` the response will differ. Here is an example of the response.
+When we make use of the option `shareWithUserIds` or `shareWithUserNames` the response will differ. 
 
 === "JSON"
 

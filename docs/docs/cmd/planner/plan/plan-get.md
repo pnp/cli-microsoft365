@@ -58,8 +58,6 @@ m365 planner plan get --title "MyPlan" --ownerGroupName "My Planner Group"
 
 ## Response
 
-Here is an example of the response from this command.
-
 === "JSON"
 
     ``` json
