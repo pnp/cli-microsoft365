@@ -820,7 +820,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
     }
   }
 
-  private getStatus(result: CheckStatus, message: string) {
+  private getStatus(result: CheckStatus, message: string): string {
     const primarySupported: boolean = process.platform !== 'win32' ||
       process.env.CI === 'true' ||
       process.env.TERM === 'xterm-256color';

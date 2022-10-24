@@ -804,7 +804,7 @@ export class Cli {
     return filteredArgs;
   }
 
-  private static loadOptionValuesFromFiles(args: { options: minimist.ParsedArgs }) {
+  private static loadOptionValuesFromFiles(args: { options: minimist.ParsedArgs }): void {
     const optionNames: string[] = Object.getOwnPropertyNames(args.options);
     optionNames.forEach(option => {
       const value = args.options[option];

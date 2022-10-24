@@ -1,3 +1,10 @@
+---
+tags:
+  - groups
+  - provisioning
+  - teams
+---
+
 # Create a Microsoft Team with channels from a Microsoft 365 Group
 
 Inspired by: [Patrick Lamber](https://www.nubo.eu/Provision-A-Team-With-CLI-For-Microsoft-365/)
@@ -48,8 +55,3 @@ A sample script which creates a Microsoft 365 Group, associates a logo to it and
         m365 teams channel add --teamId $group.id --name $_ 
     }
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Provisioning

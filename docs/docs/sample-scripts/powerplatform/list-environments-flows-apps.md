@@ -1,3 +1,10 @@
+---
+tags:  
+  - apps
+  - flows
+  - reports
+---
+
 # List all Power Platform Environments and their Flows and Apps
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/power-platform-tenant-reporting-cli-microsoft-365/)
@@ -72,10 +79,3 @@ This script will retrieve all environments as an Administrator and loop through 
 
     Write-Host -f Green "Done"
     ```
-
-Keywords:
-
-- Power Platform
-- Power Automate
-- Power Apps
-- Flow

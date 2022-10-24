@@ -163,7 +163,7 @@ const contributors = [
     company: '',
     github: '',
     twitter: ''
-  },  
+  },
   {
     name: 'Bruce Albany',
     company: 'Telstra Purple',
@@ -405,6 +405,12 @@ const contributors = [
     twitter: 'nickhonen4'
   },
   {
+    name: 'Nico De Cleyre',
+    company: 'Ordina Belgium',
+    github: 'nicodecleyre',
+    twitter: ''
+  },
+  {
     name: 'Otto',
     company: '',
     github: 'berot3',
@@ -597,6 +603,12 @@ const contributors = [
     twitter: 'sudharsank'
   },
   {
+    name: 'Tanmay Rathi',
+    company: 'Intuit',
+    github: ' Tanmay-21',
+    twitter: ''
+  },
+  {
     name: 'Thomas Gölles',
     company: 'Solvion',
     github: 'thomyg',
@@ -690,7 +702,7 @@ function generateGridCard(profile) {
 
   // Configure profile company
   const companyElement = profileCard.getElementsByClassName("cli-grid-item-company")[0];
-  if (profile.company) { 
+  if (profile.company) {
     companyElement.innerHTML = profile.company;
   } else {
     companyElement.remove();
@@ -699,13 +711,13 @@ function generateGridCard(profile) {
   // Configure profile links
   const githubElement = profileCard.querySelector('[title="GitHub"]');
   const twitterElement = profileCard.querySelector('[title="Twitter"]');
-  if (profile.github) { 
+  if (profile.github) {
     githubElement.setAttribute("href", `https://github.com/${profile.github}`);
   } else {
     githubElement.remove();
   }
 
-  if (profile.twitter) { 
+  if (profile.twitter) {
     twitterElement.setAttribute("href", `https://twitter.com/${profile.twitter}`);
   } else {
     twitterElement.remove();

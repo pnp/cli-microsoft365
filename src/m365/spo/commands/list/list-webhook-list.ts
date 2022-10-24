@@ -1,8 +1,10 @@
+import { AxiosRequestConfig } from 'axios';
 import * as chalk from 'chalk';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -16,6 +18,7 @@ interface Options extends GlobalOptions {
   id?: string;
   listTitle?: string;
   listId?: string;
+  listUrl?: string;
   title?: string;
 }
 
@@ -39,15 +42,17 @@ class SpoListWebhookListCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        listId: (!(!args.options.listId)).toString(),
-        listTitle: (!(!args.options.listTitle)).toString(),
-        title: (!(!args.options.title)).toString()
+        id: typeof args.options.id !== 'undefined',
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        title: typeof args.options.title !== 'undefined'
       });
     });
   }
@@ -62,6 +67,9 @@ class SpoListWebhookListCommand extends SpoCommand {
       },
       {
         option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       },
       {
         option: '--id [id]'
@@ -92,23 +100,13 @@ class SpoListWebhookListCommand extends SpoCommand {
           }
         }
 
-        if (args.options.id && args.options.title) {
-          return 'Specify id or title, but not both';
-        }
-
-        if (args.options.listId && args.options.listTitle) {
-          return 'Specify listId or listTitle, but not both';
-        }
-
-        if (!args.options.id && !args.options.title) {
-          if (!args.options.listId && !args.options.listTitle) {
-            return 'Specify listId or listTitle, one is required';
-          }
-        }
-
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'title', 'listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -121,26 +119,28 @@ class SpoListWebhookListCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      const list: string = args.options.id ? formatting.encodeQueryParameter(args.options.id as string) : (args.options.listId ? formatting.encodeQueryParameter(args.options.listId as string) : (args.options.title ? formatting.encodeQueryParameter(args.options.title as string) : formatting.encodeQueryParameter(args.options.listTitle as string)));
-      logger.logToStderr(`Retrieving webhook information for list ${list} in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving webhook information for list ${args.options.id || args.options.listId || args.options.listUrl} in site at ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = '';
-
+    let requestUrl: string = `${args.options.webUrl}/_api/web`;
     if (args.options.id) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.id)}')/Subscriptions`;
+      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.id)}')/Subscriptions`;
     }
     else if (args.options.listId) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/Subscriptions`;
+      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/Subscriptions`;
     }
     else if (args.options.listTitle) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/Subscriptions`;
+      requestUrl += `/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/Subscriptions`;
     }
-    else {
-      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')/Subscriptions`;
+    else if (args.options.title) {
+      requestUrl += `/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title)}')/Subscriptions`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Subscriptions`;
     }
 
-    const requestOptions: any = {
+    const requestOptions: AxiosRequestConfig = {
       url: requestUrl,
       method: 'GET',
       headers: {

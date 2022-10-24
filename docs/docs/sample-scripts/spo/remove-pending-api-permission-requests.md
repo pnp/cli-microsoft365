@@ -1,3 +1,9 @@
+---
+tags:
+  - cleanup
+  - security
+---
+
 # Remove pending SharePoint API permission requests
 
 Author: [Waldek Mastykarz](https://blog.mastykarz.nl/sample-script-quickly-remove-pending-sharepoint-api-permission-requests/)
@@ -33,8 +39,3 @@ Using [CLI for Microsoft 365](https://aka.ms/cli-m365), the script first retriev
 This script uses [CLI for Microsoft 365](https://aka.ms/cli-m365) and [Google zx](https://github.com/google/zx).
 
 To run the script, save it to a file with the `.mjs` extension. Next, run the script either by calling `zx remove-permissionrequests.mjs` or `./remove-permissionrequests.mjs` after making the script executable using `chmod +x ./remove-permissionrequests.mjs;`
-
-Keywords:
-
-- SharePoint Online
-- API Permissions

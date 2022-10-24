@@ -1,3 +1,10 @@
+---
+tags:
+  - files
+  - libraries
+  - migration
+---
+
 # Copy files to another SharePoint Library in another site
 
 Author: [Garry Trinder](https://github.com/garrytrinder), [Adam](https://github.com/Adam-it), Inspired by Veronique Lengelle
@@ -84,8 +91,3 @@ This script shows how you can use the CLI to:
     $copyKeepingSameFolderStructure = $false
     Copy-LibraryToLibrary -tenatUrl $tenatUrl -sourceLibrary $sourceLibrary -sourceSite $sourceSite -targetLibrary $targetLibrary -targetSite $targetSite -copyKeepingSameFolderStructure $copyKeepingSameFolderStructure
     ```
-
-Keywords:
-
-- SharePoint Online
-- Files

@@ -153,7 +153,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       logger.logToStderr(`Expiration date time is not specified. Will try to get appropriate maximum value`);
     }
 
-    const fromNow = (minutes: number) => {
+    const fromNow = (minutes: number): Date => {
       // convert minutes in milliseconds
       return new Date(Date.now() + (minutes * 60000));
     };

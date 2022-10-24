@@ -1,3 +1,8 @@
+---
+tags:
+  - reports
+---
+
 # Monitor and notify Microsoft 365 health status
 
 Author: [Arjun Menon](https://arjunumenon.com/tenant-status-solution-m365cli/)
@@ -96,10 +101,3 @@ If you want to schedule the script directly, you can go ahead without the need o
       Write-Host "No further updates on the existing outages"
     }
     ```
-
-Keywords:
-
-- Governance
-- Microsoft 365 Health Status
-- IT Pro
-- Health Status Monitoring

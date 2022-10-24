@@ -1,3 +1,9 @@
+---
+tags:
+  - users
+  - security
+---
+
 # Add a Site Collection Admin using a csv file
 
 !!! warning
@@ -5,7 +11,7 @@
 
     - Search
     - My Site (contoso-my.sharepoint.com)
-    - Sites created with Private Channels
+    - sites created with Private Channels
 
     Sites created with Private Channels are not (yet?) visible in the SharePoint Online admin center, so adding users as Site Collection Admins into those could cause chaos! It's safer to get a list of all your sites, and keep the intended ones in your csv file to feed the script.
 
@@ -69,8 +75,3 @@ Once you've got the .csv file from the script above, filter it to your needs to 
             }
     }
     ```
-
-Keywords
-
-- SharePoint Online
-- Governance

@@ -1,3 +1,8 @@
+---
+tags:
+  - reports
+---
+
 # Lists active SharePoint site collection application catalogs
 
 Inspired by: [David Ramalho](http://sharepoint-tricks.com/check-all-sharepoint-sites-collection-with-app-catalog-active/)
@@ -27,9 +32,3 @@ Note, because the sample uses the SharePoint search API to identify the site col
     echo $appCatalogs | jq -r '.[].SPSiteURL'
     echo "Total count:" $(echo $appCatalogs | jq length)
     ```
-
-Keywords:
-
-- SharePoint Online
-- Governance
-- Security
