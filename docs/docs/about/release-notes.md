@@ -65,6 +65,7 @@
 - extended 'outlook mail send' command with attachments support [#3832](https://github.com/pnp/cli-microsoft365/issues/3832)
 - added cookie consent to MKDocs [#3832](https://github.com/pnp/cli-microsoft365/issues/3765)
 - extended 'todo task add' with extra options [#3832](https://github.com/pnp/cli-microsoft365/issues/3827)
+- extended spo contenttype with list options 'listUrl' and 'listId' [#3806](https://github.com/pnp/cli-microsoft365/issues/3806)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
