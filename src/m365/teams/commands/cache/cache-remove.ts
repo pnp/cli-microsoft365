@@ -113,15 +113,16 @@ class TeamsCacheRemoveCommand extends GraphCommand {
 
     const platform = process.platform;
     let cmd = '';
+    const echoMessage = 'echo Folder does not exist';
 
     switch (platform) {
       case 'win32':
-        cmd = 'IF EXIST %userprofile%\\appdata\\roaming\\microsoft\\teams echo Folder exists';
+        cmd = `IF NOT EXIST %userprofile%\\appdata\\roaming\\microsoft\\teams ${echoMessage}`;
         break;
       case 'darwin':
-        cmd = `if [ -d  ~/Library/Application\\ Support/Microsoft/Teams ]
+        cmd = `if [ ! -d  ~/Library/Application\\ Support/Microsoft/Teams ]
         then
-        echo Folder exists
+        ${echoMessage}
         fi`;
         break;
     }
@@ -133,14 +134,14 @@ class TeamsCacheRemoveCommand extends GraphCommand {
     try {
       const cmdOutput = await this.exec(cmd);
 
-      if (cmdOutput.stdout !== '' && cmdOutput.stdout.startsWith('Folder exists')) {
+      if (cmdOutput.stdout !== '' && cmdOutput.stdout.startsWith('Folder does not exist')) {
         if (this.verbose) {
           logger.logToStderr(`Teams cache folder exists for ${platform}. Continuing the deletion`);
         }
-        return true;
+        return false;
       }
       else {
-        return false;
+        return true;
       }
     }
     catch (e: any) {
