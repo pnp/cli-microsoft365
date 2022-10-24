@@ -52,11 +52,11 @@ class TeamsCacheRemoveCommand extends GraphCommand {
         if (process.env.CLIMICROSOFT365_ENV === 'docker') {
           return 'Because you\'re running CLI for Microsoft 365 in a Docker container, we can\'t clear the cache on your host. Instead run this command on your host using "npx ..."';
         }
-    
+
         if (process.platform !== 'win32' && process.platform !== 'darwin') {
           return `${process.platform} platform is unsupported for this command`;
         }
-    
+
         return true;
       }
     );
@@ -71,19 +71,19 @@ class TeamsCacheRemoveCommand extends GraphCommand {
         logger.logToStderr('This command will execute the following steps.');
         logger.logToStderr('- Stop the Microsoft Teams client.');
         logger.logToStderr('- Clear the Microsoft Teams cached files.');
-  
+
         const result = await Cli.prompt<{ continue: boolean }>({
           type: 'confirm',
           name: 'continue',
           default: false,
           message: `Are you sure you want to clear your Microsoft Teams cache?`
         });
-        
+
         if (result.continue) {
           await this.clearTeamsCache(logger);
         }
-      }      
-    } 
+      }
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -91,14 +91,51 @@ class TeamsCacheRemoveCommand extends GraphCommand {
 
   private async clearTeamsCache(logger: Logger): Promise<void> {
     try {
-      await this.killRunningProcess(logger);
-      await this.removeCacheFiles(logger);
+      const folderExists = await this.checkIfCacheFolderExists(logger);
+      if (folderExists) {
+        await this.killRunningProcess(logger);
+        await this.removeCacheFiles(logger);
+        logger.logToStderr('Teams cache cleared!');
+      }
+      else {
+        logger.logToStderr('Cache folder does not exist. Nothing to remove.');
+      }
     }
     catch (e: any) {
       throw e.message as string;
     }
+  }
 
-    logger.logToStderr('Teams cache cleared!');
+  private async checkIfCacheFolderExists(logger: Logger): Promise<boolean> {
+    if (this.verbose) {
+      logger.logToStderr('Checking if cache folder exists');
+    }
+
+    const platform = process.platform;
+    let cmd = '';
+
+    switch (platform) {
+      case 'win32':
+        cmd = 'IF EXIST %userprofile%\\appdata\\roaming\\microsoft\\teams echo Folder exists';
+        break;
+      case 'darwin':
+        cmd = `if [ -d  ~/Library/Application\ Support/Microsoft/Teams ] then echo Folder exists fi`;
+        break;
+    }
+
+    try {
+      const cmdOutput = await this.exec(cmd);
+      if (cmdOutput.stdout !== '' && cmdOutput.stdout.startsWith('Folder exists')) {
+        if (this.verbose) {
+          logger.logToStderr(`Teams cache folder exists for ${platform}. Continuing the deletion`);
+        }
+        return true;
+      }
+    }
+    catch (e: any) {
+      throw new Error(e.message);
+    }
+    return false;
   }
 
   private async killRunningProcess(logger: Logger): Promise<void> {
