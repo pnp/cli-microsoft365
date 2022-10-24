@@ -1,9 +1,11 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import config from "../../../../config";
 import GlobalOptions from "../../../../GlobalOptions";
 import request from '../../../../request';
 import { formatting } from "../../../../utils/formatting";
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from "../../../../utils/spo";
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from "../../../../utils/validation";
 import SpoCommand from "../../../base/SpoCommand";
 import commands from "../../commands";
@@ -17,6 +19,7 @@ interface Options extends GlobalOptions {
   id: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   webUrl: string;
 }
 
@@ -43,6 +46,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
         date: typeof args.options.date !== 'undefined'
       });
     });
@@ -59,6 +63,10 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
       {
         option: '-t, --listTitle [listTitle]'
       },
+      {
+        option: '--listUrl [listUrl]'
+      }
+      ,
       {
         option: '-i, --id <id>'
       },
@@ -99,44 +107,47 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let formDigestValue: string = '';
-    let webIdentity: string = '';
-    let listId: string = '';
-
     try {
-      const listRestUrl: string = args.options.listId
-        ? `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`
-        : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
-
-      const contextResponse = await spo.getRequestDigest(args.options.webUrl);
-      formDigestValue = contextResponse.FormDigestValue;
-
-      const webIdentityResp = await spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
-      webIdentity = webIdentityResp.objectIdentity;
+      let listId: string = '';
 
       if (args.options.listId) {
         listId = args.options.listId;
       }
       else {
-        const requestOptions: any = {
-          url: `${listRestUrl}?$select=Id`,
+        let requestUrl = `${args.options.webUrl}/_api/web`;
+
+        if (args.options.listTitle) {
+          requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+        }
+        else if (args.options.listUrl) {
+          const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+          requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+        }
+
+        const requestOptions: AxiosRequestConfig = {
+          url: `${requestUrl}?$select=Id`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
-  
+
         const list = await request.get<{ Id: string; }>(requestOptions);
         listId = list.Id;
       }
 
+      const contextResponse = await spo.getRequestDigest(args.options.webUrl);
+      const formDigestValue = contextResponse.FormDigestValue;
+
+      const webIdentityResp = await spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
+      const webIdentity = webIdentityResp.objectIdentity;
       const requestBody: string = this.getDeclareRecordRequestBody(webIdentity, listId, args.options.id, args.options.date || '');
 
-      const requestOptions: any = {
+      const requestOptions: AxiosRequestConfig = {
         url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'Content-Type': 'text/xml',
