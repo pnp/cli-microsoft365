@@ -1,3 +1,8 @@
+---
+tags:
+  - compliance
+---
+
 # Detecting PII exists in SharePoint List using AWS Comprehend
 
 Author: [Joseph Velliah](https://blog.josephvelliah.com/detecting-pii-exist-in-sharepoint-list-using-aws-comprehend)
@@ -93,12 +98,3 @@ Output:
 
 [![pii-audit-report-data](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-data.png)](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-data.png)
 
-Keywords:
-
-- PowerShell
-- CLI for Microsoft 365
-- AWS CLI
-- SharePoint Online
-- AWS Comprehend
-- PII
-- Audit

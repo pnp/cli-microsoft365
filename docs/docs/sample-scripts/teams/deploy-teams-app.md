@@ -1,3 +1,10 @@
+---
+tags:
+  - apps
+  - pipelines
+  - provisioning
+---
+
 # Deploy Microsoft Teams app from Azure DevOps
 
 Author: [Garry Trinder](https://github.com/garrytrinder)
@@ -36,9 +43,3 @@ Installs or updates a Microsoft Teams app from an Azure DevOps pipeline. Deploys
       m365 teams app update -i $appId -p "$(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip"
     fi
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Azure DevOps
-- Continuous Deployment

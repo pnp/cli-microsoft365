@@ -29,9 +29,3 @@ Another route would be to use shell-specific webrequest tooling. To do this, obt
     me=`curl https://graph.microsoft.com/v1.0/me -H "Authorization: Bearer $token"`
     echo $me | jq
     ```
-
-Keywords:
-
-- Microsoft Graph
-- Access Token
-- HTTP

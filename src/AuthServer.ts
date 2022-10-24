@@ -39,7 +39,7 @@ export class AuthServer {
     this.httpServer = http.createServer(this.httpRequest).listen(0, this.httpListener);
   };
 
-  private httpListener = () => {
+  private httpListener = (): void => {
     const requestState = Math.random().toString(16).substr(2, 20);
     const address = this.httpServer.address() as AddressInfo;
     this.generatedServerUrl = `http://localhost:${address.port}`;
@@ -52,7 +52,7 @@ export class AuthServer {
     this.openUrl(url);
   };
 
-  private openUrl(url: string) {
+  private openUrl(url: string): void {
     this
       .open(url)
       .then(_ => {
@@ -69,7 +69,7 @@ export class AuthServer {
       });
   }
 
-  private httpRequest = (request: IncomingMessage, response: ServerResponse) => {
+  private httpRequest = (request: IncomingMessage, response: ServerResponse): void => {
     if (this.debug) {
       this.logger.logToStderr('Response:');
       this.logger.logToStderr(request.url);

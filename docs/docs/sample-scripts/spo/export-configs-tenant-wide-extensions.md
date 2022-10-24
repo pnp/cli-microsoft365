@@ -1,3 +1,9 @@
+---
+tags:
+  - customizations
+  - reports
+---
+
 # Export Configurations of Tenant Wide Extensions
 
 Author: [Joseph Velliah](https://sprider.blog/export-configs-tenant-wide-extensions)
@@ -62,9 +68,3 @@ The SharePoint Admin Center provides various governance features, but there is n
         Write-Host "Unable to get App Catalog Url."
     }
     ```
-
-Keywords:
-
-- SharePoint Online
-- SharePoint Framework Extensions
-- Governance

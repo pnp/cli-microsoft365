@@ -1,3 +1,9 @@
+---
+tags:
+  - lists
+  - provisioning
+---
+
 # Ensure the Site Assets Library is created
 
 Author: [Phillip Allan-Harding](https://github.com/phillipharding/)

@@ -149,7 +149,7 @@ class SpoPageCopyCommand extends SpoCommand {
     }
   }
 
-  private removeTrailingSlash(value: string) {
+  private removeTrailingSlash(value: string): string {
     if (value.endsWith('/')) {
       value = value.substring(0, value.length - 1);
     }
