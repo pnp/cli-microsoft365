@@ -36,10 +36,27 @@ m365 planner plan details get [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Response
+## Examples
 
-!!! note
-    The response object shown belown might be shortened for readability.
+Returns the Microsoft Planner plan with id _gndWOTSK60GfPQfiDDj43JgACDCb_
+
+```sh
+m365 planner plan get --id "gndWOTSK60GfPQfiDDj43JgACDCb"
+```
+
+Returns the Microsoft Planner plan with title _MyPlan_ for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_
+
+```sh
+m365 planner plan get --title "MyPlan" --ownerGroupId "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4"
+```
+
+Returns the Microsoft Planner plan with title _MyPlan_ for Group _My Planner Group_
+
+```sh
+m365 planner plan get --title "MyPlan" --ownerGroupName "My Planner Group"
+```
+
+## Response
 
 Here is an example of the response from this command.
 
@@ -72,6 +89,29 @@ Here is an example of the response from this command.
       },
       "categoryDescriptions": {
         "category1": null,
+        "category2": null,
+        "category3": null,
+        "category4": null,
+        "category5": null,
+        "category6": null,
+        "category7": null,
+        "category8": null,
+        "category9": null,
+        "category10": null,
+        "category11": null,
+        "category12": null,
+        "category13": null,
+        "category14": null,
+        "category15": null,
+        "category16": null,
+        "category17": null,
+        "category18": null,
+        "category19": null,
+        "category20": null,
+        "category21": null,
+        "category22": null,
+        "category23": null,
+        "category24": null,
         "category25": null
       }
     }
@@ -92,23 +132,3 @@ Here is an example of the response from this command.
     id,title,createdDateTime,owner
     xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
     ```
-
-## Examples
-
-Returns the Microsoft Planner plan with id _gndWOTSK60GfPQfiDDj43JgACDCb_
-
-```sh
-m365 planner plan get --id "gndWOTSK60GfPQfiDDj43JgACDCb"
-```
-
-Returns the Microsoft Planner plan with title _MyPlan_ for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_
-
-```sh
-m365 planner plan get --title "MyPlan" --ownerGroupId "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4"
-```
-
-Returns the Microsoft Planner plan with title _MyPlan_ for Group _My Planner Group_
-
-```sh
-m365 planner plan get --title "MyPlan" --ownerGroupName "My Planner Group"
-```

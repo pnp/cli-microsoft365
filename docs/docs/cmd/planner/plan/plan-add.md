@@ -31,10 +31,27 @@ m365 planner plan add [options]
 
 Related to the options `--shareWithUserIds` and `--shareWithUserNames`. If you are leveraging Microsoft 365 groups, use the `aad o365group user` commands to manage group membership to share the [group's](https://pnp.github.io/cli-microsoft365/cmd/aad/o365group/o365group-user-add/) plan. You can also add existing members of the group to this collection though it is not required for them to access the plan owned by the group.
 
-## Response
+## Examples
 
-!!! note
-    The response object shown belown might be shortened for readability.
+Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_
+
+```sh
+m365 planner plan add --title 'My Planner Plan' --ownerGroupId '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
+```
+
+Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _My Planner Group_
+
+```sh
+m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Group'
+```
+
+Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _My Planner Group_ and share it with the users _Allan.Carroll@contoso.com_ and _Ida.Stevens@contoso.com_
+
+```sh
+m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Group' --shareWithUserNames 'Allan.Carroll@contoso.com,Ida.Stevens@contoso.com'
+```
+
+## Response
 
 ### Standard response
 
@@ -115,6 +132,29 @@ When we make use of the option `shareWithUserIds` or `shareWithUserNames` the re
       },
       "categoryDescriptions": {
         "category1": null,
+        "category2": null,
+        "category3": null,
+        "category4": null,
+        "category5": null,
+        "category6": null,
+        "category7": null,
+        "category8": null,
+        "category9": null,
+        "category10": null,
+        "category11": null,
+        "category12": null,
+        "category13": null,
+        "category14": null,
+        "category15": null,
+        "category16": null,
+        "category17": null,
+        "category18": null,
+        "category19": null,
+        "category20": null,
+        "category21": null,
+        "category22": null,
+        "category23": null,
+        "category24": null,
         "category25": null
       }
     }
@@ -135,23 +175,3 @@ When we make use of the option `shareWithUserIds` or `shareWithUserNames` the re
     id,title,createdDateTime,owner
     xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
     ```
-
-## Examples
-
-Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_
-
-```sh
-m365 planner plan add --title 'My Planner Plan' --ownerGroupId '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
-```
-
-Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _My Planner Group_
-
-```sh
-m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Group'
-```
-
-Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _My Planner Group_ and share it with the users _Allan.Carroll@contoso.com_ and _Ida.Stevens@contoso.com_
-
-```sh
-m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Group' --shareWithUserNames 'Allan.Carroll@contoso.com,Ida.Stevens@contoso.com'
-```

@@ -27,10 +27,21 @@ m365 planner bucket list [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Response
+## Examples
 
-!!! note
-    The response object shown belown might be shortened for readability.
+Lists the Microsoft Planner buckets in the Plan _xqQg5FS2LkCp935s-FIFm2QAFkHM_
+
+```sh
+m365 planner bucket list --planId "xqQg5FS2LkCp935s-FIFm2QAFkHM"
+```
+
+Lists the Microsoft Planner buckets in the Plan _My Plan_ owned by group _My Group_
+
+```sh
+m365 planner bucket list --planTitle "My Plan" --ownerGroupName "My Group"
+```
+
+## Response
 
 Here is an example of the response from this command.
 
@@ -61,17 +72,3 @@ Here is an example of the response from this command.
     id,name,planId,orderHint
     ttEB_Uj690STdR3GC1MIDZgANq1U,My Planner Bucket,xqQg5FS2LkCp935s-FIFm2QAFkHM,8585363889524958496
     ```
-
-## Examples
-
-Lists the Microsoft Planner buckets in the Plan _xqQg5FS2LkCp935s-FIFm2QAFkHM_
-
-```sh
-m365 planner bucket list --planId "xqQg5FS2LkCp935s-FIFm2QAFkHM"
-```
-
-Lists the Microsoft Planner buckets in the Plan _My Plan_ owned by group _My Group_
-
-```sh
-m365 planner bucket list --planTitle "My Plan" --ownerGroupName "My Group"
-```

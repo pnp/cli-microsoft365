@@ -33,10 +33,21 @@ m365 planner bucket add [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Response
+## Examples
 
-!!! note
-    The response object shown belown might be shortened for readability.
+Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the ID _xqQg5FS2LkCp935s-FIFm2QAFkHM_ with order hint
+
+```sh
+m365 planner bucket add --name "My Planner Bucket" --planId "xqQg5FS2LkCp935s-FIFm2QAFkHM" --orderHint " !"
+```
+
+Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the title _My Planner Plan_ owned by group _My Planner Group_
+
+```sh
+m365 planner bucket add --name "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
+```
+
+## Response
 
 Here is an example of the response from this command.
 
@@ -66,17 +77,3 @@ Here is an example of the response from this command.
     id,name,planId,orderHint
     ttEB_Uj690STdR3GC1MIDZgANq1U,My Planner Bucket,xqQg5FS2LkCp935s-FIFm2QAFkHM,8585363889524958496
     ```
-
-## Examples
-
-Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the ID _xqQg5FS2LkCp935s-FIFm2QAFkHM_ with order hint
-
-```sh
-m365 planner bucket add --name "My Planner Bucket" --planId "xqQg5FS2LkCp935s-FIFm2QAFkHM" --orderHint " !"
-```
-
-Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the title _My Planner Plan_ owned by group _My Planner Group_
-
-```sh
-m365 planner bucket add --name "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
-```

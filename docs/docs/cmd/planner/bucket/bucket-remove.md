@@ -36,10 +36,6 @@ m365 planner bucket remove [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Response
-
-The command won't return a response on success.
-
 ## Examples
 
 Removes the Microsoft Planner bucket by ID
@@ -65,3 +61,7 @@ Removes the Microsoft Planner bucket with name _My Bucket_ in the Plan _My Plan_
 ```sh
 m365 planner bucket remove --name "My Bucket" --planTitle "My Plan" --ownerGroupName "My Group"
 ```
+
+## Response
+
+The command won't return a response on success.

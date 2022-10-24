@@ -18,10 +18,21 @@ m365 planner plan list [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Response
+## Examples
 
-!!! note
-    The response object shown belown might be shortened for readability.
+Returns a list of Microsoft Planner plans for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_
+
+```sh
+m365 planner plan list --ownerGroupId "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4"
+```
+
+Returns a list of Microsoft Planner plans for Group _My Planner Group_
+
+```sh
+m365 planner plan list --ownerGroupName "My Planner Group"
+```
+
+## Response
 
 Here is an example of the response from this command.
 
@@ -67,17 +78,3 @@ Here is an example of the response from this command.
     id,title,createdDateTime,owner
     xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
     ```
-
-## Examples
-
-Returns a list of Microsoft Planner plans for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_
-
-```sh
-m365 planner plan list --ownerGroupId "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4"
-```
-
-Returns a list of Microsoft Planner plans for Group _My Planner Group_
-
-```sh
-m365 planner plan list --ownerGroupName "My Planner Group"
-```

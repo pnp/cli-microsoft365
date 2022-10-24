@@ -27,10 +27,6 @@ m365 planner plan remove [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Response
-
-The command won't return a response on success.
-
 ## Examples
 
 Removes the Microsoft Planner plan by ID
@@ -50,3 +46,7 @@ Removes the Microsoft Planner plan with title _My Plan_ in group with name _My P
 ```sh
 m365 planner plan remove --title "My Plan" --ownerGroupName "My Planner Group" --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

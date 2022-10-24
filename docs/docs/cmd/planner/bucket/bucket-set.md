@@ -39,10 +39,6 @@ m365 planner bucket set [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Response
-
-The command won't return a response on success.
-
 ## Examples
 
 Updates the Microsoft Planner bucket with ID _vncYUXCRBke28qMLB-d4xJcACtNz_
@@ -62,3 +58,7 @@ Updates the Microsoft Planner bucket named _My Bucket_ in the Plan _My Plan_ own
 ```sh
 m365 planner bucket set --name "My Bucket" --planTitle "My Plan" --ownerGroupId 00000000-0000-0000-0000-000000000000 --newName "New bucket name"
 ```
+
+## Response
+
+The command won't return a response on success.
