@@ -2,24 +2,24 @@ site_name: CLI for Microsoft 365
 site_url: https://pnp.github.io/cli-microsoft365/
 nav:
   - Home:
-      - "index.md"
-      - v5 Upgrade Guidance: "v5-upgrade-guidance.md"
-      - v4 Upgrade Guidance: "v4-upgrade-guidance.md"
-      - v3 Upgrade Guidance: "v3-upgrade-guidance.md"
+    - 'index.md'
+    - v5 Upgrade Guidance: 'v5-upgrade-guidance.md'
+    - v4 Upgrade Guidance: 'v4-upgrade-guidance.md'
+    - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
   - User Guide:
-      - "Install the CLI": "user-guide/installing-cli.md"
-      - "Use the CLI in command line": "user-guide/using-cli.md"
-      - "Run CLI in a Docker Container": "user-guide/run-cli-in-docker-container.md"
-      - "Log in to Microsoft 365": "user-guide/connecting-office-365.md"
-      - "CLI output mode": "user-guide/cli-output-mode.md"
-      - "Filter CLI data": "user-guide/filter-cli-data.md"
-      - "Configure CLI": "user-guide/configuring-cli.md"
-      - "Command completion": "user-guide/completion.md"
-      - "Use your own Azure AD identity": "user-guide/using-own-identity.md"
-      - "Caveats when working with the CLI and certificate login": "user-guide/cli-certificate-caveats.md"
-      - "GitHub Actions": "user-guide/github-actions.md"
-      - "Manage Microsoft 365 apps with the CLI": "user-guide/manage-microsoft-365-apps.md"
-      - "Use CLI programmatically": "user-guide/use-cli-api.md"
+    - 'Install the CLI': 'user-guide/installing-cli.md'
+    - 'Use the CLI in command line': 'user-guide/using-cli.md'
+    - 'Run CLI in a Docker Container': 'user-guide/run-cli-in-docker-container.md'
+    - 'Log in to Microsoft 365': 'user-guide/connecting-office-365.md'
+    - 'CLI output mode': 'user-guide/cli-output-mode.md'
+    - 'Filter CLI data': 'user-guide/filter-cli-data.md'
+    - 'Configure CLI': 'user-guide/configuring-cli.md'
+    - 'Command completion': 'user-guide/completion.md'
+    - 'Use your own Azure AD identity': 'user-guide/using-own-identity.md'
+    - 'Caveats when working with the CLI and certificate login': 'user-guide/cli-certificate-caveats.md'
+    - 'GitHub Actions': 'user-guide/github-actions.md'
+    - 'Manage Microsoft 365 apps with the CLI': 'user-guide/manage-microsoft-365-apps.md'
+    - 'Use CLI programmatically': 'user-guide/use-cli-api.md'
   - Commands:
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
@@ -265,6 +265,7 @@ nav:
         - environment get: 'cmd/pp/environment/environment-get.md'
         - environment list: 'cmd/pp/environment/environment-list.md'
       - gateway:
+        - gateway get: 'cmd/pp/gateway/gateway-get.md'
         - gateway list: 'cmd/pp/gateway/gateway-list.md'
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
@@ -728,9 +729,9 @@ nav:
       - accesstoken:
         - accesstoken get: 'cmd/util/accesstoken/accesstoken-get.md'
   - Concepts:
-      - "Persisting connection": "concepts/persisting-connection.md"
-      - "Authorization and access tokens": "concepts/authorization-tokens.md"
-      - "Communication with Microsoft 365": "concepts/communicating-m365.md"
+    - 'Persisting connection': 'concepts/persisting-connection.md'
+    - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
+    - 'Communication with Microsoft 365': 'concepts/communicating-m365.md'
   - Sample Scripts:
     - 'Introduction': 'sample-scripts/index.md'
     - Azure Active Directory:
@@ -828,64 +829,76 @@ nav:
     - Microsoft 365 tenant:
       - sample-scripts/tenant/tenant-monitor-notify-healthstatus.md
   - About:
-      - "Why this CLI": "about/why-cli.md"
-      - "Comparison to SharePoint and Microsoft 365 PowerShell": "about/comparison-powershell.md"
-      - "Release notes": "about/release-notes.md"
-      - "Team": "about/team.md"
-      - License: "about/license.md"
+    - 'Why this CLI': 'about/why-cli.md'
+    - 'Comparison to SharePoint and Microsoft 365 PowerShell': 'about/comparison-powershell.md'
+    - 'Release notes': 'about/release-notes.md'
+    - 'Team': 'about/team.md'
+    - License: 'about/license.md'
 theme:
-  name: "material"
-  custom_dir: overrides
-  palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: "red"
-      accent: "indigo"
-      toggle:
-        icon: material/weather-sunny
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: "red"
-      toggle:
-        icon: material/weather-night
-        name: Switch to light mode
-  logo: "images/pnp-cli-microsoft365-white.svg"
-  features:
-    - navigation.tabs
-    - announce.dismiss
+    name: 'material'
+    custom_dir: overrides
+    palette:
+        - media: "(prefers-color-scheme: light)"
+          scheme: default
+          primary: 'red'
+          accent: 'indigo'
+          toggle:
+            icon: material/weather-sunny
+            name: Switch to dark mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: slate
+          primary: 'red'
+          toggle:
+            icon: material/weather-night
+            name: Switch to light mode
+    logo: 'images/pnp-cli-microsoft365-white.svg'
+    features:
+        - navigation.tabs
+        - announce.dismiss
 extra_css:
-  - "css/styles2.css"
+    - 'css/styles2.css'
 markdown_extensions:
-  - admonition
-  - meta
-  - toc:
-      permalink: true
-  - pymdownx.highlight
-  - pymdownx.snippets
-  - pymdownx.superfences
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.tabbed
-  - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
-  - def_list
+    - admonition
+    - meta
+    - toc:
+          permalink: true
+    - pymdownx.highlight
+    - pymdownx.snippets
+    - pymdownx.superfences
+    - pymdownx.tabbed:
+        alternate_style: true
+    - pymdownx.tabbed
+    - pymdownx.emoji:
+          emoji_index: !!python/name:materialx.emoji.twemoji
+          emoji_generator: !!python/name:materialx.emoji.to_svg
+    - def_list
 extra:
   analytics:
     provider: google
     property: UA-110480857-1
+  consent:
+    actions:
+      - manage
+      - accept
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
   social:
     - icon: fontawesome/brands/github
-      link: "https://github.com/pnp/cli-microsoft365"
+      link: 'https://github.com/pnp/cli-microsoft365'
     - icon: fontawesome/brands/discord
-      link: "https://discord.com/invite/7rfW4kg6B5"
+      link: 'https://discord.com/invite/7rfW4kg6B5'
     - icon: fontawesome/brands/twitter
-      link: "https://twitter.com/climicrosoft365"
+      link: 'https://twitter.com/climicrosoft365'
     - icon: fontawesome/brands/youtube
-      link: "http://aka.ms/sppnp-videos"
+      link: 'http://aka.ms/sppnp-videos'
     - icon: fontawesome/solid/link
-      link: "https://aka.ms/sppnp"
+      link: 'https://aka.ms/sppnp'
+copyright: >
+  <a href="#__consent">Modify cookie settings</a>
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs
 plugins:
