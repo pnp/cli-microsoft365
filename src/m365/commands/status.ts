@@ -31,12 +31,17 @@ class StatusCommand extends Command {
         logger.logToStderr({
           connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
           authType: AuthType[auth.service.authType],
+          appId: auth.service.appId,
+          appTenant: auth.service.tenant,
           accessTokens: JSON.stringify(auth.service.accessTokens, null, 2)
         });
       }
       else {
         logger.log({
-          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)
+          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
+          authType: AuthType[auth.service.authType],
+          appId: auth.service.appId,
+          appTenant: auth.service.tenant
         });
       }
     }
