@@ -1,3 +1,10 @@
+---
+tags:
+  - files  
+  - libraries  
+  - reports
+---
+
 # Lists number of files in all lists and folders for the given site
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/lists-file-count-cli-microsoft-365/)
@@ -45,8 +52,3 @@ List all Lists, the folders and sub folders in a given site, and output the item
 
     $results | Export-Csv -Path $fileExportPath -NoTypeInformation
     ```
-
-Keywords:
-
-- SharePoint Online
-- Governance

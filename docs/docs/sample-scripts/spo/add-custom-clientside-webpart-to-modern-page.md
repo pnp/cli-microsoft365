@@ -1,3 +1,10 @@
+---
+tags:
+  - provisioning
+  - migration
+  - pages
+---
+
 # Add custom client-side web part to modern page
 
 Author: [Yannick Plenevaux](https://ypcode.wordpress.com)
@@ -47,10 +54,3 @@ You've built an amazing new web part and now you want to programmatically add it
     m365 spo page clientsidewebpart add -u $site -n $pageName --webPartId $webPartId --webPartProperties $webPartPropsJson
     ```
 
-Keywords:
-
-- SharePoint Online
-- Client-side WebPart
-- Modern page
-- WebPart Properties
-- JSON

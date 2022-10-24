@@ -1,3 +1,9 @@
+---
+tags:
+  - apps
+  - cleanup
+---
+
 # Removes Microsoft Teams personal app from users and Microsoft Teams app catalog
 
 Author: [Sébastien Levert](https://github.com/sebastienlevert)
@@ -80,7 +86,3 @@ Uninstalls an app from the specified users and / or unpublish it from the Micros
       Write-Warning "The App with ID '$AppId' does not exist."
     }
     ```
-
-Keywords:
-
-- Microsoft Teams

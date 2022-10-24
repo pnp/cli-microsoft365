@@ -1,3 +1,8 @@
+---
+tags:
+  - cleanup
+---
+
 # Delete custom SharePoint site designs
 
 Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powershell-scripts-for-keeping-your-development-environment-tidy-and-spotless/#delete-all-sharepoint-site-designs-and-site-scripts)
@@ -60,8 +65,3 @@ Site designs and especially site scripts can be something that ends up just hang
       m365 spo sitedesign remove --id "${designinfo[1]}" --confirm
     done
     ```
-
-Keywords:
-
-- SharePoint Online
-- Site Designs

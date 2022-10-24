@@ -1,3 +1,10 @@
+---
+tags:
+  - groups
+  - users
+  - security
+---
+
 # Change group membership of all SharePoint Online sites
 
 Author: [Arjun Menon](https://twitter.com/arjunumenon), Inspired by [Patrick Lamber](https://www.nubo.eu/Change-The-Group-Memberships-Of-All-SharePoint-Online-Sites/)
@@ -41,7 +48,3 @@ This is a script which takes a subset or all members of the default owner group 
     }
     ```
 
-Keywords
-
-- SharePoint Online
-- Governance

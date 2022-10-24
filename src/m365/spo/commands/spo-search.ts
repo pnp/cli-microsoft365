@@ -319,7 +319,7 @@ class SpoSearchCommand extends SpoCommand {
     return properties ? `&properties='${properties}'` : ``;
   }
 
-  private getSelectPropertiesArray(args: CommandArgs) {
+  private getSelectPropertiesArray(args: CommandArgs): string[] {
     return args.options.selectProperties
       ? args.options.selectProperties.split(",")
       : ["Title", "OriginalPath"];

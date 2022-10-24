@@ -1,3 +1,11 @@
+---
+tags:
+  - groups
+  - security
+  - teams
+  - users
+---
+
 # Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups
 
 Author: [Joseph Velliah](https://sprider.blog/add-remove-bulk-users-to-from-microsoft-teams-microsoft-365-group-office-365-cli-commands)
@@ -55,9 +63,3 @@ Note: Refactor the code as per your requirement.
     groupMailNickname2, user2@domainname.com, member, add
     groupMailNickname3, user3@domainname.com, , remove
     ```
-
-Keywords:
-
-- Microsoft 365 Groups
-- Microsoft Teams
-- Governance

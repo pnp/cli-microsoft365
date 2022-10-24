@@ -1,3 +1,9 @@
+---
+tags:
+  - migration  
+  - tasks
+---
+
 # Add multiple tasks in Planner
 
 Author: [Veronique Lengelle](https://veronicageek.com/2019/get-files-with-specific-names/)
@@ -54,7 +60,3 @@ This script will create multiple tasks to a Planner plan from the information pr
       m365 planner task add --title "$($task.TaskName)" --description "$($task.Description)" --planId "$($task.PlanID)" --bucketName "$($task.BucketName)" --startDateTime "$($task.StartDateTime)" --dueDateTime "$($task.DueDateTime)" --assignedToUserNames "$($task.AssignedToUserNames)"
     }
     ```
-
-Keywords
-
--   Planner

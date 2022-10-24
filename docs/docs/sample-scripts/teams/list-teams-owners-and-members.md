@@ -1,3 +1,8 @@
+---
+tags:
+  - teams
+---
+
 # List all Microsoft Teams team's Owners and Members
 
 Author: [Patrick Lamber](https://www.nubo.eu/List-All-Microsoft-Teams-Owners-And-Members/)
@@ -42,8 +47,3 @@ This script allows you to list all Teams team's owners and members and export th
     $exportData | Export-Csv -Path $fileExportPath -NoTypeInformation
     Write-Host "Completed."
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Governance

@@ -1,3 +1,9 @@
+---
+tags:
+  - files
+  - reports
+---
+
 # List all documents with a specific name within a SharePoint site
 
 Author: [Veronique Lengelle](https://veronicageek.com/2019/get-files-with-specific-names/)
@@ -51,8 +57,3 @@ This script will retrieve all the files in a site that have a specific word (i.e
     }
     $results
     ```
-
-Keywords
-
--   SharePoint Online
--   Governance

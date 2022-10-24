@@ -1,3 +1,9 @@
+---
+tags:
+  - cleanup
+  - teams
+---
+
 # Remove Wiki tab in a Microsoft Teams channel
 
 Inspired by: [Garry Trinder](https://gist.github.com/garrytrinder/4df2aeaf9dd66c4375308874eb7def63) and [Laura Kokkarinen](https://laurakokkarinen.com/deleting-the-treacherous-wiki-tab-as-a-part-of-your-teams-provisioning-process/)
@@ -62,7 +68,3 @@ Removes the wiki tab of a Microsoft Teams Team's channel.
       fi
     fi
     ```
-
-Keywords:
-
-- Microsoft Teams

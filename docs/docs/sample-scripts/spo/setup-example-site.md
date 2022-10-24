@@ -1,3 +1,11 @@
+---
+tags:
+  - libraries
+  - lists
+  - provisioning
+  - sites
+---
+
 # Setup example site
 
 Author: [Adam](https://github.com/Adam-it)
@@ -145,13 +153,3 @@ This script is a good starting point for a setup script to create site with some
     $nodeAddedResponse = m365 spo navigation node add --webUrl $siteUrl --location QuickLaunch --title 'Sample Document Library' --url "/$siteRelativeUrl/$libName/Forms/AllItems.aspx"
     $nodeAddedResponse = m365 spo navigation node add --webUrl $siteUrl --location QuickLaunch --title 'Hidden Sample List' --url "/$siteRelativeUrl/Lists/$listName/AllItems.aspx"
     ```
-
-Keywords:
-
-- SharePoint Online
-- Create Site
-- Create Field
-- Create Content type
-- Create List
-- Modify View
-- Modify Navigation

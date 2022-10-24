@@ -1,3 +1,9 @@
+---
+tags:
+  - cleanup
+  - tasks
+---
+
 # Cleanup completed Microsoft To Do tasks
 
 Author: [Garry Trinder](https://garrytrinder.github.io/2021/04/cleanup-completed-microsoft-to-do-tasks-using-cli-for-microsoft365)
@@ -54,7 +60,3 @@ This script iterates across all of the task lists and removes the tasks that hav
 
     echo "Done"
     ```
-
-Keywords:
-
-- Microsoft To Do

@@ -6,6 +6,7 @@
 coverage
 docs/**
 !docs/docs/cmd/**
+!docs/docs/_clisettings.md
 node_modules
 scripts/*
 !scripts/Register-CLIM365Completion.ps1

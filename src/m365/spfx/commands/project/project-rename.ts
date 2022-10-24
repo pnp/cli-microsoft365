@@ -91,7 +91,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     return v4();
   };
 
-  private replacePackageJsonContent = (filePath: string, args: CommandArgs, logger: Logger) => {
+  private replacePackageJsonContent = (filePath: string, args: CommandArgs, logger: Logger): void => {
     if (!fs.existsSync(filePath)) {
       return;
     }
@@ -115,7 +115,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     }
   };
 
-  private replaceYoRcJsonContent = (filePath: string, newId: string, args: CommandArgs, logger: Logger) => {
+  private replaceYoRcJsonContent = (filePath: string, newId: string, args: CommandArgs, logger: Logger): void => {
     if (!fs.existsSync(filePath)) {
       return;
     }
@@ -151,7 +151,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     }
   };
 
-  private replacePackageSolutionJsonContent = (filePath: string, projectName: string, newId: string, args: CommandArgs, logger: Logger) => {
+  private replacePackageSolutionJsonContent = (filePath: string, projectName: string, newId: string, args: CommandArgs, logger: Logger): void => {
     if (!fs.existsSync(filePath)) {
       return;
     }
@@ -187,7 +187,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     }
   };
 
-  private replaceDeployAzureStorageJsonContent = (filePath: string, args: CommandArgs, logger: Logger) => {
+  private replaceDeployAzureStorageJsonContent = (filePath: string, args: CommandArgs, logger: Logger): void => {
     if (!fs.existsSync(filePath)) {
       return;
     }
@@ -211,7 +211,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     }
   };
 
-  private replaceReadMeContent = (filePath: string, projectName: string, args: CommandArgs, logger: Logger) => {
+  private replaceReadMeContent = (filePath: string, projectName: string, args: CommandArgs, logger: Logger): void => {
     if (!fs.existsSync(filePath)) {
       return;
     }

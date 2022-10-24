@@ -1,3 +1,9 @@
+---
+tags:
+  - migration
+  - teams
+---
+
 # Export all channels in Microsoft Teams teams in the tenant
 
 Author: [Sudharsan Kesavanarayanan](https://twitter.com/sudharsank)
@@ -52,8 +58,3 @@ Export all the channels from Microsoft Team in a CSV.
     Get-Channels -teamName "<Team Name>"
     Get-Channels -teamID "<Team ID>"
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Governance
