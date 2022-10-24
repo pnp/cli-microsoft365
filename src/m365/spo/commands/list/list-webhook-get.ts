@@ -43,8 +43,7 @@ class SpoListWebhookGetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        id: typeof args.options.id !== 'undefined'
+        listUrl: typeof args.options.listUrl !== 'undefined'
       });
     });
   }
@@ -64,7 +63,7 @@ class SpoListWebhookGetCommand extends SpoCommand {
         option: '--listUrl [listUrl]'
       },
       {
-        option: '-i, --id [id]'
+        option: '-i, --id <id>'
       }
     );
   }

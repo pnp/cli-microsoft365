@@ -22,16 +22,16 @@ m365 spo list webhook set [options]
 `--listUrl [listUrl]`
 : Server- or site-relative URL of the list. Specify either `listId`, `listTitle` or `listUrl`.
 
-`-i, --id [id]`
+`-i, --id <id>`
 : ID of the webhook to update.
 
 `-n, --notificationUrl [notificationUrl]`
 : The new notification url.
 
 `-e, --expirationDateTime [expirationDateTime]`
-: The new expiration date.
+: The new expiration date. _Note: Expiration Time cannot be more than 6 months in future_
 
---8<-- "docs/cmd/_global.md"
+--8<-- "docs/cmd/\_global.md"
 
 ## Remarks
 
