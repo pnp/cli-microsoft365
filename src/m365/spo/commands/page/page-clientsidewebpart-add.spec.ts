@@ -2863,25 +2863,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if either webPartId or standardWebPart parameters are not specified', async () => {
-    const actual = await command.validate({
-      options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if webPartId and standardWebPart parameters are both specified', async () => {
-    const actual = await command.validate({
-      options: {
-        pageName: 'page.aspx',
-        webUrl: 'https://contoso.sharepoint.com',
-        webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
-        standardWebPart: 'BingMap'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if webPartId value is not valid GUID', async () => {
     const actual = await command.validate({
       options: {
@@ -3043,5 +3024,12 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
+  });
+
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [
+      ['standardWebPart', 'webPartId']
+    ]);
   });
 });

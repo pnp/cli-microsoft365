@@ -17,7 +17,6 @@ import { formatting } from '../../../../utils/formatting';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
-
 interface CommandArgs {
   options: Options;
 }
@@ -114,31 +113,17 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
           return `Specified roleDefinitionId ${args.options.roleDefinitionId} is not a number`;
         }
 
-        const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
-        if (!principalOptions.some(item => item !== undefined)) {
-          return `Specify either principalId, upn or groupName`;
-        }
-
-        if (principalOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either principalId, upn or groupName but not multiple`;
-        }
-
-        const roleDefinitionOptions: any[] = [args.options.roleDefinitionId, args.options.roleDefinitionName];
-        if (!roleDefinitionOptions.some(item => item !== undefined)) {
-          return `Specify either roleDefinitionId or roleDefinitionName`;
-        }
-
-        if (roleDefinitionOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either roleDefinitionId or roleDefinitionName but not multiple`;
-        }
-
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['fileId', 'fileUrl']);
+    this.optionSets.push(
+      ['fileId', 'fileUrl'],
+      ['principalId', 'upn', 'groupName'],
+      ['roleDefinitionId', 'roleDefinitionName']
+    );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

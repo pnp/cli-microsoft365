@@ -68,10 +68,10 @@ describe(commands.APP_ADD, () => {
   };
 
   const manifest = {
-    ...basicManifest,  
+    ...basicManifest,
     "identifierUris": [
       "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
-    ],  
+    ],
     "oauth2Permissions": [
       {
         "adminConsentDescription": "Access as a user",
@@ -85,7 +85,7 @@ describe(commands.APP_ADD, () => {
         "userConsentDisplayName": null,
         "value": "access_as_user"
       }
-    ],  
+    ],
     "preAuthorizedApplications": [
       {
         "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
@@ -120,11 +120,11 @@ describe(commands.APP_ADD, () => {
           }
         ]
       }
-    ] 
+    ]
   };
 
   const manifestWithSecret = {
-    ...basicManifest,  
+    ...basicManifest,
     "passwordCredentials": [
       {
         "customKeyIdentifier": null,
@@ -2256,11 +2256,14 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(_ => Promise.reject('Issued POST request'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app',
-      withSecret: true,
-      apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        withSecret: true,
+        apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('returns error when non-existent service principal specified in the APIs', async () => {
@@ -2401,12 +2404,15 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app',
-      platform: 'spa',
-      apisDelegated: 'https://myapi.onmicrosoft.com/access_as_user',
-      implicitFlow: true } } as any), new CommandError('Service principal https://myapi.onmicrosoft.com not found'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        platform: 'spa',
+        apisDelegated: 'https://myapi.onmicrosoft.com/access_as_user',
+        implicitFlow: true
+      }
+    } as any), new CommandError('Service principal https://myapi.onmicrosoft.com not found'));
   });
 
   it('returns error when non-existent permission scope specified in the APIs', async () => {
@@ -2547,12 +2553,15 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app',
-      platform: 'spa',
-      apisDelegated: 'https://graph.microsoft.com/Read.Everything',
-      implicitFlow: true } } as any), new CommandError('Permission Read.Everything for service principal https://graph.microsoft.com not found'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        platform: 'spa',
+        apisDelegated: 'https://graph.microsoft.com/Read.Everything',
+        implicitFlow: true
+      }
+    } as any), new CommandError('Permission Read.Everything for service principal https://graph.microsoft.com not found'));
   });
 
   it('returns error when configuring secret failed', async () => {
@@ -2640,10 +2649,13 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app',
-      withSecret: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        withSecret: true
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('returns error when creating the AAD app reg failed', async () => {
@@ -2655,9 +2667,12 @@ describe(commands.APP_ADD, () => {
       }
     }));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('returns error when setting Application ID URI failed', async () => {
@@ -2741,21 +2756,27 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app',
-      uri: 'https://contoso.onmicrosoft.com/myapp' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        uri: 'https://contoso.onmicrosoft.com/myapp'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('returns error when certificate file cannot be read', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error("An error has occurred"); });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'My AAD app',
-      certificateDisplayName: 'some certificate',
-      certificateFile: 'C:\\temp\\some-certificate.cer' } } as any), new CommandError(`Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'My AAD app',
+        certificateDisplayName: 'some certificate',
+        certificateFile: 'C:\\temp\\some-certificate.cer'
+      }
+    } as any), new CommandError(`Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`));
   });
 
   it('creates AAD app reg for a web app with service principal name with trailing slash', async () => {
@@ -6418,11 +6439,6 @@ describe(commands.APP_ADD, () => {
     });
   });
 
-  it('fails validation if neither name nor manifest specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if specified platform value is not valid', async () => {
     const actual = await command.validate({ options: { name: 'My AAD app', platform: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -6529,16 +6545,17 @@ describe(commands.APP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if manifest is valid JSON with name and name not specified', async () => {
+  it('passes validation if manifest is valid JSON with manifest specified', async () => {
     const manifest = '{"name": "My app"}';
     const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if manifest is valid JSON without name and name specified', async () => {
-    const manifest = '{}';
-    const actual = await command.validate({ options: { manifest: manifest, name: 'My app' } }, commandInfo);
-    assert.strictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [
+      ['name', 'manifest']
+    ]);
   });
 
   it('supports debug mode', () => {
@@ -6794,7 +6811,7 @@ describe(commands.APP_ADD, () => {
         platform: "spa",
         redirectUris: "http://localhost/auth,https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
       }
-    }); 
+    });
 
     assert(loggerLogSpy.calledWith({
       appId: '19180b97-8f30-43ac-8a22-19565de0b064',
@@ -7116,7 +7133,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Issued PATCH request: ${JSON.stringify(opts, null, 2)}`);
     });
     sinon.stub(request, 'post').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' && 
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
@@ -7188,7 +7205,7 @@ describe(commands.APP_ADD, () => {
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/addPassword') {
         return Promise.resolve({
-          "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5" 
+          "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5"
         });
       }
 
@@ -7226,7 +7243,7 @@ describe(commands.APP_ADD, () => {
           "addIns": [],
           "appRoles": [],
           "createdDateTime":
-          "2022-02-07T08:51:18Z",
+            "2022-02-07T08:51:18Z",
           "description": null,
           "certification": null,
           "groupMembershipClaims": null,
@@ -7524,7 +7541,7 @@ describe(commands.APP_ADD, () => {
       tenantId: ''
     }));
   });
-  
+
   it('creates AAD app reg with implicit flow enabled, overriding manifest', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(opts => {
@@ -7586,8 +7603,8 @@ describe(commands.APP_ADD, () => {
           "signInAudience": "AzureADMultipleOrgs",
           "web": {
             "implicitGrantSettings": {
-              "enableAccessTokenIssuance":true,
-              "enableIdTokenIssuance":true
+              "enableAccessTokenIssuance": true,
+              "enableIdTokenIssuance": true
             }
           }
         })) {

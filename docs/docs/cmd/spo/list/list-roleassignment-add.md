@@ -14,28 +14,28 @@ m365 spo list roleassignment add [options]
 : URL of the site where the list is located
 
 `-i, --listId [listId]`
-: ID of the list. Specify either listId, listTitle or listUrl but not multiple.
+: ID of the list. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `-t, --listTitle [listTitle]`
-: Title of the list. Specify either listId, listTitle or listUrl but not multiple.
+: Title of the list. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `--listUrl [listUrl]`
-: Relative URL of the list. Specify either listId, listTitle or listUrl but not multiple.
+: Relative URL of the list. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `--principalId [principalId]`
-: SharePoint ID of principal it may be either user id or group id we want to add permissions to. Specify principalId only when upn or groupName are not used.
+: SharePoint ID of principal it may be either user id or group id you want to add permissions to. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--upn [upn]`
-: Upn/email of user to assign role to. Specify either upn or principalId
+: Upn/email of user to assign role to. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--groupName [groupName]`
-: Enter group name of Azure AD or SharePoint group.. Specify either groupName or principalId
+: Enter group name of Azure AD or SharePoint group. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--roleDefinitionId [roleDefinitionId]`
-: ID of role definition. Specify either roleDefinitionId or roleDefinitionName but not both
+: ID of role definition. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.
 
 `--roleDefinitionName [roleDefinitionName]`
-: Enter the name of a role definition, like 'Contribute', 'Read', etc. Specify either roleDefinitionId or roleDefinitionName but not both
+: Enter the name of a role definition, like 'Contribute', 'Read', etc. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -76,3 +76,4 @@ add role assignment to list _someList_ located in site _https://contoso.sharepoi
 ```sh
 m365 spo list roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --listTitle "someList" --principalId 11 --roleDefinitionName "Full Control"
 ```
+

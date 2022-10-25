@@ -11,7 +11,7 @@ m365 aad app add [options]
 ## Options
 
 `-n, --name [name]`
-: Name of the app
+: Name of the app. Specify either `name` or `certificateBase64Encoded`
 
 `--multitenant`
 : Specify, to make the app available to other tenants
@@ -62,7 +62,7 @@ m365 aad app add [options]
 : When specified, grants application & delegated permissions through admin consent
 
 `--manifest [manifest]`
-: Azure AD app manifest as retrieved from the Azure Portal to create the app registration from
+: Azure AD app manifest as retrieved from the Azure Portal to create the app registration from. Specify either `name` or `manifest`
 
 `--save`
 : Use to store the information about the created app in a local file

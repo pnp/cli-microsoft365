@@ -40,6 +40,7 @@ class SpoListItemListCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
     this.#initTypes();
   }
 
@@ -102,19 +103,6 @@ class SpoListItemListCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (!args.options.id && !args.options.title && !args.options.listId && !args.options.listTitle) {
-          return `Specify listId or listTitle`;
-        }
-
-        if (args.options.id && args.options.title) {
-          return `Specify list id or title but not both`;
-        }
-
-        // Check if only one of the 4 options is specified
-        if ([args.options.id, args.options.title, args.options.listId, args.options.listTitle].filter(o => o).length > 1) {
-          return 'Specify listId or listTitle but not both';
-        }
-
         if (args.options.camlQuery && args.options.fields) {
           return `Specify camlQuery or fields but not both`;
         }
@@ -149,6 +137,12 @@ class SpoListItemListCommand extends SpoCommand {
 
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['id', 'title', 'listId', 'listTitle']
     );
   }
 

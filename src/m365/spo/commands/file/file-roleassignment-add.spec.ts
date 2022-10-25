@@ -16,7 +16,6 @@ import * as SpoGroupGetCommand from '../group/group-get';
 import { pid } from '../../../../utils/pid';
 const command: Command = require('./file-roleassignment-add');
 
-
 describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const fileUrl = '/sites/project-x/documents/Test1.docx';
@@ -75,7 +74,11 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['fileId', 'fileUrl']]);
+    assert.deepStrictEqual(optionSets, [
+      ['fileId', 'fileUrl'],
+      ['principalId', 'upn', 'groupName'],
+      ['roleDefinitionId', 'roleDefinitionName']
+    ]);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
@@ -95,21 +98,6 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('fails validation if the roleDefinitionId option is not a valid number', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, groupName: 'Group name A', roleDefinitionId: 'NaN' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if no principalId, upn or groupname is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, roleDefinitionId: 10 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the principalId, groupname and upn option is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 1, groupName: 'Group name A', upn: 'user@devtenant.com', roleDefinitionName: 'Read' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the roleDefinitionId and roleDefinitionName is filled in', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 1, roleDefinitionId: 10, roleDefinitionName: 'Read' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

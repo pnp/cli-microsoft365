@@ -11,16 +11,16 @@ m365 teams team remove [options]
 ## Options
 
 `-i, --id [id]`
-: The ID of the Microsoft Teams team to remove. Specify either id or name but not both
+: The ID of the Microsoft Teams team to remove. Specify either `id` or `name` but not both.
 
 `-n, --name [name]`
-: The display name of the Microsoft Teams team to remove. Specify either id or name but not both
+: The display name of the Microsoft Teams team to remove. Specify either `id` or `name` but not both.
 
 `--teamId [teamId]`
-: (deprecated. Use `id` instead) The ID of the Teams team to remove
+: (deprecated. Use `id` instead) The ID of the Teams team to remove.
 
 `--confirm`
-: Don't prompt for confirming removing the specified team
+: Don't prompt for confirming removing the specified team.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -53,3 +53,4 @@ m365 teams team remove --id 00000000-0000-0000-0000-000000000000 --confirm
 ## More information
 
 - directory resource type (deleted items): [https://docs.microsoft.com/en-us/graph/api/resources/directory?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/resources/directory?view=graph-rest-1.0)
+

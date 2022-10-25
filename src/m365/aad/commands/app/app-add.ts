@@ -96,6 +96,7 @@ class AadAppAddCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -187,10 +188,6 @@ class AadAppAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.manifest && !args.options.name) {
-          return 'Specify either the name of the app to create or the manifest';
-        }
-
         if (args.options.platform &&
           AadAppAddCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
           return `${args.options.platform} is not a valid value for platform. Allowed values are ${AadAppAddCommand.aadApplicationPlatform.join(', ')}`;
@@ -245,6 +242,12 @@ class AadAppAddCommand extends GraphCommand {
 
         return true;
       },
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['name', 'manifest']
     );
   }
 

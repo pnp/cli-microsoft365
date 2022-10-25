@@ -20,19 +20,19 @@ m365 spo file roleassignment add [options]
 : The UniqueId (GUID) of the file to retrieve. Specify either `fileUrl` or `fileId` but not both
 
 `--principalId [principalId]`
-: The SharePoint Id of the principal. It may be either a user id or group id to add a role assignment for. Specify either upn, groupName or principalId.
+: The SharePoint Id of the principal. It may be either a user id or group id to add a role assignment for. Specify either `upn`, `groupName`, or `principalId`.
 
 `--upn [upn]`
-: upn/email of user to assign role to. Specify either upn, groupName or principalId.
+: upn/email of user to assign role to. Specify either `upn`, `groupName`, or `principalId`.
 
 `--groupName [groupName]`
-: The group name of Azure AD or SharePoint group. Specify either upn, groupName or principalId.
+: The group name of Azure AD or SharePoint group. Specify either `upn`, `groupName`, or `principalId`.
 
 `--roleDefinitionId [roleDefinitionId]`
-: ID of role definition. Specify either roleDefinitionId or roleDefinitionName but not both
+: ID of role definition. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.
 
 `--roleDefinitionName [roleDefinitionName]`
-: Enter the name of a role definition, like 'Contribute', 'Read', etc. Specify either roleDefinitionId or roleDefinitionName but not both
+: Enter the name of a role definition, like 'Contribute', 'Read', etc. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.
 
 --8<-- "docs/cmd/_global.md"
 

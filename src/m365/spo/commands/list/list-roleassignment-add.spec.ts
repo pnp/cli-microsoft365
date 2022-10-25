@@ -118,54 +118,13 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if listId and listTitle are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listId and listUrl are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: '/sites/Documents', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listTitle and listUrl are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listUrl: '/sites/Documents', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if principalId and upn are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', principalId: 11, upn: 'someaccount@tenant.onmicrosoft.com', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if principalId and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', principalId: 11, groupName: 'someGroup', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if upn and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', upn: 'someaccount@tenant.onmicrosoft.com', groupName: 'someGroup', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if roleDefinitionId and roleDefinitionName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', groupName: 'someGroup', roleDefinitionId: 1073741827, roleDefinitionName: 'readers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation neither roleDefinitionId nor roleDefinitionName is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', groupName: 'someGroup'} }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation neither groupName nor principalId or upn is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', roleDefinitionName: 'readers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation neither listTitle nor listId or listUrl is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', groupName: 'someGroup', roleDefinitionName: 'readers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [
+      ['listId', 'listTitle', 'listUrl'],
+      ['principalId', 'upn', 'groupName'],
+      ['roleDefinitionId', 'roleDefinitionName']
+    ]);
   });
 
   it('add role assignment on list by title and role definition id', async () => {
@@ -276,12 +235,15 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-      upn: 'someaccount@tenant.onmicrosoft.com',
-      roleDefinitionId: 1073741827 } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+        upn: 'someaccount@tenant.onmicrosoft.com',
+        roleDefinitionId: 1073741827
+      }
+    } as any), new CommandError(error));
   });
 
   it('add role assignment on list get principal id by group name', async () => {
@@ -332,12 +294,15 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-      groupName: 'someGroup',
-      roleDefinitionId: 1073741827 } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+        groupName: 'someGroup',
+        roleDefinitionId: 1073741827
+      }
+    } as any), new CommandError(error));
   });
 
   it('add role assignment on list get role definition id by role definition name', async () => {
@@ -388,11 +353,14 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-      principalId: 11,
-      roleDefinitionName: 'Full Control' } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+        principalId: 11,
+        roleDefinitionName: 'Full Control'
+      }
+    } as any), new CommandError(error));
   });
 });

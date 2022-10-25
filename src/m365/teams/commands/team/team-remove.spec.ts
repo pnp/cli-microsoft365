@@ -83,37 +83,6 @@ describe(commands.TEAM_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when all options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both id and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both teamId and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the teamId is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
@@ -139,6 +108,13 @@ describe(commands.TEAM_REMOVE, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [
+      ['id', 'name', 'teamId']
+    ]);
   });
 
   it('logs deprecation warning when option teamId is specified', async () => {
@@ -172,10 +148,13 @@ describe(commands.TEAM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false,
-      name: 'Finance',
-      confirm: true }} as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'Finance',
+        confirm: true
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('prompts before removing the specified team when confirm option not passed', async () => {
@@ -290,7 +269,7 @@ describe(commands.TEAM_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    
+
     await assert.rejects(command.action(logger, { options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });
 

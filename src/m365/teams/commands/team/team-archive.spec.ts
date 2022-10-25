@@ -103,35 +103,11 @@ describe(commands.TEAM_ARCHIVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when all options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both id and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both teamId and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [
+      ['id', 'name', 'teamId']
+    ]);
   });
 
   it('logs deprecation warning when option teamId is specified', async () => {
@@ -165,10 +141,13 @@ describe(commands.TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Finance',
-      confirm: true } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Finance',
+        confirm: true
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('archives a Microsoft Team by id', async () => {
@@ -279,9 +258,12 @@ describe(commands.TEAM_ARCHIVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
-      debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
+        debug: false
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

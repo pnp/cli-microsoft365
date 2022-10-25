@@ -40,6 +40,7 @@ class PlannerBucketGetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -86,54 +87,53 @@ class PlannerBucketGetCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id) {
-	      if (args.options.planId || args.options.planName || args.options.planTitle  || args.options.ownerGroupId || args.options.ownerGroupName) {
-	        return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
-	      }
-	      if (args.options.name) {
-	        return 'Specify either id or name';
-	      }
-	    }
+          if (args.options.planId || args.options.planName || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
+            return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
+          }
+        }
 
-	    if (args.options.name) {
-	      if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
-	        return 'Specify either planId or planTitle when using name';
-	      }
+        if (args.options.name) {
+          if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
+            return 'Specify either planId or planTitle when using name';
+          }
 
-	      if (args.options.planId && (args.options.planName || args.options.planTitle)) {
-	        return 'Specify either planId or planTitle when using name but not both';
-	      }
+          if (args.options.planId && (args.options.planName || args.options.planTitle)) {
+            return 'Specify either planId or planTitle when using name but not both';
+          }
 
-	      if (args.options.planName || args.options.planTitle) {
-	        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-	          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-	        }
+          if (args.options.planName || args.options.planTitle) {
+            if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
+              return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+            }
 
-	        if (args.options.ownerGroupId && args.options.ownerGroupName) {
-	          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-	        }
+            if (args.options.ownerGroupId && args.options.ownerGroupName) {
+              return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+            }
 
-	        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
-	          return `${args.options.ownerGroupId} is not a valid GUID`;
-	        }
-	      }
-	      
-	      if (args.options.planId) {
-	        if (args.options.ownerGroupId || args.options.ownerGroupName) {
-	          return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
-	        }
-	      }
-	    }
+            if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
+              return `${args.options.ownerGroupId} is not a valid GUID`;
+            }
+          }
 
-	    if (!args.options.id && !args.options.name) {
-	      return 'Please specify id or name';
-	    }
+          if (args.options.planId) {
+            if (args.options.ownerGroupId || args.options.ownerGroupName) {
+              return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
+            }
+          }
+        }
 
-	    return true;
+        return true;
       }
     );
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {    
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['id', 'name']
+    );
+  }
+
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 

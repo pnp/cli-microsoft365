@@ -75,22 +75,11 @@ describe(commands.SITEDESIGN_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both id and title options are not passed', async () => {
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both id and title options are passed', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a',
-        title: 'Contoso Site Design'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [
+      ['id', 'title']
+    ]);
   });
 
   it('fails to get site design when it does not exists', async () => {
@@ -101,9 +90,12 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('The specified site design does not exist');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      title: 'Contoso Site Design' } } as any), new CommandError('The specified site design does not exist'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        title: 'Contoso Site Design'
+      }
+    } as any), new CommandError('The specified site design does not exist'));
   });
 
   it('fails when multiple site designs with same title exists', async () => {
@@ -166,9 +158,12 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      title: 'Contoso Site Design' } } as any), new CommandError('Multiple site designs with title Contoso Site Design found: ca360b7e-1946-4292-b854-e0ad904f1055, 88ff1405-35d0-4880-909a-97693822d261'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        title: 'Contoso Site Design'
+      }
+    } as any), new CommandError('Multiple site designs with title Contoso Site Design found: ca360b7e-1946-4292-b854-e0ad904f1055, 88ff1405-35d0-4880-909a-97693822d261'));
   });
 
   it('gets information about the specified site design by id', async () => {

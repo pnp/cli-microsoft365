@@ -39,8 +39,8 @@ describe(commands.PLAN_GET, () => {
   };
 
   const planDetailsResponse = {
-    "sharedWith": { },
-    "categoryDescriptions": { }
+    "sharedWith": {},
+    "categoryDescriptions": {}
   };
 
   const outputResponse = {
@@ -106,52 +106,17 @@ describe(commands.PLAN_GET, () => {
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner', '@odata.etag']);
   });
-  
+
   it('defines alias', () => {
     const alias = command.alias();
     assert.notStrictEqual(typeof alias, 'undefined');
   });
 
-  it('fails validation if neither id nor title are provided.', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both id and title are specified', async () => {
+  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
-        id: validId,
-        title: validTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both deprecated planId and planTitle are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planId: validId,
-        planTitle: validTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both id and deprecated planTitle are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validId,
-        planTitle: validTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both title and deprecated planId are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planId: validId,
-        title: validTitle
+        title: validTitle,
+        ownerGroupId: invalidOwnerGroupId
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -177,31 +142,10 @@ describe(commands.PLAN_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: invalidOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if neither the ownerGroupId nor ownerGroupName are provided with deprecated planTitle', async () => {
     const actual = await command.validate({
       options: {
         planTitle: validTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both ownerGroupId and ownerGroupName are specified with deprecated planTitle', async () => {
-    const actual = await command.validate({
-      options: {
-        planTitle: validTitle,
-        ownerGroupId: validOwnerGroupId,
-        ownerGroupName: validOwnerGroupName
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -236,6 +180,11 @@ describe(commands.PLAN_GET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [['id', 'title', 'planId', 'planTitle']]);
+  });
+
   it('correctly get planner plan with given id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}`) {
@@ -249,7 +198,7 @@ describe(commands.PLAN_GET, () => {
       return Promise.reject(`Invalid request ${opts.url}`);
     });
 
-    await command.action(logger, { 
+    await command.action(logger, {
       options: {
         debug: false,
         id: validId

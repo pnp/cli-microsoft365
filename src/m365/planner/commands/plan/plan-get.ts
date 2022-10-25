@@ -46,13 +46,14 @@ class PlannerPlanGetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-	    planId: typeof args.options.planId !== 'undefined',
-    	planTitle: typeof args.options.planTitle !== 'undefined',
+        planId: typeof args.options.planId !== 'undefined',
+        planTitle: typeof args.options.planTitle !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
@@ -87,33 +88,26 @@ class PlannerPlanGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.planId && args.options.planTitle || 
-	      args.options.id && args.options.title || 
-	      args.options.planId && args.options.title || 
-	      args.options.id && args.options.planTitle) {
-	      return 'Specify either id or title but not both';
-	    }
+        if ((args.options.title || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName';
+        }
 
-	    if (!args.options.planId && !args.options.id) {
-	      if (!args.options.planTitle && !args.options.title) {
-	        return 'Specify either id or title';
-	      }
-	  
-	      if ((args.options.title || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-	        return 'Specify either ownerGroupId or ownerGroupName';
-	      }
-	  
-	      if ((args.options.title || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
-	        return 'Specify either ownerGroupId or ownerGroupName but not both';
-	      }
-	  
-	      if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-	        return `${args.options.ownerGroupId} is not a valid GUID`;
-	      }
-	    }
+        if ((args.options.title || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName but not both';
+        }
 
-	    return true;
+        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+          return `${args.options.ownerGroupId} is not a valid GUID`;
+        }
+
+        return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['id', 'title', 'planId', 'planTitle']
     );
   }
 
@@ -123,8 +117,8 @@ class PlannerPlanGetCommand extends GraphCommand {
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.');
       return;
-    }    
-    
+    }
+
     if (args.options.planId) {
       args.options.id = args.options.planId;
     }
@@ -143,7 +137,7 @@ class PlannerPlanGetCommand extends GraphCommand {
         const groupId = await this.getGroupId(args);
         const plan = await planner.getPlanByTitle(args.options.title!, groupId);
         const result = await this.getPlanDetails(plan);
-  
+
         if (result) {
           logger.log(result);
         }
