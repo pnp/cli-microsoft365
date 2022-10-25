@@ -77,6 +77,7 @@ class TodoTaskGetCommand extends GraphCommand {
     };
 
     const response = await request.get<{ value: [{ id: string }] }>(requestOptions);
+
     const taskList = response.value[0];
     if (!taskList) {
       throw `The specified task list does not exist`;

@@ -17,6 +17,26 @@ describe(commands.TASK_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  const taskResponse = {
+    "importance": "normal",
+    "isReminderOn": false,
+    "status": "notStarted",
+    "title": "Stay healthy",
+    "createdDateTime": "2020-11-01T17:13:13.9582172Z",
+    "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z",
+    "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
+    "body": {
+      "content": "",
+      "contentType": "text"
+    }
+  };
+  const taskResponseText = {
+    "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
+    "title": "Stay healthy",
+    "status": "notStarted",
+    "createdDateTime": "2020-11-01T17:13:13.9582172Z",
+    "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z"
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -73,7 +93,8 @@ describe(commands.TASK_GET, () => {
   it('fails validation if both listId and listName options are passed', async () => {
     const actual = await command.validate({
       options: {
-        listId: 'AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA==',
+        id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
+        listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=',
         listName: 'Tasks List'
       }
     }, commandInfo);
@@ -83,17 +104,18 @@ describe(commands.TASK_GET, () => {
   it('fails validation if neither listId nor listName options are passed', async () => {
     const actual = await command.validate({
       options: {
+        id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA='
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails to get ToDo Task list when the specified task list does not exist', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/me/todo/lists?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({ value: [] });
+        return ({ value: [] });
       }
-      return Promise.reject('The specified task list does not exist');
+      throw 'The specified task list does not exist';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, listName: 'Tasks List' } } as any), new CommandError('The specified task list does not exist'));
@@ -103,7 +125,7 @@ describe(commands.TASK_GET, () => {
     const actual = await command.validate({
       options: {
         id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
-        listId: 'AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA=='
+        listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA='
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -119,109 +141,78 @@ describe(commands.TASK_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('list a To Do task using listId in JSON output mode', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/tasks`) > -1) {
-        return Promise.resolve(
-          {
-            "importance": "normal",
-            "isReminderOn": false,
-            "status": "notStarted",
-            "title": "Stay healthy",
-            "createdDateTime": "2020-11-01T17:13:13.9582172Z",
-            "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z",
-            "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
-            "body": {
-              "content": "",
-              "contentType": "text"
-            }
-          }
-        );
+  it('list a To Do task using listId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/me/todo/lists/AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=/tasks/AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=') {
+        return (taskResponse);
       }
 
-      return Promise.reject('Invalid request');
+      throw `Invalid request ${opts.url}`;
     });
 
     await command.action(logger, {
       options: {
         debug: false,
-        output: 'json',
-        listId: "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA=="
+        id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
+        listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA='
       }
     });
-    assert(loggerLogSpy.calledWith(
-      {
-        "importance": "normal",
-        "isReminderOn": false,
-        "status": "notStarted",
-        "title": "Stay healthy",
-        "createdDateTime": "2020-11-01T17:13:13.9582172Z",
-        "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z",
-        "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
-        "body": {
-          "content": "",
-          "contentType": "text"
-        }
+    assert(loggerLogSpy.calledWith(taskResponseText));
+  });
+
+  it('list a To Do task using listId in JSON output mode', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/me/todo/lists/AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=/tasks/AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=') {
+        return (taskResponse);
       }
-    ));
+
+      throw `Invalid request ${request}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: false,
+        id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
+        listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=',
+        output: 'json'
+      }
+    });
+    assert(loggerLogSpy.calledWith(taskResponse));
   });
 
   it('lists a To Do task using listName', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/todo/lists?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('e1251b10-1ba4-49e3-b35a-933e3f21772b')/todo/lists",
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks%20List'`) {
+        return ({
           "value": [
             {
-              "@odata.etag": "W/\"xMBBaLl1lk+dAn8KkjfXKQABF7wr8w==\"",
               "displayName": "Tasks List",
               "isOwner": true,
               "isShared": false,
               "wellknownListName": "none",
-              "id": "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA=="
+              "id": "AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA="
             }
           ]
         });
       }
 
-      if ((opts.url as string).indexOf(`/tasks`) > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('e1251b10-1ba4-49e3-b35a-933e3f21772b')/todo/lists('AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA%3D%3D')/tasks/$entity",
-          "importance": "normal",
-          "isReminderOn": false,
-          "status": "notStarted",
-          "title": "Stay healthy",
-          "createdDateTime": "2020-11-01T17:13:13.9582172Z",
-          "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z",
-          "hasAttachments": false,
-          "categories": [],
-          "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
-          "body": {
-            "content": "",
-            "contentType": "text"
-          }
-        });
+      if (opts.url === 'https://graph.microsoft.com/v1.0/me/todo/lists/AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=/tasks/AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=') {
+        return (taskResponse);
       }
 
-      return Promise.reject('Invalid request');
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
 
     await command.action(logger, {
       options: {
         debug: false,
-        listName: 'Tasks List'
+        id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
+        listName: 'Tasks List',
+        output: 'json'
       }
     });
-    const actual = JSON.stringify(log[log.length - 1]);
-    const expected = JSON.stringify(
-      {
-        "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
-        "title": "Stay healthy",
-        "status": "notStarted",
-        "createdDateTime": "2020-11-01T17:13:13.9582172Z",
-        "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z"
-      });
-    assert.strictEqual(actual, expected);
+
+    assert(loggerLogSpy.calledWith(taskResponse));
   });
 
   it('supports debug mode', () => {
