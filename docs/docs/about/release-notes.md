@@ -25,6 +25,7 @@
 - [spo folder roleassignment remove](../cmd/spo/folder/folder-roleassignment-remove.md) - removes a role assignment from the specified folder [#3701](https://github.com/pnp/cli-microsoft365/issues/3701)
 - [spo folder roleinheritance break](../cmd/spo/folder/folder-roleinheritance-break.md) - breaks the role inheritance of a folder [#3598](https://github.com/pnp/cli-microsoft365/issues/3598)
 - [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
+- [spo listitem roleassignment add](../cmd/spo/listitem/listitem-roleassignment-add.md) - adds a role assignment to a listitem [#3539](https://github.com/pnp/cli-microsoft365/issues/3539)
 
 ### Changes
 
@@ -65,7 +66,9 @@
 - extended 'outlook mail send' command with attachments support [#3832](https://github.com/pnp/cli-microsoft365/issues/3832)
 - added cookie consent to MKDocs [#3832](https://github.com/pnp/cli-microsoft365/issues/3765)
 - extended 'todo task add' with extra options [#3832](https://github.com/pnp/cli-microsoft365/issues/3827)
-- extended spo contenttype with list options 'listUrl' and 'listId' [#3806](https://github.com/pnp/cli-microsoft365/issues/3806)
+- extended spo contenttype with list options 'listUrl' and 'listId' [#3806](https://github.com/pnp/cli-microsoft365/issues/3818)
+- extended 'status' command to log extra info [#3818](https://github.com/pnp/cli-microsoft365/issues/3806)
+- added validating output format [#2988](https://github.com/pnp/cli-microsoft365/issues/2988)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
