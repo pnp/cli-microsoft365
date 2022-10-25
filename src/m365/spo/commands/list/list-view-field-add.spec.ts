@@ -180,7 +180,7 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if (opts.url === "https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('Author')") {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/views('cc27a922-8224-4296-90a5-ebbc54da2e81')/viewfields/addviewfield('Author')`) {
         return Promise.resolve();
       }
       return Promise.reject('Invalid request');

@@ -53,8 +53,15 @@ Add field with title _Custom field_ to view with title _All Documents_ of the li
 m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle 'All Documents' --fieldTitle 'Custom field'
 ```
 
-Add field with title _Custom field_ at the position _0_ to view with title _All Documents_ of the list with url _/sites/project-x/lists/Events_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Add field with title _Custom field_ at the position _0_ to view with title _My Events_ of the list with url _/sites/project-x/lists/Events_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/lists/Events' --viewTitle 'All Documents' --fieldTitle 'Custom field' --fieldPosition 0
+m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/lists/Events' --viewTitle 'My Events' --fieldTitle 'Custom field' --fieldPosition 0
 ```
+
+Add field with title _Custom field_ to view with title _All Documents_ of the list with site-relative URL _/Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --viewTitle 'All Documents' --fieldTitle 'Custom field'
+```
+

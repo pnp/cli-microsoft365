@@ -109,8 +109,6 @@ class SpoListViewSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const baseRestUrl: string = `${args.options.webUrl}/_api/web/`;
-
     let listRestUrl: string = '';
     if (args.options.listId) {
       listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
@@ -128,7 +126,7 @@ class SpoListViewSetCommand extends SpoCommand {
     try {
       const res = await spo.getRequestDigest(args.options.webUrl);
       const requestOptions: any = {
-        url: `${baseRestUrl}${listRestUrl}${viewRestUrl}`,
+        url: `${args.options.webUrl}/_api/web/${listRestUrl}${viewRestUrl}`,
         headers: {
           'X-RequestDigest': res.FormDigestValue,
           'content-type': 'application/json;odata=nometadata',

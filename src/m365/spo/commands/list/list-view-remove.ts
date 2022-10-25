@@ -156,7 +156,7 @@ class SpoListViewRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the view from the list?`
+        message: `Are you sure you want to remove the view ${args.options.viewId || args.options.viewTitle} from the list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}?`
       });
 
       if (result.continue) {

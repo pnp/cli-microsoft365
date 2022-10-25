@@ -177,7 +177,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
     ]);
   });
 
-  it('move the field by title to the position index to viewTitle of listId', async () => {
+  it('moves the field by title to the position index to viewTitle of listId', async () => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -193,7 +193,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('move the field by title to the position index to viewId of listTitle (debug)', async () => {
+  it('moves the field by title to the position index to viewId of listTitle (debug)', async () => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -209,7 +209,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
     assert(loggerLogToStderrSpy.called);
   });
 
-  it('move the field by id to the position index to viewId of listTitle', async () => {
+  it('moves the field by id to the position index to viewId of listTitle', async () => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -225,7 +225,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('move the field by id to the position index to viewTitle of listId (debug)', async () => {
+  it('moves the field by id to the position index to viewTitle of listId (debug)', async () => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -241,7 +241,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
     assert(loggerLogToStderrSpy.called);
   });
 
-  it('move the field by id to the position index to viewTitle of listUrl', async () => {
+  it('moves the field by id to the position index to viewTitle of listUrl', async () => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {

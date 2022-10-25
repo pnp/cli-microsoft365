@@ -171,7 +171,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     });
   });
 
-  it('removes view from the list using viewId and listId (debug)', async () => {
+  it('removes view from the list using viewId and listId when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/views(guid'${formatting.encodeQueryParameter(viewId)}')`) {
         return;
@@ -180,18 +180,22 @@ describe(commands.LIST_VIEW_REMOVE, () => {
       throw 'Invalid request';
     });
 
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
     await command.action(logger, {
       options: {
         debug: true,
         webUrl: webUrl,
         listId: listId,
-        viewId: viewId,
-        confirm: true
+        viewId: viewId
       }
     });
   });
 
-  it('removes view from the list using viewId and listTitle)', async () => {
+  it('removes view from the list using viewId and listTitle when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(listTitle)}')/views(guid'${formatting.encodeQueryParameter(viewId)}')`) {
         return;
@@ -200,17 +204,21 @@ describe(commands.LIST_VIEW_REMOVE, () => {
       throw 'Invalid request';
     });
 
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
     await command.action(logger, {
       options: {
         webUrl: webUrl,
         listTitle: listTitle,
-        viewId: viewId,
-        confirm: true
+        viewId: viewId
       }
     });
   });
 
-  it('removes view from the list using viewTitle and listUrl', async () => {
+  it('removes view from the list using viewTitle and listUrl when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
       if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')/views/GetByTitle('${formatting.encodeQueryParameter(viewTitle)}')`) {
@@ -220,17 +228,21 @@ describe(commands.LIST_VIEW_REMOVE, () => {
       throw 'Invalid request';
     });
 
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
     await command.action(logger, {
       options: {
         webUrl: webUrl,
         listUrl: listUrl,
-        viewTitle: viewTitle,
-        confirm: true
+        viewTitle: viewTitle
       }
     });
   });
 
-  it('removes view from the list using viewTitle and listId (debug)', async () => {
+  it('removes view from the list using viewTitle and listId when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/views/GetByTitle('${formatting.encodeQueryParameter(viewTitle)}')`) {
         return;
@@ -239,18 +251,22 @@ describe(commands.LIST_VIEW_REMOVE, () => {
       throw 'Invalid request';
     });
 
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
     await command.action(logger, {
       options: {
         debug: true,
         webUrl: webUrl,
         listId: listId,
-        viewTitle: viewTitle,
-        confirm: true
+        viewTitle: viewTitle
       }
     });
   });
 
-  it('removes view from the list using viewTitle and listTitle', async () => {
+  it('removes view from the list using viewTitle and listTitle when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(listTitle)}')/views/GetByTitle('${formatting.encodeQueryParameter(viewTitle)}')`) {
         return;
@@ -259,12 +275,16 @@ describe(commands.LIST_VIEW_REMOVE, () => {
       throw 'Invalid request';
     });
 
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
     await command.action(logger, {
       options: {
         webUrl: webUrl,
         listTitle: listTitle,
-        viewTitle: viewTitle,
-        confirm: true
+        viewTitle: viewTitle
       }
     });
   });
@@ -282,6 +302,26 @@ describe(commands.LIST_VIEW_REMOVE, () => {
         confirm: true
       }
     }), new CommandError(errorMessage));
+  });
+
+  it('removes view from the list using viewId and listId when prompt confirmed (debug)', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/views(guid'${formatting.encodeQueryParameter(viewId)}')`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: webUrl,
+        listId: listId,
+        viewId: viewId,
+        confirm: true
+      }
+    });
   });
 
   it('supports debug mode', () => {

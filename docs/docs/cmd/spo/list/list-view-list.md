@@ -38,7 +38,7 @@ List all views for a list by ID
 m365 spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
 ```
 
-List all views for a list by url
+List all views for a list by URL
 
 ```sh
 m365 spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/lists/Events'
