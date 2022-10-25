@@ -62,19 +62,21 @@ class TeamsTeamRemoveCommand extends GraphCommand {
     );
   }
 
-  #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
-  }
-
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-	      return `${args.options.id} is not a valid GUID`;
-	    }
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
 
-	    return true;
+        return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['id', 'name']
     );
   }
 
@@ -107,7 +109,7 @@ class TeamsTeamRemoveCommand extends GraphCommand {
         };
 
         await request.delete(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -123,7 +125,7 @@ class TeamsTeamRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the team ${args.options.id ? args.options.id : args.options.name}?`
       });
-      
+
       if (result.continue) {
         await removeTeam();
       }

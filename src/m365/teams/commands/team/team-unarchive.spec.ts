@@ -89,22 +89,11 @@ describe(commands.TEAM_UNARCHIVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when no option is specified', async () => {
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both id and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [
+      ['id', 'name']
+    ]);
   });
 
   it('fails when team name does not exist', async () => {
@@ -125,10 +114,13 @@ describe(commands.TEAM_UNARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Finance',
-      confirm: true } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Finance',
+        confirm: true
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('restores an archived Microsoft Team by id', async () => {

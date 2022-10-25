@@ -107,16 +107,11 @@ describe(commands.PLAN_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner', '@odata.etag']);
   });
 
-  it('fails validation if neither id nor title are provided.', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both id and title are specified', async () => {
+  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
-        id: validId,
-        title: validTitle
+        title: validTitle,
+        ownerGroupId: invalidOwnerGroupId
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -137,16 +132,6 @@ describe(commands.PLAN_GET, () => {
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: invalidOwnerGroupId
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -179,6 +164,11 @@ describe(commands.PLAN_GET, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [['id', 'title', 'planId', 'planTitle']]);
   });
 
   it('correctly get planner plan with given id', async () => {

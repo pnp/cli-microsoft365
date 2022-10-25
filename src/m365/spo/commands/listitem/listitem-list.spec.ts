@@ -163,16 +163,6 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('fails validation if listTitle, listId and listUrl option not specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listTitle, listId and listUrl are specified together', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', listUrl: listUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', listTitle: 'Demo List' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -221,6 +211,13 @@ describe(commands.LISTITEM_LIST, () => {
   it('fails validation if the specific pageNumber is not a number', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', pageSize: 3, pageNumber: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
+  });
+
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [
+      ['listId', 'listTitle']
+    ]);
   });
 
   it('returns array of listItemInstance objects when a list of items is requested, and debug mode enabled', async () => {
