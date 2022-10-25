@@ -1,4 +1,4 @@
-# aad app open
+# app open
 
 Returns deep link of the current AD app to open the Azure portal on the Azure AD app registration management page.
 

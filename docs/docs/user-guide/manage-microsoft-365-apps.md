@@ -1,4 +1,4 @@
-# Manage Microsoft 365 apps
+# Manage Microsoft 365 apps with the CLI for Microsoft 365
 
 When developing Microsoft 365 apps, you need to register them with the Microsoft cloud. You do this by creating an Azure AD app registration. An Azure AD app registration contains information about your app such as its name, type (for example if it's a client app or a web app) or API permissions. Typically, you manage these settings through the Azure portal. CLI for Microsoft 365 contains a set of commands that simplify managing Azure AD app registrations for your Microsoft 365 apps. What's more, using CLI for Microsoft 365 you can automate create Azure AD apps to allow developers in your team share their configuration without blocking each other.
 
