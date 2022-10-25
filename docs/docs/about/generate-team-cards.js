@@ -189,6 +189,12 @@ const contributors = [
     twitter: 'chirackalcyril'
   },
   {
+    name: 'Daniaal Nadir',
+    company: 'Smoothwall',
+    github: 'daniaalnadir',
+    twitter: 'daniaalnadir'
+  },
+  {
     name: 'Daniel Laskewitz',
     company: 'Microsoft',
     github: 'Laskewitz',
@@ -403,6 +409,12 @@ const contributors = [
     company: '',
     github: 'nickhonen',
     twitter: 'nickhonen4'
+  },
+  {
+    name: 'Nico De Cleyre',
+    company: 'Ordina Belgium',
+    github: 'nicodecleyre',
+    twitter: ''
   },
   {
     name: 'Otto',

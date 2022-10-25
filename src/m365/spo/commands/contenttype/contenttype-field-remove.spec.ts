@@ -21,6 +21,7 @@ const LIST_ID = "8c7a0fcd-9d64-4634-85ea-ce2b37b2ec0c";
 const WEB_ID = "d1b7a30d-7c22-4c54-a686-f1c298ced3c7";
 const SITE_ID = "50720268-eff5-48e0-835e-de588b007927";
 const LIST_TITLE = "TEST";
+const LIST_URL = "/shared documents";
 
 describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   let log: string[];
@@ -41,6 +42,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       });
     }
     if ((opts.url as string).indexOf(`/_api/lists/GetByTitle('${LIST_TITLE}')?$select=Id`) > -1) {
+      return Promise.resolve({
+        "Id": LIST_ID
+      });
+    }
+    if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2Fshared%20documents\')?$select=Id') {
       return Promise.resolve({
         "Id": LIST_ID
       });
@@ -135,7 +141,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -459,7 +465,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   });
 
   // LIST CT
-  it('removes the field link from list content type', async () => {
+  it('removes the field link from list (retrieved by title) content type', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
@@ -474,7 +480,37 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('removes the field link from list content type - prompt', async () => {
+  it('removes the field link from list (retrieved by id) content type', async () => {
+    sinon.stub(request, 'get').callsFake(getStubCalls);
+    const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
+
+    await command.action(logger, {
+      options: {
+        webUrl: WEB_URL, listId: LIST_ID, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        confirm: true,
+        debug: false
+      }
+    } as any);
+    assert(postCallbackStub.called);
+    assert(loggerLogSpy.notCalled);
+  });
+
+  it('removes the field link from list (retrieved by url) content type', async () => {
+    sinon.stub(request, 'get').callsFake(getStubCalls);
+    const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
+
+    await command.action(logger, {
+      options: {
+        webUrl: WEB_URL, listUrl: LIST_URL, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        confirm: true,
+        debug: false
+      }
+    } as any);
+    assert(postCallbackStub.called);
+    assert(loggerLogSpy.notCalled);
+  });
+
+  it('removes the field link from list (retrieved by title) content type - prompt', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
@@ -493,7 +529,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('removes the field link from list content type - prompt: confirmed', async () => {
+  it('removes the field link from list (retrieved by title) content type - prompt: confirmed', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
@@ -513,7 +549,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('removes the field link from list content type - prompt: declined', async () => {
+  it('removes the field link from list (retrieved by title) content type - prompt: declined', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
@@ -534,7 +570,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   });
 
   // LIST CT with debug
-  it('removes the field link from list content type with debug', async () => {
+  it('removes the field link from list (retrieved by title) content type with debug', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
@@ -548,7 +584,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     } as any);
     assert(postCallbackStub.called);
   });
-  it('removes the field link from list content type with debug - prompt', async () => {
+  it('removes the field link from list (retrieved by title) content type with debug - prompt', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
@@ -566,7 +602,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     assert(promptIssued);
   });
-  it('removes the field link from list content type with debug - prompt: confirmed', async () => {
+  it('removes the field link from list (retrieved by title) content type with debug - prompt: confirmed', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
@@ -583,7 +619,43 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     } as any);
     assert(postCallbackStub.called);
   });
-  it('removes the field link from list content type with debug - prompt: declined', async () => {
+
+  it('removes the field link from list (retrieved by id) content type with debug - prompt: confirmed', async () => {
+    sinon.stub(request, 'get').callsFake(getStubCalls);
+    const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
+      options: {
+        webUrl: WEB_URL, listId: LIST_ID, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        updateChildContentTypes: false,
+        debug: true
+      }
+    } as any);
+    assert(postCallbackStub.called);
+  });
+
+  it('removes the field link from list (retrieved by url) content type with debug - prompt: confirmed', async () => {
+    sinon.stub(request, 'get').callsFake(getStubCalls);
+    const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
+      options: {
+        webUrl: WEB_URL, listUrl: LIST_URL, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
+        updateChildContentTypes: false,
+        debug: true
+      }
+    } as any);
+    assert(postCallbackStub.called);
+  });
+  it('removes the field link from list (retrieved by title) content type with debug - prompt: declined', async () => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
@@ -668,6 +740,11 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
   it('fails validation if webUrl is not correct', async () => {
     const actual = await command.validate({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: "test" } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if listId is not correct', async () => {
+    const actual = await command.validate({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, listId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
