@@ -127,6 +127,62 @@ class MockCommandWithValidation extends AnonymousCommand {
   }
 }
 
+class MockCommandWithBooleanCuration extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock boolean curation';
+  }
+  public get description(): string {
+    return 'Mock command with boolean curation';
+  }
+  constructor() {
+    super();
+
+    this.options.push(
+      {
+        option: '-a, --parameterA [parameterA]'
+      },
+      {
+        option: '-b, --parameterB [parameterB]'
+      },
+      {
+        option: '-c, --parameterC [parameterC]'
+      },
+      {
+        option: '-d, --parameterD [parameterD]'
+      },
+      {
+        option: '-e, --parameterE [parameterE]'
+      },
+      {
+        option: '-f, --parameterF [parameterF]'
+      },
+      {
+        option: '-g, --parameterG [parameterG]'
+      },
+      {
+        option: '-h, --parameterH [parameterH]'
+      },
+      {
+        option: '-x, --parameterH [parameterX]'
+      }
+    );
+
+    this.types.boolean.push('a', 'parameterA');
+    this.types.boolean.push('b', 'parameterB');
+    this.types.boolean.push('c', 'parameterC');
+    this.types.boolean.push('d', 'parameterD');
+    this.types.boolean.push('e', 'parameterE');
+    this.types.boolean.push('f', 'parameterF');
+    this.types.boolean.push('g', 'parameterG');
+    this.types.boolean.push('h', 'parameterH');
+    this.types.boolean.push('x', 'parameterX');
+  }
+  public async commandAction(logger: Logger, args: any): Promise<void> {
+    logger.log(`parameterA: ${args.options.parameterA}`);
+    logger.log(`parameterB: ${args.options.parameterB}`);
+  }
+}
+
 class MockCommandWithPrompt extends AnonymousCommand {
   public get name(): string {
     return 'cli mock prompt';
@@ -181,11 +237,13 @@ describe('Cli', () => {
   let processExitStub: sinon.SinonStub;
   let md2plainSpy: sinon.SinonSpy;
   let mockCommandActionSpy: sinon.SinonSpy;
+  let mockCommandWithBooleanCurationActionSpy: sinon.SinonSpy;
   let mockCommand: Command;
   let mockCommandWithOptionSets: Command;
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
   let log: string[] = [];
+  let mockCommandWithBooleanCuration: Command;
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -201,9 +259,11 @@ describe('Cli', () => {
 
     mockCommand = new MockCommand();
     mockCommandWithAlias = new MockCommandWithAlias();
+    mockCommandWithBooleanCuration = new MockCommandWithBooleanCuration();
     mockCommandWithValidation = new MockCommandWithValidation();
     mockCommandWithOptionSets = new MockCommandWithOptionSets();
     mockCommandActionSpy = sinon.spy(mockCommand, 'action');
+    mockCommandWithBooleanCurationActionSpy = sinon.spy(mockCommandWithBooleanCuration, 'action');
 
     return new Promise((resolve) => {
       fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string): void => {
@@ -221,6 +281,7 @@ describe('Cli', () => {
     (cli as any).loadCommand(mockCommandWithAlias);
     (cli as any).loadCommand(mockCommandWithValidation);
     (cli as any).loadCommand(cliCompletionUpdateCommand);
+    (cli as any).loadCommand(mockCommandWithBooleanCuration);
   });
 
   afterEach(() => {
@@ -237,6 +298,8 @@ describe('Cli', () => {
       fs.readFileSync,
       mockCommandWithValidation.validate,
       mockCommandWithValidation.action,
+      mockCommandWithBooleanCuration.validate,
+      mockCommandWithBooleanCuration.action,
       inquirer.prompt,
       // eslint-disable-next-line no-console
       console.log,
@@ -509,6 +572,20 @@ describe('Cli', () => {
       .then(_ => {
         try {
           assert(mockCommandActionSpy.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`passes options validation if the command specified has boolean arguments of several truthy/falsy values`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'curation', '--parameterA', '1', '-b', '0', '-c', 'true', '-d', 'false', '-e', 'yes', '-f', 'no', '-g', 'on', '--parameterH', 'off'])
+      .then(_ => {
+        try {
+          assert(mockCommandWithBooleanCurationActionSpy.called);
           done();
         }
         catch (e) {
