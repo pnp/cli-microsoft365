@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -14,6 +15,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   parentFolderUrl: string;
+  recursive?: boolean;
 }
 
 class SpoFolderListCommand extends SpoCommand {
@@ -31,11 +33,20 @@ class SpoFolderListCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        recursive: !!args.options.recursive
+      });
+    });
+  }
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -43,10 +54,13 @@ class SpoFolderListCommand extends SpoCommand {
       },
       {
         option: '-p, --parentFolderUrl <parentFolderUrl>'
+      },
+      {
+        option: '--recursive [recursive]'
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
@@ -55,12 +69,22 @@ class SpoFolderListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl}...`);
+      logger.logToStderr(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl}${args.options.recursive ? ' (recursive)' : ''}...`);
     }
 
-    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
-    const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/folders`;
-    const requestOptions: any = {
+    try {
+      const resp = await this.getFolderList(args.options.webUrl, args.options.parentFolderUrl, args.options.recursive);
+      logger.log(resp);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private async getFolderList(webUrl: string, parentFolderUrl: string, recursive: boolean | undefined, folders: FolderProperties[] = []): Promise<FolderProperties[]> {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, parentFolderUrl);
+    const requestUrl: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/folders`;
+    const requestOptions: AxiosRequestConfig = {
       url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -68,13 +92,17 @@ class SpoFolderListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    try {
-      const resp = await request.get<{ value: FolderProperties[] }>(requestOptions);
-      logger.log(resp.value);
+    const resp = await request.get<{ value: FolderProperties[] }>(requestOptions);
+    if (resp.value && resp.value.length > 0) {
+      for (const folder of resp.value) {
+        folders.push(folder);
+        if (recursive) {
+          await this.getFolderList(webUrl, folder.ServerRelativeUrl, recursive, folders);
+        }
+      }
     }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
-    }
+
+    return folders;
   }
 }
 
