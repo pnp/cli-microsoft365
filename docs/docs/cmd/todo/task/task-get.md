@@ -34,3 +34,42 @@ Gets a specific task from a Microsoft To Do tasks list based on the id of the li
 ```sh
 m365 todo task list --listId "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA==" --id "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA="
 ```
+
+## Response
+
+=== "JSON"
+
+    ``` json
+    {
+      "importance": "normal",
+      "isReminderOn": false,
+      "status": "notStarted",
+      "title": "Stay healthy",
+      "createdDateTime": "2022-10-23T14:05:09.2673009Z",
+      "lastModifiedDateTime": "2022-10-23T14:15:11.3180312Z",
+      "hasAttachments": false,
+      "categories": [],
+      "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
+      "body": {
+        "content": "",
+        "contentType": "text"
+      }
+    }
+    ```
+
+=== "Text"
+
+    ``` text
+    createdDateTime     : 2022-10-23T14:05:09.2673009Z
+    id                  : AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=
+    lastModifiedDateTime: 2022-10-23T14:15:11.3180312Z
+    status              : notStarted
+    title               : Stay healthy
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,title,status,createdDateTime,lastModifiedDateTime
+    AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=,Stay healthy,notStarted,2022-10-23T14:05:09.2673009Z,2022-10-23T14:15:11.3180312Z
+    ```
