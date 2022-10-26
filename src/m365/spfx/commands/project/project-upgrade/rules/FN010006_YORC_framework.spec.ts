@@ -47,6 +47,16 @@ describe('FN010006_YORC_framework', () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it('doesn\'t return notification if framework not found and should be removed, and @microsoft/generator-sharepoint not set', () => {
+    rule = new FN010006_YORC_framework('', false);
+    const project: Project = {
+      path: '/usr/tmp',
+      yoRcJson: {}
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 0);
+  });
+
   it('returns notification if framework not found while it should be added', () => {
     rule = new FN010006_YORC_framework('react', true);
     const project: Project = {
@@ -63,6 +73,16 @@ describe('FN010006_YORC_framework', () => {
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
     assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
+  });
+
+  it('returns notification if framework not found while it should be added and @microsoft/generator-sharepoint not set', () => {
+    rule = new FN010006_YORC_framework('react', true);
+    const project: Project = {
+      path: '/usr/tmp',
+      yoRcJson: {}
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('returns notification if framework found while it should be removed', () => {

@@ -19,4 +19,13 @@ describe('FN010008_YORC_nodeVersion', () => {
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
+
+  it(`returns notification when @microsoft/generator-sharepoint is not set`, () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      yoRcJson: {}
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1);
+  });
 });
