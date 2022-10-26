@@ -68,7 +68,7 @@ class TodoTaskGetCommand extends GraphCommand {
       return args.options.listId;
     }
 
-    const requestOptions: any = {
+    const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(args.options.listName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
