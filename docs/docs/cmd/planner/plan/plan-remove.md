@@ -46,3 +46,7 @@ Removes the Microsoft Planner plan with title _My Plan_ in group with name _My P
 ```sh
 m365 planner plan remove --title "My Plan" --ownerGroupName "My Planner Group" --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

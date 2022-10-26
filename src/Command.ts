@@ -58,6 +58,10 @@ export default abstract class Command {
   public telemetry: ((args: any) => void)[] = [];
   protected telemetryProperties: any = {};
 
+  protected get allowedOutputs(): string[] {
+    return ['csv', 'json', 'text'];
+  }
+
   public options: CommandOption[] = [];
   public optionSets: string[][] = [];
   public types: CommandTypes = {
@@ -99,7 +103,7 @@ export default abstract class Command {
       { option: '--query [query]' },
       {
         option: '-o, --output [output]',
-        autocomplete: ['csv', 'json', 'text']
+        autocomplete: this.allowedOutputs
       },
       { option: '--verbose' },
       { option: '--debug' }
@@ -110,7 +114,8 @@ export default abstract class Command {
     this.validators.push(
       (args, command) => this.validateUnknownOptions(args, command),
       (args, command) => this.validateRequiredOptions(args, command),
-      (args, command) => this.validateOptionSets(args, command),
+      args => this.validateOutput(args),
+      (args, command) => this.validateOptionSets(args, command)
     );
   }
 
@@ -198,6 +203,16 @@ export default abstract class Command {
     }
 
     return true;
+  }
+
+  private async validateOutput(args: CommandArgs): Promise<string | boolean> {
+    if (args.options.output &&
+      this.allowedOutputs.indexOf(args.options.output) < 0) {
+      return `'${args.options.output}' is not a valid output type. Allowed output types are ${this.allowedOutputs.join(', ')}`;
+    }
+    else {
+      return true;
+    }
   }
 
   public alias(): string[] | undefined {
@@ -296,7 +311,7 @@ export default abstract class Command {
         if (err instanceof CommandError) {
           throw err;
         }
-        
+
         try {
           const graphResponseError: GraphResponseError = res.error;
           if (graphResponseError.error.code) {
