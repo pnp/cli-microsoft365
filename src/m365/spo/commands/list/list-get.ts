@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -16,6 +17,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
   title?: string;
+  url?: string;
   properties?: string;
   withPermissions?: boolean;
 }
@@ -43,6 +45,7 @@ class SpoListGetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         id: (!(!args.options.id)).toString(),
         title: (!(!args.options.title)).toString(),
+        url: (!(!args.options.url)).toString(),
         properties: (!(!args.options.properties)).toString(),
         withPermissions: typeof args.options.withPermissions !== 'undefined'
       });
@@ -59,6 +62,9 @@ class SpoListGetCommand extends SpoCommand {
       },
       {
         option: '-t, --title [title]'
+      },
+      {
+        option: '--url [url]'
       },
       {
         option: '-p, --properties [properties]'
@@ -89,7 +95,7 @@ class SpoListGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'title']);
+    this.optionSets.push(['id', 'title', 'url']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -102,8 +108,12 @@ class SpoListGetCommand extends SpoCommand {
     if (args.options.id) {
       requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.id)}')`;
     }
-    else {
+    else if (args.options.title) {
       requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
+    }
+    else if (args.options.url) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
+      requestUrl = `${args.options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
 
     let propertiesSelect: string = args.options.properties ? `?$select=${encodeURIComponent(args.options.properties)}` : ``;

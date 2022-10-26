@@ -16,6 +16,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
 }
 
 class SpoListSiteScriptGetCommand extends SpoCommand {
@@ -40,7 +41,8 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         listId: (!(!args.options.listId)).toString(),
-        listTitle: (!(!args.options.listTitle)).toString()
+        listTitle: (!(!args.options.listTitle)).toString(),
+        listUrl: (!(!args.options.listUrl)).toString()
       });
     });
   }
@@ -55,6 +57,9 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
       },
       {
         option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       }
     );
   }
@@ -79,29 +84,36 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
-        logger.logToStderr(`Extracting Site Script from list ${list} in site at ${args.options.webUrl}...`);
+        logger.logToStderr(`Extracting Site Script from list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
       }
-  
+
       let requestUrl: string = '';
-  
+
       if (args.options.listId) {
         if (this.debug) {
-          logger.logToStderr(`Retrieving List Url from Id '${args.options.listId}'...`);
+          logger.logToStderr(`Retrieving List from Id '${args.options.listId}'...`);
         }
         requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')?$expand=RootFolder`;
       }
-      else {
+      else if (args.options.listTitle) {
         if (this.debug) {
-          logger.logToStderr(`Retrieving List Url from Title '${args.options.listTitle}'...`);
+          logger.logToStderr(`Retrieving List from Title '${args.options.listTitle}'...`);
         }
         requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder`;
+      }
+      else if (args.options.listUrl) {
+        if (this.debug) {
+          logger.logToStderr(`Retrieving List from URL '${args.options.listUrl}'...`);
+        }
+
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        requestUrl = `${args.options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
       }
 
       let requestOptions: any = {

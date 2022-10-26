@@ -20,7 +20,7 @@ describe(commands.LIST_LABEL_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -352,6 +352,78 @@ describe(commands.LIST_LABEL_GET, () => {
     assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
   });
 
+  it('gets the label from the given list if url option is passed (debug)', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/`) > -1) {
+        return Promise.resolve({
+          "AcceptMessagesOnlyFromSendersOrMembers": false,
+          "AccessType": null,
+          "AllowAccessFromUnmanagedDevice": null,
+          "AutoDelete": false,
+          "BlockDelete": false,
+          "BlockEdit": false,
+          "ContainsSiteLabel": false,
+          "DisplayName": "",
+          "EncryptionRMSTemplateId": null,
+          "HasRetentionAction": false,
+          "IsEventTag": false,
+          "Notes": null,
+          "RequireSenderAuthenticationEnabled": false,
+          "ReviewerEmail": null,
+          "SharingCapabilities": null,
+          "SuperLock": false,
+          "TagDuration": 0,
+          "TagId": "4d535433-2a7b-40b0-9dad-8f0f8f3b3841",
+          "TagName": "Sensitive",
+          "TagRetentionBasedOn": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/web/GetList(\'%2Fsites%2Fteam1%2Fdocuments\')`) > -1) {
+        return Promise.resolve({ "RootFolder": { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "MyLibrary", "ProgID": null, "ServerRelativeUrl": "/sites/team1/MyLibrary", "TimeCreated": "2019-01-11T10:03:19Z", "TimeLastModified": "2019-01-11T10:03:20Z", "UniqueId": "faaa6af2-0157-4e9a-a352-6165195923c8", "WelcomePage": "" } }
+        );
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com/sites/team1',
+        listUrl: 'sites/team1/documents'
+      }
+    });
+    const expected = {
+      "AcceptMessagesOnlyFromSendersOrMembers": false,
+      "AccessType": null,
+      "AllowAccessFromUnmanagedDevice": null,
+      "AutoDelete": false,
+      "BlockDelete": false,
+      "BlockEdit": false,
+      "ContainsSiteLabel": false,
+      "DisplayName": "",
+      "EncryptionRMSTemplateId": null,
+      "HasRetentionAction": false,
+      "IsEventTag": false,
+      "Notes": null,
+      "RequireSenderAuthenticationEnabled": false,
+      "ReviewerEmail": null,
+      "SharingCapabilities": null,
+      "SuperLock": false,
+      "TagDuration": 0,
+      "TagId": "4d535433-2a7b-40b0-9dad-8f0f8f3b3841",
+      "TagName": "Sensitive",
+      "TagRetentionBasedOn": null
+    };
+    const actual = log[log.length - 1];
+    assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
+  });
+
   it('correctly handles the case when no label has been set on the specified list', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`) > -1) {
@@ -461,14 +533,9 @@ describe(commands.LIST_LABEL_GET, () => {
     assert(actual);
   });
 
-  it('fails validation if both listId and listTitle options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85', listTitle: 'Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both listId and listTitle options are not passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [['listId', 'listTitle', 'listUrl']]);
   });
 
   it('supports debug mode', () => {
