@@ -10,6 +10,8 @@ describe('utils/md', () => {
   let mdMixedLineEndings: string;
   let loginHelp: string;
   let loginHelpPlain: string;
+  let plannerPlanAddHelp: string;
+  let plannerPlanAddHelpPlain: string;
 
   before(() => {
     cliCompletionClinkUpdateHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8');
@@ -17,6 +19,9 @@ describe('utils/md', () => {
     mdMixedLineEndings = '\n```sh\nnix\n```\n\r\n```sh\r\nWindows\r\n```\r\n';
     loginHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'login.md'), 'utf8');
     loginHelpPlain = md.md2plain(loginHelp, path.join(__dirname, '..', '..', 'docs'));
+    plannerPlanAddHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'planner', 'plan', 'plan-add.md'), 'utf8');
+    plannerPlanAddHelpPlain = md.md2plain(plannerPlanAddHelp, path.join(__dirname, '..', '..', 'docs'));
+
   });
 
   it('converts title to uppercase', () => {
@@ -76,5 +81,11 @@ describe('utils/md', () => {
 
   it('includes content', () => {
     assert(cliCompletionClinkUpdateHelpPlain.includes('--verbose'));
+  });
+
+  it('converts content tabs with code blocks', () => {
+    assert(plannerPlanAddHelpPlain.includes(`  JSON:\n\n  {`));
+    assert(!plannerPlanAddHelpPlain.includes(`=== "JSON"`));
+    assert(!plannerPlanAddHelpPlain.includes(`\` json`));
   });
 });
