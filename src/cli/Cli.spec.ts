@@ -36,8 +36,7 @@ class MockCommand extends AnonymousCommand {
         option: '-y, --parameterY [parameterY]'
       }
     );
-    this.types.string.push('x');
-    this.types.boolean.push('y');
+    this.types.string.push('x', 'y');
   }
   public async commandAction(logger: Logger, args: any): Promise<void> {
     logger.log(args.options.parameterX);
@@ -127,6 +126,33 @@ class MockCommandWithValidation extends AnonymousCommand {
   }
 }
 
+class MockCommandWithBooleanRewrite extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock boolean rewrite';
+  }
+  public get description(): string {
+    return 'Mock command with boolean rewrite';
+  }
+  constructor() {
+    super();
+
+    this.options.push(
+      {
+        option: '-x, --booleanParameterX [booleanParameterX]'
+      },
+      {
+        option: '-y, --booleanParameterY [booleanParameterY]'
+      }
+    );
+
+    this.types.boolean.push('x', 'booleanParameterX', 'y', 'booleanParameterY');
+  }
+  public async commandAction(logger: Logger, args: any): Promise<void> {
+    logger.log(`booleanParameterX: ${args.options.booleanParameterX}`);
+    logger.log(`booleanParameterY: ${args.options.booleanParameterY}`);
+  }
+}
+
 class MockCommandWithPrompt extends AnonymousCommand {
   public get name(): string {
     return 'cli mock prompt';
@@ -186,6 +212,7 @@ describe('Cli', () => {
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
   let log: string[] = [];
+  let mockCommandWithBooleanRewrite: Command;
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -201,6 +228,7 @@ describe('Cli', () => {
 
     mockCommand = new MockCommand();
     mockCommandWithAlias = new MockCommandWithAlias();
+    mockCommandWithBooleanRewrite = new MockCommandWithBooleanRewrite();
     mockCommandWithValidation = new MockCommandWithValidation();
     mockCommandWithOptionSets = new MockCommandWithOptionSets();
     mockCommandActionSpy = sinon.spy(mockCommand, 'action');
@@ -221,6 +249,7 @@ describe('Cli', () => {
     (cli as any).loadCommand(mockCommandWithAlias);
     (cli as any).loadCommand(mockCommandWithValidation);
     (cli as any).loadCommand(cliCompletionUpdateCommand);
+    (cli as any).loadCommand(mockCommandWithBooleanRewrite);
   });
 
   afterEach(() => {
@@ -235,13 +264,14 @@ describe('Cli', () => {
       Cli.executeCommand,
       fs.existsSync,
       fs.readFileSync,
-      mockCommandWithValidation.validate,
-      mockCommandWithValidation.action,
       inquirer.prompt,
       // eslint-disable-next-line no-console
       console.log,
       // eslint-disable-next-line no-console
       console.error,
+      mockCommand.validate,
+      mockCommandWithValidation.action,
+      mockCommandWithValidation.validate,
       mockCommand.commandAction,
       mockCommand.processOptions,
       Cli.prompt
@@ -257,7 +287,8 @@ describe('Cli', () => {
       md.md2plain,
       appInsights.trackEvent,
       pid.getProcessName,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      mockCommand.action
     ]);
   });
 
@@ -515,6 +546,105 @@ describe('Cli', () => {
           done(e);
         }
       }, e => done(e));
+  });
+
+  it(`succeeds running with truthy/falsy values 'true' and 'false'`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`rewrites a truthy/falsy values '1' and '0' to 'true' and 'false' respectively`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', '1', '--booleanParameterY', '0', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`rewrites a truthy/falsy values 'on' and 'off' to 'true' and 'false' respectively`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'on', '--booleanParameterY', 'off', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'yes', '--booleanParameterY', 'no', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`rewrites a truthy/falsy values 'True' and 'False' to 'true' and 'false' respectively`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'True', '--booleanParameterY', 'False', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively (using shorts)`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '-x', 'yes', '-y', 'no', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`shows error when a boolean option does not contain a correct truthy/falsy value`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'folse'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        assert(cliErrorStub.calledWith(chalk.red(`Error: The value 'folse' for option '--booleanParameterX' is not a valid boolean`)));
+        done();
+      });
   });
 
   it(`fails options validation if the command doesn't allow unknown options and specified options match command options`, (done) => {
@@ -1026,7 +1156,7 @@ describe('Cli', () => {
       .then(_ => {
         try {
           // 12 commands from the folder + 4 mocks + cli completion clink update
-          assert.strictEqual(cli.commands.length, 12 + 4 + 1);
+          assert.strictEqual(cli.commands.length, 12 + 5 + 1);
           done();
         }
         catch (e) {
@@ -1619,7 +1749,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  6 commands'));
+      assert(cliLogStub.calledWith('  cli *  7 commands'));
       done();
     }
     catch (e) {
@@ -1639,7 +1769,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli mock *        3 commands'));
+      assert(cliLogStub.calledWith('  cli mock *        4 commands'));
       done();
     }
     catch (e) {
@@ -1659,7 +1789,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  6 commands'));
+      assert(cliLogStub.calledWith('  cli *  7 commands'));
       done();
     }
     catch (e) {
