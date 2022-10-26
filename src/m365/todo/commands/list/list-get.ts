@@ -87,7 +87,7 @@ class TodoListGetCommand extends GraphCommand {
     }
 
     requestOptions.url = `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(options.name as string)}'`;
-    const result = await request.get<{ "value": ToDoList[] }>(requestOptions);
+    const result = await request.get<{ value: ToDoList[] }>(requestOptions);
 
     if (result.value.length === 0) {
       throw `The specified list '${options.name}' does not exist.`;

@@ -102,9 +102,9 @@ describe(commands.LIST_GET, () => {
   it('throws an error when no list found', async () => {
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/metodo/lists?$filter=displayName eq '${validName}'`)) {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Task%20list'`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
-          return ({ "value": [] });
+          return ({ value: [] });
         }
       }
 
@@ -121,7 +121,7 @@ describe(commands.LIST_GET, () => {
 
   it('throws an error when multiple lists with same name were found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/metodo/lists?$filter=displayName eq '${validName}'`)) {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Task%20list'`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
           return multipleListsResponse;
         }
@@ -157,7 +157,7 @@ describe(commands.LIST_GET, () => {
 
   it('lists a specific To Do task list based on the name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/metodo/lists?$filter=displayName eq '${validName}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Task%20list'`) {
         return (listResponse);
       }
 
