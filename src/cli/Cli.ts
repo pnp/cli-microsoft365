@@ -250,6 +250,12 @@ export class Cli {
       });
     }
     catch (err: any) {
+      // restoring the command and logger is done here instead of in a 'finally' because there were issues with the code coverage tool
+      // restore the original command name
+      cli.currentCommandName = parentCommandName;
+      // restore the original logger
+      request.logger = currentLogger;
+
       throw {
         error: err,
         stderr: logErr.join(os.EOL)
@@ -401,17 +407,68 @@ export class Cli {
       const commandTypes = commandInfo.command.types;
       if (commandTypes) {
         minimistOptions.string = commandTypes.string;
-        minimistOptions.boolean = commandTypes.boolean;
+
+        // Only treat those options as booleans that are included as arg
+        // Otherwise unincluded options will default to false.
+        minimistOptions.boolean = commandTypes.boolean?.filter(optionName => args.some(arg => `--${optionName}` === arg || `-${optionName}` === arg));
       }
+
       minimistOptions.alias = {};
       commandInfo.options.forEach(option => {
+        Cli.log(JSON.stringify(option));
         if (option.short && option.long) {
           (minimistOptions.alias as any)[option.short] = option.long;
         }
       });
     }
 
-    return minimist(args, minimistOptions);
+    const curatedArgs = this.getCuratedArgsList(args, commandInfo);
+
+    return minimist(curatedArgs, minimistOptions);
+  }
+
+  /**
+   * Curates arguments before passing them into minimist.
+   * Currently only boolean values are checked and fixed.
+   */
+  private getCuratedArgsList(args: string[], commandInfo: CommandInfo | undefined): string[] {
+    const booleanTypes = commandInfo?.command.types.boolean || [];
+
+    if (booleanTypes.length === 0) {
+      return args;
+    }
+
+    return args.map((arg: string, index: number, array: string[]) => {
+      if (!arg.startsWith("-") && index > 0 && booleanTypes.some(t => `--${t}` === array[index - 1] || `-${t}` === array[index - 1])) {
+        return this.fixBooleanArg(arg);
+      }
+
+      return arg;
+    });
+  }
+
+  /**
+   * Curates boolean arguments according to the definition:
+   * Booleans are case-insensitive, and are represented by the following values.
+   *   True: 1, yes, true, on
+   *   False: 0, no, false, off
+   */
+  private fixBooleanArg(arg: string): string {
+    const argValue = arg.toLowerCase();
+    switch (argValue) {
+      case "1":
+      case "true":
+      case "yes":
+      case "on":
+        return "true";
+      case "0":
+      case "false":
+      case "no":
+      case "off":
+        return "false";
+      default:
+        return arg;
+    }
   }
 
   private static formatOutput(logStatement: any, options: GlobalOptions): any {

@@ -2,7 +2,6 @@ import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
 import PlannerCommand from '../../../base/PlannerCommand';
 import commands from '../../commands';
 
@@ -33,6 +32,7 @@ class PlannerTenantSettingsSetCommand extends PlannerCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -78,6 +78,15 @@ class PlannerTenantSettingsSetCommand extends PlannerCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.boolean.push('isPlannerAllowed');
+    this.types.boolean.push('allowCalendarSharing');
+    this.types.boolean.push('allowTenantMoveWithDataLoss');
+    this.types.boolean.push('allowTenantMoveWithDataMigration');
+    this.types.boolean.push('allowRosterCreation');
+    this.types.boolean.push('allowPlannerMobilePushNotifications');
+  }
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -88,12 +97,6 @@ class PlannerTenantSettingsSetCommand extends PlannerCommand {
 
         if (optionsArray.every(o => typeof o === 'undefined')) {
           return 'You must specify at least one option';
-        }
-
-        for (const option of optionsArray) {
-          if (typeof option !== 'undefined' && !validation.isValidBoolean(option as any)) {
-            return `Value '${option}' is not a valid boolean`;
-          }
         }
 
         return true;
