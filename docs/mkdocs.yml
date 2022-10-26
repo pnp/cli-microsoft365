@@ -259,6 +259,7 @@ nav:
       - card:
         - card get: 'cmd/pp/card/card-get.md'
         - card list: 'cmd/pp/card/card-list.md'
+        - card remove: 'cmd/pp/card/card-remove.md'
       - dataverse:
         - dataverse table list: 'cmd/pp/dataverse/dataverse-table-list.md'
       - environment:
