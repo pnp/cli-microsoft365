@@ -31,3 +31,31 @@ Get a specific Microsoft To Do task list based on the name
 ```sh
 m365 todo list get --name "Task list"
 ```
+
+## Response
+
+=== "JSON"
+
+    ``` json
+    {
+      "displayName": "Task list",
+      "isOwner": true,
+      "isShared": false,
+      "wellknownListName": "defaultList",
+      "id": "AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA="
+    }
+    ```
+
+=== "Text"
+
+    ``` text
+    displayName    : Task list
+    id             : AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=
+    ```
+
+=== "CSV"
+
+    ``` text
+    displayName,id
+    Task list,AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=
+    ```
