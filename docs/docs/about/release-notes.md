@@ -69,6 +69,7 @@
 - extended spo contenttype with list options 'listUrl' and 'listId' [#3806](https://github.com/pnp/cli-microsoft365/issues/3818)
 - extended 'status' command to log extra info [#3818](https://github.com/pnp/cli-microsoft365/issues/3806)
 - added validating output format [#2988](https://github.com/pnp/cli-microsoft365/issues/2988)
+- included response output: Planner bucket & Planner plan [#3773](https://github.com/pnp/cli-microsoft365/issues/3773)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
