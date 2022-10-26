@@ -84,7 +84,7 @@ describe('utils/md', () => {
   });
 
   it('converts content tabs with code blocks', () => {
-    assert(plannerPlanAddHelpPlain.includes(`  JSON:\n\n  {`));
+    assert(plannerPlanAddHelpPlain.includes(`  JSON${EOL}${EOL}  {`));
     assert(!plannerPlanAddHelpPlain.includes(`=== "JSON"`));
     assert(!plannerPlanAddHelpPlain.includes(`\` json`));
   });

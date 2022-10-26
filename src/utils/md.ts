@@ -54,7 +54,7 @@ function convertHyperlinks(md: string): string {
 function convertContentTabs(md: string): string {
   const regex = new RegExp('^=== "(.+?)"(?:\r\n|\n){2}((?:^    (?:.*?(?:\r\n|\n))?)+)', 'gms');
   return md.replace(regex, (match, title: string, content: string) => {
-    return `  ${title}:${EOL}${EOL}${content.replace(/^    /gms, '')}`;
+    return `  ${title}${EOL}${EOL}${content.replace(/^    /gms, '')}`;
   });
 }
 
