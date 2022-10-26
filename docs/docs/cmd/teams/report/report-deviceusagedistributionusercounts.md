@@ -37,3 +37,38 @@ Gets the number of Microsoft Teams unique users by device type for the last week
 ```sh
 m365 teams report deviceusagedistributionusercounts --period D7 --output json > "deviceusagedistributionusercounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ``` json
+    [
+      {
+        "Report Refresh Date": "2022-10-24",
+        "Web": "0",
+        "Windows Phone": "0",
+        "Android Phone": "0",
+        "iOS": "0",
+        "Mac": "0",
+        "Windows": "1",
+        "Chrome OS": "0",
+        "Linux": "0",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ``` text
+    Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Chrome OS,Linux,Report Period
+    2022-10-24,0,0,0,0,0,1,0,0,7
+    ```
+
+=== "CSV"
+
+    ``` text
+    Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Chrome OS,Linux,Report Period
+    2022-10-24,0,0,0,0,0,1,0,0,7
+    ```
