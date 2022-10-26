@@ -110,7 +110,7 @@ describe(commands.TASK_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails to get ToDo Task list when the specified task list does not exist', async () => {
+  it('fails to get To Do Task list when the specified task list does not exist', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/me/todo/lists?$filter=displayName eq '`) > -1) {
         return ({ value: [] });
