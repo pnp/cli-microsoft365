@@ -42,7 +42,7 @@ m365 tenant report servicesusercounts --period D7 --output json > "servicesuserc
 
 === "JSON"
 
-    ``` json
+    ```json
     [
       {
         "Report Refresh Date": "2022-10-23",
@@ -67,14 +67,14 @@ m365 tenant report servicesusercounts --period D7 --output json > "servicesuserc
 
 === "Text"
 
-    ``` text
+    ```text
     Report Refresh Date,Exchange Active,Exchange Inactive,OneDrive Active,OneDrive Inactive,SharePoint Active,SharePoint Inactive,Skype For Business Active,Skype For Business Inactive,Yammer Active,Yammer Inactive,Teams Active,Teams Inactive,Office 365 Active,Office 365 Inactive,Report Period
     2022-10-23,1,23,1,23,1,23,0,24,0,24,1,23,2,22,7
     ```
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     Report Refresh Date,Exchange Active,Exchange Inactive,OneDrive Active,OneDrive Inactive,SharePoint Active,SharePoint Inactive,Skype For Business Active,Skype For Business Inactive,Yammer Active,Yammer Inactive,Teams Active,Teams Inactive,Office 365 Active,Office 365 Inactive,Report Period
     2022-10-23,1,23,1,23,1,23,0,24,0,24,1,23,2,22,7
     ```

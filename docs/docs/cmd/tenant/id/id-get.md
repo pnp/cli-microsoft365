@@ -37,18 +37,18 @@ m365 tenant id get
 
 === "JSON"
 
-    ``` json
+    ```json
     "e65b162c-6f87-4eb1-a24e-1b37d3504663"
     ```
 
 === "Text"
 
-    ``` text
+    ```text
     e65b162c-6f87-4eb1-a24e-1b37d3504663
     ```
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     e65b162c-6f87-4eb1-a24e-1b37d3504663
     ```

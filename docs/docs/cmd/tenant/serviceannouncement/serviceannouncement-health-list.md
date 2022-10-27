@@ -35,7 +35,7 @@ m365 tenant serviceannouncement health list --issues
 
 === "JSON"
 
-    ``` json
+    ```json
     [
       {
         "service": "Exchange Online",
@@ -47,7 +47,7 @@ m365 tenant serviceannouncement health list --issues
 
 === "Text"
 
-    ``` text
+    ```text
     id          status              service
     ----------  ------------------  -----------------
     Exchange    serviceDegradation  Exchange Online
@@ -55,7 +55,7 @@ m365 tenant serviceannouncement health list --issues
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     id,status,service
     Exchange,serviceDegradation,Exchange Online
     ```
@@ -66,7 +66,7 @@ When we make use of the option `issues` the response will differ.
 
 === "JSON"
 
-    ``` json
+    ```json
     [
       {
         "service": "Microsoft Defender for Cloud Apps",
@@ -107,7 +107,7 @@ When we make use of the option `issues` the response will differ.
 
 === "Text"
 
-    ``` text
+    ```text
     id          status              service
     ----------  ------------------  -----------------
     Exchange    serviceDegradation  Exchange Online
@@ -115,7 +115,7 @@ When we make use of the option `issues` the response will differ.
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     id,status,service
     Exchange,serviceDegradation,Exchange Online
     ```

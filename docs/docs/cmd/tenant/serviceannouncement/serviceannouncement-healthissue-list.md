@@ -33,7 +33,7 @@ m365 tenant serviceannouncement healthissue list --service "Microsoft Forms"
 
 === "JSON"
 
-    ``` json
+    ```json
     [
       {
         "startDateTime": "2022-05-24T16:00:00Z",
@@ -67,7 +67,7 @@ m365 tenant serviceannouncement healthissue list --service "Microsoft Forms"
 
 === "Text"
 
-    ``` text
+    ```text
     id        title
     --------  ----------------------------------------------------------
     CR384241  Installation delays within the Power Platform admin center
@@ -75,7 +75,7 @@ m365 tenant serviceannouncement healthissue list --service "Microsoft Forms"
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     id,title
     CR384241,Installation delays within the Power Platform admin center
     ```

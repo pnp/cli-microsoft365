@@ -33,7 +33,7 @@ m365 tenant serviceannouncement message list --service "Microsoft Teams"
 
 === "JSON"
 
-    ``` json
+    ```json
     [
       {
         "startDateTime": "2021-07-08T00:37:37Z",
@@ -68,7 +68,7 @@ m365 tenant serviceannouncement message list --service "Microsoft Teams"
 
 === "Text"
 
-    ``` text
+    ```text
     id        title
     --------  ------------------------------------------------
     MC267581  (Updated) Microsoft Lists: Custom list templates
@@ -76,7 +76,7 @@ m365 tenant serviceannouncement message list --service "Microsoft Teams"
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     id,title
     MC267581,(Updated) Microsoft Lists: Custom list templates
     ```

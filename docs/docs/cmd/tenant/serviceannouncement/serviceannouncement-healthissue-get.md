@@ -27,7 +27,7 @@ m365 tenant serviceannouncement healthissue get --id MO226784
 
 === "JSON"
 
-    ``` json
+    ```json
     {
       "startDateTime": "2022-05-24T16:00:00Z",
       "endDateTime": "2022-05-24T22:20:00Z",
@@ -59,7 +59,7 @@ m365 tenant serviceannouncement healthissue get --id MO226784
 
 === "Text"
 
-    ``` text
+    ```text
     classification      : advisory
     details             : []
     endDateTime         : 2022-05-24T22:20:00Z
@@ -80,7 +80,7 @@ m365 tenant serviceannouncement healthissue get --id MO226784
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     startDateTime,endDateTime,lastModifiedDateTime,title,id,impactDescription,classification,origin,status,service,feature,featureGroup,isResolved,highImpact,details,posts
     2022-05-24T16:00:00Z,2022-05-24T22:20:00Z,2022-05-24T22:27:18.63Z,Installation delays within the Power Platform admin center,CR384241,Users may have experienced delays when installing applications within the Power Platform admin center.,advisory,microsoft,serviceRestored,Dynamics 365 Apps,Other,Other,1,,[],"[{""createdDateTime"":""2022-05-24T21:22:56.817Z"",""postType"":""regular"",""description"":{""contentType"":""html"",""content"":""Title: Installation delays within the Power Platform admin center\n\nUser Impact: Users may experience delays when installing applications within the Power Platform admin center.\n\nWe are aware of an emerging issue where users are experiencing delays when installing applications through the Power Platform admin center. We are investigating the issue and will provide another update within the next 30 minutes.\n\nThis information is preliminary and may be subject to changes, corrections, and updates.""}}]"
     ```

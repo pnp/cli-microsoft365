@@ -24,7 +24,7 @@ m365 tenant report office365activationsusercounts
 
 === "JSON"
 
-    ``` json
+    ```json
     [
       {
         "Report Refresh Date": "2022-10-25",
@@ -38,14 +38,14 @@ m365 tenant report office365activationsusercounts
 
 === "Text"
 
-    ``` text
+    ```text
     Report Refresh Date,Product Type,Assigned,Activated,Shared Computer Activation
     2022-10-25,MICROSOFT 365 APPS FOR ENTERPRISE,24,5,0
     ```
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     Report Refresh Date,Product Type,Assigned,Activated,Shared Computer Activation
     2022-10-25,MICROSOFT 365 APPS FOR ENTERPRISE,24,5,0
     ```

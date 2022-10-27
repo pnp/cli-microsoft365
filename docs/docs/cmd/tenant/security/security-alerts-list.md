@@ -33,7 +33,7 @@ m365 tenant security alerts list --vendor "Azure Sentinel"
 
 === "JSON"
 
-    ``` json
+    ```json
     [
       {
           "id": "2517536653831539999_658fa695-a5e6-4b60-ac7c-b2c1396df384",
@@ -121,7 +121,7 @@ m365 tenant security alerts list --vendor "Azure Sentinel"
 
 === "Text"
 
-    ``` text
+    ```text
     id                                   title                      severity
     ------------------------------------ -------------------------- --------
     4ece2cf8-cbc0-5a42-92c3-e23f96006907 SharePoint Bulk Edit Items medium
@@ -129,7 +129,7 @@ m365 tenant security alerts list --vendor "Azure Sentinel"
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     id,title,severity
     4ece2cf8-cbc0-5a42-92c3-e23f96006907,SharePoint Bulk Edit Items,medium
     ```

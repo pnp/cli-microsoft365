@@ -38,7 +38,7 @@ m365 tenant serviceannouncement health get --serviceName "Exchange Online" --iss
 
 === "JSON"
 
-    ``` json
+    ```json
     {
       "service": "Exchange Online",
       "status": "serviceDegradation",
@@ -48,7 +48,7 @@ m365 tenant serviceannouncement health get --serviceName "Exchange Online" --iss
 
 === "Text"
 
-    ``` text
+    ```text
     id     : Exchange
     service: Exchange Online
     status : serviceDegradation
@@ -56,7 +56,7 @@ m365 tenant serviceannouncement health get --serviceName "Exchange Online" --iss
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     id,status,service
     Exchange,serviceDegradation,Exchange Online
     ```
@@ -67,7 +67,7 @@ When we make use of the option `issues` the response will differ.
 
 === "JSON"
 
-    ``` json
+    ```json
     {
       "service": "Exchange Online",
       "status": "serviceDegradation",
@@ -106,7 +106,7 @@ When we make use of the option `issues` the response will differ.
 
 === "Text"
 
-    ``` text
+    ```text
     id          status              service
     ----------  ------------------  -----------------
     Exchange    serviceDegradation  Exchange Online
@@ -114,7 +114,7 @@ When we make use of the option `issues` the response will differ.
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     id,status,service
     Exchange,serviceDegradation,Exchange Online
     ```
