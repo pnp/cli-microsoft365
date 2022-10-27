@@ -50,3 +50,52 @@ Gets details about Microsoft 365 active users for the last week and exports the 
 ```sh
 m365 tenant report activeuserdetail --period D7 --output json > "activeuserdetail.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ``` json
+    [
+      {
+        "Report Refresh Date": "2022-10-23",
+        "User Principal Name": "0439A166C614C2E8C7B4075DC4752054",
+        "Display Name": "2236A6E43D08F619FE695DF3B163A32F",
+        "Is Deleted": "False",
+        "Deleted Date": "",
+        "Has Exchange License": "True",
+        "Has OneDrive License": "True",
+        "Has SharePoint License": "True",
+        "Has Skype For Business License": "True",
+        "Has Yammer License": "True",
+        "Has Teams License": "True",
+        "Exchange Last Activity Date": "",
+        "OneDrive Last Activity Date": "",
+        "SharePoint Last Activity Date": "",
+        "Skype For Business Last Activity Date": "",
+        "Yammer Last Activity Date": "",
+        "Teams Last Activity Date": "",
+        "Exchange License Assign Date": "2020-02-26",
+        "OneDrive License Assign Date": "2020-02-26",
+        "SharePoint License Assign Date": "2020-02-26",
+        "Skype For Business License Assign Date": "2020-02-26",
+        "Yammer License Assign Date": "2020-02-26",
+        "Teams License Assign Date": "2020-02-26",
+        "Assigned Products": "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ``` text
+    Report Refresh Date,User Principal Name,Display Name,Is Deleted,Deleted Date,Has Exchange License,Has OneDrive License,Has SharePoint License,Has Skype For Business License,Has Yammer License,Has Teams License,Exchange Last Activity Date,OneDrive Last Activity Date,SharePoint Last Activity Date,Skype For Business Last Activity Date,Yammer Last Activity Date,Teams Last Activity Date,Exchange License Assign Date,OneDrive License Assign Date,SharePoint License Assign Date,Skype For Business License Assign Date,Yammer License Assign Date,Teams License Assign Date,Assigned Products
+    2022-10-23,77E5979DD60BA6EAA53E814DBEEEFA5F,4291DA7C39EE3263E97336B42734A667,False,,True,True,True,True,True,True,,2022-09-12,,,,,2021-01-10,2021-01-10,2021-01-10,2021-01-10,2021-01-10,2021-01-10,MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)
+    ```
+
+=== "CSV"
+
+    ``` CSV
+    Report Refresh Date,User Principal Name,Display Name,Is Deleted,Deleted Date,Has Exchange License,Has OneDrive License,Has SharePoint License,Has Skype For Business License,Has Yammer License,Has Teams License,Exchange Last Activity Date,OneDrive Last Activity Date,SharePoint Last Activity Date,Skype For Business Last Activity Date,Yammer Last Activity Date,Teams Last Activity Date,Exchange License Assign Date,OneDrive License Assign Date,SharePoint License Assign Date,Skype For Business License Assign Date,Yammer License Assign Date,Teams License Assign Date,Assigned Products
+    2022-10-23,77E5979DD60BA6EAA53E814DBEEEFA5F,4291DA7C39EE3263E97336B42734A667,False,,True,True,True,True,True,True,,2022-09-12,,,,,2021-01-10,2021-01-10,2021-01-10,2021-01-10,2021-01-10,2021-01-10,MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)
+    ```
