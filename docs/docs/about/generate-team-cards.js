@@ -1,5 +1,4 @@
-const maintainers = [
-  {
+const maintainers = [{
     name: 'Adam Wojcik',
     company: '',
     github: 'Adam-it',
@@ -61,8 +60,7 @@ const maintainers = [
   }
 ];
 
-const contributors = [
-  {
+const contributors = [{
     name: 'Aakash Bhardwaj',
     company: '',
     github: 'aakashbhardwaj619',
@@ -183,6 +181,12 @@ const contributors = [
     twitter: ''
   },
   {
+    name: 'Conor O\'Callaghan',
+    company: '',
+    github: 'Conor0Callaghan',
+    twitter: ''
+  },
+  {
     name: 'Cyril C Kurian',
     company: '',
     github: 'cyrilckurian',
@@ -267,10 +271,22 @@ const contributors = [
     twitter: 'garrytrinder'
   },
   {
+    name: 'Gaston Flores ',
+    company: 'Flybondi',
+    github: 'gaston-flores',
+    twitter: ''
+  },
+  {
     name: 'Hugo Bernier',
     company: 'Microsoft',
     github: 'hugoabernier',
     twitter: 'bernierh'
+  },
+  {
+    name: 'Hüseyin Saatçi',
+    company: '',
+    github: 'huseyinsaatci',
+    twitter: 'huseyinn_saatci'
   },
   {
     name: 'Jasey Waegebaert',
@@ -489,6 +505,12 @@ const contributors = [
     twitter: 'Prasad_kasiredd'
   },
   {
+    name: 'Priyanshu Ahlawat',
+    company: 'GEU',
+    github: 'PriyanshuAhlawat',
+    twitter: 'PriyanshuAhla13'
+  },
+  {
     name: 'Rabia Williams',
     company: 'Microsoft',
     github: 'rabwill',
@@ -504,6 +526,12 @@ const contributors = [
     name: 'Reshmee Auckloo',
     company: '',
     github: 'reshmee011',
+    twitter: ''
+  },
+  {
+    name: 'Riccardo Solazzi',
+    company: '',
+    github: 'theZal',
     twitter: ''
   },
   {

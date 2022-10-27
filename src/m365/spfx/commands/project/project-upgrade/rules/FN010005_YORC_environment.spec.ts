@@ -33,6 +33,15 @@ describe('FN010005_YORC_environment', () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it('returns notification when @microsoft/generator-sharepoint is not set', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      yoRcJson: {}
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1);
+  });
+
   it('returns notification if environment is not up-to-date', () => {
     const project: Project = {
       path: '/usr/tmp',

@@ -44,7 +44,7 @@ export class FN010007_YORC_isDomainIsolated extends JsonRule {
       return;
     }
 
-    if (project.yoRcJson["@microsoft/generator-sharepoint"].isDomainIsolated !== this.value) {
+    if (project.yoRcJson["@microsoft/generator-sharepoint"]?.isDomainIsolated !== this.value) {
       const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.isDomainIsolated');
       this.addFindingWithPosition(findings, node);
     }
