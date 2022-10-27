@@ -25,7 +25,7 @@ m365 spo list webhook get [options]
 `-i, --id <id>`
 : ID of the webhook.
 
---8<-- "docs/cmd/\_global.md"
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
