@@ -31,6 +31,7 @@
 **To Do:**
 
 - [todo list get](../cmd/todo/list/list-get.md) - returns a specific Microsoft To Do task list [#3847](https://github.com/pnp/cli-microsoft365/issues/3847)
+- [todo task get](../cmd/todo/task/task-get.md) - returns a specific task from a Microsoft To Do task list [#3846](https://github.com/pnp/cli-microsoft365/issues/3846)
 
 ### Changes
 
@@ -80,6 +81,9 @@
 - made id option required for command spo list webhook get and set [#3860](https://github.com/pnp/cli-microsoft365/issues/3860)
 - included docs response output for 'tenant' commands [#3926](https://github.com/pnp/cli-microsoft365/issues/3926)
 - fixed global options for spo list webhook get and set docs [#3946](https://github.com/pnp/cli-microsoft365/issues/3946)
+- extended spo listitem with listUrl [#3814](https://github.com/pnp/cli-microsoft365/issues/3814)
+- extended spo field add and spo field set with listId and listUrl [#3807](https://github.com/pnp/cli-microsoft365/issues/3807)
+- extended spo listitem with listUrl [#3813](https://github.com/pnp/cli-microsoft365/issues/3813)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
