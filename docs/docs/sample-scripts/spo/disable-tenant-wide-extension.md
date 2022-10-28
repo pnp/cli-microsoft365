@@ -1,3 +1,9 @@
+---
+tags:
+  - customizations
+  - provisioning
+---
+
 # Disable specified Tenant-wide Extension
 
 Author: [Shantha Kumar T](https://www.ktskumar.com/2020/04/manage-tenant-wide-extensions-using-office-365-cli/)
@@ -49,8 +55,3 @@ Note: TenantWideExtensionDisabled column denotes the extension is enabled or dis
       echo "No extensions found with the name '$extensionName'."
     fi
     ```
-
-Keywords:
-
-- SharePoint Online
-- Tenant Wide Extension

@@ -26,10 +26,10 @@ Specify either `listTitle`, `listId` or `listUrl`.
 Specify either `listTitle`, `listId` or `listUrl`.
 
 `-n, --name [name]`
-The name of the event receiver to retrieve. Specify either `name` or `id` but not both.
+: The name of the event receiver to retrieve. Specify either `name` or `id` but not both.
 
 `-i, --id [id]`
-The id of the event receiver to retrieve. Specify either `name` or `id` but not both.
+: The id of the event receiver to retrieve. Specify either `name` or `id` but not both.
 
 `-s, --scope [scope]`
 : The scope of which to retrieve the Event Receivers.

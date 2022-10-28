@@ -6,10 +6,14 @@
 
 **Power Platform:**
 
+- [pp card get](../cmd/pp/card//card-get.md) - gets a specific Microsoft Power Platform card in the specified Power Platform environment [#3770](https://github.com/pnp/cli-microsoft365/issues/3770)
 - [pp card list](../cmd/pp/card/card-list.md) - lists Microsoft Power Platform cards in the specified Power Platform environment [#3767](https://github.com/pnp/cli-microsoft365/issues/3767)
 - [pp dataverse table list](../cmd/pp/dataverse/dataverse-table-list.md) - lists dataverse tables in a given environment [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
+- [pp gateway get](../cmd/pp/gateway/gateway-get.md) - gets information about the specified gateway [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
+- [pp solution get](../cmd/pp/solution/solution-get.md) - gets a specific solution in a given environment [#3722](https://github.com/pnp/cli-microsoft365/issues/3722)
 - [pp solution list](../cmd/pp/solution/solution-list.md) - lists solutions in a given environment [#3711](https://github.com/pnp/cli-microsoft365/issues/3711)
 - [pp tenant settings list](../cmd/pp/tenant/tenant-settings-list.md) - lists the global Power Platform tenant settings [#3657](https://github.com/pnp/cli-microsoft365/issues/3657)
+- [pp environment get](../cmd/pp/environment/environment-get.md) - gets information about the specified Power Platform environment. [#3710](https://github.com/pnp/cli-microsoft365/issues/3710)
 
 **SharePoint:**
 
@@ -18,8 +22,10 @@
 - [spo file roleassignment remove](../cmd/spo/file/file-roleassignment-remove.md) - removes a role assignment from a file [#3693](https://github.com/pnp/cli-microsoft365/issues/3693)
 - [spo file roleinheritance break](../cmd/spo/file/file-roleinheritance-break.md) - breaks inheritance of file [#3593](https://github.com/pnp/cli-microsoft365/issues/3593)
 - [spo file roleinheritance reset](../cmd/spo/file/file-roleinheritance-reset.md) - restores the role inheritance of a file [#3595](https://github.com/pnp/cli-microsoft365/issues/3595)
+- [spo folder roleassignment remove](../cmd/spo/folder/folder-roleassignment-remove.md) - removes a role assignment from the specified folder [#3701](https://github.com/pnp/cli-microsoft365/issues/3701)
 - [spo folder roleinheritance break](../cmd/spo/folder/folder-roleinheritance-break.md) - breaks the role inheritance of a folder [#3598](https://github.com/pnp/cli-microsoft365/issues/3598)
 - [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
+- [spo listitem roleassignment add](../cmd/spo/listitem/listitem-roleassignment-add.md) - adds a role assignment to a listitem [#3539](https://github.com/pnp/cli-microsoft365/issues/3539)
 
 ### Changes
 
@@ -45,6 +51,28 @@
 - extended 'spo group list' with associated groups output [#3546](https://github.com/pnp/cli-microsoft365/issues/3546)
 - extended 'teams channel add' command with support for adding shared channels [#3691](https://github.com/pnp/cli-microsoft365/issues/3691)
 - fixed pagination for 'pp dataverse table list' command [#3803](https://github.com/pnp/cli-microsoft365/issues/3803)
+- extended 'spo list contenttype' with option 'listUrl' [#3810](https://github.com/pnp/cli-microsoft365/issues/3810)
+- updated the Microsoft Graph sample to include a 'm365 request' section [#3712](https://github.com/pnp/cli-microsoft365/issues/3712)
+- extended 'spo list webhook' with option 'listUrl' [#3812](https://github.com/pnp/cli-microsoft365/issues/3812)
+- extended 'todo task set' with extra options [#3835](https://github.com/pnp/cli-microsoft365/issues/3835)
+- fixed 'outlook mail send' command for wrong validation message [#3833](https://github.com/pnp/cli-microsoft365/issues/3833)
+- fixed documentation for eventreceiver get and eventreceiver remove [#3852](https://github.com/pnp/cli-microsoft365/issues/3852)
+- removed odata output from 'planner bucket get' [#3825](https://github.com/pnp/cli-microsoft365/issues/3825)
+- updated GitHub actions [#3799](https://github.com/pnp/cli-microsoft365/issues/3799)
+- enabled @typescript-eslint/explicit-function-return-type [#3777](https://github.com/pnp/cli-microsoft365/issues/3777)
+- added tags to samples [#3640](https://github.com/pnp/cli-microsoft365/issues/3640)
+- fixed options overriding aad app add with manifest [#3555](https://github.com/pnp/cli-microsoft365/issues/3555)
+- added 'listUrl' to spo roleinheritance break and -reset [#3809](https://github.com/pnp/cli-microsoft365/issues/3809)
+- extended 'outlook mail send' command with attachments support [#3832](https://github.com/pnp/cli-microsoft365/issues/3832)
+- added cookie consent to MKDocs [#3832](https://github.com/pnp/cli-microsoft365/issues/3765)
+- extended 'todo task add' with extra options [#3832](https://github.com/pnp/cli-microsoft365/issues/3827)
+- extended spo contenttype with list options 'listUrl' and 'listId' [#3806](https://github.com/pnp/cli-microsoft365/issues/3818)
+- extended 'status' command to log extra info [#3818](https://github.com/pnp/cli-microsoft365/issues/3806)
+- added validating output format [#2988](https://github.com/pnp/cli-microsoft365/issues/2988)
+- included response output: Planner bucket & Planner plan [#3773](https://github.com/pnp/cli-microsoft365/issues/3773)
+- updated GitHub actions to Node@16 [#3870](https://github.com/pnp/cli-microsoft365/issues/3870)
+- added support for upgrading SPFx projects to v1.16.0-beta.2 [#3937](https://github.com/pnp/cli-microsoft365/issues/3937)
+- made id option required for command spo list webhook get and set [#3860](https://github.com/pnp/cli-microsoft365/issues/3860)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 

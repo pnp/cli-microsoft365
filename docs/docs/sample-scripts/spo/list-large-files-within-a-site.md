@@ -1,3 +1,9 @@
+---
+tags:
+  - files
+  - reports
+---
+
 # List all large files within a SharePoint Site
 
 Author: [Veronique Lengelle](https://veronicageek.com/2019/get-files-bigger-50mb/)
@@ -56,8 +62,3 @@ The following script will help you find every files in a specific SharePoint Onl
 
     $results
     ```
-
-Keywords
-
-- SharePoint Online
-- Governance

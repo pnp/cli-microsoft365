@@ -174,7 +174,7 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
       }
       else if (args.options.groupName) {
         args.options.principalId = await this.getGroupPrincipalId(args.options);
-        this.addRoleAssignment(requestUrl, logger, args.options);
+        await this.addRoleAssignment(requestUrl, logger, args.options);
       }
       else {
         await this.addRoleAssignment(requestUrl, logger, args.options);

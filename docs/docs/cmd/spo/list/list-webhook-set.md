@@ -11,24 +11,27 @@ m365 spo list webhook set [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the list which contains the webhook is located
+: URL of the site where the list is located.
 
 `-l, --listId [listId]`
-: ID of the list which contains the webhook which should be updated. Specify either `listId` or `listTitle` but not both
+: ID of the list. Specify either `listId`, `listTitle` or `listUrl`.
 
 `-t, --listTitle [listTitle]`
-: Title of the list which contains the webhook which should be updated. Specify either `listId` or `listTitle` but not both
+: Title of the list. Specify either `listId`, `listTitle` or `listUrl`.
 
-`-i, --id [id]`
-: ID of the webhook to update
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listId`, `listTitle` or `listUrl`.
+
+`-i, --id <id>`
+: ID of the webhook to update.
 
 `-n, --notificationUrl [notificationUrl]`
-: The new notification url
+: The new notification url.
 
 `-e, --expirationDateTime [expirationDateTime]`
-: The new expiration date
+: The new expiration date. _Note: Expiration Time cannot be more than 6 months in future_
 
---8<-- "docs/cmd/_global.md"
+--8<-- "docs/cmd/\_global.md"
 
 ## Remarks
 
@@ -36,21 +39,20 @@ If the specified `id` doesn't refer to an existing webhook, you will get a `404 
 
 ## Examples
 
-Update the notification url of a webhook with ID _cc27a922-8224-4296-90a5-ebbc54da2e81_ which belongs to a list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/ninja_ to _https://contoso-functions.azurewebsites.net/webhook_
+Update the notification url of a webhook with a specific ID attached to a list with a specific ID in a specific site to a specific URL
 
 ```sh
 m365 spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook
 ```
 
-Update the expiration date of a webhook with ID _cc27a922-8224-4296-90a5-ebbc54da2e81_ which belongs to a list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/ninja_ to _October 9th, 2018 at 6:15 PM_
+Update the expiration date of a webhook with a specific ID attached to a list with a specific title in a specific site to a specfic date
 
 ```sh
 m365 spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime 2018-10-09T18:15
 ```
 
-From the webhook with ID _cc27a922-8224-4296-90a5-ebbc54da2e81_ which belongs to a list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/ninja_ update the notification url to _https://contoso-functions.azurewebsites.net/webhook_
-and the expiration date to _March 2nd, 2019_
+Update the notification url of a webhook with a specific ID attached to a list with a specific URL in a specific site to a specific URL and the expiration date to a specific date
 
 ```sh
-m365 spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-03-02
+m365 spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listUrl '/sites/ninja/Documents' --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-03-02
 ```

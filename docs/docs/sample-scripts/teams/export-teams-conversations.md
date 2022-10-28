@@ -1,3 +1,9 @@
+---
+tags:
+  - migration
+  - teams
+---
+
 # Export conversations from Microsoft Teams Channels
 
 Author: [Joseph Velliah](https://sprider.blog/export-conversations-from-microsoft-teams)
@@ -93,8 +99,3 @@ This script uses CLI for Microsoft 365 to export the conversations from Microsof
       Write-Error $ErrorMessage
     }
     ```
-
-Keywords:
-
-- Microsoft Teams
-- PowerShell

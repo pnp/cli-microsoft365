@@ -1,3 +1,10 @@
+---
+tags:
+  - apps
+  - reports
+  - teams
+---
+
 # List app usage in Microsoft Teams
 
 Inspired by: [Thomy Goelles](https://thomy.tech/list-teams-app-usage/)
@@ -48,8 +55,3 @@ A sample script which iterates through all the teams in your tenant and lists al
         echo $apps
     done
     ```
-
-Keywords:
-
-- Microsoft Teams
-- Governance

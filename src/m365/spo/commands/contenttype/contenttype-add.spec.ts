@@ -24,7 +24,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -81,10 +81,10 @@ describe(commands.CONTENTTYPE_ADD, () => {
   });
 
   it('creates site content type with minimal properties', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}"><Property Name="Description" Type="Null" /><Property Name="Group" Type="Null" /><Property Name="Id" Type="String">0x0100FF0B2E33A3718B46A3909298D240FD93</Property><Property Name="Name" Type="String">PnP Tile</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8008.1219", "ErrorInfo": null, "TraceCorrelationId": "2846869e-a0d0-0000-2105-47de3b2952e7"
           }, 13, {
@@ -92,31 +92,29 @@ describe(commands.CONTENTTYPE_ADD, () => {
           }, 14, {
             "_ObjectIdentity_": "2846869e-a0d0-0000-2105-47de3b2952e7|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:contenttype:0x0100FF0B2E33A3718B46A3909298D240FD93"
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoContentTypeGetCommand) {
-        return Promise.resolve({
-          stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"SchemaXml":"","Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}'
-        });
+        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"SchemaXml":"","Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw 'Unknown case';
     });
 
-    await command.action(logger, { options: { output: "json",  debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } });
+    await command.action(logger, { options: { output: "json", debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } });
     assert(loggerLogSpy.called);
   });
 
   it('creates site content type with description and group (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}"><Property Name="Description" Type="String">A tile</Property><Property Name="Group" Type="String">PnP Content Types</Property><Property Name="Id" Type="String">0x0100FF0B2E33A3718B46A3909298D240FD93</Property><Property Name="Name" Type="String">PnP Tile</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8008.1219", "ErrorInfo": null, "TraceCorrelationId": "2846869e-a0d0-0000-2105-47de3b2952e7"
           }, 13, {
@@ -124,52 +122,44 @@ describe(commands.CONTENTTYPE_ADD, () => {
           }, 14, {
             "_ObjectIdentity_": "2846869e-a0d0-0000-2105-47de3b2952e7|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:contenttype:0x0100FF0B2E33A3718B46A3909298D240FD93"
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoContentTypeGetCommand) {
-        return Promise.resolve({
-          stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}'
-        });
+        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw 'Unknown case';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', description: 'A tile', group: 'PnP Content Types' } });
     assert(loggerLogToStderrSpy.called);
   });
-  
+
   it('creates list content type with minimal properties', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('My%20list')?$select=Id`) > -1) {
-        return Promise.resolve({
-          Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
-        });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/lists/getByTitle('My%20list')?$select=Id`) {
+        return { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
       }
 
-      if ((opts.url as string).indexOf('/_api/site?$select=Id') > -1) {
-        return Promise.resolve({
-          Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a'
-        });
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web?$select=Id') {
+        return { Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a' };
       }
 
-      if ((opts.url as string).indexOf('/_api/web?$select=Id') > -1) {
-        return Promise.resolve({
-          Id: '942595c1-6100-4ad0-9dd4-19743732ffdc'
-        });
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site?$select=Id') {
+        return { Id: '942595c1-6100-4ad0-9dd4-19743732ffdc' };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery` &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}"><Property Name="Description" Type="Null" /><Property Name="Group" Type="Null" /><Property Name="Id" Type="String">0x0100FF0B2E33A3718B46A3909298D240FD93</Property><Property Name="Name" Type="String">PnP Tile</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method><Identity Id="5" Name="1a48869e-c092-0000-1f61-81ec89809537|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:list:81f0ecee-75a8-46f0-b384-c8f4f9f31d99" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify([
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8008.1219", "ErrorInfo": null, "TraceCorrelationId": "2846869e-a0d0-0000-2105-47de3b2952e7"
           }, 13, {
@@ -177,10 +167,10 @@ describe(commands.CONTENTTYPE_ADD, () => {
           }, 14, {
             "_ObjectIdentity_": "2846869e-a0d0-0000-2105-47de3b2952e7|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:list:81f0ecee-75a8-46f0-b384-c8f4f9f31d99:contenttype:0x0100FF0B2E33A3718B46A3909298D240FD93"
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list' } }));
@@ -188,31 +178,24 @@ describe(commands.CONTENTTYPE_ADD, () => {
   });
 
   it('creates list content type with description', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('My%20list')?$select=Id`) > -1) {
-        return Promise.resolve({
-          Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
-        });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/lists/getByTitle('My%20list')?$select=Id`) {
+        return { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
       }
 
-      if ((opts.url as string).indexOf('/_api/site?$select=Id') > -1) {
-        return Promise.resolve({
-          Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a'
-        });
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web?$select=Id') {
+        return { Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a' };
       }
 
-      if ((opts.url as string).indexOf('/_api/web?$select=Id') > -1) {
-        return Promise.resolve({
-          Id: '942595c1-6100-4ad0-9dd4-19743732ffdc'
-        });
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site?$select=Id') {
+        return { Id: '942595c1-6100-4ad0-9dd4-19743732ffdc' };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
-        opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}"><Property Name="Description" Type="String">A tile</Property><Property Name="Group" Type="Null" /><Property Name="Id" Type="String">0x0100FF0B2E33A3718B46A3909298D240FD93</Property><Property Name="Name" Type="String">PnP Tile</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method><Identity Id="5" Name="1a48869e-c092-0000-1f61-81ec89809537|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:list:81f0ecee-75a8-46f0-b384-c8f4f9f31d99" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify([
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery') {
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8008.1219", "ErrorInfo": null, "TraceCorrelationId": "2846869e-a0d0-0000-2105-47de3b2952e7"
           }, 13, {
@@ -220,30 +203,152 @@ describe(commands.CONTENTTYPE_ADD, () => {
           }, 14, {
             "_ObjectIdentity_": "2846869e-a0d0-0000-2105-47de3b2952e7|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:list:81f0ecee-75a8-46f0-b384-c8f4f9f31d99:contenttype:0x0100FF0B2E33A3718B46A3909298D240FD93"
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoContentTypeGetCommand) {
-        return Promise.resolve({
-          stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}'
-        });
+        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw 'Unknown case';
     });
 
     await command.action(logger, { options: { debug: false, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list', description: 'A tile' } });
     assert(loggerLogToStderrSpy.called);
   });
 
+  it('creates list retrieved by id content type with description', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web?$select=Id') {
+        return { Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a' };
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site?$select=Id') {
+        return { Id: '942595c1-6100-4ad0-9dd4-19743732ffdc' };
+      }
+
+      throw 'Invalid request';
+    });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
+        return JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8008.1219", "ErrorInfo": null, "TraceCorrelationId": "2846869e-a0d0-0000-2105-47de3b2952e7"
+          }, 13, {
+            "IsNull": false
+          }, 14, {
+            "_ObjectIdentity_": "2846869e-a0d0-0000-2105-47de3b2952e7|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:list:81f0ecee-75a8-46f0-b384-c8f4f9f31d99:contenttype:0x0100FF0B2E33A3718B46A3909298D240FD93"
+          }
+        ]);
+      }
+
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoContentTypeGetCommand) {
+        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
+      }
+
+      throw 'Unknown case';
+    });
+
+    await command.action(logger, { options: { debug: false, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listId: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99', description: 'A tile' } });
+    assert(loggerLogToStderrSpy.called);
+  });
+
+  it('creates list retrieved by url content type with description', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('%2Fsites%2Fsales%2Fdocuments')?$select=Id`) {
+        return { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web?$select=Id') {
+        return { Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a' };
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site?$select=Id') {
+        return { Id: '942595c1-6100-4ad0-9dd4-19743732ffdc' };
+      }
+
+      throw 'Invalid request';
+    });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
+        return JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8008.1219", "ErrorInfo": null, "TraceCorrelationId": "2846869e-a0d0-0000-2105-47de3b2952e7"
+          }, 13, {
+            "IsNull": false
+          }, 14, {
+            "_ObjectIdentity_": "2846869e-a0d0-0000-2105-47de3b2952e7|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:list:81f0ecee-75a8-46f0-b384-c8f4f9f31d99:contenttype:0x0100FF0B2E33A3718B46A3909298D240FD93"
+          }
+        ]);
+      }
+
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoContentTypeGetCommand) {
+        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
+      }
+
+      throw 'Unknown case';
+    });
+
+    await command.action(logger, { options: { debug: false, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listUrl: '/sites/sales/documents', description: 'A tile' } });
+    assert(loggerLogToStderrSpy.called);
+  });
+
+  it('throws error when executeCommandWithOutput errors', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/GetList('%2Fsites%2Fsales%2Fdocuments')?$select=Id`) {
+        return { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web?$select=Id') {
+        return { Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a' };
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site?$select=Id') {
+        return { Id: '942595c1-6100-4ad0-9dd4-19743732ffdc' };
+      }
+
+      throw 'Invalid request';
+    });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
+        return JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8008.1219", "ErrorInfo": null, "TraceCorrelationId": "2846869e-a0d0-0000-2105-47de3b2952e7"
+          }, 13, {
+            "IsNull": false
+          }, 14, {
+            "_ObjectIdentity_": "2846869e-a0d0-0000-2105-47de3b2952e7|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:list:81f0ecee-75a8-46f0-b384-c8f4f9f31d99:contenttype:0x0100FF0B2E33A3718B46A3909298D240FD93"
+          }
+        ]);
+      }
+
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoContentTypeGetCommand) {
+        throw { 'error': 'Something went wrong obtaining the content types' };
+      }
+
+      throw 'Unknown case';
+    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } } as any),
+      new CommandError('Something went wrong obtaining the content types'));
+  });
+
   it('escapes XML in user input', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
-        opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}"><Property Name="Description" Type="String">&lt;A tile</Property><Property Name="Group" Type="String">&lt;PnP Content Types</Property><Property Name="Id" Type="String">&lt;0x0100FF0B2E33A3718B46A3909298D240FD93</Property><Property Name="Name" Type="String">&lt;PnP Tile</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify([
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8008.1219", "ErrorInfo": null, "TraceCorrelationId": "2846869e-a0d0-0000-2105-47de3b2952e7"
           }, 13, {
@@ -251,20 +356,18 @@ describe(commands.CONTENTTYPE_ADD, () => {
           }, 14, {
             "_ObjectIdentity_": "2846869e-a0d0-0000-2105-47de3b2952e7|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:276f6d32-f43b-4b26-ada6-7aa9d5bcab6a:web:942595c1-6100-4ad0-9dd4-19743732ffdc:contenttype:0x0100FF0B2E33A3718B46A3909298D240FD93"
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoContentTypeGetCommand) {
-        return Promise.resolve({
-          stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}'
-        });
+        return { stdout: '{"Description":"Create a new list item.","DisplayFormTemplateName":"ListForm","DisplayFormUrl":"","DocumentTemplate":"","DocumentTemplateUrl":"","EditFormTemplateName":"ListForm","EditFormUrl":"","Group":"PnP Content Types","Hidden":false,"Id":{"StringValue":"0x0100558D85B7216F6A489A499DB361E1AE2F"},"JSLink":"","MobileDisplayFormUrl":"","MobileEditFormUrl":"","MobileNewFormUrl":"","Name":"PnP Alert","NewFormTemplateName":"ListForm","NewFormUrl":"","ReadOnly":false,"Scope":"/sites/portal","Sealed":false,"StringId":"0x0100FF0B2E33A3718B46A3909298D240FD93"}' };
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      throw 'Unknown case';
     });
 
     await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: '<PnP Tile', id: '<0x0100FF0B2E33A3718B46A3909298D240FD93', description: '<A tile', group: '<PnP Content Types' } });
@@ -272,18 +375,18 @@ describe(commands.CONTENTTYPE_ADD, () => {
   });
 
   it('correctly handles error when a content with the specified name already exists', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        return Promise.resolve(JSON.stringify([
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_vti_bin/client.svc/ProcessQuery`) {
+        return JSON.stringify([
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8008.1219", "ErrorInfo": {
               "ErrorMessage": "A duplicate content type \"PnP Tile\" was found.", "ErrorValue": null, "TraceCorrelationId": "0e46869e-2024-0000-1f04-7f2be163c9c0", "ErrorCode": 183, "ErrorTypeName": "Microsoft.SharePoint.SPException"
             }, "TraceCorrelationId": "0e46869e-2024-0000-1f04-7f2be163c9c0"
           }
-        ]));
+        ]);
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } } as any),
@@ -291,24 +394,20 @@ describe(commands.CONTENTTYPE_ADD, () => {
   });
 
   it('correctly handles error when the specified list doesn\'t exist', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('My%20list')?$select=Id`) > -1) {
-        return Promise.reject({ error: { 'odata.error': { message: { value: "List 'My list' does not exist at site with URL 'https://contoso.sharepoint.com/sites/sales'." } } } });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/lists/getByTitle('My%20list')?$select=Id`) {
+        throw { error: { 'odata.error': { message: { value: "List 'My list' does not exist at site with URL 'https://contoso.sharepoint.com/sites/sales'." } } } };
       }
 
-      if ((opts.url as string).indexOf('/_api/site?$select=Id') > -1) {
-        return Promise.resolve({
-          Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a'
-        });
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/web?$select=Id') {
+        return { Id: '276f6d32-f43b-4b26-ada6-7aa9d5bcab6a' };
       }
 
-      if ((opts.url as string).indexOf('/_api/web?$select=Id') > -1) {
-        return Promise.resolve({
-          Id: '942595c1-6100-4ad0-9dd4-19743732ffdc'
-        });
+      if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site?$select=Id') {
+        return { Id: '942595c1-6100-4ad0-9dd4-19743732ffdc' };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list' } } as any),
@@ -328,6 +427,11 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
   it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'site.com', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when listId is not a valid listId', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

@@ -1,5 +1,4 @@
-const maintainers = [
-  {
+const maintainers = [{
     name: 'Adam Wojcik',
     company: '',
     github: 'Adam-it',
@@ -61,8 +60,7 @@ const maintainers = [
   }
 ];
 
-const contributors = [
-  {
+const contributors = [{
     name: 'Aakash Bhardwaj',
     company: '',
     github: 'aakashbhardwaj619',
@@ -163,7 +161,7 @@ const contributors = [
     company: '',
     github: '',
     twitter: ''
-  },  
+  },
   {
     name: 'Bruce Albany',
     company: 'Telstra Purple',
@@ -183,10 +181,22 @@ const contributors = [
     twitter: ''
   },
   {
+    name: 'Conor O\'Callaghan',
+    company: '',
+    github: 'Conor0Callaghan',
+    twitter: ''
+  },
+  {
     name: 'Cyril C Kurian',
     company: '',
     github: 'cyrilckurian',
     twitter: 'chirackalcyril'
+  },
+  {
+    name: 'Daniaal Nadir',
+    company: 'Smoothwall',
+    github: 'daniaalnadir',
+    twitter: 'daniaalnadir'
   },
   {
     name: 'Daniel Laskewitz',
@@ -261,10 +271,22 @@ const contributors = [
     twitter: 'garrytrinder'
   },
   {
+    name: 'Gaston Flores ',
+    company: 'Flybondi',
+    github: 'gaston-flores',
+    twitter: ''
+  },
+  {
     name: 'Hugo Bernier',
     company: 'Microsoft',
     github: 'hugoabernier',
     twitter: 'bernierh'
+  },
+  {
+    name: 'Hüseyin Saatçi',
+    company: '',
+    github: 'huseyinsaatci',
+    twitter: 'huseyinn_saatci'
   },
   {
     name: 'Jasey Waegebaert',
@@ -405,6 +427,12 @@ const contributors = [
     twitter: 'nickhonen4'
   },
   {
+    name: 'Nico De Cleyre',
+    company: 'Ordina Belgium',
+    github: 'nicodecleyre',
+    twitter: ''
+  },
+  {
     name: 'Otto',
     company: '',
     github: 'berot3',
@@ -477,6 +505,12 @@ const contributors = [
     twitter: 'Prasad_kasiredd'
   },
   {
+    name: 'Priyanshu Ahlawat',
+    company: 'GEU',
+    github: 'PriyanshuAhlawat',
+    twitter: 'PriyanshuAhla13'
+  },
+  {
     name: 'Rabia Williams',
     company: 'Microsoft',
     github: 'rabwill',
@@ -492,6 +526,12 @@ const contributors = [
     name: 'Reshmee Auckloo',
     company: '',
     github: 'reshmee011',
+    twitter: ''
+  },
+  {
+    name: 'Riccardo Solazzi',
+    company: '',
+    github: 'theZal',
     twitter: ''
   },
   {
@@ -597,6 +637,12 @@ const contributors = [
     twitter: 'sudharsank'
   },
   {
+    name: 'Tanmay Rathi',
+    company: 'Intuit',
+    github: ' Tanmay-21',
+    twitter: ''
+  },
+  {
     name: 'Thomas Gölles',
     company: 'Solvion',
     github: 'thomyg',
@@ -690,7 +736,7 @@ function generateGridCard(profile) {
 
   // Configure profile company
   const companyElement = profileCard.getElementsByClassName("cli-grid-item-company")[0];
-  if (profile.company) { 
+  if (profile.company) {
     companyElement.innerHTML = profile.company;
   } else {
     companyElement.remove();
@@ -699,13 +745,13 @@ function generateGridCard(profile) {
   // Configure profile links
   const githubElement = profileCard.querySelector('[title="GitHub"]');
   const twitterElement = profileCard.querySelector('[title="Twitter"]');
-  if (profile.github) { 
+  if (profile.github) {
     githubElement.setAttribute("href", `https://github.com/${profile.github}`);
   } else {
     githubElement.remove();
   }
 
-  if (profile.twitter) { 
+  if (profile.twitter) {
     twitterElement.setAttribute("href", `https://twitter.com/${profile.twitter}`);
   } else {
     twitterElement.remove();

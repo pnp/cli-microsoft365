@@ -67,6 +67,10 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     '1.16.0-beta.1'
   ];
 
+  protected get allowedOutputs(): string[] {
+    return ['json', 'text', 'md', 'tour'];
+  }
+
   public get name(): string {
     return commands.PROJECT_DOCTOR;
   }
@@ -94,7 +98,7 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
   #initOptions(): void {
     this.options.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
-        o.autocomplete = ['json', 'text', 'md', 'tour'];
+        o.autocomplete = this.allowedOutputs;
       }
     });
     this.options.unshift(
@@ -113,7 +117,7 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
             return `${args.options.packageManager} is not a supported package manager. Supported package managers are ${SpfxProjectDoctorCommand.packageManagers.join(', ')}`;
           }
         }
-    
+
         return true;
       }
     );

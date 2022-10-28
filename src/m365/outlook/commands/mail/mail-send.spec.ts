@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import * as fs from 'fs';
 import appInsights from '../../../../appInsights';
 import auth, { Auth } from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
@@ -49,7 +50,10 @@ describe(commands.MAIL_SEND, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Auth.isAppOnlyAuth
+      Auth.isAppOnlyAuth,
+      fs.existsSync,
+      fs.readFileSync,
+      fs.lstatSync
     ]);
   });
 
@@ -250,6 +254,52 @@ describe(commands.MAIL_SEND, () => {
     assert.strictEqual(actual, expected);
   });
 
+  it('sends email with multiple attachments', async () => {
+    const fileContentBase64 = 'TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=';
+    sinon.stub(fs, 'readFileSync').returns(fileContentBase64);
+
+    const requestPostStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        subject: 'Lorem ipsum',
+        to: 'mail@domain.com',
+        bodyContents: 'Lorem ipsum',
+        attachment: ['C:/File1.txt', 'C:/File2.txt']
+      }
+    });
+    assert.deepStrictEqual(requestPostStub.lastCall.args[0].data.message.attachments, [{ '@odata.type': '#microsoft.graph.fileAttachment', name: 'File1.txt', contentBytes: fileContentBase64 }, { '@odata.type': '#microsoft.graph.fileAttachment', name: 'File2.txt', contentBytes: fileContentBase64 }]);
+  });
+
+  it('sends email with single attachment', async () => {
+    const fileContentBase64 = 'TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=';
+    sinon.stub(fs, 'readFileSync').returns(fileContentBase64);
+
+    const requestPostStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        subject: 'Lorem ipsum',
+        to: 'mail@domain.com',
+        bodyContents: 'Lorem ipsum',
+        attachment: 'C:/File1.txt'
+      }
+    });
+    assert.deepStrictEqual(requestPostStub.lastCall.args[0].data.message.attachments, [{ '@odata.type': '#microsoft.graph.fileAttachment', name: 'File1.txt', contentBytes: fileContentBase64 }]);
+  });
+
   it('correctly handles error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
@@ -280,6 +330,49 @@ describe(commands.MAIL_SEND, () => {
 
   it('fails validation if importance is invalid', async () => {
     const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', importance: 'Invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if file doesn\'t exist', async () => {
+    sinon.stub(fs, 'lstatSync').returns({ isFile: () => true } as any);
+    sinon.stub(fs, 'existsSync').callsFake(path => {
+      if (path.toString() === 'C:/File2.txt') {
+        return false;
+      }
+
+      return true;
+    });
+
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails vlaidation if attachment is not a file', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').callsFake(path => {
+      if (path.toString() === 'C:/File2.txt') {
+        return { isFile: () => false } as any;
+      }
+
+      return { isFile: () => true } as any;
+    });
+    
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if attachments are too large', async () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns({ isFile: () => true } as any);
+    sinon.stub(fs, 'readFileSync').callsFake(path => {
+      if (path.toString() === 'C:/File.txt') {
+        return 'A'.repeat(4_250_000);
+      }
+
+      throw 'Invalid read request';
+    });
+
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: 'C:/File.txt' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -338,8 +431,8 @@ describe(commands.MAIL_SEND, () => {
           contentType: 'Text',
           content: 'Lorem ipsum'
         },
-        toRecipients: [{ emailAddress: { address: 'mail@domain.com' } }],
-        from: { emailAddress: { address: 'sales@domain.com' } }
+        from: { emailAddress: { address: 'sales@domain.com' } },
+        toRecipients: [{ emailAddress: { address: 'mail@domain.com' } }]
       },
       saveToSentItems: undefined
     });

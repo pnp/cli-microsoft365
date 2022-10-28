@@ -11,32 +11,41 @@ m365 spo list contenttype remove [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the list is located
+: URL of the site where the list is located.
 
-`-l, --listId [listId]`
-: ID of the list from which to remove the content type, specify `listId` or `listTitle` but not both
+`-i, --listId [listId]`
+: ID of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-t, --listTitle [listTitle]`
-: Title of the list from which to remove the content type, specify `listId` or `listTitle` but not both
+: Title of the list. Specify either `listTitle`, `listId` or `listUrl`.
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-c, --contentTypeId <contentTypeId>`
-: ID of the content type to remove from the list
+: ID of the content type
 
 `--confirm`
-: Don't prompt for confirming removing the content type from the list
+: Don't prompt for confirmation
 
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
 
-Remove content type with ID _0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A_ from the list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Remove content type with a specific id from the list retrieved by id in a specific site.
 
 ```sh
 m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A
 ```
 
-Remove content type with ID _0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A_ from the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Remove content type with a specific id from the list retrieved by title in a specific site.
 
 ```sh
 m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A
+```
+
+Remove content type with a specific id from the list retrieved by server relative URL in a specific site. This will not prompt for confirmation.
+
+```sh
+m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'sites/project-x/Documents' --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A --confirm
 ```
