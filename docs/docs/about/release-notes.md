@@ -26,6 +26,11 @@
 - [spo folder roleinheritance break](../cmd/spo/folder/folder-roleinheritance-break.md) - breaks the role inheritance of a folder [#3598](https://github.com/pnp/cli-microsoft365/issues/3598)
 - [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
 - [spo listitem roleassignment add](../cmd/spo/listitem/listitem-roleassignment-add.md) - adds a role assignment to a listitem [#3539](https://github.com/pnp/cli-microsoft365/issues/3539)
+- [spo web roleinheritance break](../cmd//spo/web/web-roleinheritance-break.md) - break role inheritance of subsite [#3547](https://github.com/pnp/cli-microsoft365/issues/3547)
+
+**To Do:**
+
+- [todo list get](../cmd/todo/list/list-get.md) - returns a specific Microsoft To Do task list [#3847](https://github.com/pnp/cli-microsoft365/issues/3847)
 
 ### Changes
 
@@ -73,6 +78,8 @@
 - updated GitHub actions to Node@16 [#3870](https://github.com/pnp/cli-microsoft365/issues/3870)
 - added support for upgrading SPFx projects to v1.16.0-beta.2 [#3937](https://github.com/pnp/cli-microsoft365/issues/3937)
 - made id option required for command spo list webhook get and set [#3860](https://github.com/pnp/cli-microsoft365/issues/3860)
+- included docs response output for 'tenant' commands [#3926](https://github.com/pnp/cli-microsoft365/issues/3926)
+- fixed global options for spo list webhook get and set docs [#3946](https://github.com/pnp/cli-microsoft365/issues/3946)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
