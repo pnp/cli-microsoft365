@@ -64,3 +64,7 @@ Change the status of a schema extension to 'Available'
 ```sh
 m365 graph schemaextension set --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --status Available
 ```
+
+## Response
+
+none

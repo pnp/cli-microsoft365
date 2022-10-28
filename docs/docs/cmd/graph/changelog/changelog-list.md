@@ -51,3 +51,54 @@ Get all changes within Microsoft Graph that happend between _2021-01-01_ and _20
 ```sh
 m365 graph changelog list --startDate '2021-01-01' --endDate '2021-05-01'
 ```
+
+## Response
+
+=== "JSON"
+
+```json
+[
+  {
+    "guid": "f5545eaf-7e2f-424a-b4cd-61d5a95cc44fbeta",
+    "category": "beta",
+    "title": "Personal contacts",
+    "description": "Added mobilePhone property to personal contacts entity-set.\\\n",
+    "pubDate": "2015-12-01T00:00:00.000Z"
+  },
+  {
+    "guid": "a0eccf7b-3efb-4c5f-bb1c-4049202b1e0fbeta",
+    "category": "beta",
+    "title": "Calendar",
+    "description": "Added eventMessageRequest subtype of eventMessage and startDateTime, endDateTime, location, type, recurrence and isOutOfDate properties to eventMessage type.\\\n",
+    "pubDate": "2015-12-01T00:00:00.000Z"
+  }
+]
+```
+
+=== "Text"
+
+    ``` text
+
+category title description
+
+---
+
+v1.0 General Added support for complex type property sorting...
+beta Personal contacts Added mobilePhone property to personal contacts...
+beta Calendar Added eventMessageRequest subtype of eventMessa...
+
+````
+
+=== "CSV"
+
+    ``` text
+category,title,description
+v1.0,General,"Added support for complex type property sorting and filtering.
+Added authorization_uri property in the www-authenticate header on a 401 response. This uri can be used to start the token acquisition flow.
+Improved error messages across users and groups.
+"
+beta,Personal contacts,"Added mobilePhone property to personal contacts entity-set.
+"
+beta,Calendar,"Added eventMessageRequest subtype of eventMessage and startDateTime, endDateTime, location, type, recurrence and isOutOfDate properties to eventMessage type.
+"
+````

@@ -36,3 +36,7 @@ Removes specified Microsoft Graph schema extension with ID domain_myExtension wi
 ```sh
 m365 graph schemaextension remove --id domain_myExtension --confirm
 ```
+
+## Response
+
+none

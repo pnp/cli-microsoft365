@@ -51,3 +51,51 @@ m365 graph schemaextension list --owner 617720dc-85fc-45d7-a187-cee75eaf239e --p
 ## More information
 
 [https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/schemaextension_list](https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/schemaextension_list)
+
+## Response
+
+=== "JSON"
+
+```json
+[
+  {
+    "id": "adatumisv_exo2",
+    "description": "sample desccription",
+    "targetTypes": [
+      "Message"
+    ],
+    "status": "Available",
+    "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+    "properties": [
+      {
+        "name": "p1",
+        "type": "String"
+      },
+      {
+        "name": "p2",
+        "type": "String"
+      }
+    ]
+  }
+]
+```
+
+=== "Text"
+
+    ``` text
+description: sample desccription
+id         : adatumisv_exo2
+owner      : 617720dc-85fc-45d7-a187-cee75eaf239e
+properties : [{"name":"p1","type":"String"},{"name":"p2","type":"String"}]
+status     : Available
+targetTypes: ["Message"]
+
+````
+
+=== "CSV"
+
+    ``` text
+id,description,targetTypes,status,owner,properties
+adatumisv_exo2,sample desccription,"[""Message""]",Available,617720dc-85fc-45d7-a187-cee75eaf239e,"[{""name"":""p1"",""type"":""String""},{""name"":""p2"",""type"":""String""}]"
+
+````

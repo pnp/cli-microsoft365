@@ -62,3 +62,55 @@ Create a subscription using the maximum allowed expiration for Group resources
 ```sh
 m365 graph subscription add --resource groups --changeType "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient"
 ```
+
+## Response
+
+=== "JSON"
+
+```json
+{
+  "id": "3eceb2b5-9bb0-41da-a931-a919b8e8e553",
+  "resource": "groups",
+  "applicationId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
+  "changeType": "updated",
+  "clientState": null,
+  "notificationUrl": "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+  "notificationQueryOptions": null,
+  "lifecycleNotificationUrl": null,
+  "expirationDateTime": "2022-10-31T15:08:23.461Z",
+  "creatorId": "411edae6-e8e6-4dbd-9a02-2cb6e319aa08",
+  "includeResourceData": null,
+  "latestSupportedTlsVersion": "v1_2",
+  "encryptionCertificate": null,
+  "encryptionCertificateId": null,
+  "notificationUrlAppId": null
+}
+```
+
+=== "Text"
+
+    ``` text
+applicationId            : 31359c7f-bd7e-475c-86db-fdb8c937548e
+changeType               : updated
+clientState              : null
+creatorId                : 411edae6-e8e6-4dbd-9a02-2cb6e319aa08
+encryptionCertificate    : null
+encryptionCertificateId  : null
+expirationDateTime       : 2022-10-31T15:09:15.356Z
+id                       : 094aeced-1f16-44ff-a4c8-3c0610b824a0
+includeResourceData      : null
+latestSupportedTlsVersion: v1_2
+lifecycleNotificationUrl : null
+notificationQueryOptions : null
+notificationUrl          : https://webhook.azurewebsites.net/api/send/myNotifyClient
+notificationUrlAppId     : null
+resource                 : groups    
+````
+
+=== "CSV"
+
+    ``` text
+id,resource,applicationId,changeType,clientState,notificationUrl,notificationQueryOptions,lifecycleNotificationUrl,expirationDateTime,creatorId,includeResourceData,latestSupportedTlsVersion,encryptionCertificate,encryptionCertificateId,notificationUrlAppId
+e926b017-fc99-41d8-b9cf-3d2f8663e2fa,groups,31359c7f-bd7e-475c-86db-fdb8c937548e,updated,,https://webhook.azurewebsites.net/api/send/myNotifyClient,,,2022-10-31T15:09:41.241Z,411edae6-e8e6-4dbd-9a02-2cb6e319aa08,,v1_2,,,
+````
+
