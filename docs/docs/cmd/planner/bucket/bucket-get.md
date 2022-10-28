@@ -63,7 +63,7 @@ m365 planner bucket get --name "Planner Bucket A" --planTitle "My Plan" --ownerG
 
 === "JSON"
 
-    ``` json
+    ```json
     {
       "name": "My Planner Bucket",
       "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
@@ -74,7 +74,7 @@ m365 planner bucket get --name "Planner Bucket A" --planTitle "My Plan" --ownerG
 
 === "Text"
 
-    ``` text
+    ```text
     id       : ttEB_Uj690STdR3GC1MIDZgANq1U
     name     : My Planner Bucket
     orderHint: 8585363889524958496
@@ -83,7 +83,7 @@ m365 planner bucket get --name "Planner Bucket A" --planTitle "My Plan" --ownerG
 
 === "CSV"
 
-    ``` text
+    ```csv
     id,name,planId,orderHint
     ttEB_Uj690STdR3GC1MIDZgANq1U,My Planner Bucket,xqQg5FS2LkCp935s-FIFm2QAFkHM,8585363889524958496
     ```
