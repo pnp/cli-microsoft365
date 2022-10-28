@@ -78,7 +78,7 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
       keepExistingPermissions = !args.options.clearExistingPermissions;
     }
 
-    const breakroleInheritance = (): void => {
+    const breakroleInheritance = async (): Promise<void> => {
       const requestOptions: any = {
         url: `${args.options.webUrl}/_api/web/breakroleinheritance(${keepExistingPermissions})`,
         method: 'POST',
@@ -89,12 +89,12 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      request
+      await request
         .post(requestOptions)
         .then(_ => (err: any): void => this.handleRejectedODataJsonPromise(err));
     };
     if (args.options.confirm) {
-      breakroleInheritance();
+      await breakroleInheritance();
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -105,7 +105,7 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        breakroleInheritance();
+        await breakroleInheritance();
       }
     }
   }

@@ -172,7 +172,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     assert(correctRequestIssued);
   });
 
-  it('break role inheritance of subsite', (done) => {
+  it('break role inheritance of subsite', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/breakroleinheritance(true)') > -1) {
         return Promise.resolve();
@@ -182,23 +182,21 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     });
 
     try {
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: true,
           webUrl: 'https://contoso.sharepoint.com',
           confirm: true
         }
       });
-      done();
     }
     catch (e) {
       assert.strictEqual(typeof e, 'undefined');
-      done(e);
     }
   });
 
 
-  it('break role inheritance on web clear all permissions', (done) => {
+  it('break role inheritance on web clear all permissions', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/breakroleinheritance(false)') > -1) {
         return Promise.resolve();
@@ -208,7 +206,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     });
 
     try {
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: true,
           webUrl: 'https://contoso.sharepoint.com',
@@ -216,15 +214,14 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
           confirm: true
         }
       });
-      done();
     }
     catch (e) {
       assert.strictEqual(typeof e, 'undefined');
-      done(e);
+
     }
   });
 
-  it('web role inheritance break command handles reject request correctly', (done) => {
+  it('web role inheritance break command handles reject request correctly', async () => {
     const err = 'request rejected';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/breakroleinheritance(true)') > -1) {
@@ -234,18 +231,16 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     });
 
     try {
-      command.action(logger, {
+      await command.action(logger, {
         options: {
           debug: true,
           webUrl: 'https://contoso.sharepoint.com',
           confirm: true
         }
       });
-      done();
     }
     catch (e) {
       assert.strictEqual(JSON.stringify(e), JSON.stringify(new CommandError(err)));
-      done(e);
     }
   });
 });
