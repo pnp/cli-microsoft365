@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -51,6 +52,7 @@ describe(commands.CACHE_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      fs.existsSync,
       Cli.prompt,
       (command as any).exec,
       (process as any).kill
@@ -126,23 +128,12 @@ describe(commands.CACHE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails to remove teams cache when exec fails randomly when checking if cache folder exists', async () => {
-    sinon.stub(process, 'platform').value('win32');
-    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    const error = new Error('random error');
-    sinon.stub(command, 'exec' as any).rejects(error);
-
-    await assert.rejects(command.action(logger, { options: { confirm: true } } as any), new CommandError('random error'));
-  });
-
   it('fails to remove teams cache when exec fails randomly when killing teams.exe process', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
     const error = new Error('random error');
     sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
-      if (opts === 'IF NOT EXIST %userprofile%\\appdata\\roaming\\microsoft\\teams echo Folder does not exist') {
-        return { stdout: '' };
-      }
       if (opts === 'taskkill /IM "Teams.exe" /F') {
         throw error;
       }
@@ -154,11 +145,9 @@ describe(commands.CACHE_REMOVE, () => {
   it('fails to remove teams cache when exec fails randomly when removing cache folder', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
     const error = new Error('random error');
     sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
-      if (opts === 'IF NOT EXIST %userprofile%\\appdata\\roaming\\microsoft\\teams echo Folder does not exist') {
-        return { stdout: '' };
-      }
       if (opts === 'taskkill /IM "Teams.exe" /F') {
         return { stdout: '' };
       }
@@ -175,6 +164,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     sinon.stub(command, 'exec' as any).returns({ stdout: '' });
     sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     await command.action(logger, {
       options: {
@@ -188,12 +178,10 @@ describe(commands.CACHE_REMOVE, () => {
   it('removes teams cache when teams is currently not active', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
     const error = new Error('ERROR: The process "Teams.exe" not found.');
     sinon.stub(process, 'kill' as any).returns(null);
     sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
-      if (opts === 'IF NOT EXIST %userprofile%\\appdata\\roaming\\microsoft\\teams echo Folder does not exist') {
-        return { stdout: '' };
-      }
       if (opts === 'taskkill /IM "Teams.exe" /F') {
         throw error;
       }
@@ -216,6 +204,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     sinon.stub(command, 'exec' as any).returns({ stdout: '' });
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     await command.action(logger, {
       options: {
@@ -231,6 +220,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     sinon.stub(command, 'exec' as any).returns({ stdout: 'pid' });
     sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     await command.action(logger, {
       options: {
@@ -243,8 +233,8 @@ describe(commands.CACHE_REMOVE, () => {
   it('aborts cache clearing when no cache folder is found', async () => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
 
-    sinon.stub(command, 'exec' as any).returns({ stdout: 'Folder does not exist' });
     await command.action(logger, {
       options: {
         verbose: true

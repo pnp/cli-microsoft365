@@ -1,6 +1,8 @@
 import * as util from 'util';
+import * as fs from 'fs';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
+import { homedir } from 'os';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -112,41 +114,18 @@ class TeamsCacheRemoveCommand extends GraphCommand {
     }
 
     const platform = process.platform;
-    let cmd = '';
-    const echoMessage = 'echo Folder does not exist';
+    let filePath = '';
 
     switch (platform) {
       case 'win32':
-        cmd = `IF NOT EXIST %userprofile%\\appdata\\roaming\\microsoft\\teams ${echoMessage}`;
+        filePath = `${process.env.APPDATA}\\Microsoft\\Teams`;
         break;
       case 'darwin':
-        cmd = `if [ ! -d  ~/Library/Application\\ Support/Microsoft/Teams ]
-        then
-        ${echoMessage}
-        fi`;
+        filePath = `${homedir}/Library/Application Support/Microsoft/Teams`;
         break;
     }
 
-    if (this.debug) {
-      logger.logToStderr(cmd);
-    }
-
-    try {
-      const cmdOutput = await this.exec(cmd);
-
-      if (cmdOutput.stdout !== '' && cmdOutput.stdout.startsWith('Folder does not exist')) {
-        if (this.verbose) {
-          logger.logToStderr(`Teams cache folder exists for ${platform}. Continuing the deletion`);
-        }
-        return false;
-      }
-      else {
-        return true;
-      }
-    }
-    catch (e: any) {
-      throw new Error(e.message);
-    }
+    return fs.existsSync(filePath);
   }
 
   private async killRunningProcess(logger: Logger): Promise<void> {
