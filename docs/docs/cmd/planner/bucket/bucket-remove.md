@@ -61,3 +61,7 @@ Removes the Microsoft Planner bucket with name _My Bucket_ in the Plan _My Plan_
 ```sh
 m365 planner bucket remove --name "My Bucket" --planTitle "My Plan" --ownerGroupName "My Group"
 ```
+
+## Response
+
+The command won't return a response on success.

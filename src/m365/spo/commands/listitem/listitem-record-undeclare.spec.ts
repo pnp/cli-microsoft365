@@ -7,37 +7,36 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 const command: Command = require('./listitem-record-undeclare');
 
 describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
+  const listUrl = '/sites/project-x/lists/TestList';
+  const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  const postFakes = (opts: any) => {
+  const postFakes = async (opts: any) => {
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-
       // requestObjectIdentity mock
       if (opts.data.indexOf('Name="Current"') > -1) {
-
         if ((opts.url as string).indexOf('rejectme.com') > -1) {
-
-          return Promise.reject('Failed request');
-
+          throw 'Failed request';
         }
-
         if ((opts.url as string).indexOf('returnerror.com') > -1) {
-
-          return Promise.resolve(JSON.stringify(
+          return JSON.stringify(
             [{ "ErrorInfo": "error occurred" }]
-          ));
-
+          );
         }
 
-        return Promise.resolve(JSON.stringify(
+        return JSON.stringify(
           [
             {
               "SchemaVersion": "15.0.0.0",
@@ -50,22 +49,24 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
               "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
               "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
             }
-          ])
-        );
-
+          ]);
       }
       if (opts.data.indexOf('Name="UndeclareItemAsRecord') > -1) {
-        return Promise.resolve();
+        return;
       }
     }
-    return Promise.reject('Invalid request');
+    throw 'Invalid request';
   };
 
-  const getFakes = (opts: any) => {
-    if ((opts.url as string).indexOf('/id') > -1) {
-      return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
+  const getFakes = async (opts: any) => {
+    if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`) {
+      return { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
     }
-    return Promise.reject('Invalid request');
+
+    if ((opts.url as string).indexOf('?$select=Id') > -1) {
+      return { Id: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" };
+    }
+    throw 'Invalid request';
   };
 
   before(() => {
@@ -136,7 +137,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     await assert.rejects(command.action(logger, { options: options } as any), new CommandError('ClientSvc unknown error'));
   });
 
-  it('correctly undeclares list item as a record when listTitle is passes', async () => {
+  it('correctly undeclares list item as a record when listTitle is passed', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -147,6 +148,21 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
       listTitle: 'Demo List',
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+    };
+    await command.action(logger, { options: options } as any);
+  });
+
+  it('correctly undeclares list item as a record when listUrl is passed', async () => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    command.allowUnknownOptions();
+
+    const options: any = {
+      debug: true,
+      listUrl: listUrl,
+      id: 47,
+      webUrl: webUrl
     };
     await command.action(logger, { options: options } as any);
   });

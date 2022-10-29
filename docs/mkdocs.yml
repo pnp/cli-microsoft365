@@ -257,6 +257,7 @@ nav:
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
       - card:
+        - card get: 'cmd/pp/card/card-get.md'
         - card list: 'cmd/pp/card/card-list.md'
       - dataverse:
         - dataverse table list: 'cmd/pp/dataverse/dataverse-table-list.md'
@@ -264,11 +265,13 @@ nav:
         - environment get: 'cmd/pp/environment/environment-get.md'
         - environment list: 'cmd/pp/environment/environment-list.md'
       - gateway:
+        - gateway get: 'cmd/pp/gateway/gateway-get.md'
         - gateway list: 'cmd/pp/gateway/gateway-list.md'
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
         - managementapp list: 'cmd/pp/managementapp/managementapp-list.md'
       - solution:
+        - solution get: 'cmd/pp/solution/solution-get.md'
         - solution list: 'cmd/pp/solution/solution-list.md'
       - tenant:
         - tenant settings list: 'cmd/pp/tenant/tenant-settings-list.md'
@@ -451,6 +454,7 @@ nav:
         - listitem isrecord: 'cmd/spo/listitem/listitem-isrecord.md'
         - listitem list: 'cmd/spo/listitem/listitem-list.md'
         - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
+        - listitem roleassignment add: 'cmd/spo/listitem/listitem-roleassignment-add.md'
         - listitem roleassignment remove: 'cmd/spo/listitem/listitem-roleassignment-remove.md'
         - listitem roleinheritance break: 'cmd/spo/listitem/listitem-roleinheritance-break.md'
         - listitem roleinheritance reset: 'cmd/spo/listitem/listitem-roleinheritance-reset.md'
@@ -609,6 +613,7 @@ nav:
         - web remove: 'cmd/spo/web/web-remove.md'
         - web roleassignment add: 'cmd/spo/web/web-roleassignment-add.md'
         - web roleassignment remove: 'cmd/spo/web/web-roleassignment-remove.md'
+        - web roleinheritance break: 'cmd/spo/web/web-roleinheritance-break.md'
         - web roleinheritance reset: 'cmd/spo/web/web-roleinheritance-reset.md'
         - web set: 'cmd/spo/web/web-set.md'
     - Teams (teams):
@@ -687,11 +692,13 @@ nav:
     - To Do (todo):
       - list:
         - list add: 'cmd/todo/list/list-add.md'
+        - list get: 'cmd/todo/list/list-get.md'
         - list list: 'cmd/todo/list/list-list.md'
         - list remove: 'cmd/todo/list/list-remove.md'
         - list set: 'cmd/todo/list/list-set.md'
       - task:
         - task add: 'cmd/todo/task/task-add.md'
+        - task get: 'cmd/todo/task/task-get.md'
         - task list: 'cmd/todo/task/task-list.md'
         - task remove: 'cmd/todo/task/task-remove.md'
         - task set: 'cmd/todo/task/task-set.md'
@@ -876,6 +883,16 @@ extra:
   analytics:
     provider: google
     property: UA-110480857-1
+  consent:
+    actions:
+      - manage
+      - accept
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
   social:
     - icon: fontawesome/brands/github
       link: 'https://github.com/pnp/cli-microsoft365'
@@ -887,6 +904,8 @@ extra:
       link: 'http://aka.ms/sppnp-videos'
     - icon: fontawesome/solid/link
       link: 'https://aka.ms/sppnp'
+copyright: >
+  <a href="#__consent">Modify cookie settings</a>
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs
 plugins:

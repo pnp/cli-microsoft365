@@ -47,7 +47,7 @@ export class FN010008_YORC_nodeVersion extends JsonRule {
 
     const nodeVersion = process.version.substring(1);
 
-    if (project.yoRcJson["@microsoft/generator-sharepoint"].nodeVersion !== nodeVersion) {
+    if (project.yoRcJson["@microsoft/generator-sharepoint"]?.nodeVersion !== nodeVersion) {
       const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.nodeVersion');
       this.addFindingWithPosition(findings, node);
     }

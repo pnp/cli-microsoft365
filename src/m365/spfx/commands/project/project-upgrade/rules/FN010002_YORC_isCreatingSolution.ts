@@ -44,7 +44,7 @@ export class FN010002_YORC_isCreatingSolution extends JsonRule {
       return;
     }
 
-    if (project.yoRcJson["@microsoft/generator-sharepoint"].isCreatingSolution !== this.value) {
+    if (project.yoRcJson["@microsoft/generator-sharepoint"]?.isCreatingSolution !== this.value) {
       const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.isCreatingSolution');
       this.addFindingWithPosition(findings, node);
     }

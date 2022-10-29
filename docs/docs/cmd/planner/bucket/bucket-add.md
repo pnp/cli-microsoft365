@@ -46,3 +46,32 @@ Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with 
 ```sh
 m365 planner bucket add --name "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "name": "My Planner Bucket",
+      "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
+      "orderHint": "8585363889524958496",
+      "id": "ttEB_Uj690STdR3GC1MIDZgANq1U"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    id       : ttEB_Uj690STdR3GC1MIDZgANq1U
+    name     : My Planner Bucket
+    orderHint: 8585363889524958496
+    planId   : xqQg5FS2LkCp935s-FIFm2QAFkHM
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,name,planId,orderHint
+    ttEB_Uj690STdR3GC1MIDZgANq1U,My Planner Bucket,xqQg5FS2LkCp935s-FIFm2QAFkHM,8585363889524958496
+    ```

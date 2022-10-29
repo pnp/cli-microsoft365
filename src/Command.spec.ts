@@ -30,7 +30,7 @@ class MockCommand1 extends Command {
 
   constructor() {
     super();
-    
+
     this.types.string.push('option2');
     this.options.push(
       {
@@ -250,7 +250,7 @@ describe('Command', () => {
     }
   });
 
-  it('logs command name in the telemetry when command name used', async() => {
+  it('logs command name in the telemetry when command name used', async () => {
     const mock = new MockCommand1();
     await mock.action(logger, { options: {} });
 
@@ -306,7 +306,7 @@ describe('Command', () => {
     });
     command.trackUnknownOptionsPublic(actual, { Prop2: false });
     assert.strictEqual(JSON.stringify(actual), expected);
-  });  
+  });
 
   it('adds unknown options to payload', () => {
     const command = new MockCommand1();
@@ -321,8 +321,33 @@ describe('Command', () => {
     assert.strictEqual(JSON.stringify(actual), expected);
   });
 
-  it('catches exception thrown by commandAction', async() => {
+  it('catches exception thrown by commandAction', async () => {
     const command = new MockCommand4();
     await assert.rejects(command.action(logger, { options: {} }), new CommandError('Exception'));
+  });
+
+  it('passes validation when csv output specified', async () => {
+    const cmd = new MockCommand2();
+    assert.strictEqual(await cmd.validate({ options: { output: 'csv' } }, Cli.getCommandInfo(cmd)), true);
+  });
+
+  it('passes validation when json output specified', async () => {
+    const cmd = new MockCommand2();
+    assert.strictEqual(await cmd.validate({ options: { output: 'json' } }, Cli.getCommandInfo(cmd)), true);
+  });
+
+  it('passes validation when text output specified', async () => {
+    const cmd = new MockCommand2();
+    assert.strictEqual(await cmd.validate({ options: { output: 'text' } }, Cli.getCommandInfo(cmd)), true);
+  });
+
+  it('passes validation when no output specified', async () => {
+    const cmd = new MockCommand2();
+    assert.strictEqual(await cmd.validate({ options: {} }, Cli.getCommandInfo(cmd)), true);
+  });
+
+  it('fails validation when invalid output specified', async () => {
+    const cmd = new MockCommand2();
+    assert.notStrictEqual(await cmd.validate({ options: { output: 'invalid' } }, Cli.getCommandInfo(cmd)), true);
   });
 });

@@ -59,6 +59,20 @@ describe('FN010004_YORC_componentType', () => {
     assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
   });
 
+  it('suggests setting componentType to webpart for a project with a web part when @microsoft/generator-sharepoint not set', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [{
+        "$schema": 'https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json',
+        componentType: 'WebPart',
+        path: '/usr/tmp/src/webparts/helloWorld/HelloWorld.manifest.json'
+      }],
+      yoRcJson: {}
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1);
+  });
+
   it('suggests setting componentType to extension for a project with an extension', () => {
     const project: Project = {
       path: '/usr/tmp',

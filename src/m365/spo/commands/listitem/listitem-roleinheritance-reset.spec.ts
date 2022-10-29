@@ -7,8 +7,10 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 const command: Command = require('./listitem-roleinheritance-reset');
 
@@ -87,7 +89,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['listId', 'listTitle']]);
+    assert.deepStrictEqual(optionSets, [['listId', 'listTitle', 'listUrl']]);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
@@ -118,6 +120,30 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
   it('passes validation if the specified list item id is a number', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listItemId: '4' } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('reset role inheritance on list item by list url', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
+    const listUrl = '/sites/project-x/lists/TestList';
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+    const listItemId = 8;
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(${listItemId})/resetroleinheritance`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: webUrl,
+        listItemId: listItemId,
+        listUrl: listUrl
+      }
+    });
   });
 
   it('reset role inheritance on list item by list title', async () => {

@@ -40,3 +40,33 @@ Lists the Microsoft Planner buckets in the Plan _My Plan_ owned by group _My Gro
 ```sh
 m365 planner bucket list --planTitle "My Plan" --ownerGroupName "My Group"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "name": "My Planner Bucket",
+        "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
+        "orderHint": "8585363889524958496",
+        "id": "ttEB_Uj690STdR3GC1MIDZgANq1U"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    id                            name               planId                        orderHint
+    ----------------------------  -----------------  ----------------------------  -------------------
+    ttEB_Uj690STdR3GC1MIDZgANq1U  My Planner Bucket  xqQg5FS2LkCp935s-FIFm2QAFkHM  8585363889524958496
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,name,planId,orderHint
+    ttEB_Uj690STdR3GC1MIDZgANq1U,My Planner Bucket,xqQg5FS2LkCp935s-FIFm2QAFkHM,8585363889524958496
+    ```

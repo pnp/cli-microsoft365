@@ -46,6 +46,10 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
   public static ERROR_NO_VERSION: number = 3;
   public static ERROR_UNSUPPORTED_VERSION: number = 2;
 
+  protected get allowedOutputs(): string[] {
+    return ['json', 'text', 'md'];
+  }
+
   public get name(): string {
     return commands.PROJECT_EXTERNALIZE;
   }
@@ -56,18 +60,18 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
   }
-  
+
   #initOptions(): void {
     this.options.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
-        o.autocomplete = ['json', 'text', 'md'];
+        o.autocomplete = this.allowedOutputs;
       }
     });
   }
-  
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.output !== 'json' || this.verbose) {
       logger.logToStderr(`This command is currently in preview. Feedback welcome at https://github.com/pnp/cli-microsoft365/issues${os.EOL}`);

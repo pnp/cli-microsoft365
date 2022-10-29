@@ -6,8 +6,11 @@
 
 **Power Platform:**
 
+- [pp card get](../cmd/pp/card//card-get.md) - gets a specific Microsoft Power Platform card in the specified Power Platform environment [#3770](https://github.com/pnp/cli-microsoft365/issues/3770)
 - [pp card list](../cmd/pp/card/card-list.md) - lists Microsoft Power Platform cards in the specified Power Platform environment [#3767](https://github.com/pnp/cli-microsoft365/issues/3767)
 - [pp dataverse table list](../cmd/pp/dataverse/dataverse-table-list.md) - lists dataverse tables in a given environment [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
+- [pp gateway get](../cmd/pp/gateway/gateway-get.md) - gets information about the specified gateway [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
+- [pp solution get](../cmd/pp/solution/solution-get.md) - gets a specific solution in a given environment [#3722](https://github.com/pnp/cli-microsoft365/issues/3722)
 - [pp solution list](../cmd/pp/solution/solution-list.md) - lists solutions in a given environment [#3711](https://github.com/pnp/cli-microsoft365/issues/3711)
 - [pp tenant settings list](../cmd/pp/tenant/tenant-settings-list.md) - lists the global Power Platform tenant settings [#3657](https://github.com/pnp/cli-microsoft365/issues/3657)
 - [pp environment get](../cmd/pp/environment/environment-get.md) - gets information about the specified Power Platform environment. [#3710](https://github.com/pnp/cli-microsoft365/issues/3710)
@@ -22,6 +25,13 @@
 - [spo folder roleassignment remove](../cmd/spo/folder/folder-roleassignment-remove.md) - removes a role assignment from the specified folder [#3701](https://github.com/pnp/cli-microsoft365/issues/3701)
 - [spo folder roleinheritance break](../cmd/spo/folder/folder-roleinheritance-break.md) - breaks the role inheritance of a folder [#3598](https://github.com/pnp/cli-microsoft365/issues/3598)
 - [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
+- [spo listitem roleassignment add](../cmd/spo/listitem/listitem-roleassignment-add.md) - adds a role assignment to a listitem [#3539](https://github.com/pnp/cli-microsoft365/issues/3539)
+- [spo web roleinheritance break](../cmd//spo/web/web-roleinheritance-break.md) - break role inheritance of subsite [#3547](https://github.com/pnp/cli-microsoft365/issues/3547)
+
+**To Do:**
+
+- [todo list get](../cmd/todo/list/list-get.md) - returns a specific Microsoft To Do task list [#3847](https://github.com/pnp/cli-microsoft365/issues/3847)
+- [todo task get](../cmd/todo/task/task-get.md) - returns a specific task from a Microsoft To Do task list [#3846](https://github.com/pnp/cli-microsoft365/issues/3846)
 
 ### Changes
 
@@ -60,6 +70,20 @@
 - fixed options overriding aad app add with manifest [#3555](https://github.com/pnp/cli-microsoft365/issues/3555)
 - added 'listUrl' to spo roleinheritance break and -reset [#3809](https://github.com/pnp/cli-microsoft365/issues/3809)
 - extended 'outlook mail send' command with attachments support [#3832](https://github.com/pnp/cli-microsoft365/issues/3832)
+- added cookie consent to MKDocs [#3832](https://github.com/pnp/cli-microsoft365/issues/3765)
+- extended 'todo task add' with extra options [#3832](https://github.com/pnp/cli-microsoft365/issues/3827)
+- extended spo contenttype with list options 'listUrl' and 'listId' [#3806](https://github.com/pnp/cli-microsoft365/issues/3818)
+- extended 'status' command to log extra info [#3818](https://github.com/pnp/cli-microsoft365/issues/3806)
+- added validating output format [#2988](https://github.com/pnp/cli-microsoft365/issues/2988)
+- included response output: Planner bucket & Planner plan [#3773](https://github.com/pnp/cli-microsoft365/issues/3773)
+- updated GitHub actions to Node@16 [#3870](https://github.com/pnp/cli-microsoft365/issues/3870)
+- added support for upgrading SPFx projects to v1.16.0-beta.2 [#3937](https://github.com/pnp/cli-microsoft365/issues/3937)
+- made id option required for command spo list webhook get and set [#3860](https://github.com/pnp/cli-microsoft365/issues/3860)
+- included docs response output for 'tenant' commands [#3926](https://github.com/pnp/cli-microsoft365/issues/3926)
+- fixed global options for spo list webhook get and set docs [#3946](https://github.com/pnp/cli-microsoft365/issues/3946)
+- extended spo listitem with listUrl [#3814](https://github.com/pnp/cli-microsoft365/issues/3814)
+- extended spo field add and spo field set with listId and listUrl [#3807](https://github.com/pnp/cli-microsoft365/issues/3807)
+- extended spo listitem with listUrl [#3813](https://github.com/pnp/cli-microsoft365/issues/3813)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 

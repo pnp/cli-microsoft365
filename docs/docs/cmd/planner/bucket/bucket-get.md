@@ -58,3 +58,32 @@ Gets the Microsoft Planner bucket in the Plan _My Plan_ owned by groupId ee0f40f
 ```sh
 m365 planner bucket get --name "Planner Bucket A" --planTitle "My Plan" --ownerGroupId "ee0f40fc-b2f7-45c7-b62d-11b90dd2ea8e"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "name": "My Planner Bucket",
+      "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
+      "orderHint": "8585363889524958496",
+      "id": "ttEB_Uj690STdR3GC1MIDZgANq1U"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    id       : ttEB_Uj690STdR3GC1MIDZgANq1U
+    name     : My Planner Bucket
+    orderHint: 8585363889524958496
+    planId   : xqQg5FS2LkCp935s-FIFm2QAFkHM
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,name,planId,orderHint
+    ttEB_Uj690STdR3GC1MIDZgANq1U,My Planner Bucket,xqQg5FS2LkCp935s-FIFm2QAFkHM,8585363889524958496
+    ```

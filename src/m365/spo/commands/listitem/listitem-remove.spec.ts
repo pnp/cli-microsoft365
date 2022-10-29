@@ -7,12 +7,18 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 const command: Command = require('./listitem-remove');
 
 describe(commands.LISTITEM_REMOVE, () => {
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
+  const listUrl = 'sites/project-x/documents';
+  const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -130,7 +136,36 @@ describe(commands.LISTITEM_REMOVE, () => {
         correctRequestIssued = true;
       }
     });
-    
+
+    assert(correctRequestIssued);
+  });
+
+  it('removes the list item from list retrieved by listUrl when prompt confirmed', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      requests.push(opts);
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(1)`
+        && opts.headers && opts.headers.accept && opts.headers.accept === 'application/json;odata=nometadata') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { verbose: true, listUrl: listUrl, webUrl: webUrl, id: 1 } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(1)` &&
+        r.headers.accept &&
+        r.headers.accept === 'application/json;odata=nometadata') {
+        correctRequestIssued = true;
+      }
+    });
+
     assert(correctRequestIssued);
   });
 
@@ -162,7 +197,7 @@ describe(commands.LISTITEM_REMOVE, () => {
         correctRequestIssued = true;
       }
     });
-    
+
     assert(correctRequestIssued);
   });
 

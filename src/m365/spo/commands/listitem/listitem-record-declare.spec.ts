@@ -7,9 +7,11 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 const command: Command = require('./listitem-record-declare');
 
@@ -19,21 +21,25 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   let commandInfo: CommandInfo;
   let declareItemAsRecordFakeCalled = false;
 
-  const postFakes = (opts: any) => {
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
+  const listUrl = '/sites/project-x/lists/TestList';
+  const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+
+  const postFakes = async (opts: any) => {
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
       // requestObjectIdentity mock
       if (opts.data.indexOf('Name="Current"') > -1) {
 
         if ((opts.url as string).indexOf('rejectme.sharepoint.com') > -1) {
-          return Promise.reject('Failed request');
+          throw 'Failed request';
         }
 
         if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
-          return Promise.reject("error occurred");
+          throw 'error occurred';
         }
 
-        return Promise.resolve(JSON.stringify(
+        return JSON.stringify(
           [
             {
               "SchemaVersion": "15.0.0.0",
@@ -46,25 +52,22 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
               "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
               "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
             }
-          ])
-        );
+          ]);
       }
 
-      if (opts.data.indexOf('Name="DeclareItemAsRecord') > -1
-        || opts.data.indexOf('Name="DeclareItemAsRecordWithDeclarationDate') > -1) {
-
+      if (opts.data.indexOf('Name="DeclareItemAsRecord') > -1 || opts.data.indexOf('Name="DeclareItemAsRecordWithDeclarationDate') > -1) {
         if ((opts.url as string).indexOf('alreadydeclared') > -1) {
-          return Promise.resolve(JSON.stringify([
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8713.1223", "ErrorInfo": {
                 "ErrorMessage": "This item has already been declared a record.", "ErrorValue": null, "TraceCorrelationId": "9d66cc9e-e0fa-8000-1225-3a9b7ff9284d", "ErrorCode": -2146232832, "ErrorTypeName": "Microsoft.SharePoint.SPException"
               }, "TraceCorrelationId": "9d66cc9e-e0fa-8000-1225-3a9b7ff9284d"
             }
-          ]));
+          ]);
         }
 
         declareItemAsRecordFakeCalled = true;
-        return Promise.resolve(JSON.stringify(
+        return JSON.stringify(
           [
             {
               "SchemaVersion": "15.0.0.0",
@@ -72,26 +75,24 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
               "ErrorInfo": null,
               "TraceCorrelationId": "9d20cc9e-7077-8000-1225-32482bc95341"
             }
-          ])
-        );
-
+          ]);
       }
     }
-    return Promise.reject('Invalid request');
+    throw 'Invalid request';
   };
 
-  const getFakes = (opts: any) => {
+  const getFakes = async (opts: any) => {
     if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
       (opts.url as string).indexOf('$select=Id') > -1) {
       logger.log('faked!');
-      return Promise.resolve({
-        Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
-      });
+      return { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
     }
-    if ((opts.url as string).indexOf('/id') > -1) {
-      return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
+
+    if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`) {
+      return { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
     }
-    return Promise.reject('Invalid request');
+
+    throw 'Invalid request';
   };
 
   before(() => {
@@ -157,6 +158,22 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       listTitle: 'Test List',
       id: 147,
       webUrl: `https://contoso.sharepoint.com/sites/project-y/`
+    };
+
+    declareItemAsRecordFakeCalled = false;
+    await command.action(logger, { options: options } as any);
+    assert(declareItemAsRecordFakeCalled);
+  });
+
+  it('declares a record using list url is specified', async () => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    const options: any = {
+      verbose: true,
+      listUrl: listUrl,
+      id: 147,
+      webUrl: webUrl
     };
 
     declareItemAsRecordFakeCalled = false;

@@ -44,7 +44,7 @@ export class FN010005_YORC_environment extends JsonRule {
       return;
     }
 
-    if (project.yoRcJson["@microsoft/generator-sharepoint"].environment !== this.environment) {
+    if (project.yoRcJson["@microsoft/generator-sharepoint"]?.environment !== this.environment) {
       const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.environment');
       this.addFindingWithPosition(findings, node);
     }
