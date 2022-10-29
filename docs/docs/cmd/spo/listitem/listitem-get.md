@@ -17,10 +17,13 @@ m365 spo listitem get [options]
 : ID of the item to retrieve.
 
 `-l, --listId [listId]`
-: ID of the list from which to retrieve the item. Specify `listId` or `listTitle` but not both
+: ID of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
 
 `-t, --listTitle [listTitle]`
-: Title of the list from which to retrieve the item. Specify `listId` or `listTitle` but not both
+: Title of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`
 
 `-p, --properties [properties]`
 : Comma-separated list of properties to retrieve. Will retrieve all properties if not specified and json output is requested
@@ -49,4 +52,10 @@ Get an items _Title_, _Created_ column and lookup column _Company_ with ID _147_
 
 ```sh
 m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created,Company/Title"
+```
+
+Get an item with specific properties from a list retrieved by server-relative URL in a specific site
+
+```sh
+m365 spo listitem get --listUrl /sites/project-x/documents --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created,Company/Title"
 ```

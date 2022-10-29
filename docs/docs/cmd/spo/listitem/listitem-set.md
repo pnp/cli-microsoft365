@@ -17,10 +17,13 @@ m365 spo listitem set [options]
 : ID of the list item to update.
 
 `-l, --listId [listId]`
-: ID of the list where the item should be updated. Specify `listId` or `listTitle` but not both
+: ID of the list where the item should be updated. Specify either `listTitle`, `listId` or `listUrl`
 
 `-t, --listTitle [listTitle]`
-: Title of the list where the item should be updated. Specify `listId` or `listTitle` but not both
+: Title of the list where the item should be updated. Specify either `listTitle`, `listId` or `listUrl`
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list where the item should be updated. Specify either `listTitle`, `listId` or `listUrl`
 
 `-c, --contentType [contentType]`
 : The name or the ID of the content type to associate with the updated item
@@ -62,8 +65,8 @@ Update an item with id _147_ with Title _Demo Multi Person Field_ and a multi-se
 m365 spo listitem set --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
 ```
 
-Update an item with id _147_ with Title _Demo Hyperlink Field_ and a hyperlink field named _CustomHyperlink_ to list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
+Update the field _Title_ and _CustomHyperlink_ of an item with a specific id in a list retrieved by server-relative URL in a specific site
 
 ```sh
-m365 spo listitem set --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
+m365 spo listitem set --listUrl '/sites/project-x/lists/Demo List' --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
 ```

@@ -45,13 +45,13 @@ export class FN010006_YORC_framework extends JsonRule {
     }
 
     if (this.add) {
-      if (project.yoRcJson["@microsoft/generator-sharepoint"].framework !== this.framework) {
+      if (project.yoRcJson["@microsoft/generator-sharepoint"]?.framework !== this.framework) {
         const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.framework');
         this.addFindingWithPosition(findings, node);
       }
     }
     else {
-      if (project.yoRcJson["@microsoft/generator-sharepoint"].framework) {
+      if (project.yoRcJson["@microsoft/generator-sharepoint"]?.framework) {
         const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.framework');
         this.addFindingWithPosition(findings, node);
       }

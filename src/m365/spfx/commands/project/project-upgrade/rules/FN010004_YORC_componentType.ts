@@ -60,7 +60,7 @@ export class FN010004_YORC_componentType extends JsonRule {
       componentType = 'webpart';
     }
 
-    if (project.yoRcJson["@microsoft/generator-sharepoint"].componentType !== componentType) {
+    if (project.yoRcJson["@microsoft/generator-sharepoint"]?.componentType !== componentType) {
       const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.componentType');
       this.addFindingWithOccurrences([{
         file: this.file,

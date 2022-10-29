@@ -19,11 +19,14 @@ m365 spo listitem list [options]
 `--id [id]`
 : (deprecated. Use `listId` instead) ID of the list to retrieve items from. Specify `id` or `title` but not both
 
-`-t, --listTitle [listTitle]`
-: Title of the list to retrieve items from. Specify `listId` or `listTitle` but not both
+`-l, --listId [listId]`
+: ID of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
 
-`--title [title]`
-: (deprecated. Use `listTitle` instead) Title of the list to retrieve items from. Specify `id` or `title` but not both
+`-t, --listTitle [listTitle]`
+: Title of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`
 
 `-q, --camlQuery [camlQuery]`
 : CAML query to use to query the list of items with
@@ -90,4 +93,10 @@ From a list named _Demo List_ get the second batch of 10 items
 
 ```sh
 m365 spo listitem list --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --pageSize 10 --pageNumber 2
+```
+
+Get all items from a list by server-relative URL
+
+```sh
+m365 spo listitem list --listUrl /sites/project-x/documents --webUrl https://contoso.sharepoint.com/sites/project-x
 ```

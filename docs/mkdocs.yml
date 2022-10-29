@@ -610,6 +610,7 @@ nav:
         - web remove: 'cmd/spo/web/web-remove.md'
         - web roleassignment add: 'cmd/spo/web/web-roleassignment-add.md'
         - web roleassignment remove: 'cmd/spo/web/web-roleassignment-remove.md'
+        - web roleinheritance break: 'cmd/spo/web/web-roleinheritance-break.md'
         - web roleinheritance reset: 'cmd/spo/web/web-roleinheritance-reset.md'
         - web set: 'cmd/spo/web/web-set.md'
     - Teams (teams):
@@ -688,11 +689,13 @@ nav:
     - To Do (todo):
       - list:
         - list add: 'cmd/todo/list/list-add.md'
+        - list get: 'cmd/todo/list/list-get.md'
         - list list: 'cmd/todo/list/list-list.md'
         - list remove: 'cmd/todo/list/list-remove.md'
         - list set: 'cmd/todo/list/list-set.md'
       - task:
         - task add: 'cmd/todo/task/task-add.md'
+        - task get: 'cmd/todo/task/task-get.md'
         - task list: 'cmd/todo/task/task-list.md'
         - task remove: 'cmd/todo/task/task-remove.md'
         - task set: 'cmd/todo/task/task-set.md'

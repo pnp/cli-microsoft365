@@ -17,10 +17,13 @@ m365 spo listitem roleinheritance break [options]
 : ID of the item for which to break role inheritance
 
 `-l, --listId [listId]`
-: ID of the list. Specify listId or listTitle but not both
+: ID of the list. Specify either `listTitle`, `listId` or `listUrl`
 
 `-t, --listTitle [listTitle]`
-: Title of the list. Specify listId or listTitle but not both
+: Title of the list.  Specify either `listTitle`, `listId` or `listUrl`
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`
 
 `-c, --clearExistingPermissions`
 : Set to clear existing roles from the list item
@@ -51,8 +54,8 @@ Break inheritance of list item _1_ in list _someList_ located in site _https://c
 m365 spo listitem roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --listTitle "_someList_" --listItemId 1 --clearExistingPermissions
 ```
 
-Break inheritance of list item _1_ in list with ID _202b8199-b9de-43fd-9737-7f213f51c991_ located in site _https://contoso.sharepoint.com/sites/project-x_ with clearing permissions
+Break inheritance of a specific list item in a list retrieved by server-relative URL in a specific site and clear the existing permissions
 
 ```sh
-m365 spo listitem roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x --listId 202b8199-b9de-43fd-9737-7f213f51c991 --listItemId 1 --clearExistingPermissions
+m365 spo listitem roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/Documents --listItemId 1 --clearExistingPermissions
 ```

@@ -7,50 +7,48 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 const command: Command = require('./listitem-attachment-list');
 
 describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
+  const listUrl = 'sites/project-x/documents';
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
+  const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
-  const itemId = 147;
-
-  const getFakes = (opts: any) => {
-    if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
-      return Promise.resolve(
-        {
-          "AttachmentFiles": [
-            {
-              "FileName": "my_file.docx",
-              "ServerRelativeUrl": "/sites/project-x/Lists/Demo List/Attachments/1/my_file.docx"
-            },
-            {
-              "FileName": "my_workbook.xlsx",
-              "ServerRelativeUrl": "/sites/project-x/Lists/Demo List/Attachments/1/my_workbook.xlsx"
-            }
-          ]
-        }
-      );
-    }
-    return Promise.reject('Invalid request');
+  const attachmentsResponse = {
+    AttachmentFiles: [
+      {
+        "FileName": "my_file.docx",
+        "ServerRelativeUrl": "/sites/project-x/Lists/Demo List/Attachments/1/my_file.docx"
+      },
+      {
+        "FileName": "my_workbook.xlsx",
+        "ServerRelativeUrl": "/sites/project-x/Lists/Demo List/Attachments/1/my_workbook.xlsx"
+      }
+    ]
   };
 
-  const jsonOutput = [
-    {
-      "FileName": "my_file.docx",
-      "ServerRelativeUrl": "/sites/project-x/Lists/Demo List/Attachments/1/my_file.docx"
-    },
-    {
-      "FileName": "my_workbook.xlsx",
-      "ServerRelativeUrl": "/sites/project-x/Lists/Demo List/Attachments/1/my_workbook.xlsx"
+  const itemId = 147;
+
+  const getFakes = async (opts: any) => {
+    if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
+      return attachmentsResponse;
     }
-  ];
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(147)?$select=AttachmentFiles&$expand=AttachmentFiles`) {
+      return attachmentsResponse;
+    }
+    throw 'Invalid request';
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -172,7 +170,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert(loggerLogSpy.calledWith(jsonOutput));
+    assert(loggerLogSpy.calledWith(attachmentsResponse.AttachmentFiles));
   });
 
   it('returns attachments associated to a list item by listTitle', async () => {
@@ -186,7 +184,21 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
     };
 
     await command.action(logger, { options: options } as any);
-    assert(loggerLogSpy.calledWith(jsonOutput));
+    assert(loggerLogSpy.calledWith(attachmentsResponse.AttachmentFiles));
+  });
+
+  it('returns attachments associated to a list item by listUrl', async () => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    const options: any = {
+      verbose: true,
+      webUrl: webUrl,
+      listUrl: listUrl,
+      itemId: itemId
+    };
+
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(attachmentsResponse.AttachmentFiles));
   });
 
   it('correctly handles random API error', async () => {

@@ -44,7 +44,7 @@ export class FN010003_YORC_packageManager extends JsonRule {
       return;
     }
 
-    if (project.yoRcJson["@microsoft/generator-sharepoint"].packageManager !== this.packageManager) {
+    if (project.yoRcJson["@microsoft/generator-sharepoint"]?.packageManager !== this.packageManager) {
       const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.packageManager');
       this.addFindingWithPosition(findings, node);
     }
