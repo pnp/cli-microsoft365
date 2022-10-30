@@ -273,6 +273,7 @@ nav:
       - solution:
         - solution get: 'cmd/pp/solution/solution-get.md'
         - solution list: 'cmd/pp/solution/solution-list.md'
+        - solution remove: 'cmd/pp/solution/solution-remove.md'
       - tenant:
         - tenant settings list: 'cmd/pp/tenant/tenant-settings-list.md'
     - Search (search):
