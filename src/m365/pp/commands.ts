@@ -14,5 +14,6 @@ export default {
   MANAGEMENTAPP_LIST: `${prefix} managementapp list`,
   SOLUTION_GET: `${prefix} solution get`,
   SOLUTION_LIST: `${prefix} solution list`,
+  SOLUTION_REMOVE: `${prefix} solution remove`,
   TENANT_SETTINGS_LIST: `${prefix} tenant settings list`
 };
