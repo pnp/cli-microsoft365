@@ -97,7 +97,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
     }
 
     if (args.options.confirm) {
-      await this.deleteCard(args, logger);
+      await this.deleteCard(args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -108,12 +108,12 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
       });
 
       if (result.continue) {
-        await this.deleteCard(args, logger);
+        await this.deleteCard(args);
       }
     }
   }
 
-  private async getCardId(args: CommandArgs, logger: Logger): Promise<any> {
+  private async getCardId(args: CommandArgs): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
@@ -131,11 +131,11 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
     return getCardOutput.cardid;
   }
 
-  private async deleteCard(args: CommandArgs, logger: Logger): Promise<void> {
+  private async deleteCard(args: CommandArgs): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
-      const cardId = await this.getCardId(args, logger);
+      const cardId = await this.getCardId(args);
       const requestOptions: AxiosRequestConfig = {
         url: `${dynamicsApiUrl}/api/data/v9.1/cards(${cardId})`,
         headers: {
