@@ -11,6 +11,7 @@ import { pid } from '../../../../utils/pid';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import * as PpCardGetCommand from './card-get';
 const command: Command = require('./card-remove');
 
 describe(commands.CARD_REMOVE, () => {
@@ -20,63 +21,6 @@ describe(commands.CARD_REMOVE, () => {
   const validId = '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893';
   const validName = 'CLI 365 Card';
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
-  const cardResponse = {
-    "value": [
-      {
-        "solutionid": "fd140aae-4df4-11dd-bd17-0019b9312238",
-        "modifiedon": "2022-10-11T08:52:12Z",
-        "_owninguser_value": "7d48edd3-69fd-ec11-82e5-000d3ab87733",
-        "overriddencreatedon": null,
-        "ismanaged": false,
-        "schemaversion": null,
-        "tags": null,
-        "importsequencenumber": null,
-        "componentidunique": "d7c1acb5-37a4-4873-b24e-34b18c15c6a5",
-        "_modifiedonbehalfby_value": null,
-        "componentstate": 0,
-        "statecode": 0,
-        "name": "DummyCard",
-        "versionnumber": 3044006,
-        "utcconversiontimezonecode": null,
-        "cardid": "69703efe-4149-ed11-bba2-000d3adf7537",
-        "publishdate": null,
-        "_createdonbehalfby_value": null,
-        "_modifiedby_value": "7d48edd3-69fd-ec11-82e5-000d3ab87733",
-        "createdon": "2022-10-11T08:52:12Z",
-        "overwritetime": "1900-01-01T00:00:00Z",
-        "_owningbusinessunit_value": "2199f44c-195b-ec11-8f8f-000d3adca49c",
-        "hiddentags": null,
-        "description": " ",
-        "appdefinition": "{\"screens\":{\"main\":{\"template\":{\"type\":\"AdaptiveCard\",\"body\":[{\"type\":\"TextBlock\",\"size\":\"Medium\",\"weight\":\"bolder\",\"text\":\"Your card title goes here\"},{\"type\":\"TextBlock\",\"text\":\"Add and remove element to customize your new card.\",\"wrap\":true}],\"actions\":[],\"$schema\":\"http://adaptivecards.io/schemas/1.4.0/adaptive-card.json\",\"version\":\"1.4\"},\"verbs\":{\"submit\":\"echo\"}}},\"sampleData\":{\"main\":{}},\"connections\":{},\"variables\":{},\"flows\":{}}",
-        "statuscode": 1,
-        "remixsourceid": null,
-        "sizes": null,
-        "_owningteam_value": null,
-        "coowners": null,
-        "_createdby_value": "7d48edd3-69fd-ec11-82e5-000d3ab87733",
-        "_ownerid_value": "7d48edd3-69fd-ec11-82e5-000d3ab87733",
-        "publishsourceid": null,
-        "timezoneruleversionnumber": null,
-        "iscustomizable": {
-          "Value": true,
-          "CanBeChanged": true,
-          "ManagedPropertyLogicalName": "iscustomizableanddeletable"
-        },
-        "owninguser": {
-          "azureactivedirectoryobjectid": "88e85b64-e687-4e0b-bbf4-f42f5f8e574c",
-          "fullname": "Contoso Admin",
-          "systemuserid": "7d48edd3-69fd-ec11-82e5-000d3ab87733",
-          "ownerid": "7d48edd3-69fd-ec11-82e5-000d3ab87733"
-        }
-      }
-    ]
-  };
-  const multipleCardsResponse = {
-    value: [
-      { cardid: '69703efe-4149-ed11-bba2-000d3adf7537' },
-      { cardid: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
-    ]
-  };
   //#endregion
 
   let log: string[];
@@ -118,7 +62,8 @@ describe(commands.CARD_REMOVE, () => {
       request.get,
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
-      Cli.prompt
+      Cli.prompt,
+      Cli.executeCommandWithOutput
     ]);
   });
 
@@ -137,10 +82,6 @@ describe(commands.CARD_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['name', 'cardid', 'publishdate', 'createdon', 'modifiedon']);
   });
 
   it('fails validation if id is not a valid guid.', async () => {
@@ -163,54 +104,11 @@ describe(commands.CARD_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails to remove card when multiple cards with same name were found', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards?$filter=name eq '${validName}'`)) {
-        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
-          return multipleCardsResponse;
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        environment: validEnvironment,
-        name: validName
-      }
-    }), new CommandError(`Multiple cards with name '${validName}' found: ${multipleCardsResponse.value.map(x => x.cardid).join(',')}`));
-  });
-
-  it('fails to remove card when card does not exists', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards?$filter=name eq '${validName}'`)) {
-        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
-          return ({ "value": [] });
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        environment: validEnvironment,
-        name: validName
-      }
-    }), new CommandError(`The specified card '${validName}' does not exist.`));
-  });
-
   it('prompts before removing the specified card owned by the currently signed-in user when confirm option not passed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     await command.action(logger, {
       options: {
-        debug: false,
         environment: validEnvironment,
         id: validId
       }
@@ -234,7 +132,6 @@ describe(commands.CARD_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         environment: validEnvironment,
         id: validId
       }
@@ -245,18 +142,18 @@ describe(commands.CARD_REMOVE, () => {
   it('removes the specified card owned by the currently signed-in user when prompt confirmed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards?$filter=name eq '${validName}'`)) {
-        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
-          return cardResponse;
-        }
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === PpCardGetCommand) {
+        return ({
+          stdout: `{ "overwritetime": "1900-01-01T00:00:00Z", "_owningbusinessunit_value": "b419f090-fe22-ec11-b6e5-000d3ab596a1", "solutionid": "fd140aae-4df4-11dd-bd17-0019b9312238", "componentidunique": "e2b1d019-bd9a-491a-b888-693740711319", "_owninguser_value": "4f175d04-b952-ed11-bba2-000d3adf774e", "statecode": 0, "statuscode": 1, "ismanaged": false, "cardid": "${validId}", "_ownerid_value": "4f175d04-b952-ed11-bba2-000d3adf774e", "componentstate": 0, "modifiedon": "2022-10-29T08:22:46Z", "name": "${validName}", "_modifiedby_value": "4f175d04-b952-ed11-bba2-000d3adf774e", "versionnumber": 4463945, "createdon": "2022-10-29T08:22:46Z", "description": " ", "_createdby_value": "4f175d04-b952-ed11-bba2-000d3adf774e", "overriddencreatedon": null, "schemaversion": null, "importsequencenumber": null, "tags": null, "_modifiedonbehalfby_value": null, "utcconversiontimezonecode": null, "publishdate": null, "_createdonbehalfby_value": null, "hiddentags": null, "remixsourceid": null, "sizes": null, "coowners": null, "_owningteam_value": null, "publishsourceid": null, "timezoneruleversionnumber": null, "iscustomizable": { "Value": true, "CanBeChanged": true, "ManagedPropertyLogicalName": "iscustomizableanddeletable"}}`
+        });
       }
 
-      throw 'Invalid request';
+      throw new CommandError('Unknown case');
     });
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards(${cardResponse.value[0].cardid})`) {
+      if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards(${validId})`) {
         return { statusCode: 200 };
       }
 
@@ -300,27 +197,17 @@ describe(commands.CARD_REMOVE, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+    const errorMessage = `The environment '${validEnvironment}' could not be retrieved. See the inner exception for more details: undefined`;
+    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
 
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards?$filter=name eq '${validName}'`)) {
-        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
-          throw {
-            error: {
-              'odata.error': {
-                code: '-1, InvalidOperationException',
-                message: {
-                  value: `Resource '' does not exist or one of its queried reference-property objects are not present`
-                }
-              }
-            }
-          };
-        }
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        environment: validEnvironment,
+        name: validName,
+        confirm: true
       }
-    });
-
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment, name: validName } } as any),
-      new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
+    }), new CommandError(errorMessage));
   });
 
   it('supports debug mode', () => {

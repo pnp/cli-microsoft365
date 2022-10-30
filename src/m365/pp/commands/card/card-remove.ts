@@ -7,6 +7,9 @@ import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
+import { Options as PpCardGetCommandOptions } from './card-get';
+import * as PpCardGetCommand from './card-get';
+import Command from '../../../../Command';
 
 interface CommandArgs {
   options: Options;
@@ -28,10 +31,6 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
 
   public get description(): string {
     return 'Removes a specific Microsoft Power Platform card in the specified Power Platform environment.';
-  }
-
-  public defaultProperties(): string[] | undefined {
-    return ['name', 'cardid', 'publishdate', 'createdon', 'modifiedon'];
   }
 
   constructor() {
@@ -97,68 +96,60 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
       logger.logToStderr(`Removes a card '${args.options.id || args.options.name}'...`);
     }
 
+    if (args.options.confirm) {
+      await this.deleteCard(args, logger);
+    }
+    else {
+      const result = await Cli.prompt<{ continue: boolean }>({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the card '${args.options.id || args.options.name}'?`
+      });
+
+      if (result.continue) {
+        await this.deleteCard(args, logger);
+      }
+    }
+  }
+
+  private async getCardId(args: CommandArgs, logger: Logger): Promise<any> {
+    if (args.options.id) {
+      return args.options.id;
+    }
+
+    const options: PpCardGetCommandOptions = {
+      environment: args.options.environment,
+      name: args.options.name,
+      output: 'json',
+      debug: this.debug,
+      verbose: this.verbose
+    };
+
+    const output = await Cli.executeCommandWithOutput(PpCardGetCommand as Command, { options: { ...options, _: [] } });
+    const getCardOutput = JSON.parse(output.stdout);
+    logger.log(getCardOutput);
+    return getCardOutput.cardid;
+  }
+
+  private async deleteCard(args: CommandArgs, logger: Logger): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
-      const cardId = await this.getCardId(dynamicsApiUrl, args.options);
+      const cardId = await this.getCardId(args, logger);
+      const requestOptions: AxiosRequestConfig = {
+        url: `${dynamicsApiUrl}/api/data/v9.1/cards(${cardId})`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-      if (args.options.confirm) {
-        await this.deleteCard(dynamicsApiUrl, cardId);
-      }
-      else {
-        const result = await Cli.prompt<{ continue: boolean }>({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to remove the card?`
-        });
-
-        if (result.continue) {
-          await this.deleteCard(dynamicsApiUrl, cardId);
-        }
-      }
+      await request.delete(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getCardId(dynamicsApiUrl: string, options: Options): Promise<any> {
-    if (options.id) {
-      return options.id;
-    }
-
-    const requestOptions: AxiosRequestConfig = {
-      url: `${dynamicsApiUrl}/api/data/v9.1/cards?$filter=name eq '${options.name}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const result = await request.get<{ value: any[] }>(requestOptions);
-
-    if (result.value.length === 0) {
-      throw `The specified card '${options.name}' does not exist.`;
-    }
-
-    if (result.value.length > 1) {
-      throw `Multiple cards with name '${options.name}' found: ${result.value.map(x => x.cardid).join(',')}`;
-    }
-
-    return result.value[0].cardid;
-  }
-
-  private async deleteCard(dynamicsApiUrl: string, id: string): Promise<void> {
-    const requestOptions: AxiosRequestConfig = {
-      url: `${dynamicsApiUrl}/api/data/v9.1/cards(${id})`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    await request.delete(requestOptions);
   }
 }
 

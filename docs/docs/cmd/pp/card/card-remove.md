@@ -20,7 +20,7 @@ m365 pp card remove [options]
 : The name of the card. Specify either `id` or `name` but not both.
 
 `--asAdmin`
-: Set, to remove the card as admin
+: Run the command as admin for environments you do not have explicitly assigned permissions to.
 
 `--confirm`
 : Don't prompt for confirmation
