@@ -128,7 +128,6 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
 
     const output = await Cli.executeCommandWithOutput(PpCardGetCommand as Command, { options: { ...options, _: [] } });
     const getCardOutput = JSON.parse(output.stdout);
-    logger.log(getCardOutput);
     return getCardOutput.cardid;
   }
 
