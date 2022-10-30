@@ -29,6 +29,10 @@ Adds a reference inside the CDS Solution project in the current directory to the
 m365 pa solution reference add --path ./projects/ExampleProject
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - Create and build a custom component: [https://docs.microsoft.com/en-us/powerapps/developer/component-framework/create-custom-controls-using-pcf](https://docs.microsoft.com/en-us/powerapps/developer/component-framework/create-custom-controls-using-pcf)

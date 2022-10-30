@@ -47,3 +47,7 @@ Export the specified custom connector to the specific directory
 ```sh
 m365 pa connector export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --connector shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa --outputFolder connector
 ```
+
+## Response
+
+The command won't return a response on success.

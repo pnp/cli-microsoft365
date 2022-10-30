@@ -43,6 +43,10 @@ Initialize the PowerApps Component Framework for a Dataset component
 m365 pa pcf init --namespace yourNamespace --name yourCustomFieldComponent --template Dataset
 ```
 
+## Response
+
+The response is a custom message which will show the location where the component framework has been created and a message to remind you to run `npm install` in the directory.
+
 ## More information
 
 - Create and build a custom component: [https://docs.microsoft.com/en-us/powerapps/developer/component-framework/create-custom-controls-using-pcf](https://docs.microsoft.com/en-us/powerapps/developer/component-framework/create-custom-controls-using-pcf)
