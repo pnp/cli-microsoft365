@@ -39,3 +39,7 @@ Removes the specified Power App without confirmation
 ```sh
 m365 pa app remove --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --confirm
 ```
+
+## Response
+
+The command won't return a response on success.
