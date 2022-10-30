@@ -71,3 +71,9 @@ m365 viva connections app create --portalUrl https://contoso.sharepoint.com --ap
 - Add Viva Connections for Microsoft Teams desktop: [https://docs.microsoft.com/sharepoint/viva-connections](https://docs.microsoft.com/sharepoint/viva-connections?WT.mc_id=m365-15896-cxa)
 - App manifest checklist: [https://docs.microsoft.com/microsoftteams/platform/concepts/deploy-and-publish/appsource/prepare/app-manifest-checklist](https://docs.microsoft.com/microsoftteams/platform/concepts/deploy-and-publish/appsource/prepare/app-manifest-checklist?WT.mc_id=m365-15896-cxa)
 - Reference: Manifest schema for Microsoft Teams: [https://docs.microsoft.com/microsoftteams/platform/resources/schema/manifest-schema](https://docs.microsoft.com/microsoftteams/platform/resources/schema/manifest-schema?WT.mc_id=m365-15896-cxa)
+
+
+## Response
+
+The command won't return a response on success.
+

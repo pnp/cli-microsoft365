@@ -14,10 +14,10 @@ m365 todo task add [options]
 : The title of the task.
 
 `--listName [listName]`
-: The name of the list in which to create the task. Specify either `listName` or `listId` but not both.
+: The name of the list in which to create the task. Specify either `listName` or `listId`, but not both.
 
 `--listId [listId]`
-: The id of the list in which to create the task. Specify either `listName` or `listId` but not both.
+: The id of the list in which to create the task. Specify either `listName` or `listId`, but not both.
 
 `--bodyContent [bodyContent]`
 : The body content of the task. In the UI this is called 'notes'.
@@ -61,3 +61,106 @@ Create a new task with a specific due date
 ```sh
 m365 todo task add --title "New task" --listId "AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==" --dueDateTime 2023-01-01
 ```
+
+## Response
+
+### Standard response
+
+=== "JSON"
+
+    ```json
+    {
+      "importance": "normal",
+      "isReminderOn": false,
+      "status": "notStarted",
+      "title": "New task",
+      "createdDateTime": "2022-10-29T10:54:06.3672421Z",
+      "lastModifiedDateTime": "2022-10-29T10:54:06.5078837Z",
+      "hasAttachments": false,
+      "categories": [],
+      "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
+      "body": {
+        "content": "",
+        "contentType": "text"
+      }
+    }
+	  ```
+
+=== "Text"
+
+    ```text
+    body                : {"content":"","contentType":"text"}
+    categories          : []
+    createdDateTime     : 2022-10-29T10:54:06.3672421Z
+    hasAttachments      : false
+    id                  : AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=
+    importance          : normal
+    isReminderOn        : false
+    lastModifiedDateTime: 2022-10-29T10:54:06.5078837Z
+    status              : notStarted
+    title               : New task
+	  ```
+
+=== "CSV"
+
+    ```csv
+    importance,isReminderOn,status,title,createdDateTime,lastModifiedDateTime,hasAttachments,categories,id,body
+    normal,,notStarted,New task,2022-10-29T10:54:06.3672421Z,2022-10-29T10:54:06.5078837Z,,[],AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=,"{""content"":"""",""contentType"":""text""}"
+	  ```
+
+### `bodyContent`, `dueDateTime`, `reminderDateTime`, `importance` response
+
+When we make use of the options `shareWithUserIds` or `shareWithUserNames` the response will differ. 
+
+=== "JSON"
+
+    ```json
+    {
+      "importance": "high",
+      "isReminderOn": true,
+      "status": "notStarted",
+      "title": "New task",
+      "createdDateTime": "2022-10-29T10:54:06.3672421Z",
+      "lastModifiedDateTime": "2022-10-29T10:54:06.5078837Z",
+      "hasAttachments": false,
+      "categories": [],
+      "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
+      "body": {
+        "content": "I should not forget this",
+        "contentType": "text"
+      },
+      "dueDateTime": {
+        "dateTime": "2023-01-01T00:00:00.0000000",
+        "timeZone": "UTC"
+      },
+      "reminderDateTime": {
+        "dateTime": "2023-01-01T12:00:00.0000000",
+        "timeZone": "UTC"
+      }
+    }
+	  ```
+
+=== "Text"
+
+    ```text
+    body                : {"content":"I should not forget this","contentType":"text"}
+    categories          : []
+    createdDateTime     : 2022-10-29T10:54:06.3672421Z
+    dueDateTime         : {"dateTime":"2023-01-01T00:00:00.0000000","timeZone":"UTC"}
+    hasAttachments      : false
+    id                  : AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=
+    importance          : high
+    isReminderOn        : true
+    lastModifiedDateTime: 2022-10-29T10:54:06.5078837Z
+    reminderDateTime    : {"dateTime":"2023-01-01T12:00:00.0000000","timeZone":"UTC"}
+    status              : notStarted
+    title               : New task
+	  ```
+
+=== "CSV"
+
+    ```csv
+    importance,isReminderOn,status,title,createdDateTime,lastModifiedDateTime,hasAttachments,categories,id,body,dueDateTime,reminderDateTime
+    high,1,notStarted,New task,2022-10-29T10:54:06.3672421Z,2022-10-29T10:54:06.5078837Z,,[],AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=,"{""content"":""I should not forget this"",""contentType"":""text""}","{""dateTime"":""2023-01-01T00:00:00.0000000"",""timeZone"":""UTC""}","{""dateTime"":""2023-01-01T12:00:00.0000000"",""timeZone"":""UTC""}"
+	  ```
+

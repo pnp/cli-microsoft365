@@ -11,13 +11,13 @@ m365 todo list set [options]
 ## Options
 
 `-i, --id [id]`
-: The ID of the list to update. Specify either id or name, not both
+: The ID of the list to update. Specify either `id` or `name`, but not both.
 
 `-n, --name [name]`
-: The display name of the list to update. Specify either id or name, not both
+: The display name of the list to update. Specify either `id` or `name`, but not both.
 
 `--newName <newName>`
-: The new name for the task list
+: The new name for the task list.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -34,3 +34,8 @@ Rename the list with name _My Task list_ to "My updated task list"
 ```sh
 m365 todo list set --name "My Task list" --newName "My updated task list"
 ```
+
+## Response
+
+The command won't return a response on success.
+
