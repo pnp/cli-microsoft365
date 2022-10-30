@@ -12,6 +12,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { External, ExternalConfiguration, Project } from './project-model';
 import { ExternalizeEntry, FileEdit } from './project-externalize/';
+import { Cli } from '../../../../cli/Cli';
 const command: Command = require('./project-externalize');
 
 describe(commands.PROJECT_EXTERNALIZE, () => {
@@ -583,6 +584,22 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     // Windows processes JSON.stringify different then OSX/Linux and adds two empty characters
     assert(emptyReport.length === 122 || emptyReport.length === 124);
+  });
+
+  it('passes validation when json output specified', async () => {
+    assert.strictEqual(await command.validate({ options: { output: 'json' } }, Cli.getCommandInfo(command)), true);
+  });
+
+  it('passes validation when text output specified', async () => {
+    assert.strictEqual(await command.validate({ options: { output: 'text' } }, Cli.getCommandInfo(command)), true);
+  });
+
+  it('passes validation when md output specified', async () => {
+    assert.strictEqual(await command.validate({ options: { output: 'md' } }, Cli.getCommandInfo(command)), true);
+  });
+
+  it('fails validation when csv output specified', async () => {
+    assert.notStrictEqual(await command.validate({ options: { output: 'csv' } }, Cli.getCommandInfo(command)), true);
   });
 
   it('supports debug mode', () => {

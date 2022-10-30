@@ -456,6 +456,9 @@ class SpfxDoctorCommand extends AnonymousCommand {
     }
   };
 
+  protected get allowedOutputs(): string[] {
+    return ['text'];
+  }
 
   public get name(): string {
     return commands.DOCTOR;
@@ -509,10 +512,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
           if (!this.versions[args.options.spfxVersion]) {
             return `${args.options.spfxVersion} is not a supported SharePoint Framework version. Supported versions are ${Object.keys(this.versions).join(', ')}`;
           }
-        }
-
-        if (args.options.output && args.options.output !== 'text') {
-          return `The output option only accepts the type 'text'`;
         }
 
         return true;
