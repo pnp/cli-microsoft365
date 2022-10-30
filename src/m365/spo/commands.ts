@@ -61,6 +61,7 @@ export default {
   FILE_ROLEINHERITANCE_BREAK: `${prefix} file roleinheritance break`,
   FILE_ROLEINHERITANCE_RESET: `${prefix} file roleinheritance reset`,
   FILE_SHARINGINFO_GET: `${prefix} file sharinginfo get`,
+  FILE_VERSION_GET: `${prefix} file version get`,
   FILE_VERSION_LIST: `${prefix} file version list`,
   FILE_VERSION_RESTORE: `${prefix} file version restore`,
   FOLDER_ADD: `${prefix} folder add`,
