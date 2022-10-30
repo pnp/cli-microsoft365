@@ -148,25 +148,6 @@ describe(commands.FILE_VERSION_GET, () => {
     assert(loggerLogSpy.calledWith(fileVersionResponse.value[0]));
   });
 
-  it('retrieves version from a file with the fileId options and label in correct format', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions/?$filter=VersionLabel eq '${validLabel}'`) {
-        return fileVersionResponse;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: validWebUrl,
-        label: "1",
-        fileId: validFileId
-      }
-    });
-    assert(loggerLogSpy.calledWith(fileVersionResponse.value[0]));
-  });
-
   it('properly escapes single quotes in fileUrl', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url = `${validWebUrl}/_api/web/GetFileByServerRelativeUrl('Shared%20Documents%2FFo''lde''r')/versions/?$filter=VersionLabel eq '${validLabel}'`) {

@@ -33,6 +33,7 @@ class SpoFileVersionGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -77,9 +78,11 @@ class SpoFileVersionGetCommand extends SpoCommand {
     this.optionSets.push(['fileUrl', 'fileId']);
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    args.options.label = this.ensureMajorVersionIsString(args.options.label);
+  #initTypes(): void {
+    this.types.string.push('label');
+  }
 
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving version ${args.options.label} of the file ${args.options.fileUrl || args.options.fileId} at site ${args.options.webUrl}...`);
     }
@@ -113,15 +116,6 @@ class SpoFileVersionGetCommand extends SpoCommand {
 
     const response = await request.get<{ value: any[] }>(requestOptions);
     return response;
-  }
-
-  private ensureMajorVersionIsString(label: string): string {
-    if (label.toString().indexOf('.') > -1) {
-      return label;
-    }
-    else {
-      return `${label}.0`;
-    }
   }
 }
 
