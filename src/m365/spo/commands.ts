@@ -64,6 +64,7 @@ export default {
   FILE_VERSION_CLEAR: `${prefix} file version clear`,
   FILE_VERSION_GET: `${prefix} file version get`,
   FILE_VERSION_LIST: `${prefix} file version list`,
+  FILE_VERSION_REMOVE: `${prefix} file version remove`,
   FILE_VERSION_RESTORE: `${prefix} file version restore`,
   FOLDER_ADD: `${prefix} folder add`,
   FOLDER_COPY: `${prefix} folder copy`,

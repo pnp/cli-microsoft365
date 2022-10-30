@@ -382,6 +382,7 @@ nav:
         - file version clear: 'cmd/spo/file/file-version-clear.md'
         - file version get: 'cmd/spo/file/file-version-get.md'
         - file version list: 'cmd/spo/file/file-version-list.md'
+        - file version remove: 'cmd/spo/file/file-version-remove.md'
         - file version restore: 'cmd/spo/file/file-version-restore.md'
       - folder:
         - folder add: 'cmd/spo/folder/folder-add.md'
