@@ -264,19 +264,19 @@ describe(commands.MEETING_LIST, () => {
   };
   const meetingResponseText: any = [
     {
-      "end": "26/06/2022, 13:00:00",
-      "start": "26/06/2022, 12:30:00",
-      "subject": "Test"
+      "subject": "Test",
+      "start": "2022-06-26T12:30:00.0000000",
+      "end": "2022-06-26T13:00:00.0000000"
     },
     {
-      "end": "08/04/2022, 12:00:00",
-      "start": "08/04/2022, 11:30:00",
-      "subject": "Test"
+      "subject": "Test",
+      "start": "2022-04-08T11:30:00.0000000",
+      "end": "2022-04-08T12:00:00.0000000"
     },
     {
-      "end": "15/03/2022, 05:30:00",
-      "start": "15/03/2022, 05:00:00",
-      "subject": "Online meeting test"
+      "subject": "Online meeting test",
+      "start": "2022-03-15T05:00:00.0000000",
+      "end": "2022-03-15T05:30:00.0000000"
     }
   ];
   let log: string[];

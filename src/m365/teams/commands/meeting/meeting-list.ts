@@ -151,8 +151,8 @@ class TeamsMeetingListCommand extends GraphCommand {
         logger.log(resFiltered.map(i => {
           return {
             subject: i.subject,
-            start: new Date(i.start.dateTime).toLocaleString(i.start.timeZone),
-            end: new Date(i.end.dateTime).toLocaleString(i.end.timeZone)
+            start: i.start.dateTime,
+            end: i.end.dateTime
           };
         }));
       }
