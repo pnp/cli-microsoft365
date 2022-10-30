@@ -172,10 +172,10 @@ describe(commands.FILE_VERSION_LIST, () => {
     assert(loggerLogSpy.calledWith(fileVersionResponse.value));
   });
 
-  it('command correctly handles files list reject request', async () => {
-    const err = 'Invalid request';
+  it('command correctly handles version list reject request', async () => {
+    const err = 'Invalid versions request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
         throw err;
       }
 
