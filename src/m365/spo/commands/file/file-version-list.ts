@@ -22,7 +22,7 @@ class SpoFileVersionListCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'List all the versions of a file in a SharePoint Documentlibrary';
+    return 'List all the versions of a file in a SharePoint Document library';
   }
 
   constructor() {
