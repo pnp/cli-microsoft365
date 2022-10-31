@@ -163,8 +163,6 @@ class SpoListWebhookSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    logger.log(requestOptions);
-
     try {
       await request.patch(requestOptions);
       // REST patch call doesn't return anything
