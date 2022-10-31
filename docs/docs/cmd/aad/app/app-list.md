@@ -5,7 +5,7 @@ Retrieves a list of Azure AD app registrations
 ## Usage
 
 ```sh
-m365 aad app list
+m365 aad app list [options]
 ```
 
 ## Options
