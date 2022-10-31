@@ -13,7 +13,7 @@ m365 flow enable [options]
 `-n, --name <name>`
 : The name of the Power Automate flow to enable
 
-`-e, --environment <environment>`
+`-e, --environmentName <environmentName>`
 : The name of the environment for which to enable Power Automate
 
 `--asAdmin`

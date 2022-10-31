@@ -10,7 +10,7 @@ m365 yammer message like set [options]
 
 ## Options
 
-`--id <id>`
+`--messageId <messageId>`
 : The id of the Yammer message
 
 `--enable [enable]`
@@ -31,17 +31,17 @@ m365 yammer message like set [options]
 Likes the message with the ID `5611239081`
 
 ```sh
-m365 yammer message like set --id 5611239081
+m365 yammer message like set --messageId 5611239081
 ```
 
 Unlike the message with the ID `5611239081`
 
 ```sh
-m365 yammer message like set --id 5611239081 --enable false
+m365 yammer message like set --messageId 5611239081 --enable false
 ```
 
 Unlike the message with the ID `5611239081` without asking for confirmation
 
 ```sh
-m365 yammer message like set --id 5611239081 --enable false --confirm
+m365 yammer message like set --messageId 5611239081 --enable false --confirm
 ```

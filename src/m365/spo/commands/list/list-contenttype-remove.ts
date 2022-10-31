@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  contentTypeId: string;
+  id: string;
   confirm?: boolean;
 }
 
@@ -66,7 +66,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
         option: '--listUrl [listUrl]'
       },
       {
-        option: '-c, --contentTypeId <contentTypeId>'
+        option: '-i, --id <id>'
       },
       {
         option: '--confirm'
@@ -94,7 +94,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('contentTypeId', 'c');
+    this.types.string.push('id', 'i');
   }
 
   #initOptionSets(): void {
@@ -105,7 +105,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
     const removeContentTypeFromList: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         const list: string = (args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl) as string;
-        logger.logToStderr(`Removing content type ${args.options.contentTypeId} from list ${list} in site at ${args.options.webUrl}...`);
+        logger.logToStderr(`Removing content type ${args.options.id} from list ${list} in site at ${args.options.webUrl}...`);
       }
 
       let requestUrl: string = `${args.options.webUrl}/_api/web/`;
@@ -122,7 +122,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
       }
 
       const requestOptions: any = {
-        url: `${requestUrl}/ContentTypes('${encodeURIComponent(args.options.contentTypeId)}')`,
+        url: `${requestUrl}/ContentTypes('${encodeURIComponent(args.options.id)}')`,
         headers: {
           'X-HTTP-Method': 'DELETE',
           'If-Match': '*',
@@ -147,7 +147,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the content type ${args.options.contentTypeId} from the list ${args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl} in site ${args.options.webUrl}?`
+        message: `Are you sure you want to remove the content type ${args.options.id} from the list ${args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl} in site ${args.options.webUrl}?`
       });
 
       if (result.continue) {

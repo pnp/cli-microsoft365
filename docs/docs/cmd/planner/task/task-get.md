@@ -22,9 +22,6 @@ m365 planner task details get [options]
 `-t, --title [title]`
 : Title of the task. Specify either `id` or `title` but not both.
 
-`--taskId [taskId]`
-: (deprecated. Use `id` instead) ID of the task.
-
 `--bucketId [bucketId]`
 : ID of the bucket to which the task belongs. Specify `bucketId` or `bucketName` when using `title`.
 
@@ -36,9 +33,6 @@ m365 planner task details get [options]
 
 `--planTitle [planTitle]`
 : Title of the plan to which the task belongs. Specify `planId` or `planTitle` when using `bucketName`.
-
-`--planName [planName]`
-: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.

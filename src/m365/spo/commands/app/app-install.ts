@@ -12,7 +12,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   siteUrl: string;
-  scope?: string;
+  appCatalogScope?: string;
 }
 
 class SpoAppInstallCommand extends SpoCommand {
@@ -35,7 +35,7 @@ class SpoAppInstallCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        scope: args.options.scope || 'tenant'
+        appCatalogScope: args.options.appCatalogScope || 'tenant'
       });
     });
   }
@@ -49,7 +49,7 @@ class SpoAppInstallCommand extends SpoCommand {
         option: '-s, --siteUrl <siteUrl>'
       },
       {
-        option: '--scope [scope]',
+        option: '--appCatalogScope [appCatalogScope]',
         autocomplete: ['tenant', 'sitecollection']
       }
     );
@@ -58,10 +58,10 @@ class SpoAppInstallCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.scope) {
-          const testScope: string = args.options.scope.toLowerCase();
+        if (args.options.appCatalogScope) {
+          const testScope: string = args.options.appCatalogScope.toLowerCase();
           if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-            return `Scope must be either 'tenant' or 'sitecollection' if specified`;
+            return `appCatalogScope must be either 'tenant' or 'sitecollection' if specified`;
           }
         }
     
@@ -75,7 +75,7 @@ class SpoAppInstallCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
+    const scope: string = (args.options.appCatalogScope) ? args.options.appCatalogScope.toLowerCase() : 'tenant';
 
     if (this.verbose) {
       logger.logToStderr(`Installing app '${args.options.id}' in site '${args.options.siteUrl}'...`);
