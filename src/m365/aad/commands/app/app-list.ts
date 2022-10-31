@@ -18,27 +18,20 @@ class AadAppListCommand extends GraphCommand {
     return 'Gets a list of Azure AD app registrations';
   }
 
-  constructor() {
-    super();
-  }
-
   public async commandAction(logger: Logger): Promise<void> {
     try {
-      const appList = await this.getAppList();
-      logger.log(appList);
+      const url = `https://graph.microsoft.com/v1.0/applications`;
+
+      logger.log(await odata.getAllItems<Application>(url));
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private getAppList(): Promise<Application[]> {
-    const select = ["appId","id","displayName","signInAudience"];
-    const url = `https://graph.microsoft.com/v1.0/applications?$select=${select.join(",")}`;
-
-    return odata.getAllItems<Application>(url);
+  public defaultProperties(): string[] | undefined {
+    return ['appId', 'id', 'displayName', "signInAudience"];
   }
-
 }
 
 module.exports = new AadAppListCommand();

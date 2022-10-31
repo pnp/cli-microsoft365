@@ -1,11 +1,11 @@
 import * as assert from 'assert';
-import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./app-list');
@@ -18,6 +18,7 @@ describe(commands.APP_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => undefined);
     auth.service.connected = true;
   });
 
@@ -39,17 +40,15 @@ describe(commands.APP_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      fs.existsSync,
-      fs.readFileSync,
-      fs.writeFileSync
+      request.get
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
   });
@@ -63,9 +62,9 @@ describe(commands.APP_LIST, () => {
   });
 
   it(`should get a list of Azure AD app registrations`, async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$select=appId,id,displayName,signInAudience`) {
-        return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications`) {
+        return {
           value: [
             {
               "id": "340a4aa3-1af6-43ac-87d8-189819003952",
@@ -82,10 +81,10 @@ describe(commands.APP_LIST, () => {
               "signInAudience": "My Audience"
             }
           ]
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -111,12 +110,11 @@ describe(commands.APP_LIST, () => {
   });
 
   it('handles error when retrieving app list failed', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/applications?$select=appId,id,displayName,signInAudience`) {
-        return Promise.reject('An error has occurred');
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/applications`) {
+        throw 'An error has occurred';
       }
-
-      return Promise.reject(`Invalid request`);
+      throw `Invalid request`;
     });
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
