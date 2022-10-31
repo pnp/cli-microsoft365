@@ -30,7 +30,7 @@ class TeamsMeetingListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Retrieve all online meetings for a given organizer';
+    return 'Retrieve all online meetings for a given user or shared mailbox';
   }
 
   public defaultProperties(): string[] | undefined {

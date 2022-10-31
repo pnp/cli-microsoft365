@@ -11,13 +11,13 @@ m365 teams meetings list [options]
 ## Options
 
 `-u, --userId [userId]`
-: The id of the user, omit to retrieve meetings for current signed in user. Use either `id`, `userName` or `email`, but not multiple.
+: The id of the user or shared mailbox, omit to retrieve meetings for current signed in user. Use either `id`, `userName` or `email`, but not multiple.
 
 `-n, --userName [userName]`
-: The name of the user, omit to retrieve meetings for current signed in user. Use either `id`, `userName` or `email`, but not multiple.
+: The name of the user or shared mailbox, omit to retrieve meetings for current signed in user. Use either `id`, `userName` or `email`, but not multiple.
 
 `--email [email]`
-: The email of the user, omit to retrieve meetings for current signed in user. Use either `id`, `userName` or `email`, but not multiple.
+: The email of the user or shared mailbox, omit to retrieve meetings for current signed in user. Use either `id`, `userName` or `email`, but not multiple.
 
 `--startDateTime <startDateTime>`
 : The startdate used to query for meetings

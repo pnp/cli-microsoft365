@@ -643,8 +643,8 @@ nav:
       - guestsettings:
         - guestsettings list: 'cmd/teams/guestsettings/guestsettings-list.md'
         - guestsettings set: 'cmd/teams/guestsettings/guestsettings-set.md'
-      - meetings:
-        - meetings list: 'cmd/teams/meetings/meetings-list.md'
+      - meeting:
+        - meeting list: 'cmd/teams/meetings/meeting-list.md'
       - membersettings:
         - membersettings list: 'cmd/teams/membersettings/membersettings-list.md'
         - membersettings set: 'cmd/teams/membersettings/membersettings-set.md'
