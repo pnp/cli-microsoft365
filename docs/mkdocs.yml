@@ -380,6 +380,7 @@ nav:
         - file roleinheritance reset: 'cmd/spo/file/file-roleinheritance-reset.md'
         - file sharinginfo get: 'cmd/spo/file/file-sharinginfo-get.md'
         - file version list: 'cmd/spo/file/file-version-list.md'
+        - file version restore: 'cmd/spo/file/file-version-restore.md'
       - folder:
         - folder add: 'cmd/spo/folder/folder-add.md'
         - folder copy: 'cmd/spo/folder/folder-copy.md'
