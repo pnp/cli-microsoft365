@@ -362,7 +362,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { displayName: 'Deleted' } });
+    await command.action(logger, { options: { groupDisplayName: 'Deleted' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -479,7 +479,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { mailNickname: 'd_team' } });
+    await command.action(logger, { options: { groupMailNickname: 'd_team' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -596,7 +596,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { displayName: 'Deleted', mailNickname: 'd_team' } });
+    await command.action(logger, { options: { groupDisplayName: 'Deleted', groupMailNickname: 'd_team' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -658,22 +658,22 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
     await assert.rejects(command.action(logger, { options: { mailNickname: 'd_team' } }), new CommandError(errorMessage));
   });
 
-  it('supports specifying displayName', () => {
+  it('supports specifying groupDisplayName', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--displayName') > -1) {
+      if (o.option.indexOf('--groupDisplayName') > -1) {
         containsOption = true;
       }
     });
     assert(containsOption);
   });
 
-  it('supports specifying mailNickname', () => {
+  it('supports specifying groupMailNickname', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--mailNickname') > -1) {
+      if (o.option.indexOf('--groupMailNickname') > -1) {
         containsOption = true;
       }
     });

@@ -15,8 +15,6 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  planId?: string;
-  planTitle?: string;
   id?: string;
   title?: string;
   ownerGroupId?: string;
@@ -26,10 +24,6 @@ interface Options extends GlobalOptions {
 class PlannerPlanGetCommand extends GraphCommand {
   public get name(): string {
     return commands.PLAN_GET;
-  }
-
-  public alias(): string[] | undefined {
-    return [commands.PLAN_DETAILS_GET];
   }
 
   public get description(): string {
@@ -51,8 +45,6 @@ class PlannerPlanGetCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-	    planId: typeof args.options.planId !== 'undefined',
-    	planTitle: typeof args.options.planTitle !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
@@ -63,12 +55,6 @@ class PlannerPlanGetCommand extends GraphCommand {
 
   #initOptions(): void {
     this.options.unshift(
-      {
-        option: '--planId [planId]'
-      },
-      {
-        option: '--planTitle [planTitle]'
-      },
       {
         option: '-i, --id [id]'
       },
@@ -87,50 +73,37 @@ class PlannerPlanGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.planId && args.options.planTitle || 
-	      args.options.id && args.options.title || 
-	      args.options.planId && args.options.title || 
-	      args.options.id && args.options.planTitle) {
-	      return 'Specify either id or title but not both';
-	    }
+        if (args.options.id && args.options.title) {
+          return 'Specify either id or title but not both';
+        }
 
-	    if (!args.options.planId && !args.options.id) {
-	      if (!args.options.planTitle && !args.options.title) {
-	        return 'Specify either id or title';
-	      }
-	  
-	      if ((args.options.title || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-	        return 'Specify either ownerGroupId or ownerGroupName';
-	      }
-	  
-	      if ((args.options.title || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
-	        return 'Specify either ownerGroupId or ownerGroupName but not both';
-	      }
-	  
-	      if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-	        return `${args.options.ownerGroupId} is not a valid GUID`;
-	      }
-	    }
+        if (!args.options.id) {
+          if (!args.options.title) {
+            return 'Specify either id or title';
+          }
 
-	    return true;
+          if (args.options.title && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+            return 'Specify either ownerGroupId or ownerGroupName';
+          }
+
+          if (args.options.title && args.options.ownerGroupId && args.options.ownerGroupName) {
+            return 'Specify either ownerGroupId or ownerGroupName but not both';
+          }
+
+          if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+            return `${args.options.ownerGroupId} is not a valid GUID`;
+          }
+        }
+
+        return true;
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, commands.PLAN_DETAILS_GET, commands.PLAN_GET);
-
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.');
       return;
-    }    
-    
-    if (args.options.planId) {
-      args.options.id = args.options.planId;
-    }
-
-    if (args.options.planTitle) {
-      args.options.title = args.options.planTitle;
     }
 
     try {
@@ -143,7 +116,7 @@ class PlannerPlanGetCommand extends GraphCommand {
         const groupId = await this.getGroupId(args);
         const plan = await planner.getPlanByTitle(args.options.title!, groupId);
         const result = await this.getPlanDetails(plan);
-  
+
         if (result) {
           logger.log(result);
         }

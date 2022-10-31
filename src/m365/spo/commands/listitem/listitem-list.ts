@@ -15,7 +15,6 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  id?: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
@@ -24,7 +23,6 @@ export interface Options extends GlobalOptions {
   pageNumber?: string;
   pageSize?: string;
   camlQuery?: string;
-  title?: string;
   webUrl: string;
 }
 
@@ -49,11 +47,9 @@ class SpoListItemListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
         fields: typeof args.options.fields !== 'undefined',
         filter: typeof args.options.filter !== 'undefined',
         pageNumber: typeof args.options.pageNumber !== 'undefined',
@@ -67,12 +63,6 @@ class SpoListItemListCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--id [id]'
-      },
-      {
-        option: '--title [title]'
       },
       {
         option: '-i, --listId [listId]'
@@ -109,16 +99,11 @@ class SpoListItemListCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (!args.options.id && !args.options.title && !args.options.listId && !args.options.listTitle && !args.options.listUrl) {
+        if (!args.options.listId && !args.options.listTitle && !args.options.listUrl) {
           return `Specify listId or listTitle or listUrl`;
         }
 
-        if (args.options.id && args.options.title) {
-          return `Specify list id or title but not both`;
-        }
-
-        // Check if only one of the 4 options is specified
-        if ([args.options.id, args.options.title, args.options.listId, args.options.listTitle, args.options.listUrl].filter(o => o).length > 1) {
+        if ([args.options.listId, args.options.listTitle, args.options.listUrl].filter(o => o).length > 1) {
           return 'Specify listId or listTitle or listUrl but not multiple';
         }
 
@@ -150,10 +135,6 @@ class SpoListItemListCommand extends SpoCommand {
           return `${args.options.listId} is not a valid GUID`;
         }
 
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} in option id is not a valid GUID`;
-        }
-
         return true;
       }
     );
@@ -162,8 +143,6 @@ class SpoListItemListCommand extends SpoCommand {
   #initTypes(): void {
     this.types.string.push(
       'webUrl',
-      'id',
-      'title',
       'camlQuery',
       'pageSize',
       'pageNumber',
@@ -173,13 +152,6 @@ class SpoListItemListCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.id) {
-      this.warn(logger, `Option 'id' is deprecated. Please use 'listId' instead.`);
-    }
-    if (args.options.title) {
-      this.warn(logger, `Option 'title' is deprecated. Please use 'listTitle' instead.`);
-    }
-
     let requestUrl = `${args.options.webUrl}/_api/web`;
 
     if (args.options.listId) {
@@ -187,12 +159,6 @@ class SpoListItemListCommand extends SpoCommand {
     }
     else if (args.options.listTitle) {
       requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
-    }
-    else if (args.options.id) {
-      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.id)}')`;
-    }
-    else if (args.options.title) {
-      requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.title)}')`;
     }
     else if (args.options.listUrl) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);

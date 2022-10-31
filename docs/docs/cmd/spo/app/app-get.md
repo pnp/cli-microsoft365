@@ -19,7 +19,7 @@ m365 spo app get [options]
 `-u, --appCatalogUrl [appCatalogUrl]`
 : URL of the tenant or site collection app catalog. It must be specified when the scope is `sitecollection`
 
-`-s, --scope [scope]`
+`-s, --appCatalogScope [appCatalogScope]`
 : Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
 
 --8<-- "docs/cmd/_global.md"
@@ -53,7 +53,7 @@ m365 spo app get --name solution.sppkg --appCatalogUrl https://contoso.sharepoin
 Return details about the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ available in the site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.
 
 ```sh
-m365 spo app get --id b2307a39-e878-458b-bc90-03bc578531d6 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+m365 spo app get --id b2307a39-e878-458b-bc90-03bc578531d6 --appCatalogScope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 ## More information

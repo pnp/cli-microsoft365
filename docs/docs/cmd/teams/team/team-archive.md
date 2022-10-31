@@ -16,9 +16,6 @@ m365 teams team archive [options]
 `-n, --name [name]`
 : The display name of the Microsoft Teams team to archive. Specify either id or name but not both
 
-`--teamId [teamId]`
-: (deprecated. Use `id` instead) The ID of the Microsoft Teams team to archive
-
 `--shouldSetSpoSiteReadOnlyForMembers`
 : Sets the permissions for team members to read-only on the SharePoint Online site associated with the team
 

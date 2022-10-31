@@ -14,7 +14,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  siteUrl: string;
   wait?: boolean;
   confirm?: boolean;
 }
@@ -52,7 +52,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --siteUrl <siteUrl>'
       },
       {
         option: '--wait'
@@ -65,7 +65,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.siteUrl)
     );
   }
 
@@ -75,7 +75,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
         const adminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
         const res: FormDigestInfo = await spo.ensureFormDigest(adminUrl, logger, this.context, this.debug);
         if (this.verbose) {
-          logger.logToStderr(`Removing deleted site collection ${args.options.url}...`);
+          logger.logToStderr(`Removing deleted site collection ${args.options.siteUrl}...`);
         }
 
         const requestOptions: any = {
@@ -83,7 +83,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
           headers: {
             'X-RequestDigest': res.FormDigestValue
           },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="16" ObjectPathId="15" /><Query Id="17" ObjectPathId="15"><Query SelectAllProperties="false"><Properties><Property Name="PollingInterval" ScalarProperty="true" /><Property Name="IsComplete" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="15" ParentId="1" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter></Parameters></Method><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="16" ObjectPathId="15" /><Query Id="17" ObjectPathId="15"><Query SelectAllProperties="false"><Properties><Property Name="PollingInterval" ScalarProperty="true" /><Property Name="IsComplete" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="15" ParentId="1" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.siteUrl)}</Parameter></Parameters></Method><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
         };
 
         const processQuery: string = await request.post(requestOptions);
@@ -129,7 +129,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the deleted site collection ${args.options.url} from tenant recycle bin?`
+        message: `Are you sure you want to remove the deleted site collection ${args.options.siteUrl} from tenant recycle bin?`
       });
       
       if (result.continue) {

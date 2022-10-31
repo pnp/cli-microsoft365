@@ -10,7 +10,7 @@ m365 spo customaction list [options]
 
 ## Options
 
-`-u, --url <url>`
+`-u, --webUrl <webUrl>`
 : Url of the site or site collection to retrieve the custom action from
 
 `-s, --scope [scope]`
@@ -27,19 +27,19 @@ When using the text output type (default), the command lists only the values of 
 Return details about all user custom actions located in site or site collection _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction list --url https://contoso.sharepoint.com/sites/test
+m365 spo customaction list --webUrl https://contoso.sharepoint.com/sites/test
 ```
 
 Return details about all user custom actions located in site collection _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction list --url https://contoso.sharepoint.com/sites/test --scope Site
+m365 spo customaction list --webUrl https://contoso.sharepoint.com/sites/test --scope Site
 ```
 
 Return details about all user custom actions located in site _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction list --url https://contoso.sharepoint.com/sites/test --scope Web
+m365 spo customaction list --webUrl https://contoso.sharepoint.com/sites/test --scope Web
 ```
 
 ## More information
