@@ -59,3 +59,7 @@ Update the notification url and clientState of a webhook with a specific ID atta
 ```sh
 m365 spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listUrl '/sites/ninja/Documents' --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-03-02 --clientState 'pnp-js-core-subscription'
 ```
+
+## Respone
+
+The command won't return a response on success.
