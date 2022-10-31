@@ -3,6 +3,7 @@ site_url: https://pnp.github.io/cli-microsoft365/
 nav:
   - Home:
     - 'index.md'
+    - v6 Upgrade Guidance: 'v6-upgrade-guidance.md'
     - v5 Upgrade Guidance: 'v5-upgrade-guidance.md'
     - v4 Upgrade Guidance: 'v4-upgrade-guidance.md'
     - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
@@ -201,7 +202,6 @@ nav:
         - bucket remove: 'cmd/planner/bucket/bucket-remove.md'
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
-        - plan details get: 'cmd/planner/plan/plan-get.md'
         - plan get: 'cmd/planner/plan/plan-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
         - plan remove: 'cmd/planner/plan/plan-remove.md'
@@ -210,7 +210,6 @@ nav:
         - task checklistitem add: 'cmd/planner/task/task-checklistitem-add.md'
         - task checklistitem list: 'cmd/planner/task/task-checklistitem-list.md'
         - task checklistitem remove: 'cmd/planner/task/task-checklistitem-remove.md'
-        - task details get: 'cmd/planner/task/task-get.md'
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
         - task reference add: 'cmd/planner/task/task-reference-add.md'
@@ -398,9 +397,7 @@ nav:
         - homesite remove: 'cmd/spo/homesite/homesite-remove.md'
         - homesite set: 'cmd/spo/homesite/homesite-set.md'
       - hubsite:
-        - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
         - hubsite data get: 'cmd/spo/hubsite/hubsite-data-get.md'
-        - hubsite disconnect: 'cmd/spo/hubsite/hubsite-disconnect.md'
         - hubsite get: 'cmd/spo/hubsite/hubsite-get.md'
         - hubsite list: 'cmd/spo/hubsite/hubsite-list.md'
         - hubsite register: 'cmd/spo/hubsite/hubsite-register.md'
@@ -523,6 +520,8 @@ nav:
         - site ensure: 'cmd/spo/site/site-ensure.md'
         - site get: 'cmd/spo/site/site-get.md'
         - site groupify: 'cmd/spo/site/site-groupify.md'
+        - site hubsite disconnect: 'cmd/spo/site/site-hubsite-disconnect.md'
+        - site hubsite connect: 'cmd/spo/site/site-hubsite-connect.md'
         - site list: 'cmd/spo/site/site-list.md'
         - site recyclebinitem list: 'cmd/spo/site/site-recyclebinitem-list.md'
         - site recyclebinitem restore: 'cmd/spo/site/site-recyclebinitem-restore.md'
@@ -537,9 +536,6 @@ nav:
         - site apppermission remove: 'cmd/spo/site/site-apppermission-remove.md'
         - site apppermission set: 'cmd/spo/site/site-apppermission-set.md'
         - site chrome set: 'cmd/spo/site/site-chrome-set.md'
-        - site classic add: 'cmd/spo/site/site-classic-add.md'
-        - site classic list: 'cmd/spo/site/site-classic-list.md'
-        - site classic set: 'cmd/spo/site/site-classic-set.md'
         - site commsite enable: 'cmd/spo/site/site-commsite-enable.md'
         - site inplacerecordsmanagement set: 'cmd/spo/site/site-inplacerecordsmanagement-set.md'
       - sitedesign:

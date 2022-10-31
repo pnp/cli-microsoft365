@@ -10,7 +10,7 @@ You can test your queries using the [JMESPath](http://jmespath.org/) interactive
 
 ## Basic array filters
 
-Let's start with a basic command and return some results using the following command: `m365 spo site classic list --output json`. To simplify the testing most of the properties are removed, but the result would look similarly to:
+Let's start with a basic command and return some results using the following command: `m365 spo site list`. To simplify the testing most of the properties are removed, but the result would look similarly to:
 
 ```json
 [{

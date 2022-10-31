@@ -10,10 +10,10 @@ m365 spo feature disable [options]
 
 ## Options
 
-`-u, --url <url>`
+`-u, --webUrl <webUrl>`
 : The URL of the site or web for which to disable the feature
 
-`-f, --featureId <id>`
+`-i, --id <id>`
 : The ID of the feature to disable
 
 `-s, --scope [scope]`
@@ -33,11 +33,11 @@ If the specified url doesn't refer to an existing site collection, you will get 
 Disable site feature
 
 ```sh
-m365 spo feature disable --url https://contoso.sharepoint.com/sites/sales --featureId 915c240e-a6cc-49b8-8b2c-0bff8b553ed3 --scope Site
+m365 spo feature disable --webUrl https://contoso.sharepoint.com/sites/salis --id 915c240e-a6cc-49b8-8b2c-0bff8b553ed3 --scope Site
 ```
 
 Disable web feature (with force to ignore errors)
 
 ```sh
-m365 spo feature disable --url https://contoso.sharepoint.com/sites/sales --featureId 00bfea71-5932-4f9c-ad71-1557e5751100 --scope Web --force
+m365 spo feature disable --webUrl https://contoso.sharepoint.com/sites/salis --id 00bfea71-5932-4f9c-ad71-1557e5751100 --scope Web --force
 ```

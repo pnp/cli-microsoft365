@@ -39,8 +39,8 @@ describe(commands.PLAN_GET, () => {
   };
 
   const planDetailsResponse = {
-    "sharedWith": { },
-    "categoryDescriptions": { }
+    "sharedWith": {},
+    "categoryDescriptions": {}
   };
 
   const outputResponse = {
@@ -106,11 +106,6 @@ describe(commands.PLAN_GET, () => {
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner', '@odata.etag']);
   });
-  
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
 
   it('fails validation if neither id nor title are provided.', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
@@ -121,36 +116,6 @@ describe(commands.PLAN_GET, () => {
     const actual = await command.validate({
       options: {
         id: validId,
-        title: validTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both deprecated planId and planTitle are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planId: validId,
-        planTitle: validTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both id and deprecated planTitle are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validId,
-        planTitle: validTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both title and deprecated planId are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        planId: validId,
         title: validTitle
       }
     }, commandInfo);
@@ -182,26 +147,6 @@ describe(commands.PLAN_GET, () => {
       options: {
         title: validTitle,
         ownerGroupId: invalidOwnerGroupId
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided with deprecated planTitle', async () => {
-    const actual = await command.validate({
-      options: {
-        planTitle: validTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both ownerGroupId and ownerGroupName are specified with deprecated planTitle', async () => {
-    const actual = await command.validate({
-      options: {
-        planTitle: validTitle,
-        ownerGroupId: validOwnerGroupId,
-        ownerGroupName: validOwnerGroupName
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -249,35 +194,13 @@ describe(commands.PLAN_GET, () => {
       return Promise.reject(`Invalid request ${opts.url}`);
     });
 
-    await command.action(logger, { 
+    await command.action(logger, {
       options: {
         debug: false,
         id: validId
       }
     });
 
-    assert(loggerLogSpy.calledWith(outputResponse));
-  });
-
-  it('correctly get planner plan with deprecated planId', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}`) {
-        return Promise.resolve(planResponse);
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
-        return Promise.resolve(planDetailsResponse);
-      }
-
-      return Promise.reject(`Invalid request ${opts.url}`);
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: false,
-        planId: validId
-      }
-    });
     assert(loggerLogSpy.calledWith(outputResponse));
   });
 
@@ -301,33 +224,6 @@ describe(commands.PLAN_GET, () => {
     const options: any = {
       debug: false,
       title: validTitle,
-      ownerGroupId: validOwnerGroupId
-    };
-
-    await command.action(logger, { options: options });
-    assert(loggerLogSpy.calledWith(outputResponse));
-  });
-
-  it('correctly get planner plan with given ownerGroupId and deprecated planTitle', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
-        return Promise.resolve({
-          "value": [
-            planResponse
-          ]
-        });
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
-        return Promise.resolve(planDetailsResponse);
-      }
-
-      return Promise.reject(`Invalid request ${opts.url}`);
-    });
-
-    const options: any = {
-      debug: false,
-      planTitle: validTitle,
       ownerGroupId: validOwnerGroupId
     };
 

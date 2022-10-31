@@ -87,7 +87,7 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
   });
 
   it('sets the Knowledgehub Site', async () => {
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/knowledgesite' } });
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/knowledgesite' } });
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -101,7 +101,7 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
   });
 
   it('sets the Knowledgehub Site (debug)', async () => {
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/knowledgesite' } });
+    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/knowledgesite' } });
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -145,17 +145,17 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/knowledgesite' } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/knowledgesite' } } as any),
       new CommandError('An error has occurred'));
   });
 
   it('passes validation when the url is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/knowledgesite' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/knowledgesite' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'site.com' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'site.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

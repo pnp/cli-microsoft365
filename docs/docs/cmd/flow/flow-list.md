@@ -10,7 +10,7 @@ m365 flow list [options]
 
 ## Options
 
-`-e, --environment <environment>`
+`-e, --environmentName <environmentName>`
 : The name of the environment for which to retrieve available flows
 
 `--asAdmin`
@@ -32,11 +32,11 @@ By default, the `flow list` command returns only your flows. To list all flows, 
 List all your flows in the given environment
 
 ```sh
-m365 flow list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5
+m365 flow list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 ```
 
 List all flows in the given environment
 
 ```sh
-m365 flow list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
+m365 flow list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
 ```

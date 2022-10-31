@@ -10,7 +10,7 @@ m365 spo app list [options]
 
 ## Options
 
-`-s, --scope [scope]`
+`-s, --appCatalogScope [appCatalogScope]`
 : Target app catalog. `tenant,sitecollection`. Default `tenant`
 
 `-u, --appCatalogUrl [appCatalogUrl]`
@@ -37,7 +37,7 @@ m365 spo app list
 Return the list of available apps from a site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.
 
 ```sh
-m365 spo app list --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+m365 spo app list --appCatalogScope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 ## More information

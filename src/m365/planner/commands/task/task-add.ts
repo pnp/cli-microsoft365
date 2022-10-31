@@ -19,7 +19,6 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   planId?: string;
-  planName?: string;
   planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
@@ -66,7 +65,6 @@ class PlannerTaskAddCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         planId: typeof args.options.planId !== 'undefined',
-        planName: typeof args.options.planName !== 'undefined',
         planTitle: typeof args.options.planTitle !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
         ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
@@ -91,7 +89,6 @@ class PlannerTaskAddCommand extends GraphCommand {
     this.options.unshift(
       { option: '-t, --title <title>' },
       { option: '--planId [planId]' },
-      { option: '--planName [planName]' },
       { option: '--planTitle [planTitle]' },
       { option: '--ownerGroupId [ownerGroupId]' },
       { option: '--ownerGroupName [ownerGroupName]' },
@@ -120,11 +117,11 @@ class PlannerTaskAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+        if (args.options.planTitle && !args.options.ownerGroupId && !args.options.ownerGroupName) {
           return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
         }
 
-        if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+        if (args.options.planTitle && args.options.ownerGroupId && args.options.ownerGroupName) {
           return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
         }
 
@@ -188,12 +185,6 @@ class PlannerTaskAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.planName) {
-      args.options.planTitle = args.options.planName;
-
-      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
-    }
-
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.');
       return;
