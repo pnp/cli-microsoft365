@@ -10,7 +10,7 @@ m365 spo hubsite register [options]
 
 ## Options
 
-`-u, --url <url>`
+`-u, --siteUrl <siteUrl>`
 : URL of the site collection to register as a hub site
 
 --8<-- "docs/cmd/_global.md"
@@ -27,7 +27,7 @@ If the specified site collection is already registered as a hub site, you will g
 Register the site collection with URL _https://contoso.sharepoint.com/sites/sales_ as a hub site
 
 ```sh
-m365 spo hubsite register --url https://contoso.sharepoint.com/sites/sales
+m365 spo hubsite register --siteUrl https://contoso.sharepoint.com/sites/sales
 ```
 
 ## More information

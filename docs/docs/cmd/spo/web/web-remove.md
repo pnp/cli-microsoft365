@@ -10,7 +10,7 @@ m365 spo web remove [options]
 
 ## Options
 
-`-u, --webUrl <webUrl>`
+`-u, --url <url>`
 : URL of the subsite to remove
 
 `--confirm`
@@ -23,5 +23,5 @@ m365 spo web remove [options]
 Delete subsite without prompting for confirmation
 
 ```sh
-m365 spo web remove --webUrl https://contoso.sharepoint.com/subsite --confirm
+m365 spo web remove --url https://contoso.sharepoint.com/subsite --confirm
 ```

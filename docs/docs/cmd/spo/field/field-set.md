@@ -14,19 +14,19 @@ m365 spo field set [options]
 : Absolute URL of the site where the field is located
 
 `--listId [listId]`
-: ID of the list where the field is located (if list column). Specify `listTitle` or `listId` but not both
+: ID of the list where the field is located (if list column). Specify either `listTitle`, `listId` or `listUrl`
 
 `--listTitle [listTitle]`
-: Title of the list where the field is located (if list column). Specify `listTitle` or `listId` but not both
+: Title of the list where the field is located (if list column). Specify either `listTitle`, `listId` or `listUrl`
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list where the field is located (if list column). Specify either `listTitle`, `listId` or `listUrl`
 
 `-i, --id [id]`
 : ID of the field to update. Specify `id` or `title` but not both
 
 `-t, --title [title]`
 : Title or internal name of the field to update. Specify `id` or `title` but not both
-
-`-n, --name [name]`
-: (deprecated. Use `title` instead) Title or internal name of the field to update. Specify `id` or `name` but not both
 
 `--updateExistingLists`
 : Set, to push the update to existing lists. Otherwise, the changes will apply to new lists only
@@ -49,6 +49,12 @@ Update the title of the list column specified by its ID
 
 ```sh
 m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --id 330f29c5-5c4c-465f-9f4b-7903020ae1ce --Title 'My column'
+```
+
+Update the description of a column specified by the ID on a list retrieved by the URL
+
+```sh
+m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/Lists/My List' --id 330f29c5-5c4c-465f-9f4b-7903020ae1ce --Description 'My column Description'
 ```
 
 Update column formatting of the specified list column

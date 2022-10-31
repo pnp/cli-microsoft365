@@ -31,7 +31,7 @@ m365 spo list webhook set [options]
 `-e, --expirationDateTime [expirationDateTime]`
 : The new expiration date. _Note: Expiration Time cannot be more than 6 months in future_
 
---8<-- "docs/cmd/\_global.md"
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

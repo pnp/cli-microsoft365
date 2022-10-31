@@ -14,10 +14,13 @@ m365 spo listitem add [options]
 : URL of the site where the item should be added
 
 `-l, --listId [listId]`
-: ID of the list where the item should be added. Specify `listId` or `listTitle` but not both
+: ID of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
 
 `-t, --listTitle [listTitle]`
-: Title of the list where the item should be added. Specify `listId` or `listTitle` but not both
+: Title of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`
 
 `-c, --contentType [contentType]`
 : The name or the ID of the content type to associate with the new item
@@ -63,4 +66,10 @@ Add an item with Title _Demo Hyperlink Field_ and a hyperlink field named _Custo
 
 ```sh
 m365 spo listitem add --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
+```
+
+Add an item with a specific title to a list retrieved by server-relative URL in a specific site
+
+```sh
+m365 spo listitem add --contentType Item --listUrl /sites/project-x/Documents --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Item"
 ```

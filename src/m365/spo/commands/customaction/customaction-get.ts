@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   title?: string;
-  url: string;
+  webUrl: string;
   scope?: string;
 }
 
@@ -28,13 +28,13 @@ class SpoCustomActionGetCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -42,7 +42,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -52,7 +52,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
         option: '-t, --title [title]'
       },
       {
-        option: '-u, --url <url>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-s, --scope [scope]',
@@ -60,33 +60,34 @@ class SpoCustomActionGetCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id && validation.isValidGuid(args.options.id) === false) {
-	      return `${args.options.id} is not valid. Custom action id (Guid) expected.`;
-	    }
+          return `${args.options.id} is not valid. Custom action id (Guid) expected.`;
+        }
 
-	    if (validation.isValidSharePointUrl(args.options.url) !== true) {
-	      return 'Missing required option url';
-	    }
+        const isValidUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (typeof isValidUrl === 'string') {
+          return isValidUrl;
+        }
 
-	    if (args.options.scope) {
-	      if (args.options.scope !== 'Site' &&
-	        args.options.scope !== 'Web' &&
-	        args.options.scope !== 'All') {
-	        return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
-	      }
-	    }
+        if (args.options.scope) {
+          if (args.options.scope !== 'Site' &&
+            args.options.scope !== 'Web' &&
+            args.options.scope !== 'All') {
+            return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
+          }
+        }
 
-	    return true;
+        return true;
       }
     );
   }
 
   #initOptionSets(): void {
-  	this.optionSets.push(['id', 'title']);
+    this.optionSets.push(['id', 'title']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -140,7 +141,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
       `?$filter=Title eq '${encodeURIComponent(options.title as string)}'`;
 
     const requestOptions: any = {
-      url: `${options.url}/_api/${options.scope}/UserCustomActions${filter}`,
+      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions${filter}`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },

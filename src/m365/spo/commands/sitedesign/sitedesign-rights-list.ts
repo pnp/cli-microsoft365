@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  siteDesignId: string;
 }
 
 class SpoSiteDesignRightsListCommand extends SpoCommand {
@@ -34,7 +34,7 @@ class SpoSiteDesignRightsListCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-i, --siteDesignId <siteDesignId>'
       }
     );
   }
@@ -42,8 +42,8 @@ class SpoSiteDesignRightsListCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.siteDesignId)) {
+          return `${args.options.siteDesignId} is not a valid GUID`;
         }
 
         return true;
@@ -62,7 +62,7 @@ class SpoSiteDesignRightsListCommand extends SpoCommand {
           'content-type': 'application/json;charset=utf-8',
           accept: 'application/json;odata=nometadata'
         },
-        data: { id: args.options.id },
+        data: { id: args.options.siteDesignId },
         responseType: 'json'
       };
 

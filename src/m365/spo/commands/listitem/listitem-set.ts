@@ -1,9 +1,11 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -17,6 +19,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   id: string;
   contentType?: string;
   systemUpdate?: boolean;
@@ -50,6 +53,7 @@ class SpoListItemSetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
         contentType: typeof args.options.contentType !== 'undefined',
         systemUpdate: typeof args.options.systemUpdate !== 'undefined'
       });
@@ -69,6 +73,9 @@ class SpoListItemSetCommand extends SpoCommand {
       },
       {
         option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       },
       {
         option: '-c, --contentType [contentType]'
@@ -102,6 +109,7 @@ class SpoListItemSetCommand extends SpoCommand {
       'webUrl',
       'listId',
       'listTitle',
+      'listUrl',
       'id',
       'contentType'
     );
@@ -109,45 +117,52 @@ class SpoListItemSetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const listIdArgument = args.options.listId || '';
-    const listTitleArgument = args.options.listTitle || '';
-    const listRestUrl: string = (args.options.listId ?
-      `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
     let contentTypeName: string = '';
-
-    let formDigestValue: string = '';
-    let environmentListId: string = '';
+    let listId: string = '';
 
     try {
-      if (args.options.systemUpdate) {
+      let requestUrl = `${args.options.webUrl}/_api/web`;
+
+      if (args.options.listId) {
+        listId = args.options.listId;
+        requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+      }
+      else if (args.options.listTitle) {
+        requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+      }
+      else if (args.options.listUrl) {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+      }
+
+      if (args.options.systemUpdate && !args.options.listId) {
         if (this.verbose) {
           logger.logToStderr(`Getting list id...`);
         }
 
-        const listRequestOptions: any = {
-          url: `${listRestUrl}/id`,
+        const listRequestOptions: AxiosRequestConfig = {
+          url: `${requestUrl}?$select=Id`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
 
-        const dataReturned: any = await request.get(listRequestOptions);
-        environmentListId = dataReturned.value;
+        const list = await request.get<{ Id: string; }>(listRequestOptions);
+        listId = list.Id;
       }
-      
+
       if (args.options.contentType) {
         if (this.verbose) {
           logger.logToStderr(`Getting content types for list...`);
         }
 
         const requestOptions: any = {
-          url: `${listRestUrl}/contenttypes?$select=Name,Id`,
+          url: `${requestUrl}/contenttypes?$select=Name,Id`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -201,10 +216,10 @@ class SpoListItemSetCommand extends SpoCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+        logger.logToStderr(`Updating item in list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}...`);
       }
 
-      formDigestValue = args.options.systemUpdate ? res['FormDigestValue'] : '';
+      const formDigestValue = args.options.systemUpdate ? res['FormDigestValue'] : '';
       let objectIdentity: string = '';
 
       if (args.options.systemUpdate) {
@@ -226,7 +241,7 @@ class SpoListItemSetCommand extends SpoCommand {
             <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />
           </Actions>
           <ObjectPaths>
-            <Identity Id="147" Name="${objectIdentity}:list:${environmentListId}:item:${args.options.id},1" />
+            <Identity Id="147" Name="${objectIdentity}:list:${listId}:item:${args.options.id},1" />
           </ObjectPaths>
         </Request>`
         : {
@@ -244,7 +259,7 @@ class SpoListItemSetCommand extends SpoCommand {
         });
       }
 
-      const requestOptions: any = args.options.systemUpdate ?
+      const requestOptions: AxiosRequestConfig = args.options.systemUpdate ?
         {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
@@ -254,7 +269,7 @@ class SpoListItemSetCommand extends SpoCommand {
           data: requestBody
         } :
         {
-          url: `${listRestUrl}/items(${args.options.id})/ValidateUpdateListItem()`,
+          url: `${requestUrl}/items(${args.options.id})/ValidateUpdateListItem()`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -285,8 +300,8 @@ class SpoListItemSetCommand extends SpoCommand {
         }
       }
 
-      const requestOptionsItems: any = {
-        url: `${listRestUrl}/items(${itemId})`,
+      const requestOptionsItems: AxiosRequestConfig = {
+        url: `${requestUrl}/items(${itemId})`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -296,7 +311,7 @@ class SpoListItemSetCommand extends SpoCommand {
       const itemsResponse = await request.get(requestOptionsItems);
       logger.log(<ListItemInstance>itemsResponse);
 
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -307,6 +322,7 @@ class SpoListItemSetCommand extends SpoCommand {
     const excludeOptions: string[] = [
       'listTitle',
       'listId',
+      'listUrl',
       'webUrl',
       'id',
       'contentType',
@@ -351,8 +367,8 @@ class SpoListItemSetCommand extends SpoCommand {
    * @param webUrl web url
    * @param cmd command cmd
    */
-  private requestObjectIdentity(webUrl: string, logger: Logger, formDigestValue: string): Promise<string> {
-    const requestOptions: any = {
+  private async requestObjectIdentity(webUrl: string, logger: Logger, formDigestValue: string): Promise<string> {
+    const requestOptions: AxiosRequestConfig = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': formDigestValue
@@ -360,29 +376,25 @@ class SpoListItemSetCommand extends SpoCommand {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
     };
 
-    return new Promise<string>((resolve: any, reject: any): void => {
-      request.post(requestOptions).then((res: any) => {
-        if (this.debug) {
-          logger.logToStderr('Attempt to get _ObjectIdentity_ key values');
-        }
+    const response = await request.post<any>(requestOptions);
+    if (this.debug) {
+      logger.logToStderr('Attempt to get _ObjectIdentity_ key values');
+    }
 
-        const json: ClientSvcResponse = JSON.parse(res);
+    const json: ClientSvcResponse = JSON.parse(response);
 
-        const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
-        if (contents && contents.ErrorInfo) {
-          reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
-        }
+    const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
+    if (contents && contents.ErrorInfo) {
+      throw contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error';
+    }
 
-        const identityObject = json.find(x => { return x['_ObjectIdentity_']; });
-        if (identityObject) {
-          resolve(identityObject['_ObjectIdentity_']);
-        }
+    const identityObject = json.find(x => { return x['_ObjectIdentity_']; });
+    if (identityObject) {
+      return identityObject['_ObjectIdentity_'];
+    }
 
-        reject('Cannot proceed. _ObjectIdentity_ not found'); // this is not supposed to happen
-      }).catch((err) => {
-        reject(err);
-      });
-    });
+    throw 'Cannot proceed. _ObjectIdentity_ not found'; // this is not supposed to happen
+
   }
 }
 

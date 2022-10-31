@@ -83,7 +83,7 @@ describe(commands.USER_GET, () => {
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
-  it('calls user by userId', async () => {
+  it('calls user by id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/1496550646.json') {
         return Promise.resolve(
@@ -92,7 +92,7 @@ describe(commands.USER_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { userId: 1496550646 } } as any);
+    await command.action(logger, { options: { id: 1496550646 } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646);
   });
 
@@ -136,8 +136,8 @@ describe(commands.USER_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if userId set ', async () => {
-    const actual = await command.validate({ options: { userId: 1496550646 } }, commandInfo);
+  it('passes validation if id set ', async () => {
+    const actual = await command.validate({ options: { id: 1496550646 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -146,8 +146,8 @@ describe(commands.USER_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('does not pass with userId and e-mail', async () => {
-    const actual = await command.validate({ options: { userId: 1496550646, email: "pl@nubo.eu" } }, commandInfo);
+  it('does not pass with id and e-mail', async () => {
+    const actual = await command.validate({ options: { id: 1496550646, email: "pl@nubo.eu" } }, commandInfo);
     assert.strictEqual(actual, "You are only allowed to search by ID or e-mail but not both");
   });
 

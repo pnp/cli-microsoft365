@@ -13,17 +13,17 @@ m365 aad approleassignment list [options]
 `-i, --appId [appId]`
 : Application (client) Id of the App Registration for which the configured app roles should be retrieved
 
-`-n, --displayName [displayName]`
+`-n, --appDisplayName [appDisplayName]`
 : Display name of the application for which the configured app roles should be retrieved
 
-`--objectId [objectId]`
+`--appObjectId [appObjectId]`
 : ObjectId of the application for which the configured app roles should be retrieved
 
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-Specify either the `appId`, `objectId` or `displayName`. If you specify more than one option value, the command will fail with an error.
+Specify either the `appId`, `appObjectId` or `appDisplayName`. If you specify more than one option value, the command will fail with an error.
 
 ## Examples
 
@@ -36,13 +36,13 @@ m365 aad approleassignment list --appId b2307a39-e878-458b-bc90-03bc578531d6
 List app roles assigned to service principal with Application display name _MyAppName_.
 
 ```sh
-m365 aad approleassignment list --displayName 'MyAppName'
+m365 aad approleassignment list --appDisplayName 'MyAppName'
 ```
 
 List app roles assigned to service principal with ObjectId _b2307a39-e878-458b-bc90-03bc578531dd_.
 
 ```sh
-m365 aad approleassignment list --objectId b2307a39-e878-458b-bc90-03bc578531dd
+m365 aad approleassignment list --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
 ```
 
 ## More information

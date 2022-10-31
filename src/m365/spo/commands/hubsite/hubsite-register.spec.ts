@@ -90,7 +90,7 @@ describe(commands.HUBSITE_REGISTER, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/sales' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -121,7 +121,7 @@ describe(commands.HUBSITE_REGISTER, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/sales' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -149,7 +149,7 @@ describe(commands.HUBSITE_REGISTER, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales' } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/sales' } } as any),
       new CommandError('This site is already a HubSite.'));
   });
 
@@ -168,7 +168,7 @@ describe(commands.HUBSITE_REGISTER, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--url') > -1) {
+      if (o.option.indexOf('--siteUrl') > -1) {
         containsOption = true;
       }
     });
@@ -176,12 +176,12 @@ describe(commands.HUBSITE_REGISTER, () => {
   });
 
   it('fails validation if the specified site collection URL is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'site.com' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'site.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when all required parameters are valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -118,7 +118,7 @@ describe(commands.WEB_LIST, () => {
       options: {
         output: 'json',
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
+        url: 'https://contoso.sharepoint.com'
       }
     });
     assert(loggerLogSpy.calledWith([{
@@ -169,7 +169,7 @@ describe(commands.WEB_LIST, () => {
 
     await assert.rejects(command.action(logger, { options: {
       debug: true,
-      webUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError(err));
+      url: 'https://contoso.sharepoint.com' } } as any), new CommandError(err));
   });
 
   it('uses correct API url when output json option is passed', async () => {
@@ -187,7 +187,7 @@ describe(commands.WEB_LIST, () => {
       options: {
         output: 'json',
         debug: false,
-        webUrl: 'https://contoso.sharepoint.com'
+        url: 'https://contoso.sharepoint.com'
       }
     });
     assert('Correct Url');
@@ -208,7 +208,7 @@ describe(commands.WEB_LIST, () => {
     const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
+      if (o.option.indexOf('<url>') > -1) {
         containsTypeOption = true;
       }
     });
@@ -216,12 +216,12 @@ describe(commands.WEB_LIST, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

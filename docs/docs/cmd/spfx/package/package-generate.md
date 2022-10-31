@@ -16,7 +16,7 @@ m365 spfx package generate
 `-d, --webPartDescription <webPartDescription>`
 : Description of the web part to generate. Displayed in the tool box when adding web part to page
 
-`-n, --packageName <packageName>`
+`-n, --name <name>`
 : Name of the package to generate. Used among others for the .sppkg file. Must be unique in the app catalog to avoid collisions with other solutions.
 
 `--html <html>`
@@ -54,5 +54,5 @@ m365 spfx package generate
 Generate a web part that shows the weather for Amsterdam. Load web part contents from a local file. Allow the web part to be deployed to all sites. Expose the web part in Teams as a personal tab.
 
 ```sh
-m365 spfx package generate --webPartTitle "Amsterdam weather" --webPartDescription "Shows weather in Amsterdam" --packageName amsterdam-weather --html @amsterdam-weather.html --allowTenantWideDeployment --enableForTeams all
+m365 spfx package generate --webPartTitle "Amsterdam weather" --webPartDescription "Shows weather in Amsterdam" --name amsterdam-weather --html @amsterdam-weather.html --allowTenantWideDeployment --enableForTeams all
 ```
