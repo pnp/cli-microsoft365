@@ -43,3 +43,52 @@ Get details about direct routing calls made between 2020-10-31 and 2020-12-31 an
 ```sh
 m365 teams report directroutingcalls --fromDateTime 2020-10-31 --toDateTime 2020-12-31 --output json > "directroutingcalls.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ``` json
+    {
+      "@odata.count": 1,
+      "value": [
+        {
+          "id": "9e8bba57-dc14-533a-a7dd-f0da6575eed1",
+          "correlationId": "c98e1515-a937-4b81-b8a8-3992afde64e0",
+          "userId": "db03c14b-06eb-4189-939b-7cbf3a20ba27",
+          "userPrincipalName": "richard.malk@contoso.com",
+          "userDisplayName": "Richard Malk",
+          "startDateTime": "2019-11-01T00:00:25.105Z",
+          "inviteDateTime": "2019-11-01T00:00:21.949Z",
+          "failureDateTime": "0001-01-01T00:00:00Z",
+          "endDateTime": "2019-11-01T00:00:30.105Z",
+          "duration": 5,
+          "callType": "ByotIn",
+          "successfulCall": true,
+          "callerNumber": "+12345678***",
+          "calleeNumber": "+01234567***",
+          "mediaPathLocation": "USWE",
+          "signalingLocation": "EUNO",
+          "finalSipCode": 0,
+          "callEndSubReason": 540000,
+          "finalSipCodePhrase": "BYE",
+          "trunkFullyQualifiedDomainName": "tll-audiocodes01.adatum.biz",
+          "mediaBypassEnabled": false
+        }
+      ]
+    }
+    ```
+
+=== "Text"
+
+    ``` text
+    id,calleeNumber,callerNumber,startDateTime
+    9e8bba57-dc14-533a-a7dd-f0da6575eed1,+01234567***,+12345678***,2019-11-01T00:00:25.105Z
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,calleeNumber,callerNumber,startDateTime
+    9e8bba57-dc14-533a-a7dd-f0da6575eed1,+01234567***,+12345678***,2019-11-01T00:00:25.105Z
+    ```
