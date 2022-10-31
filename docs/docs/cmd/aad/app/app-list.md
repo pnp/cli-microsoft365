@@ -10,7 +10,7 @@ m365 aad app list [options]
 
 ## Options
 
-None
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 
