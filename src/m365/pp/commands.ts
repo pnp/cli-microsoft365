@@ -1,6 +1,7 @@
 const prefix: string = 'pp';
 
 export default {
+  CARD_CLONE: `${prefix} card clone`,
   CARD_GET: `${prefix} card get`,
   CARD_LIST: `${prefix} card list`,
   CARD_REMOVE: `${prefix} card remove`,

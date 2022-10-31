@@ -259,6 +259,7 @@ nav:
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
       - card:
+        - card clone: 'cmd/pp/card/card-clone.md'
         - card get: 'cmd/pp/card/card-get.md'
         - card list: 'cmd/pp/card/card-list.md'
         - card remove: 'cmd/pp/card/card-remove.md'
