@@ -18,7 +18,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   accentColor?: string;
-  appName: string;
+  name: string;
   coloredIconPath: string;
   companyName: string;
   companyWebsiteUrl: string;
@@ -52,7 +52,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
   #initOptions(): void {
     this.options.unshift(
       { option: '--portalUrl <portalUrl>' },
-      { option: '--appName <appName>' },
+      { option: '--name <name>' },
       { option: '--description <description>' },
       { option: '--longDescription <longDescription>' },
       { option: '--privacyPolicyUrl [privacyPolicyUrl]' },
@@ -69,7 +69,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.appName.length > 30) {
+        if (args.options.name.length > 30) {
           return `App name must not exceed 30 characters`;
         }
 
@@ -83,7 +83,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
           return 'Long description must not exceed 4000 characters';
         }
 
-        const appFilePath = path.resolve(`${args.options.appName}.zip`);
+        const appFilePath = path.resolve(`${args.options.name}.zip`);
         if (fs.existsSync(appFilePath) && !args.options.force) {
           return `File ${appFilePath} already exists. Delete the file or use the --force option to overwrite the existing file`;
         }
@@ -148,7 +148,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
         "manifestVersion": "1.9",
         "version": "1.0",
         "id": appId,
-        "packageName": `com.microsoft.teams.${args.options.appName}`,
+        "packageName": `com.microsoft.teams.${args.options.name}`,
         "developer": {
           "name": args.options.companyName,
           "websiteUrl": args.options.companyWebsiteUrl,
@@ -160,8 +160,8 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
           "outline": outlineIconFileName
         },
         "name": {
-          "short": args.options.appName,
-          "full": args.options.appName
+          "short": args.options.name,
+          "full": args.options.name
         },
         "description": {
           "short": `${args.options.description}`,
@@ -172,7 +172,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
         "staticTabs": [
           {
             "entityId": `sharepointportal_${appId}`,
-            "name": `Portals-${args.options.appName}`,
+            "name": `Portals-${args.options.name}`,
             "contentUrl": `https://${domain}/_layouts/15/teamslogon.aspx?spfx=true&dest=${appPortalUrl}`,
             "websiteUrl": portalUrl,
             "searchUrl": `https://${searchUrlPath}/_layouts/15/search.aspx?q={searchQuery}`,
@@ -210,7 +210,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
         this.archive.addFile('manifest.json', Buffer.alloc(manifestString.length, manifestString, 'utf8'));
         this.archive.addLocalFile(coloredIconPath, undefined, coloredIconFileName);
         this.archive.addLocalFile(outlineIconPath, undefined, outlineIconFileName);
-        this.archive.writeZip(`${args.options.appName}.zip`);
+        this.archive.writeZip(`${args.options.name}.zip`);
       }
       catch (ex: any) {
         throw ex.message;
@@ -227,7 +227,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
     }
 
     const options: SpoWebGetCommandOptions = {
-      webUrl: args.options.portalUrl,
+      url: args.options.portalUrl,
       output: 'json',
       debug: this.debug,
       verbose: this.verbose

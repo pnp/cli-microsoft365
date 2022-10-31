@@ -305,19 +305,6 @@ describe(commands.BUCKET_ADD, () => {
     assert(loggerLogSpy.calledWith(bucketAddResponse));
   });
 
-  it('correctly adds planner bucket with name, deprecated planName, and ownerGroupId', async () => {
-    const options: any = {
-      debug: false,
-      name: 'My Planner Bucket',
-      planName: 'My Planner Plan',
-      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-      verbose: true
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert(loggerLogSpy.calledWith(bucketAddResponse));
-  });
-
   it('correctly adds planner bucket with name, planTitle, and ownerGroupId', async () => {
     const options: any = {
       debug: false,

@@ -10,7 +10,7 @@ m365 spo web reindex [options]
 
 ## Options
 
-`-u, --webUrl <webUrl>`
+`-u, --url <url>`
 : URL of the subsite to reindex
 
 --8<-- "docs/cmd/_global.md"
@@ -24,5 +24,5 @@ If the subsite to be reindexed is a no-script site, the command will request rei
 Request reindexing the subsite _https://contoso.sharepoint.com/subsite_
 
 ```sh
-m365 spo web reindex --webUrl https://contoso.sharepoint.com/subsite
+m365 spo web reindex --url https://contoso.sharepoint.com/subsite
 ```

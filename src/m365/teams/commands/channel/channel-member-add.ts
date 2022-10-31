@@ -35,10 +35,6 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     return 'Adds a specified member in the specified Microsoft Teams private or shared team channel';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.CONVERSATIONMEMBER_ADD];
-  }
-
   constructor() {
     super();
 
@@ -113,8 +109,6 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, commands.CONVERSATIONMEMBER_ADD, commands.CHANNEL_MEMBER_ADD);
-
     try {
       const teamId: string = await this.getTeamId(args);
       const channelId: string = await this.getChannelId(teamId, args);

@@ -13,7 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  folderUrl: string;
+  url: string;
   recycle?: boolean;
   confirm?: boolean;
 }
@@ -50,7 +50,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folderUrl <folderUrl>'
+        option: '-f, --url <url>'
       },
       {
         option: '--recycle'
@@ -73,7 +73,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
         logger.logToStderr(`Removing folder in site at ${args.options.webUrl}...`);
       }
 
-      const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
+      const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
       let requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')`;
       if (args.options.recycle) {
         requestUrl += `/recycle()`;
@@ -105,7 +105,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the folder ${args.options.folderUrl} located in site ${args.options.webUrl}?`
+        message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the folder ${args.options.url} located in site ${args.options.webUrl}?`
       });
 
       if (result.continue) {
