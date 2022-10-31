@@ -126,7 +126,6 @@ class TeamsCacheRemoveCommand extends GraphCommand {
         filePath = `${homedir}/Library/Application Support/Microsoft/Teams`;
         break;
     }
-
     return filePath;
   }
 
@@ -194,10 +193,10 @@ class TeamsCacheRemoveCommand extends GraphCommand {
 
     switch (platform) {
       case 'win32':
-        cmd = 'cd %userprofile% && rmdir /s /q AppData\\Roaming\\Microsoft\\Teams';
+        cmd = `rmdir /s /q ${filePath}`;
         break;
       case 'darwin':
-        cmd = 'rm -r ~/Library/Application\\ Support/Microsoft/Teams';
+        cmd = `rm -r ${filePath}`;
         break;
     }
 

@@ -144,14 +144,15 @@ describe(commands.CACHE_REMOVE, () => {
 
   it('fails to remove teams cache when exec fails randomly when removing cache folder', async () => {
     sinon.stub(process, 'platform').value('win32');
-    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming' });
+
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const error = new Error('random error');
     sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
       if (opts === 'taskkill /IM "Teams.exe" /F') {
         return { stdout: '' };
       }
-      if (opts === 'cd %userprofile% && rmdir /s /q AppData\\Roaming\\Microsoft\\Teams') {
+      if (opts === 'rmdir /s /q C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Teams') {
         throw error;
       }
       throw 'Invalid request';
@@ -177,7 +178,8 @@ describe(commands.CACHE_REMOVE, () => {
 
   it('removes teams cache when teams is currently not active', async () => {
     sinon.stub(process, 'platform').value('win32');
-    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming' });
+
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const error = new Error('ERROR: The process "Teams.exe" not found.');
     sinon.stub(process, 'kill' as any).returns(null);
@@ -185,7 +187,7 @@ describe(commands.CACHE_REMOVE, () => {
       if (opts === 'taskkill /IM "Teams.exe" /F') {
         throw error;
       }
-      if (opts === 'cd %userprofile% && rmdir /s /q AppData\\Roaming\\Microsoft\\Teams') {
+      if (opts === 'rmdir /s /q C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Teams') {
         return;
       }
       throw 'Invalid request';
