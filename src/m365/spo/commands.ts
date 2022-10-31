@@ -85,6 +85,7 @@ export default {
   HOMESITE_GET: `${prefix} homesite get`,
   HOMESITE_REMOVE: `${prefix} homesite remove`,
   HOMESITE_SET: `${prefix} homesite set`,
+  HUBSITE_CONNECT: `${prefix} hubsite connect`,
   HUBSITE_DATA_GET: `${prefix} hubsite data get`,
   HUBSITE_GET: `${prefix} hubsite get`,
   HUBSITE_LIST: `${prefix} hubsite list`,

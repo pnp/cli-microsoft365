@@ -402,6 +402,7 @@ nav:
         - homesite remove: 'cmd/spo/homesite/homesite-remove.md'
         - homesite set: 'cmd/spo/homesite/homesite-set.md'
       - hubsite:
+        - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
         - hubsite data get: 'cmd/spo/hubsite/hubsite-data-get.md'
         - hubsite get: 'cmd/spo/hubsite/hubsite-get.md'
         - hubsite list: 'cmd/spo/hubsite/hubsite-list.md'
