@@ -16,8 +16,8 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  viewId?: string;
-  viewTitle?: string;
+  id?: string;
+  title?: string;
 }
 
 class SpoListViewGetCommand extends SpoCommand {
@@ -44,8 +44,8 @@ class SpoListViewGetCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
-        viewId: typeof args.options.viewId !== 'undefined',
-        viewTitle: typeof args.options.viewTitle !== 'undefined'
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined'
       });
     });
   }
@@ -65,10 +65,10 @@ class SpoListViewGetCommand extends SpoCommand {
         option: '--listUrl [listUrl]'
       },
       {
-        option: '--viewId [viewId]'
+        option: '--id [id]'
       },
       {
-        option: '--viewTitle [viewTitle]'
+        option: '--title [title]'
       }
     );
   }
@@ -86,9 +86,9 @@ class SpoListViewGetCommand extends SpoCommand {
           return `${args.options.listId} in option listId is not a valid GUID`;
         }
 
-        if (args.options.viewId &&
-          !validation.isValidGuid(args.options.viewId)) {
-          return `${args.options.viewId} in option viewId is not a valid GUID`;
+        if (args.options.id &&
+          !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} in option id is not a valid GUID`;
         }
 
         return true;
@@ -99,7 +99,7 @@ class SpoListViewGetCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       ['listId', 'listTitle', 'listUrl'],
-      ['viewId', 'viewTitle']
+      ['id', 'title']
     );
   }
 
@@ -119,7 +119,7 @@ class SpoListViewGetCommand extends SpoCommand {
       listRestUrl = `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
 
-    const viewRestUrl: string = `/views/${(args.options.viewId ? `getById('${formatting.encodeQueryParameter(args.options.viewId)}')` : `getByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`)}`;
+    const viewRestUrl: string = `/views/${(args.options.id ? `getById('${formatting.encodeQueryParameter(args.options.id)}')` : `getByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`)}`;
 
     const requestOptions: any = {
       url: `${baseRestUrl}${listRestUrl}${viewRestUrl}`,

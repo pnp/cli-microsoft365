@@ -38,7 +38,7 @@ Inspired By: [Salaudeen Rajack](https://www.sharepointdiary.com/2017/02/sharepoi
             [Parameter(Mandatory = $true)] 
             [string]$UserToRemove
         )
-        $allSPOSites = m365 spo site classic list -o json | ConvertFrom-Json
+        $allSPOSites = m365 spo site list | ConvertFrom-Json
         $siteCount = $allSPOSites.Count
 
         Write-Host "Processing $siteCount sites..." -f Green

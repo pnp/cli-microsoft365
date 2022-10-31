@@ -11,9 +11,9 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
-const command: Command = require('./hubsite-disconnect');
+const command: Command = require('./site-hubsite-disconnect');
 
-describe(commands.HUBSITE_DISCONNECT, () => {
+describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -74,7 +74,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.HUBSITE_DISCONNECT), true);
+    assert.strictEqual(command.name.startsWith(commands.SITE_HUBSITE_DISCONNECT), true);
   });
 
   it('has a description', () => {
@@ -83,7 +83,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   it('disconnects the site from its hub site without prompting for confirmation when confirm option specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) {
         return Promise.resolve({
           "odata.null": true
         });
@@ -92,13 +92,13 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } });
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
   it('disconnects the site from its hub site without prompting for confirmation when confirm option specified (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`) {
         return Promise.resolve({
           "odata.null": true
         });
@@ -107,12 +107,12 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } });
+    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
   it('prompts before disconnecting the specified site from its hub site when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -128,7 +128,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(postSpy.notCalled);
   });
 
@@ -140,7 +140,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(postStub.called);
   });
 
@@ -159,7 +159,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
       new CommandError('Exception of type \'Microsoft.SharePoint.Client.ResourceNotFoundException\' was thrown.'));
   });
 
@@ -178,7 +178,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--url') > -1) {
+      if (o.option.indexOf('--siteUrl') > -1) {
         containsOption = true;
       }
     });
@@ -186,12 +186,12 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   });
 
   it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when url is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

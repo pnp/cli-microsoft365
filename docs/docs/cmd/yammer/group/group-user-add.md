@@ -10,10 +10,10 @@ m365 yammer group user add [options]
 
 ## Options
 
-`--id <id>`
+`--groupId <groupId>`
 : The ID of the group to add the user to
 
-`--userId [userId]`
+`--id [id]`
 : ID of the user to add to the group. If not specified, adds the current user
 
 `--email [email]`
@@ -33,17 +33,17 @@ If the specified user is not a member of the network, the command will return an
 Adds the current user to the group with the ID `5611239081`
 
 ```sh
-m365 yammer group user add --id 5611239081
+m365 yammer group user add --groupId 5611239081
 ```
 
 Adds the user with ID `66622349` to the group with the ID `5611239081`
 
 ```sh
-m365 yammer group user add --id 5611239081 --userId 66622349
+m365 yammer group user add --groupId 5611239081 --id 66622349
 ```
 
 Adds the user with e-mail `suzy@contoso.com` to the group with ID `5611239081`
 
 ```sh
-m365 yammer group user add --id 5611239081 --email suzy@contoso.com
+m365 yammer group user add --groupId 5611239081 --email suzy@contoso.com
 ```

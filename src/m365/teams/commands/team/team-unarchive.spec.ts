@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -16,7 +15,6 @@ const command: Command = require('./team-unarchive');
 describe(commands.TEAM_UNARCHIVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -40,7 +38,7 @@ describe(commands.TEAM_UNARCHIVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
+
     (command as any).items = [];
   });
 
@@ -68,13 +66,9 @@ describe(commands.TEAM_UNARCHIVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [['id', 'name']]);
   });
 
   it('fails validation if the id is not a valid guid.', async () => {
@@ -103,17 +97,6 @@ describe(commands.TEAM_UNARCHIVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when all options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation when both id and name are specified', async () => {
     const actual = await command.validate({
       options: {
@@ -122,33 +105,6 @@ describe(commands.TEAM_UNARCHIVE, () => {
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both teamId and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('logs deprecation warning when option teamId is specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/unarchive`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, {
-      options: {
-        teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
-      }
-    } as any);
-    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
   });
 
   it('fails when team name does not exist', async () => {

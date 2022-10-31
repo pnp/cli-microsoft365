@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -16,7 +15,6 @@ const command: Command = require('./team-remove');
 describe(commands.TEAM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
   let commandInfo: CommandInfo;
 
@@ -42,7 +40,6 @@ describe(commands.TEAM_REMOVE, () => {
       }
     };
 
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     promptOptions = undefined;
     sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
@@ -75,52 +72,9 @@ describe(commands.TEAM_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when no option is specified', async () => {
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when all options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both id and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both teamId and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [['id', 'name']]);
   });
 
   it('fails validation if the id is not a valid guid.', async () => {
@@ -132,26 +86,13 @@ describe(commands.TEAM_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when valid id is specified', async () => {
+  it('passes validation when the input is correct', async () => {
     const actual = await command.validate({
       options: {
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('logs deprecation warning when option teamId is specified', async () => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", confirm: true } });
-    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
   });
 
   it('fails when team name does not exist', async () => {
@@ -178,7 +119,7 @@ describe(commands.TEAM_REMOVE, () => {
       confirm: true }} as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('prompts before removing the specified team when confirm option not passed', async () => {
+  it('prompts before removing the specified team by id when confirm option not passed', async () => {
     await command.action(logger, { options: { debug: false, id: "00000000-0000-0000-0000-000000000000" } });
     let promptIssued = false;
 
@@ -188,8 +129,8 @@ describe(commands.TEAM_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('prompts before removing the specified team when confirm option not passed (debug)', async () => {
-    await command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } });
+  it('prompts before removing the specified team by name when confirm option not passed (debug)', async () => {
+    await command.action(logger, { options: { debug: true, name: "Finance" } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {

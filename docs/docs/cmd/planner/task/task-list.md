@@ -22,9 +22,6 @@ m365 planner task list [options]
 `--planTitle [planTitle]`
 : Title of a plan to list the tasks of. To retrieve all tasks from a plan, specify either `planId` or `planTitle` but not both. Always use in combination with either `ownerGroupId` or `ownerGroupName`. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
 
-`--planName [planName]`
-: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
-
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 

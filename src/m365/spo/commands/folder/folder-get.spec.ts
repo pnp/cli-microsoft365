@@ -82,11 +82,11 @@ describe(commands.FOLDER_GET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['folderUrl', 'id']]);
+    assert.deepStrictEqual(optionSets, [['url', 'id']]);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: '/Shared Documents' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', url: '/Shared Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -95,8 +95,8 @@ describe(commands.FOLDER_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL and folderUrl specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } }, commandInfo);
+  it('passes validation if the webUrl option is a valid SharePoint site URL and url specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -117,7 +117,7 @@ describe(commands.FOLDER_GET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
-        folderUrl: '/Shared Documents'
+        url: '/Shared Documents'
       }
     } as any), new CommandError('error1'));
   });
@@ -128,7 +128,7 @@ describe(commands.FOLDER_GET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
-        folderUrl: '/Shared Documents'
+        url: '/Shared Documents'
       }
     } as any), new CommandError('Please check the folder URL. Folder might not exist on the specified URL'));
   });
@@ -140,7 +140,7 @@ describe(commands.FOLDER_GET, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        folderUrl: '/Shared Documents'
+        url: '/Shared Documents'
       }
     });
     assert(loggerLogSpy.lastCall.calledWith({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/test1", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" }));
@@ -169,7 +169,7 @@ describe(commands.FOLDER_GET, () => {
         debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com',
-        folderUrl: '/Shared Documents'
+        url: '/Shared Documents'
       }
     });
     const lastCall: any = request.lastCall.args[0];
@@ -184,7 +184,7 @@ describe(commands.FOLDER_GET, () => {
         debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
-        folderUrl: 'Shared Documents/'
+        url: 'Shared Documents/'
       }
     });
     const lastCall: any = request.lastCall.args[0];

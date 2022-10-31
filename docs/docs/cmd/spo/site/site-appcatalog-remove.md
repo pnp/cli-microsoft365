@@ -10,7 +10,7 @@ m365 spo site appcatalog remove [options]
 
 ## Options
 
-`-u, --url <url>`
+`-u, --siteUrl <siteUrl>`
 : URL of the site collection containing the app catalog to disable
 
 --8<-- "docs/cmd/_global.md"
@@ -27,7 +27,7 @@ While the command uses the term *'remove'*, like its equivalent PowerShell cmdle
 Remove the site collection app catalog from specified site
 
 ```sh
-m365 spo site appcatalog remove --url https://contoso.sharepoint/sites/site
+m365 spo site appcatalog remove --siteUrl https://contoso.sharepoint/sites/site
 ```
 
 ## More information

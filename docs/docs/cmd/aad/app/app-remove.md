@@ -8,12 +8,6 @@ Removes an Azure AD app registration
 m365 aad app remove [options]
 ```
 
-## Alias
-
-```sh
-m365 aad app delete [options]
-```
-
 ## Options
 
 `--appId [appId]`

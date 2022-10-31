@@ -93,7 +93,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -113,7 +113,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } });
+    await command.action(logger, { options: { debug: true, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -133,7 +133,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin,user', rights: 'Join' } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin,user', rights: 'Join' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -153,7 +153,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', rights: 'Join' } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', rights: 'Join' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -173,7 +173,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin, user', rights: 'Join' } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin, user', rights: 'Join' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -193,7 +193,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales>', principals: 'admin>', rights: 'Join' } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales>', principals: 'admin>', rights: 'Join' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -212,7 +212,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } } as any),
       new CommandError('File Not Found.'));
   });
 
@@ -221,7 +221,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -240,7 +240,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--url') > -1) {
+      if (o.option.indexOf('--hubSiteUrl') > -1) {
         containsOption = true;
       }
     });
@@ -270,22 +270,22 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   });
 
   it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'abc', principals: 'admin', rights: 'Join' } }, commandInfo);
+    const actual = await command.validate({ options: { hubSiteUrl: 'abc', principals: 'admin', rights: 'Join' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if specified rights value is invalid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Invalid' } }, commandInfo);
+    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if all required parameters are valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Join' } }, commandInfo);
+    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Join' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if all required parameters are valid (multiple principals)', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF,AdeleV', rights: 'Join' } }, commandInfo);
+    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF,AdeleV', rights: 'Join' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

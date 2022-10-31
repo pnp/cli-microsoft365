@@ -10,7 +10,7 @@ m365 spo customaction clear [options]
 
 ## Options
 
-`-u, --url <url>`
+`-u, --webUrl <webUrl>`
 : Url of the site or site collection to clear the custom actions from
 
 `-s, --scope [scope]`
@@ -27,17 +27,17 @@ Clears all user custom actions for both site and site collection _https://contos
 Skips the confirmation prompt message.
 
 ```sh
-m365 spo customaction clear --url https://contoso.sharepoint.com/sites/test --confirm
+m365 spo customaction clear --webUrl https://contoso.sharepoint.com/sites/test --confirm
 ```
 
 Clears all user custom actions for site _https://contoso.sharepoint.com/sites/test_. 
 
 ```sh
-m365 spo customaction clear --url https://contoso.sharepoint.com/sites/test --scope Web
+m365 spo customaction clear --webUrl https://contoso.sharepoint.com/sites/test --scope Web
 ```
 
 Clears all user custom actions for site collection _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction clear --url https://contoso.sharepoint.com/sites/test --scope Site
+m365 spo customaction clear --webUrl https://contoso.sharepoint.com/sites/test --scope Site
 ```
