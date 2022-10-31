@@ -281,6 +281,7 @@ nav:
         - solution remove: 'cmd/pp/solution/solution-remove.md'
         - solution publisher get: 'cmd/pp/solution/solution-publisher-get.md'
         - solution publisher list: 'cmd/pp/solution/solution-publisher-list.md'
+        - solution publisher remove: 'cmd/pp/solution/solution-publisher-remove.md'
       - tenant:
         - tenant settings list: 'cmd/pp/tenant/tenant-settings-list.md'
     - Search (search):

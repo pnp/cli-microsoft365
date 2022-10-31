@@ -18,5 +18,6 @@ export default {
   SOLUTION_REMOVE: `${prefix} solution remove`,
   SOLUTION_PUBLISHER_GET: `${prefix} solution publisher get`,
   SOLUTION_PUBLISHER_LIST: `${prefix} solution publisher list`,
+  SOLUTION_PUBLISHER_REMOVE: `${prefix} solution publisher remove`,
   TENANT_SETTINGS_LIST: `${prefix} tenant settings list`
 };
