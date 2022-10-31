@@ -10,9 +10,9 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  siteUrl: string;
-  newSiteUrl: string;
-  newSiteTitle?: string;
+  url: string;
+  newUrl: string;
+  newTitle?: string;
   suppressMarketplaceAppCheck?: boolean;
   suppressWorkflow2013Check?: boolean;
   wait?: boolean;
@@ -47,7 +47,7 @@ class SpoSiteRenameCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        newSiteTitle: args.options.newSiteTitle ? true : false,
+        newTitle: args.options.newTitle ? true : false,
         suppressMarketplaceAppCheck: args.options.suppressMarketplaceAppCheck,
         suppressWorkflow2013Check: args.options.suppressWorkflow2013Check,
         wait: args.options.wait
@@ -58,13 +58,13 @@ class SpoSiteRenameCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --siteUrl <siteUrl>'
+        option: '-u, --url <url>'
       },
       {
-        option: '--newSiteUrl <newSiteUrl>'
+        option: '--newUrl <newUrl>'
       },
       {
-        option: '--newSiteTitle [newSiteTitle]'
+        option: '--newTitle [newTitle]'
       },
       {
         option: '--suppressMarketplaceAppCheck'
@@ -81,7 +81,7 @@ class SpoSiteRenameCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.siteUrl.toLowerCase() === args.options.newSiteUrl.toLowerCase()) {
+        if (args.options.url.toLowerCase() === args.options.newUrl.toLowerCase()) {
           return 'The new URL cannot be the same as the target URL.';
         }
 
@@ -111,9 +111,9 @@ class SpoSiteRenameCommand extends SpoCommand {
       }
 
       const requestOptions = {
-        "SourceSiteUrl": options.siteUrl,
-        "TargetSiteUrl": options.newSiteUrl,
-        "TargetSiteTitle": options.newSiteTitle || null,
+        "SourceSiteUrl": options.url,
+        "TargetSiteUrl": options.newUrl,
+        "TargetSiteTitle": options.newTitle || null,
         "Option": optionsBitmask,
         "Reserve": null,
         "SkipGestures": null,
@@ -148,7 +148,7 @@ class SpoSiteRenameCommand extends SpoCommand {
           this,
           true,
           spoAdminUrl,
-          options.siteUrl,
+          options.url,
           0
         );
       }

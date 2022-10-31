@@ -16,9 +16,6 @@ m365 teams team unarchive [options]
 `-n, --name [name]`
 : The display name of the Microsoft Teams team to restore. Specify either id or name but not both
 
-`--teamId [teamId]`
-: (deprecated. Use `id` instead) The ID of the Microsoft Teams team to restore
-
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks

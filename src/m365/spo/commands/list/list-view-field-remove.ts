@@ -17,8 +17,8 @@ interface Options extends GlobalOptions {
   listTitle?: string;
   viewId?: string;
   viewTitle?: string;
-  fieldId?: string;
-  fieldTitle?: string;
+  id?: string;
+  title?: string;
   confirm?: boolean;
 }
 
@@ -47,8 +47,8 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
         listTitle: typeof args.options.listTitle !== 'undefined',
         viewId: typeof args.options.viewId !== 'undefined',
         viewTitle: typeof args.options.viewTitle !== 'undefined',
-        fieldId: typeof args.options.fieldId !== 'undefined',
-        fieldTitle: typeof args.options.fieldTitle !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
         confirm: (!(!args.options.confirm)).toString()
       });
     });
@@ -72,10 +72,10 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
         option: '--viewTitle [viewTitle]'
       },
       {
-        option: '--fieldId [fieldId]'
+        option: '--id [id]'
       },
       {
-        option: '--fieldTitle [fieldTitle]'
+        option: '--title [title]'
       },
       {
         option: '--confirm'
@@ -103,8 +103,8 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
           }
         }
 
-        if (args.options.fieldId) {
-          if (!validation.isValidGuid(args.options.fieldId)) {
+        if (args.options.id) {
+          if (!validation.isValidGuid(args.options.id)) {
             return `${args.options.viewId} is not a valid GUID`;
           }
         }
@@ -118,7 +118,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
     this.optionSets.push(
       ['listId', 'listTitle'],
       ['viewId', 'viewTitle'],
-      ['fieldId', 'fieldTitle']
+      ['id', 'title']
     );
   }
 
@@ -128,12 +128,12 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
     const removeFieldFromView: () => Promise<void> = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          logger.logToStderr(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
+          logger.logToStderr(`Getting field ${args.options.id || args.options.title}...`);
         }
 
         const field = await this.getField(args.options, listSelector);
         if (this.verbose) {
-          logger.logToStderr(`Removing field ${args.options.fieldId || args.options.fieldTitle} from view ${args.options.viewId || args.options.viewTitle}...`);
+          logger.logToStderr(`Removing field ${args.options.id || args.options.title} from view ${args.options.viewId || args.options.viewTitle}...`);
         }
 
         const viewSelector: string = args.options.viewId ? `('${formatting.encodeQueryParameter(args.options.viewId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`;
@@ -163,7 +163,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the field ${args.options.fieldId || args.options.fieldTitle} from the view ${args.options.viewId || args.options.viewTitle} from list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}?`
+        message: `Are you sure you want to remove the field ${args.options.id || args.options.title} from the view ${args.options.viewId || args.options.viewTitle} from list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}?`
       });
 
       if (result.continue) {
@@ -173,7 +173,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
   }
 
   private getField(options: Options, listSelector: string): Promise<{ InternalName: string; }> {
-    const fieldSelector: string = options.fieldId ? `/getbyid('${encodeURIComponent(options.fieldId)}')` : `/getbyinternalnameortitle('${encodeURIComponent(options.fieldTitle as string)}')`;
+    const fieldSelector: string = options.id ? `/getbyid('${encodeURIComponent(options.id)}')` : `/getbyinternalnameortitle('${encodeURIComponent(options.title as string)}')`;
     const getRequestUrl: string = `${options.webUrl}/_api/web/lists${listSelector}/fields${fieldSelector}`;
 
     const requestOptions: any = {

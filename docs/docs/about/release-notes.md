@@ -1,5 +1,31 @@
 # Release notes
 
+## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
+
+### Changes
+
+- removed deprecated options for 'spo listitem list' command [#3365](https://github.com/pnp/cli-microsoft365/issues/3365)
+- removed 'aad app delete' and 'aad app role delete' alias [#3134](https://github.com/pnp/cli-microsoft365/issues/3134)
+- removed executeWithLimitedPermission option from spo list list [#3408](https://github.com/pnp/cli-microsoft365/issues/3408)
+- removed references and alias for deprecated planner task details get [#3435](https://github.com/pnp/cli-microsoft365/issues/3435)
+- removed references and alias for deprecated planner plan details get [#3435](https://github.com/pnp/cli-microsoft365/issues/3435)
+- removed deprecated options for 'spo listitem list' command [#3365](https://github.com/pnp/cli-microsoft365/issues/3365)
+- removed deprecated planName options [#3363](https://github.com/pnp/cli-microsoft365/issues/3363)
+- removed default type of spo site list [#3526](https://github.com/pnp/cli-microsoft365/issues/3526)
+- removed deprecated spo site classic _verb_ commands [#3458](https://github.com/pnp/cli-microsoft365/issues/3458)
+- aligned commands' options with naming convention [#2696](https://github.com/pnp/cli-microsoft365/issues/2696)
+- removed the setting autoOpenBrowserOnLogin to follow new settings autoOpenLinksInBrowser [#3163](https://github.com/pnp/cli-microsoft365/issues/3163)
+- removed deprecated options for 'teams team remove', 'teams team archive', and 'teams team unarchive' command [#3502](https://github.com/pnp/cli-microsoft365/issues/3502)
+- updated classic references to spo site list [#3522](https://github.com/pnp/cli-microsoft365/issues/3522)
+- removed unnecessary aliases [#3644](https://github.com/pnp/cli-microsoft365/issues/3644)
+- added upgrade guidance [#3481](https://github.com/pnp/cli-microsoft365/issues/3481)
+- added confirm option to 'spo roleinheritance break and reset' commands [#3658](https://github.com/pnp/cli-microsoft365/issues/3658)
+- removed secret option from 'aad app add' command [#3136](https://github.com/pnp/cli-microsoft365/issues/3136)
+- removed name option from 'spo field set' command [#3419](https://github.com/pnp/cli-microsoft365/issues/3419)
+- renamed 'spo hubsite disconnect' to 'spo site hubsite disconnect' [#3878](https://github.com/pnp/cli-microsoft365/issues/3878)
+- renamed 'spo hubsite connect' to 'spo site hubsite connect' [#3877](https://github.com/pnp/cli-microsoft365/issues/3877)
+- removed deprecated options [#3840](https://github.com/pnp/cli-microsoft365/issues/3840)
+
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
 ### New commands
@@ -26,6 +52,12 @@
 - [spo folder roleinheritance break](../cmd/spo/folder/folder-roleinheritance-break.md) - breaks the role inheritance of a folder [#3598](https://github.com/pnp/cli-microsoft365/issues/3598)
 - [spo folder roleinheritance reset](../cmd/spo/folder/folder-roleinheritance-reset.md) - restores the role inheritance of a folder [#3603](https://github.com/pnp/cli-microsoft365/issues/3603)
 - [spo listitem roleassignment add](../cmd/spo/listitem/listitem-roleassignment-add.md) - adds a role assignment to a listitem [#3539](https://github.com/pnp/cli-microsoft365/issues/3539)
+- [spo web roleinheritance break](../cmd//spo/web/web-roleinheritance-break.md) - break role inheritance of subsite [#3547](https://github.com/pnp/cli-microsoft365/issues/3547)
+
+**To Do:**
+
+- [todo list get](../cmd/todo/list/list-get.md) - returns a specific Microsoft To Do task list [#3847](https://github.com/pnp/cli-microsoft365/issues/3847)
+- [todo task get](../cmd/todo/task/task-get.md) - returns a specific task from a Microsoft To Do task list [#3846](https://github.com/pnp/cli-microsoft365/issues/3846)
 
 ### Changes
 
@@ -70,6 +102,14 @@
 - extended 'status' command to log extra info [#3818](https://github.com/pnp/cli-microsoft365/issues/3806)
 - added validating output format [#2988](https://github.com/pnp/cli-microsoft365/issues/2988)
 - included response output: Planner bucket & Planner plan [#3773](https://github.com/pnp/cli-microsoft365/issues/3773)
+- updated GitHub actions to Node@16 [#3870](https://github.com/pnp/cli-microsoft365/issues/3870)
+- added support for upgrading SPFx projects to v1.16.0-beta.2 [#3937](https://github.com/pnp/cli-microsoft365/issues/3937)
+- made id option required for command spo list webhook get and set [#3860](https://github.com/pnp/cli-microsoft365/issues/3860)
+- included docs response output for 'tenant' commands [#3926](https://github.com/pnp/cli-microsoft365/issues/3926)
+- fixed global options for spo list webhook get and set docs [#3946](https://github.com/pnp/cli-microsoft365/issues/3946)
+- extended spo listitem with listUrl [#3814](https://github.com/pnp/cli-microsoft365/issues/3814)
+- extended spo field add and spo field set with listId and listUrl [#3807](https://github.com/pnp/cli-microsoft365/issues/3807)
+- extended spo listitem with listUrl [#3813](https://github.com/pnp/cli-microsoft365/issues/3813)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 

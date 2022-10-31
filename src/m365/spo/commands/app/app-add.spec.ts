@@ -153,7 +153,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
     try {
-      await command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+      await command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/sitecollectionappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1 &&
@@ -258,7 +258,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any), 
+      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any), 
         new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.'));
     }
     finally {
@@ -317,7 +317,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError('An error has occurred'));
     }
     finally {
@@ -377,7 +377,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError('An error has occurred'));
     }
     finally {
@@ -443,7 +443,7 @@ describe(commands.APP_ADD, () => {
   });
 
   it('fails validation on invalid scope', async () => {
-    const actual = await command.validate({ options: { scope: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { appCatalogScope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -453,7 +453,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = await command.validate({ options: { scope: 'tenant', filePath: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { appCatalogScope: 'tenant', filePath: 'abc' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
@@ -467,7 +467,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = await command.validate({ options: { scope: 'Tenant', filePath: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { appCatalogScope: 'Tenant', filePath: 'abc' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
@@ -481,7 +481,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = await command.validate({ options: { scope: 'SiteCollection', appCatalogUrl: 'https://contoso.sharepoint.com', filePath: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { appCatalogScope: 'SiteCollection', appCatalogUrl: 'https://contoso.sharepoint.com', filePath: 'abc' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
@@ -544,10 +544,10 @@ describe(commands.APP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(fs, 'readFileSync').callsFake(() => '123');    
+    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
     try {
-      await command.action(logger, { options: { scope: 'tenant', filePath: 'spfx.sppkg' } });
+      await command.action(logger, { options: { appCatalogScope: 'tenant', filePath: 'spfx.sppkg' } });
       let correctAppCatalogUsed = false;
       requests.forEach(r => {
         if (r.url.indexOf('/tenantappcatalog/') > -1) {
@@ -584,7 +584,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
     try {
-      await command.action(logger, { options: { scope: 'sitecollection', filePath: 'spfx.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+      await command.action(logger, { options: { appCatalogScope: 'sitecollection', filePath: 'spfx.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com' } });
       let correctAppCatalogUsed = false;
       requests.forEach(r => {
         if (r.url.indexOf('/sitecollectionappcatalog/') > -1) {
@@ -627,7 +627,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = await command.validate({ options: { filePath: 'abc', scope: 'foo' } }, commandInfo);
+    const actual = await command.validate({ options: { filePath: 'abc', appCatalogScope: 'foo' } }, commandInfo);
 
     sinonUtil.restore([
       fs.existsSync,
@@ -672,7 +672,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = await command.validate({ options: { filePath: 'abc', scope: 'tenant' } }, commandInfo);
+    const actual = await command.validate({ options: { filePath: 'abc', appCatalogScope: 'tenant' } }, commandInfo);
 
     sinonUtil.restore([
       fs.existsSync,
@@ -688,7 +688,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = await command.validate({ options: { filePath: 'abc', scope: 'sitecollection' } }, commandInfo);
+    const actual = await command.validate({ options: { filePath: 'abc', appCatalogScope: 'sitecollection' } }, commandInfo);
 
     sinonUtil.restore([
       fs.existsSync,
@@ -703,7 +703,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = await command.validate({ options: { filePath: 'abc', scope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { filePath: 'abc', appCatalogScope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
 
     sinonUtil.restore([
       fs.existsSync,
@@ -718,7 +718,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = await command.validate({ options: { filePath: 'abc', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { filePath: 'abc', appCatalogScope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
 
     sinonUtil.restore([
       fs.existsSync,

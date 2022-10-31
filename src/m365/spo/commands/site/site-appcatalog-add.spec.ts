@@ -107,7 +107,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/site' } });
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
   });
 
   it('creates site collection app catalog (debug=true)', async () => {
@@ -141,7 +141,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } });
+    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -166,13 +166,13 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } } as any), new CommandError('Unknown Error'));
+    await assert.rejects(command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } } as any), new CommandError('Unknown Error'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {
@@ -189,7 +189,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
   it('supports specifying site url', () => {
     const options = command.options;
     for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--url') > -1) {
+      if (options[i].option.indexOf('--siteUrl') > -1) {
         assert(true);
         return;
       }
@@ -200,7 +200,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
   it('passes validation when the url option specified', async () => {
     const actual = await command.validate({
       options: {
-        url: 'https://contoso.sharepoint.com/sites/site'
+        siteUrl: 'https://contoso.sharepoint.com/sites/site'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -216,7 +216,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
   it('fails validation when the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({
       options: {
-        url: 'foo'
+        siteUrl: 'foo'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

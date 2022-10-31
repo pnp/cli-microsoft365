@@ -11,7 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  fileUrl?: string;
+  url?: string;
   id?: string;
 }
 
@@ -37,7 +37,7 @@ class SpoFileCheckoutCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: (!(!args.options.id)).toString(),
-        fileUrl: (!(!args.options.fileUrl)).toString()
+        url: (!(!args.options.url)).toString()
       });
     });
   }
@@ -48,7 +48,7 @@ class SpoFileCheckoutCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --fileUrl [fileUrl]'
+        option: '-f, --url [url]'
       },
       {
         option: '-i, --id [id]'
@@ -76,7 +76,7 @@ class SpoFileCheckoutCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'fileUrl']);
+    this.optionSets.push(['id', 'url']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -86,8 +86,8 @@ class SpoFileCheckoutCommand extends SpoCommand {
       requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${encodeURIComponent(args.options.id)}')/checkout`;
     }
 
-    if (args.options.fileUrl) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(args.options.fileUrl)}')/checkout`;
+    if (args.options.url) {
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(args.options.url)}')/checkout`;
     }
 
     const requestOptions: any = {

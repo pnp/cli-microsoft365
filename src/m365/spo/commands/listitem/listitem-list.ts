@@ -1,8 +1,10 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -13,15 +15,14 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  id?: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   fields?: string;
   filter?: string;
   pageNumber?: string;
   pageSize?: string;
   camlQuery?: string;
-  title?: string;
   webUrl: string;
 }
 
@@ -46,10 +47,9 @@ class SpoListItemListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
         fields: typeof args.options.fields !== 'undefined',
         filter: typeof args.options.filter !== 'undefined',
         pageNumber: typeof args.options.pageNumber !== 'undefined',
@@ -65,16 +65,13 @@ class SpoListItemListCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--id [id]'
-      },
-      {
-        option: '--title [title]'
-      },
-      {
         option: '-i, --listId [listId]'
       },
       {
         option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       },
       {
         option: '-s, --pageSize [pageSize]'
@@ -102,17 +99,12 @@ class SpoListItemListCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (!args.options.id && !args.options.title && !args.options.listId && !args.options.listTitle) {
-          return `Specify listId or listTitle`;
+        if (!args.options.listId && !args.options.listTitle && !args.options.listUrl) {
+          return `Specify listId or listTitle or listUrl`;
         }
 
-        if (args.options.id && args.options.title) {
-          return `Specify list id or title but not both`;
-        }
-
-        // Check if only one of the 4 options is specified
-        if ([args.options.id, args.options.title, args.options.listId, args.options.listTitle].filter(o => o).length > 1) {
-          return 'Specify listId or listTitle but not both';
+        if ([args.options.listId, args.options.listTitle, args.options.listUrl].filter(o => o).length > 1) {
+          return 'Specify listId or listTitle or listUrl but not multiple';
         }
 
         if (args.options.camlQuery && args.options.fields) {
@@ -143,10 +135,6 @@ class SpoListItemListCommand extends SpoCommand {
           return `${args.options.listId} is not a valid GUID`;
         }
 
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} in option id is not a valid GUID`;
-        }
-
         return true;
       }
     );
@@ -155,8 +143,6 @@ class SpoListItemListCommand extends SpoCommand {
   #initTypes(): void {
     this.types.string.push(
       'webUrl',
-      'id',
-      'title',
       'camlQuery',
       'pageSize',
       'pageNumber',
@@ -166,15 +152,18 @@ class SpoListItemListCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.id) {
-      this.warn(logger, `Option 'id' is deprecated. Please use 'listId' instead.`);
-    }
-    if (args.options.title) {
-      this.warn(logger, `Option 'title' is deprecated. Please use 'listTitle' instead.`);
-    }
+    let requestUrl = `${args.options.webUrl}/_api/web`;
 
-    const listIdArgument = args.options.listId || args.options.id || '';
-    const listTitleArgument = args.options.listTitle || args.options.title || '';
+    if (args.options.listId) {
+      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+    }
+    else if (args.options.listTitle) {
+      requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
 
     let formDigestValue: string = '';
 
@@ -184,10 +173,6 @@ class SpoListItemListCommand extends SpoCommand {
     const fieldsWithSlash: string[] = fieldsArray.filter(item => item.includes('/'));
     const fieldsToExpand: string[] = fieldsWithSlash.map(e => e.split('/')[0]);
     const expandFieldsArray: string[] = fieldsToExpand.filter((item, pos) => fieldsToExpand.indexOf(item) === pos);
-
-    const listRestUrl: string = listIdArgument ?
-      `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`;
 
     try {
       if (args.options.camlQuery) {
@@ -205,8 +190,8 @@ class SpoListItemListCommand extends SpoCommand {
         const filter: string = args.options.filter ? `$filter=${encodeURIComponent(args.options.filter)}` : ``;
         const fieldSelect: string = `?$select=Id&${rowLimit}&${filter}`;
 
-        const requestOptions: any = {
-          url: `${listRestUrl}/items${fieldSelect}`,
+        const requestOptions: AxiosRequestConfig = {
+          url: `${requestUrl}/items${fieldSelect}`,
           headers: {
             'accept': 'application/json;odata=nometadata',
             'X-RequestDigest': formDigestValue
@@ -233,8 +218,8 @@ class SpoListItemListCommand extends SpoCommand {
         }
         : ``;
 
-      const requestOptions: any = {
-        url: `${listRestUrl}/${args.options.camlQuery ? `GetItems` : `items${fieldSelect}`}`,
+      const requestOptions: AxiosRequestConfig = {
+        url: `${requestUrl}/${args.options.camlQuery ? `GetItems` : `items${fieldSelect}`}`,
         headers: {
           'accept': 'application/json;odata=nometadata',
           'X-RequestDigest': formDigestValue

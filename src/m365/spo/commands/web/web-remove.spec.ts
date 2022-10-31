@@ -82,11 +82,11 @@ describe(commands.WEB_REMOVE, () => {
     assert(containsDebugOption);
   });
 
-  it('should fail validation if the webUrl option is not a valid SharePoint site URL', async () => {
+  it('should fail validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({
       options:
       {
-        webUrl: 'foo'
+        url: 'foo'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -95,7 +95,7 @@ describe(commands.WEB_REMOVE, () => {
   it('passes validation if all required options are specified', async () => {
     const actual = await command.validate({
       options: {
-        webUrl: "https://contoso.sharepoint.com/subsite"
+        url: "https://contoso.sharepoint.com/subsite"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -110,7 +110,7 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
     
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/subsite' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/subsite' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -131,7 +131,7 @@ describe(commands.WEB_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: "https://contoso.sharepoint.com/subsite",
+        url: "https://contoso.sharepoint.com/subsite",
         confirm: true
       }
     });
@@ -164,7 +164,7 @@ describe(commands.WEB_REMOVE, () => {
     
     await command.action(logger, {
       options: {
-        webUrl: "https://contoso.sharepoint.com/subsite"
+        url: "https://contoso.sharepoint.com/subsite"
       }
     });
     let correctRequestIssued = false;
@@ -191,7 +191,7 @@ describe(commands.WEB_REMOVE, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        webUrl: "https://contoso.sharepoint.com/subsite",
+        url: "https://contoso.sharepoint.com/subsite",
         confirm: true
       }
     });
@@ -219,7 +219,7 @@ describe(commands.WEB_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        webUrl: "https://contoso.sharepoint.com/subsite",
+        url: "https://contoso.sharepoint.com/subsite",
         confirm: true
       }
     });
@@ -245,7 +245,7 @@ describe(commands.WEB_REMOVE, () => {
     });
 
     await assert.rejects(command.action(logger, { options: {
-      webUrl: "https://contoso.sharepoint.com/subsite",
+      url: "https://contoso.sharepoint.com/subsite",
       confirm: true } } as any), new CommandError('An error has occurred'));
   });
 });
