@@ -245,6 +245,33 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     assert.strictEqual(actual, expected);
   });
 
+  it('updates clientState of the webhook by passing list url', async () => {
+    let actual: string = '';
+    const clientState = 'pnp-js-core-subscription';
+    const expected: string = JSON.stringify({
+      clientState: clientState
+    });
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('${formatting.encodeQueryParameter('/sites/ninja/lists/Documents')}')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) {
+        actual = JSON.stringify(opts.data);
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        listUrl: '/sites/ninja/lists/Documents',
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
+        clientState: clientState
+      }
+    });
+    assert.strictEqual(actual, expected);
+  });
+
   it('updates expiration date of the webhook by passing list title', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
@@ -413,7 +440,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if both notificationUrl and expirationDateTime options are not passed', async () => {
+  it('fails validation if notificationUrl, expirationDateTime or clientState options are not passed', async () => {
     const actual = await command.validate({
       options:
       {

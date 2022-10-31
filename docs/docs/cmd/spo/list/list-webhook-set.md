@@ -31,6 +31,9 @@ m365 spo list webhook set [options]
 `-e, --expirationDateTime [expirationDateTime]`
 : The new expiration date. _Note: Expiration Time cannot be more than 6 months in future_
 
+`-c, --clientState [clientState]`
+: A client state information that will be passed through notifications.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -51,8 +54,8 @@ Update the expiration date of a webhook with a specific ID attached to a list wi
 m365 spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime 2018-10-09T18:15
 ```
 
-Update the notification url of a webhook with a specific ID attached to a list with a specific URL in a specific site to a specific URL and the expiration date to a specific date
+Update the notification url and clientState of a webhook with a specific ID attached to a list with a specific URL in a specific site to a specific URL and the expiration date to a specific date
 
 ```sh
-m365 spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listUrl '/sites/ninja/Documents' --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-03-02
+m365 spo list webhook set --webUrl https://contoso.sharepoint.com/sites/ninja --listUrl '/sites/ninja/Documents' --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-03-02 --clientState 'pnp-js-core-subscription'
 ```

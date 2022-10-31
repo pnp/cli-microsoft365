@@ -20,6 +20,7 @@ interface Options extends GlobalOptions {
   listUrl?: string;
   notificationUrl?: string;
   expirationDateTime?: string;
+  clientState?: string;
   id: string;
 }
 
@@ -48,7 +49,8 @@ class SpoListWebhookSetCommand extends SpoCommand {
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
         notificationUrl: typeof args.options.notificationUrl !== 'undefined',
-        expirationDateTime: typeof args.options.expirationDateTime !== 'undefined'
+        expirationDateTime: typeof args.options.expirationDateTime !== 'undefined',
+        clientState: typeof args.options.clientState !== 'undefined'
       });
     });
   }
@@ -75,6 +77,9 @@ class SpoListWebhookSetCommand extends SpoCommand {
       },
       {
         option: '-e, --expirationDateTime [expirationDateTime]'
+      },
+      {
+        option: '-c, --clientState [clientState]'
       }
     );
   }
@@ -97,8 +102,8 @@ class SpoListWebhookSetCommand extends SpoCommand {
           }
         }
 
-        if (!args.options.notificationUrl && !args.options.expirationDateTime) {
-          return 'Specify notificationUrl, expirationDateTime or both, at least one is required';
+        if (!args.options.notificationUrl && !args.options.expirationDateTime && !args.options.clientState) {
+          return 'Specify notificationUrl, expirationDateTime, clientState or multiple, at least one is required';
         }
 
         const parsedDateTime = Date.parse(args.options.expirationDateTime as string);
@@ -144,6 +149,9 @@ class SpoListWebhookSetCommand extends SpoCommand {
     if (args.options.expirationDateTime) {
       requestBody.expirationDateTime = args.options.expirationDateTime;
     }
+    if (args.options.clientState) {
+      requestBody.clientState = args.options.clientState;
+    }
 
     const requestOptions: AxiosRequestConfig = {
       url: requestUrl,
@@ -154,6 +162,8 @@ class SpoListWebhookSetCommand extends SpoCommand {
       data: requestBody,
       responseType: 'json'
     };
+
+    logger.log(requestOptions);
 
     try {
       await request.patch(requestOptions);
