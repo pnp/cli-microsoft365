@@ -28,6 +28,9 @@ m365 spo listitem roleinheritance break [options]
 `-c, --clearExistingPermissions`
 : Set to clear existing roles from the list item
 
+`--confirm`
+: Do not prompt for confirmation before breaking role inheritance.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -58,4 +61,10 @@ Break inheritance of a specific list item in a list retrieved by server-relative
 
 ```sh
 m365 spo listitem roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/Documents --listItemId 1 --clearExistingPermissions
+```
+
+Break inheritance of list item _1_ in list with ID _202b8199-b9de-43fd-9737-7f213f51c991_ located in site _https://contoso.sharepoint.com/sites/project-x_ with clearing permissions without prompting for confirmation
+
+```sh
+m365 spo listitem roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x --listId 202b8199-b9de-43fd-9737-7f213f51c991 --listItemId 1 --clearExistingPermissions --confirm
 ```

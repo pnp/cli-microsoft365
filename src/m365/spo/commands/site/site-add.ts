@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -24,7 +23,6 @@ export interface Options extends GlobalOptions {
   isPublic?: boolean;
   lcid?: number;
   url?: string;
-  allowFileSharingForGuestUsers?: boolean;
   owners: string;
   shareByEmailEnabled?: boolean;
   siteDesign?: string;
@@ -88,7 +86,6 @@ class SpoSiteAddCommand extends SpoCommand {
       telemetryProps.owners = typeof args.options.owners !== 'undefined';
 
       if (isCommunicationSite) {
-        telemetryProps.allowFileSharingForGuestUsers = args.options.allowFileSharingForGuestUsers || false;
         telemetryProps.shareByEmailEnabled = args.options.shareByEmailEnabled || false;
         telemetryProps.siteDesign = args.options.siteDesign;
         telemetryProps.siteDesignId = (!(!args.options.siteDesignId)).toString();
@@ -148,9 +145,6 @@ class SpoSiteAddCommand extends SpoCommand {
         option: '--siteDesignId [siteDesignId]'
       },
       {
-        option: '--allowFileSharingForGuestUsers'
-      },
-      {
         option: '--shareByEmailEnabled'
       },
       {
@@ -197,7 +191,7 @@ class SpoSiteAddCommand extends SpoCommand {
             return 'Required option alias missing';
           }
 
-          if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
+          if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.shareByEmailEnabled || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
             return "Type TeamSite supports only the parameters title, lcid, alias, owners, classification, isPublic, and description";
           }
         }
@@ -234,7 +228,7 @@ class SpoSiteAddCommand extends SpoCommand {
           }
 
           if (args.options.timeZone || args.options.isPublic || args.options.removeDeletedSite || args.options.wait || args.options.alias || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
-            return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, allowFileSharingForGuestUsers, siteDesignId, owners, and description";
+            return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, siteDesignId, owners, and description";
           }
         }
         else {
@@ -301,7 +295,7 @@ class SpoSiteAddCommand extends SpoCommand {
             return `storageQuotaWarningLevel cannot exceed storageQuota`;
           }
 
-          if (args.options.classification || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.siteDesignId || args.options.alias || args.options.isPublic) {
+          if (args.options.classification || args.options.shareByEmailEnabled || args.options.siteDesignId || args.options.siteDesignId || args.options.alias || args.options.isPublic) {
             return "Type ClassicSite supports only the parameters url, title, lcid, storageQuota, storageQuotaWarningLevel, resourceQuota, resourceQuotaWarningLevel, webTemplate, owners, and description";
           }
         }
@@ -341,10 +335,6 @@ class SpoSiteAddCommand extends SpoCommand {
 
     try {
       const spoUrl = await spo.getSpoUrl(logger, this.debug);
-
-      if (args.options.allowFileSharingForGuestUsers && this.verbose) {
-        logger.logToStderr(chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
-      }
 
       if (this.verbose) {
         logger.logToStderr(`Creating new site...`);
@@ -419,7 +409,7 @@ class SpoSiteAddCommand extends SpoCommand {
             request: {
               Title: args.options.title,
               Url: args.options.url,
-              ShareByEmailEnabled: args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers,
+              ShareByEmailEnabled: args.options.shareByEmailEnabled,
               Description: args.options.description || '',
               Classification: args.options.classification || '',
               WebTemplate: 'SITEPAGEPUBLISHING#0',

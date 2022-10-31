@@ -35,7 +35,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  siteUrl: string;
   headerLayout?: HeaderLayout;
   headerEmphasis?: Emphasis;
   logoAlignment?: Alignment;
@@ -81,7 +81,7 @@ class SpoSiteChromeSetCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --siteUrl <siteUrl>'
       },
       {
         option: '--headerLayout [headerLayout]',
@@ -118,7 +118,7 @@ class SpoSiteChromeSetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
@@ -185,7 +185,7 @@ class SpoSiteChromeSetCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.url}/_api/web/SetChromeOptions`,
+      url: `${args.options.siteUrl}/_api/web/SetChromeOptions`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },

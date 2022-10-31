@@ -10,8 +10,11 @@ m365 spo tenant recyclebinitem restore [options]
 
 ## Options
 
-`-u, --url`
+`-u, --siteUrl <siteUrl>`
 : URL of the site to restore
+
+`--wait`
+: Wait for the site collection to be restored before completing the command
 
 --8<-- "docs/cmd/_global.md"
 
@@ -27,11 +30,11 @@ Restoring deleted site collections is by default asynchronous and depending on t
 Restore a deleted site collection from tenant recycle bin
 
 ```sh
-m365 spo tenant recyclebinitem restore --url https://contoso.sharepoint.com/sites/team
+m365 spo tenant recyclebinitem restore --siteUrl https://contoso.sharepoint.com/sites/team
 ```
 
 Restore a deleted site collection from tenant recycle bin and wait for completion
 
 ```sh
-m365 spo tenant recyclebinitem restore --url https://contoso.sharepoint.com/sites/team --wait
+m365 spo tenant recyclebinitem restore --siteUrl https://contoso.sharepoint.com/sites/team --wait
 ```

@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -11,6 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
+  confirm?: boolean;
 }
 
 class SpoWebRoleInheritanceResetCommand extends SpoCommand {
@@ -25,14 +27,26 @@ class SpoWebRoleInheritanceResetCommand extends SpoCommand {
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
         option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--confirm'
       }
     );
   }
@@ -50,21 +64,39 @@ class SpoWebRoleInheritanceResetCommand extends SpoCommand {
       logger.logToStderr(`Restore role inheritance of subsite at ${args.options.webUrl}...`);
     }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/resetroleinheritance`,
-      method: 'POST',
-      headers: {
-        'accept': 'application/json;odata=nometadata',
-        'content-type': 'application/json'
-      },
-      responseType: 'json'
+    const resetWebRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/resetroleinheritance`,
+          method: 'POST',
+          headers: {
+            'accept': 'application/json;odata=nometadata',
+            'content-type': 'application/json'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
-    try {
-      await request.post(requestOptions);
-    } 
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+    if (args.options.confirm) {
+      await resetWebRoleInheritance();
+    }
+    else {
+      const result = await Cli.prompt<{ continue: boolean }>({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to reset the role inheritance of ${args.options.webUrl}`
+      });
+
+      if (result.continue) {
+        await resetWebRoleInheritance();
+      }
     }
   }
 }

@@ -55,7 +55,7 @@ Get-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|[spo orgassetslibrary list](../cmd/spo/orgassetslibrary/orgassetslibrary-list.md)
 Get-SPOOrgNewsSite|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOPublicCdnOrigins|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site classic list](../cmd/spo/site/site-classic-list.md)
+Get-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site list](../cmd/spo/site/site-list.md)
 Get-SPOSiteCollectionAppCatalogs|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteContentMoveState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteDataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
@@ -103,7 +103,7 @@ New-SPOMigrationEncryptionParameters|Microsoft.Online.SharePoint.PowerShell|
 New-SPOMigrationPackage|Microsoft.Online.SharePoint.PowerShell|
 New-SPOPublicCdnOrigin|Microsoft.Online.SharePoint.PowerShell|
 New-SPOSdnProvider|Microsoft.Online.SharePoint.PowerShell|
-New-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site classic add](../cmd/spo/site/site-classic-add.md)
+New-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site add](../cmd/spo/site/site-add.md)
 New-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 New-SPOSiteSharingReportJob|Microsoft.Online.SharePoint.PowerShell|
 New-SPOTenantOrgRelation|Microsoft.Online.SharePoint.PowerShell|
@@ -481,7 +481,7 @@ Get-PnPTenantSequenceSite|PnP.PowerShell|
 Get-PnPTenantServicePrincipal|PnP.PowerShell|
 Get-PnPTenantServicePrincipalPermissionGrants|PnP.PowerShell|[spo serviceprincipal grant list](../cmd/spo/serviceprincipal/serviceprincipal-grant-list.md)
 Get-PnPTenantServicePrincipalPermissionRequests|PnP.PowerShell|[spo serviceprincipal permissionrequest list](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.md)
-Get-PnPTenantSite|PnP.PowerShell|[spo site get](../cmd/spo/site/site-get.md), [spo site classic list](../cmd/spo/site/site-classic-list.md)
+Get-PnPTenantSite|PnP.PowerShell|[spo site get](../cmd/spo/site/site-get.md), [spo site list](../cmd/spo/site/site-list.md)
 Get-PnPTenantSyncClientRestriction|PnP.PowerShell|
 Get-PnPTenantTemplate|PnP.PowerShell|
 Get-PnPTenantTheme|PnP.PowerShell|[spo theme get](../cmd/spo/theme/theme-get.md), [spo theme list](../cmd/spo/theme/theme-list.md)
@@ -786,7 +786,7 @@ Set-PnPTenant|PnP.PowerShell|[spo tenant settings set](../cmd/spo/tenant/tenant-
 Set-PnPTenantAppCatalogUrl|PnP.PowerShell|
 Set-PnPTenantCdnEnabled|PnP.PowerShell|[spo cdn set](../cmd/spo/cdn/cdn-set.md)
 Set-PnPTenantCdnPolicy|PnP.PowerShell|[spo cdn policy set](../cmd/spo/cdn/cdn-policy-set.md)
-Set-PnPTenantSite|PnP.PowerShell|[spo site classic set](../cmd/spo/site/site-classic-set.md)
+Set-PnPTenantSite|PnP.PowerShell|[spo site set](../cmd/spo/site/site-set.md)
 Set-PnPTenantSyncClientRestriction|PnP.PowerShell|
 Set-PnPTerm|PnP.PowerShell|
 Set-PnPTermGroup|PnP.PowerShell|

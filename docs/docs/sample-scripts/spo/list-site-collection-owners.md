@@ -25,7 +25,7 @@ This script helps you to list and export all site collection owners in your Shar
 
     $results = @()
     Write-host "Retrieving all sites..."
-    $allSPOSites = m365 spo site classic list -o json | ConvertFrom-Json
+    $allSPOSites = m365 spo site list | ConvertFrom-Json
     $siteCount = $allSPOSites.Count
 
     Write-Host "Processing $siteCount sites..."

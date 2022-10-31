@@ -92,11 +92,6 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
     ]);
   });
 
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(commands.CONVERSATIONMEMBER_REMOVE) !== -1), true);
-  });
-
   it('fails validation if the teamId is not a valid guid', async () => {
     const actual = await command.validate({
       options: {

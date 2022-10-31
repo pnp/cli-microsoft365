@@ -14,7 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: string;
-  name: string;
+  pageName: string;
   webUrl: string;
 }
 
@@ -40,7 +40,7 @@ class SpoPageControlGetCommand extends SpoCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '-n, --name <name>'
+        option: '-n, --pageName <pageName>'
       },
       {
         option: '-u, --webUrl <webUrl>'
@@ -61,8 +61,8 @@ class SpoPageControlGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let pageName: string = args.options.name;
-    if (args.options.name.indexOf('.aspx') < 0) {
+    let pageName: string = args.options.pageName;
+    if (args.options.pageName.indexOf('.aspx') < 0) {
       pageName += '.aspx';
     }
 
@@ -98,7 +98,7 @@ class SpoPageControlGetCommand extends SpoCommand {
       }
       else {
         if (this.verbose) {
-          logger.logToStderr(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
+          logger.logToStderr(`Control with ID ${args.options.id} not found on page ${args.options.pageName}`);
         }
       }
     }

@@ -10,7 +10,7 @@ m365 spo feature list [options]
 
 ## Options
 
-`-u, --url <url>`
+`-u, --webUrl <webUrl>`
 : URL of the site (collection) to retrieve the activated Features from
 
 `-s, --scope [scope]`
@@ -23,11 +23,11 @@ m365 spo feature list [options]
 Return details about Features activated in the specified site collection
 
 ```sh
-m365 spo feature list --url https://contoso.sharepoint.com/sites/test --scope Site
+m365 spo feature list --webUrl https://contoso.sharepoint.com/sites/test --scope Site
 ```
 
 Return details about Features activated in the specified site
 
 ```sh
-m365 spo feature list --url https://contoso.sharepoint.com/sites/test --scope Web
+m365 spo feature list --webUrl https://contoso.sharepoint.com/sites/test --scope Web
 ```

@@ -235,7 +235,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
     }
 
     const options: SpoWebGetCommandOptions = {
-      webUrl: args.options.url,
+      url: args.options.url,
       output: 'json',
       debug: this.debug,
       verbose: this.verbose

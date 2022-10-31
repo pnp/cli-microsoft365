@@ -82,7 +82,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const getCustomActionsSpy = sinon.spy((command as any), 'getCustomActions');
     const options = {
       debug: false,
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
     };
 
@@ -91,7 +91,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       assert(getRequestSpy.calledOnce);
       assert(getCustomActionsSpy.calledWith({
         debug: false,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web'
       }));
       assert(getCustomActionsSpy.calledOnce);
@@ -113,7 +113,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const getCustomActionsSpy = sinon.spy((command as any), 'getCustomActions');
     const options = {
       debug: false,
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site'
     };
 
@@ -122,7 +122,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       assert(getRequestSpy.calledOnce);
       assert(getCustomActionsSpy.calledWith({
         debug: false,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'Site'
       }));
       assert(getCustomActionsSpy.calledOnce);
@@ -143,7 +143,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     const options = {
       debug: false,
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site',
       output: 'json'
     };
@@ -176,7 +176,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       await command.action(logger, {
         options: {
           debug: true,
-          url: 'https://contoso.sharepoint.com'
+          webUrl: 'https://contoso.sharepoint.com'
         }
       });
       assert(getRequestSpy.calledTwice);
@@ -199,7 +199,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
     const options = {
       debug: false,
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: "All"
     };
 
@@ -207,7 +207,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       await assert.rejects(command.action(logger, { options: options } as any));
       assert(searchAllScopesSpy.calledWith(sinon.match(
         {
-          url: 'https://contoso.sharepoint.com'
+          webUrl: 'https://contoso.sharepoint.com'
         })));
       assert(searchAllScopesSpy.calledOnce);
     }
@@ -233,7 +233,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       options: {
         debug: false,
         verbose: false,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     });
@@ -257,7 +257,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       options: {
         debug: false,
         verbose: true,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     });
@@ -277,7 +277,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: false,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     }), new CommandError(err));
@@ -301,7 +301,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       options: {
         debug: false,
         verbose: true,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     }), new CommandError(err));
@@ -359,7 +359,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/abc' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/abc' } });
     assert(loggerLogSpy.calledWith([
       {
         Name: 'customaction2',
@@ -408,7 +408,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     await command.action(logger, { 
       options: { 
-        url: 'https://contoso.sharepoint.com/sites/abc',
+        webUrl: 'https://contoso.sharepoint.com/sites/abc',
         debug: true 
       } });
 
@@ -444,7 +444,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const actual = await command.validate({
       options:
         {
-          url: 'foo'
+          webUrl: 'foo'
         }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -454,7 +454,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const actual = await command.validate({
       options:
         {
-          url: "https://contoso.sharepoint.com"
+          webUrl: "https://contoso.sharepoint.com"
         }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -464,7 +464,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const actual = await command.validate({
       options:
         {
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: "Site"
         }
     }, commandInfo);
@@ -490,7 +490,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const actual = await command.validate({
       options:
         {
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: 'All'
         }
     }, commandInfo);
@@ -501,7 +501,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const actual = await command.validate({
       options:
         {
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: 'Site'
         }
     }, commandInfo);
@@ -512,7 +512,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const actual = await command.validate({
       options:
         {
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: 'Web'
         }
     }, commandInfo);
@@ -523,7 +523,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const scope = 'foo';
     const actual = await command.validate({
       options: {
-        url: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         scope: scope
       }
     }, commandInfo);
@@ -534,7 +534,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const scope = 123;
     const actual = await command.validate({
       options: {
-        url: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         scope: scope
       }
     }, commandInfo);
@@ -546,7 +546,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       {
         options:
           {
-            url: "https://contoso.sharepoint.com"
+            webUrl: "https://contoso.sharepoint.com"
           }
       }, commandInfo);
     assert.strictEqual(actual, true);

@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  taskId: string;
+  id: string;
   confirm?: boolean;
 }
 
@@ -44,7 +44,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --taskId <taskId>'
+        option: '-i, --id <id>'
       },
       {
         option: '--confirm'
@@ -55,8 +55,8 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.taskId)) {
-          return `${args.options.taskId} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
         }
 
         return true;
@@ -74,7 +74,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
             accept: 'application/json;odata=nometadata'
           },
           data: {
-            taskId: args.options.taskId
+            taskId: args.options.id
           },
           responseType: 'json'
         };
@@ -93,7 +93,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the site design task ${args.options.taskId}?`
+        message: `Are you sure you want to remove the site design task ${args.options.id}?`
       });
       
       if (result.continue) {
