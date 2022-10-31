@@ -1,5 +1,4 @@
 import { AxiosRequestConfig } from 'axios';
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -15,11 +14,9 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  id?: string;
   listTitle?: string;
   listId?: string;
   listUrl?: string;
-  title?: string;
 }
 
 class SpoListWebhookListCommand extends SpoCommand {
@@ -48,11 +45,9 @@ class SpoListWebhookListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
-        title: typeof args.options.title !== 'undefined'
+        listUrl: typeof args.options.listUrl !== 'undefined'
       });
     });
   }
@@ -71,12 +66,6 @@ class SpoListWebhookListCommand extends SpoCommand {
       {
         option: '--listUrl [listUrl]'
       },
-      {
-        option: '--id [id]'
-      },
-      {
-        option: '--title [title]'
-      }
     );
   }
 
@@ -86,12 +75,6 @@ class SpoListWebhookListCommand extends SpoCommand {
         const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
-        }
-
-        if (args.options.id) {
-          if (!validation.isValidGuid(args.options.id)) {
-            return `${args.options.id} is not a valid GUID`;
-          }
         }
 
         if (args.options.listId) {
@@ -106,34 +89,21 @@ class SpoListWebhookListCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'title', 'listId', 'listTitle', 'listUrl']);
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.title && this.verbose) {
-      logger.logToStderr(chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead`));
-    }
-
-    if (args.options.id && this.verbose) {
-      logger.logToStderr(chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead`));
-    }
-
     if (this.verbose) {
-      logger.logToStderr(`Retrieving webhook information for list ${args.options.id || args.options.listId || args.options.listUrl} in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving webhook information for list ${args.options.listTitle || args.options.listId || args.options.listUrl} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = `${args.options.webUrl}/_api/web`;
-    if (args.options.id) {
-      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.id)}')/Subscriptions`;
-    }
-    else if (args.options.listId) {
+
+    if (args.options.listId) {
       requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/Subscriptions`;
     }
     else if (args.options.listTitle) {
       requestUrl += `/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/Subscriptions`;
-    }
-    else if (args.options.title) {
-      requestUrl += `/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title)}')/Subscriptions`;
     }
     else if (args.options.listUrl) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);

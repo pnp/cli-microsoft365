@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  appId: string;
+  id: string;
   userId: string;
   confirm?: boolean;
 }
@@ -44,7 +44,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--appId <appId>'
+        option: '--id <id>'
       },
       {
         option: '--userId <userId>'
@@ -72,7 +72,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
       const endpoint: string = `${this.resource}/v1.0`;
 
       const requestOptions: any = {
-        url: `${endpoint}/users/${args.options.userId}/teamwork/installedApps/${args.options.appId}`,
+        url: `${endpoint}/users/${args.options.userId}/teamwork/installedApps/${args.options.id}`,
         headers: {
           'accept': 'application/json;odata.metadata=none'
         },
@@ -95,7 +95,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the app with id ${args.options.appId} for user ${args.options.userId}?`
+        message: `Are you sure you want to remove the app with id ${args.options.id} for user ${args.options.userId}?`
       });
       
       if (result.continue) {

@@ -8,12 +8,6 @@ Lists members of the specified Microsoft Teams team channel
 m365 teams channel member list [options]
 ```
 
-## Alias
-
-```sh
-m365 teams conversationmember list [options]
-```
-
 ## Options
 
 `-i, --teamId [teamId]`

@@ -16,7 +16,7 @@ m365 spo web add [options]
 `-d, --description [description]`
 : Subsite description
 
-`-u, --webUrl <webUrl>`
+`-u, --url <url>`
 : Subsite relative url
 
 `-w, --webTemplate <webTemplate>`
@@ -41,17 +41,17 @@ m365 spo web add [options]
 Create subsite using the _Team site_ template in the _en-US_ locale
 
 ```sh
-m365 spo web add --title Subsite --description Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033
+m365 spo web add --title Subsite --description Subsite --url subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033
 ```
 
 Create subsite with unique permissions using the default _en-US_ locale
 
 ```sh
-m365 spo web add --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --breakInheritance
+m365 spo web add --title Subsite --url subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --breakInheritance
 ```
 
 Create subsite with the same navigation as the parent site
 
 ```sh
-m365 spo web add --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --inheritNavigation
+m365 spo web add --title Subsite --url subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --inheritNavigation
 ```
