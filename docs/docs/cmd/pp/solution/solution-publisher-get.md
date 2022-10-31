@@ -49,3 +49,35 @@ Gets a specific publisher in a specific environment based on id as Admin
 ```sh
 m365 pp solution publisher get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e" --asAdmin
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "publisherid": "d21aab70-79e7-11dd-8874-00188b01e34f",
+      "uniquename": "MicrosoftCorporation",
+      "friendlyname": "MicrosoftCorporation",
+      "versionnumber": 1226559,
+      "isreadonly": false,
+      "description": "Uitgever van Microsoft-oplossingen",
+      "customizationprefix": "",
+      "customizationoptionvalueprefix": 0
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    friendlyname: MicrosoftCorporation
+    publisherid : d21aab70-79e7-11dd-8874-00188b01e34f
+    uniquename  : MicrosoftCorporation
+    ```
+
+=== "CSV"
+
+    ```csv
+    publisherid,uniquename,friendlyname
+    d21aab70-79e7-11dd-8874-00188b01e34f,MicrosoftCorporation,MicrosoftCorporation
+    ```
