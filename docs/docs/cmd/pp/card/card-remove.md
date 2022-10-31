@@ -1,4 +1,4 @@
-# card remove
+# pp card remove
 
 Removes the specified Microsoft Power Platform card in the specified Power Platform environment
 

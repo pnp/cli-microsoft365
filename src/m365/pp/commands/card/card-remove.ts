@@ -48,7 +48,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
         id: typeof args.options.id !== 'undefined',
         name: typeof args.options.name !== 'undefined',
         asAdmin: !!args.options.asAdmin,
-        confirm: (!(!args.options.confirm)).toString()
+        confirm: !!args.options.confirm
       });
     });
   }
