@@ -25,7 +25,7 @@ This script helps you to list all external users in all SharePoint Online sites.
 
     $results = @()
     Write-host "Retrieving all sites and check external users..."
-    $allSPOSites = m365 spo site classic list -o json | ConvertFrom-Json
+    $allSPOSites = m365 spo site list | ConvertFrom-Json
     $siteCount = $allSPOSites.Count
 
     Write-Host "Processing $siteCount sites..."

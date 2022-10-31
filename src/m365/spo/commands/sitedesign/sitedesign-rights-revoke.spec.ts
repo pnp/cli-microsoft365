@@ -96,7 +96,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } });
+    await command.action(logger, { options: { debug: false, confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -115,7 +115,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF,AdeleV' } });
+    await command.action(logger, { options: { debug: false, confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF,AdeleV' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -134,7 +134,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com,AdeleV@contoso.com' } });
+    await command.action(logger, { options: { debug: false, confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com,AdeleV@contoso.com' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -153,12 +153,12 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com, AdeleV@contoso.com' } });
+    await command.action(logger, { options: { debug: false, confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com, AdeleV@contoso.com' } });
     assert(loggerLogSpy.notCalled);
   });
 
   it('prompts before revoking access to the specified site design when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
+    await command.action(logger, { options: { debug: false, siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -170,7 +170,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
   it('aborts revoking access to the site design when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
+    await command.action(logger, { options: { debug: false, siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
     assert(postSpy.notCalled);
   });
 
@@ -181,7 +181,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
+    await command.action(logger, { options: { debug: false, siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
     assert(postStub.called);
   });
 
@@ -190,7 +190,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('File Not Found.' );
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports debug mode', () => {
@@ -208,7 +208,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
+      if (o.option.indexOf('--siteDesignId') > -1) {
         containsOption = true;
       }
     });
@@ -238,12 +238,12 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc', principals: 'PattiF' } }, commandInfo);
+    const actual = await command.validate({ options: { siteDesignId: 'abc', principals: 'PattiF' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the all required parameters are specified', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a', principals: 'PattiF' } }, commandInfo);
+    const actual = await command.validate({ options: { siteDesignId: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a', principals: 'PattiF' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

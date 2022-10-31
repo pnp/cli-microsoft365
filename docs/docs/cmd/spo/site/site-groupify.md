@@ -11,15 +11,9 @@ Connects site collection to an Microsoft 365 Group
 m365 spo site groupify [options]
 ```
 
-## Alias
-
-```sh
-m365 spo site groupify
-```
-
 ## Options
 
-`-u, --siteUrl <siteUrl>`
+`-u, --url <url>`
 : URL of the site collection being connected to new Microsoft 365 Group
 
 `-a, --alias <alias>`
@@ -51,25 +45,25 @@ When connecting site collection to an Microsoft 365 Group, SharePoint will creat
 Connect site collection to an Microsoft 365 Group
 
 ```sh
-m365 spo site groupify --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A'
+m365 spo site groupify --url https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A'
 ```
 
 Connect site collection to an Microsoft 365 Group and make the group public
 
 ```sh
-m365 spo site groupify --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --isPublic
+m365 spo site groupify --url https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --isPublic
 ```
 
 Connect site collection to an Microsoft 365 Group and set the group classification
 
 ```sh
-m365 spo site groupify --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --classification HBI
+m365 spo site groupify --url https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --classification HBI
 ```
 
 Connect site collection to an Microsoft 365 Group and keep the old home page
 
 ```sh
-m365 spo site groupify --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --keepOldHomepage
+m365 spo site groupify --url https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --keepOldHomepage
 ```
 
 ## More information

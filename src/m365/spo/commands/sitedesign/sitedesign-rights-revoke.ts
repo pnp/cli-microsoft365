@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  siteDesignId: string;
   principals: string;
   confirm?: boolean;
 }
@@ -45,7 +45,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-i, --siteDesignId <siteDesignId>'
       },
       {
         option: '-p, --principals <principals>'
@@ -59,8 +59,8 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.siteDesignId)) {
+          return `${args.options.siteDesignId} is not a valid GUID`;
         }
 
         return true;
@@ -81,7 +81,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
             accept: 'application/json;odata=nometadata'
           },
           data: {
-            id: args.options.id,
+            id: args.options.siteDesignId,
             principalNames: args.options.principals.split(',').map(p => p.trim())
           },
           responseType: 'json'
@@ -102,7 +102,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to revoke access to site design ${args.options.id} from the specified users?`
+        message: `Are you sure you want to revoke access to site design ${args.options.siteDesignId} from the specified users?`
       });
       
       if (result.continue) {

@@ -83,17 +83,17 @@ describe(commands.GROUP_USER_REMOVE, () => {
   });
 
   it('passes validation with parameters', async () => {
-    const actual = await command.validate({ options: { id: 10123123 } }, commandInfo);
+    const actual = await command.validate({ options: { groupId: 10123123 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('id must be a number', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { groupId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('userId must be a number', async () => {
-    const actual = await command.validate({ options: { id: 10, userId: 'abc' } }, commandInfo);
+  it('id must be a number', async () => {
+    const actual = await command.validate({ options: { groupId: 10, id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -120,7 +120,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { debug: true, id: 1231231 } });
+    await command.action(logger, { options: { debug: true, groupId: 1231231 } });
 
     assert(requestDeleteStub.called);
   });
@@ -133,7 +133,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, id: 1231231, userId: 989998789, confirm: true } });
+    await command.action(logger, { options: { debug: true, groupId: 1231231, id: 989998789, confirm: true } });
 
     assert(requestDeleteStub.called);
   });
@@ -150,7 +150,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { debug: true, id: 1231231, userId: 989998789 } });
+    await command.action(logger, { options: { debug: true, groupId: 1231231, id: 989998789 } });
 
     assert(requestDeleteStub.called);
   });
@@ -160,7 +160,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       { continue: false }
     ));
     
-    await command.action(logger, { options: { debug: false, id: 1231231, userId: 989998789 } });
+    await command.action(logger, { options: { debug: false, groupId: 1231231, id: 989998789 } });
 
     assert(promptStub.called);
   });
@@ -170,7 +170,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       { continue: false }
     ));  
 
-    await command.action(logger, { options: { debug: false, id: 1231231, userId: 989998789 } });
+    await command.action(logger, { options: { debug: false, groupId: 1231231, id: 989998789 } });
 
     assert(requests.length === 0);
   });

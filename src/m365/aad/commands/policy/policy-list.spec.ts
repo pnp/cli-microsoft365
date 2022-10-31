@@ -101,7 +101,7 @@ describe(commands.POLICY_LIST, () => {
     await command.action(logger, {
       options: {
         debug: false,
-        policyType: "authorization"
+        type: "authorization"
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -151,7 +151,7 @@ describe(commands.POLICY_LIST, () => {
     await command.action(logger, {
       options: {
         debug: false,
-        policyType: "tokenLifetime"
+        type: "tokenLifetime"
       }
     });
     assert(loggerLogSpy.calledWith([
@@ -319,7 +319,7 @@ describe(commands.POLICY_LIST, () => {
       return Promise.reject("An error has occurred.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, policyType: "foo" } } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: { debug: false, type: "foo" } } as any), new CommandError("An error has occurred."));
   });
 
   it('correctly handles API OData error for all policies', async () => {
@@ -330,81 +330,81 @@ describe(commands.POLICY_LIST, () => {
     await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError("An error has occurred."));
   });
 
-  it('accepts policyType to be activityBasedTimeout', async () => {
+  it('accepts type to be activityBasedTimeout', async () => {
     const actual = await command.validate({
       options:
       {
-        policyType: "activityBasedTimeout"
+        type: "activityBasedTimeout"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be authorization', async () => {
+  it('accepts type to be authorization', async () => {
     const actual = await command.validate({
       options:
       {
-        policyType: "authorization"
+        type: "authorization"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be claimsMapping', async () => {
+  it('accepts type to be claimsMapping', async () => {
     const actual = await command.validate({
       options:
       {
-        policyType: "claimsMapping"
+        type: "claimsMapping"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be homeRealmDiscovery', async () => {
+  it('accepts type to be homeRealmDiscovery', async () => {
     const actual = await command.validate({
       options:
       {
-        policyType: "homeRealmDiscovery"
+        type: "homeRealmDiscovery"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be identitySecurityDefaultsEnforcement', async () => {
+  it('accepts type to be identitySecurityDefaultsEnforcement', async () => {
     const actual = await command.validate({
       options:
       {
-        policyType: "identitySecurityDefaultsEnforcement"
+        type: "identitySecurityDefaultsEnforcement"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be tokenLifetime', async () => {
+  it('accepts type to be tokenLifetime', async () => {
     const actual = await command.validate({
       options:
       {
-        policyType: "tokenLifetime"
+        type: "tokenLifetime"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be tokenIssuance', async () => {
+  it('accepts type to be tokenIssuance', async () => {
     const actual = await command.validate({
       options:
       {
-        policyType: "tokenIssuance"
+        type: "tokenIssuance"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('rejects invalid policyType', async () => {
-    const policyType = 'foo';
+  it('rejects invalid type', async () => {
+    const type = 'foo';
     const actual = await command.validate({
       options: {
-        policyType: policyType
+        type: type
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
