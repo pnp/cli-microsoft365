@@ -8,12 +8,6 @@ Removes role from the specified Azure AD app registration
 m365 aad app role remove [options]
 ```
 
-## Alias
-
-```sh
-m365 aad app role delete [options]
-```
-
 ## Options
 
 `--appId [appId]`

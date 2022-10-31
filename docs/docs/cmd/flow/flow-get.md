@@ -13,7 +13,7 @@ m365 flow get [options]
 `-n, --name <name>`
 : The name of the Power Automate flow to get information about
 
-`-e, --environment <environment>`
+`-e, --environmentNameName <environmentName>`
 : The name of the environment for which to retrieve available flows
 
 `--asAdmin`
@@ -37,11 +37,11 @@ If the Power Automate flow with the name you specified doesn't exist, you will g
 Get information about the specified Power Automate flow owned by the currently signed-in user
 
 ```sh
-m365 flow get --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d
+m365 flow get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d
 ```
 
 Get information about the specified Power Automate flow owned by another user
 
 ```sh
-m365 flow get --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin
+m365 flow get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin
 ```

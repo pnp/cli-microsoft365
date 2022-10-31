@@ -25,6 +25,9 @@ m365 spo listitem roleinheritance reset [options]
 `--listUrl [listUrl]`
 : Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`
 
+`--confirm`
+: Do not prompt for confirmation before resetting role inheritance.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
@@ -41,8 +44,8 @@ Restore role inheritance of list item with id 8 from list with title _test_ loca
 m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --listItemId 8 --listTitle test
 ```
 
-Restore role inheritance of a list item with a specific id in a list retrieved by server relative URL located in a specific site
+Restore role inheritance of a list item with a specific id in a list retrieved by server relative URL located in a specific site without prompting for confirmation
 
 ```sh
-m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --listItemId 8 --listUrl /sites/project-x/lists/test
+m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --listItemId 8 --listUrl /sites/project-x/lists/test --confirm
 ```

@@ -11,8 +11,8 @@ interface CommandArgs {
 
 export interface Options extends GlobalOptions {
   appId?: string;
-  displayName?: string;
-  objectId?: string;
+  appDisplayName?: string;
+  appObjectId?: string;
 }
 
 class AadSpGetCommand extends GraphCommand {
@@ -37,8 +37,8 @@ class AadSpGetCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         appId: (!(!args.options.appId)).toString(),
-        displayName: (!(!args.options.displayName)).toString(),
-        objectId: (!(!args.options.objectId)).toString()
+        appDisplayName: (!(!args.options.appDisplayName)).toString(),
+        appObjectId: (!(!args.options.appObjectId)).toString()
       });
     });
   }
@@ -49,10 +49,10 @@ class AadSpGetCommand extends GraphCommand {
         option: '-i, --appId [appId]'
       },
       {
-        option: '-n, --displayName [displayName]'
+        option: '-n, --appDisplayName [appDisplayName]'
       },
       {
-        option: '--objectId [objectId]'
+        option: '--appObjectId [appObjectId]'
       }
     );
   }
@@ -64,8 +64,8 @@ class AadSpGetCommand extends GraphCommand {
           return `${args.options.appId} is not a valid appId GUID`;
         }
     
-        if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
-          return `${args.options.objectId} is not a valid objectId GUID`;
+        if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
+          return `${args.options.appObjectId} is not a valid objectId GUID`;
         }
     
         return true;
@@ -74,17 +74,17 @@ class AadSpGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'displayName', 'objectId']);
+    this.optionSets.push(['appId', 'appDisplayName', 'appObjectId']);
   }
 
   private getSpId(args: CommandArgs): Promise<string> {
-    if (args.options.objectId) {
-      return Promise.resolve(args.options.objectId);
+    if (args.options.appObjectId) {
+      return Promise.resolve(args.options.appObjectId);
     }
 
     let spMatchQuery: string = '';
-    if (args.options.displayName) {
-      spMatchQuery = `displayName eq '${encodeURIComponent(args.options.displayName)}'`;
+    if (args.options.appDisplayName) {
+      spMatchQuery = `displayName eq '${encodeURIComponent(args.options.appDisplayName)}'`;
     }
     else if (args.options.appId) {
       spMatchQuery = `appId eq '${encodeURIComponent(args.options.appId)}'`;
@@ -108,7 +108,7 @@ class AadSpGetCommand extends GraphCommand {
         }
 
         if (response.value.length > 1) {
-          return Promise.reject(`Multiple Azure AD apps with name ${args.options.displayName} found: ${response.value.map(x => x.id)}`);
+          return Promise.reject(`Multiple Azure AD apps with name ${args.options.appDisplayName} found: ${response.value.map(x => x.id)}`);
         }
 
         return Promise.resolve(spItem.id);

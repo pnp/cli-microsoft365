@@ -10,7 +10,7 @@ m365 spo web get [options]
 
 ## Options
 
-`-u, --webUrl <webUrl>`
+`-u, --url <url>`
 : URL of the site for which to retrieve the information
 
 `--withGroups`
@@ -23,11 +23,11 @@ m365 spo web get [options]
 Retrieve information about the site _https://contoso.sharepoint.com/subsite_
 
 ```sh
-m365 spo web get --webUrl https://contoso.sharepoint.com/subsite
+m365 spo web get --url https://contoso.sharepoint.com/subsite
 ```
 
 Retrieve information about the site _https://contoso.sharepoint.com/subsite_ along with associated groups for the web
 
 ```sh
-m365 spo web get --webUrl https://contoso.sharepoint.com/subsite --withGroups
+m365 spo web get --url https://contoso.sharepoint.com/subsite --withGroups
 ```

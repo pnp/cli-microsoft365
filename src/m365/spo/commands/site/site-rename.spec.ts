@@ -105,7 +105,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', verbose: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', verbose: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -133,7 +133,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { output: 'json', siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed' } });
+    await command.action(logger, { options: { output: 'json', url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed' } });
     assert(loggerLogSpy.calledWith({
       "Option": 0,
       "Reserve": null,
@@ -177,7 +177,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressMarketplaceAppCheck: true, verbose: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressMarketplaceAppCheck: true, verbose: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -207,7 +207,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressWorkflow2013Check: true, verbose: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressWorkflow2013Check: true, verbose: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -237,7 +237,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', newSiteTitle: "RenamedSite", suppressWorkflow2013Check: true, suppressMarketplaceAppCheck: true, verbose: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', newTitle: "RenamedSite", suppressWorkflow2013Check: true, suppressMarketplaceAppCheck: true, verbose: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -328,7 +328,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', wait: true, debug: true, verbose: true } } as any);
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', newUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', wait: true, debug: true, verbose: true } } as any);
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -388,8 +388,8 @@ describe(commands.SITE_RENAME, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        siteUrl: "https://contoso.sharepoint.com/sites/site1-reject",
-        newSiteUrl: "https://contoso.sharepoint.com/sites/site1-reject-renamed",
+        url: "https://contoso.sharepoint.com/sites/site1-reject",
+        newUrl: "https://contoso.sharepoint.com/sites/site1-reject-renamed",
         wait: true,
         verbose: true
       }
@@ -426,8 +426,8 @@ describe(commands.SITE_RENAME, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        siteUrl: "https://contoso.sharepoint.com/sites/site1-reject",
-        newSiteUrl: "https://contoso.sharepoint.com/sites/site1-reject-renamed",
+        url: "https://contoso.sharepoint.com/sites/site1-reject",
+        newUrl: "https://contoso.sharepoint.com/sites/site1-reject-renamed",
         wait: true,
         verbose: true
       }
@@ -462,8 +462,8 @@ describe(commands.SITE_RENAME, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        siteUrl: "https://contoso.sharepoint.com/sites/old",
-        newSiteUrl: "https://contoso.sharepoint.com/sites/new",
+        url: "https://contoso.sharepoint.com/sites/old",
+        newUrl: "https://contoso.sharepoint.com/sites/new",
         wait: true
       }
     } as any), new CommandError("An error has occurred"));
@@ -480,38 +480,38 @@ describe(commands.SITE_RENAME, () => {
     assert(containsdebugOption);
   });
 
-  it('accepts newSiteUrl parameter', async () => {
-    const actual = await command.validate({ options: { siteUrl: "https://contoso.sharepoint.com/", newSiteUrl: "https://contoso.sharepoint.com/sites/new" } }, commandInfo);
+  it('accepts newUrl parameter', async () => {
+    const actual = await command.validate({ options: { url: "https://contoso.sharepoint.com/", newUrl: "https://contoso.sharepoint.com/sites/new" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts both newSiteUrl and newSiteTitle', async () => {
-    const actual = await command.validate({ options: { siteUrl: "https://contoso.sharepoint.com/", newSiteUrl: "https://contoso.sharepoint.com/sites/new", newSiteTitle: "New Site" } }, commandInfo);
+  it('accepts both newUrl and newTitle', async () => {
+    const actual = await command.validate({ options: { url: "https://contoso.sharepoint.com/", newUrl: "https://contoso.sharepoint.com/sites/new", newTitle: "New Site" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('accepts suppressMarketplaceAppCheck flag', async () => {
-    const actual = await command.validate({ options: { siteUrl: "https://contoso.sharepoint.com/", newSiteUrl: "https://contoso.sharepoint.com/sites/new", newSiteTitle: "New Site", suppressMarketplaceAppCheck: true } }, commandInfo);
+    const actual = await command.validate({ options: { url: "https://contoso.sharepoint.com/", newUrl: "https://contoso.sharepoint.com/sites/new", newTitle: "New Site", suppressMarketplaceAppCheck: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('accepts suppressWorkflow2013Check flag', async () => {
-    const actual = await command.validate({ options: { siteUrl: "https://contoso.sharepoint.com/", newSiteUrl: "https://contoso.sharepoint.com/sites/new", newSiteTitle: "New Site", suppressWorkflow2013Check: true } }, commandInfo);
+    const actual = await command.validate({ options: { url: "https://contoso.sharepoint.com/", newUrl: "https://contoso.sharepoint.com/sites/new", newTitle: "New Site", suppressWorkflow2013Check: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('accepts wait flag', async () => {
-    const actual = await command.validate({ options: { siteUrl: "https://contoso.sharepoint.com/", newSiteUrl: "https://contoso.sharepoint.com/sites/new", newSiteTitle: "New Site", wait: true } }, commandInfo);
+    const actual = await command.validate({ options: { url: "https://contoso.sharepoint.com/", newUrl: "https://contoso.sharepoint.com/sites/new", newTitle: "New Site", wait: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('rejects missing newSiteUrl', async () => {
-    const actual = await command.validate({ options: { siteUrl: "https://contoso.sharepoint.com", newSiteTitle: "New Site" } }, commandInfo);
-    assert.strictEqual(actual, `Required option newSiteUrl not specified`);
+  it('rejects missing newUrl', async () => {
+    const actual = await command.validate({ options: { url: "https://contoso.sharepoint.com", newTitle: "New Site" } }, commandInfo);
+    assert.strictEqual(actual, `Required option newUrl not specified`);
   });
 
-  it('rejects when newSiteUrl is the same as siteUrl', async () => {
-    const actual = await command.validate({ options: { siteUrl: "https://contoso.sharepoint.com/sites/target", newSiteUrl: "https://contoso.sharepoint.com/sites/target" } }, commandInfo);
+  it('rejects when newUrl is the same as url', async () => {
+    const actual = await command.validate({ options: { url: "https://contoso.sharepoint.com/sites/target", newUrl: "https://contoso.sharepoint.com/sites/target" } }, commandInfo);
     assert.strictEqual(actual, `The new URL cannot be the same as the target URL.`);
   });
 });

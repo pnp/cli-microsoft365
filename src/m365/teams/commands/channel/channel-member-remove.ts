@@ -40,10 +40,6 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
     return 'Remove the specified member from the specified Microsoft Teams private or shared team channel';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.CONVERSATIONMEMBER_REMOVE];
-  }
-
   constructor() {
     super();
 
@@ -126,8 +122,6 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, commands.CONVERSATIONMEMBER_REMOVE, commands.CHANNEL_MEMBER_REMOVE);
-
     const removeMember: () => Promise<void> = async (): Promise<void> => {
       try {
         await this.removeMemberFromChannel(args);

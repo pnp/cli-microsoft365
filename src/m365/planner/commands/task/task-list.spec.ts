@@ -653,19 +653,6 @@ describe(commands.TASK_LIST, () => {
     assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
   });
 
-  it('correctly lists planner tasks with bucketName, deprecated planName, and ownerGroupName', async () => {
-    const options: any = {
-      debug: false,
-      bucketName: 'Planner Bucket A',
-      planName: 'My Planner Plan',
-      ownerGroupName: 'My Planner Group',
-      verbose: true
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
-  });
-
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));

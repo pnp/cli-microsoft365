@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  pageName: string;
   webUrl: string;
   sectionTemplate: string;
   order?: number;
@@ -47,7 +47,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-n, --name <name>'
+        option: '-n, --pageName <pageName>'
       },
       {
         option: '-u, --webUrl <webUrl>'
@@ -80,7 +80,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let pageFullName: string = args.options.name.toLowerCase();
+    let pageFullName: string = args.options.pageName.toLowerCase();
     if (pageFullName.indexOf('.aspx') < 0) {
       pageFullName += '.aspx';
     }

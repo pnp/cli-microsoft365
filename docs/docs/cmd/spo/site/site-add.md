@@ -46,9 +46,6 @@ m365 spo site add [options]
 `--siteDesignId [siteDesignId]`
 : Id of the custom site design to use to create the site. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies to type CommunicationSite)
 
-`--allowFileSharingForGuestUsers`
-: (deprecated. Use `shareByEmailEnabled` instead) Determines whether it's allowed to share file with guests (applies to type CommunicationSite)
-
 `--shareByEmailEnabled`
 : Determines whether it's allowed to share file with guests (applies to type CommunicationSite)
 
@@ -87,9 +84,9 @@ The value of the `--storageQuota` option must not exceed the company's available
 
 The value of the `--storageQuotaWarningLevel` option must not exceed the the value of the `--storageQuota` option.
 
-If you try to create a site with the same URL as a site that has been previously moved to the recycle bin, you will get an error. To avoid this error, you can use the `--removeDeletedSite` option. Prior to creating the site, the spo site classic add command will check if the site with the specified URL has been previously moved to the recycle bin and if so, will remove it. Because removing sites from the recycle bin might take a moment, it should be used in conjunction with the `--wait` option so that the new site is not created before the old site is fully removed.
+If you try to create a site with the same URL as a site that has been previously moved to the recycle bin, you will get an error. To avoid this error, you can use the `--removeDeletedSite` option. Prior to creating the site, the spo site add command will check if the site with the specified URL has been previously moved to the recycle bin and if so, will remove it. Because removing sites from the recycle bin might take a moment, it should be used in conjunction with the `--wait` option so that the new site is not created before the old site is fully removed.
 
-Deleting and creating classic site collections is by default asynchronous and depending on the current state of Office 365, might take up to few minutes. If you're building a script with steps that require the site to be fully provisioned, you should use the `--wait` flag. When using this flag, the spo site classic add command will keep running until it received confirmation from Office 365 that the site has been fully provisioned.
+Deleting and creating classic site collections is by default asynchronous and depending on the current state of Office 365, might take up to few minutes. If you're building a script with steps that require the site to be fully provisioned, you should use the `--wait` flag. When using this flag, the spo site add command will keep running until it received confirmation from Office 365 that the site has been fully provisioned.
 
 ## Remarks for modern sites
 
