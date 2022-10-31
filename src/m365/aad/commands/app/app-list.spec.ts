@@ -91,8 +91,7 @@ describe(commands.APP_LIST, () => {
     await command.action(logger, {
       options: {}
     });
-    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-    assert.deepStrictEqual(call.args[0], [
+    assert(loggerLogSpy.calledWith([
       {
         "id": "340a4aa3-1af6-43ac-87d8-189819003952",
         "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
