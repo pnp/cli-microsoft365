@@ -126,7 +126,6 @@ class SpoFileVersionRemoveCommand extends SpoCommand {
     }
     const requestOptions: any = {
       url: requestUrl,
-      method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
