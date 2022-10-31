@@ -93,10 +93,11 @@ class TeamsCacheRemoveCommand extends GraphCommand {
 
   private async clearTeamsCache(logger: Logger): Promise<void> {
     try {
-      const folderExists = await this.checkIfCacheFolderExists(logger);
+      const filePath = this.getFilePath(logger);
+      const folderExists = await this.checkIfCacheFolderExists(filePath, logger);
       if (folderExists) {
         await this.killRunningProcess(logger);
-        await this.removeCacheFiles(logger);
+        await this.removeCacheFiles(filePath, logger);
         logger.logToStderr('Teams cache cleared!');
       }
       else {
@@ -108,12 +109,13 @@ class TeamsCacheRemoveCommand extends GraphCommand {
     }
   }
 
-  private async checkIfCacheFolderExists(logger: Logger): Promise<boolean> {
+  private getFilePath(logger: Logger): string {
+    const platform = process.platform;
+
     if (this.verbose) {
-      logger.logToStderr('Checking if cache folder exists');
+      logger.logToStderr(`Getting filePath of Teams cache folder for platform ${platform}`);
     }
 
-    const platform = process.platform;
     let filePath = '';
 
     switch (platform) {
@@ -123,6 +125,14 @@ class TeamsCacheRemoveCommand extends GraphCommand {
       case 'darwin':
         filePath = `${homedir}/Library/Application Support/Microsoft/Teams`;
         break;
+    }
+
+    return filePath;
+  }
+
+  private async checkIfCacheFolderExists(filePath: string, logger: Logger): Promise<boolean> {
+    if (this.verbose) {
+      logger.logToStderr(`Checking if cache folder exists for filePath ${filePath}`);
     }
 
     return fs.existsSync(filePath);
@@ -174,7 +184,7 @@ class TeamsCacheRemoveCommand extends GraphCommand {
     }
   }
 
-  private async removeCacheFiles(logger: Logger): Promise<void> {
+  private async removeCacheFiles(filePath: string, logger: Logger): Promise<void> {
     if (this.verbose) {
       logger.logToStderr('Clear Teams cached files');
     }
