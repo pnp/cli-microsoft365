@@ -17,7 +17,7 @@ m365 spo hubsite register [options]
 
 ## Remarks
 
-!!! attention
+!!! important
     To use this command you must be a global administrator.
 
 If the specified site collection is already registered as a hub site, you will get a `This site is already a HubSite.` error.
