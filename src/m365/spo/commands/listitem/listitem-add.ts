@@ -13,7 +13,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
@@ -123,7 +123,6 @@ class SpoListItemAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-
       let requestUrl = `${args.options.webUrl}/_api/web`;
 
       if (args.options.listId) {
@@ -278,6 +277,7 @@ class SpoListItemAddCommand extends SpoCommand {
       'listId',
       'listUrl',
       'webUrl',
+      '_',
       'contentType',
       'folder',
       'debug',
