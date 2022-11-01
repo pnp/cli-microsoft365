@@ -16,9 +16,6 @@ m365 planner bucket list [options]
 `--planTitle [planTitle]`
 : Title of the plan to list the buckets of. Specify either `planId` or `planTitle` but not both.
 
-`--planName [planName]`
-: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
-
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
@@ -45,7 +42,7 @@ m365 planner bucket list --planTitle "My Plan" --ownerGroupName "My Group"
 
 === "JSON"
 
-    ``` json
+    ```json
     [
       {
         "name": "My Planner Bucket",
@@ -58,7 +55,7 @@ m365 planner bucket list --planTitle "My Plan" --ownerGroupName "My Group"
 
 === "Text"
 
-    ``` text
+    ```text
     id                            name               planId                        orderHint
     ----------------------------  -----------------  ----------------------------  -------------------
     ttEB_Uj690STdR3GC1MIDZgANq1U  My Planner Bucket  xqQg5FS2LkCp935s-FIFm2QAFkHM  8585363889524958496
@@ -66,7 +63,7 @@ m365 planner bucket list --planTitle "My Plan" --ownerGroupName "My Group"
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     id,name,planId,orderHint
     ttEB_Uj690STdR3GC1MIDZgANq1U,My Planner Bucket,xqQg5FS2LkCp935s-FIFm2QAFkHM,8585363889524958496
     ```

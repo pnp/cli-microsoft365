@@ -37,3 +37,38 @@ Gets the count of daily active users in the reporting period by product for the 
 ```sh
 m365 tenant report activeusercounts --period D7 --output json > "activeusercounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Office 365": "1",
+        "Exchange": "5",
+        "OneDrive": "4",
+        "SharePoint": "3",
+        "Skype For Business": "2",
+        "Yammer": "3",
+        "Teams": "1",
+        "Report Date": "2022-10-19",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Office 365,Exchange,OneDrive,SharePoint,Skype For Business,Yammer,Teams,Report Date,Report Period
+    2022-10-25,1,5,4,3,2,3,1,2022-10-19,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Office 365,Exchange,OneDrive,SharePoint,Skype For Business,Yammer,Teams,Report Date,Report Period
+    2022-10-25,1,5,4,3,2,3,1,2022-10-19,7
+    ```

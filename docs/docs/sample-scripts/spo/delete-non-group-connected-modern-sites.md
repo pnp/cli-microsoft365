@@ -14,7 +14,7 @@ When you delete Microsoft 365 groups, the modern group-connected team sites get 
 
     ```powershell
     $sparksjoy = "Cat Lovers United", "Extranet", "Hub"
-    $sites = m365 spo site classic list -o json |ConvertFrom-Json
+    $sites = m365 spo site list |ConvertFrom-Json
     $sites = $sites | where {  $_.template -eq "SITEPAGEPUBLISHING#0" -or $_.template -eq "STS#3" -and -not ($sparksjoy -contains $_.Title)}
     if ($sites.Count -eq 0) { break }
     $sites | Format-Table Title, Url, Template
@@ -26,7 +26,7 @@ When you delete Microsoft 365 groups, the modern group-connected team sites get 
         $progress++
         write-host $progress / $total":" $site.Title
         write-host $site.Url
-        m365 spo site classic remove --url $site.Url
+        m365 spo site remove --url $site.Url
     }
     ```
 
@@ -55,7 +55,7 @@ When you delete Microsoft 365 groups, the modern group-connected team sites get 
         sitestoremove+=("$site")
       fi
 
-    done < <(m365 spo site classic list -o json | jq -c '.[] | select(.Template == "SITEPAGEPUBLISHING#0" or .Template == "STS#3")')
+    done < <(m365 spo site list | jq -c '.[] | select(.Template == "SITEPAGEPUBLISHING#0" or .Template == "STS#3")')
 
     if [ ${#sitestoremove[@]} = 0 ]; then
       exit 1
@@ -69,6 +69,6 @@ When you delete Microsoft 365 groups, the modern group-connected team sites get 
       siteUrl=$(echo ${site} | jq -r '.Url')
       echo "Deleting site..."
       echo $siteUrl
-      m365 spo site classic remove --url $siteUrl
+      m365 spo site remove --url $siteUrl
     done
     ```

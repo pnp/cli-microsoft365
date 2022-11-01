@@ -8,12 +8,6 @@ Retrieve information about the specified plan
 m365 planner plan get [options]
 ```
 
-## Alias
-
-```sh
-m365 planner plan details get [options]
-```
-
 ## Options
 
 `-i, --id [id]`
@@ -21,12 +15,6 @@ m365 planner plan details get [options]
 
 `-t, --title [title]`
 : Title of the plan. Specify either `id` or `title` but not both.
-
-`--planId [planId]`
-: (deprecated. Use `id` instead) ID of the plan. Specify either `planId` or `planTitle` but not both.
-
-`---planTitle [planTitle]`
-: (deprecated. Use `title` instead) Title of the plan. Specify either `planId` or `planTitle` but not both.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title` or the deprecated `planTitle`.
@@ -60,7 +48,7 @@ m365 planner plan get --title "MyPlan" --ownerGroupName "My Planner Group"
 
 === "JSON"
 
-    ``` json
+    ```json
     {
       "createdDateTime": "2015-03-30T18:36:49.2407981Z",
       "owner": "ebf3b108-5234-4e22-b93d-656d7dae5874",
@@ -117,7 +105,7 @@ m365 planner plan get --title "MyPlan" --ownerGroupName "My Planner Group"
 
 === "Text"
 
-    ``` text
+    ```text
     createdDateTime: 2015-03-30T18:36:49.2407981Z
     id             : xqQg5FS2LkCp935s-FIFm2QAFkHM
     owner          : ebf3b108-5234-4e22-b93d-656d7dae5874
@@ -126,7 +114,7 @@ m365 planner plan get --title "MyPlan" --ownerGroupName "My Planner Group"
 
 === "CSV"
 
-    ``` text
+    ```csv
     id,title,createdDateTime,owner
     xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
     ```

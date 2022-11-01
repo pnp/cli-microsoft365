@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: number;
+  messageId: number;
   enable?: string;
   confirm?: boolean;
 }
@@ -44,7 +44,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--id <id>'
+        option: '--messageId <messageId>'
       },
       {
         option: '--enable [enable]'
@@ -58,8 +58,8 @@ class YammerMessageLikeSetCommand extends YammerCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && typeof args.options.id !== 'number') {
-          return `${args.options.id} is not a number`;
+        if (args.options.messageId && typeof args.options.messageId !== 'number') {
+          return `${args.options.messageId} is not a number`;
         }
 
         if (args.options.enable &&
@@ -84,7 +84,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
         },
         responseType: 'json',
         data: {
-          message_id: args.options.id
+          message_id: args.options.messageId
         }
       };
 
@@ -106,7 +106,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
         await executeLikeAction();
       }
       else {
-        const messagePrompt = `Are you sure you want to unlike message ${args.options.id}?`;
+        const messagePrompt = `Are you sure you want to unlike message ${args.options.messageId}?`;
 
         const result = await Cli.prompt<{ continue: boolean }>({
           type: 'confirm',

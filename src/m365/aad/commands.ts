@@ -2,11 +2,9 @@ const prefix: string = 'aad';
 
 export default {
   APP_ADD: `${prefix} app add`,
-  APP_DELETE: `${prefix} app delete`,
   APP_GET: `${prefix} app get`,
   APP_REMOVE: `${prefix} app remove`,  
   APP_ROLE_ADD: `${prefix} app role add`,
-  APP_ROLE_DELETE: `${prefix} app role delete`,
   APP_ROLE_LIST: `${prefix} app role list`,
   APP_ROLE_REMOVE: `${prefix} app role remove`,
   APP_SET: `${prefix} app set`,
@@ -39,7 +37,6 @@ export default {
   O365GROUP_REPORT_ACTIVITYFILECOUNTS: `${prefix} o365group report activityfilecounts`,
   O365GROUP_REPORT_ACTIVITYGROUPCOUNTS: `${prefix} o365group report activitygroupcounts`,
   O365GROUP_REPORT_ACTIVITYSTORAGE: `${prefix} o365group report activitystorage`,
-  O365GROUP_RESTORE: `${prefix} o365group restore`,
   O365GROUP_USER_ADD: `${prefix} o365group user add`,
   O365GROUP_USER_LIST: `${prefix} o365group user list`,
   O365GROUP_USER_REMOVE: `${prefix} o365group user remove`,
@@ -56,6 +53,7 @@ export default {
   SP_ADD: `${prefix} sp add`,
   SP_GET: `${prefix} sp get`,
   USER_GET: `${prefix} user get`,
+  USER_GUEST_ADD: `${prefix} user guest add`,
   USER_HIBP: `${prefix} user hibp`,
   USER_LIST: `${prefix} user list`,
   USER_PASSWORD_VALIDATE: `${prefix} user password validate`,

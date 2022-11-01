@@ -8,12 +8,6 @@ Sends an email
 m365 outlook mail send [options]
 ```
 
-## Alias
-
-```sh
-m365 outlook sendmail [options]
-```
-
 ## Options
 
 `-s, --subject <subject>`

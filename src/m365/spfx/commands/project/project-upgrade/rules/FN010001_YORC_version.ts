@@ -44,7 +44,7 @@ export class FN010001_YORC_version extends JsonRule {
       return;
     }
 
-    if (project.yoRcJson["@microsoft/generator-sharepoint"].version !== this.version) {
+    if (project.yoRcJson["@microsoft/generator-sharepoint"]?.version !== this.version) {
       const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.version');
       this.addFindingWithPosition(findings, node);
     }
