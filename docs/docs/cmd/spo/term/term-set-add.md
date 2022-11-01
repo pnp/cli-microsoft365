@@ -33,6 +33,11 @@ m365 spo term set add [options]
 !!! important
     To use this command you have to have permissions to access the tenant admin site.
 
+## Remarks
+
+!!! warning "Escaping JSON in PowerShell"
+    When using the `--customProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../user-guide/using-cli.md#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../user-guide/using-cli.md#passing-complex-content-into-cli-options) instead.
+
 ## Examples
 
 Add taxonomy term set to the term group specified by ID
@@ -56,5 +61,5 @@ m365 spo term set add --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-
 Add taxonomy term set and set its custom properties
 
 ```sh
-m365 spo term set add --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --customProperties '`{"Property":"Value"}`'
+m365 spo term set add --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --customProperties '{"Property":"Value"}'
 ```

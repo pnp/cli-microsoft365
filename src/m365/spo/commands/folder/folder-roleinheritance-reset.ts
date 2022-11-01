@@ -1,10 +1,12 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import { AxiosRequestConfig } from 'axios';
+import { formatting } from '../../../../utils/formatting';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -63,10 +65,20 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
+    const roleFolderUrl: string = urlUtil.getWebRelativePath(args.options.webUrl, args.options.folderUrl);
+    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
+
     const resetFolderRoleInheritance: () => Promise<void> = async (): Promise<void> => {
       try {
+        if (roleFolderUrl.split('/').length === 2) {
+          requestUrl += `GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+        }
+        else {
+          requestUrl += `GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields`;
+        }
         const requestOptions: AxiosRequestConfig = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${args.options.folderUrl}')/ListItemAllFields/resetroleinheritance`,
+          url: `${requestUrl}/resetroleinheritance`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },

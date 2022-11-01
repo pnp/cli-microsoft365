@@ -92,6 +92,7 @@ nav:
         - sp get: 'cmd/aad/sp/sp-get.md'
       - user:
         - user get: 'cmd/aad/user/user-get.md'
+        - user guest add: 'cmd/aad/user/user-guest-add.md'
         - user hibp: 'cmd/aad/user/user-hibp.md'
         - user list: 'cmd/aad/user/user-list.md'
         - user password validate: 'cmd/aad/user/user-password-validate.md'
@@ -175,6 +176,7 @@ nav:
       - mail:
         - mail send: 'cmd/outlook/mail/mail-send.md'
       - message:
+        - message get: 'cmd/outlook/message/message-get.md' 
         - message list: 'cmd/outlook/message/message-list.md'
         - message move: 'cmd/outlook/message/message-move.md'
       - report:
@@ -406,7 +408,6 @@ nav:
         - hubsite rights grant: 'cmd/spo/hubsite/hubsite-rights-grant.md'
         - hubsite rights revoke: 'cmd/spo/hubsite/hubsite-rights-revoke.md'
         - hubsite set: 'cmd/spo/hubsite/hubsite-set.md'
-        - hubsite theme sync: 'cmd/spo/hubsite/hubsite-theme-sync.md'
         - hubsite unregister: 'cmd/spo/hubsite/hubsite-unregister.md'
       - knowledgehub:
         - knowledgehub get: 'cmd/spo/knowledgehub/knowledgehub-get.md'
@@ -522,8 +523,9 @@ nav:
         - site ensure: 'cmd/spo/site/site-ensure.md'
         - site get: 'cmd/spo/site/site-get.md'
         - site groupify: 'cmd/spo/site/site-groupify.md'
-        - site hubsite disconnect: 'cmd/spo/site/site-hubsite-disconnect.md'
         - site hubsite connect: 'cmd/spo/site/site-hubsite-connect.md'
+        - site hubsite disconnect: 'cmd/spo/site/site-hubsite-disconnect.md'
+        - site hubsite theme sync: 'cmd/spo/site/site-hubsite-theme-sync.md'
         - site list: 'cmd/spo/site/site-list.md'
         - site recyclebinitem list: 'cmd/spo/site/site-recyclebinitem-list.md'
         - site recyclebinitem restore: 'cmd/spo/site/site-recyclebinitem-restore.md'

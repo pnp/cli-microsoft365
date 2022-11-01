@@ -43,26 +43,19 @@ The schema extension owner is the ID of the Azure AD application that is the own
 
 The target types are the set of Microsoft Graph resource types (that support schema extensions) that this schema extension definition can be applied to. This option is specified as a comma-separated list
 
-When specifying the JSON string of properties on Windows, you have to escape double quotes in a specific way. Considering the following value for the _properties_ option: `{"Foo":"Bar"}`,
-you should specify the value as <code>\`"{""Foo"":""Bar""}"\`</code>.
-In addition, when using PowerShell, you should use the `--%` argument.
+!!! warning "Escaping JSON in PowerShell"
+    When using the `--properties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../user-guide/using-cli.md#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../user-guide/using-cli.md#passing-complex-content-into-cli-options) instead.
 
 ## Examples
 
 Create a schema extension
 
 ```sh
-m365 graph schemaextension add --id MySchemaExtension --description "My Schema Extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
+m365 graph schemaextension add --id MySchemaExtension --description "My Schema Extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties '[{"name":"myProp1","type":"Integer"},{"name":"myProp2","type":"String"}]'
 ```
 
 Create a schema extension with a verified domain
 
 ```sh
-m365 graph schemaextension add --id contoso_MySchemaExtension --description "My Schema Extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
-```
-
-Create a schema extension in PowerShell
-
-```PowerShell
-graph schemaextension add --id contoso_MySchemaExtension --description "My Schema Extension" --targetTypes Group --owner "62375ab9-6b52-47ed-826b-58e47e0e304b" --properties --% \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
+m365 graph schemaextension add --id contoso_MySchemaExtension --description "My Schema Extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties '[{"name":"myProp1","type":"Integer"},{"name":"myProp2","type":"String"}]'
 ```
