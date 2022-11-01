@@ -14,10 +14,10 @@ describe(commands.APP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     sinon.stub(pid, 'getProcessName').callsFake(() => undefined);
     auth.service.connected = true;
   });
@@ -39,9 +39,7 @@ describe(commands.APP_LIST, () => {
   });
 
   afterEach(() => {
-    sinonUtil.restore([
-      request.get
-    ]);
+    sinonUtil.restore([request.get]);
   });
 
   after(() => {
@@ -67,18 +65,18 @@ describe(commands.APP_LIST, () => {
         return {
           value: [
             {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-              "displayName": "My App 1",
-              "description": "My second app",
-              "signInAudience": "My Audience"
+              id: '340a4aa3-1af6-43ac-87d8-189819003952',
+              appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+              displayName: 'My App 1',
+              description: 'My second app',
+              signInAudience: 'My Audience'
             },
             {
-              "id": "340a4aa3-1af6-43ac-87d8-189819003953",
-              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b670",
-              "displayName": "My App 2",
-              "description": "My second app",
-              "signInAudience": "My Audience"
+              id: '340a4aa3-1af6-43ac-87d8-189819003953',
+              appId: '9b1b1e42-794b-4c71-93ac-5ed92488b670',
+              displayName: 'My App 2',
+              description: 'My second app',
+              signInAudience: 'My Audience'
             }
           ]
         };
@@ -90,22 +88,25 @@ describe(commands.APP_LIST, () => {
     await command.action(logger, {
       options: {}
     });
-    assert(loggerLogSpy.calledWith([
-      {
-        "id": "340a4aa3-1af6-43ac-87d8-189819003952",
-        "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
-        "displayName": "My App 1",
-        "description": "My second app",
-        "signInAudience": "My Audience"
-      },
-      {
-        "id": "340a4aa3-1af6-43ac-87d8-189819003953",
-        "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b670",
-        "displayName": "My App 2",
-        "description": "My second app",
-        "signInAudience": "My Audience"
-      }
-    ]);
+
+    assert(
+      loggerLogSpy.calledWith([
+        {
+          id: '340a4aa3-1af6-43ac-87d8-189819003952',
+          appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+          displayName: 'My App 1',
+          description: 'My second app',
+          signInAudience: 'My Audience'
+        },
+        {
+          id: '340a4aa3-1af6-43ac-87d8-189819003953',
+          appId: '9b1b1e42-794b-4c71-93ac-5ed92488b670',
+          displayName: 'My App 2',
+          description: 'My second app',
+          signInAudience: 'My Audience'
+        }
+      ])
+    );
   });
 
   it('handles error when retrieving app list failed', async () => {
@@ -116,13 +117,16 @@ describe(commands.APP_LIST, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
+    await assert.rejects(
+      command.action(logger, { options: {} } as any),
+      new CommandError('An error has occurred')
+    );
   });
 
   it('supports debug mode', () => {
     const options = command.options;
     let containsOption = false;
-    options.forEach(o => {
+    options.forEach((o) => {
       if (o.option === '--debug') {
         containsOption = true;
       }
