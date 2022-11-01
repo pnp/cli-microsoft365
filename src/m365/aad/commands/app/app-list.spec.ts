@@ -133,4 +133,13 @@ describe(commands.APP_LIST, () => {
     });
     assert(containsOption);
   });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), [
+      'appId',
+      'id',
+      'displayName',
+      'signInAudience'
+    ]);
+  });
 });
