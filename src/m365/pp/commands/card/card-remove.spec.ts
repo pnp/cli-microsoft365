@@ -123,8 +123,6 @@ describe(commands.CARD_REMOVE, () => {
 
 
   it('aborts removing the specified card owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
-    // sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
