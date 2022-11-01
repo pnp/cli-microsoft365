@@ -34,3 +34,9 @@ Reset inheritance of folder with server-relative url _/sites/project-x/Shared Do
 ```sh
 m365 spo folder roleinheritance reset --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "/sites/project-x/Shared Documents/TestFolder" --confirm
 ```
+
+Reset inheritance of the specified root folder for the library with the server-relative url _/sites/project-x/Shared Documents located in site _https://contoso.sharepoint.com/sites/project-x_. It will **not** prompt for confirmation before resetting.
+
+```sh
+m365 spo folder roleinheritance reset --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "/sites/project-x/Shared Documents" --confirm
+```
