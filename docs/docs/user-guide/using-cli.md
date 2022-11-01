@@ -91,6 +91,37 @@ You can use the `@` token in any command, with any option that accepts a value.
 m365 spo sitescript add --title "Contoso" --description "Contoso theme script" --content `@themeScript.json
 ```
 
+## Escaping double quotes in PowerShell
+
+PowerShell Versions 5 to 7.2 have an [issue with escaping double quotes](https://github.com/PowerShell/PowerShell/issues/1995). Command arguments are being parsed twice for tools like the CLI. Once by PowerShell and once by the CLI for Microsoft 365 executable that's being called by PowerShell. The result is that you need to escape quotes twice. The issue should be resolved from version 7.3.
+
+As an example, see the following code: 
+
+```PowerShell
+m365 spo listitem set --webUrl "<some-url>" --id 1 --listTitle somelist --SomeField "{ `"test1`": `"test2`" }"
+```
+
+While correctly escaped, it would result in the following being saved to sharepoint: `{ test1: test2 }`. The double quotes are missing.
+
+The following two methods resolve this:
+
+### Method 1: Escaping twice
+Escape the double quotes twice. Once for powershell using the backtick (`) and once for the executable, using a backslash.
+
+```PowerShell
+m365 spo listitem set --webUrl "<some-url>" --id 1 --listTitle somelist --SomeField "{ \`"test1\`": \`"test2\`" }"
+```
+
+### Method 2: Using verbatim strings with single quotes
+Use single quotes to start a verbatim string. The double quotes need not be escaped for powershell using the backtick. However, they do need to be escaped for the executable, using a backslash.
+
+```PowerShell
+m365 spo listitem set --webUrl "<some-url>" --id 1 --listTitle somelist --SomeField '{ \"test1\": \"test2\" }'
+```
+
+!!! info
+    Remember, instead of escaping, it's also possible to [feed complex content from a file](./using-cli.md#passing-complex-content-into-cli-options). 
+
 ## `@meId` and `@meUserName` tokens
 
 CLI for Microsoft 365 contains a number of commands that require you to provide a user ID or username. If you want to pass these values for the current user, instead of looking them up, you can use the built-in tokens. With the `@meId` token you can specify the ID of the current user. Using the `@meUserName` token you can specify the username of the current user.

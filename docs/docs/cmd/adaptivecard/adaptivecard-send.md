@@ -43,6 +43,9 @@ The predefined card is automatically adjusted based on which options have been s
 
 If your custom card is a card template (card with placeholders like `${title}`), you can fill it with data either by specifying the complete data object using the `cardData` option, or by passing any number of arbitrary options that will be mapped onto the card. The arbitrary properties should not match any of the global options like `output`, `query`, `debug`, etc. Data options like `title`, `description`, `imageUrl` and `actionUrl` will be mapped onto the card as well.
 
+!!! warning "Escaping JSON in PowerShell"
+    When using the `--card` and `--cardData` options it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../user-guide/using-cli.md#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../user-guide/using-cli.md#passing-complex-content-into-cli-options) instead.
+
 ## Examples
 
 Send a predefined adaptive card with just title
