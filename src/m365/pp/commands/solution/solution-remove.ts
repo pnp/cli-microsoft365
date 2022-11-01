@@ -104,7 +104,7 @@ class PpSolutionRemoveCommand extends PowerPlatformCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the solution '${args.options.id || args.options.name}'?`
+        message: `Are you sure you want to remove solution '${args.options.id || args.options.name}'?`
       });
 
       if (result.continue) {
