@@ -10,9 +10,9 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-const command: Command = require('./hubsite-theme-sync');
+const command: Command = require('./site-hubsite-theme-sync');
 
-describe(commands.HUBSITE_THEME_SYNC, () => {
+describe(commands.SITE_HUBSITE_THEME_SYNC, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -59,7 +59,7 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.HUBSITE_THEME_SYNC), true);
+    assert.strictEqual(command.name.startsWith(commands.SITE_HUBSITE_THEME_SYNC), true);
   });
 
   it('has a description', () => {

@@ -41,6 +41,7 @@ Alias | Command | Reason
 `teams conversationmember add` | [teams channel member add](./cmd/teams/channel/channel-member-add.md) | Renamed to better match intention and naming convention.
 `teams conversationmember list` | [teams channel member list](./cmd/teams/channel/channel-member-list.md) | Renamed to better match intention and naming convention.
 `teams conversationmember remove` | [teams channel member remove](./cmd/teams/channel/channel-member-remove.md) | Renamed to better match intention and naming convention.
+`spo hubsite theme sync` | [spo site hubsite theme sync](./cmd/spo/site/site-hubsite-theme-sync.md) | Renamed to better match intention and naming convention.
 
 ### What action do I need to take?
 
@@ -55,6 +56,7 @@ In several planner commands we renamed the `planName` option to `planTitle` to a
 - [planner bucket list](./cmd/planner/bucket/bucket-list.md)
 - [planner bucket remove](./cmd/planner/bucket/bucket-remove.md)
 - [planner bucket set](./cmd/planner/bucket/bucket-set.md)
+- [planner plan get](./cmd/planner/plan/plan-get.md)
 - [planner task add](./cmd/planner/task/task-add.md)
 - [planner task get](./cmd/planner/task/task-get.md)
 - [planner task list](./cmd/planner/task/task-list.md)
