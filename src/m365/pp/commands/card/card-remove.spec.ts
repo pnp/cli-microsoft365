@@ -59,7 +59,6 @@ describe(commands.CARD_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
       Cli.prompt,
@@ -122,23 +121,6 @@ describe(commands.CARD_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified card owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
-    await command.action(logger, {
-      options: {
-        environment: validEnvironment,
-        id: validId
-      }
-    });
-    assert(postSpy.notCalled);
-  });
-
   it('removes the specified card owned by the currently signed-in user when prompt confirmed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
@@ -154,7 +136,7 @@ describe(commands.CARD_REMOVE, () => {
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards(${validId})`) {
-        return { statusCode: 200 };
+        return;
       }
 
       throw 'Invalid request';
@@ -179,7 +161,7 @@ describe(commands.CARD_REMOVE, () => {
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards(${validId})`) {
-        return { statusCode: 200 };
+        return;
       }
 
       throw 'Invalid request';
@@ -197,14 +179,17 @@ describe(commands.CARD_REMOVE, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    const errorMessage = `The environment '${validEnvironment}' could not be retrieved. See the inner exception for more details: undefined`;
-    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+    const errorMessage = 'Something went wrong';
+
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    sinon.stub(request, 'delete').callsFake(async () => { throw errorMessage; });
 
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         environment: validEnvironment,
-        name: validName,
+        id: validId,
         confirm: true
       }
     }), new CommandError(errorMessage));

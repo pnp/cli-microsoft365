@@ -82,7 +82,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
@@ -93,7 +93,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removes a card '${args.options.id || args.options.name}'...`);
+      logger.logToStderr(`Removing a card '${args.options.id || args.options.name}'...`);
     }
 
     if (args.options.confirm) {
@@ -104,7 +104,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the card '${args.options.id || args.options.name}'?`
+        message: `Are you sure you want to remove card '${args.options.id || args.options.name}'?`
       });
 
       if (result.continue) {
