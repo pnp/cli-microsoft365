@@ -93,7 +93,7 @@ class PpSolutionRemoveCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removes a solution '${args.options.id || args.options.name}'...`);
+      logger.logToStderr(`Removing solution '${args.options.id || args.options.name}'...`);
     }
 
     if (args.options.confirm) {
