@@ -17,7 +17,7 @@ m365 pp solution remove [options]
 : The id of the solution. Specify either `id` or `name` but not both.
 
 `-n, --name [name]`
-: The name of the solution. Specify either `id` or `name` but not both.
+: The unique name (not the display name) of the solution. Specify either `id` or `name` but not both.
 
 `--asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
