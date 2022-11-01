@@ -142,16 +142,11 @@ class SpoListWebhookSetCommand extends SpoCommand {
       requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Subscriptions('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
 
-    const requestBody: any = {};
-    if (args.options.notificationUrl) {
-      requestBody.notificationUrl = args.options.notificationUrl;
-    }
-    if (args.options.expirationDateTime) {
-      requestBody.expirationDateTime = args.options.expirationDateTime;
-    }
-    if (args.options.clientState) {
-      requestBody.clientState = args.options.clientState;
-    }
+    const requestBody: any = {
+      notificationUrl: args.options.notificationUrl,
+      expirationDateTime: args.options.expirationDateTime,
+      clientState: args.options.clientState
+    };
 
     const requestOptions: AxiosRequestConfig = {
       url: requestUrl,
