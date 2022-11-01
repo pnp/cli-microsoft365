@@ -1,4 +1,4 @@
-# solution remove
+# pp solution remove
 
 Removes the specified solution in the specified Power Platform environment
 
