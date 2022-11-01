@@ -170,6 +170,7 @@ nav:
         - report usagestorage: 'cmd/onedrive/report/report-usagestorage.md'
     - OneNote (onenote):
       - notebook:
+        - notebook add: 'cmd/onenote/notebook/notebook-add.md'
         - notebook list: 'cmd/onenote/notebook/notebook-list.md'
     - Outlook (outlook):
       - mail:
