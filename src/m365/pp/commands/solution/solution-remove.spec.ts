@@ -59,7 +59,6 @@ describe(commands.SOLUTION_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
       Cli.prompt,
@@ -105,8 +104,6 @@ describe(commands.SOLUTION_REMOVE, () => {
   });
 
   it('prompts before removing the specified solution owned by the currently signed-in user when confirm option not passed', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
     await command.action(logger, {
       options: {
         environment: validEnvironment,
@@ -123,8 +120,6 @@ describe(commands.SOLUTION_REMOVE, () => {
   });
 
   it('aborts removing the specified solution owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
@@ -209,14 +204,17 @@ describe(commands.SOLUTION_REMOVE, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    const errorMessage = `The environment '${validEnvironment}' could not be retrieved. See the inner exception for more details: undefined`;
-    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+    const errorMessage = 'Something went wrong';
+
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    sinon.stub(request, 'delete').callsFake(async () => { throw { error: { error: { message: errorMessage } } }; });
 
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         environment: validEnvironment,
-        name: validName,
+        id: validId,
         confirm: true
       }
     }), new CommandError(errorMessage));

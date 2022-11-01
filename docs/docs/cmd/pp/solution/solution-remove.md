@@ -62,7 +62,7 @@ m365 pp solution remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55
 Removes the specified solution owned by the currently signed-in user based on the id parameter without confirmation
 
 ```sh
-m365 pp solution remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 00000001-0000-0000-0001-00000000009b
+m365 pp solution remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 00000001-0000-0000-0001-00000000009b --confirm
 ```
 
 Removes the specified solution owned by another user based on the id parameter
@@ -76,6 +76,7 @@ Removes the specified solution owned by another user based on the id parameter w
 ```sh
 m365 pp solution remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 00000001-0000-0000-0001-00000000009b --asAdmin --confirm
 ```
+
 ## Response
 
 The command won't return a response on success.
