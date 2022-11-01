@@ -29,7 +29,7 @@ m365 pp solution remove [options]
 
 ## Examples
 
-Removes the specified solution owned by the currently signed-in user based on the name parameter
+Removes the specified solution with a specific name, owned by the currently signed-in user
 
 ```sh
 m365 pp solution remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name "Solution Name"
