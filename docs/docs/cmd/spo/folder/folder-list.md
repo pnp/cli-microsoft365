@@ -37,11 +37,9 @@ m365 spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --p
 
 ## Response
 
-### Standard response
-
 === "JSON"
 
-    ``` json
+    ```json
     [  
       {
         "Exists": true,
@@ -60,7 +58,7 @@ m365 spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --p
 
 === "Text"
 
-    ``` text
+    ```text
     Name     ServerRelativeUrl
     -------  -------------------------
     Folder A /Shared Documents/Folder A
@@ -68,59 +66,7 @@ m365 spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --p
 
 === "CSV"
 
-    ``` CSV
+    ```csv
     Name,ServerRelativeUrl
     Folder A,/Shared Documents/Folder A
-    ```
-
-### `recursive` response
-
-When we make use of the option `recursive` the response will differ.
-
-=== "JSON"
-
-    ``` json
-    [  
-      {
-        "Exists": true,
-        "IsWOPIEnabled": false,
-        "ItemCount": 9,
-        "Name": "Folder A",
-        "ProgID": null,
-        "ServerRelativeUrl": "/Shared Documents/Folder A",
-        "TimeCreated": "2022-04-26T12:30:56Z",
-        "TimeLastModified": "2022-04-26T12:50:14Z",
-        "UniqueId": "20523746-971b-4488-aa6d-b45d645f61c5",
-        "WelcomePage": ""
-      }, 
-      {
-        "Exists": true,
-        "IsWOPIEnabled": false,
-        "ItemCount": 9,
-        "Name": "Folder C",
-        "ProgID": null,
-        "ServerRelativeUrl": "/Shared Documents/Folder A/Folder C",
-        "TimeCreated": "2022-04-26T12:30:56Z",
-        "TimeLastModified": "2022-04-26T12:50:14Z",
-        "UniqueId": "20523746-971b-4488-aa6d-b45d645f61c4",
-        "WelcomePage": ""
-      }
-    ]
-    ```
-
-=== "Text"
-
-    ``` text
-    Name     ServerRelativeUrl
-    -------  -------------------------
-    Folder A /Shared Documents/Folder A
-    Folder C /Shared Documents/Folder A/Folder C
-    ```
-
-=== "CSV"
-
-    ``` CSV
-    Name,ServerRelativeUrl
-    Folder A,/Shared Documents/Folder A
-    Folder C,/Shared Documents/Folder A/Folder C
     ```

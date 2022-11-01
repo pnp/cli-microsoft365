@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -150,9 +151,9 @@ describe(commands.FOLDER_LIST, () => {
   });
 
   it('returns all information recursive for output type json', async () => {
-    const serverRelativeUrlLevel1First: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test`))}')/folders`;
-    const serverRelativeUrlLevel2First: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test/Test2`))}')/folders`;
-    const serverRelativeUrlLevel2Second: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test/Test3`))}')/folders`;
+    const serverRelativeUrlLevel1First: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test`))}')/folders`;
+    const serverRelativeUrlLevel2First: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test/Test2`))}')/folders`;
+    const serverRelativeUrlLevel2Second: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(webUrl, `${parentFolderUrl}/Test/Test3`))}')/folders`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === requestUrl) {
         return folderListOutputSingleFolder;
@@ -163,11 +164,11 @@ describe(commands.FOLDER_LIST, () => {
       }
 
       if (opts.url === serverRelativeUrlLevel2First) {
-        return [];
+        return { value: [] };
       }
 
       if (opts.url === serverRelativeUrlLevel2Second) {
-        return [];
+        return { value: [] };
       }
 
       throw 'Invalid request';
@@ -210,7 +211,7 @@ describe(commands.FOLDER_LIST, () => {
   it('should send correct request params when /sites/abc', async () => {
     const webUrl = 'https://contoso.sharepoint.com/sites/abc';
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, parentFolderUrl);
-    const requestUrl: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/folders`;
+    const requestUrl: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/folders`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === requestUrl) {
         return folderListOutput;
