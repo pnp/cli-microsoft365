@@ -121,6 +121,25 @@ describe(commands.CARD_REMOVE, () => {
     assert(promptIssued);
   });
 
+
+  it('aborts removing the specified card owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
+    // sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    const postSpy = sinon.spy(request, 'delete');
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, {
+      options: {
+        environment: validEnvironment,
+        id: validId
+      }
+    });
+    assert(postSpy.notCalled);
+  });
+
+
   it('removes the specified card owned by the currently signed-in user when prompt confirmed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
@@ -183,7 +202,7 @@ describe(commands.CARD_REMOVE, () => {
 
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
-    sinon.stub(request, 'delete').callsFake(async () => { throw errorMessage; });
+    sinon.stub(request, 'delete').callsFake(async () => { throw { error: { error: { message: errorMessage } } }; });
 
     await assert.rejects(command.action(logger, {
       options: {
