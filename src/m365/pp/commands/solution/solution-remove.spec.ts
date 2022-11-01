@@ -191,7 +191,7 @@ describe(commands.SOLUTION_REMOVE, () => {
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/solutions(${validId})`) {
-        return { statusCode: 200 };
+        return;
       }
 
       throw 'Invalid request';
