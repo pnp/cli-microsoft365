@@ -21,7 +21,7 @@ m365 spo hubsite unregister [options]
 ## Remarks
 
 !!! important
-    To use this command you must be a global administrator.
+    To use this command you must be a Global or SharePoint administrator.
 
 If the specified site collection is not registered as a hub site, you will get a `hubSiteId` error.
 
