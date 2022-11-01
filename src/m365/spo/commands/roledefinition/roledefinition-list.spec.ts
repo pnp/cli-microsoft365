@@ -92,12 +92,12 @@ describe(commands.ROLEDEFINITION_LIST, () => {
 
   it('list role definitions handles reject request correctly', async () => {
     const err = 'request rejected';
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/roledefinitions') > -1) {
-        return Promise.reject(err);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/roledefinitions') {
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -109,9 +109,9 @@ describe(commands.ROLEDEFINITION_LIST, () => {
   });
 
   it('lists all role definitions from web', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/roledefinitions') > -1) {
-        return Promise.resolve({
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/cli/_api/web/roledefinitions') {
+        return ({
           value:
             [
               {
@@ -141,14 +141,14 @@ describe(commands.ROLEDEFINITION_LIST, () => {
             ]
         });
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com/sites/cli'
       }
     });
     assert(loggerLogSpy.calledWith(
@@ -163,7 +163,45 @@ describe(commands.ROLEDEFINITION_LIST, () => {
           "Id": 1073741829,
           "Name": "Full Control",
           "Order": 1,
-          "RoleTypeKind": 5
+          "RoleTypeKind": 5,
+          "BasePermissionsValue": [
+            "ViewListItems",
+            "AddListItems",
+            "EditListItems",
+            "DeleteListItems",
+            "ApproveItems",
+            "OpenItems",
+            "ViewVersions",
+            "DeleteVersions",
+            "CancelCheckout",
+            "ManagePersonalViews",
+            "ManageLists",
+            "ViewFormPages",
+            "AnonymousSearchAccessList",
+            "Open",
+            "ViewPages",
+            "AddAndCustomizePages",
+            "ApplyThemeAndBorder",
+            "ApplyStyleSheets",
+            "ViewUsageData",
+            "CreateSSCSite",
+            "ManageSubwebs",
+            "CreateGroups",
+            "ManagePermissions",
+            "BrowseDirectories",
+            "BrowseUserInfo",
+            "AddDelPrivateWebParts",
+            "UpdatePersonalWebParts",
+            "ManageWeb",
+            "AnonymousSearchAccessWebLists",
+            "UseClientIntegration",
+            "UseRemoteAPIs",
+            "ManageAlerts",
+            "CreateAlerts",
+            "EditMyUserInfo",
+            "EnumeratePermissions"
+          ],
+          "RoleTypeKindValue": "Administrator"
         },
         {
           "BasePermissions": {
@@ -175,7 +213,88 @@ describe(commands.ROLEDEFINITION_LIST, () => {
           "Id": 1073741828,
           "Name": "Design",
           "Order": 32,
-          "RoleTypeKind": 4
+          "RoleTypeKind": 4,
+          "BasePermissionsValue": [
+            "ViewListItems",
+            "AddListItems",
+            "EditListItems",
+            "DeleteListItems",
+            "ApproveItems",
+            "OpenItems",
+            "ViewVersions",
+            "DeleteVersions",
+            "CancelCheckout",
+            "ManagePersonalViews",
+            "ManageLists",
+            "ViewFormPages",
+            "Open",
+            "ViewPages",
+            "AddAndCustomizePages",
+            "ApplyThemeAndBorder",
+            "ApplyStyleSheets",
+            "CreateSSCSite",
+            "BrowseDirectories",
+            "BrowseUserInfo",
+            "AddDelPrivateWebParts",
+            "UpdatePersonalWebParts",
+            "UseClientIntegration",
+            "UseRemoteAPIs",
+            "CreateAlerts",
+            "EditMyUserInfo"
+          ],
+          "RoleTypeKindValue": "WebDesigner"
+        }
+      ]
+    ));
+  });
+
+  it('should return an empty array for BasePermissionValue & not return RoleTypeKindValue with unmappable data', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/roledefinitions') {
+        return ({
+          value:
+            [
+              {
+                "BasePermissions": {
+                  "High": "0",
+                  "Low": "0"
+                },
+                "Description": "Has no permissions.",
+                "Hidden": false,
+                "Id": 1073741822,
+                "Name": "No Permissions",
+                "Order": 1,
+                "RoleTypeKind": 9
+              }
+            ]
+        });
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        output: 'json',
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "BasePermissions": {
+            "High": "0",
+            "Low": "0"
+          },
+          "Description": "Has no permissions.",
+          "Hidden": false,
+          "Id": 1073741822,
+          "Name": "No Permissions",
+          "Order": 1,
+          "RoleTypeKind": 9,
+          "BasePermissionsValue": [],
+          "RoleTypeKindValue": undefined
         }
       ]
     ));

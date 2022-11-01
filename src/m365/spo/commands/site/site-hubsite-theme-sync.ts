@@ -13,13 +13,13 @@ interface Options extends GlobalOptions {
   webUrl: string;
 }
 
-class SpoHubSiteThemeSyncCommand extends SpoCommand {
+class SpoSiteHubSiteThemeSyncCommand extends SpoCommand {
   public get name(): string {
-    return commands.HUBSITE_THEME_SYNC;
+    return commands.SITE_HUBSITE_THEME_SYNC;
   }
 
   public get description(): string {
-    return 'Applies any theme updates from the parent hub site.';
+    return 'Applies any theme updates from the hub site the site is connected to.';
   }
 
   constructor() {
@@ -65,4 +65,4 @@ class SpoHubSiteThemeSyncCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoHubSiteThemeSyncCommand();
+module.exports = new SpoSiteHubSiteThemeSyncCommand();
