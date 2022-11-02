@@ -146,7 +146,7 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, scope: 'sitecollection', id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } });
+    await command.action(logger, { options: { debug: false, appCatalogScope: 'sitecollection', id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', confirm: true } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/remove`) > -1 &&
@@ -317,23 +317,23 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('fails validation when invalid scope is specified', async () => {
-    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'foo' } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogScope: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', async () => {
 
-    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'sitecollection' } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogScope: 'sitecollection' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('should pass when \'tenant\' scope and appCatalogUrl specified', async () => {
-    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogScope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', async () => {
-    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogScope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -343,7 +343,7 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('passes validation when the id and appCatalogUrl options are specified', async () => {
-    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'tenant' } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'https://contoso.sharepoint.com', appCatalogScope: 'tenant' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -353,12 +353,12 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('passes validation when the scope is specified with \'tenant\'', async () => {
-    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'tenant' } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogScope: 'tenant' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when the scope is specified with \'sitecollection\'', async () => {
-    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

@@ -89,7 +89,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('sets IncludeFileExtensions CDN policy on the public CDN when Public type specified', async () => {
-    await command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Public' } });
+    await command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', cdnType: 'Public' } });
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -102,7 +102,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('sets IncludeFileExtensions CDN policy on the private CDN when Private type specified', async () => {
-    await assert.rejects(command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Private' } }));
+    await assert.rejects(command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', cdnType: 'Private' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -241,18 +241,18 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('accepts Public SharePoint Online CDN type', async () => {
-    const actual = await command.validate({ options: { type: 'Public', policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' } }, commandInfo);
+    const actual = await command.validate({ options: { cdnType: 'Public', policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', async () => {
-    const actual = await command.validate({ options: { type: 'Private', policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' } }, commandInfo);
+    const actual = await command.validate({ options: { cdnType: 'Private', policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', async () => {
     const type = 'foo';
-    const actual = await command.validate({ options: { type: type, policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' } }, commandInfo);
+    const actual = await command.validate({ options: { cdnType: type, policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' } }, commandInfo);
     assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 

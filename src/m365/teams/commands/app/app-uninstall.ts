@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  appId: string;
+  id: string;
   teamId: string;
   confirm?: boolean;
 }
@@ -44,7 +44,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--appId <appId>'
+        option: '--id <id>'
       },
       {
         option: '--teamId <teamId>'
@@ -70,7 +70,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const uninstallApp: () => Promise<void> = async (): Promise<void> => {
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${args.options.teamId}/installedApps/${args.options.appId}`,
+        url: `${this.resource}/v1.0/teams/${args.options.teamId}/installedApps/${args.options.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         }
@@ -92,7 +92,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to uninstall the app with id ${args.options.appId} from the Microsoft Teams team ${args.options.teamId}?`
+        message: `Are you sure you want to uninstall the app with id ${args.options.id} from the Microsoft Teams team ${args.options.teamId}?`
       });
       
       if (result.continue) {

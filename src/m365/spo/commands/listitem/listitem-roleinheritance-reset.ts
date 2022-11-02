@@ -1,4 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -18,6 +19,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
+  confirm?: boolean;
 }
 
 class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
@@ -43,7 +45,8 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined'
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        confirm: (!(!args.options.confirm)).toString()
       });
     });
   }
@@ -64,6 +67,9 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
       },
       {
         option: '--listUrl [listUrl]'
+      },
+      {
+        option: '--confirm'
       }
     );
   }
@@ -94,34 +100,56 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let requestUrl: string = `${args.options.webUrl}/_api/web`;
-
-    if (args.options.listId) {
-      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
-    }
-    else if (args.options.listTitle) {
-      requestUrl += `/lists/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
-    }
-    else if (args.options.listUrl) {
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-      requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    if (this.verbose) {
+      logger.logToStderr(`Restore role inheritance of list item in site at ${args.options.webUrl}...`);
     }
 
-    const requestOptions: AxiosRequestConfig = {
-      url: `${requestUrl}/items(${args.options.listItemId})/resetroleinheritance`,
-      method: 'POST',
-      headers: {
-        'accept': 'application/json;odata=nometadata',
-        'content-type': 'application/json'
-      },
-      responseType: 'json'
+    const resetListItemRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+      try {
+        let requestUrl: string = `${args.options.webUrl}/_api/web`;
+
+        if (args.options.listId) {
+          requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+        }
+        else if (args.options.listTitle) {
+          requestUrl += `/lists/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+        }
+        else if (args.options.listUrl) {
+          const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+          requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+        }
+
+        const requestOptions: AxiosRequestConfig = {
+          url: `${requestUrl}/items(${args.options.listItemId})/resetroleinheritance`,
+          method: 'POST',
+          headers: {
+            'accept': 'application/json;odata=nometadata',
+            'content-type': 'application/json'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
-    try {
-      await request.post(requestOptions);
+    if (args.options.confirm) {
+      await resetListItemRoleInheritance();
     }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+    else {
+      const result = await Cli.prompt<{ continue: boolean }>({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to reset the role inheritance of ${args.options.listItemId} in list ${args.options.listId ?? args.options.listTitle}?`
+      });
+
+      if (result.continue) {
+        await resetListItemRoleInheritance();
+      }
     }
   }
 }

@@ -100,7 +100,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -120,12 +120,12 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } });
+    await command.action(logger, { options: { debug: true, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
   it('prompts before revoking the rights when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -141,7 +141,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
     assert(postSpy.notCalled);
   });
 
@@ -157,7 +157,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
     assert(postStub.called);
   });
 
@@ -177,7 +177,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales>', principals: 'admin>', confirm: true } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales>', principals: 'admin>', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -197,7 +197,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user', confirm: true } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -217,7 +217,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', confirm: true } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -237,7 +237,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user', confirm: true } });
+    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -256,7 +256,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } } as any),
       new CommandError('An error has occurred.'));
   });
 
@@ -265,7 +265,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -284,7 +284,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--url') > -1) {
+      if (o.option.indexOf('--hubSiteUrl') > -1) {
         containsOption = true;
       }
     });
@@ -314,27 +314,27 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   });
 
   it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'abc', principals: 'admin' } }, commandInfo);
+    const actual = await command.validate({ options: { hubSiteUrl: 'abc', principals: 'admin' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when all parameters are valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } }, commandInfo);
+    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when all parameters are valid (multiple principals)', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user' } }, commandInfo);
+    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when all parameters are valid (multiple principals separated with an extra space)', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user' } }, commandInfo);
+    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when all parameters are valid (multiple principals with email address)', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, commandInfo);
+    const actual = await command.validate({ options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

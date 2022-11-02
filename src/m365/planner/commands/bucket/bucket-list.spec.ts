@@ -309,19 +309,6 @@ describe(commands.BUCKET_LIST, () => {
     assert(loggerLogSpy.calledWith(bucketListResponseValue));
   });
 
-  it('correctly lists planner buckets with deprecated planName and ownerGroupId', async () => {
-    const options: any = {
-      debug: false,
-      planName: 'My Planner Plan',
-      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-      verbose: true
-    };
-
-    await command.action(logger, { options: options } as any);
-    assert(loggerLogSpy.calledWith(bucketListResponseValue));
-  });
-
-
   it('fails validation when ownerGroupName not found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {

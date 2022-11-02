@@ -14,7 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   connector: string;
-  environment: string;
+  environmentName: string;
   outputFolder?: string;
 }
 
@@ -50,7 +50,7 @@ class PaConnectorExportCommand extends PowerAppsCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '-c, --connector <connector>'
@@ -83,7 +83,7 @@ class PaConnectorExportCommand extends PowerAppsCommand {
     const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.connector);
 
     const requestOptions: any = {
-      url: `${this.resource}/providers/Microsoft.PowerApps/apis/${encodeURIComponent(args.options.connector)}?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environment)}%27%20and%20IsCustomApi%20eq%20%27True%27`,
+      url: `${this.resource}/providers/Microsoft.PowerApps/apis/${encodeURIComponent(args.options.connector)}?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environmentName)}%27%20and%20IsCustomApi%20eq%20%27True%27`,
       headers: {
         accept: 'application/json'
       },
@@ -112,7 +112,7 @@ class PaConnectorExportCommand extends PowerAppsCommand {
         apiDefinition: "apiDefinition.swagger.json",
         apiProperties: "apiProperties.json",
         connectorId: args.options.connector,
-        environment: args.options.environment,
+        environment: args.options.environmentName,
         icon: "icon.png",
         powerAppsApiVersion: "2016-11-01",
         powerAppsUrl: "https://api.powerapps.com"

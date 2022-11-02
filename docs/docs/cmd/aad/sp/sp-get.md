@@ -13,17 +13,17 @@ m365 aad sp get [options]
 `-i, --appId [appId]`
 : ID of the application for which the service principal should be retrieved
 
-`-n, --displayName [displayName]`
+`-n, --appDisplayName [appDisplayName]`
 : Display name of the application for which the service principal should be retrieved
 
-`--objectId [objectId]`
+`--appObjectId [appObjectId]`
 : ObjectId of the application for which the service principal should be retrieved
 
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-Specify either the `appId`, `objectId` or `displayName`. If you specify more than one option value, the command will fail with an error.
+Specify either the `appId`, `appObjectId` or `appDisplayName`. If you specify more than one option value, the command will fail with an error.
 
 ## Examples
 
@@ -36,13 +36,13 @@ m365 aad sp get --appId b2307a39-e878-458b-bc90-03bc578531d6
 Return details about the _Microsoft Graph_ service principal.
 
 ```sh
-m365 aad sp get --displayName "Microsoft Graph"
+m365 aad sp get --appDisplayName "Microsoft Graph"
 ```
 
 Return details about the service principal with ObjectId _b2307a39-e878-458b-bc90-03bc578531dd_.
 
 ```sh
-m365 aad sp get --objectId b2307a39-e878-458b-bc90-03bc578531dd
+m365 aad sp get --appObjectId b2307a39-e878-458b-bc90-03bc578531dd
 ```
 
 ## More information

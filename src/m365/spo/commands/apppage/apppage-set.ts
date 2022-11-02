@@ -11,7 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  pageName: string;
+  name: string;
   webPartData: string;
 }
 
@@ -37,7 +37,7 @@ class SpoAppPageSetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --pageName <pageName>'
+        option: '-n, --name <name>'
       },
       {
         option: '-d, --webPartData <webPartData>'
@@ -69,7 +69,7 @@ class SpoAppPageSetCommand extends SpoCommand {
       },
       responseType: 'json',
       data: {
-        serverRelativeUrl: `${urlUtil.getServerRelativePath(args.options.webUrl, '')}/SitePages/${args.options.pageName}`,
+        serverRelativeUrl: `${urlUtil.getServerRelativePath(args.options.webUrl, '')}/SitePages/${args.options.name}`,
         webPartDataAsJson: args.options.webPartData
       }
     };

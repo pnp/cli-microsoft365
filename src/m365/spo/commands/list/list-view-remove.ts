@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -15,8 +16,9 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
   listId?: string;
   listTitle?: string;
-  viewId?: string;
-  viewTitle?: string;
+  listUrl?: string;
+  id?: string;
+  title?: string;
   webUrl: string;
 }
 
@@ -43,8 +45,9 @@ class SpoListViewRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
-        viewId: typeof args.options.viewId !== 'undefined',
-        viewTitle: typeof args.options.viewTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
         confirm: (!(!args.options.confirm)).toString()
       });
     });
@@ -62,10 +65,13 @@ class SpoListViewRemoveCommand extends SpoCommand {
         option: '--listTitle [listTitle]'
       },
       {
-        option: '--viewId [viewId]'
+        option: '--listUrl [listUrl]'
       },
       {
-        option: '--viewTitle [viewTitle]'
+        option: '--id [id]'
+      },
+      {
+        option: '--title [title]'
       },
       {
         option: '--confirm'
@@ -87,9 +93,9 @@ class SpoListViewRemoveCommand extends SpoCommand {
           }
         }
 
-        if (args.options.viewId) {
-          if (!validation.isValidGuid(args.options.viewId)) {
-            return `${args.options.viewId} is not a valid GUID`;
+        if (args.options.id) {
+          if (!validation.isValidGuid(args.options.id)) {
+            return `${args.options.id} is not a valid GUID`;
           }
         }
 
@@ -100,23 +106,28 @@ class SpoListViewRemoveCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['listId', 'listTitle'],
-      ['viewId', 'viewTitle']
+      ['listId', 'listTitle', 'listUrl'],
+      ['id', 'title']
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeViewFromList: () => Promise<void> = async (): Promise<void> => {
-      if (this.verbose) {
-        const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
-        logger.logToStderr(`Removing view ${args.options.viewId || args.options.viewTitle} from list ${list} in site at ${args.options.webUrl}...`);
+      let listSelector: string = '';
+      if (args.options.listId) {
+        listSelector = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+      }
+      else if (args.options.listTitle) {
+        listSelector = `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+      }
+      else if (args.options.listUrl) {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        listSelector = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
       }
 
-      let requestUrl: string = '';
-      const listSelector: string = args.options.listId ? `(guid'${formatting.encodeQueryParameter(args.options.listId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
-      const viewSelector: string = args.options.viewId ? `(guid'${formatting.encodeQueryParameter(args.options.viewId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`;
+      const viewSelector: string = args.options.id ? `(guid'${formatting.encodeQueryParameter(args.options.id)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
 
-      requestUrl = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}`;
+      const requestUrl: string = `${args.options.webUrl}/_api/web/${listSelector}/views${viewSelector}`;
 
       const requestOptions: any = {
         url: requestUrl,
@@ -132,7 +143,7 @@ class SpoListViewRemoveCommand extends SpoCommand {
         await request.post(requestOptions);
         // REST post call doesn't return anything
       }
-      catch(err: any) {
+      catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
     };
@@ -145,7 +156,7 @@ class SpoListViewRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the view ${args.options.viewId || args.options.viewTitle} from the list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}?`
+        message: `Are you sure you want to remove the view ${args.options.id || args.options.title} from the list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}?`
       });
 
       if (result.continue) {
