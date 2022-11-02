@@ -32,13 +32,13 @@ class SpoHubSiteConnectCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -51,7 +51,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -81,7 +81,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
       ['parentId', 'parentTitle', 'parentUrl']
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -94,11 +94,19 @@ class SpoHubSiteConnectCommand extends SpoCommand {
         }
 
         if (args.options.url) {
-          return validation.isValidSharePointUrl(args.options.url);
+          const isValidSharePointUrl = validation.isValidSharePointUrl(args.options.url);
+
+          if (isValidSharePointUrl !== true) {
+            return isValidSharePointUrl;
+          }
         }
 
         if (args.options.parentUrl) {
-          return validation.isValidSharePointUrl(args.options.parentUrl);
+          const isValidSharePointUrl = validation.isValidSharePointUrl(args.options.parentUrl);
+
+          if (isValidSharePointUrl !== true) {
+            return isValidSharePointUrl;
+          }
         }
 
         return true;
@@ -129,7 +137,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
           ParentHubSiteId: parentHubSite.ID
         }
       };
-  
+
       await request.patch(requestOptions);
     }
     catch (err: any) {
