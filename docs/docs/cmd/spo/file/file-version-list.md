@@ -29,7 +29,7 @@ Get file versions of a specific file based on fileId
 m365 spo file version list --webUrl https://contoso.sharepoint.com --fileId 'b2307a39-e878-458b-bc90-03bc578531d6'
 ```
 
-Get file versions in a specific site based on fileId
+Get file versions of a specific file based on fileUrl
 
 ```sh
 m365 spo file version list --webUrl https://contoso.sharepoint.com --fileUrl '/Shared Documents/Document.docx'
