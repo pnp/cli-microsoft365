@@ -17,8 +17,8 @@ m365 spo hubsite register [options]
 
 ## Remarks
 
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
+!!! important
+    To use this command you must be a Global or SharePoint administrator.
 
 If the specified site collection is already registered as a hub site, you will get a `This site is already a HubSite.` error.
 
