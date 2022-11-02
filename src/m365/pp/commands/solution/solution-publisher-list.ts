@@ -13,6 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   environment: string;
+  includeMicrosoftPublishers: boolean;
   asAdmin: boolean;
 }
 
@@ -39,6 +40,7 @@ class PpSolutionPublisherListCommand extends PowerPlatformCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        includeMicrosoftPublishers: typeof args.options.includeMicrosoftPublishers !== 'undefined',
         asAdmin: !!args.options.asAdmin
       });
     });
@@ -48,6 +50,9 @@ class PpSolutionPublisherListCommand extends PowerPlatformCommand {
     this.options.unshift(
       {
         option: '-e, --environment <environment>'
+      },
+      {
+        option: '--includeMicrosoftPublishers'
       },
       {
         option: '-a, --asAdmin'
@@ -64,7 +69,7 @@ class PpSolutionPublisherListCommand extends PowerPlatformCommand {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
       const requestOptions: AxiosRequestConfig = {
-        url: `${dynamicsApiUrl}/api/data/v9.0/publishers?$select=publisherid,uniquename,friendlyname,versionnumber,isreadonly,description,customizationprefix,customizationoptionvalueprefix&api-version=9.1`,
+        url: `${dynamicsApiUrl}/api/data/v9.0/publishers?$select=publisherid,uniquename,friendlyname,versionnumber,isreadonly,description,customizationprefix,customizationoptionvalueprefix${!args.options.includeMicrosoftPublishers ? `&$filter=publisherid ne 'd21aab70-79e7-11dd-8874-00188b01e34f'` : ''}&api-version=9.1`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

@@ -13,6 +13,9 @@ m365 pp solution publisher list [options]
 `-e, --environment <environment>`
 : The name of the environment
 
+`--includeMicrosoftPublishers`
+: Include the Microsoft Publishers
+
 `-a, --asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
 
@@ -47,15 +50,6 @@ m365 pp solution publisher list --environment "Default-2ca3eaa5-140f-4175-8261-3
         "description": null,
         "customizationprefix": "cr6c3",
         "customizationoptionvalueprefix": 43186
-      },
-      {
-        "publisherid": "d21aab70-79e7-11dd-8874-00188b01e34f",
-        "uniquename": "MicrosoftCorporation",
-        "friendlyname": "MicrosoftCorporation",
-        "versionnumber": 1226559,
-        "isreadonly": false,
-        "customizationprefix": "",
-        "customizationoptionvalueprefix": 0
       }
     ]
     ```
@@ -66,7 +60,6 @@ m365 pp solution publisher list --environment "Default-2ca3eaa5-140f-4175-8261-3
     publisherid                           uniquename                     friendlyname
     ------------------------------------  -----------------------------  ----------------------------------
     00000001-0000-0000-0000-00000000005a  Cree38e                        CDS Default Publisher
-    d21aab70-79e7-11dd-8874-00188b01e34f  MicrosoftCorporation           MicrosoftCorporation
     ```
 
 === "CSV"
@@ -74,6 +67,5 @@ m365 pp solution publisher list --environment "Default-2ca3eaa5-140f-4175-8261-3
     ```csv
     publisherid,uniquename,friendlyname
     00000001-0000-0000-0000-00000000005a,Cree38e,CDS Default Publisher
-    d21aab70-79e7-11dd-8874-00188b01e34f,MicrosoftCorporation,MicrosoftCorporation
     ```
 
