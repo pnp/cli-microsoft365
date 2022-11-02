@@ -6,11 +6,16 @@
 
 **Azure Active Directory:**
 
+- [aad app list](../cmd/aad/app/app-list.md) - retrieves a list of Azure AD app registrations [#3742](https://github.com/pnp/cli-microsoft365/issues/3742)
 - [aad user guest add](../cmd/aad/user/user-guest-add.md) - invites an external user to the organization [#3298](https://github.com/pnp/cli-microsoft365/issues/3298)
 
 **Outlook:**
 
 - [outlook message get](../cmd/outlook/message/message-get.md) - retrieves specified message [#3868](https://github.com/pnp/cli-microsoft365/issues/3868)
+
+**Power Platform:**
+
+- [pp card remove](../cmd/pp/card/card-remove.md) - removes the specified Microsoft Power Platform card in the specified Power Platform environment [#3781](https://github.com/pnp/cli-microsoft365/issues/3781)
 
 ### Changes
 
@@ -39,6 +44,9 @@
 - expanded the user guide with info about escaping in PowerShell [#3638](https://github.com/pnp/cli-microsoft365/issues/3638)
 - updated 'spo roledefinition list' output with readable values [#3824](https://github.com/pnp/cli-microsoft365/issues/3824)
 - renamed 'spo hubsite theme sync' to 'spo site hubsite theme sync' [#3881](https://github.com/pnp/cli-microsoft365/issues/3881)
+- extended 'spo list webhook set' command with clientState option [#3861](https://github.com/pnp/cli-microsoft365/issues/3861)
+- extended 'spo folder list' command with recursive option [#2767](https://github.com/pnp/cli-microsoft365/issues/2767)
+- added role requirements for spo hubsite register and unregister docs [#3965](https://github.com/pnp/cli-microsoft365/issues/3965)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
