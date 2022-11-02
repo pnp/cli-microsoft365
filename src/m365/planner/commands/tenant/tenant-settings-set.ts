@@ -79,12 +79,7 @@ class PlannerTenantSettingsSetCommand extends PlannerCommand {
   }
 
   #initTypes(): void {
-    this.types.boolean.push('isPlannerAllowed');
-    this.types.boolean.push('allowCalendarSharing');
-    this.types.boolean.push('allowTenantMoveWithDataLoss');
-    this.types.boolean.push('allowTenantMoveWithDataMigration');
-    this.types.boolean.push('allowRosterCreation');
-    this.types.boolean.push('allowPlannerMobilePushNotifications');
+    this.types.boolean.push('isPlannerAllowed', 'allowCalendarSharing', 'allowTenantMoveWithDataLoss', 'allowTenantMoveWithDataMigration', 'allowRosterCreation', 'allowPlannerMobilePushNotifications');
   }
 
   #initValidators(): void {

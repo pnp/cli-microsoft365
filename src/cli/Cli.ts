@@ -18,6 +18,7 @@ import { fsUtil } from '../utils/fsUtil';
 import { md } from '../utils/md';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
+import { validation } from '../utils/validation';
 const packageJSON = require('../../package.json');
 
 export interface CommandOutput {
@@ -109,9 +110,17 @@ export class Cli {
       // we have found a command to execute. Parse args again taking into
       // account short and long options, option types and whether the command
       // supports known and unknown options or not
-      this.optionsFromArgs = {
-        options: this.getCommandOptionsFromArgs(rawArgs, this.commandToExecute)
-      };
+
+      try {
+        this.optionsFromArgs = {
+          options: this.getCommandOptionsFromArgs(rawArgs, this.commandToExecute)
+        };
+      }
+      catch (e: any) {
+        const optionsWithoutShorts = Cli.removeShortOptions({ options: parsedArgs });
+
+        return this.closeWithError(e.message, optionsWithoutShorts, false);
+      }
     }
     else {
       this.optionsFromArgs = {
@@ -415,60 +424,50 @@ export class Cli {
 
       minimistOptions.alias = {};
       commandInfo.options.forEach(option => {
-        Cli.log(JSON.stringify(option));
         if (option.short && option.long) {
           (minimistOptions.alias as any)[option.short] = option.long;
         }
       });
     }
 
-    const curatedArgs = this.getCuratedArgsList(args, commandInfo);
+    const rewrittenArgs = this.getRewrittenArgsList(args, commandInfo);
 
-    return minimist(curatedArgs, minimistOptions);
+    return minimist(rewrittenArgs, minimistOptions);
   }
 
   /**
-   * Curates arguments before passing them into minimist.
+   * Rewrites arguments (if necessary) before passing them into minimist.
    * Currently only boolean values are checked and fixed.
    */
-  private getCuratedArgsList(args: string[], commandInfo: CommandInfo | undefined): string[] {
+  private getRewrittenArgsList(args: string[], commandInfo: CommandInfo | undefined): string[] {
     const booleanTypes = commandInfo?.command.types.boolean || [];
 
     if (booleanTypes.length === 0) {
       return args;
     }
 
+    // The list of arguments is checked for boolean values to rewrite. 
+    // Boolean values are arguments that:
+    //  - do not start with a dash (-) 
+    //  - have a preceding argument that occurs in the 'booleanTypes' list in it's long or short form.
     return args.map((arg: string, index: number, array: string[]) => {
-      if (!arg.startsWith("-") && index > 0 && booleanTypes.some(t => `--${t}` === array[index - 1] || `-${t}` === array[index - 1])) {
-        return this.fixBooleanArg(arg);
+      if (arg.startsWith("-") || index === 0) {
+        return arg;
+      }
+
+      if (booleanTypes.some(t => `--${t}` === array[index - 1] || `-${t}` === array[index - 1])) {
+        const rewrittenBoolean = formatting.rewriteBooleanValue(arg);
+
+        if (!validation.isValidBoolean(rewrittenBoolean)) {
+          const optionName = array[index - 1];
+          throw new Error(`The value '${arg}' for option '${optionName}' is not a valid boolean`);
+        }
+
+        return rewrittenBoolean;
       }
 
       return arg;
     });
-  }
-
-  /**
-   * Curates boolean arguments according to the definition:
-   * Booleans are case-insensitive, and are represented by the following values.
-   *   True: 1, yes, true, on
-   *   False: 0, no, false, off
-   */
-  private fixBooleanArg(arg: string): string {
-    const argValue = arg.toLowerCase();
-    switch (argValue) {
-      case "1":
-      case "true":
-      case "yes":
-      case "on":
-        return "true";
-      case "0":
-      case "false":
-      case "no":
-      case "off":
-        return "false";
-      default:
-        return arg;
-    }
   }
 
   private static formatOutput(logStatement: any, options: GlobalOptions): any {

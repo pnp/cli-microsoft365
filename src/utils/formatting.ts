@@ -84,5 +84,31 @@ export const formatting = {
       .replace(/:/g, '%3A')
       .replace(/@/g, '%40')
       .replace(/#/g, '%23');
+  },
+
+  /**
+   * Rewrites boolean values according to the definition:
+   * Booleans are case-insensitive, and are represented by the following values.
+   *   True: 1, yes, true, on
+   *   False: 0, no, false, off
+   * @value Stringied Boolean value to rewrite
+   * @returns A stringified boolean with the value 'true' or 'false'. Returns the original value if it does not comply with the definition. 
+   */
+  rewriteBooleanValue(value: string): string {
+    const argValue = value.toLowerCase();
+    switch (argValue) {
+      case '1':
+      case 'true':
+      case 'yes':
+      case 'on':
+        return 'true';
+      case '0':
+      case 'false':
+      case 'no':
+      case 'off':
+        return 'false';
+      default:
+        return value;
+    }
   }
 };
