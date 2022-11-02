@@ -93,6 +93,11 @@ describe(commands.FILE_VERSION_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [['fileUrl', 'fileId']]);
+  });
+
   it('fails validation if fileId is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
@@ -154,29 +159,11 @@ describe(commands.FILE_VERSION_LIST, () => {
     assert(loggerLogSpy.calledWith(fileVersionResponse.value));
   });
 
-  it('properly escapes single quotes in fileUrl', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url = `${validWebUrl}/_api/web/GetFileByServerRelativeUrl('Shared%20Documents%2FFo''lde''r')/versions`) {
-        return fileVersionResponse;
-      }
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: false,
-        webUrl: validWebUrl,
-        fileUrl: `Shared Documents/Fo'lde'r`
-      }
-    });
-    assert(loggerLogSpy.calledWith(fileVersionResponse.value));
-  });
-
-  it('command correctly handles version list reject request', async () => {
+  it('handles a random API error correctly', async () => {
     const err = 'Invalid versions request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
-        throw err;
+      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions`) {
+        throw { error: { error: { message: err } } };
       }
 
       throw 'Invalid request';
@@ -185,7 +172,8 @@ describe(commands.FILE_VERSION_LIST, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        webUrl: validFileUrl
+        webUrl: validWebUrl,
+        fileId: validFileId
       }
     }), new CommandError(err));
   });
@@ -199,16 +187,5 @@ describe(commands.FILE_VERSION_LIST, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
   });
 });

@@ -50,16 +50,6 @@ m365 spo file version list --webUrl https://contoso.sharepoint.com --fileUrl '/S
         "Size": 18898,
         "Url": "_vti_history/512/Shared Documents/Document.docx",
         "VersionLabel": "1.0"
-      },
-      {
-        "CheckInComment": "",
-        "Created": "2022-10-30T12:06:13Z",
-        "ID": 1024,
-        "IsCurrentVersion": false,
-        "Length": "21098",
-        "Size": 21098,
-        "Url": "_vti_history/1024/Shared Documents/Document.docx",
-        "VersionLabel": "2.0"
       }
     ]
     ```
@@ -70,7 +60,6 @@ m365 spo file version list --webUrl https://contoso.sharepoint.com --fileUrl '/S
     CheckInComment  Created               ID    IsCurrentVersion  Length  Size   Url                                               VersionLabel
     --------------  --------------------  ----  ----------------  ------  -----  ------------------------------------------------  ------------
                     2022-10-30T12:03:06Z  512   false             18898   18898  _vti_history/512/Shared Documents/Document.docx   1.0
-                    2022-10-30T12:06:13Z  1024  false             21098   21098  _vti_history/1024/Shared Documents/Document.docx  2.0
     ```
 
 === "CSV"
@@ -78,6 +67,5 @@ m365 spo file version list --webUrl https://contoso.sharepoint.com --fileUrl '/S
     ```csv
     CheckInComment,Created,ID,IsCurrentVersion,Length,Size,Url,VersionLabel
     ,2022-10-30T12:03:06Z,512,,18898,18898,_vti_history/512/Shared Documents/Document.docx,1.0
-    ,2022-10-30T12:06:13Z,1024,,21098,21098,_vti_history/1024/Shared Documents/Document.docx,2.0
     ```
 

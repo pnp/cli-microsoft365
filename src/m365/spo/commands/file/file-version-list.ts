@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -37,8 +38,8 @@ class SpoFileVersionListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        fileUrl: args.options.fileUrl,
-        fileId: args.options.fileId
+        fileUrl: typeof args.options.fileUrl !== 'undefined',
+        fileId: typeof args.options.fileId !== 'undefined'
       });
     });
   }
@@ -60,7 +61,7 @@ class SpoFileVersionListCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.fileId && !validation.isValidGuid(args.options.fileId as string)) {
+        if (args.options.fileId && !validation.isValidGuid(args.options.fileId)) {
           return `${args.options.fileId} is not a valid GUID`;
         }
 
@@ -75,37 +76,31 @@ class SpoFileVersionListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving all the versions of the file ${args.options.fileUrl || args.options.fileId} at site ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving all versions of file ${args.options.fileUrl || args.options.fileId} at site ${args.options.webUrl}...`);
     }
 
     try {
-      const versions = await this.getVersions(args);
-      logger.log(versions.value);
+      let requestUrl = `${args.options.webUrl}/_api/web`;
+      if (args.options.fileUrl) {
+        requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl)}')/versions`;
+      }
+      else {
+        requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${args.options.fileId}')/versions`;
+      }
+      const requestOptions: AxiosRequestConfig = {
+        url: requestUrl,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const response = await request.get<{ value: any[] }>(requestOptions);
+      logger.log(response.value);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  // Gets files from a folder recursively.
-  private async getVersions(args: CommandArgs): Promise<any> {
-    let requestUrl;
-    if (args.options.fileUrl) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl)}')/versions`;
-    }
-    else {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${args.options.fileId}')/versions`;
-    }
-    const requestOptions: any = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ value: any[] }>(requestOptions);
-    return response;
   }
 }
 
