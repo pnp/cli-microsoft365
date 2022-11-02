@@ -1,6 +1,6 @@
 # spo file version list
 
-Gets information about the versions of a specified file
+Retrieves all versions of a file
 
 ## Usage
 
