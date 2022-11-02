@@ -4,6 +4,7 @@ export default {
   CARD_CLONE: `${prefix} card clone`,
   CARD_GET: `${prefix} card get`,
   CARD_LIST: `${prefix} card list`,
+  CARD_REMOVE: `${prefix} card remove`,
   DATAVERSE_TABLE_LIST: `${prefix} dataverse table list`,
   ENVIRONMENT_GET: `${prefix} environment get`,
   ENVIRONMENT_LIST: `${prefix} environment list`,

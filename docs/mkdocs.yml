@@ -31,6 +31,7 @@ nav:
       - app:
         - app add: 'cmd/aad/app/app-add.md'
         - app get: 'cmd/aad/app/app-get.md'
+        - app list: 'cmd/aad/app/app-list.md'
         - app remove: 'cmd/aad/app/app-remove.md'
         - app role add: 'cmd/aad/app/app-role-add.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
@@ -261,6 +262,7 @@ nav:
         - card clone: 'cmd/pp/card/card-clone.md'
         - card get: 'cmd/pp/card/card-get.md'
         - card list: 'cmd/pp/card/card-list.md'
+        - card remove: 'cmd/pp/card/card-remove.md'
       - dataverse:
         - dataverse table list: 'cmd/pp/dataverse/dataverse-table-list.md'
       - environment:
