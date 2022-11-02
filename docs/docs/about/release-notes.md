@@ -47,6 +47,8 @@
 - extended 'spo list webhook set' command with clientState option [#3861](https://github.com/pnp/cli-microsoft365/issues/3861)
 - extended 'spo folder list' command with recursive option [#2767](https://github.com/pnp/cli-microsoft365/issues/2767)
 - added role requirements for spo hubsite register and unregister docs [#3965](https://github.com/pnp/cli-microsoft365/issues/3965)
+- fixed output options for spfx project upgrade [#3979](https://github.com/pnp/cli-microsoft365/issues/3979)
+- converted content tabs with code blocks into plain text [#3912](https://github.com/pnp/cli-microsoft365/issues/3912)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
