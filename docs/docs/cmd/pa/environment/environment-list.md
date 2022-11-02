@@ -38,7 +38,7 @@ m365 pa environment list
         "type":"Microsoft.PowerApps/environments",
         "properties":{
           "azureRegionHint":"westeurope",
-          "displayName":"mathijsdev2 (default) (org6633049a)",
+          "displayName":"contoso (default) (org6633049a)",
           "createdTime":"2020-03-12T13:39:17.9876946Z",
           "createdBy":{
             "id":"SYSTEM",
@@ -62,7 +62,7 @@ m365 pa environment list
           "linkedEnvironmentMetadata":{
             "type":"Dynamics365Instance",
             "resourceId":"5041ef46-5a1c-4a0f-a185-6bb49b5c6686",
-            "friendlyName":"mathijsdev2 (default)",
+            "friendlyName":"contoso (default)",
             "uniqueName":"unq5041ef465a1c4a0fa1856bb49b5c6",
             "domainName":"org6633049a",
             "version":"9.2.22101.00168",
@@ -114,7 +114,7 @@ m365 pa environment list
             "protectionLevel":"Basic"
           }
         },
-        "displayName":"mathijsdev2 (default) (org6633049a)"
+        "displayName":"contoso (default) (org6633049a)"
       }
     ]
     ```

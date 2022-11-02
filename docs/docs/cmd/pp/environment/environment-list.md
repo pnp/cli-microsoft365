@@ -50,7 +50,7 @@ m365 pp environment list --asAdmin
         "properties":{
           "tenantId":"e1dd4023-a656-480a-8a0e-c1b1eec51e1d",
           "azureRegion":"northeurope",
-          "displayName":"mathijsdev2 (default)",
+          "displayName":"contoso (default)",
           "createdTime":"2020-03-12T13:39:17.9876946Z",
           "createdBy":{
             "id":"SYSTEM",
@@ -77,7 +77,7 @@ m365 pp environment list --asAdmin
           "databaseType":"CommonDataService",
           "linkedEnvironmentMetadata":{
             "resourceId":"5041ef46-5a1c-4a0f-a185-6bb49b5c6686",
-            "friendlyName":"mathijsdev2 (default)",
+            "friendlyName":"contoso (default)",
             "uniqueName":"unq5041ef465a1c4a0fa1856bb49b5c6",
             "domainName":"org6633049a",
             "version":"9.2.22101.00168",
@@ -328,7 +328,7 @@ m365 pp environment list --asAdmin
             "protectionLevel":"Basic"
           }
         },
-        "displayName":"mathijsdev2 (default)"
+        "displayName":"contoso (default)"
       }
     ]
     ```
@@ -345,5 +345,5 @@ m365 pp environment list --asAdmin
 
     ```csv
     name,displayName
-    Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d,mathijsdev2 (default)
+    Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d,contoso (default)
     ```

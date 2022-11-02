@@ -84,41 +84,41 @@ m365 pa app get --displayName App
         },
         "owner": {
           "id": "fe36f75e-c103-410b-a18a-2bf6df06ac3a",
-          "displayName": "Mathijs Verbeeck",
-          "email": "mathijs@mathijsdev2.onmicrosoft.com",
+          "displayName": "contoso",
+          "email": "user@contoso.onmicrosoft.com",
           "type": "User",
           "tenantId": "e1dd4023-a656-480a-8a0e-c1b1eec51e1d",
-          "userPrincipalName": "mathijs@mathijsdev2.onmicrosoft.com"
+          "userPrincipalName": "user@contoso.onmicrosoft.com"
         },
         "createdBy": {
           "id": "fe36f75e-c103-410b-a18a-2bf6df06ac3a",
-          "displayName": "Mathijs Verbeeck",
-          "email": "mathijs@mathijsdev2.onmicrosoft.com",
+          "displayName": "contoso",
+          "email": "user@contoso.onmicrosoft.com",
           "type": "User",
           "tenantId": "e1dd4023-a656-480a-8a0e-c1b1eec51e1d",
-          "userPrincipalName": "mathijs@mathijsdev2.onmicrosoft.com"
+          "userPrincipalName": "user@contoso.onmicrosoft.com"
         },
         "lastModifiedBy": {
           "id": "fe36f75e-c103-410b-a18a-2bf6df06ac3a",
-          "displayName": "Mathijs Verbeeck",
-          "email": "mathijs@mathijsdev2.onmicrosoft.com",
+          "displayName": "contoso",
+          "email": "user@contoso.onmicrosoft.com",
           "type": "User",
           "tenantId": "e1dd4023-a656-480a-8a0e-c1b1eec51e1d",
-          "userPrincipalName": "mathijs@mathijsdev2.onmicrosoft.com"
+          "userPrincipalName": "user@contoso.onmicrosoft.com"
         },
         "lastPublishedBy": {
           "id": "fe36f75e-c103-410b-a18a-2bf6df06ac3a",
-          "displayName": "Mathijs Verbeeck",
-          "email": "mathijs@mathijsdev2.onmicrosoft.com",
+          "displayName": "contoso",
+          "email": "user@contoso.onmicrosoft.com",
           "type": "User",
           "tenantId": "e1dd4023-a656-480a-8a0e-c1b1eec51e1d",
-          "userPrincipalName": "mathijs@mathijsdev2.onmicrosoft.com"
+          "userPrincipalName": "user@contoso.onmicrosoft.com"
         },
         "backgroundColor": "RGBA(0,176,240,1)",
         "backgroundImageUri": "https://pafeblobprodam.blob.core.windows.net:443/20221025t000000zddd642012aba4021a4886c8e21a3e1cb/logoSmallFile?sv=2018-03-28&sr=c&sig=cOkbwChyhCO%2BEJpqMDRxrXaxRoPD1TbTy%2B%2BFkdJEOjI%3D&se=2022-12-24T10%3A06%3A27Z&sp=rl",
         "teamsColorIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20221025t000000ze297221f3dc643ed9686b72b22d9a414/teamscoloricon.png?sv=2018-03-28&sr=c&sig=Fhk8E0LO4Lw0mHvNawCF5Ld7GHzPHo9l7RxvZbeZY48%3D&se=2022-12-24T10%3A06%3A27Z&sp=rl",
         "teamsOutlineIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20221025t000000ze297221f3dc643ed9686b72b22d9a414/teamsoutlineicon.png?sv=2018-03-28&sr=c&sig=Fhk8E0LO4Lw0mHvNawCF5Ld7GHzPHo9l7RxvZbeZY48%3D&se=2022-12-24T10%3A06%3A27Z&sp=rl",
-        "displayName": "Tefalplaat",
+        "displayName": "Test application",
         "description": "",
         "commitMessage": "",
         "appUris": {
@@ -211,9 +211,9 @@ m365 pa app get --displayName App
     ```text
     appVersion : 2022-10-25T21:28:12Z
     description: App Description
-    displayName: Tefalplaat
+    displayName: Test application
     name       : 37ea6004-f07b-46ca-8ef3-a256b67b4dbb
-    owner      : mathijs@mathijsdev2.onmicrosoft.com
+    owner      : user@contoso.onmicrosoft.com
     ```
 
 === "CSV"
