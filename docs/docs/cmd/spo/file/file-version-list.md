@@ -17,7 +17,7 @@ m365 spo file version list [options]
 : The server-relative URL of the file. Specify either `fileUrl` or `fileId` but not both
 
 `-i, --fileId [fileId]`
-: The UniqueId (GUID) of the file to retrieve. Specify either `fileUrl` or `fileId` but not both
+: The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both
 
 --8<-- "docs/cmd/_global.md"
 
