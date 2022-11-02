@@ -71,6 +71,7 @@ describe(commands.NOTEBOOK_ADD, () => {
     const actual = await command.validate({
       options:
       {
+        name: 'Private Notebook',
         userId: '2609af39-7775-4f94-a3dc-0dd67657e900',
         userName: 'Documents'
       }
@@ -82,6 +83,7 @@ describe(commands.NOTEBOOK_ADD, () => {
     const actual = await command.validate({
       options:
       {
+        name: 'Private Notebook',
         groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4',
         groupName: 'MyGroup'
       }
@@ -90,141 +92,333 @@ describe(commands.NOTEBOOK_ADD, () => {
   });
 
   it('fails validation if the userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { userId: '123' } }, commandInfo);
+    const actual = await command.validate({ options: { name: 'Private Notebook', userId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: '123' } }, commandInfo);
+    const actual = await command.validate({ options: { name: 'Private Notebook', groupId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if no option specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
+  it('passes validation when valid name and groupId specified', async () => {
+    const actual = await command.validate({
+      options: {
+        name: 'Private Notebook',
+        groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
+      }
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('orrectly adds Microsoft OneNote notebook for the currently logged in user (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/onenote/notebooks`) {
-        return Promise.resolve({
-          "value": [
-            {
-              "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-              "createdDateTime": "2021-11-15T10:27:22Z",
-              "displayName": "Meeting Notes",
-              "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-            },
-            {
-              "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-              "createdDateTime": "2020-01-13T17:52:03Z",
-              "displayName": "My Notebook",
-              "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-            }
-          ]
-        });
+  it('passes validation when valid name and groupName specified', async () => {
+    const actual = await command.validate({
+      options: {
+        name: 'Private Notebook',
+        groupName: 'MyGroup'
       }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, { options: { debug: true } });
-    assert(loggerLogSpy.calledWith([
-      {
-        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-        "createdDateTime": "2021-11-15T10:27:22Z",
-        "displayName": "Meeting Notes",
-        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-      },
-      {
-        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-        "createdDateTime": "2020-01-13T17:52:03Z",
-        "displayName": "My Notebook",
-        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-      }
-    ]));
+    }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 
-  it('orrectly adds Microsoft OneNote notebook for user by id', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/2609af39-7775-4f94-a3dc-0dd67657e900/onenote/notebooks`) {
+  it('correctly adds Microsoft OneNote notebook for the currently logged in user (debug)', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/onenote/notebooks`) {
         return Promise.resolve({
-          "value": [
-            {
-              "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-              "createdDateTime": "2021-11-15T10:27:22Z",
-              "displayName": "Meeting Notes",
-              "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-            },
-            {
-              "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-              "createdDateTime": "2020-01-13T17:52:03Z",
-              "displayName": "My Notebook",
-              "lastModifiedDateTime": "2020-01-13T17:52:03Z"
+          "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "self": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "createdDateTime": "2022-10-26T00:05:46Z",
+          "displayName": "Private Note",
+          "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+          "isDefault": false,
+          "userRole": "Owner",
+          "isShared": false,
+          "sectionsUrl": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+          "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+          "createdBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
             }
-          ]
+          },
+          "lastModifiedBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
+            }
+          },
+          "links": {
+            "oneNoteClientUrl": {
+              "href": "onenote:https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+            },
+            "oneNoteWebUrl": {
+              "href": "https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+            }
+          }
         });
       }
 
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { userId: '2609af39-7775-4f94-a3dc-0dd67657e900' } });
-    assert(loggerLogSpy.calledWith([
-      {
-        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-        "createdDateTime": "2021-11-15T10:27:22Z",
-        "displayName": "Meeting Notes",
-        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
+    await command.action(logger, { options: { name: 'Private Notebook', debug: true } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "self": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "createdDateTime": "2022-10-26T00:05:46Z",
+      "displayName": "Private Note",
+      "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+      "isDefault": false,
+      "userRole": "Owner",
+      "isShared": false,
+      "sectionsUrl": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+      "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+      "createdBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
       },
-      {
-        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-        "createdDateTime": "2020-01-13T17:52:03Z",
-        "displayName": "My Notebook",
-        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
+      "lastModifiedBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
+      },
+      "links": {
+        "oneNoteClientUrl": {
+          "href": "onenote:https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+        },
+        "oneNoteWebUrl": {
+          "href": "https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+        }
       }
-    ]));
+    }));
+  });
+
+  it('correctly adds Microsoft OneNote notebook for user by id', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks`) {
+        return Promise.resolve({
+          "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "self": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "createdDateTime": "2022-10-26T00:05:46Z",
+          "displayName": "Private Note",
+          "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+          "isDefault": false,
+          "userRole": "Owner",
+          "isShared": false,
+          "sectionsUrl": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+          "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+          "createdBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
+            }
+          },
+          "lastModifiedBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
+            }
+          },
+          "links": {
+            "oneNoteClientUrl": {
+              "href": "onenote:https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+            },
+            "oneNoteWebUrl": {
+              "href": "https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+            }
+          }
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, { options: { name: 'Private Notebook', userId: 'am917f88-cd36-4048-83c7-6z6608f344f0' } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "self": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "createdDateTime": "2022-10-26T00:05:46Z",
+      "displayName": "Private Note",
+      "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+      "isDefault": false,
+      "userRole": "Owner",
+      "isShared": false,
+      "sectionsUrl": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+      "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/users/am917f88-cd36-4048-83c7-6z6608f344f0/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+      "createdBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
+      },
+      "links": {
+        "oneNoteClientUrl": {
+          "href": "onenote:https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+        },
+        "oneNoteWebUrl": {
+          "href": "https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+        }
+      }
+    }));
+  });
+
+  it('correctly adds Microsoft OneNote notebook for user by name', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/jdoe@contoso.onmicrosoft.com/onenote/notebooks`) {
+        return Promise.resolve({
+          "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "self": "https://graph.microsoft.com/v1.0/users/jdoe@contoso.onmicrosoft.com/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "createdDateTime": "2022-10-26T00:05:46Z",
+          "displayName": "Private Note",
+          "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+          "isDefault": false,
+          "userRole": "Owner",
+          "isShared": false,
+          "sectionsUrl": "https://graph.microsoft.com/v1.0/users/jdoe@contoso.onmicrosoft.com/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+          "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/users/jdoe@contoso.onmicrosoft.com/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+          "createdBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
+            }
+          },
+          "lastModifiedBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
+            }
+          },
+          "links": {
+            "oneNoteClientUrl": {
+              "href": "onenote:https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+            },
+            "oneNoteWebUrl": {
+              "href": "https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+            }
+          }
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, { options: { name: 'Private Notebook', userName: 'jdoe@contoso.onmicrosoft.com' } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "self": "https://graph.microsoft.com/v1.0/users/jdoe@contoso.onmicrosoft.com/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "createdDateTime": "2022-10-26T00:05:46Z",
+      "displayName": "Private Note",
+      "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+      "isDefault": false,
+      "userRole": "Owner",
+      "isShared": false,
+      "sectionsUrl": "https://graph.microsoft.com/v1.0/users/jdoe@contoso.onmicrosoft.com/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+      "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/users/jdoe@contoso.onmicrosoft.com/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+      "createdBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
+      },
+      "links": {
+        "oneNoteClientUrl": {
+          "href": "onenote:https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+        },
+        "oneNoteWebUrl": {
+          "href": "https://contoso-my.sharepoint.com/personal/jdoe_contoso_onmicrosoft_com/Documents/Notebooks/Private%20Notebook"
+        }
+      }
+    }));
   });
 
   it('correctly adds Microsoft OneNote notebook in group by id', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks`) {
         return Promise.resolve({
-          "value": [
-            {
-              "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-              "createdDateTime": "2021-11-15T10:27:22Z",
-              "displayName": "Meeting Notes",
-              "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-            },
-            {
-              "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-              "createdDateTime": "2020-01-13T17:52:03Z",
-              "displayName": "My Notebook",
-              "lastModifiedDateTime": "2020-01-13T17:52:03Z"
+          "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "self": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "createdDateTime": "2022-10-26T00:05:46Z",
+          "displayName": "Private Note",
+          "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+          "isDefault": false,
+          "userRole": "Owner",
+          "isShared": false,
+          "sectionsUrl": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+          "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+          "createdBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
             }
-          ]
+          },
+          "lastModifiedBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
+            }
+          },
+          "links": {
+            "oneNoteClientUrl": {
+              "href": "onenote:https://contoso.sharepoint.com/sites/MySite/Shared%20Documents/Notebooks/Private%20Notebook"
+            },
+            "oneNoteWebUrl": {
+              "href": "https://contoso.sharepoint.com/sites/MySite/Shared%20Documents/Notebooks/Private%20Notebook"
+            }
+          }
         });
       }
 
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' } });
-    assert(loggerLogSpy.calledWith([
-      {
-        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-        "createdDateTime": "2021-11-15T10:27:22Z",
-        "displayName": "Meeting Notes",
-        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
+    await command.action(logger, { options: { name: 'Private Notebook', groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4' } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "self": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "createdDateTime": "2022-10-26T00:05:46Z",
+      "displayName": "Private Note",
+      "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+      "isDefault": false,
+      "userRole": "Owner",
+      "isShared": false,
+      "sectionsUrl": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+      "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+      "createdBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
       },
-      {
-        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-        "createdDateTime": "2020-01-13T17:52:03Z",
-        "displayName": "My Notebook",
-        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
+      "lastModifiedBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
+      },
+      "links": {
+        "oneNoteClientUrl": {
+          "href": "onenote:https://contoso.sharepoint.com/sites/MySite/Shared%20Documents/Notebooks/Private%20Notebook"
+        },
+        "oneNoteWebUrl": {
+          "href": "https://contoso.sharepoint.com/sites/MySite/Shared%20Documents/Notebooks/Private%20Notebook"
+        }
       }
-    ]));
+    }));
   });
 
   it('handles error when adding Microsoft OneNote notebooks in group by name', async () => {
@@ -236,7 +430,7 @@ describe(commands.NOTEBOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { groupName: 'MyGroup' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { name: 'Private Notebook', groupName: 'MyGroup' } } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly adds Microsoft OneNote notebook in group by name', async () => {
@@ -252,44 +446,80 @@ describe(commands.NOTEBOOK_ADD, () => {
           ]
         });
       }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks`) {
-        return Promise.resolve({
-          "value": [
-            {
-              "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-              "createdDateTime": "2021-11-15T10:27:22Z",
-              "displayName": "Meeting Notes",
-              "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-            },
-            {
-              "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-              "createdDateTime": "2020-01-13T17:52:03Z",
-              "displayName": "My Notebook",
-              "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-            }
-          ]
-        });
-      }
-
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { groupName: 'MyGroup' } });
-    assert(loggerLogSpy.calledWith([
-      {
-        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-        "createdDateTime": "2021-11-15T10:27:22Z",
-        "displayName": "Meeting Notes",
-        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-      },
-      {
-        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-        "createdDateTime": "2020-01-13T17:52:03Z",
-        "displayName": "My Notebook",
-        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks`) {
+        return Promise.resolve({
+          "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "self": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "createdDateTime": "2022-10-26T00:05:46Z",
+          "displayName": "Private Note",
+          "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+          "isDefault": false,
+          "userRole": "Owner",
+          "isShared": false,
+          "sectionsUrl": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+          "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+          "createdBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
+            }
+          },
+          "lastModifiedBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
+            }
+          },
+          "links": {
+            "oneNoteClientUrl": {
+              "href": "onenote:https://contoso.sharepoint.com/sites/testsite/Shared%20Documents/Notebooks/Private%20Notebook"
+            },
+            "oneNoteWebUrl": {
+              "href": "https://contoso.sharepoint.com/sites/testsite/Shared%20Documents/Notebooks/Private%20Notebook"
+            }
+          }
+        });
       }
-    ]));
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, { options: { name: 'Private Notebook', groupName: 'MyGroup' } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "self": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "createdDateTime": "2022-10-26T00:05:46Z",
+      "displayName": "Private Note",
+      "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+      "isDefault": false,
+      "userRole": "Owner",
+      "isShared": false,
+      "sectionsUrl": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+      "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+      "createdBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
+      },
+      "links": {
+        "oneNoteClientUrl": {
+          "href": "onenote:https://contoso.sharepoint.com/sites/testsite/Shared%20Documents/Notebooks/Private%20Notebook"
+        },
+        "oneNoteWebUrl": {
+          "href": "https://contoso.sharepoint.com/sites/testsite/Shared%20Documents/Notebooks/Private%20Notebook"
+        }
+      }
+    }));
   });
 
   it('handles error when adding Microsoft OneNote notebooks for site', async () => {
@@ -301,104 +531,93 @@ describe(commands.NOTEBOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { name: 'Private Notebook', webUrl: 'https://contoso.sharepoint.com/sites/testsite' } } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly adds Microsoft OneNote notebook for site', async () => {
-    const getRequestStub = sinon.stub(request, 'get');
-    getRequestStub.onCall(0)
-      .callsFake((opts) => {
-        if ((opts.url as string).indexOf('/v1.0/sites/') > -1) {
-          return Promise.resolve({
-            "id": "contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2",
-            "name": "testsite",
-            "webUrl": "https://contoso.sharepoint.com/sites/testsite",
-            "displayName": "testsite"
-          });
-        }
-        return Promise.reject('Invalid request');
-      });
-
-    getRequestStub.onCall(1)
-      .callsFake((opts) => {
-        if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2/onenote/notebooks`) {
-          return Promise.resolve({
-            "value": [
-              {
-                "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-                "createdDateTime": "2021-11-15T10:27:22Z",
-                "displayName": "Meeting Notes",
-                "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-              },
-              {
-                "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-                "createdDateTime": "2020-01-13T17:52:03Z",
-                "displayName": "My Notebook",
-                "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-              }
-            ]
-          });
-        }
-
-        return Promise.reject('Invalid request');
-      });
-
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } });
-    assert(loggerLogSpy.calledWith([
-      {
-        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-        "createdDateTime": "2021-11-15T10:27:22Z",
-        "displayName": "Meeting Notes",
-        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-      },
-      {
-        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-        "createdDateTime": "2020-01-13T17:52:03Z",
-        "displayName": "My Notebook",
-        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-      }
-    ]));
-  });
-
-  it('correctly adds Microsoft OneNote notebook for user by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/user1@contoso.onmicrosoft.com/onenote/notebooks`) {
+      if ((opts.url as string).indexOf('/v1.0/sites/') > -1) {
         return Promise.resolve({
-          "value": [
-            {
-              "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-              "createdDateTime": "2021-11-15T10:27:22Z",
-              "displayName": "Meeting Notes",
-              "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-            },
-            {
-              "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-              "createdDateTime": "2020-01-13T17:52:03Z",
-              "displayName": "My Notebook",
-              "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-            }
-          ]
+          "id": "contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2",
+          "name": "testsite",
+          "webUrl": "https://contoso.sharepoint.com/sites/testsite",
+          "displayName": "testsite"
         });
       }
-
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { userName: 'user1@contoso.onmicrosoft.com' } });
-    assert(loggerLogSpy.calledWith([
-      {
-        "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-        "createdDateTime": "2021-11-15T10:27:22Z",
-        "displayName": "Meeting Notes",
-        "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-      },
-      {
-        "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-        "createdDateTime": "2020-01-13T17:52:03Z",
-        "displayName": "My Notebook",
-        "lastModifiedDateTime": "2020-01-13T17:52:03Z"
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2/onenote/notebooks`) {
+        return Promise.resolve({
+          "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "self": "https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+          "createdDateTime": "2022-10-26T00:05:46Z",
+          "displayName": "Private Note",
+          "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+          "isDefault": false,
+          "userRole": "Owner",
+          "isShared": false,
+          "sectionsUrl": "https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+          "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+          "createdBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
+            }
+          },
+          "lastModifiedBy": {
+            "user": {
+              "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+              "displayName": "John Doe"
+            }
+          },
+          "links": {
+            "oneNoteClientUrl": {
+              "href": "onenote:https://contoso.sharepoint.com/sites/testsite/Shared%20Documents/Notebooks/Private%20Notebook"
+            },
+            "oneNoteWebUrl": {
+              "href": "https://contoso.sharepoint.com/sites/testsite/Shared%20Documents/Notebooks/Private%20Notebook"
+            }
+          }
+        });
       }
-    ]));
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, { options: { name: 'Private Notebook', webUrl: 'https://contoso.sharepoint.com/sites/testsite' } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "self": "https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0",
+      "createdDateTime": "2022-10-26T00:05:46Z",
+      "displayName": "Private Note",
+      "lastModifiedDateTime": "2022-10-26T00:05:46Z",
+      "isDefault": false,
+      "userRole": "Owner",
+      "isShared": false,
+      "sectionsUrl": "https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sections",
+      "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2/onenote/notebooks/1-558ac4dh-3c0a-4123-bc46-e4d1c22256f0/sectionGroups",
+      "createdBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "id": "am917f88-cd36-4048-83c7-6z6608f344f0",
+          "displayName": "John Doe"
+        }
+      },
+      "links": {
+        "oneNoteClientUrl": {
+          "href": "onenote:https://contoso.sharepoint.com/sites/testsite/Shared%20Documents/Notebooks/Private%20Notebook"
+        },
+        "oneNoteWebUrl": {
+          "href": "https://contoso.sharepoint.com/sites/testsite/Shared%20Documents/Notebooks/Private%20Notebook"
+        }
+      }
+    }));
   });
 
   it('supports debug mode', () => {
