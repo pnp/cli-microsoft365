@@ -49,6 +49,8 @@
 - added role requirements for spo hubsite register and unregister docs [#3965](https://github.com/pnp/cli-microsoft365/issues/3965)
 - fixed output options for spfx project upgrade [#3979](https://github.com/pnp/cli-microsoft365/issues/3979)
 - converted content tabs with code blocks into plain text [#3912](https://github.com/pnp/cli-microsoft365/issues/3912)
+- extended 'spo list view' commands to include listUrl option. [#3811](https://github.com/pnp/cli-microsoft365/issues/3811)
+- extended 'teams channel' commands with extra options. [#3688](https://github.com/pnp/cli-microsoft365/issues/3688)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
