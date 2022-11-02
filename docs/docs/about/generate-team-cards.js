@@ -193,6 +193,12 @@ const contributors = [{
     twitter: 'chirackalcyril'
   },
   {
+    name: 'Dan Greuel',
+    company: '',
+    github: 'dgreuel',
+    twitter: ''
+  },
+  {
     name: 'Daniaal Nadir',
     company: 'Smoothwall',
     github: 'daniaalnadir',
