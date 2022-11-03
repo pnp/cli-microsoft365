@@ -9,13 +9,13 @@ import { FN002016_DEVDEP_types_react_dom } from './rules/FN002016_DEVDEP_types_r
 import { FN002019_DEVDEP_microsoft_rush_stack_compiler } from './rules/FN002019_DEVDEP_microsoft_rush_stack_compiler';
 
 module.exports = [
-  new FN001008_DEP_react('16'),
-  new FN001009_DEP_react_dom('16'),
-  new FN001022_DEP_office_ui_fabric_react('7.192.0'),
+  new FN001008_DEP_react('17'),
+  new FN001009_DEP_react_dom('17'),
+  new FN001022_DEP_office_ui_fabric_react('^7.199.1'),
   new FN002004_DEVDEP_gulp('4.0.2'),
   new FN002007_DEVDEP_ajv('^6.12.5'),
   new FN002013_DEVDEP_types_webpack_env('~1.15.2'),
-  new FN002015_DEVDEP_types_react('16'),
-  new FN002016_DEVDEP_types_react_dom('16'),
+  new FN002015_DEVDEP_types_react('17'),
+  new FN002016_DEVDEP_types_react_dom('17'),
   new FN002019_DEVDEP_microsoft_rush_stack_compiler(['4.5'])
 ];
