@@ -6,6 +6,7 @@ export default {
   CARD_LIST: `${prefix} card list`,
   CARD_REMOVE: `${prefix} card remove`,
   DATAVERSE_TABLE_LIST: `${prefix} dataverse table list`,
+  DATAVERSE_TABLE_GET: `${prefix} dataverse table get`,
   ENVIRONMENT_GET: `${prefix} environment get`,
   ENVIRONMENT_LIST: `${prefix} environment list`,
   GATEWAY_GET: `${prefix} gateway get`,
