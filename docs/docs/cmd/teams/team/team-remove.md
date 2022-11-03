@@ -50,4 +50,3 @@ m365 teams team remove --id 00000000-0000-0000-0000-000000000000 --confirm
 ## More information
 
 - directory resource type (deleted items): [https://docs.microsoft.com/en-us/graph/api/resources/directory?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/resources/directory?view=graph-rest-1.0)
-

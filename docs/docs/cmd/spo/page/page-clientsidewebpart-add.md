@@ -17,16 +17,16 @@ m365 spo page clientsidewebpart add [options]
 : Name of the page to which add the web part
 
 `--standardWebPart [standardWebPart]`
-: Name of the standard web part to add (see the possible values below)
+: Name of the standard web part to add (see the possible values below). Specify either `standardWebPart` or `webPartId` but not both.
 
 `--webPartId [webPartId]`
-: ID of the custom web part to add
+: ID of the custom web part to add. Specify either `standardWebPart` or `webPartId` but not both.
 
 `--webPartProperties [webPartProperties]`
-: JSON string with web part properties to set on the web part. Specify `webPartProperties` or `webPartData` but not both
+: JSON string with web part properties to set on the web part. Specify `webPartProperties` or `webPartData` but not both.
 
 `--webPartData [webPartData]`
-: JSON string with web part data as retrieved from the web part maintenance mode. Specify `webPartProperties` or `webPartData` but not both
+: JSON string with web part data as retrieved from the web part maintenance mode. Specify `webPartProperties` or `webPartData` but not both.
 
 `--section [section]`
 : Number of the section to which the web part should be added (1 or higher)
@@ -79,3 +79,4 @@ Add the standard Image web part with the preconfigured image
 ```sh
 m365 spo page clientsidewebpart add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart Image --webPartData '{ "dataVersion": "1.8", "serverProcessedContent": {"htmlStrings":{},"searchablePlainTexts":{"captionText":""},"imageSources":{"imageSource":"/sites/team-a/SiteAssets/work-life-balance.png"},"links":{}}, "properties": {"imageSourceType":2,"altText":"a group of people on a beach","overlayText":"Work life balance","fileName":"48146-OFF12_Justice_01.png","siteId":"27664b85-067d-4be9-a7d7-89b2e804d09f","webId":"a7664b85-067d-4be9-a7d7-89b2e804d09f","listId":"37664b85-067d-4be9-a7d7-89b2e804d09f","uniqueId":"67664b85-067d-4be9-a7d7-89b2e804d09f","imgWidth":650,"imgHeight":433,"fixAspectRatio":false,"isOverlayTextEnabled":true}}'
 ```
+

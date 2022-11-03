@@ -168,7 +168,7 @@ describe(commands.PLAN_GET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title', 'planId', 'planTitle']]);
+    assert.deepStrictEqual(optionSets, [['id', 'title']]);
   });
 
   it('correctly get planner plan with given id', async () => {

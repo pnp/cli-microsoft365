@@ -14,7 +14,7 @@ m365 adaptivecard send [options]
 : URL where to send the card to
 
 `-t, --title [title]`
-: Title of the card
+: Title of the card. Specify either `title` or `card`
 
 `-d, --description [description]`
 : Contents of the card
@@ -26,7 +26,7 @@ m365 adaptivecard send [options]
 : URL that users should be sent to after clicking the **View** button on the card
 
 `--card [card]`
-: Card definition
+: Card definition. Specify either `title` or `card`
 
 `--cardData [cardData]`
 : Card data. If your card is a card template, using cardData you can apply data to it. If you specify cardData, unknown options will be ignored.

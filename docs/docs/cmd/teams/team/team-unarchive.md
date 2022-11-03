@@ -39,4 +39,3 @@ Restore an archived Microsoft Teams team with name _Team Name_
 ```sh
 m365 teams team unarchive --name "Team Name"
 ```
-

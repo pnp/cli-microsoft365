@@ -40,6 +40,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -83,22 +84,19 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-     
+
         if (args.options.principalId && isNaN(args.options.principalId)) {
           return `Specified principalId ${args.options.principalId} is not a number`;
         }
 
-        const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
-        if (principalOptions.some(item => item !== undefined) && principalOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either principalId id, upn or groupName`;
-        }
-
-        if (principalOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least principalId id, upn or groupName`;
-        }
-
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['principalId', 'upn', 'groupName']
     );
   }
 
@@ -110,7 +108,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
       const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields`;
 
-      try { 
+      try {
         if (args.options.upn) {
           args.options.principalId = await this.getUserPrincipalId(args.options);
           await this.removeRoleAssignment(requestUrl, logger, args.options);
@@ -122,7 +120,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         else {
           await this.removeRoleAssignment(requestUrl, logger, args.options);
         }
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -138,7 +136,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
         default: false,
         message: `Are you sure you want to remove a role assignment from the folder with url '${args.options.folderUrl}'?`
       });
-      
+
       if (result.continue) {
         await removeRoleAssignment();
       }
@@ -155,7 +153,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
       },
       responseType: 'json'
     };
-    
+
     await request.post(requestOptions);
   }
 
@@ -170,7 +168,7 @@ class SpoFolderRoleAssignmentRemoveCommand extends SpoCommand {
 
     const output = await Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
     const getGroupOutput = JSON.parse(output.stdout);
-    return getGroupOutput.Id as number;  
+    return getGroupOutput.Id as number;
   }
 
   private async getUserPrincipalId(options: Options): Promise<number> {
