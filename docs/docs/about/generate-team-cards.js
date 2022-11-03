@@ -283,6 +283,12 @@ const contributors = [{
     twitter: ''
   },
   {
+    name: 'Geoffrey Hunt',
+    company: '',
+    github: 'runningdeveloper',
+    twitter: 'geoff4l'
+  },
+  {
     name: 'Hugo Bernier',
     company: 'Microsoft',
     github: 'hugoabernier',
