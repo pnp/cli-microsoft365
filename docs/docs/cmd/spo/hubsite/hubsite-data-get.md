@@ -20,9 +20,6 @@ m365 spo hubsite data get [options]
 
 ## Remarks
 
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
-
 By default, the hub site data is returned from the server's cache. To refresh the data with the latest updates, use the `-f, --forceRefresh` option. Use this option, if you just made changes and need to see them right
 away.
 
