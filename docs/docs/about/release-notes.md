@@ -51,6 +51,9 @@
 - converted content tabs with code blocks into plain text [#3912](https://github.com/pnp/cli-microsoft365/issues/3912)
 - extended 'spo list view' commands to include listUrl option. [#3811](https://github.com/pnp/cli-microsoft365/issues/3811)
 - extended 'teams channel' commands with extra options. [#3688](https://github.com/pnp/cli-microsoft365/issues/3688)
+- added docs response for adaptivecards, app, booking commands. [#3920](https://github.com/pnp/cli-microsoft365/issues/3920)
+- added docs response for todo, util, viva commands. [#3927](https://github.com/pnp/cli-microsoft365/issues/3927)
+- added docs response for pa, pp commands. [#3924](https://github.com/pnp/cli-microsoft365/issues/3924)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
