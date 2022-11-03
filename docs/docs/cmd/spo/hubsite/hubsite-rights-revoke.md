@@ -21,13 +21,10 @@ m365 spo hubsite rights revoke [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
+!!! important
+    To use this command you must be a Global or SharePoint administrator.
 
 ## Examples
 
