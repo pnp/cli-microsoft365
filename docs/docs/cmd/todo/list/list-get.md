@@ -11,10 +11,10 @@ m365 todo list get [options]
 ## Options
 
 `-i, --id [id]`
-: The id of the list. Specify either `id` or `name` but not both.
+: The id of the list. Specify either `id` or `name`, but not both.
 
 `-n, --name [name]`
-: The name of the list. Specify either `id` or `name` but not both.
+: The name of the list. Specify either `id` or `name`, but not both.
 
 --8<-- "docs/cmd/_global.md"
 
