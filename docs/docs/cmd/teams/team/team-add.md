@@ -50,13 +50,9 @@ Add a new Microsoft Teams team using a template and wait for the team to be prov
 m365 teams team add --name "Architecture" --description "Architecture Discussion" --template @template.json --wait
 ```
 
-## More information
-
-- Get started with Teams templates: [https://docs.microsoft.com/MicrosoftTeams/get-started-with-teams-templates](https://docs.microsoft.com/MicrosoftTeams/get-started-with-teams-templates)
-- group resource type: [https://docs.microsoft.com/graph/api/resources/group?view=graph-rest-1.0](https://docs.microsoft.com/graph/api/resources/group?view=graph-rest-1.0)
-- teamsAsyncOperation resource type: [https://docs.microsoft.com/graph/api/resources/teamsasyncoperation?view=graph-rest-1.0](https://docs.microsoft.com/graph/api/resources/teamsasyncoperation?view=graph-rest-1.0)
-
 ## Response
+
+### Standard response
 
 === "JSON"
 
@@ -98,3 +94,109 @@ m365 teams team add --name "Architecture" --description "Architecture Discussion
     @odata.context,id,operationType,createdDateTime,status,lastActionDateTime,attemptsCount,targetResourceId,targetResourceLocation,Value,error
     https://graph.microsoft.com/v1.0/$metadata#teams('40d5758d-5ad9-406d-88ab-0a78992ffbab')/operations/$entity,65778567-595d-4543-bb21-f8d62c678c8e,createTeam,2022-10-31T12:57:42.4956529Z,notStarted,2022-10-31T12:57:42.4956529Z,1,40d5758d-5ad9-406d-88ab-0a78992ffbab,/teams('40d5758d-5ad9-406d-88ab-0a78992ffbab'),"{""apps"":[],""channels"":[],""WorkflowId"":""northeurope.d0475d7e-7461-4dd5-ae1e-0cfa9e692412""}",
     ```
+    
+### `wait` response
+
+When we make use of the option `wait` the response will differ. 
+
+=== "JSON"
+
+    ``` json
+{
+  "id": "d592059d-100f-48c6-8a91-b68eec00ecec",
+  "deletedDateTime": null,
+  "classification": null,
+  "createdDateTime": "2022-11-04T12:46:47Z",
+  "creationOptions": [
+    "Team",
+    "ExchangeProvisioningFlags:3552"
+  ],
+  "description": "Team Name Discussion",
+  "displayName": "Team Name",
+  "expirationDateTime": null,
+  "groupTypes": [
+    "Unified"
+  ],
+  "isAssignableToRole": null,
+  "mail": "TeamName185@contoso.onmicrosoft.com",
+  "mailEnabled": true,
+  "mailNickname": "TeamName185",
+  "membershipRule": null,
+  "membershipRuleProcessingState": null,
+  "onPremisesDomainName": null,
+  "onPremisesLastSyncDateTime": null,
+  "onPremisesNetBiosName": null,
+  "onPremisesSamAccountName": null,
+  "onPremisesSecurityIdentifier": null,
+  "onPremisesSyncEnabled": null,
+  "preferredDataLocation": null,
+  "preferredLanguage": null,
+  "proxyAddresses": [
+    "SMTP:TeamName185@contoso.onmicrosoft.com"
+  ],
+  "renewedDateTime": "2022-11-04T12:46:47Z",
+  "resourceBehaviorOptions": [
+    "HideGroupInOutlook",
+    "SubscribeMembersToCalendarEventsDisabled",
+    "WelcomeEmailDisabled"
+  ],
+  "resourceProvisioningOptions": [
+    "Team"
+  ],
+  "securityEnabled": false,
+  "securityIdentifier": "S-1-12-1-3583116701-1220939791-2394329482-3974889708",
+  "theme": null,
+  "visibility": "Public",
+  "onPremisesProvisioningErrors": []
+}
+    ```
+
+=== "Text"
+
+    ``` text
+    classification               : null
+    createdDateTime              : 2022-11-04T12:47:57Z
+    creationOptions              : ["Team","ExchangeProvisioningFlags:3552"]
+    deletedDateTime              : null
+    description                  : Team Name Discussion
+    displayName                  : Team Name
+    expirationDateTime           : null
+    groupTypes                   : ["Unified"]
+    id                           : 29c242bb-a96f-470a-b280-d63154f5446f
+    isAssignableToRole           : null
+    mail                         : TeamName185@contoso.onmicrosoft.com
+    mailEnabled                  : true
+    mailNickname                 : ATeamName185
+    membershipRule               : null
+    membershipRuleProcessingState: null
+    onPremisesDomainName         : null
+    onPremisesLastSyncDateTime   : null
+    onPremisesNetBiosName        : null
+    onPremisesProvisioningErrors : []
+    onPremisesSamAccountName     : null
+    onPremisesSecurityIdentifier : null
+    onPremisesSyncEnabled        : null
+    preferredDataLocation        : null
+    preferredLanguage            : null
+    proxyAddresses               : ["SMTP:TeamName185@contoso.onmicrosoft.com"]
+    renewedDateTime              : 2022-11-04T12:47:57Z
+    resourceBehaviorOptions      : ["HideGroupInOutlook","SubscribeMembersToCalendarEventsDisabled","WelcomeEmailDisabled"]
+    resourceProvisioningOptions  : ["Team"]
+    securityEnabled              : false
+    securityIdentifier           : S-1-12-1-700596923-1191881071-836141234-1866790228
+    theme                        : null
+    visibility                   : Public
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,deletedDateTime,classification,createdDateTime,creationOptions,description,displayName,expirationDateTime,groupTypes,isAssignableToRole,mail,mailEnabled,mailNickname,membershipRule,membershipRuleProcessingState,onPremisesDomainName,onPremisesLastSyncDateTime,onPremisesNetBiosName,onPremisesSamAccountName,onPremisesSecurityIdentifier,onPremisesSyncEnabled,preferredDataLocation,preferredLanguage,proxyAddresses,renewedDateTime,resourceBehaviorOptions,resourceProvisioningOptions,securityEnabled,securityIdentifier,theme,visibility,onPremisesProvisioningErrors
+    bb57868a-e82e-470b-85aa-8a86942a5bf8,,,2022-11-04T12:51:35Z,"[""Team"",""ExchangeProvisioningFlags:3552""]",Team Name Discussion,Team Name,,"[""Unified""]",,TeamName185@contoso.onmicrosoft.com,1,TeamName,,,,,,,,,,,"[""SMTP:TeamName185@contoso.onmicrosoft.com""]",2022-11-04T12:51:35Z,"[""HideGroupInOutlook"",""SubscribeMembersToCalendarEventsDisabled"",""WelcomeEmailDisabled""]","[""Team""]",,S-1-12-1-3143075466-1191962670-2257234565-4166724244,,Public,[]
+    ```
+
+## More information
+
+- Get started with Teams templates: [https://docs.microsoft.com/MicrosoftTeams/get-started-with-teams-templates](https://docs.microsoft.com/MicrosoftTeams/get-started-with-teams-templates)
+- group resource type: [https://docs.microsoft.com/graph/api/resources/group?view=graph-rest-1.0](https://docs.microsoft.com/graph/api/resources/group?view=graph-rest-1.0)
+- teamsAsyncOperation resource type: [https://docs.microsoft.com/graph/api/resources/teamsasyncoperation?view=graph-rest-1.0](https://docs.microsoft.com/graph/api/resources/teamsasyncoperation?view=graph-rest-1.0)

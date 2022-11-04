@@ -59,7 +59,7 @@ m365 teams message list --teamId fce9e580-8bba-4638-ab5c-ab40016651e3 --channelI
         "chatId": null,
         "importance": "normal",
         "locale": "en-us",
-        "webUrl": "https://teams.microsoft.com/l/message/19%3Ae2916df2b11046beba42d22da898383f%40thread.tacv2/1666799217259?groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba&createdTime=1666799217259&parentMessageId=1666799217259",
+        "webUrl": "https://teams.microsoft.com/l/message/19%3eb30973b42a847a2a1df92d91e37c76a%40thread.tacv2/1666799217259?groupId=fce9e580-8bba-4638-ab5c-ab40016651e3&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba&createdTime=1666799217259&parentMessageId=1666799217259",
         "policyViolation": null,
         "eventDetail": null,
         "from": {
@@ -77,7 +77,7 @@ m365 teams message list --teamId fce9e580-8bba-4638-ab5c-ab40016651e3 --channelI
           "content": "First message!"
         },
         "channelIdentity": {
-          "teamId": "aee5a2c9-b1df-45ac-9964-c708e760a045",
+          "teamId": "fce9e580-8bba-4638-ab5c-ab40016651e3",
           "channelId": "19:e2916df2b11046beba42d22da898383f@thread.tacv2"
         },
         "attachments": [],

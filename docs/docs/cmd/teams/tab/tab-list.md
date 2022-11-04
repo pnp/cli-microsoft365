@@ -46,19 +46,19 @@ m365 teams tab list --teamId 00000000-0000-0000-0000-000000000000 --channelId 19
     [
       {
         "id": "34991fbf-59f4-48d9-b094-b9d64d550e23",
-        "displayName": "Polly",
-        "webUrl": "https://teams.microsoft.com/l/entity/1542629c-01b3-4a6d-8f76-1938b779e48d/_djb2_msteams_prefix_34991fbf-59f4-48d9-b094-b9d64d550e23?webUrl=https%3a%2f%2fteams.polly.ai%2fmsteams%2fcontent%2ftab%2fteam%3ftheme%3d%7btheme%7d&label=Polly&context=%7b%0d%0a++%22canvasUrl%22%3a+%22https%3a%2f%2fteams.polly.ai%2fmsteams%2fcontent%2ftab%2fteam%3ftheme%3d%7btheme%7d%22%2c%0d%0a++%22channelId%22%3a+%2219%3aB3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1%40thread.tacv2%22%2c%0d%0a++%22subEntityId%22%3a+null%0d%0a%7d&groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba",
+        "displayName": "My Contoso Tab",
+        "webUrl": "https://teams.microsoft.com/l/entity/1542629c-01b3-4a6d-8f76-1938b779e48d/_djb2_msteams_prefix_34991fbf-59f4-48d9-b094-b9d64d550e23?webUrl=https%3a%2f%2fteams.contoso.ai%2fmsteams%2fcontent%2ftab%2fteam%3ftheme%3d%7btheme%7d&label=My%20Contoso%20Tab&context=%7b%0d%0a++%22canvasUrl%22%3a+%22https%3a%2f%2fteams.contoso.ai%2fmsteams%2fcontent%2ftab%2fteam%3ftheme%3d%7btheme%7d%22%2c%0d%0a++%22channelId%22%3a+%2219%3aB3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1%40thread.tacv2%22%2c%0d%0a++%22subEntityId%22%3a+null%0d%0a%7d&groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba",
         "configuration": {
           "entityId": "surveys_list:19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2:ps67c9jyf3a30j2j5eum72",
-          "contentUrl": "https://teams.polly.ai/msteams/content/tab/team?theme={theme}",
-          "removeUrl": "https://teams.polly.ai/msteams/content/tabdelete?theme={theme}",
-          "websiteUrl": "https://teams.polly.ai/msteams/content/tab/team?theme={theme}",
+          "contentUrl": "https://teams.contoso.ai/msteams/content/tab/team?theme={theme}",
+          "removeUrl": "https://teams.contoso.ai/msteams/content/tabdelete?theme={theme}",
+          "websiteUrl": "https://teams.contoso.ai/msteams/content/tab/team?theme={theme}",
           "dateAdded": "2022-10-31T12:17:58.632Z"
         },
         "teamsApp": {
           "id": "1542629c-01b3-4a6d-8f76-1938b779e48d",
           "externalId": null,
-          "displayName": "Polly",
+          "displayName": "My Contoso Tab",
           "distributionMethod": "store"
         },
         "teamsAppTabId": "1542629c-01b3-4a6d-8f76-1938b779e48d"
@@ -69,7 +69,7 @@ m365 teams tab list --teamId 00000000-0000-0000-0000-000000000000 --channelId 19
 === "Text"
 
     ``` text
-    displayName  : Polly
+    displayName  : My Contoso Tab
     id           : 34991fbf-59f4-48d9-b094-b9d64d550e23
     teamsAppTabId: 1542629c-01b3-4a6d-8f76-1938b779e48d
     ```
@@ -78,5 +78,5 @@ m365 teams tab list --teamId 00000000-0000-0000-0000-000000000000 --channelId 19
 
     ``` text
     id,displayName,teamsAppTabId
-    34991fbf-59f4-48d9-b094-b9d64d550e23,Polly,1542629c-01b3-4a6d-8f76-1938b779e48d
+    34991fbf-59f4-48d9-b094-b9d64d550e23,My Contoso Tab,1542629c-01b3-4a6d-8f76-1938b779e48d
     ```
