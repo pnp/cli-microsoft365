@@ -61,7 +61,7 @@ m365 teams message reply list --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --ch
           "device": null,
           "user": {
             "id": "78ccf530-bbf0-47e4-aae6-da5f8c6fb142",
-            "displayName": "Nico De Cleyre",
+            "displayName": "John Doe",
             "userIdentityType": "aadUser",
             "tenantId": "92e59666-257b-49c3-b1fa-1bae8107f6ba"
           }

@@ -67,7 +67,7 @@ m365 teams message list --teamId fce9e580-8bba-4638-ab5c-ab40016651e3 --channelI
           "device": null,
           "user": {
             "id": "78ccf530-bbf0-47e4-aae6-da5f8c6fb142",
-            "displayName": "Nico De Cleyre",
+            "displayName": "John Doe",
             "userIdentityType": "aadUser",
             "tenantId": "92e59666-257b-49c3-b1fa-1bae8107f6ba"
           }

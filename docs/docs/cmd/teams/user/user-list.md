@@ -40,8 +40,8 @@ m365 teams user list --teamId '00000000-0000-0000-0000-000000000000' --role Owne
     [
       {
         "id": "78ccf530-bbf0-47e4-aae6-da5f8c6fb142",
-        "displayName": "Nico De Cleyre",
-        "userPrincipalName": "nico@contoso.onmicrosoft.com",
+        "displayName": "John Doe",
+        "userPrincipalName": "john@contoso.onmicrosoft.com",
         "userType": "Owner"
       }
     ]
@@ -50,9 +50,9 @@ m365 teams user list --teamId '00000000-0000-0000-0000-000000000000' --role Owne
 === "Text"
 
     ``` text
-    displayName      : Nico De Cleyre
+    displayName      : John Doe
     id               : 78ccf530-bbf0-47e4-aae6-da5f8c6fb142
-    userPrincipalName: nico@contoso.onmicrosoft.com
+    userPrincipalName: john@contoso.onmicrosoft.com
     userType         : Owner
     ```
 
@@ -60,5 +60,5 @@ m365 teams user list --teamId '00000000-0000-0000-0000-000000000000' --role Owne
 
     ``` text
     id,displayName,userPrincipalName,userType
-    78ccf530-bbf0-47e4-aae6-da5f8c6fb142,Nico De Cleyre,nico@contos.onmicrosoft.com,Owner
+    78ccf530-bbf0-47e4-aae6-da5f8c6fb142,John Doe,john@contoso.onmicrosoft.com,Owner
     ```

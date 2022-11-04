@@ -60,7 +60,7 @@ m365 teams message get --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --channelId
         "device": null,
         "user": {
           "id": "78ccf530-bbf0-47e4-aae6-da5f8c6fb142",
-          "displayName": "Nico De Cleyre",
+          "displayName": "John Doe",
           "userIdentityType": "aadUser",
           "tenantId": "92e59666-257b-49c3-b1fa-1bae8107f6ba"
         }
@@ -90,7 +90,7 @@ m365 teams message get --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --channelId
     deletedDateTime     : null
     etag                : 1666799582385
     eventDetail         : null
-    from                : {"application":null,"device":null,"user":{"id":"78ccf530-bbf0-47e4-aae6-da5f8c6fb142","displayName":"Nico De Cleyre","userIdentityType":"aadUser","tenantId":"92e59666-257b-49c3-b1fa-1bae8107f6ba"}}
+    from                : {"application":null,"device":null,"user":{"id":"78ccf530-bbf0-47e4-aae6-da5f8c6fb142","displayName":"John Doe","userIdentityType":"aadUser","tenantId":"92e59666-257b-49c3-b1fa-1bae8107f6ba"}}
     id                  : 1666799520731
     importance          : normal
     lastEditedDateTime  : 2022-10-26T15:53:02.288Z
@@ -110,5 +110,5 @@ m365 teams message get --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --channelId
 
     ``` text
     id,replyToId,etag,messageType,createdDateTime,lastModifiedDateTime,lastEditedDateTime,deletedDateTime,subject,summary,chatId,importance,locale,webUrl,policyViolation,eventDetail,from,body,channelIdentity,attachments,mentions,reactions
-    1666799520731,,1666799582385,message,2022-10-26T15:52:00.731Z,2022-10-26T15:53:02.385Z,2022-10-26T15:53:02.288Z,,Second message Title,,,normal,en-us,https://teams.microsoft.com/l/message/19%3Ae2916df2b11046beba42d22da898383f%40thread.tacv2/1666799520731?groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba&createdTime=1666799520731&parentMessageId=1666799520731,,,"{""application"":null,""device"":null,""user"":{""id"":""78ccf530-bbf0-47e4-aae6-da5f8c6fb142"",""displayName"":""Nico De Cleyre"",""userIdentityType"":""aadUser"",""tenantId"":""92e59666-257b-49c3-b1fa-1bae8107f6ba""}}","{""contentType"":""text"",""content"":""second message!""}","{""teamId"":""aee5a2c9-b1df-45ac-9964-c708e760a045"",""channelId"":""19:e2916df2b11046beba42d22da898383f@thread.tacv2""}",[],[],[]
+    1666799520731,,1666799582385,message,2022-10-26T15:52:00.731Z,2022-10-26T15:53:02.385Z,2022-10-26T15:53:02.288Z,,Second message Title,,,normal,en-us,https://teams.microsoft.com/l/message/19%3Ae2916df2b11046beba42d22da898383f%40thread.tacv2/1666799520731?groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba&createdTime=1666799520731&parentMessageId=1666799520731,,,"{""application"":null,""device"":null,""user"":{""id"":""78ccf530-bbf0-47e4-aae6-da5f8c6fb142"",""displayName"":""John Doe"",""userIdentityType"":""aadUser"",""tenantId"":""92e59666-257b-49c3-b1fa-1bae8107f6ba""}}","{""contentType"":""text"",""content"":""second message!""}","{""teamId"":""aee5a2c9-b1df-45ac-9964-c708e760a045"",""channelId"":""19:e2916df2b11046beba42d22da898383f@thread.tacv2""}",[],[],[]
     ```
