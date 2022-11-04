@@ -107,12 +107,12 @@ class SpoFileVersionClearCommand extends SpoCommand {
   }
 
   private async clearVersions(args: CommandArgs): Promise<void> {
-    let requestUrl;
+    let requestUrl:string = `${args.options.webUrl}/_api/web/`;
     if (args.options.fileUrl) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl)}')/versions/DeleteAll()`;
+      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl)}')/versions/DeleteAll()`;
     }
     else {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${args.options.fileId}')/versions/DeleteAll()`;
+      requestUrl += `GetFileById('${args.options.fileId}')/versions/DeleteAll()`;
     }
     const requestOptions: any = {
       url: requestUrl,
