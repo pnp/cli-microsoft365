@@ -15,7 +15,8 @@ import { Options as SpoGroupGetCommandOptions } from '../group/group-get';
 import * as SpoRoleDefinitionFolderCommand from '../roledefinition/roledefinition-list';
 import { Options as SpoRoleDefinitionFolderCommandOptions } from '../roledefinition/roledefinition-list';
 import { RoleDefinition } from '../roledefinition/RoleDefinition';
-
+import * as SpoFolderGetCommand from './folder-get';
+import { Options as SpoFolderGetCommandOptions } from './folder-get';
 interface CommandArgs {
   options: Options;
 }
@@ -131,9 +132,10 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
 
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
     const roleFolderUrl: string = urlUtil.getWebRelativePath(args.options.webUrl, args.options.folderUrl);
-    try {
-      let requestUrl: string = `${args.options.webUrl}/_api/web/`;
 
+    try {
+      await this.getFolderUrl(args.options);
+      let requestUrl: string = `${args.options.webUrl}/_api/web/`;
       if (roleFolderUrl.split('/').length === 2) {
         requestUrl += `GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
       }
@@ -204,9 +206,15 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
 
     const output = await Cli.executeCommandWithOutput(SpoRoleDefinitionFolderCommand as Command, { options: { ...roleDefinitionFolderCommandOptions, _: [] } });
     const getRoleDefinitionFolderOutput = JSON.parse(output.stdout);
-    const roleDefinitionId: number = getRoleDefinitionFolderOutput.find((role: RoleDefinition) => role.Name === options.roleDefinitionName).Id;
-    return roleDefinitionId;
+    const roleDefinition = getRoleDefinitionFolderOutput.find((role: RoleDefinition) => role.Name === options.roleDefinitionName);
+    if (roleDefinition) {
+      return roleDefinition.Id;
+    }
+    else {
+      throw Error(`The specified role definition name '${options.roleDefinitionName}' does not exist.`);
+    }
   }
+
 
   private async getGroupPrincipalId(options: Options): Promise<number> {
     const groupGetCommandOptions: SpoGroupGetCommandOptions = {
@@ -235,6 +243,14 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
     const output = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.Id as number;
+  }
+
+  private async getFolderUrl(options: Options): Promise<void> {
+    const folderGetCommandOptions: SpoFolderGetCommandOptions = {
+      webUrl: options.webUrl,
+      folderUrl: options.folderUrl
+    };
+    await Cli.executeCommandWithOutput(SpoFolderGetCommand as Command, { options: { ...folderGetCommandOptions, _: [] } });
   }
 }
 

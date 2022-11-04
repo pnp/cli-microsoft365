@@ -11,6 +11,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as SpoUserGetCommand from '../user/user-get';
 import * as SpoGroupGetCommand from '../group/group-get';
+import * as SpoFolderGetCommand from './folder-get';
 import * as SpoRoleDefinitionFolderCommand from '../roledefinition/roledefinition-list';
 const command: Command = require('./folder-roleassignment-add');
 
@@ -149,6 +150,10 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+      if (command === SpoFolderGetCommand) {
+        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
+      }
+
       if (command === SpoUserGetCommand) {
         return Promise.resolve({
           stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|someaccount@tenant.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "someaccount@tenant.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "someaccount@tenant.onmicrosoft.com"}'
@@ -169,11 +174,12 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     });
   });
 
-  it('add the role assignment to the specified root folder based on the upn and role definition id', async () => {
+  it('add the role assignment to the specified root folder based on the principal id and role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2FShared%20Documents\')/breakroleinheritance(true)') {
         return Promise.resolve();
       }
+
       if (opts.url === 'https://contoso.sharepoint.com/_api/web/GetList(\'%2FShared%20Documents\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') {
         return Promise.resolve();
       }
@@ -182,12 +188,9 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
     });
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
-      if (command === SpoUserGetCommand) {
-        return Promise.resolve({
-          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "i:0#.f|membership|someaccount@tenant.onmicrosoft.com","Title": "Some Account","PrincipalType": 1,"Email": "someaccount@tenant.onmicrosoft.com","Expiration": "","IsEmailAuthenticationGuestUser": false,"IsShareByEmailGuestUser": false,"IsSiteAdmin": true,"UserId": {"NameId": "1003200097d06dd6","NameIdIssuer": "urn:federation:microsoftonline"},"UserPrincipalName": "someaccount@tenant.onmicrosoft.com"}'
-        });
+      if (command === SpoFolderGetCommand) {
+        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
       }
-
       return Promise.reject(new CommandError('Unknown case'));
     });
 
@@ -196,7 +199,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents',
-        upn: 'someaccount@tenant.onmicrosoft.com',
+        principalId: 11,
         roleDefinitionId: 1073741827
       }
     });
@@ -217,6 +220,10 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
     const error = 'no user found';
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+      if (command === SpoFolderGetCommand) {
+        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
+      }
+
       if (command === SpoUserGetCommand) {
         return Promise.reject(error);
       }
@@ -250,6 +257,10 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+      if (command === SpoFolderGetCommand) {
+        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
+      }
+
       if (command === SpoGroupGetCommand) {
         return Promise.resolve({
           stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "otherGroup","Title": "otherGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
@@ -285,6 +296,10 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
 
     const error = 'no group found';
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+      if (command === SpoFolderGetCommand) {
+        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
+      }
+
       if (command === SpoGroupGetCommand) {
         return Promise.reject(error);
       }
@@ -316,7 +331,12 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
+
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+      if (command === SpoFolderGetCommand) {
+        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
+      }
+
       if (command === SpoRoleDefinitionFolderCommand) {
         return Promise.resolve({
           stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
@@ -350,13 +370,18 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    const error = 'no role definition found';
+    const error = "The specified role definition name 'Full Control1' does not exist.";
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
-      if (command === SpoRoleDefinitionFolderCommand) {
-        return Promise.reject(error);
+      if (command === SpoFolderGetCommand) {
+        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/Shared Documents/FolderPermission", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
       }
 
-      return Promise.reject(new CommandError('Unknown case'));
+      if (command === SpoRoleDefinitionFolderCommand) {
+        return Promise.resolve({
+          stdout: '[{"BasePermissions": {"High": "2147483647","Low": "4294967295"},"Description": "Has full control.","Hidden": false,"Id": 1073741827,"Name": "Full Control","Order": 1,"RoleTypeKind": 5}]'
+        });
+      }
+      return Promise.reject(new CommandError(error));
     });
 
     await assert.rejects(command.action(logger, {
@@ -365,7 +390,7 @@ describe(commands.FOLDER_ROLEASSIGNMENT_ADD, () => {
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/FolderPermission',
         principalId: 11,
-        roleDefinitionName: 'Full Control'
+        roleDefinitionName: 'Full Control1'
       }
     } as any), new CommandError(error));
   });
