@@ -103,17 +103,17 @@ class SpoListGetCommand extends SpoCommand {
       logger.logToStderr(`Retrieving information for list in site at ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = '';
+    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
 
     if (args.options.id) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.id)}')`;
+      requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.id)}')`;
     }
     else if (args.options.title) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
+      requestUrl += `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
     }
     else if (args.options.url) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
-      requestUrl = `${args.options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+      requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
 
     let propertiesSelect: string = args.options.properties ? `?$select=${encodeURIComponent(args.options.properties)}` : ``;

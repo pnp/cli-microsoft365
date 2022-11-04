@@ -382,15 +382,6 @@ describe(commands.LIST_LABEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/web/GetList(\'%2Fsites%2Fteam1%2Fdocuments\')`) > -1) {
-        return Promise.resolve({ "RootFolder": { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "MyLibrary", "ProgID": null, "ServerRelativeUrl": "/sites/team1/MyLibrary", "TimeCreated": "2019-01-11T10:03:19Z", "TimeLastModified": "2019-01-11T10:03:20Z", "UniqueId": "faaa6af2-0157-4e9a-a352-6165195923c8", "WelcomePage": "" } }
-        );
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
     await command.action(logger, {
       options: {
         debug: true,

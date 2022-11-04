@@ -32,37 +32,37 @@ m365 spo list get [options]
 
 ## Examples
 
-Get information about a list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get information about a list with specified ID located in the specified site.
 
 ```sh
 m365 spo list get --id 0cd891ef-afce-4e55-b836-fce03286cccf --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
-Get information about a list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get information about a list with specified title located in the specified site.
 
 ```sh
 m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
-Get information about a list with server relative url _sites/project-x/Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get information about a list with specified server relative url located in the specified site.
 
 ```sh
-m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'sites/project-x/Documents'
+m365 spo list get --url 'sites/project-x/Documents' --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
-Get information about a list with site-relative URL _Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get information about a list with specified site-relative URL located in the specified site.
 
 ```sh
-m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents'
+m365 spo list get --url 'Shared Documents' --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
-Get information about a list returning the specified list properties
+Get information about a list returning the specified list properties.
 
 ```sh
 m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Id,HasUniqueRoleAssignments,AllowContentTypes"
 ```
 
-Get information about a list along with the roles and permissions
+Get information about a list along with the roles and permissions.
 
 ```sh
 m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x --withPermissions

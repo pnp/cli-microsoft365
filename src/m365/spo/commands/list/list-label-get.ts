@@ -93,42 +93,47 @@ class SpoListLabelGetCommand extends SpoCommand {
         logger.logToStderr(`Getting label set on the list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
       }
 
-      let requestUrl: string = '';
+      let requestUrl: string = `${args.options.webUrl}/_api/web/`;
 
       if (args.options.listId) {
         if (this.debug) {
           logger.logToStderr(`Retrieving List from Id '${args.options.listId}'...`);
         }
 
-        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')?$expand=RootFolder&$select=RootFolder`;
+        requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')?$expand=RootFolder&$select=RootFolder`;
       }
       else if (args.options.listTitle) {
         if (this.debug) {
           logger.logToStderr(`Retrieving List from Title '${args.options.listTitle}'...`);
         }
 
-        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder&$select=RootFolder`;
+        requestUrl += `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder&$select=RootFolder`;
       }
-      else if (args.options.listUrl) {
+
+      let listServerRelativeUrl: string = '';
+
+      if (args.options.listUrl) {
         if (this.debug) {
           logger.logToStderr(`Retrieving List from URL '${args.options.listUrl}'...`);
         }
 
-        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-        requestUrl = `${args.options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+        listServerRelativeUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      }
+      else {
+        const requestOptions: any = {
+          url: requestUrl,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        const listInstance: ListInstance = await request.get<ListInstance>(requestOptions);
+        listServerRelativeUrl = listInstance.RootFolder.ServerRelativeUrl;
       }
 
-      let requestOptions: any = {
-        url: requestUrl,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const listInstance = await request.get<ListInstance>(requestOptions);
-      const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listInstance.RootFolder.ServerRelativeUrl);
-      requestOptions = {
+      const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
+      const reqOptions: any = {
         url: `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`,
         headers: {
           'accept': 'application/json;odata=nometadata',
@@ -140,7 +145,7 @@ class SpoListLabelGetCommand extends SpoCommand {
         }
       };
 
-      const res = await request.post<any>(requestOptions);
+      const res = await request.post<any>(reqOptions);
       if (res['odata.null'] !== true) {
         logger.log(res);
       }

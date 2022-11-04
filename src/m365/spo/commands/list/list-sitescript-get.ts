@@ -93,19 +93,19 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
         logger.logToStderr(`Extracting Site Script from list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
       }
 
-      let requestUrl: string = '';
+      let requestUrl: string = `${args.options.webUrl}/_api/web/`;
 
       if (args.options.listId) {
         if (this.debug) {
           logger.logToStderr(`Retrieving List from Id '${args.options.listId}'...`);
         }
-        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')?$expand=RootFolder`;
+        requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')?$expand=RootFolder`;
       }
       else if (args.options.listTitle) {
         if (this.debug) {
           logger.logToStderr(`Retrieving List from Title '${args.options.listTitle}'...`);
         }
-        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder`;
+        requestUrl += `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder`;
       }
       else if (args.options.listUrl) {
         if (this.debug) {
@@ -113,7 +113,7 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
         }
 
         const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-        requestUrl = `${args.options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+        requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
       }
 
       let requestOptions: any = {
