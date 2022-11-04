@@ -11,13 +11,13 @@ m365 teams team archive [options]
 ## Options
 
 `-i, --id [id]`
-: The ID of the Microsoft Teams team to archive. Specify either id or name but not both
+: The ID of the Microsoft Teams team to archive. Specify either `id` or `name` but not both.
 
 `-n, --name [name]`
-: The display name of the Microsoft Teams team to archive. Specify either id or name but not both
+: The display name of the Microsoft Teams team to archive. Specify either `id` or `name` but not both.
 
 `--shouldSetSpoSiteReadOnlyForMembers`
-: Sets the permissions for team members to read-only on the SharePoint Online site associated with the team
+: Sets the permissions for team members to read-only on the SharePoint Online site associated with the team.
 
 --8<-- "docs/cmd/_global.md"
 

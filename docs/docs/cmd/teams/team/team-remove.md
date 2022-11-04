@@ -11,13 +11,13 @@ m365 teams team remove [options]
 ## Options
 
 `-i, --id [id]`
-: The ID of the Microsoft Teams team to remove. Specify either id or name but not both
+: The ID of the Microsoft Teams team to remove. Specify either `id` or `name` but not both.
 
 `-n, --name [name]`
-: The display name of the Microsoft Teams team to remove. Specify either id or name but not both
+: The display name of the Microsoft Teams team to remove. Specify either `id` or `name` but not both.
 
 `--confirm`
-: Don't prompt for confirming removing the specified team
+: Don't prompt for confirming removing the specified team.
 
 --8<-- "docs/cmd/_global.md"
 

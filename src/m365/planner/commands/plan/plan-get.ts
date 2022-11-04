@@ -40,6 +40,7 @@ class PlannerPlanGetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -73,30 +74,26 @@ class PlannerPlanGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && args.options.title) {
-          return 'Specify either id or title but not both';
+        if (args.options.title && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName';
         }
 
-        if (!args.options.id) {
-          if (!args.options.title) {
-            return 'Specify either id or title';
-          }
+        if (args.options.title && args.options.ownerGroupId && args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName but not both';
+        }
 
-          if (args.options.title && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-            return 'Specify either ownerGroupId or ownerGroupName';
-          }
-
-          if (args.options.title && args.options.ownerGroupId && args.options.ownerGroupName) {
-            return 'Specify either ownerGroupId or ownerGroupName but not both';
-          }
-
-          if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-            return `${args.options.ownerGroupId} is not a valid GUID`;
-          }
+        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+          return `${args.options.ownerGroupId} is not a valid GUID`;
         }
 
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['id', 'title']
     );
   }
 
