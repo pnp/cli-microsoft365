@@ -14,7 +14,7 @@ pp card clone [options]
 : The name of the environment.
 
 `--newName <newName>`
-: The name of the new card
+: The name of the new card.
 
 `-i, --id [id]`
 : The id of the card. Specify either `id` or `name` but not both.

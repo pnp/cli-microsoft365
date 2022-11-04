@@ -16,7 +16,6 @@ const command: Command = require('./card-clone');
 
 describe(commands.CARD_CLONE, () => {
   let commandInfo: CommandInfo;
-  //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validId = '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893';
   const validName = 'CLI 365 Card';
@@ -25,8 +24,6 @@ describe(commands.CARD_CLONE, () => {
   const cardResponse = {
     "CardIdClone": "80cff342-ddf1-4633-aec1-6d3d131b29e0"
   };
-
-  //#endregion
 
   let log: string[];
   let logger: Logger;
@@ -165,7 +162,6 @@ describe(commands.CARD_CLONE, () => {
     });
     assert(loggerLogSpy.calledWith(cardResponse));
   });
-
 
   it('correctly handles API OData error', async () => {
     const errorMessage = `The environment '${validEnvironment}' could not be retrieved. See the inner exception for more details: undefined`;
