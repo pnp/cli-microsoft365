@@ -110,7 +110,7 @@ class TeamsMeetingListCommand extends GraphCommand {
       let requestUrl = `${this.resource}/v1.0/`;
       if (isAppOnlyAuth) {
         if (!args.options.userId && !args.options.userName && !args.options.email) {
-          throw `The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only credentials`;
+          throw `The option 'userId', 'userName' or 'email' is required when retrieving meetings using application permissions`;
         }
         requestUrl += 'users/';
         if (args.options.userId) {

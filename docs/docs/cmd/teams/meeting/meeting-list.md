@@ -1,11 +1,11 @@
-# teams meetings list
+# teams meeting list
 
-Retrieve all online meetings for a given user
+Retrieve all online meetings for a given user or shared mailbox
 
 ## Usage
 
 ```sh
-m365 teams meetings list [options]
+m365 teams meeting list [options]
 ```
 
 ## Options
@@ -20,13 +20,13 @@ m365 teams meetings list [options]
 : The email of the user or shared mailbox, omit to retrieve meetings for current signed in user. Use either `id`, `userName` or `email`, but not multiple.
 
 `--startDateTime <startDateTime>`
-: The startdate used to query for meetings
+: The start date used to query for meetings.
 
 `--endDateTime [endDateTime]`
-: The enddate used to query for meetings
+: The end date used to query for meetings.
 
 `--isOrganizer`
-: Set to retrieve only meetings the user is organizer for  
+: Set to retrieve only meetings the user is organizer for.
 
 --8<-- "docs/cmd/_global.md"
 
