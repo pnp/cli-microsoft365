@@ -14,7 +14,7 @@ m365 spo file version remove [options]
 : The URL of the site where the file is located
 
 `--label <label>`
-: Label of version which will be retrieved
+: Label of version which will be removed
 
 `-u, --fileUrl [fileUrl]`
 : The server-relative URL of the file to retrieve. Specify either `fileUrl` or `fileId` but not both
