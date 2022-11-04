@@ -32,6 +32,11 @@ Initializes a CDS solution project using _yourPublisherName_ as publisher name a
 m365 pa solution init --publisherName yourPublisherName --publisherPrefix ypn
 ```
 
+## Response
+
+The response is a custom message which will show the location where the solution has been created and a message to remind you to have a look at the publisher information and solution name in the `Solution.xml` file.
+
+
 ## More information
 
 - Create and build a custom component: [https://docs.microsoft.com/en-us/powerapps/developer/component-framework/create-custom-controls-using-pcf](https://docs.microsoft.com/en-us/powerapps/developer/component-framework/create-custom-controls-using-pcf)

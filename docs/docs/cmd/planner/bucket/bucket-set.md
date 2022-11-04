@@ -22,9 +22,6 @@ m365 planner bucket set [options]
 `--planTitle [planTitle]`
 : Title of the plan to update the bucket of. Specify either `planId` or `planTitle` when using `name`. Always use in combination with either `ownerGroupId` or `ownerGroupName`. 
 
-`--planName [planName]`
-: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
-
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 

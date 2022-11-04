@@ -79,11 +79,11 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     assert.strictEqual(telemetry.name, commands.SOLUTION_REFERENCE_ADD);
   });
 
-  it('supports specifying path', () => {
+  it('supports specifying projectPath', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--path') > -1) {
+      if (o.option.indexOf('--projectPath') > -1) {
         containsOption = true;
       }
     });
@@ -93,14 +93,14 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   it('fails validation when no *.cdsproj exists in the current directory', async () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => []);
 
-    const actual = await command.validate({ options: { path: 'path/to/project' } }, commandInfo);
+    const actual = await command.validate({ options: { projectPath: 'path/to/project' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when more than one *.cdsproj exists in the current directory', async () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.cdsproj', 'file2.cdsproj'] as any);
 
-    const actual = await command.validate({ options: { path: 'path/to/project' } }, commandInfo);
+    const actual = await command.validate({ options: { projectPath: 'path/to/project' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -115,7 +115,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.cdsproj'] as any);
     sinon.stub(fs, 'existsSync').callsFake(() => false);
 
-    const actual = await command.validate({ options: { path: 'path/to/project' } }, commandInfo);
+    const actual = await command.validate({ options: { projectPath: 'path/to/project' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -128,7 +128,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     });
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
-    const actual = await command.validate({ options: { path: 'path/to/project' } }, commandInfo);
+    const actual = await command.validate({ options: { projectPath: 'path/to/project' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -141,7 +141,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     });
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
-    const actual = await command.validate({ options: { path: 'path/to/project' } }, commandInfo);
+    const actual = await command.validate({ options: { projectPath: 'path/to/project' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -154,7 +154,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     });
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
-    const actual = await command.validate({ options: { path: 'path/to/project' } }, commandInfo);
+    const actual = await command.validate({ options: { projectPath: 'path/to/project' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -167,7 +167,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     });
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
-    const actual = await command.validate({ options: { path: 'path/to/project' } }, commandInfo);
+    const actual = await command.validate({ options: { projectPath: 'path/to/project' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -180,7 +180,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     });
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
-    const actual = await command.validate({ options: { path: 'path/to/project' } }, commandInfo);
+    const actual = await command.validate({ options: { projectPath: 'path/to/project' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -193,7 +193,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     });
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
-    const actual = await command.validate({ options: { path: 'path/to/project' } }, commandInfo);
+    const actual = await command.validate({ options: { projectPath: 'path/to/project' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -206,7 +206,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     });
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
-    const actual = await command.validate({ options: { path: 'path/to/project' } }, commandInfo);
+    const actual = await command.validate({ options: { projectPath: 'path/to/project' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -219,7 +219,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     });
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
-    const actual = await command.validate({ options: { path: 'path/to/project' } }, commandInfo);
+    const actual = await command.validate({ options: { projectPath: 'path/to/project' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -245,7 +245,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     const addProjectReferenceStub = sinon.stub(CdsProjectMutator.prototype, 'addProjectReference').callsFake(() => { });
     const fsWriteFileSync = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
-    await command.action(logger, { options: { path: pathToDirectory } });
+    await command.action(logger, { options: { projectPath: pathToDirectory } });
     assert(pathRelative.calledWith(process.cwd(), pathToPcfProject));
     assert(fsReadFileSync.calledWith(pathToCdsProject, 'utf8'));
     assert(addProjectReferenceStub.calledWith(pathToPcfProject));

@@ -13,10 +13,10 @@ m365 aad approleassignment remove [options]
 `--appId [appId]`
 : Application appId also known as clientId of the App Registration for which the configured scopes (app roles) should be deleted
 
-`--objectId [objectId]`
+`--appObjectId [appObjectId]`
 : Application objectId of the App Registration for which the configured scopes (app roles) should be deleted
 
-`--displayName [displayName]`
+`--appDisplayName [appDisplayName]`
 : Application name of the App Registration for which the configured scopes (app roles) should be deleted
 
 `-r, --resource <resource>`
@@ -34,7 +34,7 @@ m365 aad approleassignment remove [options]
 
 This command requires tenant administrator permissions.
 
-Specify either the `appId`, `objectId` or `displayName` but not both. If you specify more than one option value, the command will fail with an error.
+Specify either the `appId`, `appObjectId` or `appDisplayName` but not multiple. If you specify more than one option value, the command will fail with an error.
 
 Autocomplete values for the `resource` option do not mean allowed values. The autocomplete will just suggest some known names, but that doesn't restrict you to use name of your own custom application or other application within your tenant.
 
@@ -51,13 +51,13 @@ m365 aad approleassignment remove --appId "57907bf8-73fa-43a6-89a5-1f603e29e451"
 Deletes multiple Microsoft Graph application permissions from an Azure AD application with name _MyAppName_
 
 ```sh
-m365 aad approleassignment remove --displayName "MyAppName" --resource "Microsoft Graph" --scope "Mail.Read,Mail.Send"
+m365 aad approleassignment remove --appDisplayName "MyAppName" --resource "Microsoft Graph" --scope "Mail.Read,Mail.Send"
 ```
 
 Deletes Microsoft Graph _Mail.Read_ application permissions from a system managed identity app with objectId _57907bf8-73fa-43a6-89a5-1f603e29e451_
 
 ```sh
-m365 aad approleassignment remove --objectId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "Microsoft Graph" --scope "Mail.Read"
+m365 aad approleassignment remove --appObjectId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "Microsoft Graph" --scope "Mail.Read"
 ```
 
 ## More information

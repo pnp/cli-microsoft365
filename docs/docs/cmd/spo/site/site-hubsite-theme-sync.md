@@ -1,11 +1,11 @@
-# spo hubsite theme sync
+# spo site hubsite theme sync
 
-Applies any theme updates from the parent hub site.
+Applies any theme updates from the hub site the site is connected to.
 
 ## Usage
 
 ```sh
-m365 spo hubsite theme sync [options]
+m365 spo site hubsite theme sync [options]
 ```
 
 ## Options
@@ -22,10 +22,10 @@ m365 spo hubsite theme sync [options]
 
 ## Examples
 
-Applies any theme updates from the parent hub site to the site with URL https://contoso.sharepoint.com/sites/project-x
+Applies any theme updates from the hub site to a specific site
 
 ```sh
-m365 spo hubsite theme sync --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo site hubsite theme sync --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 ## More information

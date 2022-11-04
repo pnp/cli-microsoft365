@@ -14,16 +14,19 @@ m365 spo list view remove [options]
 : URL of the site where the list to remove the view from is located
 
 `--listId [listId]`
-: ID of the list from which the view should be removed. Specify either `listId` or `listTitle` but not both
+: ID of the list from which the view should be removed. Specify either `listId`, `listTitle`, or `listUrl`.
 
 `--listTitle [listTitle]`
-: Title of the list from which the view should be removed. Specify either `listId` or `listTitle` but not both
+: Title of the list from which the view should be removed. Specify either `listId`, `listTitle`, or `listUrl`.
 
-`--viewId [viewId]`
-: ID of the view to remove. Specify either `viewId` or `viewTitle` but not both
+ `--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listId` , `listTitle` or `listUrl`.
 
-`--viewTitle [viewTitle]`
-: Title of the view to remove. Specify either `viewId` or `viewTitle` but not both
+`--id [id]`
+: ID of the view to remove. Specify either `id` or `title` but not both
+
+`--title [title]`
+: Title of the view to remove. Specify either `id` or `title` but not both
 
 `--confirm`
 : Don't prompt for confirming removing the view
@@ -32,26 +35,32 @@ m365 spo list view remove [options]
 
 ## Examples
 
-Remove view with ID _cc27a922-8224-4296-90a5-ebbc54da2e81_ from the list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Remove view from the list by ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --viewId cc27a922-8224-4296-90a5-ebbc54da2e81
+m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81
 ```
 
 Remove view with ID _cc27a922-8224-4296-90a5-ebbc54da2e81_ from the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewId cc27a922-8224-4296-90a5-ebbc54da2e81
+m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81
 ```
 
 Remove view with title _MyView_ from a list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle MyView
+m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --title MyView
+```
+
+Remove view with title _MyView_ from a list with url _/sites/project-x/lists/Events_ located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/lists/Events' --viewTitle MyView
 ```
 
 Remove view with ID _cc27a922-8224-4296-90a5-ebbc54da2e81_ from a list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_ without being asked for confirmation
 
 ```sh
-m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewId cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
+m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
 ```

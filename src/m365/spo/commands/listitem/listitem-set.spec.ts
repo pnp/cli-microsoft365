@@ -7,9 +7,11 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 const command: Command = require('./listitem-set');
 
@@ -17,6 +19,10 @@ describe(commands.LISTITEM_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-w';
+  const listUrl = '/sites/project-x/lists/TestList';
+  const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
 
   const expectedTitle = `List Item 1`;
 
@@ -26,35 +32,29 @@ describe(commands.LISTITEM_SET, () => {
   const expectedContentType = 'Item';
   let actualContentType = '';
 
-  const postFakes = (opts: any) => {
-    if ((opts.url as string).indexOf('ValidateUpdateListItem') > -1) {
-      const bodyString = JSON.stringify(opts.data);
-      const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
-      actualContentType = ctMatch ? ctMatch[1] : "";
-      if (bodyString.indexOf("fail updating me") > -1) {return Promise.resolve({ value: [{ ErrorMessage: 'failed updating' }] });}
-      return Promise.resolve({ value: [{ ItemId: expectedId }] });
+  const postFakes = async (opts: any) => {
+    if (opts.url.indexOf('/_api/web/lists') > -1) {
+      if ((opts.url as string).indexOf('ValidateUpdateListItem') > -1) {
+        const bodyString = JSON.stringify(opts.data);
+        const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
+        actualContentType = ctMatch ? ctMatch[1] : "";
+        if (bodyString.indexOf("fail updating me") > -1) { return Promise.resolve({ value: [{ ErrorMessage: 'failed updating' }] }); }
+        return { value: [{ ItemId: expectedId }] };
+      }
     }
 
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
-      // requestObjectIdentity mock
       if (opts.data.indexOf('Name="Current"') > -1) {
-
         if ((opts.url as string).indexOf('rejectme.com') > -1) {
-
-          return Promise.reject('Failed request');
-
+          throw 'Failed request';
         }
 
         if ((opts.url as string).indexOf('returnerror.com') > -1) {
-
-          return Promise.resolve(JSON.stringify(
-            [{ "ErrorInfo": "error occurred" }]
-          ));
-
+          return JSON.stringify([{ "ErrorInfo": "error occurred" }]);
         }
 
-        return Promise.resolve(JSON.stringify(
-          [
+        if (opts.url === `https://objectidentityNotFound.sharepoint.com/sites/project-y/_vti_bin/client.svc/ProcessQuery`) {
+          return JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0",
               "LibraryVersion": "16.0.7618.1204",
@@ -63,39 +63,45 @@ describe(commands.LISTITEM_SET, () => {
             },
             {
               "_ObjectType_": "SP.Web",
-              "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
-              "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
+              "ServerRelativeUrl": "\\u002fsites\\u002fprojecty"
             }
-          ])
-        );
-
-      }
-      if (opts.data.indexOf('SystemUpdate') > -1) {
-
-        if (opts.data.indexOf('systemUpdate error') > -1) {
-          return Promise.resolve(
-            'ErrorMessage": "systemUpdate error"}'
-          );
-
+          ]);
         }
 
+        return JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0",
+            "LibraryVersion": "16.0.7618.1204",
+            "ErrorInfo": null,
+            "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021"
+          },
+          {
+            "_ObjectType_": "SP.Web",
+            "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
+            "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
+          }
+        ]);
+      }
+      if (opts.data.indexOf('SystemUpdate') > -1) {
+        if (opts.data.indexOf('systemUpdate error') > -1) {
+          return 'ErrorMessage": "systemUpdate error"}';
+        }
         actualId = expectedId;
-        return Promise.resolve(
-          ']SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7618.1204","ErrorInfo":null,"TraceCorrelationId":"3e3e629e-f0e9-5000-9f31-c6758b453a4a"'
-        );
+        return ']SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.7618.1204","ErrorInfo":null,"TraceCorrelationId":"3e3e629e-f0e9-5000-9f31-c6758b453a4a"';
       }
     }
-    return Promise.reject('Invalid request');
+
+    throw 'Invalid request';
   };
 
-  const getFakes = (opts: any) => {
-    if ((opts.url as string).indexOf('contenttypes') > -1) {
-      return Promise.resolve({ value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] });
-    }
-    if ((opts.url as string).indexOf('/items(') > -1) {
-      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
-      return Promise.resolve(
-        {
+  const getFakes = async (opts: any) => {
+    if (opts.url.indexOf('/_api/web/lists') > -1) {
+      if ((opts.url as string).indexOf('contenttypes') > -1) {
+        return { value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] };
+      }
+      if ((opts.url as string).indexOf('/items(') > -1) {
+        actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
+        return {
           "Attachments": false,
           "AuthorId": 3,
           "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
@@ -105,13 +111,37 @@ describe(commands.LISTITEM_SET, () => {
           "ID": actualId,
           "Modified": "2018-03-15T10:52:10Z",
           "Title": expectedTitle
-        }
-      );
+        };
+      }
+      if ((opts.url as string).indexOf(')?$select=Id') > -1) {
+        return { Id: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" };
+      }
     }
-    if ((opts.url as string).indexOf('/id') > -1) {
-      return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
+
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-w/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`) {
+      return { Id: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" };
     }
-    return Promise.reject('Invalid request');
+
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-w/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/contenttypes?$select=Name,Id`) {
+      return { value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] };
+    }
+
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-w/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(147)`) {
+      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
+      return {
+        "Attachments": false,
+        "AuthorId": 3,
+        "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+        "Created": "2018-03-15T10:43:10Z",
+        "EditorId": 3,
+        "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
+        "ID": actualId,
+        "Modified": "2018-03-15T10:52:10Z",
+        "Title": expectedTitle
+      };
+    }
+
+    throw 'Invalid request';
   };
 
   before(() => {
@@ -195,13 +225,13 @@ describe(commands.LISTITEM_SET, () => {
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('fails validation if listTitle and listId option not specified', async () => {
+  it('fails validation if listTitle, listId or listUrl option not specified', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if listTitle and listId are specified together', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1' } }, commandInfo);
+  it('fails validation if listTitle, listId and listUrl are specified together', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: listUrl, id: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -255,6 +285,26 @@ describe(commands.LISTITEM_SET, () => {
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       Title: expectedTitle
+    };
+
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(actualId, expectedId);
+  });
+
+  it('returns listItemInstance object when list item in list retrieved by URL is updated with correct values', async () => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    command.allowUnknownOptions();
+
+    const options: any = {
+      verbose: true,
+      listUrl: listUrl,
+      id: 147,
+      webUrl: webUrl,
+      contentType: 'Item',
+      Title: expectedTitle,
+      systemUpdate: true
     };
 
     await command.action(logger, { options: options } as any);
@@ -349,6 +399,24 @@ describe(commands.LISTITEM_SET, () => {
     await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Failed request"));
   });
 
+  it('fails to get _ObjecttIdentity_ when objectidentity not found', async () => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    actualId = 0;
+
+    const options: any = {
+      debug: true,
+      listTitle: 'Test List',
+      id: 147,
+      webUrl: 'https://objectidentityNotFound.sharepoint.com/sites/project-y',
+      Title: expectedTitle,
+      systemUpdate: true
+    };
+
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Cannot proceed. _ObjectIdentity_ not found"));
+  });
+
   it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request and systemUpdate parameter is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -364,7 +432,7 @@ describe(commands.LISTITEM_SET, () => {
       systemUpdate: true
     };
 
-    await assert.rejects(command.action(logger, { options:options } as any), new CommandError('ClientSvc unknown error'));
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('ClientSvc unknown error'));
     assert(actualId !== expectedId);
   });
 

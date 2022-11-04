@@ -5,7 +5,7 @@ Following table lists the different CLI for Microsoft 365 commands and how they 
 PowerShell Cmdlet|Source|CLI for Microsoft 365 command
 -----------------|------|----------------------
 Add-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
-Add-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
+Add-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite connect](../cmd/spo/site/site-hubsite-connect.md)
 Add-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.md)
 Add-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md)
@@ -55,7 +55,7 @@ Get-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|[spo orgassetslibrary list](../cmd/spo/orgassetslibrary/orgassetslibrary-list.md)
 Get-SPOOrgNewsSite|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOPublicCdnOrigins|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site classic list](../cmd/spo/site/site-classic-list.md)
+Get-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site list](../cmd/spo/site/site-list.md)
 Get-SPOSiteCollectionAppCatalogs|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteContentMoveState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOSiteDataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
@@ -103,7 +103,7 @@ New-SPOMigrationEncryptionParameters|Microsoft.Online.SharePoint.PowerShell|
 New-SPOMigrationPackage|Microsoft.Online.SharePoint.PowerShell|
 New-SPOPublicCdnOrigin|Microsoft.Online.SharePoint.PowerShell|
 New-SPOSdnProvider|Microsoft.Online.SharePoint.PowerShell|
-New-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site classic add](../cmd/spo/site/site-classic-add.md)
+New-SPOSite|Microsoft.Online.SharePoint.PowerShell|[spo site add](../cmd/spo/site/site-add.md)
 New-SPOSiteGroup|Microsoft.Online.SharePoint.PowerShell|
 New-SPOSiteSharingReportJob|Microsoft.Online.SharePoint.PowerShell|
 New-SPOTenantOrgRelation|Microsoft.Online.SharePoint.PowerShell|
@@ -113,7 +113,7 @@ Remove-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|[spo tenant recycle
 Remove-SPOExternalUser|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite remove](../cmd/spo/homesite/homesite-remove.md)
-Remove-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
+Remove-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite disconnect](../cmd/spo/site/site-hubsite-disconnect.md)
 Remove-SPOHubToHubAssociation|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOKnowledgeHubSite|Microsoft.Online.SharePoint.PowerShell|[spo knowledgehub remove](../cmd/spo/knowledgehub/knowledgehub-remove.md)
 Remove-SPOMigrationJob|Microsoft.Online.SharePoint.PowerShell|
@@ -214,7 +214,7 @@ Add-PnPFileToSiteTemplate|PnP.PowerShell|
 Add-PnPFolder|PnP.PowerShell|[spo folder add](../cmd/spo/folder/folder-add.md)
 Add-PnPGroupMember|PnP.PowerShell|[group user add](../cmd/spo/group/group-user-add.md)
 Add-PnPHtmlPublishingPageLayout|PnP.PowerShell|
-Add-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
+Add-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite connect](../cmd/spo/site/site-hubsite-connect.md)
 Add-PnPHubToHubAssociation|PnP.PowerShell|
 Add-PnPIndexedProperty|PnP.PowerShell|
 Add-PnPJavaScriptBlock|PnP.PowerShell|
@@ -481,7 +481,7 @@ Get-PnPTenantSequenceSite|PnP.PowerShell|
 Get-PnPTenantServicePrincipal|PnP.PowerShell|
 Get-PnPTenantServicePrincipalPermissionGrants|PnP.PowerShell|[spo serviceprincipal grant list](../cmd/spo/serviceprincipal/serviceprincipal-grant-list.md)
 Get-PnPTenantServicePrincipalPermissionRequests|PnP.PowerShell|[spo serviceprincipal permissionrequest list](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.md)
-Get-PnPTenantSite|PnP.PowerShell|[spo site get](../cmd/spo/site/site-get.md), [spo site classic list](../cmd/spo/site/site-classic-list.md)
+Get-PnPTenantSite|PnP.PowerShell|[spo site get](../cmd/spo/site/site-get.md), [spo site list](../cmd/spo/site/site-list.md)
 Get-PnPTenantSyncClientRestriction|PnP.PowerShell|
 Get-PnPTenantTemplate|PnP.PowerShell|
 Get-PnPTenantTheme|PnP.PowerShell|[spo theme get](../cmd/spo/theme/theme-get.md), [spo theme list](../cmd/spo/theme/theme-list.md)
@@ -604,7 +604,7 @@ Remove-PnPGraphSubscription|PnP.PowerShell|
 Remove-PnPGroup|PnP.PowerShell|[spo group remove](../cmd/spo/group/group-remove.md)
 Remove-PnPGroupMember|PnP.PowerShell|[spo group user remove](../cmd/spo/group/group-user-remove.md)
 Remove-PnPHomeSite|PnP.PowerShell|[spo homesite remove](../cmd/spo/homesite/homesite-remove.md)
-Remove-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
+Remove-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite disconnect](../cmd/spo/site/site-hubsite-disconnect.md)
 Remove-PnPHubToHubAssociation|PnP.PowerShell|
 Remove-PnPIndexedProperty|PnP.PowerShell|
 Remove-PnPJavaScriptLink|PnP.PowerShell|
@@ -786,7 +786,7 @@ Set-PnPTenant|PnP.PowerShell|[spo tenant settings set](../cmd/spo/tenant/tenant-
 Set-PnPTenantAppCatalogUrl|PnP.PowerShell|
 Set-PnPTenantCdnEnabled|PnP.PowerShell|[spo cdn set](../cmd/spo/cdn/cdn-set.md)
 Set-PnPTenantCdnPolicy|PnP.PowerShell|[spo cdn policy set](../cmd/spo/cdn/cdn-policy-set.md)
-Set-PnPTenantSite|PnP.PowerShell|[spo site classic set](../cmd/spo/site/site-classic-set.md)
+Set-PnPTenantSite|PnP.PowerShell|[spo site set](../cmd/spo/site/site-set.md)
 Set-PnPTenantSyncClientRestriction|PnP.PowerShell|
 Set-PnPTerm|PnP.PowerShell|
 Set-PnPTermGroup|PnP.PowerShell|

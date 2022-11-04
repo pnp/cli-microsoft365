@@ -7,12 +7,18 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 const command: Command = require('./listitem-get');
 
 describe(commands.LISTITEM_GET, () => {
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
+  const listUrl = 'sites/project-x/documents';
+  const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -23,11 +29,11 @@ describe(commands.LISTITEM_GET, () => {
 
   let actualId = 0;
 
-  const getFakes = (opts: any) => {
-    if ((opts.url as string).indexOf('/items(') > -1) {
-      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
-      return Promise.resolve(
-        {
+  const getFakes = async (opts: any) => {
+    if (opts.url.indexOf('/_api/web/lists') > -1) {
+      if ((opts.url as string).indexOf('/items(') > -1) {
+        actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
+        return {
           "Attachments": false,
           "AuthorId": 3,
           "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
@@ -37,10 +43,24 @@ describe(commands.LISTITEM_GET, () => {
           "ID": actualId,
           "Modified": "2018-03-15T10:43:10Z",
           "Title": expectedTitle
-        }
-      );
+        };
+      }
     }
-    return Promise.reject('Invalid request');
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(147)?$select=${formatting.encodeQueryParameter('Title,Modified')}`) {
+      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
+      return {
+        "Attachments": false,
+        "AuthorId": 3,
+        "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+        "Created": "2018-03-15T10:43:10Z",
+        "EditorId": 3,
+        "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
+        "ID": actualId,
+        "Modified": "2018-03-15T10:43:10Z",
+        "Title": expectedTitle
+      };
+    }
+    throw 'Invalid request';
   };
 
   before(() => {
@@ -117,13 +137,13 @@ describe(commands.LISTITEM_GET, () => {
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('fails validation if listTitle and listId option not specified', async () => {
+  it('fails validation if listTitle, listId or listUrl option not specified', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: expectedId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if listTitle and listId are specified together', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: expectedId } }, commandInfo);
+  it('fails validation if listTitle, listId and listUrl are specified together', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: listUrl, id: expectedId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -160,7 +180,7 @@ describe(commands.LISTITEM_GET, () => {
     const options: any = {
       debug: true,
       listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      webUrl: webUrl,
       id: expectedId
     };
 
@@ -176,7 +196,7 @@ describe(commands.LISTITEM_GET, () => {
     const options: any = {
       debug: false,
       listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      webUrl: webUrl,
       id: expectedId,
       output: "json",
       properties: "ID,Modified"
@@ -208,7 +228,7 @@ describe(commands.LISTITEM_GET, () => {
     const options: any = {
       debug: false,
       listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      webUrl: webUrl,
       id: expectedId,
       output: "json",
       properties: "Title,Modified,Company/Title"
@@ -230,7 +250,7 @@ describe(commands.LISTITEM_GET, () => {
     const options: any = {
       debug: false,
       listTitle: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      webUrl: webUrl,
       id: expectedId,
       output: "text"
     };
@@ -247,9 +267,27 @@ describe(commands.LISTITEM_GET, () => {
     const options: any = {
       debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      webUrl: webUrl,
       id: expectedId,
       output: "json"
+    };
+
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(actualId, expectedId);
+  });
+
+  it('returns listItemInstance object when list item is requested with an output type of text from a list specified by url, and a list of fields are being specified', async () => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    command.allowUnknownOptions();
+
+    const options: any = {
+      verbose: true,
+      webUrl: webUrl,
+      id: expectedId,
+      listUrl: listUrl,
+      output: 'json',
+      properties: 'Title,Modified'
     };
 
     await command.action(logger, { options: options } as any);
@@ -262,7 +300,7 @@ describe(commands.LISTITEM_GET, () => {
     const options: any = {
       debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      webUrl: webUrl,
       id: expectedId,
       output: "json"
     };

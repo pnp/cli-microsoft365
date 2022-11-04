@@ -111,6 +111,11 @@ describe('validation/validation', () => {
     assert.strictEqual(result, true);
   });
 
+  it('isValidGuid returns false if guid is empty', () => {
+    const result = validation.isValidGuid(undefined);
+    assert.strictEqual(result, false);
+  });
+
   it('isValidGuid returns false if invalid guid', () => {
     const result = validation.isValidGuid('b2307a39-e878-458b-bc90-03bc578531dw');
     assert(result === false);

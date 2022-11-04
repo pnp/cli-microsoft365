@@ -13,8 +13,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  id?: string;
-  url?: string;
+  fileId?: string;
+  fileUrl?: string;
 }
 
 interface SharingPrincipal {
@@ -67,8 +67,8 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        url: (!(!args.options.url)).toString()
+        fileId: (!(!args.options.fileId)).toString(),
+        fileUrl: (!(!args.options.fileUrl)).toString()
       });
     });
   }
@@ -76,13 +76,13 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-w, --webUrl <webUrl>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [id]'
+        option: '-i, --fileId [fileId]'
       },
       {
-        option: '-u, --url [url]'
+        option: '-f, --fileUrl [fileUrl]'
       }
     );
   }
@@ -95,9 +95,9 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
     
-        if (args.options.id) {
-          if (!validation.isValidGuid(args.options.id)) {
-            return `${args.options.id} is not a valid GUID`;
+        if (args.options.fileId) {
+          if (!validation.isValidGuid(args.options.fileId)) {
+            return `${args.options.fileId} is not a valid GUID`;
           }
         }
     
@@ -107,11 +107,11 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'url']);
+    this.optionSets.push(['fileId', 'fileUrl']);
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
-    return ['url'];
+    return ['fileUrl'];
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -172,11 +172,11 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
   private getNeededFileInformation(args: CommandArgs): Promise<{ fileItemId: number; libraryName: string; }> {
     let requestUrl: string = '';
 
-    if (args.options.id) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${escape(args.options.id as string)}')/?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
+    if (args.options.fileId) {
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${escape(args.options.fileId as string)}')/?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
     }
     else {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${encodeURIComponent(args.options.url as string)}')?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${encodeURIComponent(args.options.fileUrl as string)}')?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
     }
 
     const requestOptions: any = {

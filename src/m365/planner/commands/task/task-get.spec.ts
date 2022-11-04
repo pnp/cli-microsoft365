@@ -178,11 +178,6 @@ describe(commands.TASK_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-  
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['id', 'title']]);
@@ -483,41 +478,6 @@ describe(commands.TASK_GET, () => {
     assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('Correctly gets task by name with deprecated planName', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
-        return Promise.resolve(singleGroupResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
-        return Promise.resolve(singlePlanResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
-        return Promise.resolve(singleBucketByNameResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
-        return Promise.resolve(singleTaskByTitleResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
-        return Promise.resolve(taskResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
-        return Promise.resolve(taskDetailsResponse);
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    await command.action(logger, {
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planName: validPlanTitle,
-        ownerGroupName: validOwnerGroupName
-      }
-    });
-    assert(loggerLogSpy.calledWith(outputResponse));
-  });
-
   it('correctly gets task by task ID', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
@@ -533,27 +493,6 @@ describe(commands.TASK_GET, () => {
     await command.action(logger, {
       options: {
         id: validTaskId
-      }
-    });
-    assert(loggerLogSpy.calledWith(outputResponse));
-  });
-
-  // This test has been added to support task details get alias. Needs to be removed when deprecation is removed. 
-  it('correctly gets task by task ID from task details get', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
-        return Promise.resolve(taskResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
-        return Promise.resolve(taskDetailsResponse);
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    await command.action(logger, {
-      options: {
-        taskId: validTaskId
       }
     });
     assert(loggerLogSpy.calledWith(outputResponse));

@@ -414,31 +414,6 @@ describe(commands.BUCKET_GET, () => {
     }));
   });
 
-  it('Correctly gets bucket by deprecated plan name and owner group ID', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
-        return Promise.resolve(singlePlanResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
-        return Promise.resolve(singleBucketByNameResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
-        return Promise.resolve(singleBucketByIdResponse);
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    await assert.doesNotReject(command.action(logger, {
-      options: {
-        name: validBucketName,
-        planName: validPlanTitle,
-        ownerGroupId: validOwnerGroupId,
-        verbose: true
-      }
-    }));
-  });
-
   it('supports debug mode', () => {
     const options = command.options;
     let containsOption = false;

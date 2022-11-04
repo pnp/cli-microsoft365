@@ -16,7 +16,7 @@ m365 spo app add [options]
 `--overwrite`
 : Set to overwrite the existing package file
 
-`-s, --scope [scope]`
+`-s, --appCatalogScope [appCatalogScope]`
 : Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
 
 `-u, --appCatalogUrl [appCatalogUrl]`
@@ -51,7 +51,7 @@ m365 spo app add --filePath sharepoint/solution/spfx.sppkg --overwrite
 Add the _spfx.sppkg_ package to the site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_
 
 ```sh
-m365 spo app add --filePath c:\spfx.sppkg --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+m365 spo app add --filePath c:\spfx.sppkg --appCatalogScope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 ## More information

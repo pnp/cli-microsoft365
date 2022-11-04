@@ -14,7 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   title: string;
-  webUrl: string;
+  url: string;
   webTemplate: string;
   parentWebUrl: string;
   description?: string;
@@ -60,7 +60,7 @@ class SpoWebAddCommand extends SpoCommand {
         option: '-d, --description [description]'
       },
       {
-        option: '-u, --webUrl <webUrl>'
+        option: '-u, --url <url>'
       },
       {
         option: '-w, --webTemplate <webTemplate>'
@@ -101,7 +101,7 @@ class SpoWebAddCommand extends SpoCommand {
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
-    return ['webUrl'];
+    return ['url'];
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -120,7 +120,7 @@ class SpoWebAddCommand extends SpoCommand {
         responseType: 'json',
         data: {
           parameters: {
-            Url: args.options.webUrl,
+            Url: args.options.url,
             Title: args.options.title,
             Description: args.options.description,
             Language: args.options.locale,
@@ -141,7 +141,7 @@ class SpoWebAddCommand extends SpoCommand {
           logger.logToStderr("Setting inheriting navigation from the parent site...");
         }
 
-        subsiteFullUrl = `${args.options.parentWebUrl}/${encodeURIComponent(args.options.webUrl)}`;
+        subsiteFullUrl = `${args.options.parentWebUrl}/${encodeURIComponent(args.options.url)}`;
 
         const requestOptionsPer: any = {
           url: `${subsiteFullUrl}/_api/web/effectivebasepermissions`,

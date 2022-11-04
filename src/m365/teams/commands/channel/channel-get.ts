@@ -19,8 +19,8 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   teamId?: string;
   teamName?: string;
-  channelId?: string;
-  channelName?: string;
+  id?: string;
+  name?: string;
   primary?: boolean;
 }
 
@@ -49,8 +49,8 @@ class TeamsChannelGetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         teamId: typeof args.options.teamId !== 'undefined',
         teamName: typeof args.options.teamName !== 'undefined',
-        channelId: typeof args.options.channelId !== 'undefined',
-        channelName: typeof args.options.channelName !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
         primary: (!(!args.options.primary)).toString()
       });
     });
@@ -59,16 +59,16 @@ class TeamsChannelGetCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --teamId [teamId]'
+        option: '--teamId [teamId]'
       },
       {
         option: '--teamName [teamName]'
       },
       {
-        option: '-c, --channelId [channelId]'
+        option: '-i, --id [id]'
       },
       {
-        option: '--channelName [channelName]'
+        option: '--name [name]'
       },
       {
         option: '--primary'
@@ -79,12 +79,12 @@ class TeamsChannelGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
           return `${args.options.teamId} is not a valid GUID`;
         }
 
-        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
-          return `${args.options.channelId} is not a valid Teams ChannelId`;
+        if (args.options.id && !validation.isValidTeamsChannelId(args.options.id)) {
+          return `${args.options.id} is not a valid Teams channel id`;
         }
 
         return true;
@@ -95,7 +95,7 @@ class TeamsChannelGetCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       ['teamId', 'teamName'],
-      ['channelId', 'channelName', 'primary']
+      ['id', 'name', 'primary']
     );
   }
 
@@ -116,8 +116,8 @@ class TeamsChannelGetCommand extends GraphCommand {
   }
 
   private getChannelId(args: CommandArgs): Promise<string> {
-    if (args.options.channelId) {
-      return Promise.resolve(args.options.channelId);
+    if (args.options.id) {
+      return Promise.resolve(args.options.id);
     }
 
     if (args.options.primary) {
@@ -125,7 +125,7 @@ class TeamsChannelGetCommand extends GraphCommand {
     }
 
     const channelRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.name as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -167,7 +167,7 @@ class TeamsChannelGetCommand extends GraphCommand {
 
       const res: Channel = await request.get<Channel>(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
