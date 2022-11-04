@@ -116,12 +116,12 @@ class SpoFileVersionRemoveCommand extends SpoCommand {
   }
 
   private async removeVersion(args: CommandArgs): Promise<void> {
-    let requestUrl;
+    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
     if (args.options.fileUrl) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl)}')/versions/DeleteByLabel('${args.options.label}')`;
+      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl)}')/versions/DeleteByLabel('${args.options.label}')`;
     }
     else {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${args.options.fileId}')/versions/DeleteByLabel('${args.options.label}')`;
+      requestUrl += `GetFileById('${args.options.fileId}')/versions/DeleteByLabel('${args.options.label}')`;
     }
     const requestOptions: any = {
       url: requestUrl,
