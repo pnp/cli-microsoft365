@@ -54,6 +54,7 @@
 - added docs response for adaptivecards, app, booking commands. [#3920](https://github.com/pnp/cli-microsoft365/issues/3920)
 - added docs response for todo, util, viva commands. [#3927](https://github.com/pnp/cli-microsoft365/issues/3927)
 - added docs response for pa, pp commands. [#3924](https://github.com/pnp/cli-microsoft365/issues/3924)
+- extended spo list set to include title and url option. [#3678](https://github.com/pnp/cli-microsoft365/issues/3678)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
