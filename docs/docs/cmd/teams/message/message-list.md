@@ -46,45 +46,6 @@ m365 teams message list --teamId fce9e580-8bba-4638-ab5c-ab40016651e3 --channelI
     ``` json
     [
       {
-        "id": "1666799520731",
-        "replyToId": null,
-        "etag": "1666799582385",
-        "messageType": "message",
-        "createdDateTime": "2022-10-26T15:52:00.731Z",
-        "lastModifiedDateTime": "2022-10-26T15:53:02.385Z",
-        "lastEditedDateTime": "2022-10-26T15:53:02.288Z",
-        "deletedDateTime": null,
-        "subject": "Second message Title",
-        "summary": null,
-        "chatId": null,
-        "importance": "normal",
-        "locale": "en-us",
-        "webUrl": "https://teams.microsoft.com/l/message/19%3Ae2916df2b11046beba42d22da898383f%40thread.tacv2/1666799520731?groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=0cac6cda-2e04-4a3d-9c16-9c91470d7022&createdTime=1666799520731&parentMessageId=1666799520731",
-        "policyViolation": null,
-        "eventDetail": null,
-        "from": {
-          "application": null,
-          "device": null,
-          "user": {
-            "id": "78ccf530-bbf0-47e4-aae6-da5f8c6fb142",
-            "displayName": "Nico De Cleyre",
-            "userIdentityType": "aadUser",
-            "tenantId": "0cac6cda-2e04-4a3d-9c16-9c91470d7022"
-          }
-        },
-        "body": {
-          "contentType": "text",
-          "content": "second message!"
-        },
-        "channelIdentity": {
-          "teamId": "aee5a2c9-b1df-45ac-9964-c708e760a045",
-          "channelId": "19:e2916df2b11046beba42d22da898383f@thread.tacv2"
-        },
-        "attachments": [],
-        "mentions": [],
-        "reactions": []
-      },
-      {
         "id": "1666799217259",
         "replyToId": null,
         "etag": "1666799649208",
@@ -98,7 +59,7 @@ m365 teams message list --teamId fce9e580-8bba-4638-ab5c-ab40016651e3 --channelI
         "chatId": null,
         "importance": "normal",
         "locale": "en-us",
-        "webUrl": "https://teams.microsoft.com/l/message/19%3Ae2916df2b11046beba42d22da898383f%40thread.tacv2/1666799217259?groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=0cac6cda-2e04-4a3d-9c16-9c91470d7022&createdTime=1666799217259&parentMessageId=1666799217259",
+        "webUrl": "https://teams.microsoft.com/l/message/19%3Ae2916df2b11046beba42d22da898383f%40thread.tacv2/1666799217259?groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba&createdTime=1666799217259&parentMessageId=1666799217259",
         "policyViolation": null,
         "eventDetail": null,
         "from": {
@@ -108,7 +69,7 @@ m365 teams message list --teamId fce9e580-8bba-4638-ab5c-ab40016651e3 --channelI
             "id": "78ccf530-bbf0-47e4-aae6-da5f8c6fb142",
             "displayName": "Nico De Cleyre",
             "userIdentityType": "aadUser",
-            "tenantId": "0cac6cda-2e04-4a3d-9c16-9c91470d7022"
+            "tenantId": "92e59666-257b-49c3-b1fa-1bae8107f6ba"
           }
         },
         "body": {
@@ -131,7 +92,6 @@ m365 teams message list --teamId fce9e580-8bba-4638-ab5c-ab40016651e3 --channelI
     ``` text
     id             summary  body
     -------------  -------  ---------------
-    1666799520731  null     second message!
     1666799217259  null     First message!
     ```
 
@@ -139,6 +99,5 @@ m365 teams message list --teamId fce9e580-8bba-4638-ab5c-ab40016651e3 --channelI
 
     ``` text
     id,summary,body
-    1666799520731,,second message!
     1666799217259,,First message!
     ```

@@ -56,84 +56,6 @@ m365 teams report deviceusageusercounts --period D7 --output json > "deviceusage
         "Linux": "0",
         "Report Date": "2022-10-24",
         "Report Period": "7"
-      },
-      {
-        "Report Refresh Date": "2022-10-24",
-        "Web": "0",
-        "Windows Phone": "0",
-        "Android Phone": "0",
-        "iOS": "0",
-        "Mac": "0",
-        "Windows": "1",
-        "Chrome OS": "0",
-        "Linux": "0",
-        "Report Date": "2022-10-23",
-        "Report Period": "7"
-      },
-      {
-        "Report Refresh Date": "2022-10-24",
-        "Web": "0",
-        "Windows Phone": "0",
-        "Android Phone": "0",
-        "iOS": "0",
-        "Mac": "0",
-        "Windows": "0",
-        "Chrome OS": "0",
-        "Linux": "0",
-        "Report Date": "2022-10-22",
-        "Report Period": "7"
-      },
-      {
-        "Report Refresh Date": "2022-10-24",
-        "Web": "0",
-        "Windows Phone": "0",
-        "Android Phone": "0",
-        "iOS": "0",
-        "Mac": "0",
-        "Windows": "0",
-        "Chrome OS": "0",
-        "Linux": "0",
-        "Report Date": "2022-10-21",
-        "Report Period": "7"
-      },
-      {
-        "Report Refresh Date": "2022-10-24",
-        "Web": "0",
-        "Windows Phone": "0",
-        "Android Phone": "0",
-        "iOS": "0",
-        "Mac": "0",
-        "Windows": "0",
-        "Chrome OS": "0",
-        "Linux": "0",
-        "Report Date": "2022-10-20",
-        "Report Period": "7"
-      },
-      {
-        "Report Refresh Date": "2022-10-24",
-        "Web": "0",
-        "Windows Phone": "0",
-        "Android Phone": "0",
-        "iOS": "0",
-        "Mac": "0",
-        "Windows": "1",
-        "Chrome OS": "0",
-        "Linux": "0",
-        "Report Date": "2022-10-19",
-        "Report Period": "7"
-      },
-      {
-        "Report Refresh Date": "2022-10-24",
-        "Web": "0",
-        "Windows Phone": "0",
-        "Android Phone": "0",
-        "iOS": "0",
-        "Mac": "0",
-        "Windows": "0",
-        "Chrome OS": "0",
-        "Linux": "0",
-        "Report Date": "2022-10-18",
-        "Report Period": "7"
       }
     ]
     ```
@@ -143,12 +65,6 @@ m365 teams report deviceusageusercounts --period D7 --output json > "deviceusage
     ``` text
     Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Chrome OS,Linux,Report Date,Report Period
     2022-10-24,0,0,0,0,0,1,0,0,2022-10-24,7
-    2022-10-24,0,0,0,0,0,1,0,0,2022-10-23,7
-    2022-10-24,0,0,0,0,0,0,0,0,2022-10-22,7
-    2022-10-24,0,0,0,0,0,0,0,0,2022-10-21,7
-    2022-10-24,0,0,0,0,0,0,0,0,2022-10-20,7
-    2022-10-24,0,0,0,0,0,1,0,0,2022-10-19,7
-    2022-10-24,0,0,0,0,0,0,0,0,2022-10-18,7
     ```
 
 === "CSV"
@@ -156,10 +72,4 @@ m365 teams report deviceusageusercounts --period D7 --output json > "deviceusage
     ``` text
     Report Refresh Date,Web,Windows Phone,Android Phone,iOS,Mac,Windows,Chrome OS,Linux,Report Date,Report Period
     2022-10-24,0,0,0,0,0,1,0,0,2022-10-24,7
-    2022-10-24,0,0,0,0,0,1,0,0,2022-10-23,7
-    2022-10-24,0,0,0,0,0,0,0,0,2022-10-22,7
-    2022-10-24,0,0,0,0,0,0,0,0,2022-10-21,7
-    2022-10-24,0,0,0,0,0,0,0,0,2022-10-20,7
-    2022-10-24,0,0,0,0,0,1,0,0,2022-10-19,7
-    2022-10-24,0,0,0,0,0,0,0,0,2022-10-18,7
     ```

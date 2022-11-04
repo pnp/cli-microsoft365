@@ -52,21 +52,6 @@ m365 teams user app list --userName admin@contoso.com
           "createdBy": null
         },
         "appId": "14d6962d-6eeb-4f48-8890-de55454bb136"
-      },
-      {
-        "id": "NzhjY2Y1MzAtYmJmMC00N2U0LWFhZTYtZGE1ZjhjNmZiMTQyIyMyMGMzNDQwZC1jNjdlLTQ0MjAtOWY4MC0wZTUwYzM5NjkzZGY=",
-        "teamsAppDefinition": {
-          "id": "MjBjMzQ0MGQtYzY3ZS00NDIwLTlmODAtMGU1MGMzOTY5M2RmIyMxLjAjI1B1Ymxpc2hlZA==",
-          "teamsAppId": "20c3440d-c67e-4420-9f80-0e50c39693df",
-          "displayName": "Calling",
-          "version": "1.0",
-          "publishingState": "published",
-          "shortDescription": "Calling app bar entry.",
-          "description": "Calling app bar entry.",
-          "lastModifiedDateTime": null,
-          "createdBy": null
-        },
-        "appId": "20c3440d-c67e-4420-9f80-0e50c39693df"
       }
     ]
     ```
@@ -77,7 +62,6 @@ m365 teams user app list --userName admin@contoso.com
     id                                                                                                        appId                                    displayName                 version
     --------------------------------------------------------------------------------------------------------  ---------------------------------------  --------------------------  -------
     NzhjY2Y1MzAtYmJmMC00N2U0LWFhZTYtZGE1ZjhjNmZiMTQyIyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=      14d6962d-6eeb-4f48-8890-de55454bb136     Activity                    1.0
-    NzhjY2Y1MzAtYmJmMC00N2U0LWFhZTYtZGE1ZjhjNmZiMTQyIyMyMGMzNDQwZC1jNjdlLTQ0MjAtOWY4MC0wZTUwYzM5NjkzZGY=      20c3440d-c67e-4420-9f80-0e50c39693df     Calling                     1.0
     ```
 
 === "CSV"
@@ -85,6 +69,5 @@ m365 teams user app list --userName admin@contoso.com
     ``` text
     id,appId,displayName,version
     NzhjY2Y1MzAtYmJmMC00N2U0LWFhZTYtZGE1ZjhjNmZiMTQyIyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=,14d6962d-6eeb-4f48-8890-de55454bb136,Activity,1.0
-    NzhjY2Y1MzAtYmJmMC00N2U0LWFhZTYtZGE1ZjhjNmZiMTQyIyMyMGMzNDQwZC1jNjdlLTQ0MjAtOWY4MC0wZTUwYzM5NjkzZGY=,20c3440d-c67e-4420-9f80-0e50c39693df,Calling,1.0
     ```
 

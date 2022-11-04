@@ -46,7 +46,7 @@ m365 teams team get --name "Team Name"
       "classification": null,
       "specialization": "none",
       "visibility": "public",
-      "webUrl": "https://teams.microsoft.com/l/team/19%3a2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41%40thread.tacv2/conversations?groupId=a40210cd-0060-4b91-aaa1-a44e0853d979&tenantId=0cac6cda-2e04-4a3d-9c16-9c91470d7022",
+      "webUrl": "https://teams.microsoft.com/l/team/19%3a2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41%40thread.tacv2/conversations?groupId=a40210cd-0060-4b91-aaa1-a44e0853d979&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba",
       "isArchived": false,
       "isMembershipLimitedToOwners": false,
       "discoverySettings": {
@@ -100,12 +100,12 @@ m365 teams team get --name "Team Name"
     specialization             : none
     summary                    : null
     visibility                 : public
-    webUrl                     : https://teams.microsoft.com/l/team/19%3a2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41%40thread.tacv2/conversations?groupId=a40210cd-0060-4b91-aaa1-a44e0853d979&tenantId=0cac6cda-2e04-4a3d-9c16-9c91470d7022
+    webUrl                     : https://teams.microsoft.com/l/team/19%3a2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41%40thread.tacv2/conversations?groupId=a40210cd-0060-4b91-aaa1-a44e0853d979&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba
     ```
 
 === "CSV"
 
     ``` text
     id,createdDateTime,displayName,description,internalId,classification,specialization,visibility,webUrl,isArchived,isMembershipLimitedToOwners,discoverySettings,summary,memberSettings,guestSettings,messagingSettings,funSettings
-    a40210cd-0060-4b91-aaa1-a44e0853d979,2022-10-31T12:50:42.819Z,Architecture,Architecture Discussion,19:2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41@thread.tacv2,,none,public,https://teams.microsoft.com/l/team/19%3a2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41%40thread.tacv2/conversations?groupId=a40210cd-0060-4b91-aaa1-a44e0853d979&tenantId=0cac6cda-2e04-4a3d-9c16-9c91470d7022,,,"{""showInTeamsSearchAndSuggestions"":true}",,"{""allowCreateUpdateChannels"":true,""allowCreatePrivateChannels"":true,""allowDeleteChannels"":true,""allowAddRemoveApps"":true,""allowCreateUpdateRemoveTabs"":true,""allowCreateUpdateRemoveConnectors"":true}","{""allowCreateUpdateChannels"":false,""allowDeleteChannels"":false}","{""allowUserEditMessages"":true,""allowUserDeleteMessages"":true,""allowOwnerDeleteMessages"":true,""allowTeamMentions"":true,""allowChannelMentions"":true}","{""allowGiphy"":true,""giphyContentRating"":""moderate"",""allowStickersAndMemes"":true,""allowCustomMemes"":true}"
+    a40210cd-0060-4b91-aaa1-a44e0853d979,2022-10-31T12:50:42.819Z,Architecture,Architecture Discussion,19:2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41@thread.tacv2,,none,public,https://teams.microsoft.com/l/team/19%3a2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41%40thread.tacv2/conversations?groupId=a40210cd-0060-4b91-aaa1-a44e0853d979&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba,,,"{""showInTeamsSearchAndSuggestions"":true}",,"{""allowCreateUpdateChannels"":true,""allowCreatePrivateChannels"":true,""allowDeleteChannels"":true,""allowAddRemoveApps"":true,""allowCreateUpdateRemoveTabs"":true,""allowCreateUpdateRemoveConnectors"":true}","{""allowCreateUpdateChannels"":false,""allowDeleteChannels"":false}","{""allowUserEditMessages"":true,""allowUserDeleteMessages"":true,""allowOwnerDeleteMessages"":true,""allowTeamMentions"":true,""allowChannelMentions"":true}","{""allowGiphy"":true,""giphyContentRating"":""moderate"",""allowStickersAndMemes"":true,""allowCustomMemes"":true}"
     ```
