@@ -196,15 +196,4 @@ describe(commands.FILE_VERSION_GET, () => {
     });
     assert(containsDebugOption);
   });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
-  });
 });

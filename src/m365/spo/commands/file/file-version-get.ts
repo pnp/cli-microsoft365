@@ -96,7 +96,6 @@ class SpoFileVersionGetCommand extends SpoCommand {
     }
   }
 
-  // Gets files from a folder recursively.
   private async getVersion(args: CommandArgs): Promise<any> {
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
     if (args.options.fileUrl) {
