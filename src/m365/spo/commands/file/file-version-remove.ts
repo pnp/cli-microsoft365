@@ -115,7 +115,6 @@ class SpoFileVersionRemoveCommand extends SpoCommand {
     }
   }
 
-  // Gets files from a folder recursively.
   private async removeVersion(args: CommandArgs): Promise<void> {
     let requestUrl;
     if (args.options.fileUrl) {
