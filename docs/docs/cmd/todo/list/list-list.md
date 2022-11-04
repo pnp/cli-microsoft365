@@ -19,3 +19,34 @@ Get the list of Microsoft To Do task lists
 ```sh
 m365 todo list list
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "displayName": "Tasks",
+        "isOwner": true,
+        "isShared": false,
+        "wellknownListName": "defaultList",
+        "id": "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQAAAgESAAAA"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    displayName     id                                                                                                      
+    --------------  ------------------------------------------------------------------------------------------------------------------------
+    Tasks           AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQAAAgESAAAA
+    ```
+
+=== "CSV"
+
+    ```csv
+    displayName,id
+    Tasks,AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQAAAgESAAAA
+    ```

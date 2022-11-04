@@ -86,6 +86,10 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     return 'Upgrades SharePoint Framework project to the specified version';
   }
 
+  protected get allowedOutputs(): string[] {
+    return ['json', 'text', 'md', 'tour'];
+  }
+
   constructor() {
     super();
 
@@ -129,7 +133,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
 
     this.options.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
-        o.autocomplete = ['json', 'text', 'md', 'tour'];
+        o.autocomplete = this.allowedOutputs;
       }
     });
   }

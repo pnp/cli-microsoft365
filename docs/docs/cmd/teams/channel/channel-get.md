@@ -10,20 +10,20 @@ m365 teams channel get [options]
 
 ## Options
 
-`-i, --teamId [teamId]`
-: The ID of the team to which the channel belongs to. Specify either teamId or teamName but not both
+`--teamId [teamId]`
+: The ID of the team to which the channel belongs to. Specify either `teamId` or `teamName` but not both.
 
 `--teamName [teamName]`
-: The display name of the team to which the channel belongs to. Specify either teamId or teamName but not both
+: The display name of the team to which the channel belongs to. Specify either `teamId` or `teamName` but not both.
 
-`-c, --id [id]`
-: The ID of the channel for which to retrieve more information. Specify either id or name but not both
+`-i, --id [id]`
+: The ID of the channel for which to retrieve more information. Specify either `id` or `name` but not both.
 
 `--name [name]`
-: The display name of the channel for which to retrieve more information. Specify either id or name but not both
+: The display name of the channel for which to retrieve more information. Specify either `id` or `name` but not both.
 
 `--primary`
-: Gets the default channel, General, of a team. If specified, id or name are not needed
+: Gets the default channel, General, of a team. If specified, id or name are not needed.
 
 --8<-- "docs/cmd/_global.md"
 
