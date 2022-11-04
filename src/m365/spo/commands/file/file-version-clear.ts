@@ -106,7 +106,6 @@ class SpoFileVersionClearCommand extends SpoCommand {
     }
   }
 
-  // Gets files from a folder recursively.
   private async clearVersions(args: CommandArgs): Promise<void> {
     let requestUrl;
     if (args.options.fileUrl) {
