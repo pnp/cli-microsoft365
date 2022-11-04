@@ -107,7 +107,7 @@ class SpoFileVersionClearCommand extends SpoCommand {
   }
 
   private async clearVersions(args: CommandArgs): Promise<void> {
-    let requestUrl:string = `${args.options.webUrl}/_api/web/`;
+    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
     if (args.options.fileUrl) {
       requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl)}')/versions/DeleteAll()`;
     }
@@ -116,7 +116,6 @@ class SpoFileVersionClearCommand extends SpoCommand {
     }
     const requestOptions: any = {
       url: requestUrl,
-      method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
