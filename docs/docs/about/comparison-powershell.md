@@ -5,7 +5,7 @@ Following table lists the different CLI for Microsoft 365 commands and how they 
 PowerShell Cmdlet|Source|CLI for Microsoft 365 command
 -----------------|------|----------------------
 Add-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
-Add-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
+Add-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite connect](../cmd/spo/site/site-hubsite-connect.md)
 Add-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOSiteCollectionAppCatalog|Microsoft.Online.SharePoint.PowerShell|[spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.md)
 Add-SPOSiteDesign|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md)
@@ -113,7 +113,7 @@ Remove-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|[spo tenant recycle
 Remove-SPOExternalUser|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite remove](../cmd/spo/homesite/homesite-remove.md)
-Remove-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
+Remove-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite disconnect](../cmd/spo/site/site-hubsite-disconnect.md)
 Remove-SPOHubToHubAssociation|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOKnowledgeHubSite|Microsoft.Online.SharePoint.PowerShell|[spo knowledgehub remove](../cmd/spo/knowledgehub/knowledgehub-remove.md)
 Remove-SPOMigrationJob|Microsoft.Online.SharePoint.PowerShell|
@@ -214,7 +214,7 @@ Add-PnPFileToSiteTemplate|PnP.PowerShell|
 Add-PnPFolder|PnP.PowerShell|[spo folder add](../cmd/spo/folder/folder-add.md)
 Add-PnPGroupMember|PnP.PowerShell|[group user add](../cmd/spo/group/group-user-add.md)
 Add-PnPHtmlPublishingPageLayout|PnP.PowerShell|
-Add-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
+Add-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite connect](../cmd/spo/site/site-hubsite-connect.md)
 Add-PnPHubToHubAssociation|PnP.PowerShell|
 Add-PnPIndexedProperty|PnP.PowerShell|
 Add-PnPJavaScriptBlock|PnP.PowerShell|
@@ -604,7 +604,7 @@ Remove-PnPGraphSubscription|PnP.PowerShell|
 Remove-PnPGroup|PnP.PowerShell|[spo group remove](../cmd/spo/group/group-remove.md)
 Remove-PnPGroupMember|PnP.PowerShell|[spo group user remove](../cmd/spo/group/group-user-remove.md)
 Remove-PnPHomeSite|PnP.PowerShell|[spo homesite remove](../cmd/spo/homesite/homesite-remove.md)
-Remove-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
+Remove-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite disconnect](../cmd/spo/site/site-hubsite-disconnect.md)
 Remove-PnPHubToHubAssociation|PnP.PowerShell|
 Remove-PnPIndexedProperty|PnP.PowerShell|
 Remove-PnPJavaScriptLink|PnP.PowerShell|

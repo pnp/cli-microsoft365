@@ -14,10 +14,13 @@ m365 spo list view field add [options]
 : URL of the site where the list is located
 
 `--listId [listId]`
-: ID of the list where the view is located. Specify `listTitle` or `listId` but not both
+: ID of the list where the view is located. Specify either `listId`, `listTitle`, or `listUrl`.
 
 `--listTitle [listTitle]`
-: Title of the list where the view is located. Specify `listTitle` or `listId` but not both
+: Title of the list where the view is located. Specify either `listId`, `listTitle`, or `listUrl`.
+
+ `--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listId` , `listTitle` or `listUrl`.
 
 `--viewId [viewId]`
 : ID of the view to update. Specify `viewTitle` or `viewId` but not both
@@ -50,8 +53,15 @@ Add field with title _Custom field_ to view with title _All Documents_ of the li
 m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle 'All Documents' --title 'Custom field'
 ```
 
-Add field with title _Custom field_ at the position _0_ to view with title _All Documents_ of the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Add field with title _Custom field_ at the position _0_ to view with title _My Events_ of the list with url _/sites/project-x/lists/Events_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle 'All Documents' --title 'Custom field' --position 0
+m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/lists/Events' --viewTitle 'My Events' --title 'Custom field' --fieldPosition 0
 ```
+
+Add field with title _Custom field_ to view with title _All Documents_ of the list with site-relative URL _/Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --viewTitle 'All Documents' --fieldTitle 'Custom field'
+```
+
