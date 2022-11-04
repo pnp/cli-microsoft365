@@ -17,7 +17,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   title?: string;
-  name?: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
@@ -48,7 +47,6 @@ class SpoFieldSetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
@@ -73,9 +71,6 @@ class SpoFieldSetCommand extends SpoCommand {
       },
       {
         option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
       },
       {
         option: '-t, --title [title]'
@@ -115,7 +110,7 @@ class SpoFieldSetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'title', 'name']);
+    this.optionSets.push(['id', 'title']);
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -123,10 +118,6 @@ class SpoFieldSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.name) {
-      this.warn(logger, `Option 'name' is deprecated. Please use 'title' instead.`);
-    }
-
     try {
       const reqDigest = await spo.getRequestDigest(args.options.webUrl);
       const requestDigest = reqDigest.FormDigestValue;
@@ -215,7 +206,6 @@ class SpoFieldSetCommand extends SpoCommand {
       'listTitle',
       'listUrl',
       'id',
-      'name',
       'title',
       'updateExistingLists',
       'debug',

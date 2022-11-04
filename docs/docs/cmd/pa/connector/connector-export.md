@@ -16,7 +16,7 @@ m365 flow connector export
 
 ## Options
 
-`-e, --environment <environment>`
+`-e, --environmentName <environmentName>`
 : The name of the environment where the custom connector to export is located
 
 `-c, --connector <connector>`
@@ -39,11 +39,15 @@ If no output folder has been specified, the `pa connector export` command will c
 Export the specified custom connector
 
 ```sh
-m365 pa connector export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --connector shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa
+m365 pa connector export --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --connector shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa
 ```
 
 Export the specified custom connector to the specific directory
 
 ```sh
-m365 pa connector export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --connector shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa --outputFolder connector
+m365 pa connector export --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --connector shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa --outputFolder connector
 ```
+
+## Response
+
+The command won't return a response on success.

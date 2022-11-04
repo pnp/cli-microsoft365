@@ -14,7 +14,7 @@ interface CommandArgs {
 
 export interface Options extends GlobalOptions {
   webUrl: string;
-  folderUrl?: string;
+  url?: string;
   id?: string;
 }
 
@@ -39,8 +39,8 @@ class SpoFolderGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: (!(!args.options.id)).toString(),
-        folderUrl: (!(!args.options.folderUrl)).toString()
+        id: typeof args.options.id !== 'undefined',
+        url: typeof args.options.url !== 'undefined'
       });
     });
   }
@@ -51,7 +51,7 @@ class SpoFolderGetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folderUrl [folderUrl]'
+        option: '-f, --url [url]'
       },
       {
         option: '-i, --id [id]'
@@ -79,7 +79,7 @@ class SpoFolderGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['folderUrl', 'id']);
+    this.optionSets.push(['url', 'id']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -92,8 +92,8 @@ class SpoFolderGetCommand extends SpoCommand {
     if (args.options.id) {
       requestUrl = `${args.options.webUrl}/_api/web/GetFolderById('${encodeURIComponent(args.options.id)}')`;
     }
-    else if (args.options.folderUrl) {
-      const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
+    else if (args.options.url) {
+      const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
       requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')`;
     }
 

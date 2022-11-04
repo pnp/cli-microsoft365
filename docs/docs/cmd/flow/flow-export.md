@@ -13,7 +13,7 @@ m365 flow export [options]
 `-i, --id <id>`
 : The id of the Power Automate flow to export
 
-`-e, --environment <environment>`
+`-e, --environmentNameName <environmentName>`
 : The name of the environment for which to export the flow
 
 `-n, --packageDisplayName [packageDisplayName]`
@@ -50,23 +50,23 @@ If the Power Automate flow with the id you specified doesn't exist, you will get
 Export the specified Power Automate flow as a ZIP file
 
 ```sh
-m365 flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d
+m365 flow export --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d
 ```
 
 Export the specified Power Automate flow as a JSON file
 
 ```sh
-m365 flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --format json
+m365 flow export --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --format json
 ```
 
 Export the specified Power Automate flow as a ZIP file, specifying a Display Name of 'My flow name' to be embedded into the package
 
 ```sh
-m365 flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --packageDisplayName 'My flow name'
+m365 flow export --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --packageDisplayName 'My flow name'
 ```
 
 Export the specified Power Automate flow as a ZIP file with the filename 'MyFlow.zip' saved to the current directory
 
 ```sh
-m365 flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --path './MyFlow.zip'
+m365 flow export --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --path './MyFlow.zip'
 ```

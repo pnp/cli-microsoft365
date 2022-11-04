@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -11,11 +12,12 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  fieldId?: string;
-  fieldTitle?: string;
-  fieldPosition: string;
+  id?: string;
+  title?: string;
+  position: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   viewId?: string;
   viewTitle?: string;
   webUrl: string;
@@ -44,10 +46,11 @@ class SpoListViewFieldSetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
         viewId: typeof args.options.viewId !== 'undefined',
         viewTitle: typeof args.options.viewTitle !== 'undefined',
-        fieldId: typeof args.options.fieldId !== 'undefined',
-        fieldTitle: typeof args.options.fieldTitle !== 'undefined'
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined'
       });
     });
   }
@@ -64,19 +67,22 @@ class SpoListViewFieldSetCommand extends SpoCommand {
         option: '--listTitle [listTitle]'
       },
       {
+        option: '--listUrl [listUrl]'
+      },
+      {
         option: '--viewId [viewId]'
       },
       {
         option: '--viewTitle [viewTitle]'
       },
       {
-        option: '--fieldId [fieldId]'
+        option: '--id [id]'
       },
       {
-        option: '--fieldTitle [fieldTitle]'
+        option: '--title [title]'
       },
       {
-        option: '--fieldPosition <fieldPosition>'
+        option: '--position <position>'
       }
     );
   }
@@ -101,15 +107,15 @@ class SpoListViewFieldSetCommand extends SpoCommand {
           }
         }
 
-        if (args.options.fieldId) {
-          if (!validation.isValidGuid(args.options.fieldId)) {
-            return `${args.options.fieldId} is not a valid GUID`;
+        if (args.options.id) {
+          if (!validation.isValidGuid(args.options.id)) {
+            return `${args.options.id} is not a valid GUID`;
           }
         }
 
-        const position: number = parseInt(args.options.fieldPosition);
+        const position: number = parseInt(args.options.position);
         if (isNaN(position)) {
-          return `${args.options.fieldPosition} is not a number`;
+          return `${args.options.position} is not a number`;
         }
 
         return true;
@@ -119,29 +125,39 @@ class SpoListViewFieldSetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['listId', 'listTitle'],
+      ['listId', 'listTitle', 'listUrl'],
       ['viewId', 'viewTitle'],
-      ['fieldId', 'fieldTitle']
+      ['id', 'title']
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const listSelector: string = args.options.listId ? `(guid'${formatting.encodeQueryParameter(args.options.listId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+    let listSelector: string = '';
+    if (args.options.listId) {
+      listSelector = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+    }
+    else if (args.options.listTitle) {
+      listSelector = `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      listSelector = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
+
     const viewSelector: string = args.options.viewId ? `('${formatting.encodeQueryParameter(args.options.viewId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`;
 
     if (this.verbose) {
-      logger.logToStderr(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
+      logger.logToStderr(`Getting field ${args.options.id || args.options.title}...`);
     }
 
     try {
       const field = await this.getField(args.options, listSelector);
 
       if (this.verbose) {
-        logger.logToStderr(`Moving the field ${args.options.fieldId || args.options.fieldTitle} in view ${args.options.viewId || args.options.viewTitle} to position ${args.options.fieldPosition}...`);
+        logger.logToStderr(`Moving the field ${args.options.id || args.options.title} in view ${args.options.viewId || args.options.viewTitle} to position ${args.options.position}...`);
       }
 
-      const moveRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
-
+      const moveRequestUrl: string = `${args.options.webUrl}/_api/web/${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
       const moveRequestOptions: any = {
         url: moveRequestUrl,
         headers: {
@@ -149,7 +165,7 @@ class SpoListViewFieldSetCommand extends SpoCommand {
         },
         data: {
           field: field.InternalName,
-          index: args.options.fieldPosition
+          index: args.options.position
         },
         responseType: 'json'
       };
@@ -162,8 +178,8 @@ class SpoListViewFieldSetCommand extends SpoCommand {
   }
 
   private getField(options: Options, listSelector: string): Promise<{ InternalName: string; }> {
-    const fieldSelector: string = options.fieldId ? `/getbyid('${encodeURIComponent(options.fieldId)}')` : `/getbyinternalnameortitle('${encodeURIComponent(options.fieldTitle as string)}')`;
-    const getRequestUrl: string = `${options.webUrl}/_api/web/lists${listSelector}/fields${fieldSelector}`;
+    const fieldSelector: string = options.id ? `/getbyid('${encodeURIComponent(options.id)}')` : `/getbyinternalnameortitle('${encodeURIComponent(options.title as string)}')`;
+    const getRequestUrl: string = `${options.webUrl}/_api/web/${listSelector}/fields${fieldSelector}`;
 
     const requestOptions: any = {
       url: getRequestUrl,

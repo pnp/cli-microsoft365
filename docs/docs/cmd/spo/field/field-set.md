@@ -28,9 +28,6 @@ m365 spo field set [options]
 `-t, --title [title]`
 : Title or internal name of the field to update. Specify `id` or `title` but not both
 
-`-n, --name [name]`
-: (deprecated. Use `title` instead) Title or internal name of the field to update. Specify `id` or `name` but not both
-
 `--updateExistingLists`
 : Set, to push the update to existing lists. Otherwise, the changes will apply to new lists only
 
@@ -39,6 +36,9 @@ m365 spo field set [options]
 ## Remarks
 
 Specify properties to update using their names, eg. `--Title 'New Title' --JSLink jslink.js`.
+
+!!! warning "Escaping JSON in PowerShell"
+    When updating column formatting for a field with the `--CustomFormatter` option, it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.md#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.md#passing-complex-content-into-cli-options) instead.
 
 ## Examples
 
@@ -63,5 +63,5 @@ m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --lis
 Update column formatting of the specified list column
 
 ```sh
-m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --title 'MyColumn' --CustomFormatter '`{"schema":"https://developer.microsoft.com/json-schemas/sp/column-formatting.schema.json", "elmType": "div", "txtContent": "@currentField"}`'
+m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --title 'MyColumn' --CustomFormatter '{"schema":"https://developer.microsoft.com/json-schemas/sp/column-formatting.schema.json", "elmType": "div", "txtContent": "@currentField"}'
 ```

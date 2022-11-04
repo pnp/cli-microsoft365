@@ -20,7 +20,6 @@ interface Options extends GlobalOptions {
   id?: string;
   name?: string;
   planId?: string;
-  planName?: string;
   planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
@@ -51,7 +50,6 @@ class PlannerBucketRemoveCommand extends GraphCommand {
         id: typeof args.options.id !== 'undefined',
         name: typeof args.options.name !== 'undefined',
         planId: typeof args.options.planId !== 'undefined',
-        planName: typeof args.options.planName !== 'undefined',
         planTitle: typeof args.options.planTitle !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
         ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
@@ -72,9 +70,6 @@ class PlannerBucketRemoveCommand extends GraphCommand {
         option: '--planId [planId]'
       },
       {
-        option: '--planName [planName]'
-      },
-      {
         option: "--planTitle [planTitle]"
       },
       {
@@ -93,20 +88,20 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id) {
-	      if (args.options.planId || args.options.planName || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
+	      if (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
 	        return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
 	      }
 	    }
 	    else {
-	      if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
+	      if (!args.options.planId && !args.options.planTitle) {
 	        return 'Specify either planId or planTitle when using name';
 	      }
 
-	      if (args.options.planId && (args.options.planName || args.options.planTitle)) {
+	      if (args.options.planId && args.options.planTitle) {
 	        return 'Specify either planId or planTitle when using name but not both';  
 	      }
 
-	      if (args.options.planName || args.options.planTitle) {
+	      if (args.options.planTitle) {
 	        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
 	          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
 	        }
@@ -138,12 +133,6 @@ class PlannerBucketRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.planName) {
-      args.options.planTitle = args.options.planName;
-
-      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
-    }
-
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.');
       return;

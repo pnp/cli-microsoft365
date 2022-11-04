@@ -22,10 +22,6 @@ class AadAppRemoveCommand extends GraphCommand {
     return commands.APP_REMOVE;
   }
 
-  public alias(): string[] | undefined {
-    return [commands.APP_DELETE];
-  }
-
   public get description(): string {
     return 'Removes an Azure AD app registration';
   }
@@ -80,8 +76,6 @@ class AadAppRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, commands.APP_DELETE, commands.APP_REMOVE);
-
     const deleteApp: () => Promise<void> = async (): Promise<void> => {
       try {
         const objectId = await this.getObjectId(args, logger);

@@ -33,9 +33,6 @@ interface AppInfo {
   // objectId
   id: string;
   tenantId: string;
-  secret?: string;
-  // used when multiple secrets have been defined in the manifest
-  // in v6 we'll remove secret from AppInfo and just use secrets
   secrets?: {
     displayName: string;
     value: string;
@@ -268,9 +265,6 @@ class AadAppAddCommand extends GraphCommand {
         objectId: _appInfo.id,
         tenantId: _appInfo.tenantId
       };
-      if (_appInfo.secret) {
-        appInfo.secret = _appInfo.secret;
-      }
       if (_appInfo.secrets) {
         appInfo.secrets = _appInfo.secrets;
       }
@@ -881,8 +875,10 @@ class AadAppAddCommand extends GraphCommand {
     return this
       .createSecret({ appObjectId: appInfo.id })
       .then(secret => {
-        appInfo.secret = secret.value;
-        appInfo.secrets = [{ displayName: secret.displayName, value: secret.value }];
+        if (!appInfo.secrets) {
+          appInfo.secrets = [];
+        }
+        appInfo.secrets.push(secret);
         return Promise.resolve(appInfo);
       });
   }

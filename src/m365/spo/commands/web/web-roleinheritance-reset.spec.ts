@@ -16,6 +16,7 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -38,11 +39,16 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
         log.push(msg);
       }
     };
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
+      promptOptions = options;
+      return { continue: false };
+    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -107,7 +113,8 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com',
+        confirm: true
       }
     });
   });
@@ -124,6 +131,42 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
 
     await assert.rejects(command.action(logger, { options: {
       debug: true,
-      webUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError(err));
+      webUrl: 'https://contoso.sharepoint.com',
+      confirm: true } } as any), new CommandError(err));
+  });
+
+  it('aborts resetting role inheritance when prompt not confirmed', async () => {
+    const postSpy = sinon.spy(request, 'post');
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com' } });
+    assert(postSpy.notCalled);
+  });
+
+  it('prompts before resetting role inheritance when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com' } });
+  	let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
+  });
+
+  it('reset role inheritance when prompt confirmed', async () => {
+    let resetInheritanceCallIssued = false;
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/resetroleinheritance') > -1) {
+        resetInheritanceCallIssued = true;
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => {
+      return { continue: true };
+    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com' } });
+    assert(resetInheritanceCallIssued);
   });
 });

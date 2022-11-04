@@ -16,11 +16,9 @@ import commands from '../../commands';
 const command: Command = require('./listitem-isrecord');
 
 describe(commands.LISTITEM_ISRECORD, () => {
-  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
+  const webUrl = 'https://contoso.sharepoint.com/sites/project-y';
   const listUrl = 'sites/project-x/documents';
   const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
-  const currentWebIdentity = JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7618.1204", "ErrorInfo": null, "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021" }, { "_ObjectType_": "SP.Web", "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7", "ServerRelativeUrl": "\\u002fsites\\u002fprojectx" }]);
-  const itemDoesNotExistError = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "Item does not exist. It may have been deleted by another user.", "ErrorValue": null, "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32", "ErrorCode": -2130575338, "ErrorTypeName": "Microsoft.SharePoint.SPException" }, "LibraryVersion": "16.0.9005.1214", "SchemaVersion": "15.0.0.0", "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32" }]);
   const listIdResponse = { Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99' };
 
   let log: any[];
@@ -29,49 +27,70 @@ describe(commands.LISTITEM_ISRECORD, () => {
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
-  const postFakes = async (opts: any) => {
+  const postFakes = (opts: any) => {
     // requestObjectIdentity mock
     if (opts.data.indexOf('Name="Current"') > -1) {
       if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
         logger.log("Returns error from requestObjectIdentity");
-        throw 'error occurred';
+        return Promise.reject("error occurred");
       }
-      if (opts.url === `${webUrl}/_vti_bin/client.svc/ProcessQuery`) {
-        return currentWebIdentity;
-      }
+
+      return Promise.resolve(JSON.stringify(
+        [
+          {
+            "SchemaVersion": "15.0.0.0",
+            "LibraryVersion": "16.0.7618.1204",
+            "ErrorInfo": null,
+            "TraceCorrelationId": "3e3e629e-30cc-5000-9f31-cf83b8e70021"
+          },
+          {
+            "_ObjectType_": "SP.Web",
+            "_ObjectIdentity_": "d704ae73-d5ed-459e-80b0-b8103c5fb6e0|8f2be65d-f195-4699-b0de-24aca3384ba9:site:0ead8b78-89e5-427f-b1bc-6e5a77ac191c:web:4c076c07-e3f1-49a8-ad01-dbb70b263cd7",
+            "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
+          }
+        ])
+      );
     }
 
     // IsRecord request mocks
-    if (opts.url === `${webUrl}/_vti_bin/client.svc/ProcessQuery`) {
-      return JSON.stringify(
+    if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
+      // Unsuccessful response for when the item does not exist
+      if ((opts.url as string).indexOf('itemdoesnotexist.sharepoint.com') > -1) {
+        return Promise.resolve(JSON.stringify(
+          [
+            {
+              "ErrorInfo": { "ErrorMessage": "Item does not exist. It may have been deleted by another user.", "ErrorValue": null, "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32", "ErrorCode": -2130575338, "ErrorTypeName": "Microsoft.SharePoint.SPException" },
+              "LibraryVersion": "16.0.9005.1214",
+              "SchemaVersion": "15.0.0.0",
+              "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32"
+            }]));
+      }
+
+      // Successful response
+      return Promise.resolve(JSON.stringify(
         [
           {
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.9005.1214", "ErrorInfo": null, "TraceCorrelationId": "9ec8e69e-d001-8000-f13a-d5e03849cd96"
           }, 32, true
         ]
-      );
+      ));
     }
-
-    if (opts.url === 'https://itemdoesnotexist.sharepoint.com/sites/project-y/_vti_bin/client.svc/ProcessQuery') {
-      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="CLI for Microsoft 365 v5.9.0" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`) {
-        return currentWebIdentity;
-      }
-      return itemDoesNotExistError;
-    }
-    throw 'Invalid request';
+    return Promise.reject('Invalid request');
   };
 
-  const getFakes = async (opts: any) => {
+  const getFakes = (opts: any) => {
     // Get list mock
     if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
       (opts.url as string).indexOf('$select=Id') > -1) {
       logger.log('faked!');
-      return listIdResponse;
+      return Promise.resolve({
+        Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
+      });
     }
-    if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`) {
-      return listIdResponse;
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-y/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`) {
+      return Promise.resolve(listIdResponse);
     }
-    throw 'Invalid request';
+    return Promise.reject('Invalid request');
   };
 
   before(() => {

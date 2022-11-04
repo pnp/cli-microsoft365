@@ -193,6 +193,12 @@ const contributors = [{
     twitter: 'chirackalcyril'
   },
   {
+    name: 'Dan Greuel',
+    company: '',
+    github: 'dgreuel',
+    twitter: ''
+  },
+  {
     name: 'Daniaal Nadir',
     company: 'Smoothwall',
     github: 'daniaalnadir',
@@ -275,6 +281,12 @@ const contributors = [{
     company: 'Flybondi',
     github: 'gaston-flores',
     twitter: ''
+  },
+  {
+    name: 'Geoffrey Hunt',
+    company: '',
+    github: 'runningdeveloper',
+    twitter: 'geoff4l'
   },
   {
     name: 'Hugo Bernier',

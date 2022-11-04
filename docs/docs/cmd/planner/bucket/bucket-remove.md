@@ -22,9 +22,6 @@ m365 planner bucket remove [options]
 `--planTitle [planTitle]`
 : Title of the plan to which the bucket to remove belongs. Specify either `planId` or `planTitle` when using `name`.
 
-`--planName [planName]`
-: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
-
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify either `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 

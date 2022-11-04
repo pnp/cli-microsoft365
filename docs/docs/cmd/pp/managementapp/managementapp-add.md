@@ -48,3 +48,26 @@ Register Azure AD application named _My app_ as a management application for the
 ```sh
 m365 pp managementapp add --name "My app"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548e"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    applicationId: 31359c7f-bd7e-475c-86db-fdb8c937548e
+    ```
+
+=== "CSV"
+
+    ```csv
+    applicationId
+    31359c7f-bd7e-475c-86db-fdb8c937548e
+    ```

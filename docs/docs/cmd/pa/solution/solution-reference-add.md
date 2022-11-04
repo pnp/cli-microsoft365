@@ -10,7 +10,7 @@ m365 pa solution reference add [options]
 
 ## Options
 
-`-p, --path <path>`
+`-p, --projectPath <projectPath>`
 : The path to the referenced project
 
 --8<-- "docs/cmd/_global.md"
@@ -26,8 +26,12 @@ The CDS solution project and the PowerApps component framework project cannot ha
 Adds a reference inside the CDS Solution project in the current directory to the PowerApps component framework project at `./projects/ExampleProject`
 
 ```sh
-m365 pa solution reference add --path ./projects/ExampleProject
+m365 pa solution reference add --projectPath ./projects/ExampleProject
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

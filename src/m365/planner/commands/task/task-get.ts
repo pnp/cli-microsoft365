@@ -15,13 +15,11 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  taskId?: string; // This option has been added to support task details get alias. Needs to be removed when deprecation is removed. 
   id?: string;
   title?: string;
   bucketId?: string;
   bucketName?: string;
   planId?: string;
-  planName?: string;
   planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
@@ -30,10 +28,6 @@ interface Options extends GlobalOptions {
 class PlannerTaskGetCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_GET;
-  }
-
-  public alias(): string[] | undefined {
-    return [commands.TASK_DETAILS_GET];
   }
 
   public get description(): string {
@@ -57,7 +51,6 @@ class PlannerTaskGetCommand extends GraphCommand {
         bucketId: typeof args.options.bucketId !== 'undefined',
         bucketName: typeof args.options.bucketName !== 'undefined',
         planId: typeof args.options.planId !== 'undefined',
-        planName: typeof args.options.planName !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
         ownerGroupName: typeof args.options.ownerGroupName !== 'undefined'
       });
@@ -66,13 +59,11 @@ class PlannerTaskGetCommand extends GraphCommand {
 
   #initOptions(): void {
     this.options.unshift(
-      { option: '--taskId [taskId]' }, // This option has been added to support task details get alias. Needs to be removed when deprecation is removed. 
       { option: '-i, --id [id]' },
       { option: '-t, --title [title]' },
       { option: '--bucketId [bucketId]' },
       { option: '--bucketName [bucketName]' },
       { option: '--planId [planId]' },
-      { option: '--planName [planName]' },
       { option: '--planTitle [planTitle]' },
       { option: '--ownerGroupId [ownerGroupId]' },
       { option: '--ownerGroupName [ownerGroupName]' }
@@ -98,19 +89,19 @@ class PlannerTaskGetCommand extends GraphCommand {
 	      return 'Specify either bucketId or bucketName when using title but not both';
 	    }
 
-	    if (args.options.bucketName && !args.options.planId && !args.options.planName && !args.options.planTitle) {
+	    if (args.options.bucketName && !args.options.planId && !args.options.planTitle) {
 	      return 'Specify either planId or planTitle when using bucketName';
 	    }
 
-	    if (args.options.bucketName && args.options.planId && (args.options.planName || args.options.planTitle)) {
+	    if (args.options.bucketName && args.options.planId && args.options.planTitle) {
 	      return 'Specify either planId or planTitle when using bucketName but not both';
 	    }
 
-	    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+	    if (args.options.planTitle && !args.options.ownerGroupId && !args.options.ownerGroupName) {
 	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
 	    }
 
-	    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+	    if (args.options.planTitle && args.options.ownerGroupId && args.options.ownerGroupName) {
 	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
 	    }
 
@@ -130,22 +121,9 @@ class PlannerTaskGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, commands.TASK_DETAILS_GET, commands.TASK_GET);
-    
-    if (args.options.planName) {
-      args.options.planTitle = args.options.planName;
-
-      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
-    }
-
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.');
       return;
-    }
-
-    // This check has been added to support task details get alias. Needs to be removed when deprecation is removed. 
-    if (args.options.taskId) {
-      args.options.id = args.options.taskId;
     }
 
     try {

@@ -63,32 +63,64 @@ describe(commands.LIST_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('sets specified title for list', async () => {
-    const expected = 'List 1';
+  it('sets specified title for list retrieved by title', async () => {
+    const newTitle = 'List 1';
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`_api/web/lists/getByTitle(\'Documents\')`) > -1) {
         actual = opts.data.Title;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', title: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
-    assert.strictEqual(actual, expected);
+    await command.action(logger, { options: { debug: true, title: 'Documents', newTitle: newTitle, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, newTitle);
+  });
+
+  it('sets specified title for list retrieved by url', async () => {
+    const newTitle = 'List 1';
+    let actual = '';
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/GetList('%2Fsites%2Fproject-x%2Fdocuments')`) > -1) {
+        actual = opts.data.Title;
+        return { ErrorMessage: null };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { debug: true, url: 'sites/project-x/documents', newTitle: newTitle, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, newTitle);
+  });
+
+  it('sets specified title for list', async () => {
+    const newTitle = 'List 1';
+    let actual = '';
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists(guid'3EA5A977-315E-4E25-8B0F-E4F949BF6B8F')`) > -1) {
+        actual = opts.data.Title;
+        return { ErrorMessage: null };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { debug: true, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', newTitle: newTitle, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, newTitle);
   });
 
   it('sets specified description for list', async () => {
     const expected = 'List 1 description';
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.Description;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', description: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -98,13 +130,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified templateFeatureId for list', async () => {
     const expected = '00bfea71-de22-43b2-a848-c05709900100';
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.TemplateFeatureId;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -114,13 +146,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified schemaXml for list', async () => {
     const expected = `<List Title=\'List 1' ID='BE9CE88C-EF3A-4A61-9A8E-F8C038442227'></List>`;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.SchemaXml;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', schemaXml: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -130,13 +162,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified allowDeletion for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.AllowDeletion;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -146,13 +178,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified allowEveryoneViewItems for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.AllowEveryoneViewItems;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -162,13 +194,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified allowMultiResponses for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.AllowMultiResponses;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -178,13 +210,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified contentTypesEnabled for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.ContentTypesEnabled;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -194,13 +226,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified crawlNonDefaultViews for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.CrawlNonDefaultViews;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -210,13 +242,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified defaultContentApprovalWorkflowId for list', async () => {
     const expected = '00bfea71-de22-43b2-a848-c05709900100';
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.DefaultContentApprovalWorkflowId;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -226,13 +258,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified defaultDisplayFormUrl for list', async () => {
     const expected = '/sites/project-x/List%201/view.aspx';
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.DefaultDisplayFormUrl;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -242,13 +274,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified defaultEditFormUrl for list', async () => {
     const expected = '/sites/project-x/List%201/edit.aspx';
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.DefaultEditFormUrl;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -259,13 +291,13 @@ describe(commands.LIST_SET, () => {
     const expected = 'LTR';
     let actual = '';
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists(guid`) > -1) {
         actual = opts.data.Direction;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -275,13 +307,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified disableGridEditing for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.DisableGridEditing;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -291,13 +323,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified draftVersionVisibility for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.DraftVersionVisibility;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -307,13 +339,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified emailAlias for list', async () => {
     const expected = 'yourname@contoso.onmicrosoft.com';
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EmailAlias;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -323,13 +355,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enableAssignToEmail for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnableAssignToEmail;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -339,13 +371,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enableAttachments for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnableAttachments;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -355,13 +387,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enableDeployWithDependentList for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnableDeployWithDependentList;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -371,13 +403,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enableFolderCreation for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnableFolderCreation;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -387,13 +419,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enableMinorVersions for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnableMinorVersions;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -403,13 +435,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enableModeration for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnableModeration;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -419,13 +451,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enablePeopleSelector for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnablePeopleSelector;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -435,13 +467,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enableResourceSelector for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnableResourceSelector;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -451,13 +483,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enableSchemaCaching for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnableSchemaCaching;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -467,13 +499,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enableSyndication for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnableSyndication;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -483,13 +515,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enableThrottling for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnableThrottling;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -499,13 +531,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enableVersioning for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnableVersioning;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -515,13 +547,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified enforceDataValidation for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.EnforceDataValidation;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -531,13 +563,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified excludeFromOfflineClient for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.ExcludeFromOfflineClient;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -547,13 +579,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified fetchPropertyBagForListView for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.FetchPropertyBagForListView;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -563,13 +595,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified followable for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.Followable;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -579,13 +611,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified forceCheckout for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.ForceCheckout;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -595,13 +627,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified forceDefaultContentType for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.ForceDefaultContentType;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -611,13 +643,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified hidden for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.Hidden;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -627,13 +659,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified includedInMyFilesScope for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.IncludedInMyFilesScope;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -643,13 +675,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified irmEnabled for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.IrmEnabled;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -659,13 +691,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified irmExpire for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.IrmExpire;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -675,13 +707,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified irmReject for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.IrmReject;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -691,13 +723,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified isApplicationList for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.IsApplicationList;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -707,13 +739,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified listExperienceOptions for list', async () => {
     const expected = 'NewExperience';
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.ListExperienceOptions;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -723,13 +755,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified majorVersionLimit for list', async () => {
     const expected = 34;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.MajorVersionLimit;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -739,13 +771,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified majorWithMinorVersionsLimit for list', async () => {
     const expected = 20;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.MajorWithMinorVersionsLimit;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -755,13 +787,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified multipleDataList for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.MultipleDataList;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -771,13 +803,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified navigateForFormsPages for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.NavigateForFormsPages;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -787,13 +819,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified needUpdateSiteClientTag for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.NeedUpdateSiteClientTag;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -803,13 +835,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified noCrawl for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.NoCrawl;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -819,13 +851,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified onQuickLaunch for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.OnQuickLaunch;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -835,13 +867,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified ordered for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.Ordered;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -851,13 +883,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified parserDisabled for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.ParserDisabled;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -867,13 +899,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified readOnlyUI for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.ReadOnlyUI;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -883,13 +915,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified readSecurity for list', async () => {
     const expected = 2;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.ReadSecurity;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -899,13 +931,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified requestAccessEnabled for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.RequestAccessEnabled;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -915,13 +947,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified restrictUserUpdates for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.RestrictUserUpdates;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -931,13 +963,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified sendToLocationName for list', async () => {
     const expected = 'SendToLocation';
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.SendToLocationName;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -947,13 +979,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified sendToLocationUrl for list', async () => {
     const expected = '/sites/project-x/SendToLocation.aspx';
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.SendToLocationUrl;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -963,13 +995,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified showUser for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.ShowUser;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -979,13 +1011,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified useFormsForDisplay for list', async () => {
     const expected = true;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.UseFormsForDisplay;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -995,13 +1027,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified validationFormula for list', async () => {
     const expected = `IF(fieldName=true);'truetest':'falsetest'`;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.ValidationFormula;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -1011,13 +1043,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified validationMessage for list', async () => {
     const expected = 'Error on field x';
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.ValidationMessage;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -1027,13 +1059,13 @@ describe(commands.LIST_SET, () => {
   it('sets specified writeSecurity for list', async () => {
     const expected = 4;
     let actual = '';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
         actual = opts.data.WriteSecurity;
-        return Promise.resolve({ ErrorMessage: null });
+        return { ErrorMessage: null };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
@@ -1042,7 +1074,7 @@ describe(commands.LIST_SET, () => {
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('An error has occurred');
+      throw 'An error has occurred';
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any), new CommandError('An error has occurred'));
@@ -1084,6 +1116,16 @@ describe(commands.LIST_SET, () => {
   it('configures command types', () => {
     assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
+  });
+
+  it('fails validation if the neither id, title or url is set', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if id and title is set', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', title: 'Documents' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the id option is not a valid GUID', async () => {

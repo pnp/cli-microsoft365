@@ -13,10 +13,10 @@ m365 flow run resubmit [options]
 `-n, --name <name>`
 : The name of the run to resubmit
 
-`-f, --flow <flow>`
+`-f, --flowName <flowName>`
 : The name of the flow to resubmit the run for
 
-`-e, --environment <environment>`
+`-e, --environmentName <environmentName>`
 : The name of the environment where the Flow is located
 
 `--confirm`
@@ -40,11 +40,11 @@ If the run with the name you specified doesn't exist, you will get the `The work
 Resubmits a specific flow run for the specified Microsoft Flow
 
 ```sh
-m365 flow run resubmit --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flow 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
+m365 flow run resubmit --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
 ```
 
 Resubmits a specific flow run for the specified Microsoft Flow without prompting for confirmation
 
 ```sh
-m365 flow run resubmit --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flow 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62 --confirm
+m365 flow run resubmit --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62 --confirm
 ```

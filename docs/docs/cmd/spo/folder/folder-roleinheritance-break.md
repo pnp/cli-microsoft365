@@ -37,3 +37,9 @@ Break the inheritance of a folder with a specified server-relative URL. It will 
 ```sh
 m365 spo folder roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "/sites/project-x/Shared Documents/TestFolder" --clearExistingPermissions --confirm
 ```
+
+Break the inheritance of the specified root folder for the library with a specified server-relative URL. It will clear the existing permissions of the root folder. It will **not** prompt for confirmation before breaking the inheritance.
+
+```sh
+m365 spo folder roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --folderUrl "/sites/project-x/Shared Documents" --clearExistingPermissions --confirm
+```

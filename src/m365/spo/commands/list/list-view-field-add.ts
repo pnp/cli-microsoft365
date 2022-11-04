@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -11,11 +12,12 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  fieldId?: string;
-  fieldTitle?: string;
-  fieldPosition?: string;
+  id?: string;
+  title?: string;
+  position?: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   viewId?: string;
   viewTitle?: string;
   webUrl: string;
@@ -44,11 +46,12 @@ class SpoListViewFieldAddCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
         viewId: typeof args.options.viewId !== 'undefined',
         viewTitle: typeof args.options.viewTitle !== 'undefined',
-        fieldId: typeof args.options.fieldId !== 'undefined',
-        fieldTitle: typeof args.options.fieldTitle !== 'undefined',
-        fieldPosition: typeof args.options.fieldPosition !== 'undefined'
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        position: typeof args.options.position !== 'undefined'
       });
     });
   }
@@ -65,19 +68,22 @@ class SpoListViewFieldAddCommand extends SpoCommand {
         option: '--listTitle [listTitle]'
       },
       {
+        option: '--listUrl [listUrl]'
+      },
+      {
         option: '--viewId [viewId]'
       },
       {
         option: '--viewTitle [viewTitle]'
       },
       {
-        option: '--fieldId [fieldId]'
+        option: '--id [id]'
       },
       {
-        option: '--fieldTitle [fieldTitle]'
+        option: '--title [title]'
       },
       {
-        option: '--fieldPosition [fieldPosition]'
+        option: '--position [position]'
       }
     );
   }
@@ -102,16 +108,16 @@ class SpoListViewFieldAddCommand extends SpoCommand {
           }
         }
 
-        if (args.options.fieldId) {
-          if (!validation.isValidGuid(args.options.fieldId)) {
-            return `${args.options.fieldId} is not a valid GUID`;
+        if (args.options.id) {
+          if (!validation.isValidGuid(args.options.id)) {
+            return `${args.options.id} is not a valid GUID`;
           }
         }
 
-        if (args.options.fieldPosition) {
-          const position: number = parseInt(args.options.fieldPosition);
+        if (args.options.position) {
+          const position: number = parseInt(args.options.position);
           if (isNaN(position)) {
-            return `${args.options.fieldPosition} is not a number`;
+            return `${args.options.position} is not a number`;
           }
         }
 
@@ -122,32 +128,43 @@ class SpoListViewFieldAddCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['listId', 'listTitle'],
+      ['listId', 'listTitle', 'listUrl'],
       ['viewId', 'viewTitle'],
-      ['fieldId', 'fieldTitle']
+      ['id', 'title']
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const listSelector: string = args.options.listId ? `(guid'${formatting.encodeQueryParameter(args.options.listId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+    let listSelector: string = '';
+    if (args.options.listId) {
+      listSelector = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+    }
+    else if (args.options.listTitle) {
+      listSelector = `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      listSelector = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
+
     let viewSelector: string = '';
     let currentField: { InternalName: string; };
 
     if (this.verbose) {
-      logger.logToStderr(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
+      logger.logToStderr(`Getting field ${args.options.id || args.options.title}...`);
     }
 
     try {
       const field = await this.getField(args.options, listSelector);
 
       if (this.verbose) {
-        logger.logToStderr(`Adding the field ${args.options.fieldId || args.options.fieldTitle} to the view ${args.options.viewId || args.options.viewTitle}...`);
+        logger.logToStderr(`Adding the field ${args.options.id || args.options.title} to the view ${args.options.viewId || args.options.viewTitle}...`);
       }
 
       currentField = field;
 
       viewSelector = args.options.viewId ? `('${formatting.encodeQueryParameter(args.options.viewId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`;
-      const postRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/addviewfield('${field.InternalName}')`;
+      const postRequestUrl: string = `${args.options.webUrl}/_api/web/${listSelector}/views${viewSelector}/viewfields/addviewfield('${field.InternalName}')`;
 
       const postRequestOptions: any = {
         url: postRequestUrl,
@@ -159,7 +176,7 @@ class SpoListViewFieldAddCommand extends SpoCommand {
 
       await request.post(postRequestOptions);
 
-      if (typeof args.options.fieldPosition === 'undefined') {
+      if (typeof args.options.position === 'undefined') {
         if (this.debug) {
           logger.logToStderr(`No field position.`);
         }
@@ -169,20 +186,20 @@ class SpoListViewFieldAddCommand extends SpoCommand {
 
       if (this.debug) {
         logger.logToStderr(`moveField request...`);
-        logger.logToStderr(args.options.fieldPosition);
+        logger.logToStderr(args.options.position);
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Moving the field ${args.options.fieldId || args.options.fieldTitle} to the position ${args.options.fieldPosition} from view ${args.options.viewId || args.options.viewTitle}...`);
+        logger.logToStderr(`Moving the field ${args.options.id || args.options.title} to the position ${args.options.position} from view ${args.options.viewId || args.options.viewTitle}...`);
       }
-      const moveRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
+      const moveRequestUrl: string = `${args.options.webUrl}/_api/web/${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
 
       const moveRequestOptions: any = {
         url: moveRequestUrl,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
-        data: { 'field': currentField.InternalName, 'index': args.options.fieldPosition },
+        data: { 'field': currentField.InternalName, 'index': args.options.position },
         responseType: 'json'
       };
 
@@ -195,8 +212,8 @@ class SpoListViewFieldAddCommand extends SpoCommand {
   }
 
   private getField(options: Options, listSelector: string): Promise<{ InternalName: string; }> {
-    const fieldSelector: string = options.fieldId ? `/getbyid('${encodeURIComponent(options.fieldId)}')` : `/getbyinternalnameortitle('${encodeURIComponent(options.fieldTitle as string)}')`;
-    const getRequestUrl: string = `${options.webUrl}/_api/web/lists${listSelector}/fields${fieldSelector}`;
+    const fieldSelector: string = options.id ? `/getbyid('${encodeURIComponent(options.id)}')` : `/getbyinternalnameortitle('${encodeURIComponent(options.title as string)}')`;
+    const getRequestUrl: string = `${options.webUrl}/_api/web/${listSelector}/fields${fieldSelector}`;
 
     const requestOptions: any = {
       url: getRequestUrl,

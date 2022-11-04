@@ -82,7 +82,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         debug: false,
         listId: listId,
         webUrl: webUrl,
-        contentTypeId: contentTypeId
+        id: contentTypeId
       }
     });
     let promptIssued = false;
@@ -100,7 +100,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         debug: false,
         listTitle: listTitle,
         webUrl: webUrl,
-        contentTypeId: contentTypeId
+        id: contentTypeId
       }
     });
     let promptIssued = false;
@@ -150,7 +150,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         debug: true,
         listId: listId,
         webUrl: webUrl,
-        contentTypeId: contentTypeId
+        id: contentTypeId
       }
     });
     assert(postStub.called);
@@ -180,7 +180,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         debug: true,
         listTitle: listTitle,
         webUrl: webUrl,
-        contentTypeId: contentTypeId
+        id: contentTypeId
       }
     });
     assert(postStub.called);
@@ -210,7 +210,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         debug: true,
         listUrl: 'sites/documents',
         webUrl: webUrl,
-        contentTypeId: contentTypeId
+        id: contentTypeId
       }
     });
     assert(postStub.called);
@@ -239,7 +239,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
       options: {
         listUrl: 'sites/documents',
         webUrl: webUrl,
-        contentTypeId: contentTypeId
+        id: contentTypeId
       }
     });
     assert(postStub.called);
@@ -269,7 +269,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         debug: false,
         listId: listId,
         webUrl: webUrl,
-        contentTypeId: contentTypeId
+        id: contentTypeId
       }
     });
     assert(postStub.called);
@@ -299,7 +299,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         debug: false,
         listTitle: listTitle,
         webUrl: webUrl,
-        contentTypeId: contentTypeId
+        id: contentTypeId
       }
     });
     assert(postStub.called);
@@ -321,7 +321,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         debug: true,
         listTitle: listTitle,
         webUrl: webUrl,
-        contentTypeId: contentTypeId,
+        id: contentTypeId,
         confirm: true
       }
     }), new CommandError(err));
@@ -341,7 +341,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         debug: false,
         listTitle: listTitle,
         webUrl: webUrl,
-        contentTypeId: contentTypeId,
+        id: contentTypeId,
         confirm: true
       }
     });
@@ -363,7 +363,7 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
         debug: false,
         listId: listId,
         webUrl: webUrl,
-        contentTypeId: contentTypeId,
+        id: contentTypeId,
         confirm: true
       }
     });
@@ -382,37 +382,37 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
   });
 
   it('fails validation if both listId and listTitle options are not passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '0x0120' } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', id: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '0x0120' } }, commandInfo);
     assert(actual);
   });
 
   it('passes validation if the listTitle option is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', id: '0x0120' } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if both listId and listTitle options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', id: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -435,5 +435,12 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
   it('configures command types', () => {
     assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
+  });
+
+  it('configures content type ID as string option', () => {
+    const types = command.types;
+    ['i', 'id'].forEach(o => {
+      assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
+    });
   });
 });
