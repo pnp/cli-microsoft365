@@ -78,7 +78,7 @@ describe(commands.REMOVE, () => {
   it('fails validation if the name is not valid GUID', async () => {
     const actual = await command.validate({
       options: {
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: 'invalid'
       }
     }, commandInfo);
@@ -88,7 +88,7 @@ describe(commands.REMOVE, () => {
   it('passes validation when the name and environment specified', async () => {
     const actual = await command.validate({
       options: {
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
     }, commandInfo);
@@ -99,7 +99,7 @@ describe(commands.REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
     });
@@ -121,7 +121,7 @@ describe(commands.REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
     });
@@ -144,7 +144,7 @@ describe(commands.REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
     });
@@ -155,7 +155,7 @@ describe(commands.REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         asAdmin: true
       }
@@ -178,7 +178,7 @@ describe(commands.REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         asAdmin: true
       }
@@ -202,7 +202,7 @@ describe(commands.REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         asAdmin: true
       }
@@ -222,7 +222,7 @@ describe(commands.REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         confirm: true
       }
@@ -242,7 +242,7 @@ describe(commands.REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         confirm: true,
         asAdmin: true
@@ -265,7 +265,7 @@ describe(commands.REMOVE, () => {
       options:
       {
         debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         confirm: true
       }
@@ -291,7 +291,7 @@ describe(commands.REMOVE, () => {
       options:
       {
         debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
     } as any), new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`));
@@ -311,7 +311,7 @@ describe(commands.REMOVE, () => {
       options:
       {
         debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
     } as any);
@@ -327,7 +327,7 @@ describe(commands.REMOVE, () => {
       options:
       {
         debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         confirm: true
       }

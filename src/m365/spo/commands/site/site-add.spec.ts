@@ -362,7 +362,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Title;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -378,7 +378,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Url;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -388,29 +388,13 @@ describe(commands.SITE_ADD, () => {
     assert.strictEqual(actual, expected);
   });
 
-  it('enables sharing files with external users in communication site when allowFileSharingForGuestUsers specified', async () => {
-    const expected = true;
-    let actual = false;
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
-        actual = opts.data.request.ShareByEmailEnabled;
-        return Promise.resolve({ SiteStatus: 2});
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', allowFileSharingForGuestUsers: true } });
-    assert.strictEqual(actual, expected);
-  });
-
   it('enables sharing files with external users in communication site when shareByEmailEnabled specified', async () => {
     const expected = true;
     let actual = false;
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.ShareByEmailEnabled;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -420,22 +404,13 @@ describe(commands.SITE_ADD, () => {
     assert.strictEqual(actual, expected);
   });
 
-  it('shows deprecation warning when allowFileSharingForGuestUsers used in verbose mode', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.resolve({ SiteStatus: 2});
-    });
-
-    await command.action(logger, { options: { verbose: true, type: 'CommunicationSite', allowFileSharingForGuestUsers: true } });
-    assert(log.find(l => l.indexOf(`Option 'allowFileSharingForGuestUsers' is deprecated`) > -1));
-  });
-
-  it('sets sharing files with external users in communication site to undefined when allowFileSharingForGuestUsers and shareByEmailEnabled not specified', async () => {
+  it('sets sharing files with external users in communication site to undefined when shareByEmailEnabled not specified', async () => {
     const expected = undefined;
     let actual = false;
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.ShareByEmailEnabled;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -451,7 +426,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Description;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -467,7 +442,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Description;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -483,7 +458,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Classification;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -499,7 +474,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Classification;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -515,7 +490,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.SiteDesignId;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -531,7 +506,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.SiteDesignId;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -547,7 +522,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.SiteDesignId;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -563,7 +538,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.SiteDesignId;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -579,7 +554,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.SiteDesignId;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -595,7 +570,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Lcid;
-        return Promise.resolve({ SiteStatus: 2});
+        return Promise.resolve({ SiteStatus: 2 });
       }
 
       return Promise.reject('Invalid request');
@@ -697,17 +672,6 @@ describe(commands.SITE_ADD, () => {
     const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--isPublic') > -1) {
-        assert(true);
-        return;
-      }
-    }
-    assert(false);
-  });
-
-  it('supports specifying if the communication site allows sharing files with guest users (deprecated)', () => {
-    const options = command.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--allowFileSharingForGuestUsers') > -1) {
         assert(true);
         return;
       }

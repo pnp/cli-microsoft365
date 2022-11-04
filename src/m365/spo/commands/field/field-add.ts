@@ -1,8 +1,10 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -13,7 +15,9 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
+  listId?: string;
   listTitle?: string;
+  listUrl?: string;
   xml: string;
   options?: string;
 }
@@ -29,21 +33,23 @@ class SpoFieldAddCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         listTitle: typeof args.options.listTitle !== 'undefined',
+        listId: typeof args.options.listId !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
         options: typeof args.options.options !== 'undefined'
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -53,6 +59,12 @@ class SpoFieldAddCommand extends SpoCommand {
         option: '-l, --listTitle [listTitle]'
       },
       {
+        option: '--listId [listId]'
+      },
+      {
+        option: '--listUrl [listUrl]'
+      },
+      {
         option: '-x, --xml <xml>'
       },
       {
@@ -60,7 +72,7 @@ class SpoFieldAddCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -68,7 +80,16 @@ class SpoFieldAddCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
+        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
+        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
+          return `Specify either list id or title or list url, but not multiple`;
+        }
+
+        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} in option listId is not a valid GUID`;
+        }
+
         if (args.options.options) {
           let optionsError: string | boolean = true;
           const options: string[] = ['DefaultValue', 'AddToDefaultContentType', 'AddToNoContentType', 'AddToAllContentTypes', 'AddFieldInternalNameHint', 'AddFieldToDefaultView', 'AddFieldCheckDisplayName'];
@@ -80,7 +101,7 @@ class SpoFieldAddCommand extends SpoCommand {
           });
           return optionsError;
         }
-    
+
         return true;
       }
     );
@@ -88,9 +109,22 @@ class SpoFieldAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      let requestUrl = `${args.options.webUrl}/_api/web`;
+
+      if (args.options.listId) {
+        requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+      }
+      else if (args.options.listTitle) {
+        requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+      }
+      else if (args.options.listUrl) {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+      }
+
       const reqDigest = await spo.getRequestDigest(args.options.webUrl);
-      const requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/` : '')}fields/CreateFieldAsXml`,
+      const requestOptions: AxiosRequestConfig = {
+        url: `${requestUrl}/fields/CreateFieldAsXml`,
         headers: {
           'X-RequestDigest': reqDigest.FormDigestValue,
           accept: 'application/json;odata=nometadata'

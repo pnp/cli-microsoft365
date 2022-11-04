@@ -34,3 +34,46 @@ Retrieve API permissions for the Azure AD app with client ID _e23d235c-fcdf-45d1
 ```sh
 m365 app permission list --appId e23d235c-fcdf-45d1-ac5f-24ab2ee0695d
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "resource": "Microsoft Teams - Teams And Channels Service",
+        "permission": "channels.readwrite",
+        "type": "Application"
+      },
+      {
+        "resource": "Yammer",
+        "permission": "access_as_user",
+        "type": "Delegated"
+      },
+      {
+        "resource": "Yammer",
+        "permission": "user_impersonation",
+        "type": "Delegated"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    resource                                      permission          type
+    --------------------------------------------  ------------------  -----------
+    Microsoft Teams - Teams And Channels Service  channels.readwrite  Application
+    Yammer                                        access_as_user      Delegated
+    Yammer                                        user_impersonation  Delegated
+    ```
+
+=== "CSV"
+
+    ```csv
+    resource,permission,type
+    Microsoft Teams - Teams And Channels Service,channels.readwrite,Application
+    Yammer,access_as_user,Delegated
+    Yammer,user_impersonation,Delegated
+    ```

@@ -14,10 +14,13 @@ m365 spo listitem attachment list [options]
 URL of the site from which the item should be retrieved
 
 `--listId [listId]`
-: ID of the list from which to retrieve the item. Specify listId or listTitle but not both
+: ID of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
 
 `--listTitle [listTitle]`
-: Title of the list from which to retrieve the item. Specify listId or listTitle but not both
+: Title of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`
 
 `--itemId <itemId>`
 ID of the list item to in question
@@ -36,4 +39,10 @@ Gets the attachments from list item with itemId _147_ in list with id _0cd891ef-
 
 ```sh
 m365 spo listitem attachment list --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --itemId 147
+```
+
+Gets the attachments from a specific list item in a specific list obtained by server-relative URL in a specific site
+
+```sh
+m365 spo listitem attachment list --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/Documents --itemId 147
 ```

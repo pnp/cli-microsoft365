@@ -7,8 +7,10 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 const command: Command = require('./listitem-roleinheritance-reset');
 
@@ -16,6 +18,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -38,11 +41,16 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         log.push(msg);
       }
     };
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
+      promptOptions = options;
+      return { continue: false };
+    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -87,7 +95,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['listId', 'listTitle']]);
+    assert.deepStrictEqual(optionSets, [['listId', 'listTitle', 'listUrl']]);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
@@ -120,6 +128,30 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('reset role inheritance on list item by list url', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
+    const listUrl = '/sites/project-x/lists/TestList';
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+    const listItemId = 8;
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(${listItemId})/resetroleinheritance`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: webUrl,
+        listItemId: listItemId,
+        listUrl: listUrl
+      }
+    });
+  });
+
   it('reset role inheritance on list item by list title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/items(8)/resetroleinheritance') > -1) {
@@ -134,7 +166,8 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
-        listTitle: 'test'
+        listTitle: 'test',
+        confirm: true
       }
     });
   });
@@ -153,7 +186,33 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
-        listId: '0cd891ef-afce-4e55-b836-fce03286cccf'
+        listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+        confirm: true
+      }
+    });
+  });
+
+  it('reset role inheritance on list item by list url', async () => {
+    const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
+    const listUrl = '/sites/project-x/lists/TestList';
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
+    const listItemId = 8;
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(${listItemId})/resetroleinheritance`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: webUrl,
+        listItemId: listItemId,
+        listUrl: listUrl,
+        confirm: true
       }
     });
   });
@@ -173,8 +232,87 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
-        listTitle: 'test'
+        listTitle: 'test',
+        confirm: true
       }
     }), new CommandError(err));
+  });
+
+  it('aborts resetting role inheritance when prompt not confirmed', async () => {
+    const postSpy = sinon.spy(request, 'post');
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listTitle: 'test'
+      }
+    });
+    assert(postSpy.notCalled);
+  });
+
+  it('prompts before resetting role inheritance when confirmation argument not passed (Title)', async () => {
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listTitle: 'test'
+      }
+    });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
+  });
+
+  it('prompts before resetting role inheritance when confirmation argument not passed (id)', async () => {
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listId: '202b8199-b9de-43fd-9737-7f213f51c991'
+      }
+    });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
+  });
+
+  it('reset role inheritance when prompt confirmed', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/items(8)/resetroleinheritance') > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listTitle: 'test'
+      }
+    });
   });
 });

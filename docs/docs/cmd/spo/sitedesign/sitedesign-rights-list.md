@@ -10,14 +10,14 @@ m365 spo sitedesign rights list [options]
 
 ## Options
 
-`-i, --id <id>`
+`-i, --siteDesignId <siteDesignId>`
 : The ID of the site design to get rights information from
 
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-If the specified `id` doesn't refer to an existing site script, you will get a `File not found` error.
+If the specified `siteDesignId` doesn't refer to an existing site script, you will get a `File not found` error.
 
 If no permissions are listed, it means that the particular site design is visible to everyone.
 
@@ -26,7 +26,7 @@ If no permissions are listed, it means that the particular site design is visibl
 Get information about rights granted for the site design with ID _2c1ba4c4-cd9b-4417-832f-92a34bc34b2a_
 
 ```sh
-m365 spo sitedesign rights list --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
+m365 spo sitedesign rights list --siteDesignId 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
 ```
 
 ## More information

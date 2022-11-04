@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -16,7 +15,6 @@ const command: Command = require('./field-remove');
 describe(commands.FIELD_REMOVE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let requests: any[];
   let promptOptions: any;
@@ -42,8 +40,6 @@ describe(commands.FIELD_REMOVE, () => {
         log.push(msg);
       }
     };
-
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
 
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
@@ -127,25 +123,6 @@ describe(commands.FIELD_REMOVE, () => {
     ));
     await command.action(logger, { options: { debug: false, group: 'MyGroup', webUrl: 'https://contoso.sharepoint.com' } });
     assert(requests.length === 0);
-  });
-
-  it('logs deprecation warning when option fieldTitle is specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      requests.push(opts);
-
-      if ((opts.url as string).indexOf(`/_api/web/fields(guid'`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve();
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await assert.rejects(command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listTitle: 'Documents', confirm: true } }));
-    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'fieldTitle' is deprecated. Please use 'title' instead.`)));
   });
 
   it('removes the field when prompt confirmed', async () => {
@@ -566,10 +543,10 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title', 'fieldTitle', 'group']]);
+    assert.deepStrictEqual(optionSets, [['id', 'title', 'group']]);
   });
-  
-  it('fails validation if both id and fieldTitle options are not passed', async () => {
+
+  it('fails validation if both id and title options are not passed', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', confirm: true, listTitle: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

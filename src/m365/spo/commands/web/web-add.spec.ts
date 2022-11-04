@@ -75,7 +75,7 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('excludes options from URL processing', () => {
-    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['webUrl']);
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
   });
 
   it('creates web without inheriting the navigation', async () => {
@@ -107,7 +107,7 @@ describe(commands.WEB_ADD, () => {
     await command.action(logger, {
       options: {
         title: "subsite",
-        webUrl: "subsite",
+        url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
         locale: 1033,
         breakInheritance: true,
@@ -173,7 +173,7 @@ describe(commands.WEB_ADD, () => {
     await command.action(logger, {
       options: {
         title: "subsite",
-        webUrl: "subsite",
+        url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
         inheritNavigation: true,
         locale: 1033
@@ -237,7 +237,7 @@ describe(commands.WEB_ADD, () => {
     await command.action(logger, {
       options: {
         title: "subsite",
-        webUrl: "subsite",
+        url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
         inheritNavigation: true,
         locale: 1033,
@@ -319,7 +319,7 @@ describe(commands.WEB_ADD, () => {
     await command.action(logger, {
       options: {
         title: "subsite",
-        webUrl: "subsite",
+        url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
         inheritNavigation: true,
         locale: 1033,
@@ -388,7 +388,7 @@ describe(commands.WEB_ADD, () => {
     await command.action(logger, {
       options: {
         title: "subsite",
-        webUrl: "subsite",
+        url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com",
         inheritNavigation: true,
         locale: 1033
@@ -445,7 +445,7 @@ describe(commands.WEB_ADD, () => {
 
     await assert.rejects(command.action(logger, { options: {
       title: "subsite",
-      webUrl: "subsite",
+      url: "subsite",
       parentWebUrl: "https://contoso.sharepoint.com",
       inheritNavigation: true,
       local: 1033,
@@ -473,7 +473,7 @@ describe(commands.WEB_ADD, () => {
 
     await assert.rejects(command.action(logger, { options: {
       title: "subsite",
-      webUrl: "subsite",
+      url: "subsite",
       parentWebUrl: "https://contoso.sharepoint.com/sites/test",
       inheritNavigation: true,
       local: 1033,
@@ -520,7 +520,7 @@ describe(commands.WEB_ADD, () => {
 
     await assert.rejects(command.action(logger, { options: {
       title: "subsite",
-      webUrl: "subsite",
+      url: "subsite",
       parentWebUrl: "https://contoso.sharepoint.com",
       inheritNavigation: true,
       local: 1033,
@@ -533,7 +533,7 @@ describe(commands.WEB_ADD, () => {
     
     await assert.rejects(command.action(logger, { options: {
       title: "subsite",
-      webUrl: "subsite",
+      url: "subsite",
       parentWebUrl: "https://contoso.sharepoint.com",
       inheritNavigation: true,
       local: 1033,
@@ -548,7 +548,7 @@ describe(commands.WEB_ADD, () => {
 
     await assert.rejects(command.action(logger, { options: {
       title: "subsite",
-      webUrl: "subsite",
+      url: "subsite",
       parentWebUrl: "https://contoso.sharepoint.com",
       inheritNavigation: true,
       local: 1033,
@@ -569,7 +569,7 @@ describe(commands.WEB_ADD, () => {
   it('passes validation if all required options are specified', async () => {
     const actual = await command.validate({
       options: {
-        title: "subsite", webUrl: "subsite",
+        title: "subsite", url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0"
       }
     }, commandInfo);
@@ -579,7 +579,7 @@ describe(commands.WEB_ADD, () => {
   it('passes validation if all required options and valid locale are specified', async () => {
     const actual = await command.validate({
       options: {
-        title: "subsite", webUrl: "subsite",
+        title: "subsite", url: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0", locale: 1033
       }
     }, commandInfo);
@@ -590,7 +590,7 @@ describe(commands.WEB_ADD, () => {
     const actual = await command.validate({
       options: {
         title: "subsite",
-        webUrl: "subsite", webTemplate: "STS#0", locale: 1033
+        url: "subsite", webTemplate: "STS#0", locale: 1033
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -600,7 +600,7 @@ describe(commands.WEB_ADD, () => {
     const actual = await command.validate({
       options: {
         title: "subsite",
-        webUrl: "subsite", webTemplate: "STS#0", locale: 1033,
+        url: "subsite", webTemplate: "STS#0", locale: 1033,
         parentWebUrl: 'foo'
       }
     }, commandInfo);
@@ -610,7 +610,7 @@ describe(commands.WEB_ADD, () => {
   it('fails validation if the specified locale is not a number', async () => {
     const actual = await command.validate({
       options: {
-        title: "subsite", webUrl: "subsite", parentWebUrl: "https://contoso.sharepoint.com", webTemplate: 'STS#0', locale: 'abc'
+        title: "subsite", url: "subsite", parentWebUrl: "https://contoso.sharepoint.com", webTemplate: 'STS#0', locale: 'abc'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

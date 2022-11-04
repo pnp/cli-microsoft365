@@ -14,7 +14,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  hubSiteUrl: string;
   principals: string;
   confirm?: boolean;
 }
@@ -47,7 +47,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --hubSiteUrl <hubSiteUrl>'
       },
       {
         option: '-p, --principals <principals>'
@@ -60,7 +60,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.hubSiteUrl)
     );
   }
 
@@ -68,7 +68,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
     const revokeRights: () => Promise<void> = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          logger.logToStderr(`Revoking rights for ${args.options.principals} from ${args.options.url}...`);
+          logger.logToStderr(`Revoking rights for ${args.options.principals} from ${args.options.hubSiteUrl}...`);
         }
         
         const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
@@ -84,7 +84,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
           headers: {
             'X-RequestDigest': reqDigest.FormDigestValue
           },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="RevokeHubSiteRights" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter><Parameter Type="Array">${principals}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="RevokeHubSiteRights" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.hubSiteUrl)}</Parameter><Parameter Type="Array">${principals}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
         };
 
         const res = await request.post<string>(requestOptions);
@@ -108,7 +108,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to revoke rights to join sites to the hub site ${args.options.url} from the specified users?`
+        message: `Are you sure you want to revoke rights to join sites to the hub site ${args.options.hubSiteUrl} from the specified users?`
       });
 
       if (result.continue) {

@@ -77,17 +77,17 @@ describe(commands.GROUP_USER_ADD, () => {
   });
 
   it('passes validation with parameters', async () => {
-    const actual = await command.validate({ options: { id: 10123123 } }, commandInfo);
+    const actual = await command.validate({ options: { groupId: 10123123 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('id must be a number', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { groupId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('userId must be a number', async () => {
-    const actual = await command.validate({ options: { id: 10, userId: 'abc' } }, commandInfo);
+  it('id must be a number', async () => {
+    const actual = await command.validate({ options: { groupId: 10, id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -114,7 +114,7 @@ describe(commands.GROUP_USER_ADD, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { debug: true, id: 1231231 } });
+    await command.action(logger, { options: { debug: true, groupId: 1231231 } });
 
     assert(requestPostedStub.called);
   });
@@ -127,7 +127,7 @@ describe(commands.GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, id: 1231231, userId: 989998789 } });
+    await command.action(logger, { options: { debug: true, groupId: 1231231, id: 989998789 } });
 
     assert(requestPostedStub.called);
   });
@@ -140,7 +140,7 @@ describe(commands.GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, id: 1231231, email: "suzy@contoso.com" } } );
+    await command.action(logger, { options: { debug: true, groupId: 1231231, email: "suzy@contoso.com" } } );
 
     assert(requestPostedStub.called);
   });

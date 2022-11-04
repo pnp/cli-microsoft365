@@ -94,7 +94,7 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, displayName: 'foo' } });
+    await command.action(logger, { options: { debug: true, appDisplayName: 'foo' } });
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
@@ -115,7 +115,7 @@ describe(commands.SP_GET, () => {
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
-  it('retrieves information about the specified service principal using its objectId', async () => {
+  it('retrieves information about the specified service principal using its appObjectId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=objectId eq `) > -1) {
         return Promise.resolve(spAppInfo);
@@ -128,7 +128,7 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, objectId: '59e617e5-e447-4adc-8b88-00af644d7c92' } });
+    await command.action(logger, { options: { debug: false, appObjectId: '59e617e5-e447-4adc-8b88-00af644d7c92' } });
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
@@ -189,7 +189,7 @@ describe(commands.SP_GET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        displayName: 'foo'
+        appDisplayName: 'foo'
       }
     }), new CommandError(`Multiple Azure AD apps with name foo found: be559819-b036-470f-858b-281c4e808403,93d75ef9-ba9b-4361-9a47-1f6f7478f05f`));
   });
@@ -209,12 +209,12 @@ describe(commands.SP_GET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        displayName: 'Test App'
+        appDisplayName: 'Test App'
       }
     }), new CommandError(`The specified Azure AD app does not exist`));
   });
 
-  it('fails validation if neither the appId nor the displayName option specified', async () => {
+  it('fails validation if neither the appId nor the appDisplayName option specified', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -229,28 +229,28 @@ describe(commands.SP_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the displayName option specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'Microsoft Graph' } }, commandInfo);
+  it('passes validation when the appDisplayName option specified', async () => {
+    const actual = await command.validate({ options: { appDisplayName: 'Microsoft Graph' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when both the appId and displayName are specified', async () => {
-    const actual = await command.validate({ options: { appId: '6a7b1395-d313-4682-8ed4-65a6265a6320', displayName: 'Microsoft Graph' } }, commandInfo);
+  it('fails validation when both the appId and appDisplayName are specified', async () => {
+    const actual = await command.validate({ options: { appId: '6a7b1395-d313-4682-8ed4-65a6265a6320', appDisplayName: 'Microsoft Graph' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the objectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { objectId: '123' } }, commandInfo);
+  it('fails validation if the appObjectId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { appObjectId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appId and displayName are specified', async () => {
-    const actual = await command.validate({ options: { appId: '123', displayName: 'abc' } }, commandInfo);
+  it('fails validation if both appId and appDisplayName are specified', async () => {
+    const actual = await command.validate({ options: { appId: '123', appDisplayName: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if objectId and displayName are specified', async () => {
-    const actual = await command.validate({ options: { displayName: 'abc', objectId: '123' } }, commandInfo);
+  it('fails validation if appObjectId and appDisplayName are specified', async () => {
+    const actual = await command.validate({ options: { appDisplayName: 'abc', appObjectId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -276,11 +276,11 @@ describe(commands.SP_GET, () => {
     assert(containsOption);
   });
 
-  it('supports specifying displayName', () => {
+  it('supports specifying appDisplayName', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--displayName') > -1) {
+      if (o.option.indexOf('--appDisplayName') > -1) {
         containsOption = true;
       }
     });

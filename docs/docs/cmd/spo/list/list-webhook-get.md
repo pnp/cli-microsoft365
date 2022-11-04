@@ -22,7 +22,7 @@ m365 spo list webhook get [options]
 `--listUrl [listUrl]`
 : Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
-`-i, --id [id]`
+`-i, --id <id>`
 : ID of the webhook.
 
 --8<-- "docs/cmd/_global.md"

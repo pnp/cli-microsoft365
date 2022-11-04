@@ -11,10 +11,10 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  appCatalogScope?: string;
   appCatalogUrl?: string;
   id?: string;
   name?: string;
-  scope?: string;
   skipFeatureDeployment?: boolean;
 }
 
@@ -43,7 +43,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
         name: (!(!args.options.name)).toString(),
         appCatalogUrl: (!(!args.options.appCatalogUrl)).toString(),
         skipFeatureDeployment: args.options.skipFeatureDeployment || false,
-        scope: (!(!args.options.scope)).toString()
+        appCatalogScope: (!(!args.options.appCatalogScope)).toString()
       });
     });
   }
@@ -63,7 +63,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
         option: '--skipFeatureDeployment'
       },
       {
-        option: '-s, --scope [scope]',
+        option: '-s, --appCatalogScope [appCatalogScope]',
         autocomplete: ['tenant', 'sitecollection']
       }
     );
@@ -73,14 +73,14 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         // verify either 'tenant' or 'sitecollection' specified if scope provided
-        if (args.options.scope) {
-          const testScope: string = args.options.scope.toLowerCase();
+        if (args.options.appCatalogScope) {
+          const testScope: string = args.options.appCatalogScope.toLowerCase();
           if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-            return `Scope must be either 'tenant' or 'sitecollection'`;
+            return `appCatalogScope must be either 'tenant' or 'sitecollection'`;
           }
 
           if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-            return `You must specify appCatalogUrl when the scope is sitecollection`;
+            return `You must specify appCatalogUrl when the appCatalogScope is sitecollection`;
           }
         }
 
@@ -103,7 +103,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let appId: string = '';
-    const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
+    const scope: string = (args.options.appCatalogScope) ? args.options.appCatalogScope.toLowerCase() : 'tenant';
     let appCatalogUrl: string = '';
 
     try {

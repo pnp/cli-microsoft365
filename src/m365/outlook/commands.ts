@@ -2,6 +2,7 @@ const prefix: string = 'outlook';
 
 export default {
   MAIL_SEND: `${prefix} mail send`,
+  MESSAGE_GET: `${prefix} message get`,
   MESSAGE_LIST: `${prefix} message list`,
   MESSAGE_MOVE: `${prefix} message move`,
   REPORT_MAILACTIVITYCOUNTS: `${prefix} report mailactivitycounts`,
@@ -16,6 +17,5 @@ export default {
   REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS: `${prefix} report mailboxusagequotastatusmailboxcounts`,
   REPORT_MAILBOXUSAGESTORAGE: `${prefix} report mailboxusagestorage`,
   ROOM_LIST: `${prefix} room list`,
-  ROOMLIST_LIST: `${prefix} roomlist list`,
-  SENDMAIL: `${prefix} sendmail`
+  ROOMLIST_LIST: `${prefix} roomlist list`
 };

@@ -14,19 +14,13 @@ m365 spo list webhook list [options]
 : URL of the site where the list is located.
 
 `-i, --listId [listId]`
-: ID of the list. Specify either `id`, `title`, `listTitle`, `listId` or `listUrl`.
+: ID of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-t, --listTitle [listTitle]`
-: Title of the list. Specify either `id`, `title`, `listTitle`, `listId` or `listUrl`.
+: Title of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `--listUrl [listUrl]`
-: Server- or site-relative URL of the list. Specify either `id`, `title`, `listTitle`, `listId` or `listUrl`.
-
-`--id [id]`
-: (deprecated. Use `listId` instead) ID of the list to retrieve all webhooks for. Specify either `id`, `title`, `listTitle`, `listId` or `listUrl`.
-
-`--title [title]`
-: (deprecated. Use `listTitle` instead) Title of the list to retrieve all webhooks for. Specify either `id`, `title`, `listTitle`, `listId` or `listUrl`.
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 --8<-- "docs/cmd/_global.md"
 

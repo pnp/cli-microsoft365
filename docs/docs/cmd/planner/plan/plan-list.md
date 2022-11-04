@@ -36,7 +36,7 @@ m365 planner plan list --ownerGroupName "My Planner Group"
 
 === "JSON"
 
-    ``` json
+    ```json
     [
       {
         "createdDateTime": "2015-03-30T18:36:49.2407981Z",
@@ -64,7 +64,7 @@ m365 planner plan list --ownerGroupName "My Planner Group"
 
 === "Text"
 
-    ``` text
+    ```text
     id                            title            createdDateTime               owner
     ----------------------------  ---------------  ----------------------------  ------------------------------------
     xqQg5FS2LkCp935s-FIFm2QAFkHM  My Planner Plan  2015-03-30T18:36:49.2407981Z  ebf3b108-5234-4e22-b93d-656d7dae5874
@@ -72,7 +72,7 @@ m365 planner plan list --ownerGroupName "My Planner Group"
 
 === "CSV"
 
-    ``` text
+    ```csv
     id,title,createdDateTime,owner
     xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
     ```

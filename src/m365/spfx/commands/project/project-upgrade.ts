@@ -69,7 +69,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.14.0',
     '1.15.0',
     '1.15.2',
-    '1.16.0-beta.1'
+    '1.16.0-beta.2'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -84,6 +84,10 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
 
   public get description(): string {
     return 'Upgrades SharePoint Framework project to the specified version';
+  }
+
+  protected get allowedOutputs(): string[] {
+    return ['json', 'text', 'md', 'tour'];
   }
 
   constructor() {
@@ -129,7 +133,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
 
     this.options.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
-        o.autocomplete = ['json', 'text', 'md', 'tour'];
+        o.autocomplete = this.allowedOutputs;
       }
     });
   }
@@ -142,13 +146,13 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
             return `${args.options.packageManager} is not a supported package manager. Supported package managers are ${SpfxProjectUpgradeCommand.packageManagers.join(', ')}`;
           }
         }
-    
+
         if (args.options.shell) {
           if (SpfxProjectUpgradeCommand.shells.indexOf(args.options.shell) < 0) {
             return `${args.options.shell} is not a supported shell. Supported shells are ${SpfxProjectUpgradeCommand.shells.join(', ')}`;
           }
         }
-    
+
         return true;
       }
     );

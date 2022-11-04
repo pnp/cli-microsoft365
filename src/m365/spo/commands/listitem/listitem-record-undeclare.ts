@@ -1,9 +1,11 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -13,9 +15,10 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  listItemId: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   webUrl: string;
 }
 
@@ -41,7 +44,8 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined'
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined'
       });
     });
   }
@@ -52,13 +56,16 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id <id>'
+        option: '-i, --listItemId <listItemId>'
       },
       {
         option: '-l, --listId [listId]'
       },
       {
         option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       }
     );
   }
@@ -66,9 +73,9 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const id: number = parseInt(args.options.id);
+        const id: number = parseInt(args.options.listItemId);
         if (isNaN(id)) {
-          return `${args.options.id} is not a valid list item ID`;
+          return `${args.options.listItemId} is not a valid list item ID`;
         }
 
         const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
@@ -87,37 +94,37 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const listIdArgument: string = args.options.listId || '';
-    const listTitleArgument: string = args.options.listTitle || '';
-    const listRestUrl: string = (args.options.listId ?
-      `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
-
-    let formDigestValue: string = '';
-    let environmentListId: string = '';
-
     try {
-      if (typeof args.options.listId !== 'undefined') {
-        environmentListId = args.options.listId;
+      let listId: string = '';
+
+      if (args.options.listId) {
+        listId = args.options.listId;
       }
       else {
-        if (this.verbose) {
-          logger.logToStderr(`Getting list id...`);
+        let requestUrl = `${args.options.webUrl}/_api/web`;
+
+        if (args.options.listTitle) {
+          requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
         }
-        const listRequestOptions: any = {
-          url: `${listRestUrl}/id`,
+        else if (args.options.listUrl) {
+          const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+          requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+        }
+
+        const requestOptions: AxiosRequestConfig = {
+          url: `${requestUrl}?$select=Id`,
           headers: {
-            'accept': 'application/json;odata=nometadata'
+            accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
-  
-        const idResp = await request.get<{ value: string; }>(listRequestOptions);
-        environmentListId = idResp.value;
+
+        const list = await request.get<{ Id: string; }>(requestOptions);
+        listId = list.Id;
       }
 
       if (this.debug) {
@@ -125,12 +132,12 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
       }
 
       const reqDigest = await spo.getRequestDigest(args.options.webUrl);
-      formDigestValue = reqDigest.FormDigestValue;
+      const formDigestValue = reqDigest.FormDigestValue;
 
       const objectIdentity = await spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
 
       if (this.verbose) {
-        logger.logToStderr(`Undeclare list item as a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+        logger.logToStderr(`Undeclare list item as a record in list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}...`);
       }
 
       const requestOptions: any = {
@@ -139,7 +146,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
           'Content-Type': 'text/xml',
           'X-RequestDigest': formDigestValue
         },
-        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="UndeclareItemAsRecord" Id="53"><Parameters><Parameter ObjectPathId="49" /></Parameters></StaticMethod></Actions><ObjectPaths><Identity Id="49" Name="${objectIdentity.objectIdentity}:list:${environmentListId}:item:${args.options.id},1" /></ObjectPaths></Request>`
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="UndeclareItemAsRecord" Id="53"><Parameters><Parameter ObjectPathId="49" /></Parameters></StaticMethod></Actions><ObjectPaths><Identity Id="49" Name="${objectIdentity.objectIdentity}:list:${listId}:item:${args.options.listItemId},1" /></ObjectPaths></Request>`
       };
 
       await request.post(requestOptions);

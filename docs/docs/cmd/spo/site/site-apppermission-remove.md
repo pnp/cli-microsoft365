@@ -19,7 +19,7 @@ m365 spo site apppermission remove [options]
 `-n, --appDisplayName [appDisplayName]`
 : App display name
 
-`-i, --permissionId [permissionId]`
+`-i, --id [id]`
 : ID of the permission to remove
 
 `--confirm`
@@ -44,5 +44,5 @@ m365 spo site apppermission remove --siteUrl https://contoso.sharepoint.com/site
 Removes the application permission with the specified ID on site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo site apppermission remove --siteUrl https://contoso.sharepoint.com/sites/project-x --permissionId aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0
+m365 spo site apppermission remove --siteUrl https://contoso.sharepoint.com/sites/project-x --id aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0
 ```
