@@ -32,7 +32,7 @@ Get file version in a specific site based on fileId
 m365 spo file version get --webUrl https://contoso.sharepoint.com --label "1.0" --fileId 'b2307a39-e878-458b-bc90-03bc578531d6'
 ```
 
-Get file  in a specific site based on fileUrl
+Get file in a specific site based on fileUrl
 
 ```sh
 m365 spo file version get --webUrl https://contoso.sharepoint.com --label "1.0" --fileUrl '/Shared Documents/Document.docx'
