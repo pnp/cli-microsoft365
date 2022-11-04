@@ -11,13 +11,13 @@ m365 todo task get [options]
 ## Options
 
 `-i, --id <id>`
-: The ID of the task in de list.
+: The ID of the task in the list.
 
 `--listName [listName]`
-: The name of the task list to return tasks from. Specify either `listName` or `listId`, not both
+: The name of the task list to return tasks from. Specify either `listName` or `listId`, but not both.
 
 `--listId [listId]`
-: The id of the task list to return tasks from. Specify either `listName` or `listId`, not both
+: The id of the task list to return tasks from. Specify either `listName` or `listId`, but not both.
 
 --8<-- "docs/cmd/_global.md"
 

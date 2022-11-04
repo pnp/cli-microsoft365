@@ -80,6 +80,23 @@ If you have configured the `autoOpenBrowserOnLogin` key, you'll now need to conf
 m365 cli config set --key autoOpenLinksInBrowser --value true
 ```
 
+## In `teams channel` commands, changed short options
+
+In the following commands we've changed some shorts:
+
+- [teams channel get](./cmd/teams/channel/channel-get.md)
+- [teams channel set](./cmd/teams/channel/channel-set.md)
+- [teams channel remove](./cmd/teams/channel/channel-remove.md)
+
+The following shorts where changed:
+
+- Where we used `-c, --id`, we changed it to `-i, --id`.
+- Where we used `-i, --teamId`, we changed it to `--teamId`.
+
+### What action do I need to take?
+
+Update the reference to the short options in your scripts.
+
 ## Aligned options with naming convention
 
 As we've been adding more commands to the CLI, we noticed that several commands were using inconsistent options names. Our naming convention states that options that refer to the last noun in the command, don't need that noun as a prefix. for example: the option `--webUrl` for `m365 spo web list` has been renamed to `--url` as the last noun is `web`. In version 6 of the CLI for Microsoft 365, we updated all these options to be consistent and make it easier for you to use the CLI.
