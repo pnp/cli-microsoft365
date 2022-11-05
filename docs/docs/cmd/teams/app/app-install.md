@@ -47,3 +47,7 @@ Install a personal app for the user specified using their ID
 ```sh
 m365 teams app install --id 4440558e-8c73-4597-abc7-3644a64c4bce --userId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```
+
+## Response
+
+The command won't return a response on success.

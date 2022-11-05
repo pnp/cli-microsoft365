@@ -52,3 +52,7 @@ Add owners to a channel based on their display names
 ```sh
 m365 teams channel member add --teamName "Human Resources" --channelName "Private Channel" --userDisplayName "Anne Matthews,John Doe" --owner
 ```
+
+## Response
+
+The command won't return a response on success.

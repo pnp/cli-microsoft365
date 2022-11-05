@@ -49,3 +49,7 @@ Remove the user with id 00000000-0000-0000-0000-000000000000 from the Microsoft 
 ```sh
 m365 teams channel member remove --teamName "Team Name" --channelName "Channel Name" --userId 00000000-0000-0000-0000-000000000000
 ```
+
+## Response
+
+The command won't return a response on success.

@@ -38,3 +38,7 @@ Update the Teams app with name _Test app_ from file _teams-manifest.zip_
 ```sh
 m365 teams app update --name "Test app" --filePath ./teams-manifest.zip
 ```
+
+## Response
+
+The command won't return a response on success.

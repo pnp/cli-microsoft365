@@ -44,3 +44,6 @@ Set new display name for the specified channel in the given Microsoft Teams team
 m365 teams channel set --teamId "00000000-0000-0000-0000-000000000000" --name Reviews --newName Projects
 ```
 
+## Response
+
+The command won't return a response on success.

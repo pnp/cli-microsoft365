@@ -41,6 +41,10 @@ Removes the Microsoft Teams client cache
 m365 teams cache remove
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - [Clear the Teams client cache guidance](https://docs.microsoft.com/microsoftteams/troubleshoot/teams-administration/clear-teams-cache)

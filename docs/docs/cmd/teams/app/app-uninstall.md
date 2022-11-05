@@ -33,3 +33,7 @@ Uninstall an app from a Microsoft Teams team
 ```sh
 m365 teams app uninstall --id YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY= --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```
+
+## Response
+
+The command won't return a response on success.

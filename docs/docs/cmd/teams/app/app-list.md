@@ -50,3 +50,33 @@ List your organization's apps installed in the specified Microsoft Teams team wi
 ```sh
 m365 teams app list --teamName "Team Name"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "id": "ffdb7239-3b58-46ba-b108-7f90a6d8799b",
+        "externalId": null,
+        "displayName": "Contoso App",
+        "distributionMethod": "store"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    id                                                        displayName                       distributionMethod
+    --------------------------------------------------------  --------------------------------  ------------------
+    ffdb7239-3b58-46ba-b108-7f90a6d8799b                      Contoso App                       store
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,displayName,distributionMethod
+    ffdb7239-3b58-46ba-b108-7f90a6d8799b,Contoso App,store
+    ```
