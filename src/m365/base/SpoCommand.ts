@@ -15,23 +15,24 @@ export default abstract class SpoCommand extends Command {
   protected getNamesOfOptionsWithUrls(): string[] {
     const namesOfOptionsWithUrls: string[] = [
       'appCatalogUrl',
-      'siteUrl',
-      'webUrl',
-      'origin',
-      'url',
-      'imageUrl',
       'actionUrl',
-      'logoUrl',
+      'imageUrl',
       'libraryUrl',
-      'thumbnailUrl',
-      'targetUrl',
+      'logoUrl',
       'newSiteUrl',
-      'previewImageUrl',
       'NoAccessRedirectUrl',
-      'StartASiteFormUrl',
       'OrgNewsSiteUrl',
+      'origin',
+      'parentUrl',
       'parentWebUrl',
-      'siteLogoUrl'
+      'previewImageUrl',
+      'siteLogoUrl',
+      'siteUrl',
+      'StartASiteFormUrl',
+      'targetUrl',
+      'thumbnailUrl',
+      'url',
+      'webUrl'
     ];
     const excludedOptionsWithUrls: string[] | undefined = this.getExcludedOptionsWithUrls();
     if (!excludedOptionsWithUrls) {

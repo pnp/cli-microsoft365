@@ -69,7 +69,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.14.0',
     '1.15.0',
     '1.15.2',
-    '1.16.0-beta.2'
+    '1.16.0-rc.0'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -84,6 +84,10 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
 
   public get description(): string {
     return 'Upgrades SharePoint Framework project to the specified version';
+  }
+
+  protected get allowedOutputs(): string[] {
+    return ['json', 'text', 'md', 'tour'];
   }
 
   constructor() {
@@ -129,7 +133,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
 
     this.options.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
-        o.autocomplete = ['json', 'text', 'md', 'tour'];
+        o.autocomplete = this.allowedOutputs;
       }
     });
   }

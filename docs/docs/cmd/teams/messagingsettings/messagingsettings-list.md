@@ -22,3 +22,34 @@ Get messaging settings for a Microsoft Teams team
 ```sh
 m365 teams messagingsettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```
+
+## Response
+
+=== "JSON"
+
+    ``` json
+    {
+      "allowUserEditMessages": true,
+      "allowUserDeleteMessages": true,
+      "allowOwnerDeleteMessages": true,
+      "allowTeamMentions": true,
+      "allowChannelMentions": true
+    }
+    ```
+
+=== "Text"
+
+    ``` text
+    allowChannelMentions    : true
+    allowOwnerDeleteMessages: true
+    allowTeamMentions       : true
+    allowUserDeleteMessages : true
+    allowUserEditMessages   : true
+    ```
+
+=== "CSV"
+
+    ``` text
+    allowUserEditMessages,allowUserDeleteMessages,allowOwnerDeleteMessages,allowTeamMentions,allowChannelMentions
+    1,1,1,1,1
+    ```

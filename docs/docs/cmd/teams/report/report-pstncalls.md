@@ -47,3 +47,52 @@ m365 teams report pstncalls --fromDateTime 2020-10-31 --toDateTime 2020-12-31 --
 ## More information
 
 - List PSTN calls: [https://docs.microsoft.com/en-us/graph/api/callrecords-callrecord-getpstncalls?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/callrecords-callrecord-getpstncalls?view=graph-rest-1.0)
+
+## Response
+
+=== "JSON"
+
+    ``` json
+    {
+      "@odata.count": 1,
+      "value": [
+        {
+          "id": "9c4984c7-6c3c-427d-a30c-bd0b2eacee90",
+          "callId": "1835317186_112562680@61.221.3.176",
+          "userId": "db03c14b-06eb-4189-939b-7cbf3a20ba27",
+          "userPrincipalName": "richard.malk@contoso.com",
+          "userDisplayName": "Richard Malk",
+          "startDateTime": "2019-11-01T00:00:08.2589935Z",
+          "endDateTime": "2019-11-01T00:03:47.2589935Z",
+          "duration": 219,
+          "charge": 0.00,
+          "callType": "user_in",
+          "currency": "USD",
+          "calleeNumber": "+1234567890",
+          "usageCountryCode": "US",
+          "tenantCountryCode": "US",
+          "connectionCharge": 0.00,
+          "callerNumber": "+0123456789",
+          "destinationContext": null,
+          "destinationName": "United States",
+          "conferenceId": null,
+          "licenseCapability": "MCOPSTNU",
+          "inventoryType": "Subscriber"
+        }
+      ]
+  }
+    ```
+
+=== "Text"
+
+    ``` text
+    id,calleeNumber,callerNumber,startDateTime
+    9c4984c7-6c3c-427d-a30c-bd0b2eacee90,+1234567890,+0123456789,2019-11-01T00:00:08.2589935Z
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,calleeNumber,callerNumber,startDateTime
+    9c4984c7-6c3c-427d-a30c-bd0b2eacee90,+1234567890,+0123456789,2019-11-01T00:00:08.2589935Z
+    ```

@@ -125,10 +125,13 @@ describe(commands.TEAM_UNARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Finance',
-      confirm: true } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Finance',
+        confirm: true
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('restores an archived Microsoft Team by id', async () => {

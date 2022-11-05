@@ -42,6 +42,8 @@ Alias | Command | Reason
 `teams conversationmember list` | [teams channel member list](./cmd/teams/channel/channel-member-list.md) | Renamed to better match intention and naming convention.
 `teams conversationmember remove` | [teams channel member remove](./cmd/teams/channel/channel-member-remove.md) | Renamed to better match intention and naming convention.
 `spo hubsite theme sync` | [spo site hubsite theme sync](./cmd/spo/site/site-hubsite-theme-sync.md) | Renamed to better match intention and naming convention.
+`spo hubsite connect` | [spo site hubsite connect](./cmd/spo/site/site-hubsite-connect.md) | Renamed to better match intention and naming convention.
+`spo hubsite disconnect` | [spo site hubsite disconnect](./cmd/spo/site/site-hubsite-disconnect.md) | Renamed to better match intention and naming convention.
 
 ### What action do I need to take?
 
@@ -77,6 +79,23 @@ If you have configured the `autoOpenBrowserOnLogin` key, you'll now need to conf
 ```sh
 m365 cli config set --key autoOpenLinksInBrowser --value true
 ```
+
+## In `teams channel` commands, changed short options
+
+In the following commands we've changed some shorts:
+
+- [teams channel get](./cmd/teams/channel/channel-get.md)
+- [teams channel set](./cmd/teams/channel/channel-set.md)
+- [teams channel remove](./cmd/teams/channel/channel-remove.md)
+
+The following shorts where changed:
+
+- Where we used `-c, --id`, we changed it to `-i, --id`.
+- Where we used `-i, --teamId`, we changed it to `--teamId`.
+
+### What action do I need to take?
+
+Update the reference to the short options in your scripts.
 
 ## Aligned options with naming convention
 
@@ -150,8 +169,8 @@ Command|Old option|New option
 [spo folder get](./cmd/spo/folder/folder-get.md)|`folderUrl`|`url`
 [spo folder remove](./cmd/spo/folder/folder-remove.md)|`folderUrl`|`url`
 [spo folder rename](./cmd/spo/folder/folder-rename.md)|`folderUrl`|`url`
-[spo hubsite connect](./cmd/spo/hubsite/hubsite-connect.md)|`url`|`siteUrl`
-[spo hubsite disconnect](./cmd/spo/hubsite/hubsite-disconnect.md)|`url`|`siteUrl`
+[spo site hubsite connect](./cmd/spo/site/site-hubsite-connect.md)|`url`|`siteUrl`
+[spo site hubsite disconnect](./cmd/spo/site/site-hubsite-disconnect.md)|`url`|`siteUrl`
 [spo hubsite register](./cmd/spo/hubsite/hubsite-register.md)|`url`|`siteUrl`
 [spo hubsite rights grant](./cmd/spo/hubsite/hubsite-rights-grant.md)|`url`|`hubSiteUrl`
 [spo hubsite rights revoke](./cmd/spo/hubsite/hubsite-rights-revoke.md)|`url`|`hubSiteUrl`

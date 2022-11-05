@@ -32,3 +32,66 @@ Retrieve the replies from a specified message from a channel of the Microsoft Te
 ```sh
 m365 teams message reply list --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --channelId 19:88f7e66a8dfe42be92db19505ae912a8@thread.skype --messageId 1540747442203
 ```
+
+## Response
+
+=== "JSON"
+
+    ``` json
+    [
+      {
+        "id": "1540747442203",
+        "replyToId": "1666799520731",
+        "etag": "1540747442203",
+        "messageType": "message",
+        "createdDateTime": "2022-10-26T15:57:13.162Z",
+        "lastModifiedDateTime": "2022-10-26T15:57:13.162Z",
+        "lastEditedDateTime": null,
+        "deletedDateTime": null,
+        "subject": null,
+        "summary": null,
+        "chatId": null,
+        "importance": "normal",
+        "locale": "en-us",
+        "webUrl": "https://teams.microsoft.com/l/message/19%388f7e66a8dfe42be92db19505ae912a8%40thread.tacv2/1540747442203?groupId=5f5d7b71-1161-44d8-bcc1-3da710eb4171&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba&createdTime=1540747442203&parentMessageId=1666799520731",
+        "policyViolation": null,
+        "eventDetail": null,
+        "from": {
+          "application": null,
+          "device": null,
+          "user": {
+            "id": "78ccf530-bbf0-47e4-aae6-da5f8c6fb142",
+            "displayName": "John Doe",
+            "userIdentityType": "aadUser",
+            "tenantId": "92e59666-257b-49c3-b1fa-1bae8107f6ba"
+          }
+        },
+        "body": {
+          "contentType": "text",
+          "content": "First reply"
+        },
+        "channelIdentity": {
+          "teamId": "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
+          "channelId": "19:88f7e66a8dfe42be92db19505ae912a8@thread.tacv2"
+        },
+        "attachments": [],
+        "mentions": [],
+        "reactions": []
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ``` text
+    id             body
+    -------------  -----------
+    1540747442203  First reply
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,body
+    1540747442203,First reply
+    ```

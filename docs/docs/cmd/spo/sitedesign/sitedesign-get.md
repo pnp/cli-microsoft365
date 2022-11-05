@@ -11,10 +11,10 @@ m365 spo sitedesign get [options]
 ## Options
 
 `-i, --id [id]`
-: Site design ID. Specify either id or title but not both
+: Site design ID. Specify either `id` or `title` but not both.
 
 `--title [title]`
-: Site design title. Specify either id or title but not both
+: Site design title. Specify either `id` or `title` but not both.
 
 --8<-- "docs/cmd/_global.md"
 

@@ -6,11 +6,28 @@
 
 **Azure Active Directory:**
 
+- [aad app list](../cmd/aad/app/app-list.md) - retrieves a list of Azure AD app registrations [#3742](https://github.com/pnp/cli-microsoft365/issues/3742)
 - [aad user guest add](../cmd/aad/user/user-guest-add.md) - invites an external user to the organization [#3298](https://github.com/pnp/cli-microsoft365/issues/3298)
 
 **Outlook:**
 
 - [outlook message get](../cmd/outlook/message/message-get.md) - retrieves specified message [#3868](https://github.com/pnp/cli-microsoft365/issues/3868)
+
+**Power Platform:**
+
+- [pp card clone](../cmd/pp/card/card-clone.md) - clones a specific Microsoft Power Platform card in the specified Power Platform environment [#3790](https://github.com/pnp/cli-microsoft365/issues/3790)
+- [pp card remove](../cmd/pp/card/card-remove.md) - removes the specified Microsoft Power Platform card in the specified Power Platform environment [#3781](https://github.com/pnp/cli-microsoft365/issues/3781)
+- [pp solution remove](../cmd/pp/solution/solution-remove.md) - removes the specified solution in the specified Power Platform environment [#3723](https://github.com/pnp/cli-microsoft365/issues/3723)
+
+**SharePoint:**
+
+- [spo file version list](../cmd/spo/file/file-version-list.md) - retrieves all versions of a file [#3953](https://github.com/pnp/cli-microsoft365/issues/3953)
+- [spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md) - connect a hub site to a parent hub site [#3759](https://github.com/pnp/cli-microsoft365/issues/3759)
+- [spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md) - disconnect a hub site from its parent hub site [#3760](https://github.com/pnp/cli-microsoft365/issues/3760)
+
+**Teams**
+
+- [teams meeting list](../cmd/teams/meeting/meeting-list.md) - retrieve all online meetings for a given user or shared mailbox [#3899](https://github.com/pnp/cli-microsoft365/issues/3899)
 
 ### Changes
 
@@ -39,6 +56,22 @@
 - expanded the user guide with info about escaping in PowerShell [#3638](https://github.com/pnp/cli-microsoft365/issues/3638)
 - updated 'spo roledefinition list' output with readable values [#3824](https://github.com/pnp/cli-microsoft365/issues/3824)
 - renamed 'spo hubsite theme sync' to 'spo site hubsite theme sync' [#3881](https://github.com/pnp/cli-microsoft365/issues/3881)
+- extended 'spo list webhook set' command with clientState option [#3861](https://github.com/pnp/cli-microsoft365/issues/3861)
+- extended 'spo folder list' command with recursive option [#2767](https://github.com/pnp/cli-microsoft365/issues/2767)
+- added role requirements for spo hubsite register and unregister docs [#3965](https://github.com/pnp/cli-microsoft365/issues/3965)
+- fixed output options for spfx project upgrade [#3979](https://github.com/pnp/cli-microsoft365/issues/3979)
+- converted content tabs with code blocks into plain text [#3912](https://github.com/pnp/cli-microsoft365/issues/3912)
+- extended 'spo list view' commands to include listUrl option. [#3811](https://github.com/pnp/cli-microsoft365/issues/3811)
+- extended 'teams channel' commands with extra options. [#3688](https://github.com/pnp/cli-microsoft365/issues/3688)
+- added docs response for adaptivecards, app, booking commands. [#3920](https://github.com/pnp/cli-microsoft365/issues/3920)
+- added docs response for todo, util, viva commands. [#3927](https://github.com/pnp/cli-microsoft365/issues/3927)
+- added docs response for pa, pp commands. [#3924](https://github.com/pnp/cli-microsoft365/issues/3924)
+- extended spo list set to include title and url option. [#3678](https://github.com/pnp/cli-microsoft365/issues/3678)
+- extended multiple commands with option sets. [#3854](https://github.com/pnp/cli-microsoft365/issues/3854)
+- added docs reponse for teams message until teams user commands. [#3936](https://github.com/pnp/cli-microsoft365/issues/3936)
+- added support for upgrading SPFx projects to v1.16.0-rc.0. [#3993](https://github.com/pnp/cli-microsoft365/issues/3993)
+- extended spfx doctor to support SPFx v1.16.0-rc.0. [#3994](https://github.com/pnp/cli-microsoft365/issues/3994)
+- extended spfx project doctor to support SPFx v1.16.0-rc.0. [#3995](https://github.com/pnp/cli-microsoft365/issues/3995)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
@@ -2296,13 +2329,13 @@
 
 - [spo file remove](../cmd/spo/file/file-remove.md) - removes the specified file [#287](https://github.com/pnp/cli-microsoft365/issues/287)
 - [spo hubsite data get](../cmd/spo/hubsite/hubsite-data-get.md) - gets hub site data for the specified site [#394](https://github.com/pnp/cli-microsoft365/issues/394)
-- [spo hubsite theme sync](../cmd/spo/hubsite/hubsite-theme-sync.md) - applies any theme updates from the parent hub site [#401](https://github.com/pnp/cli-microsoft365/issues/401)
 - [spo listitem add](../cmd/spo/listitem/listitem-add.md) - creates a list item in the specified list [#270](https://github.com/pnp/cli-microsoft365/issues/270)
 - [spo listitem remove](../cmd/spo/listitem/listitem-remove.md) - removes the specified list item [#272](https://github.com/pnp/cli-microsoft365/issues/272)
 - [spo page control get](../cmd/spo/page/page-control-get.md) - gets information about the specific control on a modern page [#414](https://github.com/pnp/cli-microsoft365/issues/414)
 - [spo page control list](../cmd/spo/page/page-control-list.md) - lists controls on the specific modern page [#413](https://github.com/pnp/cli-microsoft365/issues/413)
 - [spo page get](../cmd/spo/page/page-get.md) - gets information about the specific modern page [#360](https://github.com/pnp/cli-microsoft365/issues/360)
 - [spo propertybag set](../cmd/spo/propertybag/propertybag-set.md) - sets the value of the specified property in the property bag [#393](https://github.com/pnp/cli-microsoft365/issues/393)
+- [spo site hubsite theme sync](../cmd/spo/site/site-hubsite-theme-sync.md) - applies any theme updates from the parent hub site [#401](https://github.com/pnp/cli-microsoft365/issues/401)
 - [spo web clientsidewebpart list](../cmd/spo/web/web-clientsidewebpart-list.md) - lists available client-side web parts [#367](https://github.com/pnp/cli-microsoft365/issues/367)
 
 **Microsoft Graph:**
@@ -2376,8 +2409,8 @@
 - [spo propertybag get](../cmd/spo/propertybag/propertybag-get.md) - gets the value of the specified property from the property bag [#289](https://github.com/pnp/cli-microsoft365/issues/289)
 - [spo propertybag list](../cmd/spo/propertybag/propertybag-list.md) - gets property bag values [#288](https://github.com/pnp/cli-microsoft365/issues/288)
 - [spo site set](../cmd/spo/site/site-set.md) - updates properties of the specified site [#121](https://github.com/pnp/cli-microsoft365/issues/121)
-- [spo site classic add](../cmd/spo/site/site-classic-add.md) - creates new classic site [#123](https://github.com/pnp/cli-microsoft365/issues/123)
-- [spo site classic set](../cmd/spo/site/site-classic-set.md) - change classic site settings [#124](https://github.com/pnp/cli-microsoft365/issues/124)
+- spo site classic add - creates new classic site [#123](https://github.com/pnp/cli-microsoft365/issues/123)
+- spo site classic set - change classic site settings [#124](https://github.com/pnp/cli-microsoft365/issues/124)
 - [spo sitedesign set](../cmd/spo/sitedesign/sitedesign-set.md) - updates a site design with new values [#251](https://github.com/pnp/cli-microsoft365/issues/251)
 - [spo tenant appcatalogurl get](../cmd/spo/tenant/tenant-appcatalogurl-get.md) - gets the URL of the tenant app catalog [#315](https://github.com/pnp/cli-microsoft365/issues/315)
 - [spo web add](../cmd/spo/web/web-add.md) - create new subsite [#189](https://github.com/pnp/cli-microsoft365/issues/189)
@@ -2423,18 +2456,18 @@
 - [spo sitedesign rights list](../cmd/spo/sitedesign/sitedesign-rights-list.md) - gets a list of principals that have access to a site design [#90](https://github.com/pnp/cli-microsoft365/issues/90)
 - [spo list get](../cmd/spo/list/list-get.md) - gets information about the specific list [#199](https://github.com/pnp/cli-microsoft365/issues/199)
 - [spo customaction remove](../cmd/spo/customaction/customaction-remove.md) - removes the specified custom action [#21](https://github.com/pnp/cli-microsoft365/issues/21)
-- [spo site classic list](../cmd/spo/site/site-classic-list.md) - lists sites of the given type [#122](https://github.com/pnp/cli-microsoft365/issues/122)
+- [spo customaction set](../cmd/spo/customaction/customaction-set.md) - updates a user custom action for site or site collection [#212](https://github.com/pnp/cli-microsoft365/issues/212)
+- spo site classic list - lists sites of the given type [#122](https://github.com/pnp/cli-microsoft365/issues/122)
 - [spo list list](../cmd/spo/list/list-list.md) - lists all available list in the specified site [#198](https://github.com/pnp/cli-microsoft365/issues/198)
 - [spo hubsite list](../cmd/spo/hubsite/hubsite-list.md) - lists hub sites in the current tenant [#91](https://github.com/pnp/cli-microsoft365/issues/91)
 - [spo hubsite get](../cmd/spo/hubsite/hubsite-get.md) - gets information about the specified hub site [#92](https://github.com/pnp/cli-microsoft365/issues/92)
 - [spo hubsite register](../cmd/spo/hubsite/hubsite-register.md) - registers the specified site collection as a hub site [#94](https://github.com/pnp/cli-microsoft365/issues/94)
 - [spo hubsite unregister](../cmd/spo/hubsite/hubsite-unregister.md) - unregisters the specified site collection as a hub site [#95](https://github.com/pnp/cli-microsoft365/issues/95)
 - [spo hubsite set](../cmd/spo/hubsite/hubsite-set.md) - updates properties of the specified hub site [#96](https://github.com/pnp/cli-microsoft365/issues/96)
-- [spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md) - connects the specified site collection to the given hub site [#97](https://github.com/pnp/cli-microsoft365/issues/97)
-- [spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md) - disconnects the specifies site collection from its hub site [#98](https://github.com/pnp/cli-microsoft365/issues/98)
 - [spo hubsite rights grant](../cmd/spo/hubsite/hubsite-rights-grant.md) - grants permissions to join the hub site for one or more principals [#99](https://github.com/pnp/cli-microsoft365/issues/99)
 - [spo hubsite rights revoke](../cmd/spo/hubsite/hubsite-rights-revoke.md) - revokes rights to join sites to the specified hub site for one or more principals [#100](https://github.com/pnp/cli-microsoft365/issues/100)
-- [spo customaction set](../cmd/spo/customaction/customaction-set.md) - updates a user custom action for site or site collection [#212](https://github.com/pnp/cli-microsoft365/issues/212)
+- [spo site hubsite connect](../cmd/spo/site/site-hubsite-connect.md) - connects the specified site collection to the given hub site [#97](https://github.com/pnp/cli-microsoft365/issues/97)
+- [spo site hubsite disconnect](../cmd/spo/site/site-hubsite-disconnect.md) - disconnects the specifies site collection from its hub site [#98](https://github.com/pnp/cli-microsoft365/issues/98)
 
 ### Changes
 
