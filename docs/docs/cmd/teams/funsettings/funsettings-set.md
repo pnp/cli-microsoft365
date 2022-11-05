@@ -52,3 +52,23 @@ Disable usage custom memes within a given Microsoft Teams team
 ```sh
 m365 teams funsettings set --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowCustomMemes false
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+
+    ```
+
+=== "Text"
+
+    ```text
+
+    ```
+
+=== "CSV"
+
+    ```csv
+
+    ```

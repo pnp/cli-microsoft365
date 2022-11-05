@@ -35,3 +35,7 @@ Remove the Teams app with ID _83cece1e-938d-44a1-8b86-918cf6151957_ from the org
 ```sh
 m365 teams app remove --id 83cece1e-938d-44a1-8b86-918cf6151957 --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

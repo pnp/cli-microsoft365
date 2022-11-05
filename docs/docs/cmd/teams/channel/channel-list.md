@@ -40,3 +40,38 @@ List private channels in a specified Microsoft Teams team with id 00000000-0000-
 ```sh
 m365 teams channel list --teamId 00000000-0000-0000-0000-000000000000 --type private
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "id": "19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2",
+        "createdDateTime": "2022-10-26T15:43:31.954Z",
+        "displayName": "General",
+        "description": "This team is about Contoso",
+        "isFavoriteByDefault": null,
+        "email": "TeamsName@contoso.onmicrosoft.com",
+        "tenantId": "446355e4-e7e3-43d5-82f8-d7ad8272d55b",
+        "webUrl": "https://teams.microsoft.com/l/channel/19%3AB3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1%40thread.tacv2/TeamsName?groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b&allowXTenantAccess=False",
+        "membershipType": "standard"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    id                                                            displayName
+    ------------------------------------------------------------  -----------
+    19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2  General
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,displayName
+    19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2,General
+    ```

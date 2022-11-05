@@ -28,3 +28,23 @@ List only the one on one Microsoft Teams chat conversations.
 ```sh
 m365 teams chat list --type oneOnOne
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+
+    ```
+
+=== "Text"
+
+    ```text
+
+    ```
+
+=== "CSV"
+
+    ```csv
+
+    ```

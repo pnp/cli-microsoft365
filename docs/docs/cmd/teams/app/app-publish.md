@@ -26,3 +26,7 @@ Add the _teams-manifest.zip_ file to the organization's app catalog
 ```sh
 m365 teams app publish --filePath ./teams-manifest.zip
 ```
+
+## Response
+
+The command won't return a response on success.

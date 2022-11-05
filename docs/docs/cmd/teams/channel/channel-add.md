@@ -59,3 +59,23 @@ Add shared channel to the specified Microsoft Teams team with owner ID
 ```sh
 m365 teams channel add --teamId 6703ac8a-c49b-4fd4-8223-28f0ac3a6402 --name climicrosoft365 --type shared --owner cc693a7d-4833-4911-a89a-f0fe6e49bf69
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+
+    ```
+
+=== "Text"
+
+    ```text
+
+    ```
+
+=== "CSV"
+
+    ```csv
+
+    ```

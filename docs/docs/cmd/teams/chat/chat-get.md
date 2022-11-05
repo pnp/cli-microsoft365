@@ -51,3 +51,23 @@ Get a Microsoft Teams chat conversation, finding it by display name
 ```sh
 m365 teams chat get --name "Just a conversation"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+
+    ```
+
+=== "Text"
+
+    ```text
+
+    ```
+
+=== "CSV"
+
+    ```csv
+
+    ```

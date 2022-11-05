@@ -49,3 +49,23 @@ Updates the role of the user with id 00000000-0000-0000-0000-000000000000 to mem
 ```sh
 m365 teams channel member set --teamName "Team Name" --channelName "Channel Name" --userId 00000000-0000-0000-0000-000000000000 --role member
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+
+    ```
+
+=== "Text"
+
+    ```text
+
+    ```
+
+=== "CSV"
+
+    ```csv
+
+    ```

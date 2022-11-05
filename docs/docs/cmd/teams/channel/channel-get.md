@@ -46,3 +46,42 @@ Get information about Microsoft Teams team primary channel , i.e. General
 ```sh
 m365 teams channel get --teamName "Team Name" --primary
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+{
+  "id": "19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2",
+  "createdDateTime": "2022-10-26T15:43:31.954Z",
+  "displayName": "General",
+  "description": "This team is about Contoso",
+  "isFavoriteByDefault": null,
+  "email": "TeamName@contoso.onmicrosoft.com",
+  "tenantId": "446355e4-e7e3-43d5-82f8-d7ad8272d55b",
+  "webUrl": "https://teams.microsoft.com/l/channel/19%3AB3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1%40thread.tacv2/General?groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b&allowXTenantAccess=False",
+  "membershipType": "standard"
+}
+    ```
+
+=== "Text"
+
+    ```text
+    createdDateTime    : 2022-10-26T15:43:31.954Z
+    description        : This team is about the Contoso
+    displayName        : General
+    email              : TeamName@ordidev.onmicrosoft.com
+    id                 : 19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2
+    isFavoriteByDefault: null
+    membershipType     : standard
+    tenantId           : 446355e4-e7e3-43d5-82f8-d7ad8272d55b
+    webUrl             : https://teams.microsoft.com/l/channel/19%3AB3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1%40thread.tacv2/General?groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b&allowXTenantAccess=False
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,createdDateTime,displayName,description,isFavoriteByDefault,email,tenantId,webUrl,membershipType
+    19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2,2022-10-26T15:43:31.954Z,General,This team is about Contoso,,TeamName@contoso.onmicrosoft.com,446355e4-e7e3-43d5-82f8-d7ad8272d55b,https://teams.microsoft.com/l/channel/19%3AB3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1%40thread.tacv2/General?groupId=aee5a2c9-b1df-45ac-9964-c708e760a045&tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b&allowXTenantAccess=False,standard
+    ```

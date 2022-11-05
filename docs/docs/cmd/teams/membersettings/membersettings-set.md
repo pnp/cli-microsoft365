@@ -43,3 +43,23 @@ Disallow members to add and remove apps
 ```sh
 m365 teams membersettings set --teamId '00000000-0000-0000-0000-000000000000' --allowAddRemoveApps false
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+
+    ```
+
+=== "Text"
+
+    ```text
+
+    ```
+
+=== "CSV"
+
+    ```csv
+
+    ```

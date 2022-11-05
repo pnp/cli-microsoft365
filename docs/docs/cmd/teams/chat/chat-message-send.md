@@ -53,3 +53,23 @@ Send a message to a chat conversation finding it by display name
 ```sh
 m365 teams chat message send --chatName "Just a conversation" --message "Welcome to Teams"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+
+    ```
+
+=== "Text"
+
+    ```text
+
+    ```
+
+=== "CSV"
+
+    ```csv
+
+    ```
