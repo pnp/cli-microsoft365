@@ -1,4 +1,4 @@
-# spfx
+# spfx-webpart-react
 
 ## Summary
 

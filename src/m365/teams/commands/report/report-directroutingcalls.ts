@@ -89,7 +89,7 @@ class TeamsReportDirectroutingcallsCommand extends GraphCommand {
     try {
       const res: { value: any[] } = await request.get<{ value: any[] }>(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

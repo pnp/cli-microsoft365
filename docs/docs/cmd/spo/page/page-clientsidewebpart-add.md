@@ -11,31 +11,31 @@ m365 spo page clientsidewebpart add [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the page to add the web part to is located
+: URL of the site where the page to add the web part to is located.
 
 `-n, --pageName <pageName>`
-: Name of the page to which add the web part
+: Name of the page to which add the web part.
 
 `--standardWebPart [standardWebPart]`
-: Name of the standard web part to add (see the possible values below)
+: Name of the standard web part to add (see the possible values below). Specify either `standardWebPart` or `webPartId` but not both.
 
 `--webPartId [webPartId]`
-: ID of the custom web part to add
+: ID of the custom web part to add. Specify either `standardWebPart` or `webPartId` but not both.
 
 `--webPartProperties [webPartProperties]`
-: JSON string with web part properties to set on the web part. Specify `webPartProperties` or `webPartData` but not both
+: JSON string with web part properties to set on the web part. Specify `webPartProperties` or `webPartData` but not both.
 
 `--webPartData [webPartData]`
-: JSON string with web part data as retrieved from the web part maintenance mode. Specify `webPartProperties` or `webPartData` but not both
+: JSON string with web part data as retrieved from the web part maintenance mode. Specify `webPartProperties` or `webPartData` but not both.
 
 `--section [section]`
-: Number of the section to which the web part should be added (1 or higher)
+: Number of the section to which the web part should be added (1 or higher).
 
 `--column [column]`
-: Number of the column in which the web part should be added (1 or higher)
+: Number of the column in which the web part should be added (1 or higher).
 
 `--order [order]`
-: Order of the web part in the column
+: Order of the web part in the column.
 
 --8<-- "docs/cmd/_global.md"
 
