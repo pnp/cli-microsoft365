@@ -248,7 +248,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
   private async getFolderUrl(options: Options): Promise<void> {
     const folderGetCommandOptions: SpoFolderGetCommandOptions = {
       webUrl: options.webUrl,
-      folderUrl: options.folderUrl
+      url: options.folderUrl
     };
     await Cli.executeCommandWithOutput(SpoFolderGetCommand as Command, { options: { ...folderGetCommandOptions, _: [] } });
   }
