@@ -55,17 +55,32 @@ m365 teams channel member set --teamName "Team Name" --channelName "Channel Name
 === "JSON"
 
     ```json
-
+    {
+      "id": "MCMjMiMjMGNhYzZjZGEtMmUwNC00YTNkLTljMTYtOWM5MTQ3MGQ3MDIyIyMxOTpjOTg1MzBhZjFiMWQ0ZGQyOTMwOGRkYWQ2Zjc2YjdhMUB0aHJlYWQudGFjdjIjIzI0MWFkYmY2LTJhNTYtNGM3Mi04MWYyLTY5ZTc1ZGU2YWMzNA==",
+      "roles": [],
+      "displayName": "John Doe",
+      "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
+      "userId": "00000000-0000-0000-0000-000000000000",
+      "email": "johndoe@contoso.onmicrosoft.com",
+      "tenantId": "446355e4-e7e3-43d5-82f8-d7ad8272d55b"
+    }
     ```
 
 === "Text"
 
     ```text
-
+    displayName                : John Doe
+    email                      : johndoe@contoso.onmicrosoft.com
+    id                         : MCMjMiMjMGNhYzZjZGEtMmUwNC00YTNkLTljMTYtOWM5MTQ3MGQ3MDIyIyMxOTpjOTg1MzBhZjFiMWQ0ZGQyOTMwOGRkYWQ2Zjc2YjdhMUB0aHJlYWQudGFjdjIjIzI0MWFkYmY2LTJhNTYtNGM3Mi04MWYyLTY5ZTc1ZGU2YWMzNA==
+    roles                      : []
+    tenantId                   : 446355e4-e7e3-43d5-82f8-d7ad8272d55b
+    userId                     : 00000000-0000-0000-0000-000000000000
+    visibleHistoryStartDateTime: 0001-01-01T00:00:00Z
     ```
 
 === "CSV"
 
     ```csv
-
+    id,roles,displayName,visibleHistoryStartDateTime,userId,email,tenantId
+    MCMjMiMjMGNhYzZjZGEtMmUwNC00YTNkLTljMTYtOWM5MTQ3MGQ3MDIyIyMxOTpjOTg1MzBhZjFiMWQ0ZGQyOTMwOGRkYWQ2Zjc2YjdhMUB0aHJlYWQudGFjdjIjIzI0MWFkYmY2LTJhNTYtNGM3Mi04MWYyLTY5ZTc1ZGU2YWMzNA==,[],John Doe,0001-01-01T00:00:00Z,00000000-0000-0000-0000-000000000000,johndoe@contoso.onmicrosoft.com,446355e4-e7e3-43d5-82f8-d7ad8272d55b
     ```

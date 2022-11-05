@@ -46,20 +46,4 @@ m365 teams channel set --teamId "00000000-0000-0000-0000-000000000000" --name Re
 
 ## Response
 
-=== "JSON"
-
-    ```json
-
-    ```
-
-=== "Text"
-
-    ```text
-
-    ```
-
-=== "CSV"
-
-    ```csv
-
-    ```
+The command won't return a response on success.

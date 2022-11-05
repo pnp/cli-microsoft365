@@ -28,17 +28,22 @@ m365 teams guestsettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 === "JSON"
 
     ```json
-
+    {
+      "allowCreateUpdateChannels": false,
+      "allowDeleteChannels": false
+    }
     ```
 
 === "Text"
 
     ```text
-
+    allowCreateUpdateChannels: false
+    allowDeleteChannels      : false
     ```
 
 === "CSV"
 
     ```csv
-
+    allowCreateUpdateChannels,allowDeleteChannels
+    ,
     ```

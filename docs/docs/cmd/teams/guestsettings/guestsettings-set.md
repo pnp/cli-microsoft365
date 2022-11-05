@@ -37,20 +37,4 @@ m365 teams guestsettings set --teamId '00000000-0000-0000-0000-000000000000' --a
 
 ## Response
 
-=== "JSON"
-
-    ```json
-
-    ```
-
-=== "Text"
-
-    ```text
-
-    ```
-
-=== "CSV"
-
-    ```csv
-
-    ```
+The command won't return a response on success.

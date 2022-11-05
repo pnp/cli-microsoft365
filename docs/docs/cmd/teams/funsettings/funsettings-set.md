@@ -55,20 +55,4 @@ m365 teams funsettings set --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allow
 
 ## Response
 
-=== "JSON"
-
-    ```json
-
-    ```
-
-=== "Text"
-
-    ```text
-
-    ```
-
-=== "CSV"
-
-    ```csv
-
-    ```
+The command won't return a response on success.

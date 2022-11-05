@@ -50,7 +50,7 @@ m365 teams channel list --teamId 00000000-0000-0000-0000-000000000000 --type pri
       {
         "id": "19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2",
         "createdDateTime": "2022-10-26T15:43:31.954Z",
-        "displayName": "General",
+        "displayName": "Channel Name",
         "description": "This team is about Contoso",
         "isFavoriteByDefault": null,
         "email": "TeamsName@contoso.onmicrosoft.com",
@@ -66,12 +66,12 @@ m365 teams channel list --teamId 00000000-0000-0000-0000-000000000000 --type pri
     ```text
     id                                                            displayName
     ------------------------------------------------------------  -----------
-    19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2  General
+    19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2  Channel Name
     ```
 
 === "CSV"
 
     ```csv
     id,displayName
-    19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2,General
+    19:B3nCnLKwwCoGDEADyUgQ5kJ5Pkekujyjmwxp7uhQeAE1@thread.tacv2,Channel Name
     ```

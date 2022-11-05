@@ -28,17 +28,26 @@ m365 teams funsettings list --teamId 83cece1e-938d-44a1-8b86-918cf6151957
 === "JSON"
 
     ```json
-
+    {
+      "allowGiphy": true,
+      "giphyContentRating": "moderate",
+      "allowStickersAndMemes": true,
+      "allowCustomMemes": true
+    }
     ```
 
 === "Text"
 
     ```text
-
+    allowCustomMemes     : true
+    allowGiphy           : true
+    allowStickersAndMemes: true
+    giphyContentRating   : moderate
     ```
 
 === "CSV"
 
     ```csv
-
+    allowGiphy,giphyContentRating,allowStickersAndMemes,allowCustomMemes
+    1,moderate,1,1
     ```

@@ -56,20 +56,4 @@ m365 teams chat message send --chatName "Just a conversation" --message "Welcome
 
 ## Response
 
-=== "JSON"
-
-    ```json
-
-    ```
-
-=== "Text"
-
-    ```text
-
-    ```
-
-=== "CSV"
-
-    ```csv
-
-    ```
+The command won't return a response on success.

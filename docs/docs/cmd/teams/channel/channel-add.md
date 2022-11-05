@@ -65,17 +65,34 @@ m365 teams channel add --teamId 6703ac8a-c49b-4fd4-8223-28f0ac3a6402 --name clim
 === "JSON"
 
     ```json
-
+    {
+      "id": "19:591922f67c4341eeb15e49c791822bfe@thread.tacv2",
+      "createdDateTime": "2022-11-05T10:02:44.3930065Z",
+      "displayName": "climicrosoft365",
+      "description": null,
+      "isFavoriteByDefault": false,
+      "email": "",
+      "webUrl": "https://teams.microsoft.com/l/channel/19%3a591922f67c4341eeb15e49c791822bfe%40thread.tacv2/climicrosoft365?groupId=6703ac8a-c49b-4fd4-8223-28f0ac3a6402&tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b",
+      "membershipType": "standard"
+    }
     ```
 
 === "Text"
 
     ```text
-
+    createdDateTime    : 2022-11-05T10:05:31.3998293Z
+    description        : null
+    displayName        : climicrosoft365
+    email              :
+    id                 : 19:591922f67c4341eeb15e49c791822bfe@thread.tacv2
+    isFavoriteByDefault: false
+    membershipType     : standard
+    webUrl             : https://teams.microsoft.com/l/channel/19%3a591922f67c4341eeb15e49c791822bfe%40thread.tacv2/climicrosoft365?groupId=6703ac8a-c49b-4fd4-8223-28f0ac3a6402&tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b
     ```
 
 === "CSV"
 
     ```csv
-
+    id,createdDateTime,displayName,description,isFavoriteByDefault,email,webUrl,membershipType
+    19:591922f67c4341eeb15e49c791822bfe@thread.tacv2,2022-11-05T12:34:59.6583728Z,climicrosoft365,,,,https://teams.microsoft.com/l/channel/19%3a591922f67c4341eeb15e49c791822bfe%40thread.tacv2/climicrosoft365?groupId=6703ac8a-c49b-4fd4-8223-28f0ac3a6402&tenantId=446355e4-e7e3-43d5-82f8-d7ad8272d55b,standard
     ```

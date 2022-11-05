@@ -57,6 +57,10 @@ Remove the specified Microsoft Teams channel by Name without confirmation
 m365 teams channel remove --name 'name' --teamName "Team Name" --confirm 
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - directory resource type (deleted items): [https://docs.microsoft.com/en-us/graph/api/resources/directory?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/resources/directory?view=graph-rest-1.0)

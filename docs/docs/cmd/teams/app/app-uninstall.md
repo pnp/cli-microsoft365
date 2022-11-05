@@ -37,4 +37,3 @@ m365 teams app uninstall --id YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3Iy
 ## Response
 
 The command won't return a response on success.
-
