@@ -109,3 +109,32 @@ Return only items from a specific result source (using the source id).
 ```sh
 m365 spo search --queryText "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Title": "Document",
+        "OriginalPath": "https://contoso.sharepoint.com/Shared Documents/Document.docx"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Title                    OriginalPath
+    -----------------------  --------------------------------------------------------------------------------------------------------
+    Document                 https://contoso.sharepoint.com/Shared Documents/Document.docx
+    ```
+
+=== "CSV"
+
+    ```csv
+    Title,OriginalPath
+    Document,https://contoso.sharepoint.com/Shared Documents/Document.docx
+    ```
+

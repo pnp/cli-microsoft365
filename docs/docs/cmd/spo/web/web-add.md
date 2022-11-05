@@ -55,3 +55,46 @@ Create subsite with the same navigation as the parent site
 ```sh
 m365 spo web add --title Subsite --url subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --inheritNavigation
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "Configuration": 0,
+      "Created": "2022-11-05T14:07:51",
+      "Description": "Subsite",
+      "Id": "b60137df-c3dc-4984-9def-8edcf7c98ab9",
+      "Language": 1033,
+      "LastItemModifiedDate": "2022-11-05T14:08:03Z",
+      "LastItemUserModifiedDate": "2022-11-05T14:08:03Z",
+      "ServerRelativeUrl": "/subsite",
+      "Title": "Subsite",
+      "WebTemplate": "STS",
+      "WebTemplateId": 0
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    Configuration           : 0
+    Created                 : 2022-11-05T14:08:35
+    Description             : Subsite
+    Id                      : 1f2db405-394d-470e-b820-cd5182883b45
+    Language                : 1033
+    LastItemModifiedDate    : 2022-11-05T14:08:47Z
+    LastItemUserModifiedDate: 2022-11-05T14:08:47Z
+    ServerRelativeUrl       : /subsite
+    Title                   : Subsite
+    WebTemplate             : STS
+    WebTemplateId           : 0
+    ```
+
+=== "CSV"
+
+    ```csv
+    Configuration,Created,Description,Id,Language,LastItemModifiedDate,LastItemUserModifiedDate,ServerRelativeUrl,Title,WebTemplate,WebTemplateId
+    0,2022-11-05T14:09:11,Subsite,0cbf2896-bac2-4244-b871-68b413ee7b2f,1033,2022-11-05T14:09:22Z,2022-11-05T14:09:22Z,/subsite,Subsite,STS,0
+    ```

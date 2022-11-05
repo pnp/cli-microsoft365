@@ -22,3 +22,32 @@ Return all installed languages from site _https://contoso.sharepoint.com/_
 ```sh
 m365 spo web installedlanguage list --webUrl https://contoso.sharepoint.com
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [ 
+      {
+        "DisplayName": "English",
+        "LanguageTag": "en-US",
+        "Lcid": 1033
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    DisplayName                 LanguageTag  Lcid
+    --------------------------  -----------  -----
+    English                     en-US        1033
+    ```
+
+=== "CSV"
+
+    ```csv
+    DisplayName,LanguageTag,Lcid
+    English,en-US,1033
+    ```

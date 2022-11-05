@@ -26,3 +26,7 @@ Request reindexing the subsite _https://contoso.sharepoint.com/subsite_
 ```sh
 m365 spo web reindex --url https://contoso.sharepoint.com/subsite
 ```
+
+## Response
+
+The command won't return a response on success.

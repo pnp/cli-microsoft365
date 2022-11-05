@@ -31,3 +31,7 @@ Restore role inheritance of subsite _https://contoso.sharepoint.com/sites/projec
 ```sh
 m365 spo web roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

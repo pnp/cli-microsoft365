@@ -99,6 +99,10 @@ Set welcome page for the web
 m365 spo web set  --url https://contoso.sharepoint.com/sites/team-a --welcomePage "SitePages/new-home.aspx"
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - Web properties: [https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-server/ee545886(v=office.15)](https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-server/ee545886(v=office.15))

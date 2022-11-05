@@ -25,3 +25,7 @@ Delete subsite without prompting for confirmation
 ```sh
 m365 spo web remove --url https://contoso.sharepoint.com/subsite --confirm
 ```
+
+## Response
+
+The command won't return a response on success.
