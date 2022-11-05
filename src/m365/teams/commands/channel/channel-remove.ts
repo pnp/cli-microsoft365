@@ -130,7 +130,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the channel ${channel} from team ${args.options.teamId}?`
+        message: `Are you sure you want to remove the channel ${channel} from team ${args.options.teamId || args.options.teamName}?`
       });
 
       if (result.continue) {
