@@ -2,6 +2,21 @@
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
+### New commands
+
+**Azure Active Directory:**
+
+- [aad app list](../cmd/aad/app/app-list.md) - retrieves a list of Azure AD app registrations [#3742](https://github.com/pnp/cli-microsoft365/issues/3742)
+- [aad user guest add](../cmd/aad/user/user-guest-add.md) - invites an external user to the organization [#3298](https://github.com/pnp/cli-microsoft365/issues/3298)
+
+**Outlook:**
+
+- [outlook message get](../cmd/outlook/message/message-get.md) - retrieves specified message [#3868](https://github.com/pnp/cli-microsoft365/issues/3868)
+
+**Power Platform:**
+
+- [pp card remove](../cmd/pp/card/card-remove.md) - removes the specified Microsoft Power Platform card in the specified Power Platform environment [#3781](https://github.com/pnp/cli-microsoft365/issues/3781)
+
 ### Changes
 
 - removed deprecated options for 'spo listitem list' command [#3365](https://github.com/pnp/cli-microsoft365/issues/3365)
@@ -25,6 +40,13 @@
 - renamed 'spo hubsite disconnect' to 'spo site hubsite disconnect' [#3878](https://github.com/pnp/cli-microsoft365/issues/3878)
 - renamed 'spo hubsite connect' to 'spo site hubsite connect' [#3877](https://github.com/pnp/cli-microsoft365/issues/3877)
 - removed deprecated options [#3840](https://github.com/pnp/cli-microsoft365/issues/3840)
+- added root folder support for 'spo folder roleinheritance break' and 'spo folder roleinheritance reset' [#3823](https://github.com/pnp/cli-microsoft365/issues/3823)
+- expanded the user guide with info about escaping in PowerShell [#3638](https://github.com/pnp/cli-microsoft365/issues/3638)
+- updated 'spo roledefinition list' output with readable values [#3824](https://github.com/pnp/cli-microsoft365/issues/3824)
+- renamed 'spo hubsite theme sync' to 'spo site hubsite theme sync' [#3881](https://github.com/pnp/cli-microsoft365/issues/3881)
+- extended 'spo list webhook set' command with clientState option [#3861](https://github.com/pnp/cli-microsoft365/issues/3861)
+- extended 'spo folder list' command with recursive option [#2767](https://github.com/pnp/cli-microsoft365/issues/2767)
+- added role requirements for spo hubsite register and unregister docs [#3965](https://github.com/pnp/cli-microsoft365/issues/3965)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
@@ -32,7 +54,7 @@
 
 **Power Platform:**
 
-- [pp card get](../cmd/pp/card//card-get.md) - gets a specific Microsoft Power Platform card in the specified Power Platform environment [#3770](https://github.com/pnp/cli-microsoft365/issues/3770)
+- [pp card get](../cmd/pp/card/card-get.md) - gets a specific Microsoft Power Platform card in the specified Power Platform environment [#3770](https://github.com/pnp/cli-microsoft365/issues/3770)
 - [pp card list](../cmd/pp/card/card-list.md) - lists Microsoft Power Platform cards in the specified Power Platform environment [#3767](https://github.com/pnp/cli-microsoft365/issues/3767)
 - [pp dataverse table list](../cmd/pp/dataverse/dataverse-table-list.md) - lists dataverse tables in a given environment [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)
 - [pp gateway get](../cmd/pp/gateway/gateway-get.md) - gets information about the specified gateway [#3653](https://github.com/pnp/cli-microsoft365/issues/3653)

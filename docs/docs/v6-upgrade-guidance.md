@@ -41,6 +41,9 @@ Alias | Command | Reason
 `teams conversationmember add` | [teams channel member add](./cmd/teams/channel/channel-member-add.md) | Renamed to better match intention and naming convention.
 `teams conversationmember list` | [teams channel member list](./cmd/teams/channel/channel-member-list.md) | Renamed to better match intention and naming convention.
 `teams conversationmember remove` | [teams channel member remove](./cmd/teams/channel/channel-member-remove.md) | Renamed to better match intention and naming convention.
+`spo hubsite theme sync` | [spo site hubsite theme sync](./cmd/spo/site/site-hubsite-theme-sync.md) | Renamed to better match intention and naming convention.
+`spo hubsite connect` | [spo site hubsite connect](./cmd/spo/site/site-hubsite-connect.md) | Renamed to better match intention and naming convention.
+`spo hubsite disconnect` | [spo site hubsite disconnect](./cmd/spo/site/site-hubsite-disconnect.md) | Renamed to better match intention and naming convention.
 
 ### What action do I need to take?
 
@@ -55,6 +58,7 @@ In several planner commands we renamed the `planName` option to `planTitle` to a
 - [planner bucket list](./cmd/planner/bucket/bucket-list.md)
 - [planner bucket remove](./cmd/planner/bucket/bucket-remove.md)
 - [planner bucket set](./cmd/planner/bucket/bucket-set.md)
+- [planner plan get](./cmd/planner/plan/plan-get.md)
 - [planner task add](./cmd/planner/task/task-add.md)
 - [planner task get](./cmd/planner/task/task-get.md)
 - [planner task list](./cmd/planner/task/task-list.md)
@@ -148,8 +152,8 @@ Command|Old option|New option
 [spo folder get](./cmd/spo/folder/folder-get.md)|`folderUrl`|`url`
 [spo folder remove](./cmd/spo/folder/folder-remove.md)|`folderUrl`|`url`
 [spo folder rename](./cmd/spo/folder/folder-rename.md)|`folderUrl`|`url`
-[spo hubsite connect](./cmd/spo/hubsite/hubsite-connect.md)|`url`|`siteUrl`
-[spo hubsite disconnect](./cmd/spo/hubsite/hubsite-disconnect.md)|`url`|`siteUrl`
+[spo site hubsite connect](./cmd/spo/site/site-hubsite-connect.md)|`url`|`siteUrl`
+[spo site hubsite disconnect](./cmd/spo/site/site-hubsite-disconnect.md)|`url`|`siteUrl`
 [spo hubsite register](./cmd/spo/hubsite/hubsite-register.md)|`url`|`siteUrl`
 [spo hubsite rights grant](./cmd/spo/hubsite/hubsite-rights-grant.md)|`url`|`hubSiteUrl`
 [spo hubsite rights revoke](./cmd/spo/hubsite/hubsite-rights-revoke.md)|`url`|`hubSiteUrl`

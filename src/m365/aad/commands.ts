@@ -3,7 +3,8 @@ const prefix: string = 'aad';
 export default {
   APP_ADD: `${prefix} app add`,
   APP_GET: `${prefix} app get`,
-  APP_REMOVE: `${prefix} app remove`,  
+  APP_LIST: `${prefix} app list`,
+  APP_REMOVE: `${prefix} app remove`,
   APP_ROLE_ADD: `${prefix} app role add`,
   APP_ROLE_LIST: `${prefix} app role list`,
   APP_ROLE_REMOVE: `${prefix} app role remove`,
@@ -53,6 +54,7 @@ export default {
   SP_ADD: `${prefix} sp add`,
   SP_GET: `${prefix} sp get`,
   USER_GET: `${prefix} user get`,
+  USER_GUEST_ADD: `${prefix} user guest add`,
   USER_HIBP: `${prefix} user hibp`,
   USER_LIST: `${prefix} user list`,
   USER_PASSWORD_VALIDATE: `${prefix} user password validate`,
