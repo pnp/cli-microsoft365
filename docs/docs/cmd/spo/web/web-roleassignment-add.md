@@ -55,3 +55,7 @@ add role assignment to site _https://contoso.sharepoint.com/sites/project-x_for 
 ```sh
 m365 spo web roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --principalId 11 --roleDefinitionName "Full Control"
 ```
+
+## Response
+
+The command won't return a response on success.

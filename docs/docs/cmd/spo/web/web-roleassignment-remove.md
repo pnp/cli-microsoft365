@@ -52,3 +52,7 @@ Remove roleassignment from web based on principal Id without prompting for confi
 ```sh
 m365 spo web roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --principalId 2 --confirm
 ```
+
+## Response
+
+The command won't return a response on success.
