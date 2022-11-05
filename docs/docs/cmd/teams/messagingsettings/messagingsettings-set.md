@@ -43,3 +43,7 @@ Disallow users to delete messages in channels
 ```sh
 m365 teams messagingsettings set --teamId '00000000-0000-0000-0000-000000000000' --allowUserDeleteMessages false
 ```
+
+## Response
+
+The command won't return a response on success.

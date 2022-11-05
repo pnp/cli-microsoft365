@@ -442,7 +442,7 @@ const contributors = [{
     name: 'Nico De Cleyre',
     company: 'Ordina Belgium',
     github: 'nicodecleyre',
-    twitter: ''
+    twitter: 'NicoDeCleyre'
   },
   {
     name: 'Otto',

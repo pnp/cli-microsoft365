@@ -1,6 +1,7 @@
 const prefix: string = 'pp';
 
 export default {
+  CARD_CLONE: `${prefix} card clone`,
   CARD_GET: `${prefix} card get`,
   CARD_LIST: `${prefix} card list`,
   CARD_REMOVE: `${prefix} card remove`,
@@ -13,5 +14,6 @@ export default {
   MANAGEMENTAPP_LIST: `${prefix} managementapp list`,
   SOLUTION_GET: `${prefix} solution get`,
   SOLUTION_LIST: `${prefix} solution list`,
+  SOLUTION_REMOVE: `${prefix} solution remove`,
   TENANT_SETTINGS_LIST: `${prefix} tenant settings list`
 };

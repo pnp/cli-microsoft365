@@ -17,10 +17,10 @@ m365 planner plan get [options]
 : Title of the plan. Specify either `id` or `title` but not both.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title` or the deprecated `planTitle`.
+: ID of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title` or the deprecated `planTitle`.
+: Name of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title`.
 
 --8<-- "docs/cmd/_global.md"
 

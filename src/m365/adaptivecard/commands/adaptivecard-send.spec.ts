@@ -804,11 +804,6 @@ describe(commands.SEND, () => {
     });
   });
 
-  it(`fails validation if the neither title nor card specified`, async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it(`passes validation if the title is specified`, async () => {
     const actual = await command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', title: 'Lorem' } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -837,6 +832,11 @@ describe(commands.SEND, () => {
   it(`passes validation if the specified cardData is a valid JSON string`, async () => {
     const actual = await command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', card: '{}', cardData: '{}' } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [['title', 'card']]);
   });
 
   it('supports specifying unknown options', () => {

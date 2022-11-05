@@ -20,13 +20,13 @@ m365 spo file roleassignment remove [options]
 : The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both.
 
 `--principalId [principalId]`
-: The SharePoint Id of the principal. It may be either a user id or group id. Specify either `upn`, `groupName`, or `principalId`.
+: The SharePoint Id of the principal. It may be either a user id or group id. Specify either `upn`, `groupName`, or `principalId` but not multiple.
 
 `--upn [upn]`
-: Upn/email of the user. Specify either `upn`, `groupName`, or `principalId`.
+: Upn/email of the user. Specify either `upn`, `groupName`, or `principalId` but not multiple.
 
 `--groupName [groupName]`
-: The group name of an Azure AD or SharePoint group. Specify either `upn`, `groupName`, or `principalId`.
+: The group name of an Azure AD or SharePoint group. Specify either `upn`, `groupName`, or `principalId` but not multiple.
 
 `--confirm [confirm]`
 : Don't prompt for confirmation.
