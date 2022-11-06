@@ -212,7 +212,7 @@ class SpoListViewFieldAddCommand extends SpoCommand {
   }
 
   private getField(options: Options, listSelector: string): Promise<{ InternalName: string; }> {
-    const fieldSelector: string = options.id ? `/getbyid('${encodeURIComponent(options.id)}')` : `/getbyinternalnameortitle('${encodeURIComponent(options.title as string)}')`;
+    const fieldSelector: string = options.id ? `/getbyid('${formatting.encodeQueryParameter(options.id)}')` : `/getbyinternalnameortitle('${formatting.encodeQueryParameter(options.title as string)}')`;
     const getRequestUrl: string = `${options.webUrl}/_api/web/${listSelector}/fields${fieldSelector}`;
 
     const requestOptions: any = {

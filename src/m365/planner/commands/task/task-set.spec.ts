@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -389,7 +390,7 @@ describe(commands.TASK_SET, () => {
 
   it('correctly updates planner task with title', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
       }
 
@@ -397,7 +398,7 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -435,7 +436,7 @@ describe(commands.TASK_SET, () => {
     requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve({
           "@odata.etag": "TestEtag"
         });
@@ -458,7 +459,7 @@ describe(commands.TASK_SET, () => {
     requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve({
           "@odata.etag": "TestEtag"
         });
@@ -481,7 +482,7 @@ describe(commands.TASK_SET, () => {
     requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve({
           "@odata.etag": "TestEtag"
         });
@@ -504,7 +505,7 @@ describe(commands.TASK_SET, () => {
     requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve({
           "@odata.etag": "TestEtag"
         });
@@ -524,7 +525,7 @@ describe(commands.TASK_SET, () => {
 
   it('correctly updates planner task to bucket with bucketName, planTitle, and ownerGroupName', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
       }
 
@@ -532,7 +533,7 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${formatting.encodeQueryParameter('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
         return Promise.resolve({
           value: [
             {
@@ -543,7 +544,7 @@ describe(commands.TASK_SET, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -563,7 +564,7 @@ describe(commands.TASK_SET, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
       }
 
@@ -583,7 +584,7 @@ describe(commands.TASK_SET, () => {
 
   it('correctly updates planner task  to bucket with bucketName, planTitle, and ownerGroupId', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
       }
 
@@ -591,7 +592,7 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${formatting.encodeQueryParameter('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
         return Promise.resolve({
           value: [
             {
@@ -602,7 +603,7 @@ describe(commands.TASK_SET, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -638,7 +639,7 @@ describe(commands.TASK_SET, () => {
 
   it('correctly updates planner task  to bucket with bucketName, planId', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
       }
 
@@ -646,7 +647,7 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${formatting.encodeQueryParameter('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
         return Promise.resolve({
           value: [
             {
@@ -657,7 +658,7 @@ describe(commands.TASK_SET, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -681,7 +682,7 @@ describe(commands.TASK_SET, () => {
 
   it('correctly updates planner task with assignedToUserIds', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponseWithAssignments);
       }
 
@@ -689,7 +690,7 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -712,7 +713,7 @@ describe(commands.TASK_SET, () => {
 
   it('correctly updates planner task with assignedToUserNames', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponseWithAssignments);
       }
 
@@ -720,7 +721,7 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent('user@contoso.onmicrosoft.com')}'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter('user@contoso.onmicrosoft.com')}'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -731,7 +732,7 @@ describe(commands.TASK_SET, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -754,7 +755,7 @@ describe(commands.TASK_SET, () => {
 
   it('correctly updates planner task with description', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -763,7 +764,7 @@ describe(commands.TASK_SET, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -780,7 +781,7 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details`) {
         return Promise.resolve({
           "description": "My Task Description",
           "references": {},
@@ -788,7 +789,7 @@ describe(commands.TASK_SET, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponseWithDetails);
       }
 
@@ -806,7 +807,7 @@ describe(commands.TASK_SET, () => {
 
   it('correctly updates planner task with appliedCategories, bucketId, startDateTime, dueDateTime, percentComplete, assigneePriority, orderHint and priority', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
       }
 
@@ -814,7 +815,7 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -844,7 +845,7 @@ describe(commands.TASK_SET, () => {
 
   it('fails when no bucket is found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${formatting.encodeQueryParameter('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
         return Promise.resolve({
           value: []
         });
@@ -914,7 +915,7 @@ describe(commands.TASK_SET, () => {
 
   it('fails validation when task endpoint fails', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
       }
 
@@ -922,11 +923,11 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details`) {
         return Promise.reject('Error fetching task');
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -947,7 +948,7 @@ describe(commands.TASK_SET, () => {
 
   it('fails validation when task details endpoint fails', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
       }
 
@@ -955,11 +956,11 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details`) {
         return Promise.reject('Error fetching task details');
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {

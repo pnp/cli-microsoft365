@@ -7,6 +7,7 @@ import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { TeamsApp } from '../../TeamsApp';
+import { formatting } from '../../../../utils/formatting';
 
 interface CommandArgs {
   options: Options;
@@ -105,7 +106,7 @@ class TeamsAppListCommand extends GraphCommand {
         this
           .getTeamId(args)
           .then((teamId: string): void => {
-            let endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/installedApps?$expand=teamsApp`;
+            let endpoint: string = `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/installedApps?$expand=teamsApp`;
 
             if (!args.options.all) {
               endpoint += `&$filter=teamsApp/distributionMethod eq 'organization'`;
@@ -142,7 +143,7 @@ class TeamsAppListCommand extends GraphCommand {
       }
 
       logger.log(items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

@@ -10,6 +10,7 @@ import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 
 interface CommandArgs {
   options: Options;
@@ -85,30 +86,30 @@ class PlannerTaskListCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.bucketId && args.options.bucketName) {
-	      return 'To retrieve tasks from a bucket, specify bucketId or bucketName, but not both';
-	    }
+          return 'To retrieve tasks from a bucket, specify bucketId or bucketName, but not both';
+        }
 
-	    if (args.options.bucketName && !args.options.planId && !args.options.planTitle) {
-	      return 'Specify either planId or planTitle when using bucketName';
-	    }
+        if (args.options.bucketName && !args.options.planId && !args.options.planTitle) {
+          return 'Specify either planId or planTitle when using bucketName';
+        }
 
-	    if (args.options.planId && args.options.planTitle) {
-	      return 'Specify either planId or planTitle but not both';
-	    }
+        if (args.options.planId && args.options.planTitle) {
+          return 'Specify either planId or planTitle but not both';
+        }
 
-	    if (args.options.planTitle && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-	    }
+        if (args.options.planTitle && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+        }
 
-	    if (args.options.planTitle && args.options.ownerGroupId && args.options.ownerGroupName) {
-	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-	    }
+        if (args.options.planTitle && args.options.ownerGroupId && args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+        }
 
-	    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-	      return `${args.options.ownerGroupId} is not a valid GUID`;
-	    }
+        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+          return `${args.options.ownerGroupId} is not a valid GUID`;
+        }
 
-	    return true;
+        return true;
       }
     );
   }
@@ -163,7 +164,7 @@ class PlannerTaskListCommand extends GraphCommand {
 
   private getBucketId(args: CommandArgs): Promise<string> {
     if (args.options.bucketId) {
-      return Promise.resolve(encodeURIComponent(args.options.bucketId));
+      return Promise.resolve(formatting.encodeQueryParameter(args.options.bucketId));
     }
 
     return this
@@ -192,7 +193,7 @@ class PlannerTaskListCommand extends GraphCommand {
 
   private getPlanId(args: CommandArgs): Promise<string> {
     if (args.options.planId) {
-      return Promise.resolve(encodeURIComponent(args.options.planId));
+      return Promise.resolve(formatting.encodeQueryParameter(args.options.planId));
     }
 
     return this
@@ -203,7 +204,7 @@ class PlannerTaskListCommand extends GraphCommand {
 
   private getGroupId(args: CommandArgs): Promise<string> {
     if (args.options.ownerGroupId) {
-      return Promise.resolve(encodeURIComponent(args.options.ownerGroupId));
+      return Promise.resolve(formatting.encodeQueryParameter(args.options.ownerGroupId));
     }
 
     return aadGroup

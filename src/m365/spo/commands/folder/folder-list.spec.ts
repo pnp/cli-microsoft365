@@ -18,7 +18,7 @@ describe(commands.FOLDER_LIST, () => {
   const webUrl = 'https://contoso.sharepoint.com';
   const parentFolderUrl = '/Shared Documents';
   const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, parentFolderUrl);
-  const requestUrl: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/folders`;
+  const requestUrl: string = `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/folders`;
 
   const folderListOutput = {
     value: [

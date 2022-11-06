@@ -2,6 +2,7 @@ import { ChildProcess } from 'child_process';
 import * as open from 'open';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
+import { formatting } from '../../../utils/formatting';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import commands from '../commands';
 
@@ -24,12 +25,12 @@ class CliIssueCommand extends AnonymousCommand {
 
   constructor(private open: any) {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -37,7 +38,7 @@ class CliIssueCommand extends AnonymousCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -46,14 +47,14 @@ class CliIssueCommand extends AnonymousCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (CliIssueCommand.issueType.indexOf(args.options.type) < 0) {
           return `${args.options.type} is not a valid Issue type. Allowed values are ${CliIssueCommand.issueType.join(', ')}`;
         }
-    
+
         return true;
       }
     );
@@ -62,7 +63,7 @@ class CliIssueCommand extends AnonymousCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let issueLink: string = '';
 
-    switch (encodeURIComponent(args.options.type)) {
+    switch (formatting.encodeQueryParameter(args.options.type)) {
       case 'bug':
         issueLink = 'https://aka.ms/cli-m365/bug';
         break;

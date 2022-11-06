@@ -119,7 +119,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
   it('breaks role inheritance on folder by site-relative URL (debug)', async () => {
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, folderUrl);
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields/breakroleinheritance(true)`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/breakroleinheritance(true)`) {
         return;
       }
 
@@ -139,7 +139,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
   it('breaks role inheritance on folder by site-relative URL when prompt confirmed', async () => {
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, folderUrl);
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields/breakroleinheritance(true)`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/breakroleinheritance(true)`) {
         return;
       }
 
@@ -184,7 +184,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
   it('breaks role inheritance and clears existing scopes on folder by site-relative URL when prompt confirmed', async () => {
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, folderUrl);
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields/breakroleinheritance(false)`) {
+      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/breakroleinheritance(false)`) {
         return;
       }
 

@@ -1,6 +1,7 @@
 import { DirectoryObject } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -57,8 +58,8 @@ class AadO365GroupRecycleBinItemListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
-      const displayNameFilter: string = args.options.groupDisplayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.groupDisplayName).replace(/'/g, `''`)}')` : '';
-      const mailNicknameFilter: string = args.options.groupMailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.groupMailNickname).replace(/'/g, `''`)}')` : '';
+      const displayNameFilter: string = args.options.groupDisplayName ? ` and startswith(DisplayName,'${formatting.encodeQueryParameter(args.options.groupDisplayName).replace(/'/g, `''`)}')` : '';
+      const mailNicknameFilter: string = args.options.groupMailNickname ? ` and startswith(MailNickname,'${formatting.encodeQueryParameter(args.options.groupMailNickname).replace(/'/g, `''`)}')` : '';
       const topCount: string = '&$top=100';
       const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
 

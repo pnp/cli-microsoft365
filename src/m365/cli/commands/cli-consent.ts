@@ -1,6 +1,7 @@
 import { Logger } from '../../../cli/Logger';
 import config from '../../../config';
 import GlobalOptions from '../../../GlobalOptions';
+import { formatting } from '../../../utils/formatting';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import commands from '../commands';
 
@@ -23,12 +24,12 @@ class CliConsentCommand extends AnonymousCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -36,7 +37,7 @@ class CliConsentCommand extends AnonymousCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -45,14 +46,14 @@ class CliConsentCommand extends AnonymousCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.service !== 'yammer') {
           return `${args.options.service} is not a valid value for the service option. Allowed values: yammer`;
         }
-    
+
         return true;
       }
     );
@@ -66,7 +67,7 @@ class CliConsentCommand extends AnonymousCommand {
         break;
     }
 
-    logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${config.tenant}/oauth2/v2.0/authorize?client_id=${config.cliAadAppId}&response_type=code&scope=${encodeURIComponent(scope)}`);
+    logger.log(`To consent permissions for executing ${args.options.service} commands, navigate in your web browser to https://login.microsoftonline.com/${config.tenant}/oauth2/v2.0/authorize?client_id=${config.cliAadAppId}&response_type=code&scope=${formatting.encodeQueryParameter(scope)}`);
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

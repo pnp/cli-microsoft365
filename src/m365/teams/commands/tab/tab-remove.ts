@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -82,7 +83,7 @@ class TeamsTabRemoveCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeTab: () => Promise<void> = async (): Promise<void> => {
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${args.options.channelId}/tabs/${encodeURIComponent(args.options.id)}`,
+        url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(args.options.teamId)}/channels/${args.options.channelId}/tabs/${formatting.encodeQueryParameter(args.options.id)}`,
         headers: {
           accept: "application/json;odata.metadata=none"
         },
@@ -91,7 +92,7 @@ class TeamsTabRemoveCommand extends GraphCommand {
 
       try {
         await request.delete(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -106,7 +107,7 @@ class TeamsTabRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the tab with id ${args.options.id} from channel ${args.options.channelId} in team ${args.options.teamId}?`
       });
-      
+
       if (result.continue) {
         await removeTab();
       }

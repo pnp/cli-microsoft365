@@ -1,6 +1,7 @@
 import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -66,7 +67,7 @@ class AadUserListCommand extends GraphCommand {
       const url: string = `${this.resource}/v1.0/${endpoint}?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
       const users = await odata.getAllItems<User>(url);
       logger.log(users);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -93,7 +94,7 @@ class AadUserListCommand extends GraphCommand {
           throw `Specify value for the ${key} property`;
         }
 
-        filters[key] = encodeURIComponent(options[key].toString().replace(/'/g, `''`));
+        filters[key] = formatting.encodeQueryParameter(options[key].toString());
       }
     });
     let filter: string = Object.keys(filters).map(key => `startsWith(${key}, '${filters[key]}')`).join(' and ');

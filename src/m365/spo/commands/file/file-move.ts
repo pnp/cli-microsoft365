@@ -10,6 +10,7 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { Options as SpoFileRemoveOptions } from './file-remove';
+import { formatting } from '../../../../utils/formatting';
 const removeCommand: Command = require('./file-remove');
 
 interface CommandArgs {
@@ -158,7 +159,7 @@ class SpoFileMoveCommand extends SpoCommand {
     const webServerRelativeUrl: string = webUrl.replace(tenantUrl, '');
     const fileServerRelativeUrl: string = `${webServerRelativeUrl}${sourceUrl}`;
 
-    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(fileServerRelativeUrl)}')/`;
+    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileServerRelativeUrl)}')/`;
     const requestOptions: any = {
       url: requestUrl,
       method: 'GET',
@@ -174,7 +175,7 @@ class SpoFileMoveCommand extends SpoCommand {
   /**
    * Moves file in the site recycle bin
    */
-  private async recycleFile(tenantUrl: string, targetUrl: string, filename: string, logger: Logger) : Promise<void> {
+  private async recycleFile(tenantUrl: string, targetUrl: string, filename: string, logger: Logger): Promise<void> {
     const targetFolderAbsoluteUrl: string = urlUtil.urlCombine(tenantUrl, targetUrl);
 
     // since the target WebFullUrl is unknown we can use getRequestDigest
@@ -199,10 +200,10 @@ class SpoFileMoveCommand extends SpoCommand {
 
     try {
       await Cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
-    } 
+    }
     catch (err: any) {
       if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {
-        
+
       }
       else {
         throw err;
