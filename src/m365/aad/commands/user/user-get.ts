@@ -40,6 +40,7 @@ class AadUserGetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
+        email: typeof args.options.email !== 'undefined',
         properties: args.options.properties
       });
     });

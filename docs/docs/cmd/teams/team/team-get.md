@@ -31,3 +31,81 @@ Get information about Microsoft Teams team with name _Team Name_
 ```sh
 m365 teams team get --name "Team Name"
 ```
+
+## Response
+
+=== "JSON"
+
+    ``` json
+    {
+      "id": "2eaf7dcd-7e83-4c3a-94f7-932a1299c844",
+      "createdDateTime": "2022-10-31T12:50:42.819Z",
+      "displayName": "Team Name",
+      "description": "Team Name Discussion",
+      "internalId": "19:2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41@thread.tacv2",
+      "classification": null,
+      "specialization": "none",
+      "visibility": "public",
+      "webUrl": "https://teams.microsoft.com/l/team/19%3a2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41%40thread.tacv2/conversations?groupId=2eaf7dcd-7e83-4c3a-94f7-932a1299c844&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba",
+      "isArchived": false,
+      "isMembershipLimitedToOwners": false,
+      "discoverySettings": {
+        "showInTeamsSearchAndSuggestions": true
+      },
+      "summary": null,
+      "memberSettings": {
+        "allowCreateUpdateChannels": true,
+        "allowCreatePrivateChannels": true,
+        "allowDeleteChannels": true,
+        "allowAddRemoveApps": true,
+        "allowCreateUpdateRemoveTabs": true,
+        "allowCreateUpdateRemoveConnectors": true
+      },
+      "guestSettings": {
+        "allowCreateUpdateChannels": false,
+        "allowDeleteChannels": false
+      },
+      "messagingSettings": {
+        "allowUserEditMessages": true,
+        "allowUserDeleteMessages": true,
+        "allowOwnerDeleteMessages": true,
+        "allowTeamMentions": true,
+        "allowChannelMentions": true
+      },
+      "funSettings": {
+        "allowGiphy": true,
+        "giphyContentRating": "moderate",
+        "allowStickersAndMemes": true,
+        "allowCustomMemes": true
+      }
+    }
+    ```
+
+=== "Text"
+
+    ``` text
+    classification             : null
+    createdDateTime            : 2022-10-31T12:50:42.819Z
+    description                : Team Name Discussion
+    discoverySettings          : {"showInTeamsSearchAndSuggestions":true}
+    displayName                : Team Name
+    funSettings                : {"allowGiphy":true,"giphyContentRating":"moderate","allowStickersAndMemes":true,"allowCustomMemes":true}
+    guestSettings              : {"allowCreateUpdateChannels":false,"allowDeleteChannels":false}
+    id                         : 2eaf7dcd-7e83-4c3a-94f7-932a1299c844
+    internalId                 : 19:2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41@thread.tacv2
+    isArchived                 : false
+    isMembershipLimitedToOwners: false
+    memberSettings             : {"allowCreateUpdateChannels":true,"allowCreatePrivateChannels":true,"allowDeleteChannels":true,"allowAddRemoveApps":true,"allowCreateUpdateRemoveTabs":true,"allowCreateUpdateRemoveConnectors":true}
+    messagingSettings          : {"allowUserEditMessages":true,"allowUserDeleteMessages":true,"allowOwnerDeleteMessages":true,"allowTeamMentions":true,"allowChannelMentions":true}
+    specialization             : none
+    summary                    : null
+    visibility                 : public
+    webUrl                     : https://teams.microsoft.com/l/team/19%3a2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41%40thread.tacv2/conversations?groupId=2eaf7dcd-7e83-4c3a-94f7-932a1299c844&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,createdDateTime,displayName,description,internalId,classification,specialization,visibility,webUrl,isArchived,isMembershipLimitedToOwners,discoverySettings,summary,memberSettings,guestSettings,messagingSettings,funSettings
+    2eaf7dcd-7e83-4c3a-94f7-932a1299c844,2022-10-31T12:50:42.819Z,Team Name,Team Name Discussion,19:2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41@thread.tacv2,,none,public,https://teams.microsoft.com/l/team/19%3a2soiTJiLJmUrSi94Hr23ZwcN9uWFWjE3EGYb5bFsyy41%40thread.tacv2/conversations?groupId=2eaf7dcd-7e83-4c3a-94f7-932a1299c844&tenantId=92e59666-257b-49c3-b1fa-1bae8107f6ba,,,"{""showInTeamsSearchAndSuggestions"":true}",,"{""allowCreateUpdateChannels"":true,""allowCreatePrivateChannels"":true,""allowDeleteChannels"":true,""allowAddRemoveApps"":true,""allowCreateUpdateRemoveTabs"":true,""allowCreateUpdateRemoveConnectors"":true}","{""allowCreateUpdateChannels"":false,""allowDeleteChannels"":false}","{""allowUserEditMessages"":true,""allowUserDeleteMessages"":true,""allowOwnerDeleteMessages"":true,""allowTeamMentions"":true,""allowChannelMentions"":true}","{""allowGiphy"":true,""giphyContentRating"":""moderate"",""allowStickersAndMemes"":true,""allowCustomMemes"":true}"
+    ```
