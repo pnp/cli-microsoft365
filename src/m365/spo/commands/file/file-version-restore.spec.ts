@@ -104,7 +104,6 @@ describe(commands.FILE_VERSION_RESTORE, () => {
   });
 
   it('prompts before restoring the specified version when confirm option not passed', async () => {
-
     await command.action(logger, {
       options: {
         webUrl: validWebUrl,
