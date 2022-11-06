@@ -48,20 +48,20 @@ class TeamsTeamUnarchiveCommand extends GraphCommand {
     );
   }
 
-  #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
-  }
-
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-	      return `${args.options.id} is not a valid GUID`;
-	    }
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
 
-	    return true;
+        return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'name']);
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {
@@ -95,7 +95,7 @@ class TeamsTeamUnarchiveCommand extends GraphCommand {
       };
 
       await request.post(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

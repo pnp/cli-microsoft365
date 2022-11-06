@@ -31,6 +31,7 @@ class SpoSiteDesignGetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -56,20 +57,18 @@ class SpoSiteDesignGetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && args.options.title) {
-          return 'Specify either id or title, but not both.';
-        }
-
-        if (!args.options.id && !args.options.title) {
-          return 'Specify id or title, one is required';
-        }
-
         if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['id', 'title']
     );
   }
 
@@ -119,7 +118,7 @@ class SpoSiteDesignGetCommand extends SpoCommand {
 
       const res = await request.post(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

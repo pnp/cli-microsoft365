@@ -1,6 +1,7 @@
 import { AssociatedSite } from './AssociatedSite';
 
 export interface HubSite {
+  'odata.etag'?: string;
   AssociatedSites?: AssociatedSite[];
   Description: string;
   ID: string;

@@ -31,3 +31,34 @@ List all owners and their role in the specified Microsoft teams team
 ```sh
 m365 teams user list --teamId '00000000-0000-0000-0000-000000000000' --role Owner
 ```
+
+## Response
+
+=== "JSON"
+
+    ``` json
+    [
+      {
+        "id": "78ccf530-bbf0-47e4-aae6-da5f8c6fb142",
+        "displayName": "John Doe",
+        "userPrincipalName": "john@contoso.onmicrosoft.com",
+        "userType": "Owner"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ``` text
+    displayName      : John Doe
+    id               : 78ccf530-bbf0-47e4-aae6-da5f8c6fb142
+    userPrincipalName: john@contoso.onmicrosoft.com
+    userType         : Owner
+    ```
+
+=== "CSV"
+
+    ``` text
+    id,displayName,userPrincipalName,userType
+    78ccf530-bbf0-47e4-aae6-da5f8c6fb142,John Doe,john@contoso.onmicrosoft.com,Owner
+    ```

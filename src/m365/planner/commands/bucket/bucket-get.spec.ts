@@ -151,16 +151,6 @@ describe(commands.BUCKET_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when id and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validBucketId,
-        name: validBucketName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation when id and plan details are specified', async () => {
     const actual = await command.validate({
       options: {
@@ -264,6 +254,11 @@ describe(commands.BUCKET_GET, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [['id', 'name']]);
   });
 
   it('fails validation when no groups found', async () => {

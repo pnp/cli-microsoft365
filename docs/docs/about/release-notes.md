@@ -15,7 +15,24 @@
 
 **Power Platform:**
 
+- [pp card clone](../cmd/pp/card/card-clone.md) - clones a specific Microsoft Power Platform card in the specified Power Platform environment [#3790](https://github.com/pnp/cli-microsoft365/issues/3790)
 - [pp card remove](../cmd/pp/card/card-remove.md) - removes the specified Microsoft Power Platform card in the specified Power Platform environment [#3781](https://github.com/pnp/cli-microsoft365/issues/3781)
+- [pp dataverse table get](../cmd/pp/dataverse/dataverse-table-get.md) - lists a dataverse table in a given environment [#3726](https://github.com/pnp/cli-microsoft365/issues/3726)
+- [pp solution remove](../cmd/pp/solution/solution-remove.md) - removes the specified solution in the specified Power Platform environment [#3723](https://github.com/pnp/cli-microsoft365/issues/3723)
+- [pp solution publisher get](../cmd/pp/solution/solution-publisher-get.md) - gets information about the specified publisher in a given environment [#3949](https://github.com/pnp/cli-microsoft365/issues/3949)
+- [pp solution publisher list](../cmd/pp/solution/solution-publisher-list.md) - lists publishers in a given environment [#3766](https://github.com/pnp/cli-microsoft365/issues/3766)
+- [pp solution publisher remove](../cmd/pp/solution/solution-publisher-remove.md) - removes the specified publisher in a given environment [#3950](https://github.com/pnp/cli-microsoft365/issues/3950)
+
+**SharePoint:**
+
+- [spo file version list](../cmd/spo/file/file-version-list.md) - retrieves all versions of a file [#3953](https://github.com/pnp/cli-microsoft365/issues/3953)
+- [spo folder roleassignment add](../cmd/spo/folder/folder-roleassignment-add.md) - adds a role assignment from the specified folder [#3703](https://github.com/pnp/cli-microsoft365/issues/3703)
+- [spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md) - connect a hub site to a parent hub site [#3759](https://github.com/pnp/cli-microsoft365/issues/3759)
+- [spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md) - disconnect a hub site from its parent hub site [#3760](https://github.com/pnp/cli-microsoft365/issues/3760)
+
+**Teams**
+
+- [teams meeting list](../cmd/teams/meeting/meeting-list.md) - retrieve all online meetings for a given user or shared mailbox [#3899](https://github.com/pnp/cli-microsoft365/issues/3899)
 
 ### Changes
 
@@ -51,6 +68,16 @@
 - converted content tabs with code blocks into plain text [#3912](https://github.com/pnp/cli-microsoft365/issues/3912)
 - extended 'spo list view' commands to include listUrl option. [#3811](https://github.com/pnp/cli-microsoft365/issues/3811)
 - extended 'teams channel' commands with extra options. [#3688](https://github.com/pnp/cli-microsoft365/issues/3688)
+- added docs response for adaptivecards, app, booking commands. [#3920](https://github.com/pnp/cli-microsoft365/issues/3920)
+- added docs response for todo, util, viva commands. [#3927](https://github.com/pnp/cli-microsoft365/issues/3927)
+- added docs response for pa, pp commands. [#3924](https://github.com/pnp/cli-microsoft365/issues/3924)
+- extended spo list set to include title and url option. [#3678](https://github.com/pnp/cli-microsoft365/issues/3678)
+- extended multiple commands with option sets. [#3854](https://github.com/pnp/cli-microsoft365/issues/3854)
+- added docs reponse for teams message until teams user commands. [#3936](https://github.com/pnp/cli-microsoft365/issues/3936)
+- added support for upgrading SPFx projects to v1.16.0-rc.0. [#3993](https://github.com/pnp/cli-microsoft365/issues/3993)
+- extended spfx doctor to support SPFx v1.16.0-rc.0. [#3994](https://github.com/pnp/cli-microsoft365/issues/3994)
+- extended spfx project doctor to support SPFx v1.16.0-rc.0. [#3995](https://github.com/pnp/cli-microsoft365/issues/3995)
+- improved confirmation message for 'teams channel remove' [#4004](https://github.com/pnp/cli-microsoft365/issues/4004)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
