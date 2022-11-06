@@ -446,7 +446,7 @@ describe(commands.PAGE_SET, () => {
 
   it('escapes special characters in user input', async () => {
     sinonUtil.restore([request.post]);
-    const comment = 'Don\'t tell';
+    const comment = `Don't tell`;
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${formatting.encodeQueryParameter(comment)}'&@a2=1`) {
         return Promise.resolve();
