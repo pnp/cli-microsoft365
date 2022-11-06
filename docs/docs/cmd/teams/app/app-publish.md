@@ -29,4 +29,20 @@ m365 teams app publish --filePath ./teams-manifest.zip
 
 ## Response
 
-The command won't return a response on success.
+=== "JSON"
+
+    ```json
+    "fbdfd207-83ee-45d8-9c98-5039a1a01207"
+    ```
+
+=== "Text"
+
+    ```text
+    fbdfd207-83ee-45d8-9c98-5039a1a01207
+    ```
+
+=== "CSV"
+
+    ```csv
+    fbdfd207-83ee-45d8-9c98-5039a1a01207
+    ```

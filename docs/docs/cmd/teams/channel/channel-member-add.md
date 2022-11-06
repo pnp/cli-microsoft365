@@ -55,24 +55,4 @@ m365 teams channel member add --teamName "Human Resources" --channelName "Privat
 
 ## Response
 
-=== "JSON"
-
-    ```json
-
-    ```
-
-=== "Text"
-
-    ```text
-
-    ```
-
-=== "CSV"
-
-    ```csv
-
-    ```
-
-## Response
-
 The command won't return a response on success.
