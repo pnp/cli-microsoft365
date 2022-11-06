@@ -13,7 +13,7 @@ m365 flow get [options]
 `-n, --name <name>`
 : The name of the Power Automate flow to get information about
 
-`-e, --environmentNameName <environmentName>`
+`-e, --environmentName <environmentName>`
 : The name of the environment for which to retrieve available flows
 
 `--asAdmin`

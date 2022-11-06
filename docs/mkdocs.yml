@@ -264,6 +264,7 @@ nav:
         - card list: 'cmd/pp/card/card-list.md'
         - card remove: 'cmd/pp/card/card-remove.md'
       - dataverse:
+        - dataverse table get: 'cmd/pp/dataverse/dataverse-table-get.md'
         - dataverse table list: 'cmd/pp/dataverse/dataverse-table-list.md'
       - environment:
         - environment get: 'cmd/pp/environment/environment-get.md'
@@ -278,6 +279,9 @@ nav:
         - solution get: 'cmd/pp/solution/solution-get.md'
         - solution list: 'cmd/pp/solution/solution-list.md'
         - solution remove: 'cmd/pp/solution/solution-remove.md'
+        - solution publisher get: 'cmd/pp/solution/solution-publisher-get.md'
+        - solution publisher list: 'cmd/pp/solution/solution-publisher-list.md'
+        - solution publisher remove: 'cmd/pp/solution/solution-publisher-remove.md'
       - tenant:
         - tenant settings list: 'cmd/pp/tenant/tenant-settings-list.md'
     - Search (search):
@@ -384,6 +388,7 @@ nav:
         - folder move: 'cmd/spo/folder/folder-move.md'
         - folder remove: 'cmd/spo/folder/folder-remove.md'
         - folder rename: 'cmd/spo/folder/folder-rename.md'
+        - folder roleassignment add: 'cmd/spo/folder/folder-roleassignment-add.md'
         - folder roleassignment remove: 'cmd/spo/folder/folder-roleassignment-remove.md'
         - folder roleinheritance break: 'cmd/spo/folder/folder-roleinheritance-break.md'
         - folder roleinheritance reset: 'cmd/spo/folder/folder-roleinheritance-reset.md'
