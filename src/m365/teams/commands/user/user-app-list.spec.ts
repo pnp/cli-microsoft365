@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -218,7 +219,7 @@ describe(commands.USER_APP_LIST, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${encodeURIComponent("admin@contoso.com")}/id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter("admin@contoso.com")}/id`) {
         return Promise.resolve({ "value": "5c705288-ed7f-44fc-af0a-ac164419901c" });
       }
 

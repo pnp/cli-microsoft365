@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import commands from '../../commands';
@@ -26,12 +27,12 @@ class AadUserHibpCommand extends AnonymousCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -39,7 +40,7 @@ class AadUserHibpCommand extends AnonymousCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -53,14 +54,14 @@ class AadUserHibpCommand extends AnonymousCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidUserPrincipalName(args.options.userName)) {
           return 'Specify valid userName';
         }
-    
+
         return true;
       }
     );
@@ -69,7 +70,7 @@ class AadUserHibpCommand extends AnonymousCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const requestOptions: any = {
-        url: `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(args.options.userName)}${(args.options.domain ? `?domain=${encodeURIComponent(args.options.domain)}` : '')}`,
+        url: `https://haveibeenpwned.com/api/v3/breachedaccount/${formatting.encodeQueryParameter(args.options.userName)}${(args.options.domain ? `?domain=${formatting.encodeQueryParameter(args.options.domain)}` : '')}`,
         headers: {
           'accept': 'application/json',
           'hibp-api-key': args.options.apiKey,

@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -65,11 +66,11 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
         if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
           return `${args.options.appId} is not a valid GUID`;
         }
-    
+
         if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
           return `${args.options.appObjectId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -147,10 +148,10 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
         // Use existing way to get service principal object
         let spMatchQuery: string = '';
         if (argOptions.appId) {
-          spMatchQuery = `appId eq '${encodeURIComponent(argOptions.appId)}'`;
+          spMatchQuery = `appId eq '${formatting.encodeQueryParameter(argOptions.appId)}'`;
         }
         else {
-          spMatchQuery = `displayName eq '${encodeURIComponent(argOptions.appDisplayName as string)}'`;
+          spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(argOptions.appDisplayName as string)}'`;
         }
 
         this.getServicePrincipalForApp(spMatchQuery)

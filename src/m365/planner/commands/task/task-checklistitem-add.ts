@@ -6,6 +6,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -34,11 +35,11 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -46,7 +47,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       { option: '-i, --taskId <taskId>' },
@@ -75,7 +76,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
       };
 
       const requestOptions: AxiosRequestConfig = {
-        url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.taskId)}/details`,
+        url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(args.options.taskId)}/details`,
         headers: {
           accept: 'application/json;odata.metadata=none',
           prefer: 'return=representation',
@@ -102,7 +103,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {
     const requestOptions: AxiosRequestConfig = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
+      url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}/details`,
       headers: {
         accept: 'application/json;odata.metadata=minimal'
       },

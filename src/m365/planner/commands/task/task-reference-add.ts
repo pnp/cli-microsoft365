@@ -70,7 +70,7 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
     try {
       const etag = await this.getTaskDetailsEtag(args.options.taskId);
       const requestOptionsTaskDetails: any = {
-        url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.taskId)}/details`,
+        url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(args.options.taskId)}/details`,
         headers: {
           'accept': 'application/json;odata.metadata=none',
           'If-Match': etag,
@@ -98,7 +98,7 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
+      url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}/details`,
       headers: {
         accept: 'application/json'
       },

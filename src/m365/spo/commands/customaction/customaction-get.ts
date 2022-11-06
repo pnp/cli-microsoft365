@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -137,8 +138,8 @@ class SpoCustomActionGetCommand extends SpoCommand {
 
   private getCustomAction(options: Options): Promise<CustomAction> {
     const filter: string = options.id ?
-      `('${encodeURIComponent(options.id as string)}')` :
-      `?$filter=Title eq '${encodeURIComponent(options.title as string)}'`;
+      `('${formatting.encodeQueryParameter(options.id as string)}')` :
+      `?$filter=Title eq '${formatting.encodeQueryParameter(options.title as string)}'`;
 
     const requestOptions: any = {
       url: `${options.webUrl}/_api/${options.scope}/UserCustomActions${filter}`,

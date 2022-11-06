@@ -11,6 +11,7 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./mail-send');
 
 describe(commands.MAIL_SEND, () => {
@@ -44,7 +45,7 @@ describe(commands.MAIL_SEND, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => false);   
+    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => false);
   });
 
   afterEach(() => {
@@ -351,7 +352,7 @@ describe(commands.MAIL_SEND, () => {
 
       return { isFile: () => true } as any;
     });
-    
+
     const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -459,7 +460,7 @@ describe(commands.MAIL_SEND, () => {
     });
     sinon.stub(request, 'post').callsFake((opts) => {
       actual = JSON.stringify(opts.data);
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${encodeURIComponent('some-user@domain.com')}/sendMail`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter('some-user@domain.com')}/sendMail`) {
         return Promise.resolve();
       }
 
@@ -470,14 +471,17 @@ describe(commands.MAIL_SEND, () => {
     assert.strictEqual(actual, expected);
   });
 
-  it('throws an error when the sender is not defined when signed in using app only authentication', async() => {
-    sinonUtil.restore([ Auth.isAppOnlyAuth ]);
+  it('throws an error when the sender is not defined when signed in using app only authentication', async () => {
+    sinonUtil.restore([Auth.isAppOnlyAuth]);
     sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      subject: 'Lorem ipsum', 
-      to: 'mail@domain.com', 
-      bodyContents: 'Lorem ipsum' } } as any), new CommandError(`Specify a upn or user id in the 'sender' option when using app only authentication.`));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        subject: 'Lorem ipsum',
+        to: 'mail@domain.com',
+        bodyContents: 'Lorem ipsum'
+      }
+    } as any), new CommandError(`Specify a upn or user id in the 'sender' option when using app only authentication.`));
   });
 });

@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -127,7 +128,7 @@ describe(commands.CHANNEL_REMOVE, () => {
   it('fails to remove channel when channel does not exists', async () => {
     const errorMessage = 'The specified channel does not exist in this Microsoft Teams team';
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(name)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(name)}'`) {
         return { value: [] };
       }
       throw 'Invalid request';
@@ -178,7 +179,7 @@ describe(commands.CHANNEL_REMOVE, () => {
   it('fails when team name does not exist', async () => {
     const errorMessage = 'The specified team does not exist';
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(teamName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'`) {
         return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 1,
@@ -217,7 +218,7 @@ describe(commands.CHANNEL_REMOVE, () => {
 
   it('removes the specified channel by id when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(id)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels/${formatting.encodeQueryParameter(id)}`) {
         return;
       }
 
@@ -240,7 +241,7 @@ describe(commands.CHANNEL_REMOVE, () => {
 
   it('removes the specified channel by name when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(teamName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'`) {
         return {
           value: [
             {
@@ -255,7 +256,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(id)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels/${formatting.encodeQueryParameter(id)}`) {
         return;
       }
 
@@ -279,7 +280,7 @@ describe(commands.CHANNEL_REMOVE, () => {
 
   it('removes the specified channel by name when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(name)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(name)}'`) {
         return {
           value: [
             {
@@ -297,7 +298,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(id)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels/${formatting.encodeQueryParameter(id)}`) {
         return;
       }
 
@@ -320,7 +321,7 @@ describe(commands.CHANNEL_REMOVE, () => {
 
   it('removes the specified channel by name without prompt', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(teamName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'`) {
         return {
           value: [
             {
@@ -332,7 +333,7 @@ describe(commands.CHANNEL_REMOVE, () => {
         };
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(name)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(name)}'`) {
         return {
           value: [
             {
@@ -350,7 +351,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(id)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels/${formatting.encodeQueryParameter(id)}`) {
         return;
       }
 

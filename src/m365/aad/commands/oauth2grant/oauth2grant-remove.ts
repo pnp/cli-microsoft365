@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -24,10 +25,10 @@ class AadOAuth2GrantRemoveCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -47,13 +48,13 @@ class AadOAuth2GrantRemoveCommand extends GraphCommand {
 
       try {
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}`,
+          url: `${this.resource}/v1.0/oauth2PermissionGrants/${formatting.encodeQueryParameter(args.options.grantId)}`,
           headers: {
             'accept': 'application/json;odata.metadata=none'
           },
           responseType: 'json'
         };
-  
+
         await request.delete(requestOptions);
       }
       catch (err: any) {

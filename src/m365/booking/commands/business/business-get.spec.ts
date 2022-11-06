@@ -6,6 +6,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -88,7 +89,7 @@ describe(commands.BUSINESS_GET, () => {
 
   it('gets business by id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses/${encodeURIComponent(validId)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses/${formatting.encodeQueryParameter(validId)}`) {
         return Promise.resolve(businessResponse);
       }
 
@@ -105,7 +106,7 @@ describe(commands.BUSINESS_GET, () => {
         return Promise.resolve({ value: [businessResponse] });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses/${encodeURIComponent(validId)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses/${formatting.encodeQueryParameter(validId)}`) {
         return Promise.resolve(businessResponse);
       }
 
@@ -136,14 +137,14 @@ describe(commands.BUSINESS_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    
-    await assert.rejects(command.action(logger, { options: { debug: false, name: validName  } } as any), new CommandError(`The specified business with name ${validName} does not exist.`));
+
+    await assert.rejects(command.action(logger, { options: { debug: false, name: validName } } as any), new CommandError(`The specified business with name ${validName} does not exist.`));
   });
 
   it('fails when no business found with name because of an empty displayName', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/solutions/bookingBusinesses`) {
-        return Promise.resolve({ value: [ { 'displayName': null } ] });
+        return Promise.resolve({ value: [{ 'displayName': null }] });
       }
 
       return Promise.reject('Invalid request');

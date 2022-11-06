@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
 
@@ -27,10 +28,10 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -45,7 +46,7 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+      url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

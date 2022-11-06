@@ -1,5 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
 import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './clientsidepages';
@@ -19,7 +20,7 @@ export class Page {
       const pageName: string = this.getPageNameWithExtension(name);
 
       const requestOptions: any = {
-        url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
+        url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(webUrl)}/SitePages/${formatting.encodeQueryParameter(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
         headers: {
           'content-type': 'application/json;charset=utf-8',
           accept: 'application/json;odata=nometadata'
@@ -55,7 +56,7 @@ export class Page {
 
       const pageName: string = this.getPageNameWithExtension(name);
       const requestOptions: any = {
-        url: `${webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')/checkoutpage`,
+        url: `${webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageName)}')/checkoutpage`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },

@@ -3,6 +3,7 @@ import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import flowCommands from '../../../flow/commands';
 import commands from '../../commands';
@@ -33,12 +34,12 @@ class PaConnectorExportCommand extends PowerAppsCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -46,7 +47,7 @@ class PaConnectorExportCommand extends PowerAppsCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -60,7 +61,7 @@ class PaConnectorExportCommand extends PowerAppsCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -68,12 +69,12 @@ class PaConnectorExportCommand extends PowerAppsCommand {
           !fs.existsSync(path.resolve(args.options.outputFolder))) {
           return `Specified output folder ${args.options.outputFolder} doesn't exist`;
         }
-    
+
         const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.connector);
         if (fs.existsSync(outputFolder)) {
           return `Connector output folder ${outputFolder} already exists`;
         }
-    
+
         return true;
       }
     );
@@ -83,7 +84,7 @@ class PaConnectorExportCommand extends PowerAppsCommand {
     const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.connector);
 
     const requestOptions: any = {
-      url: `${this.resource}/providers/Microsoft.PowerApps/apis/${encodeURIComponent(args.options.connector)}?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environmentName)}%27%20and%20IsCustomApi%20eq%20%27True%27`,
+      url: `${this.resource}/providers/Microsoft.PowerApps/apis/${formatting.encodeQueryParameter(args.options.connector)}?api-version=2016-11-01&$filter=environment%20eq%20%27${formatting.encodeQueryParameter(args.options.environmentName)}%27%20and%20IsCustomApi%20eq%20%27True%27`,
       headers: {
         accept: 'application/json'
       },

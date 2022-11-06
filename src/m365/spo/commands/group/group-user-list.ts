@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -82,8 +83,8 @@ class SpoGroupUserListCommand extends SpoCommand {
     }
 
     const requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/${args.options.groupId
-      ? `GetById('${encodeURIComponent(args.options.groupId)}')`
-      : `GetByName('${encodeURIComponent(args.options.groupName as string)}')`}/users`;
+      ? `GetById('${args.options.groupId}')`
+      : `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')`}/users`;
 
     const requestOptions: any = {
       url: requestUrl,
