@@ -20,9 +20,6 @@ m365 spo site hubsite connect [options]
 
 ## Remarks
 
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
-
 If the specified site collection is already connected to a hub site, it will be disconnected and connected to the newly specified hub site.
 
 If the specified `id` doesn't point to a valid hub site, you will get a `ResourceNotFoundException` error.
