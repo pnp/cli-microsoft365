@@ -43,5 +43,6 @@ m365 spo get --output json
 === "CSV"
 
     ```csv
-    SpoUrl: https://contoso.sharepoint.com
+    SpoUrl
+    https://contoso.sharepoint.com
     ```

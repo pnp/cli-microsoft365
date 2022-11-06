@@ -38,8 +38,7 @@ Get user with ID _6_ for web _https://contoso.sharepoint.com/sites/project-x_
 m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --id 6
 ```
 
-Get user with login name 'i:0#.f
-: membership|john.doe@mytenant.onmicrosoft.com' for web _https://contoso.sharepoint.com/sites/project-x_
+Get user with login name 'i:0#.f|membership|john.doe@mytenant.onmicrosoft.com' for web _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
 m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
