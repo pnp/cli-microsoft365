@@ -29,6 +29,10 @@
 - [spo folder roleassignment add](../cmd/spo/folder/folder-roleassignment-add.md) - adds a role assignment from the specified folder [#3703](https://github.com/pnp/cli-microsoft365/issues/3703)
 - [spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md) - connect a hub site to a parent hub site [#3759](https://github.com/pnp/cli-microsoft365/issues/3759)
 - [spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md) - disconnect a hub site from its parent hub site [#3760](https://github.com/pnp/cli-microsoft365/issues/3760)
+- [spo file version restore](../cmd/spo/file/file-version-restore.md) - restores a specific version of a specified file [#3956](https://github.com/pnp/cli-microsoft365/issues/3956)
+- [spo file version get](../cmd/spo/file/file-version-get.md) - gets information about a specific version of a specified file [#3954](https://github.com/pnp/cli-microsoft365/issues/3954)
+- [spo file version clear](../cmd/spo/file/file-version-clear.md) - removes all version history of a specified file [#3957](https://github.com/pnp/cli-microsoft365/issues/3957)
+- [spo file version remove](../cmd/spo/file/file-version-remove.md) - removes a specific version of a specified file [#3955](https://github.com/pnp/cli-microsoft365/issues/3955)
 
 **Teams**
 
