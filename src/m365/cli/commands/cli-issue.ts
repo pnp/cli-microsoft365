@@ -2,7 +2,6 @@ import { ChildProcess } from 'child_process';
 import * as open from 'open';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
-import { formatting } from '../../../utils/formatting';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import commands from '../commands';
 
@@ -63,7 +62,7 @@ class CliIssueCommand extends AnonymousCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let issueLink: string = '';
 
-    switch (formatting.encodeQueryParameter(args.options.type)) {
+    switch (encodeURIComponent(args.options.type)) {
       case 'bug':
         issueLink = 'https://aka.ms/cli-m365/bug';
         break;
