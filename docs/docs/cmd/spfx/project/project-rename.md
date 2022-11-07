@@ -38,3 +38,7 @@ Renames SharePoint Framework project to contoso with new solution ID
 ```sh
 m365 spfx project rename --newName contoso --generateNewId
 ```
+
+## Response
+
+The command won't return a response on success.

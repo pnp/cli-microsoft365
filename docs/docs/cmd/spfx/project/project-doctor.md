@@ -62,3 +62,29 @@ Validate if your project is correctly set up and get instructions to fix any iss
 ```sh
 m365 spfx project doctor --output tour
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    []
+	  ```
+
+=== "Text"
+
+    ```text
+    ✅ CLI for Microsoft 365 has found no issues in your project
+	  ```
+
+=== "Markdown"
+
+    ```md
+    # Validate project spfx-solution
+
+    Date: 11/7/2022
+
+    ## Findings
+
+    ✅ CLI for Microsoft 365 has found no issues in your project
+	  ```
