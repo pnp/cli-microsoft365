@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -85,16 +85,8 @@ class SpoGroupUserListCommand extends SpoCommand {
       ? `GetById('${encodeURIComponent(args.options.groupId)}')`
       : `GetByName('${encodeURIComponent(args.options.groupName as string)}')`}/users`;
 
-    const requestOptions: any = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const response = await request.get<any>(requestOptions);
+      const response = await odata.getAllItems<any>(requestUrl);
       logger.log(response);
     }
     catch (err: any) {

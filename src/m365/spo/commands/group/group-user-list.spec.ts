@@ -18,8 +18,7 @@ describe(commands.GROUP_USER_LIST, () => {
   let commandInfo: CommandInfo;
 
   const JSONSPGroupMembersList =
-  {
-    "value": [
+    [
       {
         "Id": 6,
         "IsHiddenInUI": false,
@@ -54,8 +53,7 @@ describe(commands.GROUP_USER_LIST, () => {
         },
         "UserPrincipalName": "AdeleV@contoso.com"
       }
-    ]
-  };
+    ];
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());

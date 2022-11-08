@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -29,12 +29,12 @@ class SpoContentTypeListCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -42,7 +42,7 @@ class SpoContentTypeListCommand extends SpoCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -53,7 +53,7 @@ class SpoContentTypeListCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
@@ -64,20 +64,12 @@ class SpoContentTypeListCommand extends SpoCommand {
     try {
       let requestUrl: string = `${args.options.webUrl}/_api/web/ContentTypes`;
 
-      if (args.options.category){
+      if (args.options.category) {
         requestUrl += `?$filter=Group eq '${encodeURIComponent(args.options.category as string)}'`;
       }
 
-      const requestOptions: any = {
-        url: requestUrl,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const res = await request.get<any>(requestOptions);
-      logger.log(res.value);
+      const res = await odata.getAllItems<any>(requestUrl);
+      logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

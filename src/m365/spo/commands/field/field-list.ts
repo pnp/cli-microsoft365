@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -73,16 +73,16 @@ class SpoFieldListCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
           return `${args.options.listId} is not a valid GUID`;
         }
-    
+
         const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
         if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
           return `Specify either list id or title or list url`;
         }
-    
+
         return true;
       }
     );
@@ -103,17 +103,9 @@ class SpoFieldListCommand extends SpoCommand {
       listUrl = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
     }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/${listUrl}fields`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const res = await request.get<{ value: any[] }>(requestOptions);
-      logger.log(res.value);
+      const res = await odata.getAllItems<any>(`${args.options.webUrl}/_api/web/${listUrl}fields`);
+      logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
