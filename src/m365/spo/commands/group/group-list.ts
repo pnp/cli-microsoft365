@@ -2,11 +2,12 @@ import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { AssociatedGroupPropertiesCollection } from './AssociatedGroupPropertiesCollection';
-import { GroupPropertiesCollection } from './GroupPropertiesCollection';
+import { GroupProperties } from './GroupProperties';
 
 interface CommandArgs {
   options: Options;
@@ -84,16 +85,8 @@ class SpoGroupListCommand extends SpoCommand {
   }
 
   private async getSiteGroups(baseUrl: string, logger: Logger): Promise<void> {
-    const requestOptions: AxiosRequestConfig = {
-      url: baseUrl + '/sitegroups',
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const groupProperties = await request.get<GroupPropertiesCollection>(requestOptions);
-    logger.log(groupProperties.value);
+    const groupProperties = await odata.getAllItems<GroupProperties>(`${baseUrl}/sitegroups`);
+    logger.log(groupProperties);
   }
 
   private async getAssociatedGroups(baseUrl: string, options: Options, logger: Logger): Promise<void> {
@@ -104,7 +97,9 @@ class SpoGroupListCommand extends SpoCommand {
       },
       responseType: 'json'
     };
+
     const groupProperties = await request.get<AssociatedGroupPropertiesCollection>(requestOptions);
+    logger.log(groupProperties);
     if (!options.output || options.output === 'json') {
       logger.log(groupProperties);
     }

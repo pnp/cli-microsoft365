@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -110,23 +109,14 @@ class SpoListWebhookListCommand extends SpoCommand {
       requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Subscriptions`;
     }
 
-    const requestOptions: AxiosRequestConfig = {
-      url: requestUrl,
-      method: 'GET',
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const res = await request.get<{ value: [{ id: string, clientState: string, expirationDateTime: Date, resource: string }] }>(requestOptions);
-      if (res.value && res.value.length > 0) {
-        res.value.forEach(w => {
+      const res = await odata.getAllItems<{ id: string, clientState: string, expirationDateTime: Date, resource: string }>(requestUrl);
+      if (res && res.length > 0) {
+        res.forEach(w => {
           w.clientState = w.clientState || '';
         });
 
-        logger.log(res.value);
+        logger.log(res);
       }
       else {
         if (this.verbose) {

@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -52,34 +52,18 @@ class SpoPageListCommand extends SpoCommand {
       if (this.verbose) {
         logger.logToStderr(`Retrieving client-side pages...`);
       }
-  
-      let requestOptions: any = {
-        url: `${args.options.webUrl}/_api/sitepages/pages?$orderby=Title`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-  
+
       let pages: any[] = [];
 
-      const pagesList = await request.get<{ value: any[] }>(requestOptions);
+      const pagesList = await odata.getAllItems<any>(`${args.options.webUrl}/_api/sitepages/pages?$orderby=Title`);
 
-      requestOptions = {
-        url: `${args.options.webUrl}/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      if (pagesList.value && pagesList.value.length > 0) {
-        pages = pagesList.value;
+      if (pagesList && pagesList.length > 0) {
+        pages = pagesList;
       }
 
-      const res = await request.get<{ value: any[] }>(requestOptions);
-      if (res.value && res.value.length > 0) {
-        const clientSidePages: any[] = res.value.filter(p => p.ListItemAllFields.ClientSideApplicationId === 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec');
+      const res = await odata.getAllItems<any>(`${args.options.webUrl}/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`);
+      if (res && res.length > 0) {
+        const clientSidePages: any[] = res.filter(p => p.ListItemAllFields.ClientSideApplicationId === 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec');
         pages = pages.map(p => {
           const clientSidePage = clientSidePages.find(cp => cp && cp.ListItemAllFields && cp.ListItemAllFields.Id === p.Id);
           if (clientSidePage) {

@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -86,17 +86,9 @@ class SpoGroupMemberListCommand extends SpoCommand {
       ? `GetById('${args.options.groupId}')`
       : `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')`}/users`;
 
-    const requestOptions: any = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const response = await request.get<any>(requestOptions);
-      logger.log(response.value);
+      const response = await odata.getAllItems<any>(requestUrl);
+      logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

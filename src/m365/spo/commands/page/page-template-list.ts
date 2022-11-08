@@ -1,10 +1,10 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { PageTemplateResponse } from './PageTemplateResponse';
+import { PageTemplate } from './PageTemplate';
 
 interface CommandArgs {
   options: Options;
@@ -54,18 +54,10 @@ class SpoPageTemplateListCommand extends SpoCommand {
       logger.logToStderr(`Retrieving templates...`);
     }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/sitepages/pages/templates`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const res = await request.get<PageTemplateResponse>(requestOptions);
-      if (res.value && res.value.length > 0) {
-        logger.log(res.value);
+      const res = await odata.getAllItems<PageTemplate>(`${args.options.webUrl}/_api/sitepages/pages/templates`);
+      if (res && res.length > 0) {
+        logger.log(res);
       }
     }
     catch (err: any) {
