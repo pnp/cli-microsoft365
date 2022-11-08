@@ -57,19 +57,19 @@ class CliConfigSetCommand extends AnonymousCommand {
         if (CliConfigSetCommand.optionNames.indexOf(args.options.key) < 0) {
           return `${args.options.key} is not a valid setting. Allowed values: ${CliConfigSetCommand.optionNames.join(', ')}`;
         }
-    
+
         const allowedOutputs = ['text', 'json', 'csv'];
         if (args.options.key === settingsNames.output &&
           allowedOutputs.indexOf(args.options.value) === -1) {
           return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${allowedOutputs.join(', ')}`;
         }
-    
+
         const allowedErrorOutputs = ['stdout', 'stderr'];
         if (args.options.key === settingsNames.errorOutput &&
           allowedErrorOutputs.indexOf(args.options.value) === -1) {
           return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${allowedErrorOutputs.join(', ')}`;
         }
-    
+
         return true;
       }
     );
@@ -85,6 +85,7 @@ class CliConfigSetCommand extends AnonymousCommand {
       case settingsNames.csvQuoted:
       case settingsNames.csvQuotedEmpty:
       case settingsNames.printErrorsAsPlainText:
+      case settingsNames.prompt:
       case settingsNames.showHelpOnFailure:
         value = args.options.value === 'true';
         break;
