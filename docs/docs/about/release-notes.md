@@ -85,6 +85,8 @@
 - added docs response for 'teams app' until 'teams membersettings' commands [#3935](https://github.com/pnp/cli-microsoft365/issues/3935)
 - added docs response for 'spo user' until 'spo web' commands [#3934](https://github.com/pnp/cli-microsoft365/issues/3934)
 - removed preview warning from hubsite commands [#3989](https://github.com/pnp/cli-microsoft365/issues/3989)
+- replaced encodeURIComponent to formatting.encodeQueryParameter [#4011](https://github.com/pnp/cli-microsoft365/issues/4011)
+- fixed prompt issue when false [#4020](https://github.com/pnp/cli-microsoft365/issues/4020)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
