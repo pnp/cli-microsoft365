@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
@@ -173,9 +174,12 @@ class YammerSearchCommand extends YammerCommand {
   private getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       const endpoint = `${this.resource}/v1/search.json?search=${formatting.encodeQueryParameter(args.options.queryText)}&page=${page}`;
-      const requestOptions: any = {
+      const requestOptions: AxiosRequestConfig = {
         url: endpoint,
-        responseType: 'json'
+        responseType: 'json',
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        }
       };
 
       request
