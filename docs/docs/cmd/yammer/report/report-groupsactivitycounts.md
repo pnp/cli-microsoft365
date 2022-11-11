@@ -37,3 +37,34 @@ Gets the number of Yammer messages posted, read, and liked in groups for the las
 ```sh
 m365 yammer report groupsactivitycounts --period D7 --output json > "groupsactivitycounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-11-04",
+        "Liked": "5",
+        "Posted": "6",
+        "Read": "7",
+        "Report Date": "2022-11-04",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Liked,Posted,Read,Report Date,Report Period
+    2022-11-10,5,6,7,2022-11-10,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Liked,Posted,Read,Report Date,Report Period
+    2022-11-10,5,6,7,2022-11-10,7
+    ```

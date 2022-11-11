@@ -45,3 +45,7 @@ Remove the user with the ID `66622349` from the group with the ID `5611239081` w
 ```sh
 m365 yammer group user remove --groupId 5611239081 --id 66622349 --confirm
 ```
+
+## Response
+
+The command won't return a response on success.
