@@ -87,6 +87,8 @@
 - removed preview warning from hubsite commands [#3989](https://github.com/pnp/cli-microsoft365/issues/3989)
 - replaced encodeURIComponent to formatting.encodeQueryParameter [#4011](https://github.com/pnp/cli-microsoft365/issues/4011)
 - fixed prompt issue when false [#4020](https://github.com/pnp/cli-microsoft365/issues/4020)
+- fixed retrieving all solutions for 'pp solution list' [#3802](https://github.com/pnp/cli-microsoft365/issues/3802)
+- fixed command output of 'teams app publish' [#4010](https://github.com/pnp/cli-microsoft365/issues/4010)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
