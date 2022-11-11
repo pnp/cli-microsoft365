@@ -189,6 +189,7 @@ Command|Old option|New option
 [spo file checkin](./cmd/spo/file/file-checkin.md)|`fileUrl`|`url`
 [spo file checkout](./cmd/spo/file/file-checkout.md)|`fileUrl`|`url`
 [spo file sharinginfo get](./cmd/spo/file/file-sharinginfo-get.md)|`url`|`fileUrl`
+[spo file sharinginfo get](./cmd/spo/file/file-sharinginfo-get.md)|`id`|`fileId`
 [spo folder get](./cmd/spo/folder/folder-get.md)|`folderUrl`|`url`
 [spo folder remove](./cmd/spo/folder/folder-remove.md)|`folderUrl`|`url`
 [spo folder rename](./cmd/spo/folder/folder-rename.md)|`folderUrl`|`url`
