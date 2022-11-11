@@ -97,6 +97,29 @@ The following shorts where changed:
 
 Update the reference to the short options in your scripts.
 
+## Updated `teams app publish` command output
+
+In the past versions, `teams app publish` returned just the app ID of the published app, or nothing at all. This has been adjusted, now the command will return the entire result object.
+
+Previous JSON command output:
+```json
+"fbdfd207-83ee-45d8-9c98-5039a1a01207"
+```
+
+Current JSON command output:
+```json
+{
+    "id": "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
+    "externalId": "b5561ec9-8cab-4aa3-8aa2-d8d7172e4311",
+    "displayName": "Test App",
+    "distributionMethod": "organization"
+}
+```
+
+### What action do I need to take?
+
+Update your scripts to read the `id` property of the command output.
+
 ## Aligned options with naming convention
 
 As we've been adding more commands to the CLI, we noticed that several commands were using inconsistent options names. Our naming convention states that options that refer to the last noun in the command, don't need that noun as a prefix. for example: the option `--webUrl` for `m365 spo web list` has been renamed to `--url` as the last noun is `web`. In version 6 of the CLI for Microsoft 365, we updated all these options to be consistent and make it easier for you to use the CLI.
