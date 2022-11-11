@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import request from "../request";
 import { aadGroup } from './aadGroup';
+import { formatting } from './formatting';
 import { sinonUtil } from "./sinonUtil";
 
 const validGroupName = 'Group name';
@@ -34,7 +35,7 @@ describe('utils/aadGroup', () => {
 
   it('throws error message when no group was found using getGroupByDisplayName', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'`) {
         return { value: [] };
       }
 
@@ -52,7 +53,7 @@ describe('utils/aadGroup', () => {
 
   it('throws error message when multiple groups were found using getGroupByDisplayName', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'`) {
         return {
           value: [
             { id: validGroupId, displayName: validGroupName },
@@ -75,7 +76,7 @@ describe('utils/aadGroup', () => {
 
   it('correctly get single group by name using getGroupByDisplayName', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'`) {
         return {
           value: [
             singleGroupResponse

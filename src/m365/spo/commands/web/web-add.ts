@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -141,7 +142,7 @@ class SpoWebAddCommand extends SpoCommand {
           logger.logToStderr("Setting inheriting navigation from the parent site...");
         }
 
-        subsiteFullUrl = `${args.options.parentWebUrl}/${encodeURIComponent(args.options.url)}`;
+        subsiteFullUrl = `${args.options.parentWebUrl}/${formatting.encodeQueryParameter(args.options.url)}`;
 
         const requestOptionsPer: any = {
           url: `${subsiteFullUrl}/_api/web/effectivebasepermissions`,
@@ -163,7 +164,7 @@ class SpoWebAddCommand extends SpoCommand {
         /// for the effects of NoScript
         if (permissions.has(PermissionKind.AddAndCustomizePages)) {
           const digest: ContextInfo = await spo.getRequestDigest(subsiteFullUrl);
-  
+
           const requestOptionsQuery: any = {
             url: `${subsiteFullUrl}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
@@ -171,12 +172,12 @@ class SpoWebAddCommand extends SpoCommand {
             },
             data: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="1" ObjectPathId="0" /><ObjectPath Id="3" ObjectPathId="2" /><ObjectPath Id="5" ObjectPathId="4" /><SetProperty Id="6" ObjectPathId="4" Name="UseShared"><Parameter Type="Boolean">true</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="2" ParentId="0" Name="Web" /><Property Id="4" ParentId="2" Name="Navigation" /></ObjectPaths></Request>`
           };
-  
+
           const query: string = await request.post(requestOptionsQuery);
-  
+
           const json: ClientSvcResponse = JSON.parse(query);
           const response: ClientSvcResponseContents = json[0];
-        
+
           if (response.ErrorInfo) {
             throw response.ErrorInfo.ErrorMessage;
           }
@@ -188,7 +189,7 @@ class SpoWebAddCommand extends SpoCommand {
         }
       }
       logger.log(siteInfo);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

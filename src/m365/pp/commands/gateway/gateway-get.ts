@@ -1,6 +1,7 @@
 import { Logger } from "../../../../cli/Logger";
 import { CommandArgs } from "../../../../Command";
 import request from "../../../../request";
+import { formatting } from "../../../../utils/formatting";
 import { validation } from "../../../../utils/validation";
 import PowerBICommand from "../../../base/PowerBICommand";
 import commands from "../../commands";
@@ -47,7 +48,7 @@ class PpGatewayGetCommand extends PowerBICommand {
 
   private getGateway(gatewayId: string): Promise<any> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/myorg/gateways/${encodeURIComponent(gatewayId)}`,
+      url: `${this.resource}/v1.0/myorg/gateways/${formatting.encodeQueryParameter(gatewayId)}`,
       headers: {
         accept: "application/json;odata.metadata=none"
       },

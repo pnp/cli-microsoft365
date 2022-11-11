@@ -75,7 +75,7 @@ class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
           requestUrl += `GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
         }
         else {
-          requestUrl += `GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/ListItemAllFields`;
+          requestUrl += `GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
         }
         const requestOptions: AxiosRequestConfig = {
           url: `${requestUrl}/resetroleinheritance`,

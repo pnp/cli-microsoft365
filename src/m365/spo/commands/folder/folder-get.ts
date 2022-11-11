@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -90,11 +91,11 @@ class SpoFolderGetCommand extends SpoCommand {
     let requestUrl: string = '';
 
     if (args.options.id) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFolderById('${encodeURIComponent(args.options.id)}')`;
+      requestUrl = `${args.options.webUrl}/_api/web/GetFolderById('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
     else if (args.options.url) {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
-      requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')`;
+      requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
 
     const requestOptions: any = {

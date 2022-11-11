@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -144,7 +145,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/' + fileUrl)}')`) > -1) {
+      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/' + fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -162,7 +163,7 @@ describe(commands.FILE_REMOVE, () => {
     await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/' + fileUrl)}')`) > -1 &&
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/' + fileUrl)}')`) > -1 &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;
@@ -178,7 +179,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/' + fileUrl)}')`) > -1) {
+      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/' + fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -196,7 +197,7 @@ describe(commands.FILE_REMOVE, () => {
     await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/' + fileUrl)}')`) > -1 &&
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/' + fileUrl)}')`) > -1 &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;
@@ -212,7 +213,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
+      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -230,7 +231,7 @@ describe(commands.FILE_REMOVE, () => {
     await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;
@@ -246,7 +247,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
+      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -264,7 +265,7 @@ describe(commands.FILE_REMOVE, () => {
     await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;
@@ -280,7 +281,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1) {
+      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -298,7 +299,7 @@ describe(commands.FILE_REMOVE, () => {
     await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;
@@ -314,7 +315,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1) {
+      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -332,7 +333,7 @@ describe(commands.FILE_REMOVE, () => {
     await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;
@@ -348,7 +349,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
+      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -366,7 +367,7 @@ describe(commands.FILE_REMOVE, () => {
     await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;
@@ -382,7 +383,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
+      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -400,7 +401,7 @@ describe(commands.FILE_REMOVE, () => {
     await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;
@@ -416,7 +417,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1) {
+      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -434,7 +435,7 @@ describe(commands.FILE_REMOVE, () => {
     await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;
@@ -450,7 +451,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
-      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1) {
+      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -468,7 +469,7 @@ describe(commands.FILE_REMOVE, () => {
     await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
         r.headers.accept &&
         r.headers.accept.indexOf('application/json') === 0) {
         correctRequestIssued = true;

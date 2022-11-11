@@ -4,6 +4,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandErrorWithOutput } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
@@ -139,7 +140,7 @@ class SpoGroupUserAddCommand extends SpoCommand {
 
   private getGroupId(args: CommandArgs): Promise<number> {
     const getGroupMethod: string = args.options.groupName ?
-      `GetByName('${encodeURIComponent(args.options.groupName as string)}')` :
+      `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')` :
       `GetById('${args.options.groupId}')`;
 
     const requestOptions: any = {

@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -26,11 +27,11 @@ class SpoSiteHubSiteConnectCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -41,7 +42,7 @@ class SpoSiteHubSiteConnectCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -49,11 +50,11 @@ class SpoSiteHubSiteConnectCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -63,7 +64,7 @@ class SpoSiteHubSiteConnectCommand extends SpoCommand {
     try {
       const res = await spo.getRequestDigest(args.options.siteUrl);
       const requestOptions: any = {
-        url: `${args.options.siteUrl}/_api/site/JoinHubSite('${encodeURIComponent(args.options.id)}')`,
+        url: `${args.options.siteUrl}/_api/site/JoinHubSite('${formatting.encodeQueryParameter(args.options.id)}')`,
         headers: {
           'X-RequestDigest': res.FormDigestValue,
           accept: 'application/json;odata=nometadata'

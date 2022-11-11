@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -59,15 +60,15 @@ class AadSpAddCommand extends GraphCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {    
+      async (args: CommandArgs) => {
         if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
           return `${args.options.appId} is not a valid appId GUID`;
         }
-    
+
         if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
           return `${args.options.objectId} is not a valid objectId GUID`;
         }
-    
+
         return true;
       }
     );
@@ -84,10 +85,10 @@ class AadSpAddCommand extends GraphCommand {
 
     let spMatchQuery: string = '';
     if (args.options.appName) {
-      spMatchQuery = `displayName eq '${encodeURIComponent(args.options.appName)}'`;
+      spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(args.options.appName)}'`;
     }
     else if (args.options.objectId) {
-      spMatchQuery = `id eq '${encodeURIComponent(args.options.objectId)}'`;
+      spMatchQuery = `id eq '${formatting.encodeQueryParameter(args.options.objectId)}'`;
     }
 
     const appIdRequestOptions: any = {

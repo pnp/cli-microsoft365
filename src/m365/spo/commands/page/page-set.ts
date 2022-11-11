@@ -2,6 +2,7 @@ import { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -180,7 +181,7 @@ class SpoPageSetCommand extends SpoCommand {
           },
           responseType: 'json'
         };
-  
+
         if (args.options.layoutType === 'Article') {
           requestOptions.data.PromotedState = 0;
           requestOptions.data.BannerImageUrl = {
@@ -188,7 +189,7 @@ class SpoPageSetCommand extends SpoCommand {
             Url: `${resource}/_layouts/15/images/sitepagethumbnail.png`
           };
         }
-  
+
         await request.post(requestOptions);
       }
 
@@ -249,7 +250,7 @@ class SpoPageSetCommand extends SpoCommand {
               accept: 'application/json;odata=nometadata'
             }
           };
-  
+
           const res = await request.post<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }>(requestOptions);
           if (fileNameWithoutExtension) {
             pageData.Title = fileNameWithoutExtension;
@@ -324,7 +325,7 @@ class SpoPageSetCommand extends SpoCommand {
           },
           data: pageData
         };
-  
+
         await request.post(requestOptions);
       }
 
@@ -338,7 +339,7 @@ class SpoPageSetCommand extends SpoCommand {
           },
           responseType: 'json'
         };
-  
+
         await request.post(requestOptions);
       }
 
@@ -361,7 +362,7 @@ class SpoPageSetCommand extends SpoCommand {
       }
       else {
         requestOptions = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
+          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${formatting.encodeQueryParameter(args.options.publishMessage || '')}'&@a2=1`,
           headers: {
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',

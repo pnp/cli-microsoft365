@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -87,7 +88,7 @@ class SpoUserRemoveCommand extends SpoCommand {
       }
 
       if (args.options.loginName) {
-        requestUrl = `${encodeURI(args.options.webUrl)}/_api/web/siteusers/removeByLoginName('${encodeURIComponent(args.options.loginName as string)}')`;
+        requestUrl = `${encodeURI(args.options.webUrl)}/_api/web/siteusers/removeByLoginName('${formatting.encodeQueryParameter(args.options.loginName as string)}')`;
       }
 
       const requestOptions: any = {
@@ -100,7 +101,7 @@ class SpoUserRemoveCommand extends SpoCommand {
 
       try {
         await request.post(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -116,7 +117,7 @@ class SpoUserRemoveCommand extends SpoCommand {
         default: false,
         message: `Are you sure you want to remove specified user from the site ${args.options.webUrl}`
       });
-      
+
       if (result.continue) {
         await removeUser();
       }

@@ -2,6 +2,7 @@ import * as os from 'os';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { Outlook } from '../../Outlook';
@@ -116,7 +117,7 @@ class OutlookMessageMoveCommand extends GraphCommand {
 
     return new Promise<string>((resolve: (folderId: string) => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/me/mailFolders?$filter=displayName eq '${encodeURIComponent(folderName as string)}'&$select=id`,
+        url: `${this.resource}/v1.0/me/mailFolders?$filter=displayName eq '${formatting.encodeQueryParameter(folderName as string)}'&$select=id`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

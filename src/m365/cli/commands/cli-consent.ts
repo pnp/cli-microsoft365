@@ -23,12 +23,12 @@ class CliConsentCommand extends AnonymousCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -36,7 +36,7 @@ class CliConsentCommand extends AnonymousCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -45,14 +45,14 @@ class CliConsentCommand extends AnonymousCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.service !== 'yammer') {
           return `${args.options.service} is not a valid value for the service option. Allowed values: yammer`;
         }
-    
+
         return true;
       }
     );

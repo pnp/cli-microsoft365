@@ -8,6 +8,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -1535,8 +1536,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('escapes special characters in the displayName filter', async () => {
+    const displayName = 'Team\'s #';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'Team''s%20%23')&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(DisplayName,'${formatting.encodeQueryParameter(displayName)}')&$top=100`) {
         return Promise.resolve({
           "value": [
             {
@@ -1596,7 +1598,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: 'Team\'s #' } });
+    await command.action(logger, { options: { debug: false, displayName: displayName } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1652,8 +1654,9 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('escapes special characters in the mailNickname filter', async () => {
+    const mailNickName = 'team\'s #';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(MailNickname,'team''s%20%23')&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(MailNickname,'${formatting.encodeQueryParameter(mailNickName)}')&$top=100`) {
         return Promise.resolve({
           "value": []
         });
@@ -1662,7 +1665,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, mailNickname: 'team\'s #' } });
+    await command.action(logger, { options: { debug: false, mailNickname: mailNickName } });
     assert(loggerLogSpy.calledWith([]));
   });
 

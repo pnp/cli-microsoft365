@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { FormDigestInfo, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -94,7 +95,7 @@ class SpoSiteRenameCommand extends SpoCommand {
     try {
       const options = args.options;
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-      
+
       const reqDigest = await spo.getRequestDigest(spoAdminUrl);
       this.context = reqDigest;
       if (this.verbose) {
@@ -163,7 +164,7 @@ class SpoSiteRenameCommand extends SpoCommand {
     iteration++;
 
     const requestOptions: any = {
-      url: `${spoAdminUrl}/_api/SiteRenameJobs/GetJobsBySiteUrl(url='${encodeURIComponent(siteUrl)}')?api-version=1.4.7`,
+      url: `${spoAdminUrl}/_api/SiteRenameJobs/GetJobsBySiteUrl(url='${formatting.encodeQueryParameter(siteUrl)}')?api-version=1.4.7`,
       headers: {
         'X-AttemptNumber': iteration.toString()
       },

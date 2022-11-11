@@ -4,6 +4,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
@@ -62,11 +63,11 @@ class PaAppGetCommand extends PowerAppsCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {    
+      async (args: CommandArgs) => {
         if (args.options.name && !validation.isValidGuid(args.options.name)) {
           return `${args.options.name} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -80,17 +81,17 @@ class PaAppGetCommand extends PowerAppsCommand {
     try {
       if (args.options.name) {
         const requestOptions: any = {
-          url: `${this.resource}/providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+          url: `${this.resource}/providers/Microsoft.PowerApps/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
           },
           responseType: 'json'
         };
-  
+
         if (this.verbose) {
           logger.logToStderr(`Retrieving information about Microsoft Power App with name '${args.options.name}'...`);
         }
-  
+
         const res = await request.get<any>(requestOptions);
         logger.log(this.setProperties(res));
       }
@@ -98,7 +99,7 @@ class PaAppGetCommand extends PowerAppsCommand {
         if (this.verbose) {
           logger.logToStderr(`Retrieving information about Microsoft Power App with displayName '${args.options.displayName}'...`);
         }
-  
+
         const getAppsOutput = await this.getApps(args, logger);
 
         const allApps: any = JSON.parse(getAppsOutput.stdout);

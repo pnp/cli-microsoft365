@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
@@ -27,11 +28,11 @@ class FlowRunCancelCommand extends AzmgmtCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -48,14 +49,14 @@ class FlowRunCancelCommand extends AzmgmtCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.flowName)) {
           return `${args.options.flowName} is not a valid GUID`;
         }
-        
+
         return true;
       }
     );
@@ -68,7 +69,7 @@ class FlowRunCancelCommand extends AzmgmtCommand {
 
     const cancelFlow: () => Promise<void> = async (): Promise<void> => {
       const requestOptions: any = {
-        url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.flowName)}/runs/${encodeURIComponent(args.options.name)}/cancel?api-version=2016-11-01`,
+        url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs/${formatting.encodeQueryParameter(args.options.name)}/cancel?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'
         },
@@ -93,7 +94,7 @@ class FlowRunCancelCommand extends AzmgmtCommand {
         default: false,
         message: `Are you sure you want to cancel the flow run ${args.options.name}?`
       });
-     
+
       if (result.continue) {
         await cancelFlow();
       }

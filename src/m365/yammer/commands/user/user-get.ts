@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
 
@@ -70,10 +71,10 @@ class YammerUserGetCommand extends YammerCommand {
     let endPoint = `${this.resource}/v1/users/current.json`;
 
     if (args.options.id) {
-      endPoint = `${this.resource}/v1/users/${encodeURIComponent(args.options.id)}.json`;
+      endPoint = `${this.resource}/v1/users/${args.options.id}.json`;
     }
     else if (args.options.email) {
-      endPoint = `${this.resource}/v1/users/by_email.json?email=${encodeURIComponent(args.options.email)}`;
+      endPoint = `${this.resource}/v1/users/by_email.json?email=${formatting.encodeQueryParameter(args.options.email)}`;
     }
 
     const requestOptions: any = {
@@ -87,9 +88,9 @@ class YammerUserGetCommand extends YammerCommand {
 
     try {
       const res: any = await request.get(requestOptions);
-      
+
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

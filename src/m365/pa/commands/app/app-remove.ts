@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
@@ -27,12 +28,12 @@ class PaAppRemoveCommand extends PowerAppsCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -40,7 +41,7 @@ class PaAppRemoveCommand extends PowerAppsCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -51,14 +52,14 @@ class PaAppRemoveCommand extends PowerAppsCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.name)) {
           return `${args.options.name} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -71,7 +72,7 @@ class PaAppRemoveCommand extends PowerAppsCommand {
 
     const removePaApp: () => Promise<void> = async (): Promise<void> => {
       const requestOptions: any = {
-        url: `${this.resource}/providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2017-08-01`,
+        url: `${this.resource}/providers/Microsoft.PowerApps/apps/${formatting.encodeQueryParameter(args.options.name)}?api-version=2017-08-01`,
         resolveWithFullResponse: true,
         headers: {
           accept: 'application/json'

@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -371,7 +372,7 @@ class RequestStub {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppId);
       }
       // by display name
-      if ((opts.url as string).indexOf(`displayName eq '${encodeURIComponent(CommandActionParameters.appNameWithRoleAssignments)}'`) > -1) {
+      if ((opts.url as string).indexOf(`displayName eq '${formatting.encodeQueryParameter(CommandActionParameters.appNameWithRoleAssignments)}'`) > -1) {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByDisplayName);
       }
       // by app id: no app role assignments
