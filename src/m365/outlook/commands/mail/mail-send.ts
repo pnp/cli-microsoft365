@@ -8,6 +8,7 @@ import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { validation } from '../../../../utils/validation';
+import { formatting } from '../../../../utils/formatting';
 
 interface CommandArgs {
   options: Options;
@@ -147,9 +148,9 @@ class OutlookMailSendCommand extends GraphCommand {
       if (isAppOnlyAuth === true && !args.options.sender) {
         throw `Specify a upn or user id in the 'sender' option when using app only authentication.`;
       }
-  
+
       const requestOptions: AxiosRequestConfig = {
-        url: `${this.resource}/v1.0/${args.options.sender ? 'users/' + encodeURIComponent(args.options.sender) : 'me'}/sendMail`,
+        url: `${this.resource}/v1.0/${args.options.sender ? 'users/' + formatting.encodeQueryParameter(args.options.sender) : 'me'}/sendMail`,
         headers: {
           accept: 'application/json;odata.metadata=none',
           'content-type': 'application/json'
@@ -157,7 +158,7 @@ class OutlookMailSendCommand extends GraphCommand {
         responseType: 'json',
         data: this.getRequestBody(args.options)
       };
-  
+
       await request.post(requestOptions);
     }
     catch (err: any) {

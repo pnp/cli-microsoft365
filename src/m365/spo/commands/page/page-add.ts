@@ -2,6 +2,7 @@ import { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -202,7 +203,7 @@ class SpoPageAddCommand extends SpoCommand {
         const requestOptions: any = {
           responseType: 'json'
         };
-  
+
         switch (args.options.promoteAs) {
           case 'HomePage':
             requestOptions.url = `${args.options.webUrl}/_api/web/rootfolder`;
@@ -240,7 +241,7 @@ class SpoPageAddCommand extends SpoCommand {
             };
             break;
         }
-  
+
         const res = await request.post<{ Id: string }>(requestOptions);
         if (args.options.promoteAs === 'Template') {
           let requestOptions: any = {
@@ -254,7 +255,7 @@ class SpoPageAddCommand extends SpoCommand {
               accept: 'application/json;odata=nometadata'
             }
           };
-  
+
           const tmpl = await request.post<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string, UniqueId: string }>(requestOptions);
 
           bannerImageUrl = tmpl.BannerImageUrl;
@@ -295,7 +296,7 @@ class SpoPageAddCommand extends SpoCommand {
       };
 
       await request.post(requestOptions);
-      
+
       if (args.options.promoteAs === 'Template') {
         const requestOptions: any = {
           responseType: 'json',
@@ -315,7 +316,7 @@ class SpoPageAddCommand extends SpoCommand {
             Description: pageDescription
           }
         };
-  
+
         await request.post(requestOptions);
       }
 
@@ -352,7 +353,7 @@ class SpoPageAddCommand extends SpoCommand {
       }
       else {
         requestOptions = {
-          url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
+          url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${formatting.encodeQueryParameter(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
           headers: {
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',

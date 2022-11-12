@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./eventreceiver-remove');
@@ -16,7 +17,6 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptOptions: any;
-  let deleteRequestStub: sinon.SinonStub;
 
   const eventReceiverResponseMultiple = JSON.stringify(
     [
@@ -86,13 +86,6 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     });
 
     promptOptions = undefined;
-
-    deleteRequestStub = sinon.stub(request, 'delete').callsFake((opts: any) => {
-      if (opts.url.indexOf('/eventreceivers?') !== -1) {
-        return Promise.resolve();
-      }
-      return Promise.reject();
-    });
   });
 
   afterEach(() => {
@@ -168,8 +161,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', listUrl: 'sites/hr-life/Lists/breakInheritance', name: 'PnP Event Receiver' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  
-  
+
   it('fails validation if scope is invalid value', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', scope: 'abc', name: 'PnP Event Receiver' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -181,12 +173,6 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   });
 
   it('prompts before removing the event receiver when confirm option not passed', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
-        stdout: eventReceiverResponseSingle
-      });
-    });
-
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
 
     let promptIssued = false;
@@ -199,40 +185,40 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   });
 
   it('aborts removing the event receiver when prompt not confirmed', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
-
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
-        stdout: eventReceiverResponseSingle
-      });
-    });
-
+    const requestDeleteStub = sinon.stub(request, 'delete');
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
-    assert(deleteRequestStub.notCalled);
+    assert(requestDeleteStub.notCalled);
   });
 
   it('deletes event receiver when prompt confirmed (debug)', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async opts => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/site/eventreceivers('625b1f4c-2869-457f-8b41-bed72059bb2b')`) {
+        return;
+      }
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
+      throw 'Invalid request URL: ' + opts.url;
+    });
+
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
+      return ({
         stdout: eventReceiverResponseSingle
       });
-
     });
+
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver', confirm: true } });
-    assert(deleteRequestStub.called);
+    assert(requestDeleteStub.called);
   });
 
   it('deletes event receiver with specified name', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async opts => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/site/eventreceivers('625b1f4c-2869-457f-8b41-bed72059bb2b')`) {
+        return;
+      }
+
+      throw 'Invalid request URL: ' + opts.url;
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
+      return ({
         stdout: eventReceiverResponseSingle
       });
     });
@@ -241,12 +227,19 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       { continue: true }
     ));
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
-    assert(deleteRequestStub.called);
+    assert(requestDeleteStub.called);
   });
 
   it('deletes event receiver with by name from list retrieved by URL', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async opts => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList('${formatting.encodeQueryParameter('/sites/portal/Lists/rerlist')}')/eventreceivers('625b1f4c-2869-457f-8b41-bed72059bb2b')`) {
+        return;
+      }
+
+      throw 'Invalid request URL: ' + opts.url;
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
+      return ({
         stdout: eventReceiverResponseSingle
       });
     });
@@ -254,13 +247,20 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver', listUrl: 'sites/hr-life/Lists/breakInheritance' } });
-    assert(deleteRequestStub.called);
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver', listUrl: '/sites/portal/Lists/rerlist' } });
+    assert(requestDeleteStub.called);
   });
 
   it('deletes event receiver with by name from list retrieved by ID', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async opts => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists('8fccab0d-78e5-4037-a6a7-0168f9359cd4')/eventreceivers('625b1f4c-2869-457f-8b41-bed72059bb2b')`) {
+        return;
+      }
+
+      throw 'Invalid request URL: ' + opts.url;
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
+      return ({
         stdout: eventReceiverResponseSingle
       });
     });
@@ -269,12 +269,19 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       { continue: true }
     ));
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver', listId: '8fccab0d-78e5-4037-a6a7-0168f9359cd4' } });
-    assert(deleteRequestStub.called);
+    assert(requestDeleteStub.called);
   });
 
   it('deletes event receiver by specific id', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async opts => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/site/eventreceivers('625b1f4c-2869-457f-8b41-bed72059bb2b')`) {
+        return;
+      }
+
+      throw 'Invalid request URL: ' + opts.url;
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
+      return ({
         stdout: eventReceiverResponseSingle
       });
     });
@@ -283,12 +290,19 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       { continue: true }
     ));
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', id: '625b1f4c-2869-457f-8b41-bed72059bb2b' } });
-    assert(deleteRequestStub.called);
+    assert(requestDeleteStub.called);
   });
 
   it('deletes event receiver by specific name from specific list retrieved by the list title', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async opts => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle('${formatting.encodeQueryParameter('Documents')}')/eventreceivers('625b1f4c-2869-457f-8b41-bed72059bb2b')`) {
+        return;
+      }
+
+      throw 'Invalid request URL: ' + opts.url;
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
+      return ({
         stdout: eventReceiverResponseSingle
       });
     });
@@ -297,12 +311,12 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       { continue: true }
     ));
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents', name: 'PnP Test Receiver' } });
-    assert(deleteRequestStub.called);
+    assert(requestDeleteStub.called);
   });
 
   it('shows error when no event receiver is found by name', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
+      return ({
         stdout: "[]"
       });
     });
@@ -310,37 +324,18 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await assert.rejects(command.action(logger, { 
-      options: { 
-        webUrl: 'https://contoso.sharepoint.com/sites/portal', 
-        scope: 'site', 
-        name: 'PnP Test Receiver' 
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/portal',
+        scope: 'site',
+        name: 'PnP Test Receiver'
       }
-    }), new CommandError(`Specified event receiver with name PnP Test Receiver cannot be found`));  
-  });
-
-  it('shows error when no event receiver is found by id', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
-        stdout: "[]"
-      });
-    });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
-    await assert.rejects(command.action(logger, { 
-      options: { 
-        webUrl: 'https://contoso.sharepoint.com/sites/portal', 
-        scope: 'site', 
-        id: '8fccab0d-78e5-4037-a6a7-0168f9359cd4' 
-      }
-    }), new CommandError(`Specified event receiver with id 8fccab0d-78e5-4037-a6a7-0168f9359cd4 cannot be found`));  
+    }), new CommandError(`Specified event receiver with name 'PnP Test Receiver' cannot be found`));
   });
 
   it('shows error when multiple event receivers are found by name', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
+      return ({
         stdout: eventReceiverResponseMultiple
       });
     });
@@ -349,35 +344,14 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
       { continue: true }
     ));
 
-    await assert.rejects(command.action(logger, { 
-      options: { 
-        webUrl: 'https://contoso.sharepoint.com/sites/portal', 
-        scope: 'site', 
-        name: 'PnP Test Receiver' 
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/portal',
+        scope: 'site',
+        name: 'PnP Test Receiver'
       }
-    }), new CommandError(`Multiple eventreceivers with name PnP Test Receiver, ids: 625b1f4c-2869-457f-8b41-bed72059bb2b,41ad359e-ac6a-4a5e-8966-a85492ca4f52 found`));
+    }), new CommandError(`Multiple eventreceivers with name 'PnP Test Receiver' found: 625b1f4c-2869-457f-8b41-bed72059bb2b,41ad359e-ac6a-4a5e-8966-a85492ca4f52`));
   });
-
-  it('shows error when multiple event receivers are found by id', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((): Promise<any> => {
-      return Promise.resolve({
-        stdout: eventReceiverResponseMultiple
-      });
-    });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
-
-    await assert.rejects(command.action(logger, { 
-      options: { 
-        webUrl: 'https://contoso.sharepoint.com/sites/portal', 
-        scope: 'site', 
-        id: '8fccab0d-78e5-4037-a6a7-0168f9359cd4' 
-      }
-    }), new CommandError(`Multiple eventreceivers with id 8fccab0d-78e5-4037-a6a7-0168f9359cd4 found`));
-  });
-
 
   it('supports debug mode', () => {
     const options = command.options;
@@ -389,5 +363,4 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     });
     assert(containsOption);
   });
-
 });

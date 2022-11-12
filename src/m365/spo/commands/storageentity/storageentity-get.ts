@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -25,10 +26,10 @@ class SpoStorageEntityGetCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -41,7 +42,7 @@ class SpoStorageEntityGetCommand extends SpoCommand {
     try {
       const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
       const requestOptions: any = {
-        url: `${spoUrl}/_api/web/GetStorageEntity('${encodeURIComponent(args.options.key)}')`,
+        url: `${spoUrl}/_api/web/GetStorageEntity('${formatting.encodeQueryParameter(args.options.key)}')`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
@@ -62,7 +63,7 @@ class SpoStorageEntityGetCommand extends SpoCommand {
           Comment: property.Comment
         });
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

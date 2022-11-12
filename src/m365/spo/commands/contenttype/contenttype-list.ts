@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils/odata';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -65,7 +66,7 @@ class SpoContentTypeListCommand extends SpoCommand {
       let requestUrl: string = `${args.options.webUrl}/_api/web/ContentTypes`;
 
       if (args.options.category) {
-        requestUrl += `?$filter=Group eq '${encodeURIComponent(args.options.category as string)}'`;
+        requestUrl += `?$filter=Group eq '${formatting.encodeQueryParameter(args.options.category as string)}'`;
       }
 
       const res = await odata.getAllItems<any>(requestUrl);

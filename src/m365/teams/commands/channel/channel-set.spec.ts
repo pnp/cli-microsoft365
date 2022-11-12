@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -130,7 +131,7 @@ describe(commands.CHANNEL_SET, () => {
   it('fails to patch channel when channel does not exists', async () => {
     const errorMessage = 'The specified channel does not exist in this Microsoft Teams team';
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(name)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(name)}'`) {
         return { value: [] };
       }
 
@@ -150,7 +151,7 @@ describe(commands.CHANNEL_SET, () => {
 
   it('correctly patches channel updates by teamId and name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(name)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(name)}'`) {
         return {
           value:
             [
@@ -166,7 +167,7 @@ describe(commands.CHANNEL_SET, () => {
     });
 
     sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(id)}`) &&
+      if ((opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels/${formatting.encodeQueryParameter(id)}`) &&
         JSON.stringify(opts.data) === JSON.stringify({ displayName: newName, description: description })
       ) {
         return;
@@ -188,7 +189,7 @@ describe(commands.CHANNEL_SET, () => {
 
   it('correctly patches channel updates by teamName and id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(teamName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'`) {
         return {
           value: [
             {
@@ -204,7 +205,7 @@ describe(commands.CHANNEL_SET, () => {
     });
 
     sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if ((opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(id)}`) &&
+      if ((opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels/${formatting.encodeQueryParameter(id)}`) &&
         JSON.stringify(opts.data) === JSON.stringify({ displayName: newName, description: description })
       ) {
         return;
@@ -227,7 +228,7 @@ describe(commands.CHANNEL_SET, () => {
   it('fails when team name does not exist', async () => {
     const errorMessage = 'The specified team does not exist';
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(teamName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'`) {
         return {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 1,

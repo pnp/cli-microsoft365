@@ -1,5 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
@@ -60,18 +61,18 @@ class PaAppListCommand extends PowerAppsCommand {
         if (args.options.asAdmin && !args.options.environment) {
           return 'When specifying the asAdmin option the environment option is required as well';
         }
-    
+
         if (args.options.environment && !args.options.asAdmin) {
           return 'When specifying the environment option the asAdmin option is required as well';
         }
-    
+
         return true;
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const url = `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environment ? '/environments/' + encodeURIComponent(args.options.environment) : ''}/apps?api-version=2017-08-01`;
+    const url = `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environment ? '/environments/' + formatting.encodeQueryParameter(args.options.environment) : ''}/apps?api-version=2017-08-01`;
 
     try {
       const apps = await odata.getAllItems<{ name: string; displayName: string; properties: { displayName: string } }>(url);

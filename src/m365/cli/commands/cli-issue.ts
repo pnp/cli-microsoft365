@@ -24,12 +24,12 @@ class CliIssueCommand extends AnonymousCommand {
 
   constructor(private open: any) {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -37,7 +37,7 @@ class CliIssueCommand extends AnonymousCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -46,14 +46,14 @@ class CliIssueCommand extends AnonymousCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (CliIssueCommand.issueType.indexOf(args.options.type) < 0) {
           return `${args.options.type} is not a valid Issue type. Allowed values are ${CliIssueCommand.issueType.join(', ')}`;
         }
-    
+
         return true;
       }
     );

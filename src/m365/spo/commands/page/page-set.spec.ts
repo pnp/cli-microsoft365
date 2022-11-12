@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
@@ -445,12 +446,12 @@ describe(commands.PAGE_SET, () => {
 
   it('escapes special characters in user input', async () => {
     sinonUtil.restore([request.post]);
-
+    const comment = `Don't tell`;
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Don%39t%20tell'&@a2=1") {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${formatting.encodeQueryParameter(comment)}'&@a2=1`) {
         return Promise.resolve();
       }
-      
+
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
         return Promise.resolve({
           Title: "article",
@@ -470,7 +471,7 @@ describe(commands.PAGE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Don\'t tell' } });
+    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: comment } });
     assert(loggerLogSpy.notCalled);
   });
 

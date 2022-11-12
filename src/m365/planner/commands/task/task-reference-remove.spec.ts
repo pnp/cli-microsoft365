@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -180,7 +181,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('correctly removes reference', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve({
           references: null
         });
@@ -190,7 +191,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -213,7 +214,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('correctly removes reference by alias with prompting', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve({
           references: null
         });
@@ -223,7 +224,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -246,7 +247,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('fails validation when no references found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -269,7 +270,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('fails validation when reference does not contain alias', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -292,7 +293,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('fails validation when multiple references found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {

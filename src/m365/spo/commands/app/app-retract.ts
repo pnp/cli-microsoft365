@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import commands from '../../commands';
@@ -71,20 +72,20 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
           if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
             return `appCatalogScope must be either 'tenant' or 'sitecollection' if specified`;
           }
-    
+
           if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
             return `You must specify appCatalogUrl when the appCatalogScope is sitecollection`;
           }
         }
-    
+
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         if (args.options.appCatalogUrl) {
           return validation.isValidSharePointUrl(args.options.appCatalogUrl);
         }
-    
+
         return true;
       }
     );
@@ -103,7 +104,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
         }
 
         const requestOptions: any = {
-          url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/retract`,
+          url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${formatting.encodeQueryParameter(args.options.id)}')/retract`,
           headers: {
             accept: 'application/json;odata=nometadata'
           }

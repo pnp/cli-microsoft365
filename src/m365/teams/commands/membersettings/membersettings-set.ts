@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -111,7 +112,7 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
     });
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(args.options.teamId)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -121,7 +122,7 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
 
     try {
       await request.patch(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils/odata';
+import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -107,14 +108,14 @@ class SpoEventreceiverListCommand extends SpoCommand {
     let listUrl: string = '';
 
     if (args.options.listId) {
-      listUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
+      listUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
     }
     else if (args.options.listTitle) {
-      listUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/`;
+      listUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/`;
     }
     else if (args.options.listUrl) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-      listUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
+      listUrl = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
     }
 
     if (!args.options.scope || args.options.scope === 'web') {

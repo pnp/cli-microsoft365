@@ -6,6 +6,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -38,17 +39,17 @@ describe(commands.TASK_REFERENCE_LIST, () => {
       }
     }
   };
-  
+
   const references = {
     references: [
       referenceListResponse
     ]
   };
-  
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  
+
   before(() => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -116,7 +117,7 @@ describe(commands.TASK_REFERENCE_LIST, () => {
 
   it('successfully handles item found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent("uBk5fK_MHkeyuPYlCo4OFpcAMowf")}/details?$select=references`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter("uBk5fK_MHkeyuPYlCo4OFpcAMowf")}/details?$select=references`) {
         return Promise.resolve(references);
       }
 

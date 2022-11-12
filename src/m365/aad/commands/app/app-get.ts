@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import { M365RcJson } from '../../../base/M365RcJson';
@@ -58,15 +59,15 @@ class AadAppGetCommand extends GraphCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {    
+      async (args: CommandArgs) => {
         if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
           return `${args.options.appId} is not a valid GUID`;
         }
-    
+
         if (args.options.objectId && !validation.isValidGuid(args.options.objectId as string)) {
           return `${args.options.objectId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -96,8 +97,8 @@ class AadAppGetCommand extends GraphCommand {
     const { appId, name } = args.options;
 
     const filter: string = appId ?
-      `appId eq '${encodeURIComponent(appId)}'` :
-      `displayName eq '${encodeURIComponent(name as string)}'`;
+      `appId eq '${formatting.encodeQueryParameter(appId)}'` :
+      `displayName eq '${formatting.encodeQueryParameter(name as string)}'`;
 
     const requestOptions: any = {
       url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,

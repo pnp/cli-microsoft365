@@ -6,6 +6,7 @@ import { Logger } from "../cli/Logger";
 import config from "../config";
 import { BasePermissions } from '../m365/spo/base-permissions';
 import request from "../request";
+import { formatting } from './formatting';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -381,7 +382,7 @@ export const spo = {
       const folderServerRelativeUrl = urlUtil.getServerRelativePath(webFullUrl, nextFolder);
 
       const requestOptions: any = {
-        url: `${webFullUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderServerRelativeUrl)}')`,
+        url: `${webFullUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderServerRelativeUrl)}')`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         }
@@ -396,7 +397,7 @@ export const spo = {
         .catch(() => {
           const prevFolderServerRelativeUrl: string = urlUtil.getServerRelativePath(webFullUrl, prevFolder);
           const requestOptions: any = {
-            url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27${encodeURIComponent(prevFolderServerRelativeUrl)}%27&@a2=%27${encodeURIComponent(folders[folderIndex])}%27`,
+            url: `${webFullUrl}/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27${formatting.encodeQueryParameter(prevFolderServerRelativeUrl)}%27&@a2=%27${formatting.encodeQueryParameter(folders[folderIndex])}%27`,
             headers: {
               'accept': 'application/json;odata=nometadata'
             },

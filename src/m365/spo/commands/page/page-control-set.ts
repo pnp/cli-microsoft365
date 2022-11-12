@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -109,7 +110,7 @@ class SpoPageControlSetCommand extends SpoCommand {
 
     try {
       let requestOptions: any = {
-        url: `${args.options.webUrl}/_api/SitePages/Pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')`,
+        url: `${args.options.webUrl}/_api/SitePages/Pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageName)}')`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
@@ -212,7 +213,7 @@ class SpoPageControlSetCommand extends SpoCommand {
       }
 
       requestOptions = {
-        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')/SavePageAsDraft`,
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageName)}')/SavePageAsDraft`,
         headers: {
           'X-HTTP-Method': 'MERGE',
           'IF-MATCH': '*',

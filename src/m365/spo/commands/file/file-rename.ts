@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -102,7 +103,7 @@ class SpoFileRenameCommand extends SpoCommand {
       };
 
       const requestOptions: any = {
-        url: `${webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(originalFileServerRelativeUrl)}')/ListItemAllFields/ValidateUpdateListItem()`,
+        url: `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(originalFileServerRelativeUrl)}')/ListItemAllFields/ValidateUpdateListItem()`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -119,7 +120,7 @@ class SpoFileRenameCommand extends SpoCommand {
   }
 
   private getFile(originalFileServerRelativeUrl: string, webUrl: string): Promise<FileProperties> {
-    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(originalFileServerRelativeUrl)}')?$select=UniqueId`;
+    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(originalFileServerRelativeUrl)}')?$select=UniqueId`;
     const requestOptions: any = {
       url: requestUrl,
       headers: {
@@ -143,10 +144,10 @@ class SpoFileRenameCommand extends SpoCommand {
     };
     try {
       await Cli.executeCommand(removeCommand as Command, { options: { ...removeOptions, _: [] } });
-    } 
+    }
     catch (err: any) {
       if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {
-        
+
       }
       else {
         throw err;

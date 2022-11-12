@@ -88,7 +88,7 @@ class SpoFileVersionListCommand extends SpoCommand {
       else {
         requestUrl += `/GetFileById('${args.options.fileId}')`;
       }
-      requestUrl += `/versions?$top=5000`;
+      requestUrl += `/versions`;
 
       const response = await odata.getAllItems<any>(requestUrl);
       logger.log(response);

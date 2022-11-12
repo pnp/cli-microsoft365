@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
 
@@ -27,10 +28,10 @@ class PaEnvironmentGetCommand extends PowerAppsCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -38,14 +39,14 @@ class PaEnvironmentGetCommand extends PowerAppsCommand {
       }
     );
   }
-  
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information about Microsoft Power Apps environment ${args.options.name}...`);
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/providers/Microsoft.PowerApps/environments/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+      url: `${this.resource}/providers/Microsoft.PowerApps/environments/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -165,7 +166,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
   it('gets directroutingcalls in teams with no toDateTime specified', async () => {
     const now = new Date();
     const fakeTimers = sinon.useFakeTimers(now);
-    const toDateTime: string = encodeURIComponent(now.toISOString());
+    const toDateTime: string = formatting.encodeQueryParameter(now.toISOString());
 
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=2019-11-01,toDateTime=${toDateTime})`) {

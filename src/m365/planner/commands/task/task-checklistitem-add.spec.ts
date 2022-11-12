@@ -6,6 +6,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -95,14 +96,14 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
 
   it('correctly adds checklist item', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
       }
 
       return Promise.reject('Invalid Request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsWithChecklistResponse);
       }
 
@@ -121,14 +122,14 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
 
   it('correctly adds checklist item with text output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
       }
 
       return Promise.reject('Invalid Request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsWithChecklistResponse);
       }
 
@@ -147,14 +148,14 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
 
   it('fails when unexpected API error was thrown', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
       }
 
       return Promise.reject('Invalid Request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.reject('Something went wrong.');
       }
 
@@ -171,7 +172,7 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
 
   it('fails when Planner task does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.reject('The request item is not found.');
       }
 

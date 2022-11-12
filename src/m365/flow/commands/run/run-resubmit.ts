@@ -3,6 +3,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
@@ -29,12 +30,12 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -42,7 +43,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -59,14 +60,14 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.flowName)) {
           return `${args.options.flowName} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -86,7 +87,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
         }
 
         const requestOptions: any = {
-          url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.flowName)}/triggers/${encodeURIComponent(triggerName)}/histories/${encodeURIComponent(args.options.name)}/resubmit?api-version=2016-11-01`,
+          url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/triggers/${formatting.encodeQueryParameter(triggerName)}/histories/${formatting.encodeQueryParameter(args.options.name)}/resubmit?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
           },
@@ -119,7 +120,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
 
   private getTriggerName(environment: string, flow: string): Promise<string> {
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(environment)}/flows/${encodeURIComponent(flow)}/triggers?api-version=2016-11-01`,
+      url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environment)}/flows/${formatting.encodeQueryParameter(flow)}/triggers?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

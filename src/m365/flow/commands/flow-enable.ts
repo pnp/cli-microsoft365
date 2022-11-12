@@ -1,6 +1,7 @@
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
+import { formatting } from '../../../utils/formatting';
 import AzmgmtCommand from '../../base/AzmgmtCommand';
 import commands from '../commands';
 
@@ -25,10 +26,10 @@ class FlowEnableCommand extends AzmgmtCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -39,7 +40,7 @@ class FlowEnableCommand extends AzmgmtCommand {
       },
       {
         option: '--asAdmin'
-      }      
+      }
     );
   }
 
@@ -49,7 +50,7 @@ class FlowEnableCommand extends AzmgmtCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.name)}/start?api-version=2016-11-01`,
+      url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}/start?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },
