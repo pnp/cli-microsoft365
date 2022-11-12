@@ -118,7 +118,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
 
   private getTaskDetailsEtagAndUrl(options: Options): Promise<{ etag: string, url: string }> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(options.taskId)}/details`,
+      url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(options.taskId)}/details`,
       headers: {
         accept: 'application/json'
       },
@@ -129,7 +129,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
 
     return request
       .get<PlannerTaskDetails>(requestOptions)
-      .then((taskDetails: PlannerTaskDetails) => {        
+      .then((taskDetails: PlannerTaskDetails) => {
         if (options.alias) {
           const urls: string[] = [];
 

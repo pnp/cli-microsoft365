@@ -1,5 +1,6 @@
 import { Logger } from '../../cli/Logger';
 import GlobalOptions from '../../GlobalOptions';
+import { formatting } from '../../utils/formatting';
 import PeriodBasedReport from './PeriodBasedReport';
 
 interface CommandArgs {
@@ -14,7 +15,7 @@ interface DateAndPeriodBasedOptions extends GlobalOptions {
 export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport {
   constructor() {
     super();
-    
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
@@ -45,11 +46,11 @@ export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport
         if (!args.options.period && !args.options.date) {
           return 'Specify period or date, one is required.';
         }
-    
+
         if (args.options.period && args.options.date) {
           return 'Specify period or date but not both.';
         }
-    
+
         if (args.options.date && !((args.options.date as string).match(/^\d{4}-\d{2}-\d{2}$/))) {
           return `${args.options.date} is not a valid date. The supported date format is YYYY-MM-DD`;
         }
@@ -60,8 +61,8 @@ export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const periodParameter: string = args.options.period ? `${this.usageEndpoint}(period='${encodeURIComponent(args.options.period)}')` : '';
-    const dateParameter: string = args.options.date ? `${this.usageEndpoint}(date=${encodeURIComponent(args.options.date)})` : '';
+    const periodParameter: string = args.options.period ? `${this.usageEndpoint}(period='${formatting.encodeQueryParameter(args.options.period)}')` : '';
+    const dateParameter: string = args.options.date ? `${this.usageEndpoint}(date=${formatting.encodeQueryParameter(args.options.date)})` : '';
     const endpoint: string = `${this.resource}/v1.0/reports/${(args.options.period ? periodParameter : dateParameter)}`;
     await this.executeReport(endpoint, logger, args.options.output);
   }

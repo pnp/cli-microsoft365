@@ -1,5 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import { formatting } from '../../../../utils/formatting';
 import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
 import commands from '../../commands';
 
@@ -27,10 +28,10 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
 
   constructor() {
     super();
-  
+
     this.#initOptions();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -47,7 +48,7 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
       logger.logToStderr(`Retrieving list of runs for Microsoft Flow ${args.options.flowName}...`);
     }
 
-    const url: string = `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.flowName)}/runs?api-version=2016-11-01`;
+    const url: string = `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs?api-version=2016-11-01`;
 
     try {
       await this.getAllItems(url, logger, true);

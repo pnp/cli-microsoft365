@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -254,7 +255,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
     try {
       let requestOptions: any = {
-        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=IsPageCheckedOutToCurrentUser,Title`,
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')?$select=IsPageCheckedOutToCurrentUser,Title`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -267,7 +268,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       let pageData: ClientSidePageProperties;
       if (page.IsPageCheckedOutToCurrentUser) {
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$expand=ListItemAllFields`,
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')?$expand=ListItemAllFields`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -278,7 +279,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       }
       else {
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')/checkoutpage`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -369,7 +370,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           header.properties = properties;
         }
       }
-      
+
       const requestBody: any = {
         LayoutWebpartsContent: JSON.stringify([header])
       };
@@ -394,7 +395,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       }
 
       requestOptions = {
-        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/SavePageAsDraft`,
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')/SavePageAsDraft`,
         headers: {
           'X-HTTP-Method': 'MERGE',
           'IF-MATCH': '*',
@@ -450,7 +451,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${siteUrl}/_api/web/getfilebyserverrelativeurl('${encodeURIComponent(imageUrl)}')?$select=ListId,UniqueId`,
+      url: `${siteUrl}/_api/web/getfilebyserverrelativeurl('${formatting.encodeQueryParameter(imageUrl)}')?$select=ListId,UniqueId`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },

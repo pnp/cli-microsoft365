@@ -8,6 +8,7 @@ import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
 import commands from '../../commands';
 import { Tab } from '../../Tab';
+import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -137,7 +138,7 @@ class TeamsTabGetCommand extends GraphCommand {
     }
 
     const channelRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.channelName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -163,7 +164,7 @@ class TeamsTabGetCommand extends GraphCommand {
     }
 
     const tabRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(this.channelId)}/tabs?$filter=displayName eq '${encodeURIComponent(args.options.name as string)}'`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels/${formatting.encodeQueryParameter(this.channelId)}/tabs?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -188,7 +189,7 @@ class TeamsTabGetCommand extends GraphCommand {
       this.teamId = await this.getTeamId(args);
       this.channelId = await this.getChannelId(args);
       const tabId: string = await this.getTabId(args);
-      const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(this.channelId)}/tabs/${encodeURIComponent(tabId)}`;
+      const endpoint: string = `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels/${formatting.encodeQueryParameter(this.channelId)}/tabs/${formatting.encodeQueryParameter(tabId)}`;
 
       const requestOptions: any = {
         url: endpoint,
@@ -200,7 +201,7 @@ class TeamsTabGetCommand extends GraphCommand {
 
       const res: Tab = await request.get<Tab>(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

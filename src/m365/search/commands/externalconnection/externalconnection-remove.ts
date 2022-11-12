@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -60,7 +61,7 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/external/connections?$filter=name eq '${encodeURIComponent(args.options.name as string)}'&$select=id`,
+      url: `${this.resource}/v1.0/external/connections?$filter=name eq '${formatting.encodeQueryParameter(args.options.name as string)}'&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -87,7 +88,7 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
       try {
         const externalConnectionId: string = await this.getExternalConnectionId(args);
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/external/connections/${encodeURIComponent(externalConnectionId)}`,
+          url: `${this.resource}/v1.0/external/connections/${formatting.encodeQueryParameter(externalConnectionId)}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -95,7 +96,7 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
         };
 
         await request.delete(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -111,7 +112,7 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the external connection '${args.options.id || args.options.name}'?`
       });
-      
+
       if (result.continue) {
         await removeExternalConnection();
       }

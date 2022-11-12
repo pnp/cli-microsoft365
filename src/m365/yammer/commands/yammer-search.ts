@@ -1,6 +1,7 @@
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
+import { formatting } from '../../../utils/formatting';
 import YammerCommand from '../../base/YammerCommand';
 import commands from '../commands';
 
@@ -171,7 +172,7 @@ class YammerSearchCommand extends YammerCommand {
 
   private getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const endpoint = `${this.resource}/v1/search.json?search=${encodeURIComponent(args.options.queryText)}&page=${page}`;
+      const endpoint = `${this.resource}/v1/search.json?search=${formatting.encodeQueryParameter(args.options.queryText)}&page=${page}`;
       const requestOptions: any = {
         url: endpoint,
         responseType: 'json'
@@ -260,10 +261,10 @@ class YammerSearchCommand extends YammerCommand {
     this.groups = [];
     this.topics = [];
     this.users = [];
-    
+
     try {
       await this.getAllItems(logger, args, 1);
-  
+
       if (args.options.output === 'json') {
         logger.log(
           {
@@ -276,7 +277,7 @@ class YammerSearchCommand extends YammerCommand {
       }
       else {
         const show = args.options.show?.toLowerCase();
-  
+
         if (show === "summary") {
           logger.log(this.summary);
         }
@@ -296,7 +297,7 @@ class YammerSearchCommand extends YammerCommand {
                 };
             })];
           }
-  
+
           if (show === undefined || show === "topics") {
             results = [...results, ...this.topics.map((topic) => {
               return <YammerConsolidatedResponse>
@@ -308,7 +309,7 @@ class YammerSearchCommand extends YammerCommand {
                 };
             })];
           }
-  
+
           if (show === undefined || show === "users") {
             results = [...results, ...this.users.map((user) => {
               return <YammerConsolidatedResponse>
@@ -320,7 +321,7 @@ class YammerSearchCommand extends YammerCommand {
                 };
             })];
           }
-  
+
           if (show === undefined || show === "groups") {
             results = [...results, ...this.groups.map((group) => {
               return <YammerConsolidatedResponse>
@@ -332,7 +333,7 @@ class YammerSearchCommand extends YammerCommand {
                 };
             })];
           }
-  
+
           logger.log(results);
         }
       }

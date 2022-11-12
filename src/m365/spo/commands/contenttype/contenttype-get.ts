@@ -116,10 +116,10 @@ class SpoContentTypeGetCommand extends SpoCommand {
     requestUrl += "/contenttypes";
 
     if (args.options.id) {
-      requestUrl += `('${encodeURIComponent(args.options.id)}')`;
+      requestUrl += `('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
     else if (args.options.name) {
-      requestUrl += `?$filter=Name eq '${encodeURIComponent(args.options.name)}'`;
+      requestUrl += `?$filter=Name eq '${formatting.encodeQueryParameter(args.options.name)}'`;
     }
 
     const requestOptions: AxiosRequestConfig = {

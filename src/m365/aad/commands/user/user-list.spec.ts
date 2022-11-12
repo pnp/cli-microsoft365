@@ -5,6 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -196,8 +197,9 @@ describe(commands.USER_LIST, () => {
   });
 
   it('escapes special characters in filters', async () => {
+    const displayName = 'O\'Brien';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=userPrincipalName,displayName&$filter=startsWith(displayName, 'O''Brien')&$top=100`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$select=userPrincipalName,displayName&$filter=startsWith(displayName, '${formatting.encodeQueryParameter(displayName)}')&$top=100`) {
         return Promise.resolve({
           "value": []
         });
@@ -206,7 +208,7 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: 'O\'Brien' } });
+    await command.action(logger, { options: { debug: false, displayName: displayName } });
     assert(loggerLogSpy.calledWith([]));
   });
 

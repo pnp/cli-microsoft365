@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -130,7 +131,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
 
   it('correctly deletes checklist item', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details?$select=checklist`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details?$select=checklist`) {
         return Promise.resolve({
           "@odata.etag": "TestEtag",
           checklist: responseChecklistWithId
@@ -139,7 +140,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve();
       }
       return Promise.reject('Invalid Request');
@@ -156,7 +157,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
 
   it('successfully remove checklist item with confirmation prompt', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details?$select=checklist`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details?$select=checklist`) {
         return Promise.resolve({
           "@odata.etag": "TestEtag",
           checklist: responseChecklistWithId
@@ -165,7 +166,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve();
       }
       return Promise.reject('Invalid Request');
@@ -181,7 +182,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
 
   it('fails when checklist item does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details?$select=checklist`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details?$select=checklist`) {
         return Promise.resolve({
           "@odata.etag": "TestEtag",
           checklist: responseChecklistWithNoId

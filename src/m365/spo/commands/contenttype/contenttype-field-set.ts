@@ -84,21 +84,21 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         if (typeof args.options.required !== 'undefined') {
           if (args.options.required !== 'true' &&
             args.options.required !== 'false') {
             return `${args.options.required} is not a valid boolean value. Allowed values are true|false`;
           }
         }
-    
+
         if (typeof args.options.hidden !== 'undefined') {
           if (args.options.hidden !== 'true' &&
             args.options.hidden !== 'false') {
             return `${args.options.hidden} is not a valid boolean value. Allowed values are true|false`;
           }
         }
-    
+
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
@@ -115,9 +115,9 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       if (this.verbose) {
         logger.logToStderr(`Retrieving field link for field ${args.options.id}...`);
       }
-  
+
       let requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.id}')`,
+        url: `${args.options.webUrl}/_api/web/contenttypes('${formatting.encodeQueryParameter(args.options.contentTypeId)}')/fieldlinks('${args.options.id}')`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
@@ -137,7 +137,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           logger.logToStderr('Field link not found. Creating...');
           logger.logToStderr(`Retrieving information about site column ${args.options.id}...`);
         }
-  
+
         requestOptions = {
           url: `${args.options.webUrl}/_api/web/fields('${args.options.id}')?$select=SchemaXmlWithResourceTokens`,
           headers: {
@@ -145,7 +145,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           },
           responseType: 'json'
         };
-  
+
         const field = await request.get<{ SchemaXmlWithResourceTokens: string; }>(requestOptions);
         schemaXmlWithResourceTokens = field.SchemaXmlWithResourceTokens;
         await this.createFieldLink(logger, args, schemaXmlWithResourceTokens);
@@ -156,7 +156,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         requestOptions = {
-          url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.id}')`,
+          url: `${args.options.webUrl}/_api/web/contenttypes('${formatting.encodeQueryParameter(args.options.contentTypeId)}')/fieldlinks('${args.options.id}')`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },
@@ -172,7 +172,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       if (!this.fieldLink) {
         throw `Couldn't find field link for field ${args.options.id}`;
       }
-      
+
       let updateHidden: boolean = false;
       let updateRequired: boolean = false;
       if (typeof args.options.hidden !== 'undefined' &&
@@ -195,7 +195,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         if (this.verbose) {
           logger.logToStderr(`Retrieving site collection id...`);
         }
-  
+
         requestOptions = {
           url: `${args.options.webUrl}/_api/site?$select=Id`,
           headers: {
@@ -203,7 +203,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           },
           responseType: 'json'
         };
-  
+
         const site = await request.get<{ Id: string }>(requestOptions);
         this.siteId = site.Id;
       }

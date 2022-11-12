@@ -2,6 +2,7 @@ import { Alert } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -51,7 +52,7 @@ class TenantSecurityAlertsListCommand extends GraphCommand {
     try {
       const res: any = await this.listAlert(args.options);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -73,7 +74,7 @@ class TenantSecurityAlertsListCommand extends GraphCommand {
           vendorName = 'IPC';
       }
 
-      queryFilter = `?$filter=vendorInformation/provider eq '${encodeURIComponent(vendorName)}'`;
+      queryFilter = `?$filter=vendorInformation/provider eq '${formatting.encodeQueryParameter(vendorName)}'`;
     }
 
     const requestOptions: any = {

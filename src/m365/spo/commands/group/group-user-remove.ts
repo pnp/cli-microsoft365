@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -90,8 +91,8 @@ class SpoGroupUserRemoveCommand extends SpoCommand {
 
       const loginName: string = `i:0#.f|membership|${args.options.userName}`;
       const requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/${args.options.groupId
-        ? `GetById('${encodeURIComponent(args.options.groupId)}')`
-        : `GetByName('${encodeURIComponent(args.options.groupName as string)}')`}/users/removeByLoginName(@LoginName)?@LoginName='${encodeURIComponent(loginName)}'`;
+        ? `GetById('${args.options.groupId}')`
+        : `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')`}/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`;
 
       const requestOptions: any = {
         url: requestUrl,
