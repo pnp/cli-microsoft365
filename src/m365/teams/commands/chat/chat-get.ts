@@ -6,6 +6,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -91,7 +92,7 @@ class TeamsChatGetCommand extends GraphCommand {
       const chatId = await this.getChatId(args);
       const chat: Chat = await this.getChatDetailsById(chatId as string);
       logger.log(chat);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -109,7 +110,7 @@ class TeamsChatGetCommand extends GraphCommand {
 
   private async getChatDetailsById(id: string): Promise<Chat> {
     const requestOptions: AxiosRequestConfig = {
-      url: `${this.resource}/v1.0/chats/${encodeURIComponent(id)}`,
+      url: `${this.resource}/v1.0/chats/${formatting.encodeQueryParameter(id)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

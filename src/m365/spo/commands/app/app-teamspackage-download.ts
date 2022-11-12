@@ -4,6 +4,7 @@ import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -78,32 +79,32 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
           !args.options.appName) {
           return `Specify appItemUniqueId, appItemId or appName`;
         }
-    
+
         if ((args.options.appItemUniqueId && args.options.appItemId) ||
           (args.options.appItemUniqueId && args.options.appName) ||
           (args.options.appItemId && args.options.appName)) {
           return `Specify appItemUniqueId, appItemId or appName but not multiple`;
         }
-    
+
         if (args.options.appItemUniqueId &&
           !validation.isValidGuid(args.options.appItemUniqueId)) {
           return `${args.options.appItemUniqueId} is not a valid GUID`;
         }
-    
+
         if (args.options.appItemId &&
           isNaN(args.options.appItemId)) {
           return `${args.options.appItemId} is not a number`;
         }
-    
+
         if (args.options.fileName &&
           fs.existsSync(args.options.fileName)) {
           return `File ${args.options.fileName} already exists`;
         }
-    
+
         if (args.options.appCatalogUrl) {
           return validation.isValidSharePointUrl(args.options.appCatalogUrl);
         }
-    
+
         return true;
       }
     );
@@ -184,7 +185,7 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
           url += `GetList('${serverRelativeAppCatalogListUrl}')/GetItemById(${args.options.appItemId})?$expand=File&$select=File/Name`;
         }
         else if (args.options.appName) {
-          url += `getfolderbyserverrelativeurl('${appCatalogListName}')/files('${encodeURIComponent(args.options.appName)}')/ListItemAllFields?$select=Id`;
+          url += `getfolderbyserverrelativeurl('${appCatalogListName}')/files('${formatting.encodeQueryParameter(args.options.appName)}')/ListItemAllFields?$select=Id`;
         }
 
         const requestOptions: AxiosRequestConfig = {

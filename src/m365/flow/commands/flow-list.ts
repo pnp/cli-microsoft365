@@ -1,5 +1,6 @@
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
+import { formatting } from '../../../utils/formatting';
 import { AzmgmtItemsListCommand } from '../../base/AzmgmtItemsListCommand';
 import commands from '../commands';
 
@@ -52,7 +53,7 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const url: string = `${this.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${encodeURIComponent(args.options.environmentName)}/flows?api-version=2016-11-01`;
+    const url: string = `${this.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows?api-version=2016-11-01`;
 
     try {
       await this.getAllItems(url, logger, true);

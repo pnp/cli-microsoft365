@@ -2,6 +2,7 @@ import { isNumber } from 'util';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -92,7 +93,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
 
     try {
       let requestOptions: any = {
-        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -104,7 +105,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
 
       if (!res.IsPageCheckedOutToCurrentUser) {
         requestOptions = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')/checkoutpage`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -138,7 +139,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
       canvasContent.splice(pos, 0, ...columnsToAdd);
 
       requestOptions = {
-        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')/savepage`,
         headers: {
           'accept': 'application/json;odata=nometadata',
           'content-type': 'application/json;odata=nometadata'

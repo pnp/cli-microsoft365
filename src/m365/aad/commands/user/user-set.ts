@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -63,12 +64,12 @@ class AadUserSetCommand extends GraphCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {    
+      async (args: CommandArgs) => {
         if (args.options.objectId &&
           !validation.isValidGuid(args.options.objectId)) {
           return `${args.options.objectId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -83,7 +84,7 @@ class AadUserSetCommand extends GraphCommand {
       const manifest: any = this.mapRequestBody(args.options);
 
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.objectId ? args.options.objectId : args.options.userPrincipalName as string)}`,
+        url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.objectId ? args.options.objectId : args.options.userPrincipalName as string)}`,
         headers: {
           accept: 'application/json'
         },

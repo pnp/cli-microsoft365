@@ -125,7 +125,7 @@ describe(commands.FILE_VERSION_LIST, () => {
 
   it('retrieves versions from a file with the fileUrl option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(validFileUrl)}')/versions?$top=5000`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(validFileUrl)}')/versions`) {
         return fileVersionResponse;
       }
       throw 'Invalid request';
@@ -143,7 +143,7 @@ describe(commands.FILE_VERSION_LIST, () => {
 
   it('retrieves versions from a file with the fileId option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions?$top=5000`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions`) {
         return fileVersionResponse;
       }
       throw 'Invalid request';
@@ -162,8 +162,8 @@ describe(commands.FILE_VERSION_LIST, () => {
   it('handles a random API error correctly', async () => {
     const err = 'Invalid versions request';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions?$top=5000`) {
-        throw { error: { 'odata.error': { message: { value: err }}}};
+      if (opts.url === `${validWebUrl}/_api/web/GetFileById('${validFileId}')/versions`) {
+        throw { error: { 'odata.error': { message: { value: err } } } };
       }
 
       throw 'Invalid request';

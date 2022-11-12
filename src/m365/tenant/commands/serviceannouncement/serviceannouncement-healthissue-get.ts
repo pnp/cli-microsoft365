@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -37,7 +38,7 @@ class TenantServiceAnnouncementHealthIssueGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/admin/serviceAnnouncement/issues/${encodeURIComponent(args.options.id)}`,
+      url: `${this.resource}/v1.0/admin/serviceAnnouncement/issues/${formatting.encodeQueryParameter(args.options.id)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -47,7 +48,7 @@ class TenantServiceAnnouncementHealthIssueGetCommand extends GraphCommand {
     try {
       const res: any = await request.get(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

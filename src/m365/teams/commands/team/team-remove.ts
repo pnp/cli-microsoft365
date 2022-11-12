@@ -7,6 +7,7 @@ import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -99,7 +100,7 @@ class TeamsTeamRemoveCommand extends GraphCommand {
       try {
         const teamId: string = await this.getTeamId(args);
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/groups/${encodeURIComponent(teamId)}`,
+          url: `${this.resource}/v1.0/groups/${formatting.encodeQueryParameter(teamId)}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },

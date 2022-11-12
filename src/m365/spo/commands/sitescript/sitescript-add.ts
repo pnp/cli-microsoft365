@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { ContextInfo, spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -74,7 +75,7 @@ class SpoSiteScriptAddCommand extends SpoCommand {
       const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
       const requestDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
       const requestOptions: any = {
-        url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteScript(Title=@title, Description=@description)?@title='${encodeURIComponent(args.options.title)}'&@description='${encodeURIComponent(args.options.description || '')}'`,
+        url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteScript(Title=@title, Description=@description)?@title='${formatting.encodeQueryParameter(args.options.title)}'&@description='${formatting.encodeQueryParameter(args.options.description || '')}'`,
         headers: {
           'X-RequestDigest': requestDigest.FormDigestValue,
           'content-type': 'application/json;charset=utf-8',
@@ -86,7 +87,7 @@ class SpoSiteScriptAddCommand extends SpoCommand {
 
       const res: any = await request.post(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

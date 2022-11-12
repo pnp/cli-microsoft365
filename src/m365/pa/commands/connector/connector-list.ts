@@ -1,5 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import flowCommands from '../../../flow/commands';
@@ -33,10 +34,10 @@ class PaConnectorListCommand extends PowerAppsCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -44,9 +45,9 @@ class PaConnectorListCommand extends PowerAppsCommand {
       }
     );
   }
-  
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const url = `${this.resource}/providers/Microsoft.PowerApps/apis?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environmentName)}%27%20and%20IsCustomApi%20eq%20%27True%27`;
+    const url = `${this.resource}/providers/Microsoft.PowerApps/apis?api-version=2016-11-01&$filter=environment%20eq%20%27${formatting.encodeQueryParameter(args.options.environmentName)}%27%20and%20IsCustomApi%20eq%20%27True%27`;
 
     try {
       const connectors = await odata.getAllItems<Connector>(url);
