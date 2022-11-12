@@ -152,7 +152,7 @@ describe(commands.CACHE_REMOVE, () => {
       if (opts === 'taskkill /IM "Teams.exe" /F') {
         return { stdout: '' };
       }
-      if (opts === 'rmdir /s /q C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Teams') {
+      if (opts === 'rmdir /s /q "C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Teams"') {
         throw error;
       }
       throw 'Invalid request';
@@ -187,7 +187,7 @@ describe(commands.CACHE_REMOVE, () => {
       if (opts === 'taskkill /IM "Teams.exe" /F') {
         throw error;
       }
-      if (opts === 'rmdir /s /q C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Teams') {
+      if (opts === 'rmdir /s /q "C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Teams"') {
         return;
       }
       throw 'Invalid request';

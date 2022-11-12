@@ -93,7 +93,7 @@ class TeamsCacheRemoveCommand extends GraphCommand {
 
   private async clearTeamsCache(logger: Logger): Promise<void> {
     try {
-      const filePath = this.getFilePath(logger);
+      const filePath = this.getTeamsCacheFolderPath(logger);
       const folderExists = await this.checkIfCacheFolderExists(filePath, logger);
       if (folderExists) {
         await this.killRunningProcess(logger);
@@ -109,7 +109,7 @@ class TeamsCacheRemoveCommand extends GraphCommand {
     }
   }
 
-  private getFilePath(logger: Logger): string {
+  private getTeamsCacheFolderPath(logger: Logger): string {
     const platform = process.platform;
 
     if (this.verbose) {
@@ -129,7 +129,7 @@ class TeamsCacheRemoveCommand extends GraphCommand {
     return filePath;
   }
 
-  private async checkIfCacheFolderExists(filePath: string, logger: Logger): Promise<boolean> {
+  private checkIfCacheFolderExists(filePath: string, logger: Logger): boolean {
     if (this.verbose) {
       logger.logToStderr(`Checking if cache folder exists for filePath ${filePath}`);
     }
@@ -193,10 +193,10 @@ class TeamsCacheRemoveCommand extends GraphCommand {
 
     switch (platform) {
       case 'win32':
-        cmd = `rmdir /s /q ${filePath}`;
+        cmd = `rmdir /s /q "${filePath}"`;
         break;
       case 'darwin':
-        cmd = `rm -r ${filePath}`;
+        cmd = `rm -r "${filePath}"`;
         break;
     }
 
