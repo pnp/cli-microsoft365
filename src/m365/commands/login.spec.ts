@@ -120,7 +120,7 @@ describe(commands.LOGIN, () => {
   it('logs in to Microsoft 365 using system managed identity when authType identity set', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
 
-    await command.action(logger, { options: { debug: false, authType: 'identity', userName:  'ac9fbed5-804c-4362-a369-21a4ec51109e' } });
+    await command.action(logger, { options: { debug: false, authType: 'identity', userName: 'ac9fbed5-804c-4362-a369-21a4ec51109e' } });
     assert.strictEqual(auth.service.authType, AuthType.Identity, 'Incorrect authType set');
     assert.strictEqual(auth.service.userName, 'ac9fbed5-804c-4362-a369-21a4ec51109e', 'Incorrect userName set');
   });
@@ -133,7 +133,7 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(auth.service.userName, undefined, 'Incorrect userName set');
   });
 
-  
+
   it('logs in to Microsoft 365 using client secret authType "secret" set', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
     await command.action(logger, { options: { debug: false, authType: 'secret', secret: 'unBrEakaBle@123' } });
@@ -173,6 +173,11 @@ describe(commands.LOGIN, () => {
       }
     });
     assert(containsOption);
+  });
+
+  it('fails validation if invalid authType specified', async () => {
+    const actual = await command.validate({ options: { authType: 'invalid authType' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if authType is set to password and userName and password not specified', async () => {
@@ -254,7 +259,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
     sinonUtil.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    
+
     try {
       await command.action(logger, { options: {} });
     }
@@ -269,7 +274,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
     sinonUtil.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    
+
     try {
       await command.action(logger, { options: { debug: true } });
     }
