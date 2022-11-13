@@ -83,8 +83,6 @@ class SpoWebGetCommand extends SpoCommand {
       if (args.options.withPermissions) {
         requestOptions.url = `${args.options.url}/_api/web/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
         const response = await request.get<{ value: any[] }>(requestOptions);
-        logger.log(response);
-        logger.log("---");
         const roleAssignments = this.setFriendlyPermissions(response.value);
         webProperties.RoleAssignments = roleAssignments;
       }
