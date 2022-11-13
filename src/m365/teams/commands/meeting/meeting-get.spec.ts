@@ -257,7 +257,7 @@ describe(commands.MEETING_GET, () => {
 
   it('correctly handles error when getting specified meeting details', async () => {
     const errorMessage = 'request rejected';
-    sinon.stub(request, 'post').callsFake(async () => { throw errorMessage; });
+    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
 
     await assert.rejects(command.action(logger, {
       options: {
