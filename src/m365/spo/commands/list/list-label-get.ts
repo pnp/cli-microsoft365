@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -93,23 +94,6 @@ class SpoListLabelGetCommand extends SpoCommand {
         logger.logToStderr(`Getting label set on the list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
       }
 
-      let requestUrl: string = `${args.options.webUrl}/_api/web/`;
-
-      if (args.options.listId) {
-        if (this.debug) {
-          logger.logToStderr(`Retrieving List from Id '${args.options.listId}'...`);
-        }
-
-        requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')?$expand=RootFolder&$select=RootFolder`;
-      }
-      else if (args.options.listTitle) {
-        if (this.debug) {
-          logger.logToStderr(`Retrieving List from Title '${args.options.listTitle}'...`);
-        }
-
-        requestUrl += `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder&$select=RootFolder`;
-      }
-
       let listServerRelativeUrl: string = '';
 
       if (args.options.listUrl) {
@@ -120,7 +104,24 @@ class SpoListLabelGetCommand extends SpoCommand {
         listServerRelativeUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
       }
       else {
-        const requestOptions: any = {
+        let requestUrl: string = `${args.options.webUrl}/_api/web/`;
+
+        if (args.options.listId) {
+          if (this.debug) {
+            logger.logToStderr(`Retrieving List from Id '${args.options.listId}'...`);
+          }
+
+          requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')?$expand=RootFolder&$select=RootFolder`;
+        }
+        else if (args.options.listTitle) {
+          if (this.debug) {
+            logger.logToStderr(`Retrieving List from Title '${args.options.listTitle}'...`);
+          }
+
+          requestUrl += `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder&$select=RootFolder`;
+        }
+
+        const requestOptions: AxiosRequestConfig = {
           url: requestUrl,
           headers: {
             'accept': 'application/json;odata=nometadata'
@@ -133,7 +134,7 @@ class SpoListLabelGetCommand extends SpoCommand {
       }
 
       const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
-      const reqOptions: any = {
+      const reqOptions: AxiosRequestConfig = {
         url: `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`,
         headers: {
           'accept': 'application/json;odata=nometadata',
