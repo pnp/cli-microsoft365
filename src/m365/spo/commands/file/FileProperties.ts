@@ -21,4 +21,5 @@ export interface FileProperties {
   UIVersion: number;
   UIVersionLabel: string;
   UniqueId: string;
+  RoleAssignments?: any
 }
