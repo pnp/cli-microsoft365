@@ -50,3 +50,41 @@ Gets details about Yammer device usage by user for the last week and exports the
 ```sh
 m365 yammer report deviceusageuserdetail --period D7 --output json > "deviceusageuserdetail.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-11-09",
+        "User Principal Name": "0439A166C614C2E8C7B4075DC4752054",
+        "Display Name": "2236A6E43D08F619FE695DF3B163A32F",
+        "User State": "",
+        "State Change Date": "",
+        "Last Activity Date": "",
+        "Used Web": "No",
+        "Used Windows Phone": "No",
+        "Used Android Phone": "No",
+        "Used iPhone": "No",
+        "Used iPad": "No",
+        "Used Others": "No",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,User Principal Name,Display Name,User State,State Change Date,Last Activity Date,Used Web,Used Windows Phone,Used Android Phone,Used iPhone,Used iPad,Used Others,Report Period
+    2022-11-09,77E5979DD60BA6EAA53E814DBEEEFA5F,4291DA7C39EE3263E97336B42734A667,,,,No,No,No,No,No,No,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,User Principal Name,Display Name,User State,State Change Date,Last Activity Date,Used Web,Used Windows Phone,Used Android Phone,Used iPhone,Used iPad,Used Others,Report Period
+    2022-11-09,77E5979DD60BA6EAA53E814DBEEEFA5F,4291DA7C39EE3263E97336B42734A667,,,,No,No,No,No,No,No,7
+    ```
