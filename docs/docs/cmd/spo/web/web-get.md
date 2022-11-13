@@ -16,6 +16,9 @@ m365 spo web get [options]
 `--withGroups`
 : Set if you want to return associated groups (associatedOwnerGroup, associatedMemberGroup and associatedVisitorGroup) along with other properties
 
+`--withPermissions`
+: Set if you want to return associated roles and permissions
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
