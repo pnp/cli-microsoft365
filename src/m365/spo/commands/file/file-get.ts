@@ -6,7 +6,10 @@ import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
+import { BasePermissions } from '../../base-permissions';
 import commands from '../../commands';
+import { RoleAssignment, RoleDefinition } from '../roledefinition/RoleDefinition';
+import { RoleType } from '../roledefinition/RoleType';
 import { FileProperties } from './FileProperties';
 
 interface CommandArgs {
@@ -21,6 +24,7 @@ export interface Options extends GlobalOptions {
   asListItem?: boolean;
   asFile?: boolean;
   path?: string;
+  withPermissions?: boolean;
 }
 
 class SpoFileGetCommand extends SpoCommand {
@@ -49,7 +53,8 @@ class SpoFileGetCommand extends SpoCommand {
         asString: args.options.asString || false,
         asListItem: args.options.asListItem || false,
         asFile: args.options.asFile || false,
-        path: (!(!args.options.path)).toString()
+        path: (!(!args.options.path)).toString(),
+        withPermissions: !!args.options.withPermissions
       });
     });
   }
@@ -76,6 +81,9 @@ class SpoFileGetCommand extends SpoCommand {
       },
       {
         option: '-p, --path [path]'
+      },
+      {
+        option: '--withPermissions'
       }
     );
   }
@@ -177,7 +185,6 @@ class SpoFileGetCommand extends SpoCommand {
         // Not possible to use async/await for this promise
         await new Promise<void>((resolve, reject) => {
           const writer = fs.createWriteStream(args.options.path as string);
-
           file.data.pipe(writer);
 
           writer.on('error', err => {
@@ -198,6 +205,15 @@ class SpoFileGetCommand extends SpoCommand {
         }
         else {
           const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
+          if (args.options.withPermissions) {
+            requestOptions.url = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${file.ServerRelativeUrl}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
+            const response = await request.get<{ value: any[] }>(requestOptions);
+            const roleAssignments = this.setFriendlyPermissions(response.value);
+            fileProperties.RoleAssignments = roleAssignments;
+            if (args.options.asListItem) {
+              fileProperties.ListItemAllFields.RoleAssignments = roleAssignments;
+            }
+          }
           logger.log(args.options.asListItem ? fileProperties.ListItemAllFields : fileProperties);
         }
       }
@@ -205,6 +221,20 @@ class SpoFileGetCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private setFriendlyPermissions(response: any[]): RoleAssignment[] {
+    response.forEach((r: any) => {
+      r.RoleDefinitionBindings.forEach((r: RoleDefinition) => {
+        const permissions: BasePermissions = new BasePermissions();
+        permissions.high = r.BasePermissions.High as number;
+        permissions.low = r.BasePermissions.Low as number;
+        r.BasePermissionsValue = permissions.parse();
+        r.RoleTypeKindValue = RoleType[r.RoleTypeKind];
+      });
+    });
+
+    return response;
   }
 }
 
