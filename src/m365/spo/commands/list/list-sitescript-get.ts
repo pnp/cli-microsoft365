@@ -119,7 +119,7 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
           requestUrl += `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder`;
         }
 
-        let requestOptions: AxiosRequestConfig = {
+        const requestOptions: AxiosRequestConfig = {
           url: requestUrl,
           headers: {
             'accept': 'application/json;odata=nometadata'
