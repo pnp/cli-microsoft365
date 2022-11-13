@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -73,63 +74,47 @@ class YammerGroupListCommand extends YammerCommand {
     return ['id', 'name', 'email', 'privacy', 'external', 'moderated'];
   }
 
-  private getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      let endpoint = `${this.resource}/v1`;
+  private async getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
+    let endpoint = `${this.resource}/v1`;
 
-      if (args.options.userId) {
-        endpoint += `/groups/for_user/${args.options.userId}.json`;
-      }
-      else {
-        endpoint += `/groups.json`;
-      }
-      endpoint += `?page=${page}`;
+    if (args.options.userId) {
+      endpoint += `/groups/for_user/${args.options.userId}.json`;
+    }
+    else {
+      endpoint += `/groups.json`;
+    }
+    endpoint += `?page=${page}`;
 
-      const requestOptions: any = {
-        url: endpoint,
-        headers: {
-          accept: 'application/json;odata.metadata=none',
-          'content-type': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
+    const requestOptions: AxiosRequestConfig = {
+      url: endpoint,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
 
-      request
-        .get(requestOptions)
-        .then((res: any): void => {
-          this.items = this.items.concat(res);
+    const output = await request.get<any[]>(requestOptions);
+    if (!output.length) {
+      return;
+    }
 
-          if (args.options.limit && this.items.length > args.options.limit) {
-            this.items = this.items.slice(0, args.options.limit);
-            resolve();
-          }
-          else {
-            // we need to page by 50 items (hardcoded)
-            if (this.items.length % 50 === 0) {
-              this
-                .getAllItems(logger, args, ++page)
-                .then((): void => {
-                  resolve();
-                }, (err: any): void => {
-                  reject(err);
-                });
-            }
-            else {
-              resolve();
-            }
-          }
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+    this.items = this.items.concat(output);
+
+    if (args.options.limit && this.items.length > args.options.limit) {
+      this.items = this.items.slice(0, args.options.limit);
+    }
+    else if (this.items.length % 50 === 0) {
+      await this.getAllItems(logger, args, ++page);
+    }
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.items = []; // this will reset the items array in interactive mode
 
     try {
-      await this.getAllItems(logger, args, 1);   
-      logger.log(this.items);   
+      await this.getAllItems(logger, args, 1);
+      logger.log(this.items);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

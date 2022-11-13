@@ -242,7 +242,7 @@ describe(commands.GROUP_LIST, () => {
         }
       });
     });
-    
+
     await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
@@ -290,26 +290,39 @@ describe(commands.GROUP_LIST, () => {
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910);
   });
 
-  it('returns all groups', async () => {
-    const first50Groups: any[] = [];
+  it('returns more than 50 groups correctly', async () => {
+    let first50Groups: any[] = [];
     // create a batch with 50 groups
     for (let index = 0; index < 25; index++) {
-      first50Groups.concat(groupsFirstBatchList);
+      first50Groups = first50Groups.concat(groupsFirstBatchList);
     }
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/groups.json?page=1') {
-        return Promise.resolve(first50Groups);
+        return first50Groups;
       }
       if (opts.url === 'https://www.yammer.com/api/v1/groups.json?page=2') {
-        return Promise.resolve(groupsSecondBatchList);
+        return groupsSecondBatchList;
       }
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { output: 'json' } } as any);
 
-    assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 3);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 53);
+  });
+
+  it('returns zero groups when none are found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/groups.json?page=1') {
+        return [];
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { output: 'json' } } as any);
+
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 0);
   });
 
   it('returns groups with a specific limit', async () => {
@@ -322,30 +335,6 @@ describe(commands.GROUP_LIST, () => {
     assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 1);
   });
 
-  it('handles error in loop', async () => {
-    let i: number = 0;
-    const first50Groups: any[] = [];
-    // create a batch with 50 groups
-    for (let index = 0; index < 25; index++) {
-      first50Groups.concat(groupsFirstBatchList);
-    }
-
-    sinon.stub(request, 'get').callsFake(() => {
-      if (i++ === 0) {
-        return Promise.resolve(first50Groups);
-      }
-      else {
-        return Promise.reject({
-          "error": {
-            "base": "An error has occurred."
-          }
-        });
-      }
-    });
-    
-    await assert.rejects(command.action(logger, { options: { output: 'json' } } as any), new CommandError('An error has occurred.'));
-  });
-
   it('handles correct parameters userId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/groups/for_user/10123190123128.json?page=1') {
@@ -355,7 +344,7 @@ describe(commands.GROUP_LIST, () => {
     });
 
     await command.action(logger, { options: { userId: 10123190123128, output: 'json' } } as any);
-    
+
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910);
   });
 });

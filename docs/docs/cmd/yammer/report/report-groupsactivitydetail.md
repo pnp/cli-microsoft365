@@ -50,3 +50,40 @@ Gets details about Yammer groups activity by group for the last week and exports
 ```sh
 m365 yammer report groupsactivitydetail --period D7 --output json > "groupsactivitydetail.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-11-10",
+        "Group Display Name": "7D3654B07E126BBD0D18174368FC243F",
+        "Is Deleted": "False",
+        "Owner Principal Name": "",
+        "Last Activity Date": "",
+        "Group Type": "public",
+        "Office 365 Connected": "No",
+        "Member Count": "3",
+        "Posted Count": "",
+        "Read Count": "",
+        "Liked Count": "",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Group Display Name,Is Deleted,Owner Principal Name,Last Activity Date,Group Type,Office 365 Connected,Member Count,Posted Count,Read Count,Liked Count,Report Period
+    2022-11-10,7D3654B07E126BBD0D18174368FC243F,False,,,public,No,3,,,,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Group Display Name,Is Deleted,Owner Principal Name,Last Activity Date,Group Type,Office 365 Connected,Member Count,Posted Count,Read Count,Liked Count,Report Period
+    2022-11-10,7D3654B07E126BBD0D18174368FC243F,False,,,public,No,3,,,,7
+    ```
