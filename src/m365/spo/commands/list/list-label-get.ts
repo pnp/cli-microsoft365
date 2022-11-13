@@ -79,11 +79,11 @@ class SpoListLabelGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push({ options: ['listId', 'listTitle'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    try {  
+    try {
       if (this.verbose) {
         const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
         logger.logToStderr(`Getting label set on the list ${list} in site at ${args.options.webUrl}...`);

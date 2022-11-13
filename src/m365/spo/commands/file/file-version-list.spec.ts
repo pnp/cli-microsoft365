@@ -95,7 +95,7 @@ describe(commands.FILE_VERSION_LIST, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['fileUrl', 'fileId']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['fileUrl', 'fileId'] }]);
   });
 
   it('fails validation if fileId is not a valid guid', async () => {

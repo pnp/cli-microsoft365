@@ -84,32 +84,32 @@ class SpoListViewAddCommand extends SpoCommand {
         if (webUrlValidation !== true) {
           return webUrlValidation;
         }
-    
+
         if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
           return `${args.options.listId} in option listId is not a valid GUID`;
         }
-    
+
         if (args.options.rowLimit !== undefined) {
           if (isNaN(args.options.rowLimit)) {
             return `${args.options.rowLimit} is not a number`;
           }
-    
+
           if (+args.options.rowLimit <= 0) {
             return 'rowLimit option must be greater than 0.';
           }
         }
-    
+
         if (args.options.personal && args.options.default) {
           return 'Default view cannot be a personal view.';
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

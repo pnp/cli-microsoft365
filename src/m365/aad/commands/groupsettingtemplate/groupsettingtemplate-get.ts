@@ -67,7 +67,7 @@ class AadGroupSettingTemplateGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'displayName']);
+    this.optionSets.push({ options: ['id', 'displayName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

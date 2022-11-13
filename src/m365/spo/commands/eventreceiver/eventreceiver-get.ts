@@ -88,31 +88,31 @@ class SpoEventreceiverGetCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
         if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
           return `Specify either list id or title or list url`;
         }
-    
+
         if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
           return `${args.options.listId} is not a valid GUID`;
         }
-    
+
         if (args.options.scope && ['web', 'site'].indexOf(args.options.scope) === -1) {
           return `${args.options.scope} is not a valid type value. Allowed values web|site.`;
         }
-    
+
         if (args.options.scope && args.options.scope === 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
           return 'Scope cannot be set to site when retrieving list event receivers.';
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['name', 'id']);
+    this.optionSets.push({ options: ['name', 'id'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

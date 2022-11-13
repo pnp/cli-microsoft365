@@ -114,7 +114,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'displayName', 'mailNickname']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'displayName', 'mailNickname'] }]);
   });
 
   it('fails validation when id is not a valid GUID', async () => {

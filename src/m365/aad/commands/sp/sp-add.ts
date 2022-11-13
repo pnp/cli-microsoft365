@@ -75,7 +75,7 @@ class AadSpAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appName', 'objectId']);
+    this.optionSets.push({ options: ['appId', 'appName', 'objectId'] });
   }
 
   private getAppId(args: CommandArgs): Promise<string> {

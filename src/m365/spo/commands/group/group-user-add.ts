@@ -96,8 +96,8 @@ class SpoGroupUserAddCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['groupId', 'groupName'],
-      ['userName', 'email']
+      { options: ['groupId', 'groupName'] },
+      { options: ['userName', 'email'] }
     );
   }
 

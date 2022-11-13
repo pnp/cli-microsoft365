@@ -106,7 +106,7 @@ class SpoFileCheckinCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['url', 'id']);
+    this.optionSets.push({ options: ['url', 'id'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

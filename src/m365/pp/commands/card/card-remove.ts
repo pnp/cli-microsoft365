@@ -75,7 +75,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'name']
+      { options: ['id', 'name'] }
     );
   }
 

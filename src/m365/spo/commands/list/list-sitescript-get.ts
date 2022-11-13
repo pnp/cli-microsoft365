@@ -79,7 +79,7 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle']);
+    this.optionSets.push({ options: ['listId', 'listTitle'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -88,9 +88,9 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
         const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
         logger.logToStderr(`Extracting Site Script from list ${list} in site at ${args.options.webUrl}...`);
       }
-  
+
       let requestUrl: string = '';
-  
+
       if (args.options.listId) {
         if (this.debug) {
           logger.logToStderr(`Retrieving List Url from Id '${args.options.listId}'...`);

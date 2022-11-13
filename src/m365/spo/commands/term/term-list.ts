@@ -92,8 +92,8 @@ class SpoTermListCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['termGroupId', 'termGroupName'],
-      ['termSetId', 'termSetName']
+      { options: ['termGroupId', 'termGroupName'] },
+      { options: ['termSetId', 'termSetName'] }
     );
   }
 
@@ -133,7 +133,7 @@ class SpoTermListCommand extends SpoCommand {
         });
         logger.log(result._Child_Items_);
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

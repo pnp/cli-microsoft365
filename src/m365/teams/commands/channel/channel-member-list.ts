@@ -107,8 +107,8 @@ class TeamsChannelMemberListCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['teamId', 'teamName'],
-      ['channelId', 'channelName']
+      { options: ['teamId', 'teamName'] },
+      { options: ['channelId', 'channelName'] }
     );
   }
 

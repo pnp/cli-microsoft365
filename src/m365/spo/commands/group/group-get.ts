@@ -81,7 +81,7 @@ class SpoGroupGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name', 'associatedGroup']);
+    this.optionSets.push({ options: ['id', 'name', 'associatedGroup'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

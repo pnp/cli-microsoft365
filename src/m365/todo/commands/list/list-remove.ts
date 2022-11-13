@@ -57,7 +57,7 @@ class TodoListRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['name', 'id']);
+    this.optionSets.push({ options: ['name', 'id'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -82,11 +82,11 @@ class TodoListRemoveCommand extends GraphCommand {
     const removeList = async (): Promise<void> => {
       try {
         const listId: string = await getListId();
-  
+
         if (!listId) {
           return Promise.reject(`The list ${args.options.name} cannot be found`);
         }
-  
+
         const requestOptions: any = {
           url: `${this.resource}/v1.0/me/todo/lists/${listId}`,
           headers: {
@@ -94,9 +94,9 @@ class TodoListRemoveCommand extends GraphCommand {
           },
           responseType: 'json'
         };
-        
+
         await request.delete(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -112,7 +112,7 @@ class TodoListRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the task list ${args.options.id || args.options.name}?`
       });
-      
+
       if (result.continue) {
         await removeList();
       }

@@ -122,7 +122,7 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['name', 'id']);
+    this.optionSets.push({ options: ['name', 'id'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

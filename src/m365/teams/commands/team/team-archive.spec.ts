@@ -94,7 +94,7 @@ describe(commands.TEAM_ARCHIVE, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['id', 'name']
+      { options: ['id', 'name'] }
     ]);
   });
 

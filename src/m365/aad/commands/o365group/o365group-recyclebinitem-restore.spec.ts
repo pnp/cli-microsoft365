@@ -61,7 +61,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -108,7 +108,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'displayName', 'mailNickname']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'displayName', 'mailNickname'] }]);
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
@@ -260,15 +260,5 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
   });
 });

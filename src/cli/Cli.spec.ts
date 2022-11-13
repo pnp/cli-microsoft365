@@ -59,9 +59,31 @@ class MockCommandWithOptionSets extends AnonymousCommand {
       },
       {
         option: '--opt2 [name]'
+      },
+      {
+        option: '--opt3 [name]'
+      },
+      {
+        option: '--opt4 [name]'
+      },
+      {
+        option: '--opt5 [name]'
+      },
+      {
+        option: '--opt6 [name]'
       }
     );
-    this.optionSets.push(['opt1', 'opt2']);
+    this.optionSets.push(
+      { options: ['opt1', 'opt2'] },
+      {
+        options: ['opt3', 'opt4'],
+        runsWhen: (args) => typeof args.options.opt2 !== 'undefined' // validate when opt2 is set
+      },
+      {
+        options: ['opt5', 'opt6'],
+        runsWhen: (args) => { return args.options.opt5 || args.options.opt6; } // validate when opt5 or opt6 is set
+      }
+    );
   }
   public async commandAction(): Promise<void> {
   }
@@ -463,7 +485,7 @@ describe('Cli', () => {
       });
   });
 
-  it(`shows error when optionSets validation fails - at least one option is specified`, (done) => {
+  it(`shows validation error when no option from a required set is specified`, (done) => {
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -477,7 +499,7 @@ describe('Cli', () => {
       });
   });
 
-  it(`shows error when optionSets validation fails - multiple options are specified`, (done) => {
+  it(`shows validation error when multiple options from a required set are specified`, (done) => {
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -489,6 +511,76 @@ describe('Cli', () => {
           done(e);
         }
       });
+  });
+
+  it(`passes validation when one option from a required set is specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue'])
+      .then(_ => {
+        try {
+          assert(cliErrorStub.notCalled);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, _ => done('Promise rejected while success expected'));
+  });
+
+  it(`shows validation error when no option from a dependent set is set`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt3, opt4.')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it(`passes validation when one option from a dependent set is specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue'])
+      .then(_ => {
+        try {
+          assert(cliErrorStub.notCalled);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, _ => done('Promise rejected while success expected'));
+  });
+
+  it(`shows validation error when multiple options from an optional set are specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt5', 'testvalue', '--opt6', 'testvalue'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt5, opt6, but not multiple.')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it(`passes validation when one option from an optional set is specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue', '--opt5', 'testvalue'])
+      .then(_ => {
+        try {
+          assert(cliErrorStub.notCalled);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, _ => done('Promise rejected while success expected'));
   });
 
   it(`prompts for required options`, (done) => {

@@ -102,7 +102,7 @@ class AadAppRoleAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appObjectId', 'appName']);
+    this.optionSets.push({ options: ['appId', 'appObjectId', 'appName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -92,7 +92,7 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['principalId', 'upn', 'groupName']
+      { options: ['principalId', 'upn', 'groupName'] }
     );
   }
 

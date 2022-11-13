@@ -68,7 +68,7 @@ class SpoSiteDesignGetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'title']
+      { options: ['id', 'title'] }
     );
   }
 

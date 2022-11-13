@@ -85,7 +85,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['name', 'id']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['name', 'id'] }]);
   });
 
   it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
@@ -94,12 +94,12 @@ describe(commands.EVENTRECEIVER_GET, () => {
   });
 
   it('fails validation if scope is set to site and one of the list properties is filled in', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', scope: 'site', listTitle: 'Documents'} }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', scope: 'site', listTitle: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the list ID is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listId: 'abc'} }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -253,7 +253,9 @@ describe(commands.EVENTRECEIVER_GET, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', id: 'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec' } });
+        webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', id: 'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec'
+      }
+    });
     assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
