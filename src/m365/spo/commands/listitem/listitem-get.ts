@@ -20,6 +20,7 @@ interface Options extends GlobalOptions {
   listUrl?: string;
   id: string;
   properties?: string;
+  withPermissions?: boolean;
 }
 
 class SpoListItemGetCommand extends SpoCommand {
@@ -50,7 +51,8 @@ class SpoListItemGetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined'
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        withPermissions: typeof args.options.withPermissions !== 'undefined'
       });
     });
   }
@@ -74,6 +76,9 @@ class SpoListItemGetCommand extends SpoCommand {
       },
       {
         option: '-p, --properties [properties]'
+      },
+      {
+        option: '--withPermissions'
       }
     );
   }
