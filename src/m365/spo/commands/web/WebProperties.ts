@@ -34,6 +34,7 @@ export interface WebProperties {
   UIVersionConfigurationEnabled: boolean;
   Url: string;
   WebTemplate: string;
+  RoleAssignments?: any;
 }
 
 export interface CurrentChangeToken {
