@@ -37,3 +37,33 @@ Gets the total number of groups that existed and how many included group convers
 ```sh
 m365 yammer report groupsactivitygroupcounts --period D7 --output json > "groupsactivitygroupcounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-11-04",
+        "Total": "1",
+        "Active": "0",
+        "Report Date": "2022-11-04",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Total,Active,Report Date,Report Period
+    2022-11-10,1,0,2022-11-10,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Total,Active,Report Date,Report Period
+    2022-11-10,1,0,2022-11-10,7
+    ```

@@ -45,3 +45,7 @@ Unlike the message with the ID `5611239081` without asking for confirmation
 ```sh
 m365 yammer message like set --messageId 5611239081 --enable false --confirm
 ```
+
+## Response
+
+The command won't return a response on success.
