@@ -42,3 +42,7 @@ Removes the Yammer message with the id _1239871123_ without prompting for confir
 ```sh
 m365 yammer message remove --id 1239871123 --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

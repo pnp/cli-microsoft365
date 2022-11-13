@@ -88,3 +88,63 @@ Returns the first 20 Yammer message from the sent feed of the user
 ```sh
 m365 yammer message list --feedType Sent --limit 20
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "id": 2000337749565441,
+        "sender_id": 36425097217,
+        "delegate_id": null,
+        "replied_to_id": null,
+        "created_at": "2022/11/11 20:59:10 +0000",
+        "network_id": 5897756673,
+        "message_type": "update",
+        "sender_type": "user",
+        "url": "https://www.yammer.com/api/v1/messages/2000336575053825",
+        "web_url": "https://www.yammer.com/contoso.onmicrosoft.com/messages/2000336575053825",
+        "group_id": 31158067201,
+        "body": {
+          "parsed": "Hello everyone!",
+          "plain": "Hello everyone!",
+          "rich": "Hello everyone!"
+        },
+        "thread_id": 2000337749565441,
+        "client_type": "O365 Api Auth",
+        "client_url": "https://api.yammer.com",
+        "system_message": false,
+        "direct_message": false,
+        "chat_client_sequence": null,
+        "language": "no",
+        "notified_user_ids": [],
+        "privacy": "public",
+        "attachments": [],
+        "liked_by": {
+          "count": 0,
+          "names": []
+        },
+        "supplemental_reply": false,
+        "content_excerpt": "Hello everyone!",
+        "group_created_id": 31158067201,
+        "shortBody": "Hello everyone!"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    id                replied_to_id  thread_id         group_id     shortBody
+    ----------------  -------------  ----------------  -----------  ---------------
+    2000337749565441  null           2000337749565441  31158067201  Hello everyone!
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,replied_to_id,thread_id,group_id,shortBody
+    2000337749565441,,2000337749565441,31158067201,Hello everyone!
+    ```

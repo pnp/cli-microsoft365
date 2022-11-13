@@ -36,6 +36,11 @@ m365 spo eventreceiver remove [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+!!! attention
+    You can only remove an event receiver if it has been registered by an app with the same ID.
+
 ## Examples
 
 Remove event receiver in a specific web by name.
