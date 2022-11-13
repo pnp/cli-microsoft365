@@ -6,7 +6,10 @@ import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
+import { BasePermissions } from '../../base-permissions';
 import commands from '../../commands';
+import { RoleDefinition } from '../roledefinition/RoleDefinition';
+import { RoleType } from '../roledefinition/RoleType';
 import { ListItemInstance } from './ListItemInstance';
 
 interface CommandArgs {
@@ -148,13 +151,33 @@ class SpoListItemGetCommand extends SpoCommand {
     };
 
     try {
-      const response = await request.get<any>(requestOptions);
-      delete response['ID'];
-      logger.log(<ListItemInstance>response);
+      const itemProperties = await request.get<any>(requestOptions);
+      if (args.options.withPermissions) {
+        requestOptions.url = `${requestUrl}/items(${args.options.id})/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
+        const response = await request.get<{ value: any[] }>(requestOptions);
+        const roleAssignments = this.setFriendlyPermissions(response.value);
+        itemProperties.RoleAssignments = roleAssignments;
+      }
+      delete itemProperties['ID'];
+      logger.log(<ListItemInstance>itemProperties);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private setFriendlyPermissions(response: any[]): any[] {
+    response.forEach((r: any) => {
+      r.RoleDefinitionBindings.forEach((r: RoleDefinition) => {
+        const permissions: BasePermissions = new BasePermissions();
+        permissions.high = r.BasePermissions.High as number;
+        permissions.low = r.BasePermissions.Low as number;
+        r.BasePermissionsValue = permissions.parse();
+        r.RoleTypeKindValue = RoleType[r.RoleTypeKind];
+      });
+    });
+
+    return response;
   }
 }
 
