@@ -8,7 +8,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { Logger } from './Logger';
 import appInsights from '../appInsights';
-import Command, { CommandArgs, CommandError } from '../Command';
+import Command, { CommandArgs, CommandError, CommandTypes } from '../Command';
 import config from '../config';
 import GlobalOptions from '../GlobalOptions';
 import request from '../request';
@@ -412,14 +412,17 @@ export class Cli {
       alias: {}
     };
 
+    let argsToParse = args;
+
     if (commandInfo) {
       const commandTypes = commandInfo.command.types;
       if (commandTypes) {
         minimistOptions.string = commandTypes.string;
 
-        // Only treat those options as booleans that are included as arg
-        // Otherwise unincluded options will default to false.
-        minimistOptions.boolean = commandTypes.boolean?.filter(optionName => args.some(arg => `--${optionName}` === arg || `-${optionName}` === arg));
+        // minimist will parse unused boolean options to 'false' (unused options => options that are not included in the args) 
+        // But in the CLI booleans are nullable. They can can be true, false or undefined.
+        // For this reason we only pass boolean types that are actually used as arg.
+        minimistOptions.boolean = commandTypes.boolean.filter(optionName => args.some(arg => `--${optionName}` === arg || `-${optionName}` === arg));
       }
 
       minimistOptions.alias = {};
@@ -428,33 +431,31 @@ export class Cli {
           (minimistOptions.alias as any)[option.short] = option.long;
         }
       });
+
+      argsToParse = this.getRewrittenArgs(args, commandTypes);
     }
 
-    const rewrittenArgs = this.getRewrittenArgsList(args, commandInfo);
-
-    return minimist(rewrittenArgs, minimistOptions);
+    return minimist(argsToParse, minimistOptions);
   }
 
   /**
    * Rewrites arguments (if necessary) before passing them into minimist.
    * Currently only boolean values are checked and fixed.
+   * Args are only checked and rewritten if the option has been added to the 'types.boolean' array.
    */
-  private getRewrittenArgsList(args: string[], commandInfo: CommandInfo | undefined): string[] {
-    const booleanTypes = commandInfo?.command.types.boolean || [];
+  private getRewrittenArgs(args: string[], commandTypes: CommandTypes): string[] {
+    const booleanTypes = commandTypes.boolean;
 
     if (booleanTypes.length === 0) {
       return args;
     }
 
-    // The list of arguments is checked for boolean values to rewrite. 
-    // Boolean values are arguments that:
-    //  - do not start with a dash (-) 
-    //  - have a preceding argument that occurs in the 'booleanTypes' list in it's long or short form.
     return args.map((arg: string, index: number, array: string[]) => {
-      if (arg.startsWith("-") || index === 0) {
+      if (arg.startsWith('-') || index === 0) {
         return arg;
       }
 
+      // This line checks if the current arg is a value that belongs to a boolean option.
       if (booleanTypes.some(t => `--${t}` === array[index - 1] || `-${t}` === array[index - 1])) {
         const rewrittenBoolean = formatting.rewriteBooleanValue(arg);
 

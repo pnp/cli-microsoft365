@@ -91,7 +91,7 @@ export const formatting = {
    * Booleans are case-insensitive, and are represented by the following values.
    *   True: 1, yes, true, on
    *   False: 0, no, false, off
-   * @value Stringied Boolean value to rewrite
+   * @value Stringified Boolean value to rewrite
    * @returns A stringified boolean with the value 'true' or 'false'. Returns the original value if it does not comply with the definition. 
    */
   rewriteBooleanValue(value: string): string {
