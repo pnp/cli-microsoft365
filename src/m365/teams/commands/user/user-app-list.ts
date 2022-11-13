@@ -72,7 +72,7 @@ class TeamsUserAppListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['userId', 'userName']);
+    this.optionSets.push({ options: ['userId', 'userName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

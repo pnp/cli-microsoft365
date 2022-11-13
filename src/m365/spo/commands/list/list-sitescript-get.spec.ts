@@ -1034,7 +1034,7 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['listId', 'listTitle', 'listUrl']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['listId', 'listTitle', 'listUrl'] }]);
   });
 
   it('supports debug mode', () => {

@@ -109,7 +109,7 @@ class TodoTaskAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listName']);
+    this.optionSets.push({ options: ['listId', 'listName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -139,17 +139,17 @@ class TodoTaskAddCommand extends GraphCommand {
 
       const res = await request.post<any>(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private getDateTimeTimeZone(dateTime: string | undefined) : { dateTime: string, timeZone: string } | undefined {
+  private getDateTimeTimeZone(dateTime: string | undefined): { dateTime: string, timeZone: string } | undefined {
     if (!dateTime) {
       return undefined;
     }
-    
+
     return {
       dateTime: dateTime,
       timeZone: 'Etc/GMT'

@@ -179,8 +179,8 @@ class PlannerTaskAddCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['planId', 'planTitle'],
-      ['bucketId', 'bucketName']
+      { options: ['planId', 'planTitle'] },
+      { options: ['bucketId', 'bucketName'] }
     );
   }
 

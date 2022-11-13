@@ -82,7 +82,7 @@ describe(commands.GROUP_SET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'name']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
   });
 
   it('fails validation when group id is not a number', async () => {
@@ -175,7 +175,7 @@ describe(commands.GROUP_SET, () => {
     });
   });
 
-  it('successfully updates group owner by ownerEmail', async () => {
+  it('successfully updates group owner by ownerEmail, retrieves group by id', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInfoResponse),
       stderr: ''
@@ -208,7 +208,7 @@ describe(commands.GROUP_SET, () => {
     });
   });
 
-  it('successfully updates group owner by ownerEmail', async () => {
+  it('successfully updates group owner by ownerUserName, retrieves group by name', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInfoResponse),
       stderr: ''

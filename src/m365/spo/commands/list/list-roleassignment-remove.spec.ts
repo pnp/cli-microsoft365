@@ -118,8 +118,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['listId', 'listTitle', 'listUrl'],
-      ['principalId', 'upn', 'groupName']
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['principalId', 'upn', 'groupName'] }
     ]);
   });
 

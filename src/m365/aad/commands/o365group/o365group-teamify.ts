@@ -66,7 +66,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'mailNickname']);
+    this.optionSets.push({ options: ['id', 'mailNickname'] });
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {

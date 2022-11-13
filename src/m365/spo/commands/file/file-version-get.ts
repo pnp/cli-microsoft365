@@ -75,7 +75,7 @@ class SpoFileVersionGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['fileUrl', 'fileId']);
+    this.optionSets.push({ options: ['fileUrl', 'fileId'] });
   }
 
   #initTypes(): void {

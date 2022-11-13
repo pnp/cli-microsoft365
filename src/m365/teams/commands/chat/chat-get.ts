@@ -84,7 +84,7 @@ class TeamsChatGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'participants', 'name']);
+    this.optionSets.push({ options: ['id', 'participants', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

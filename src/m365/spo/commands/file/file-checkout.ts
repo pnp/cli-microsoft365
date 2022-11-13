@@ -77,7 +77,7 @@ class SpoFileCheckoutCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'url']);
+    this.optionSets.push({ options: ['id', 'url'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -118,7 +118,7 @@ describe(commands.PLAN_GET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title'] }]);
   });
 
   it('fails validation when both ownerGroupId and ownerGroupName are specified when using title', async () => {

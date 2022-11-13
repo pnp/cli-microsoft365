@@ -95,7 +95,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['listId', 'listTitle', 'listUrl']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['listId', 'listTitle', 'listUrl'] }]);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
@@ -309,7 +309,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
     assert(promptIssued);
   });
 
-  it('break role inheritance of list item with id 1 on list by list url', async () => {
+  it('break role inheritance of list item with id 1 on list by list url without confirmation prompt', async () => {
     const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
     const listUrl = '/sites/project-x/lists/TestList';
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);

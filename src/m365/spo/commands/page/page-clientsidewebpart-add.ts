@@ -142,7 +142,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['standardWebPart', 'webPartId']
+      { options: ['standardWebPart', 'webPartId'] }
     );
   }
 

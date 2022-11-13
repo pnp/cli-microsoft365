@@ -128,7 +128,7 @@ class SpoFileGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'url']);
+    this.optionSets.push({ options: ['id', 'url'] });
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
