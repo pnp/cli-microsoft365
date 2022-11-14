@@ -109,7 +109,7 @@ Previous JSON command output:
 Current JSON command output:
 ```json
 {
-    "id": "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
+    "id": "fbdfd207-83ee-45d8-9c98-5039a1a01207",
     "externalId": "b5561ec9-8cab-4aa3-8aa2-d8d7172e4311",
     "displayName": "Test App",
     "distributionMethod": "organization"
@@ -119,6 +119,44 @@ Current JSON command output:
 ### What action do I need to take?
 
 Update your scripts to read the `id` property of the command output.
+
+## Updated `spo eventreceiver get` command output
+
+In the past versions, `spo eventreceiver get` returned an array with a single object. This has been adjusted, now the command will return the object.
+
+Previous JSON command output:
+```json
+[
+  {
+    "ReceiverAssembly": "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
+    "ReceiverClass": "Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver",
+    "ReceiverId": "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec",
+    "ReceiverName": "PnP Test Receiver",
+    "SequenceNumber": 10000,
+    "Synchronization": 2,
+    "EventType": 10204,
+    "ReceiverUrl": null
+  }
+]
+```
+
+Current JSON command output:
+```json
+{
+  "ReceiverAssembly": "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
+  "ReceiverClass": "Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver",
+  "ReceiverId": "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec",
+  "ReceiverName": "PnP Test Receiver",
+  "SequenceNumber": 10000,
+  "Synchronization": 2,
+  "EventType": 10204,
+  "ReceiverUrl": null
+}
+```
+
+### What action do I need to take?
+
+Update your scripts to expect an object instead of an array.
 
 ## Aligned options with naming convention
 

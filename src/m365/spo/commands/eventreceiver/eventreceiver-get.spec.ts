@@ -148,6 +148,28 @@ describe(commands.EVENTRECEIVER_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('throws error when multiple eventreceivers with the same name were found', async () => {
+    const multipleEventreceiversResponse = {
+      value: [
+        { ReceiverId: '69703efe-4149-ed11-bba2-000d3adf7537' },
+        { ReceiverId: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
+      ]
+    };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) > -1) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return multipleEventreceiversResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents', name: 'PnP Test Receiver' }
+    }), new CommandError(`Multiple eventreceivers with name 'PnP Test Receiver' found: ${multipleEventreceiversResponse.value.map(x => x.ReceiverId).join(',')}`));
+  });
+
   it('throws error when no eventreceiver with name were found', async () => {
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
@@ -249,8 +271,8 @@ describe(commands.EVENTRECEIVER_GET, () => {
 
   it('retrieves web event receiver using id as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/eventreceivers?$filter=receiverid eq (guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
-        return eventReceiverValue;
+      if ((opts.url as string).indexOf(`/_api/web/eventreceivers(guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
+        return eventReceiverValue.value[0];
       }
       throw 'Invalid request';
     });
@@ -261,8 +283,8 @@ describe(commands.EVENTRECEIVER_GET, () => {
 
   it('retrieves site event receiver using id as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/site/eventreceivers?$filter=receiverid eq (guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
-        return eventReceiverValue;
+      if ((opts.url as string).indexOf(`/_api/site/eventreceivers(guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
+        return eventReceiverValue.value[0];
       }
       throw 'Invalid request';
     });
@@ -277,8 +299,8 @@ describe(commands.EVENTRECEIVER_GET, () => {
 
   it('retrieves list event receiver retrieved by list title using id as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/eventreceivers?$filter=receiverid eq (guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
-        return eventReceiverValue;
+      if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/eventreceivers(guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
+        return eventReceiverValue.value[0];
       }
       throw 'Invalid request';
     });
@@ -289,8 +311,8 @@ describe(commands.EVENTRECEIVER_GET, () => {
 
   it('retrieves list event receivers queried by url using id as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetList('%2Fsites%2Fportal%2FShared%20Documents')/eventreceivers?$filter=receiverid eq (guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
-        return eventReceiverValue;
+      if ((opts.url as string).indexOf(`/_api/web/GetList('%2Fsites%2Fportal%2FShared%20Documents')/eventreceivers(guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
+        return eventReceiverValue.value[0];
       }
       throw 'Invalid request';
     });
@@ -301,8 +323,8 @@ describe(commands.EVENTRECEIVER_GET, () => {
 
   it('retrieves list event receivers queried by list id using id as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists(guid'b17bd74f-d1b1-42bf-a21d-f865a903acc3')/eventreceivers?$filter=receiverid eq (guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
-        return eventReceiverValue;
+      if ((opts.url as string).indexOf(`/_api/web/lists(guid'b17bd74f-d1b1-42bf-a21d-f865a903acc3')/eventreceivers(guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
+        return eventReceiverValue.value[0];
       }
       throw 'Invalid request';
     });

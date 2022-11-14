@@ -139,7 +139,8 @@ class SpoEventreceiverGetCommand extends SpoCommand {
     }
 
     if (args.options.id) {
-      filter += `receiverid eq (guid'${args.options.id}')`;
+      requestUrl += `(guid'${args.options.id}')`;
+      filter = "";
     }
     else {
       filter += `receivername eq '${args.options.name}'`;
@@ -156,11 +157,15 @@ class SpoEventreceiverGetCommand extends SpoCommand {
     try {
       const res = await request.get<{ value: EventReceiver[] }>(requestOptions);
 
-      if (res.value.length === 0) {
-        throw `The specified eventreceiver '${args.options.name}' does not exist.`;
+      if (res.value && res.value.length === 0) {
+        throw `The specified eventreceiver '${args.options.id || args.options.name}' does not exist.`;
       }
 
-      logger.log(res.value[0]);
+      if (res.value && res.value.length > 1) {
+        throw Error(`Multiple eventreceivers with name '${args.options.name}' found: ${res.value.map(x => x.ReceiverId)}`);
+      }
+
+      logger.log(args.options.id ? res : res.value[0]);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
