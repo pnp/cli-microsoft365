@@ -1,12 +1,10 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
-import { BasePermissions } from '../../base-permissions';
 import commands from '../../commands';
-import { RoleDefinition } from './RoleDefinition';
-import { RoleType } from './RoleType';
 
 interface CommandArgs {
   options: Options;
@@ -65,24 +63,12 @@ class SpoRoleDefinitionListCommand extends SpoCommand {
 
     try {
       const res = await request.get<{ value: any[] }>(requestOptions);
-      const response = this.setFriendlyPermissions(res.value);
+      const response = formatting.setFriendlyPermissions(res.value);
       logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private setFriendlyPermissions(response: any[]): any[] {
-    response.forEach((r: RoleDefinition) => {
-      const permissions: BasePermissions = new BasePermissions();
-      permissions.high = r.BasePermissions.High as number;
-      permissions.low = r.BasePermissions.Low as number;
-      r.BasePermissionsValue = permissions.parse();
-      r.RoleTypeKindValue = RoleType[r.RoleTypeKind];
-    });
-
-    return response;
   }
 }
 
