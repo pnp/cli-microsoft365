@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
 }
 
 class LoginCommand extends Command {
-  private static allowedauthTypes: string[] = ['certificate', 'deviceCode', 'password', 'identity', 'browser', 'secret'];
+  private static allowedAuthTypes: string[] = ['certificate', 'deviceCode', 'password', 'identity', 'browser', 'secret'];
 
   public get name(): string {
     return commands.LOGIN;
@@ -55,7 +55,7 @@ class LoginCommand extends Command {
     this.options.unshift(
       {
         option: '-t, --authType [authType]',
-        autocomplete: LoginCommand.allowedauthTypes
+        autocomplete: LoginCommand.allowedAuthTypes
       },
       {
         option: '-u, --userName [userName]'
@@ -114,8 +114,8 @@ class LoginCommand extends Command {
         }
 
         if (args.options.authType &&
-          LoginCommand.allowedauthTypes.indexOf(args.options.authType) < 0) {
-          return `'${args.options.output}' is not a valid output type. Allowed output types are ${LoginCommand.allowedauthTypes.join(', ')}`;
+          LoginCommand.allowedAuthTypes.indexOf(args.options.authType) < 0) {
+          return `'${args.options.authType}' is not a valid authentication type. Allowed authentication types are ${LoginCommand.allowedAuthTypes.join(', ')}`;
         }
 
         if (args.options.authType === 'secret') {
