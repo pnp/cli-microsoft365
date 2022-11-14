@@ -135,7 +135,7 @@ Previous JSON command output:
     "SequenceNumber": 10000,
     "Synchronization": 2,
     "EventType": 10204,
-    "ReceiverUrl": null
+    "ReceiverUrl": "https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b"
   }
 ]
 ```
@@ -150,7 +150,7 @@ Current JSON command output:
   "SequenceNumber": 10000,
   "Synchronization": 2,
   "EventType": 10204,
-  "ReceiverUrl": null
+  "ReceiverUrl": "https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b"
 }
 ```
 

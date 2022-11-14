@@ -82,7 +82,7 @@ m365 spo eventreceiver list --webUrl https://contoso.sharepoint.com/sites/contos
       "SequenceNumber": 10000,
       "Synchronization": 2,
       "EventType": 10204,
-      "ReceiverUrl": null
+      "ReceiverUrl": "https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b"
     }
     ```
 
@@ -94,7 +94,7 @@ m365 spo eventreceiver list --webUrl https://contoso.sharepoint.com/sites/contos
     ReceiverClass   : Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver
     ReceiverId      : c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec
     ReceiverName    : PnP Test Receiver
-    ReceiverUrl     : null
+    ReceiverUrl     : https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b
     SequenceNumber  : 10000
     Synchronization : 2
     ```
@@ -103,7 +103,7 @@ m365 spo eventreceiver list --webUrl https://contoso.sharepoint.com/sites/contos
 
     ```csv
     ReceiverAssembly,ReceiverClass,ReceiverId,ReceiverName,SequenceNumber,Synchronization,EventType,ReceiverUrl
-    "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver,c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec,PnP Test Receiver,10000,2,10204,
+    "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver,c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec,PnP Test Receiver,10000,2,10204,https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b
     ```
 
 
