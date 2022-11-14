@@ -212,7 +212,6 @@ describe('Cli', () => {
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
   let log: string[] = [];
-  let mockCommandWithBooleanCuration: Command;
   let mockCommandWithBooleanRewrite: Command;
 
   before(() => {
@@ -551,11 +550,11 @@ describe('Cli', () => {
 
   it(`succeeds running with truthy/falsy values 'true' and 'false'`, (done) => {
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false'])
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'text'])
       .then(_ => {
         try {
-          assert(cliLogStub.calledWith(`"booleanParameterX: true"`));
-          assert(cliLogStub.calledWith(`"booleanParameterY: false"`));
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
           done();
         }
         catch (e) {
@@ -566,11 +565,11 @@ describe('Cli', () => {
 
   it(`rewrites a truthy/falsy values '1' and '0' to 'true' and 'false' respectively`, (done) => {
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', '1', '--booleanParameterY', '0'])
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', '1', '--booleanParameterY', '0', '--output', 'text'])
       .then(_ => {
         try {
-          assert(cliLogStub.calledWith(`"booleanParameterX: true"`));
-          assert(cliLogStub.calledWith(`"booleanParameterY: false"`));
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
           done();
         }
         catch (e) {
@@ -581,11 +580,11 @@ describe('Cli', () => {
 
   it(`rewrites a truthy/falsy values 'on' and 'off' to 'true' and 'false' respectively`, (done) => {
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'on', '--booleanParameterY', 'off'])
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'on', '--booleanParameterY', 'off', '--output', 'text'])
       .then(_ => {
         try {
-          assert(cliLogStub.calledWith(`"booleanParameterX: true"`));
-          assert(cliLogStub.calledWith(`"booleanParameterY: false"`));
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
           done();
         }
         catch (e) {
@@ -596,11 +595,11 @@ describe('Cli', () => {
 
   it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively`, (done) => {
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'yes', '--booleanParameterY', 'no'])
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'yes', '--booleanParameterY', 'no', '--output', 'text'])
       .then(_ => {
         try {
-          assert(cliLogStub.calledWith(`"booleanParameterX: true"`));
-          assert(cliLogStub.calledWith(`"booleanParameterY: false"`));
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
           done();
         }
         catch (e) {
@@ -611,11 +610,11 @@ describe('Cli', () => {
 
   it(`rewrites a truthy/falsy values 'True' and 'False' to 'true' and 'false' respectively`, (done) => {
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'True', '--booleanParameterY', 'False'])
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'True', '--booleanParameterY', 'False', '--output', 'text'])
       .then(_ => {
         try {
-          assert(cliLogStub.calledWith(`"booleanParameterX: true"`));
-          assert(cliLogStub.calledWith(`"booleanParameterY: false"`));
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
           done();
         }
         catch (e) {
@@ -626,11 +625,11 @@ describe('Cli', () => {
 
   it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively (using shorts)`, (done) => {
     cli
-      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '-x', 'yes', '-y', 'no'])
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '-x', 'yes', '-y', 'no', '--output', 'text'])
       .then(_ => {
         try {
-          assert(cliLogStub.calledWith(`"booleanParameterX: true"`));
-          assert(cliLogStub.calledWith(`"booleanParameterY: false"`));
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
           done();
         }
         catch (e) {
