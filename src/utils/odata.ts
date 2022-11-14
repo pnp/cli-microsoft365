@@ -26,7 +26,7 @@ export const odata = {
       url: url,
       headers: {
         accept: `application/json;odata.metadata=${metadata ?? 'none'}`,
-        'OData-Version': '4.0'
+        'odata-version': '4.0'
       },
       responseType: 'json'
     };
