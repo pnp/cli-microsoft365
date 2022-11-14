@@ -1,4 +1,7 @@
 import * as stripJsonComments from 'strip-json-comments';
+import { BasePermissions } from '../m365/spo/base-permissions';
+import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition';
+import { RoleType } from '../m365/spo/commands/roledefinition/RoleType';
 
 export const formatting = {
   escapeXml(s: any | undefined): any | undefined {
@@ -40,6 +43,18 @@ export const formatting = {
         filtered[key] = obj[key];
         return filtered;
       }, {});
+  },
+
+  setFriendlyPermissions(response: RoleDefinition[]): RoleDefinition[] {
+    response.forEach((r: RoleDefinition) => {
+      const permissions: BasePermissions = new BasePermissions();
+      permissions.high = r.BasePermissions.High as number;
+      permissions.low = r.BasePermissions.Low as number;
+      r.BasePermissionsValue = permissions.parse();
+      r.RoleTypeKindValue = RoleType[r.RoleTypeKind];
+    });
+
+    return response;
   },
 
   parseCsvToJson(s: string, quoteChar: string = '"', delimiter: string = ','): any {

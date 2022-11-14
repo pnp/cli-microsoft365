@@ -1,12 +1,10 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
-import { BasePermissions } from '../../base-permissions';
 import commands from '../../commands';
-import { RoleAssignment, RoleDefinition } from '../roledefinition/RoleDefinition';
-import { RoleType } from '../roledefinition/RoleType';
 import { WebProperties } from './WebProperties';
 
 interface CommandArgs {
@@ -83,28 +81,16 @@ class SpoWebGetCommand extends SpoCommand {
       if (args.options.withPermissions) {
         requestOptions.url = `${args.options.url}/_api/web/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
         const response = await request.get<{ value: any[] }>(requestOptions);
-        const roleAssignments = this.setFriendlyPermissions(response.value);
-        webProperties.RoleAssignments = roleAssignments;
+        response.value.forEach((r: any) => {
+          r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
+        });
+        webProperties.RoleAssignments = response.value;
       }
       logger.log(webProperties);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private setFriendlyPermissions(response: any[]): RoleAssignment[] {
-    response.forEach((r: any) => {
-      r.RoleDefinitionBindings.forEach((r: RoleDefinition) => {
-        const permissions: BasePermissions = new BasePermissions();
-        permissions.high = r.BasePermissions.High as number;
-        permissions.low = r.BasePermissions.Low as number;
-        r.BasePermissionsValue = permissions.parse();
-        r.RoleTypeKindValue = RoleType[r.RoleTypeKind];
-      });
-    });
-
-    return response;
   }
 }
 
