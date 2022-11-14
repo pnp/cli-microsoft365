@@ -270,6 +270,7 @@ nav:
         - dataverse table get: cmd/pp/dataverse/dataverse-table-get.md
         - dataverse table list: cmd/pp/dataverse/dataverse-table-list.md
         - dataverse table remove: cmd/pp/dataverse/dataverse-table-remove.md
+        - dataverse table row list: cmd/pp/dataverse/dataverse-table-row-list.md
       - environment:
         - environment get: cmd/pp/environment/environment-get.md
         - environment list: cmd/pp/environment/environment-list.md
