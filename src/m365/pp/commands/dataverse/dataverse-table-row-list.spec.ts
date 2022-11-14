@@ -14,12 +14,12 @@ const command: Command = require('./dataverse-table-row-list');
 describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
-  const validName = 'cr6c3_cliTables';
+  const validName = 'cr6c3_clitables';
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
   const rowsResponse = {
     "value": [
       {
-        "cr6c3_cliTablesid": "95c80273-3764-ed11-9561-000d3a4bbea4",
+        "cr6c3_clitablesid": "95c80273-3764-ed11-9561-000d3a4bbea4",
         "_owningbusinessunit_value": "6da087c1-1c4d-ed11-bba1-000d3a2caf7f",
         "statecode": 0,
         "statuscode": 1,
@@ -30,7 +30,7 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
         "_modifiedby_value": "5fa787c1-1c4d-ed11-bba1-000d3a2caf7f",
         "versionnumber": 1413873,
         "createdon": "2022-11-14T16:14:45Z",
-        "cr6c3_columnOne": "Test1",
+        "cr6c3_columnone": "Test1",
         "overriddencreatedon": null,
         "importsequencenumber": null,
         "_modifiedonbehalfby_value": null,

@@ -57,7 +57,7 @@ class DataverseTableRowList extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of tables for which the user is an admin...`);
+      logger.logToStderr(`Retrieving list of table rows for which the user is an admin...`);
     }
 
     try {
