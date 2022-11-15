@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -116,7 +117,7 @@ class TeamsTeamSetCommand extends GraphCommand {
     const data: any = this.mapRequestBody(args.options);
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups/${encodeURIComponent(args.options.id as string)}`,
+      url: `${this.resource}/v1.0/groups/${formatting.encodeQueryParameter(args.options.id as string)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

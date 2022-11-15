@@ -32,9 +32,14 @@ m365 spo eventreceiver remove [options]
 : The scope. Can be either "site" or "web". Defaults to "web". Only applicable when not specifying any of the list properties.
 
 `--confirm`
-: Don't prompt for confirming removing the event receiver
+: Don't prompt for confirmation.
 
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+!!! attention
+    You can only remove an event receiver if it has been registered by an app with the same ID.
 
 ## Examples
 

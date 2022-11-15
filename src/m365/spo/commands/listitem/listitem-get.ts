@@ -135,7 +135,7 @@ class SpoListItemGetCommand extends SpoCommand {
     const fieldExpand: string = expandPropertiesArray.length > 0 ? `&$expand=${expandPropertiesArray.join(",")}` : ``;
 
     const requestOptions: AxiosRequestConfig = {
-      url: `${requestUrl}/items(${args.options.id})?$select=${encodeURIComponent(propertiesSelect.join(","))}${fieldExpand}`,
+      url: `${requestUrl}/items(${args.options.id})?$select=${formatting.encodeQueryParameter(propertiesSelect.join(","))}${fieldExpand}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },

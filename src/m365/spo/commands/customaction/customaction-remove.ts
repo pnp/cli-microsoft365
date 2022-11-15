@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -141,7 +142,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     }
 
     const customActionRequestOptions: any = {
-      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions?$filter=Title eq '${encodeURIComponent(options.title as string)}'`,
+      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions?$filter=Title eq '${formatting.encodeQueryParameter(options.title as string)}'`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -168,7 +169,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
       .getCustomActionId(options)
       .then((customActionId: string): Promise<undefined> => {
         const requestOptions: any = {
-          url: `${options.webUrl}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(customActionId)}')')`,
+          url: `${options.webUrl}/_api/${options.scope}/UserCustomActions('${formatting.encodeQueryParameter(customActionId)}')')`,
           headers: {
             accept: 'application/json;odata=nometadata',
             'X-HTTP-Method': 'DELETE'

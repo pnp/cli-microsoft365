@@ -1,6 +1,7 @@
 import { ServiceHealthIssue } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -44,13 +45,13 @@ class TenantServiceAnnouncementHealthIssueListCommand extends GraphCommand {
     let endpoint: string = `${this.resource}/v1.0/admin/serviceAnnouncement/issues`;
 
     if (args.options.service) {
-      endpoint += `?$filter=service eq '${encodeURIComponent(args.options.service)}'`;
+      endpoint += `?$filter=service eq '${formatting.encodeQueryParameter(args.options.service)}'`;
     }
 
     try {
       const items: any = await odata.getAllItems<ServiceHealthIssue>(endpoint);
       logger.log(items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

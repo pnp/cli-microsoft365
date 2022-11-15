@@ -106,7 +106,7 @@ class SpoListGetCommand extends SpoCommand {
       requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
     }
 
-    let propertiesSelect: string = args.options.properties ? `?$select=${encodeURIComponent(args.options.properties)}` : ``;
+    let propertiesSelect: string = args.options.properties ? `?$select=${formatting.encodeQueryParameter(args.options.properties)}` : ``;
     propertiesSelect += args.options.withPermissions ? `${args.options.properties ? '&' : '?'}$expand=HasUniqueRoleAssignments,RoleAssignments/Member,RoleAssignments/RoleDefinitionBindings` : ``;
 
     const requestOptions: any = {

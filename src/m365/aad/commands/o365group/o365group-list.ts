@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -73,7 +74,7 @@ class AadO365GroupListCommand extends GraphCommand {
         if (args.options.deleted && args.options.includeSiteUrl) {
           return 'You can\'t retrieve site URLs of deleted Microsoft 365 Groups';
         }
-    
+
         return true;
       }
     );
@@ -85,8 +86,8 @@ class AadO365GroupListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const groupFilter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
-    const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g, `''`)}')` : '';
-    const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.mailNickname).replace(/'/g, `''`)}')` : '';
+    const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${formatting.encodeQueryParameter(args.options.displayName)}')` : '';
+    const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${formatting.encodeQueryParameter(args.options.mailNickname)}')` : '';
     const expandOwners: string = args.options.orphaned ? '&$expand=owners' : '';
     const topCount: string = '&$top=100';
 

@@ -186,7 +186,7 @@ class SpoListItemListCommand extends SpoCommand {
       let res: any;
       if (args.options.pageNumber && Number(args.options.pageNumber) > 0) {
         const rowLimit: string = `$top=${Number(args.options.pageSize) * Number(args.options.pageNumber)}`;
-        const filter: string = args.options.filter ? `$filter=${encodeURIComponent(args.options.filter)}` : ``;
+        const filter: string = args.options.filter ? `$filter=${formatting.encodeQueryParameter(args.options.filter)}` : ``;
         const fieldSelect: string = `?$select=Id&${rowLimit}&${filter}`;
 
         const requestOptions: AxiosRequestConfig = {
@@ -204,10 +204,10 @@ class SpoListItemListCommand extends SpoCommand {
       const skipTokenId = (res && res.value && res.value.length && res.value[res.value.length - 1]) ? res.value[res.value.length - 1].Id : 0;
       const skipToken: string = (args.options.pageNumber && Number(args.options.pageNumber) > 0 && skipTokenId > 0) ? `$skiptoken=Paged=TRUE%26p_ID=${res.value[res.value.length - 1].Id}` : ``;
       const rowLimit: string = args.options.pageSize ? `$top=${args.options.pageSize}` : ``;
-      const filter: string = args.options.filter ? `$filter=${encodeURIComponent(args.options.filter)}` : ``;
+      const filter: string = args.options.filter ? `$filter=${formatting.encodeQueryParameter(args.options.filter)}` : ``;
       const fieldExpand: string = expandFieldsArray.length > 0 ? `&$expand=${expandFieldsArray.join(",")}` : ``;
       const fieldSelect: string = fieldsArray.length > 0 ?
-        `?$select=${encodeURIComponent(fieldsArray.join(","))}${fieldExpand}&${rowLimit}&${skipToken}&${filter}` :
+        `?$select=${formatting.encodeQueryParameter(fieldsArray.join(","))}${fieldExpand}&${rowLimit}&${skipToken}&${filter}` :
         `?${rowLimit}&${skipToken}&${filter}`;
       const requestBody: any = args.options.camlQuery ?
         {

@@ -94,13 +94,13 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (args.options.fileId) {
           if (!validation.isValidGuid(args.options.fileId)) {
             return `${args.options.fileId} is not a valid GUID`;
           }
         }
-    
+
         return true;
       }
     );
@@ -176,7 +176,7 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
       requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${escape(args.options.fileId as string)}')/?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
     }
     else {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${encodeURIComponent(args.options.fileUrl as string)}')?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(args.options.fileUrl as string)}')?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
     }
 
     const requestOptions: any = {

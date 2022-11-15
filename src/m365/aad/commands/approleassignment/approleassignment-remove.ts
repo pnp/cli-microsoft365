@@ -3,6 +3,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -81,11 +82,11 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
         if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
           return `${args.options.appId} is not a valid GUID`;
         }
-    
+
         if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
           return `${args.options.appObjectId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -101,13 +102,13 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
       // get the service principal associated with the appId
       let spMatchQuery: string = '';
       if (args.options.appId) {
-        spMatchQuery = `appId eq '${encodeURIComponent(args.options.appId)}'`;
+        spMatchQuery = `appId eq '${formatting.encodeQueryParameter(args.options.appId)}'`;
       }
       else if (args.options.appObjectId) {
-        spMatchQuery = `id eq '${encodeURIComponent(args.options.appObjectId)}'`;
+        spMatchQuery = `id eq '${formatting.encodeQueryParameter(args.options.appObjectId)}'`;
       }
       else {
-        spMatchQuery = `displayName eq '${encodeURIComponent(args.options.appDisplayName as string)}'`;
+        spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName as string)}'`;
       }
 
       try {
@@ -118,7 +119,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
         }
 
         sp = resp.value[0];
-        let resource: string = encodeURIComponent(args.options.resource);
+        let resource: string = formatting.encodeQueryParameter(args.options.resource);
 
         // try resolve aliases that the user might enter since these are seen in the Azure portal
         switch (args.options.resource.toLocaleLowerCase()) {
