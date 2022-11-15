@@ -39,8 +39,8 @@ class SpoWebGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        withGroups: typeof args.options.withGroups !== 'undefined',
-        withPermissions: typeof args.options.withPermissions !== 'undefined'
+        withGroups: !!args.options.withGroups,
+        withPermissions: !!args.options.withPermissions
       });
     });
   }
