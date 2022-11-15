@@ -55,7 +55,7 @@ class SpoListItemGetCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
-        withPermissions: typeof args.options.withPermissions !== 'undefined'
+        withPermissions: !!args.options.withPermissions
       });
     });
   }
