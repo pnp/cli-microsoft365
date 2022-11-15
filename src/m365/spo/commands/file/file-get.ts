@@ -54,7 +54,7 @@ class SpoFileGetCommand extends SpoCommand {
         asListItem: args.options.asListItem || false,
         asFile: args.options.asFile || false,
         path: (!(!args.options.path)).toString(),
-        withPermissions: typeof args.options.withPermissions !== 'undefined'
+        withPermissions: !!args.options.withPermissions
       });
     });
   }
