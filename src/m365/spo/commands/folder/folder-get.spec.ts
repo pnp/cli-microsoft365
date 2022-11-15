@@ -191,6 +191,361 @@ describe(commands.FOLDER_GET, () => {
     assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2Ftest1%2FShared%20Documents\')');
   });
 
+  it('retrieves details of folder if folder url and withPermissions option is passed', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.resolve({
+        "ListItemAllFields": {
+          "RoleAssignments": [
+            {
+              "Member": {
+                "Id": 3,
+                "IsHiddenInUI": false,
+                "LoginName": "MySite Owners",
+                "Title": "MySite Owners",
+                "PrincipalType": 8,
+                "AllowMembersEditMembership": false,
+                "AllowRequestToJoinLeave": false,
+                "AutoAcceptRequestToJoinLeave": false,
+                "Description": null,
+                "OnlyAllowMembersViewMembership": false,
+                "OwnerTitle": "MySite Owners",
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
+              },
+              "RoleDefinitionBindings": [
+                {
+                  "BasePermissions": {
+                    "High": "2147483647",
+                    "Low": "4294967295"
+                  },
+                  "Description": "Has full control.",
+                  "Hidden": false,
+                  "Id": 1073741829,
+                  "Name": "Full Control",
+                  "Order": 1,
+                  "RoleTypeKind": 5
+                }
+              ],
+              "PrincipalId": 3
+            },
+            {
+              "Member": {
+                "Id": 4,
+                "IsHiddenInUI": false,
+                "LoginName": "MySite Visitors",
+                "Title": "MySite Visitors",
+                "PrincipalType": 8,
+                "AllowMembersEditMembership": false,
+                "AllowRequestToJoinLeave": false,
+                "AutoAcceptRequestToJoinLeave": false,
+                "Description": null,
+                "OnlyAllowMembersViewMembership": false,
+                "OwnerTitle": "MySite Owners",
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
+              },
+              "RoleDefinitionBindings": [
+                {
+                  "BasePermissions": {
+                    "High": "176",
+                    "Low": "138612833"
+                  },
+                  "Description": "Can view pages and list items and download documents.",
+                  "Hidden": false,
+                  "Id": 1073741826,
+                  "Name": "Read",
+                  "Order": 128,
+                  "RoleTypeKind": 2
+                }
+              ],
+              "PrincipalId": 4
+            },
+            {
+              "Member": {
+                "Id": 5,
+                "IsHiddenInUI": false,
+                "LoginName": "MySite Members",
+                "Title": "MySite Members",
+                "PrincipalType": 8,
+                "AllowMembersEditMembership": true,
+                "AllowRequestToJoinLeave": false,
+                "AutoAcceptRequestToJoinLeave": false,
+                "Description": null,
+                "OnlyAllowMembersViewMembership": false,
+                "OwnerTitle": "MySite Owners",
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
+              },
+              "RoleDefinitionBindings": [
+                {
+                  "BasePermissions": {
+                    "High": "432",
+                    "Low": "1011030767"
+                  },
+                  "Description": "Can add, edit and delete lists; can view, add, update and delete list items and documents.",
+                  "Hidden": false,
+                  "Id": 1073741830,
+                  "Name": "Edit",
+                  "Order": 48,
+                  "RoleTypeKind": 6
+                }
+              ],
+              "PrincipalId": 5
+            },
+            {
+              "Member": {
+                "Id": 12,
+                "IsHiddenInUI": false,
+                "LoginName": "i:0#.f|membership|user@contoso.onmicrosoft.com",
+                "Title": "User",
+                "PrincipalType": 1,
+                "Email": "user@contoso.onmicrosoft.com",
+                "Expiration": "",
+                "IsEmailAuthenticationGuestUser": false,
+                "IsShareByEmailGuestUser": false,
+                "IsSiteAdmin": false,
+                "UserId": {
+                  "NameId": "10032000f65ded70",
+                  "NameIdIssuer": "urn:federation:microsoftonline"
+                },
+                "UserPrincipalName": "user@contoso.onmicrosoft.com",
+                "PrincipalTypeString": "User"
+              },
+              "RoleDefinitionBindings": [
+                {
+                  "BasePermissions": {
+                    "High": "176",
+                    "Low": "138612833"
+                  },
+                  "Description": "Can view pages and list items and download documents.",
+                  "Hidden": false,
+                  "Id": 1073741826,
+                  "Name": "Read",
+                  "Order": 128,
+                  "RoleTypeKind": 2
+                }
+              ],
+              "PrincipalId": 12
+            }
+          ],
+          "HasUniqueRoleAssignments": true,
+          "FileSystemObjectType": 1,
+          "Id": 2,
+          "ServerRedirectedEmbedUri": null,
+          "ServerRedirectedEmbedUrl": "",
+          "ContentTypeId": "0x012000F5E8903B1ACF184F8C31914CA58A6548",
+          "Modified": "2022-09-28T00:12:12",
+          "ComplianceAssetId": null,
+          "Title": null,
+          "ID": 2,
+          "Created": "2022-09-28T00:12:12",
+          "AuthorId": 10,
+          "EditorId": 10,
+          "OData__CopySource": null,
+          "CheckoutUserId": null,
+          "OData__UIVersionString": "1.0",
+          "GUID": "d62d7cbb-9822-4e7e-8ce6-ba98ccd3243d"
+        },
+        "Exists": true,
+        "IsWOPIEnabled": false,
+        "ItemCount": 0,
+        "Name": "FolderPermission",
+        "ProgID": null,
+        "ServerRelativeUrl": "/sites/Test1/Shared Documents/FolderPermission",
+        "TimeCreated": "2022-09-28T07:12:12Z",
+        "TimeLastModified": "2022-09-28T07:12:12Z",
+        "UniqueId": "f5143d4f-b7e1-4d19-886f-a15517bd4635",
+        "WelcomePage": ""
+      }
+      );
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com/sites/test1',
+        url: 'Shared Documents/FolderPermission',
+        withPermissions: true
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      "ListItemAllFields": {
+        "RoleAssignments": [
+          {
+            "Member": {
+              "Id": 3,
+              "IsHiddenInUI": false,
+              "LoginName": "MySite Owners",
+              "Title": "MySite Owners",
+              "PrincipalType": 8,
+              "AllowMembersEditMembership": false,
+              "AllowRequestToJoinLeave": false,
+              "AutoAcceptRequestToJoinLeave": false,
+              "Description": null,
+              "OnlyAllowMembersViewMembership": false,
+              "OwnerTitle": "MySite Owners",
+              "RequestToJoinLeaveEmailSetting": "",
+              "PrincipalTypeString": "SharePointGroup"
+            },
+            "RoleDefinitionBindings": [
+              {
+                "BasePermissions": {
+                  "High": "2147483647",
+                  "Low": "4294967295"
+                },
+                "Description": "Has full control.",
+                "Hidden": false,
+                "Id": 1073741829,
+                "Name": "Full Control",
+                "Order": 1,
+                "RoleTypeKind": 5
+              }
+            ],
+            "PrincipalId": 3
+          },
+          {
+            "Member": {
+              "Id": 4,
+              "IsHiddenInUI": false,
+              "LoginName": "MySite Visitors",
+              "Title": "MySite Visitors",
+              "PrincipalType": 8,
+              "AllowMembersEditMembership": false,
+              "AllowRequestToJoinLeave": false,
+              "AutoAcceptRequestToJoinLeave": false,
+              "Description": null,
+              "OnlyAllowMembersViewMembership": false,
+              "OwnerTitle": "MySite Owners",
+              "RequestToJoinLeaveEmailSetting": "",
+              "PrincipalTypeString": "SharePointGroup"
+            },
+            "RoleDefinitionBindings": [
+              {
+                "BasePermissions": {
+                  "High": "176",
+                  "Low": "138612833"
+                },
+                "Description": "Can view pages and list items and download documents.",
+                "Hidden": false,
+                "Id": 1073741826,
+                "Name": "Read",
+                "Order": 128,
+                "RoleTypeKind": 2
+              }
+            ],
+            "PrincipalId": 4
+          },
+          {
+            "Member": {
+              "Id": 5,
+              "IsHiddenInUI": false,
+              "LoginName": "MySite Members",
+              "Title": "MySite Members",
+              "PrincipalType": 8,
+              "AllowMembersEditMembership": true,
+              "AllowRequestToJoinLeave": false,
+              "AutoAcceptRequestToJoinLeave": false,
+              "Description": null,
+              "OnlyAllowMembersViewMembership": false,
+              "OwnerTitle": "MySite Owners",
+              "RequestToJoinLeaveEmailSetting": "",
+              "PrincipalTypeString": "SharePointGroup"
+            },
+            "RoleDefinitionBindings": [
+              {
+                "BasePermissions": {
+                  "High": "432",
+                  "Low": "1011030767"
+                },
+                "Description": "Can add, edit and delete lists; can view, add, update and delete list items and documents.",
+                "Hidden": false,
+                "Id": 1073741830,
+                "Name": "Edit",
+                "Order": 48,
+                "RoleTypeKind": 6
+              }
+            ],
+            "PrincipalId": 5
+          },
+          {
+            "Member": {
+              "Id": 12,
+              "IsHiddenInUI": false,
+              "LoginName": "i:0#.f|membership|user@contoso.onmicrosoft.com",
+              "Title": "User",
+              "PrincipalType": 1,
+              "Email": "user@contoso.onmicrosoft.com",
+              "Expiration": "",
+              "IsEmailAuthenticationGuestUser": false,
+              "IsShareByEmailGuestUser": false,
+              "IsSiteAdmin": false,
+              "UserId": {
+                "NameId": "10032000f65ded70",
+                "NameIdIssuer": "urn:federation:microsoftonline"
+              },
+              "UserPrincipalName": "user@contoso.onmicrosoft.com",
+              "PrincipalTypeString": "User"
+            },
+            "RoleDefinitionBindings": [
+              {
+                "BasePermissions": {
+                  "High": "176",
+                  "Low": "138612833"
+                },
+                "Description": "Can view pages and list items and download documents.",
+                "Hidden": false,
+                "Id": 1073741826,
+                "Name": "Read",
+                "Order": 128,
+                "RoleTypeKind": 2
+              }
+            ],
+            "PrincipalId": 12
+          }
+        ],
+        "HasUniqueRoleAssignments": true,
+        "FileSystemObjectType": 1,
+        "Id": 2,
+        "ServerRedirectedEmbedUri": null,
+        "ServerRedirectedEmbedUrl": "",
+        "ContentTypeId": "0x012000F5E8903B1ACF184F8C31914CA58A6548",
+        "Modified": "2022-09-28T00:12:12",
+        "ComplianceAssetId": null,
+        "Title": null,
+        "ID": 2,
+        "Created": "2022-09-28T00:12:12",
+        "AuthorId": 10,
+        "EditorId": 10,
+        "OData__CopySource": null,
+        "CheckoutUserId": null,
+        "OData__UIVersionString": "1.0",
+        "GUID": "d62d7cbb-9822-4e7e-8ce6-ba98ccd3243d"
+      },
+      "Exists": true,
+      "IsWOPIEnabled": false,
+      "ItemCount": 0,
+      "Name": "FolderPermission",
+      "ProgID": null,
+      "ServerRelativeUrl": "/sites/Test1/Shared Documents/FolderPermission",
+      "TimeCreated": "2022-09-28T07:12:12Z",
+      "TimeLastModified": "2022-09-28T07:12:12Z",
+      "UniqueId": "f5143d4f-b7e1-4d19-886f-a15517bd4635",
+      "WelcomePage": ""
+    }));
+  });
+
+  it('should show tip when root folder is used withPermissions', async () => {
+    sinon.stub(request, 'get').rejects({ statusCode: 500 });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        url: '/Shared Documents',
+        withPermissions: true
+      }
+    } as any), new CommandError('Ensure folder URL or Id is not root folder url or root folder id. Use spo list get instead.'));
+  });
+
   it('supports debug mode', () => {
     const options = command.options;
     let containsDebugOption = false;

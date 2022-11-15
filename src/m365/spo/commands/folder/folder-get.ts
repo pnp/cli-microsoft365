@@ -7,6 +7,7 @@ import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { ListPrincipalType } from '../list/ListPrincipalType';
 import { FolderProperties } from './FolderProperties';
 
 interface CommandArgs {
@@ -17,6 +18,7 @@ export interface Options extends GlobalOptions {
   webUrl: string;
   url?: string;
   id?: string;
+  withPermissions?: boolean;
 }
 
 class SpoFolderGetCommand extends SpoCommand {
@@ -41,7 +43,8 @@ class SpoFolderGetCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
-        url: typeof args.options.url !== 'undefined'
+        url: typeof args.options.url !== 'undefined',
+        withPermissions: typeof args.options.withPermissions !== 'undefined'
       });
     });
   }
@@ -56,6 +59,9 @@ class SpoFolderGetCommand extends SpoCommand {
       },
       {
         option: '-i, --id [id]'
+      },
+      {
+        option: '--withPermissions'
       }
     );
   }
@@ -87,19 +93,18 @@ class SpoFolderGetCommand extends SpoCommand {
     if (this.verbose) {
       logger.logToStderr(`Retrieving folder from site ${args.options.webUrl}...`);
     }
-
-    let requestUrl: string = '';
-
+    let requestUrl: string = `${args.options.webUrl}/_api/web`;
     if (args.options.id) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFolderById('${formatting.encodeQueryParameter(args.options.id)}')`;
+      requestUrl += `/GetFolderById('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
     else if (args.options.url) {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
-      requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+      requestUrl += `/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
 
+    const propertiesPermissions = args.options.withPermissions ? `?$expand=ListItemAllFields/HasUniqueRoleAssignments,ListItemAllFields/RoleAssignments/Member,ListItemAllFields/RoleAssignments/RoleDefinitionBindings` : ``;
     const requestOptions: any = {
-      url: requestUrl,
+      url: requestUrl + propertiesPermissions,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -108,6 +113,16 @@ class SpoFolderGetCommand extends SpoCommand {
 
     try {
       const folder = await request.get<FolderProperties>(requestOptions);
+      if (args.options.withPermissions) {
+        if (folder?.ListItemAllFields?.RoleAssignments?.includes ?? true) {
+          throw new CommandError('Ensure folder URL or Id is not root folder url or root folder id. Use spo list get instead.');
+        }
+        else {
+          folder.ListItemAllFields?.RoleAssignments?.forEach(r => {
+            r.Member.PrincipalTypeString = ListPrincipalType[r.Member.PrincipalType];
+          });
+        }
+      }
       logger.log(folder);
     }
     catch (err: any) {
