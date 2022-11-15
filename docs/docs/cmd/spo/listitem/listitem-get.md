@@ -63,6 +63,13 @@ Get an item with specific properties from a list retrieved by server-relative UR
 m365 spo listitem get --listUrl /sites/project-x/documents --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created,Company/Title"
 ```
 
+Get an item with ID _147_ from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_ with permissions
+
+```sh
+m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --withPermissions
+```
+
+
 ## Response
 
 === "JSON"
