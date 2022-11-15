@@ -37,3 +37,37 @@ Gets the number of daily users by device type for the last week and exports the 
 ```sh
 m365 yammer report deviceusageusercounts --period D7 --output json > "deviceusageusercounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-11-09",
+        "Web": "4",
+        "Windows Phone": "5",
+        "Android Phone": "6",
+        "iPhone": "3",
+        "iPad": "3",
+        "Other": "60",
+        "Report Date": "2022-11-09",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Web,Windows Phone,Android Phone,iPhone,iPad,Other,Report Date,Report Period
+    2022-11-09,4,5,6,3,3,60,2022-11-09,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Web,Windows Phone,Android Phone,iPhone,iPad,Other,Report Date,Report Period
+    2022-11-09,4,5,6,3,3,60,2022-11-09,7
+    ```

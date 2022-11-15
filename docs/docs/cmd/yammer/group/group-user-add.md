@@ -47,3 +47,7 @@ Adds the user with e-mail `suzy@contoso.com` to the group with ID `5611239081`
 ```sh
 m365 yammer group user add --groupId 5611239081 --email suzy@contoso.com
 ```
+
+## Response
+
+The command won't return a response on success.
