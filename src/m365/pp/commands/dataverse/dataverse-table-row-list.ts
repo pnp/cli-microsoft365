@@ -16,7 +16,7 @@ export interface Options extends GlobalOptions {
   asAdmin?: boolean;
 }
 
-class DataverseTableRowList extends PowerPlatformCommand {
+class PpDataverseTableRowListCommand extends PowerPlatformCommand {
 
   public get name(): string {
     return commands.DATAVERSE_TABLE_ROW_LIST;
@@ -80,4 +80,4 @@ class DataverseTableRowList extends PowerPlatformCommand {
   }
 }
 
-module.exports = new DataverseTableRowList();
+module.exports = new PpDataverseTableRowListCommand();
