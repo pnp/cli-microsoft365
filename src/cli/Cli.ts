@@ -38,6 +38,8 @@ export class Cli {
   private optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
   public commandsFolder: string = '';
   private static instance: Cli;
+  private static defaultHelpMode = 'full';
+  public static helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
 
   private _config: Configstore | undefined;
   public get config(): Configstore {
@@ -123,7 +125,7 @@ export class Cli {
       showHelp ||
       parsedArgs.h ||
       parsedArgs.help) {
-      this.printHelp();
+      this.printHelp(this.getHelpMode(parsedArgs));
       return Promise.resolve();
     }
 
@@ -576,12 +578,12 @@ export class Cli {
     return undefined;
   }
 
-  private printHelp(exitCode: number = 0): void {
+  private printHelp(helpMode: string, exitCode: number = 0): void {
     const properties: any = {};
 
     if (this.commandToExecute) {
       properties.command = this.commandToExecute.name;
-      this.printCommandHelp();
+      this.printCommandHelp(helpMode);
     }
     else {
       Cli.log();
@@ -602,7 +604,7 @@ export class Cli {
     process.exit(exitCode);
   }
 
-  private printCommandHelp(): void {
+  private printCommandHelp(helpMode: string): void {
     let helpFilePath = '';
     let commandNameWords: string[] = [];
     if (this.commandToExecute) {
@@ -625,9 +627,74 @@ export class Cli {
     helpFilePath = path.join(...pathChunks);
 
     if (fs.existsSync(helpFilePath)) {
+      let helpContents = fs.readFileSync(helpFilePath, 'utf8');
+      helpContents = this.getHelpSection(helpMode, helpContents);
+      helpContents = md.md2plain(helpContents, path.join(this.commandsFolder, '..', '..', 'docs'));
       Cli.log();
-      Cli.log(md.md2plain(fs.readFileSync(helpFilePath, 'utf8'), path.join(this.commandsFolder, '..', '..', 'docs')));
+      Cli.log(helpContents);
     }
+  }
+
+  private getHelpMode(options: any): string {
+    const h = options.h;
+    const help = options.help;
+
+    // user passed -h or --help, let's see if they passed a specific mode
+    // or requested the default
+    if (h || help) {
+      const helpMode: boolean | string = h ?? help;
+
+      if (typeof helpMode === 'boolean' || typeof helpMode !== 'string') {
+        // requested default mode or passed a number, let's use default
+        return this.getSettingWithDefaultValue<string>(settingsNames.helpMode, Cli.defaultHelpMode);
+      }
+      else {
+        const lowerCaseHelpMode = helpMode.toLowerCase();
+
+        if (Cli.helpModes.indexOf(lowerCaseHelpMode) < 0) {
+          Cli.getInstance().closeWithError(`Unknown help mode ${helpMode}. Allowed values are ${Cli.helpModes.join(', ')}`, { options }, false);
+          return ''; // noop
+        }
+        else {
+          return lowerCaseHelpMode;
+        }
+      }
+    }
+    else {
+      return this.getSettingWithDefaultValue<string>(settingsNames.helpMode, Cli.defaultHelpMode);
+    }
+  }
+
+  private getHelpSection(helpMode: string, helpContents: string): string {
+    if (helpMode === 'full') {
+      return helpContents;
+    }
+
+    // options is the first section, so get help up to options
+    const titleAndUsage = helpContents.substring(0, helpContents.indexOf('## Options'));
+
+    // find the requested section
+    const sectionLines: string[] = [];
+    const sectionName = helpMode[0].toUpperCase() + helpMode.substring(1);
+    const lines: string[] = helpContents.split('\n');
+    for (let i: number = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      if (line.indexOf(`## ${sectionName}`) === 0) {
+        sectionLines.push(line);
+      }
+      else if (sectionLines.length > 0) {
+        if (line.indexOf('## ') === 0) {
+          // we've reached the next section, stop
+          break;
+        }
+        else {
+          sectionLines.push(line);
+        }
+      }
+    }
+
+    return titleAndUsage + sectionLines.join('\n');
   }
 
   private printAvailableCommands(): void {
@@ -754,7 +821,7 @@ export class Cli {
 
     if (showHelpIfEnabled &&
       this.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
-      this.printHelp(exitCode);
+      this.printHelp(this.getHelpMode(args.options), exitCode);
     }
     else {
       process.exit(exitCode);
