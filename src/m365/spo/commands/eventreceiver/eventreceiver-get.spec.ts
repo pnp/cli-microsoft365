@@ -18,21 +18,19 @@ describe(commands.EVENTRECEIVER_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
-  const eventReceiverResponseJson = [
-    {
-      "ReceiverAssembly": "",
-      "ReceiverClass": "",
-      "ReceiverId": "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec",
-      "ReceiverName": "PnP Test Receiver",
-      "SequenceNumber": 30846,
-      "Synchronization": 1,
-      "EventType": 1,
-      "ReceiverUrl": "https://pnp.github.io"
-    }
-  ];
+  const eventReceiverResponseJson = {
+    "ReceiverAssembly": "",
+    "ReceiverClass": "",
+    "ReceiverId": "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec",
+    "ReceiverName": "PnP Test Receiver",
+    "SequenceNumber": 30846,
+    "Synchronization": 1,
+    "EventType": 1,
+    "ReceiverUrl": "https://pnp.github.io"
+  };
 
   const eventReceiverValue = {
-    value: eventReceiverResponseJson
+    value: [eventReceiverResponseJson]
   };
 
   before(() => {
@@ -218,7 +216,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Test Receiver' } });
-    assert(loggerLogSpy.calledWith(eventReceiverResponseJson[0]));
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('retrieves site event receiver using name as option', async () => {
@@ -230,7 +228,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', name: 'PnP Test Receiver' } });
-    assert(loggerLogSpy.calledWith(eventReceiverResponseJson[0]));
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('retrieves list event receiver retrieved by list title using name as option', async () => {
@@ -242,7 +240,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents', name: 'PnP Test Receiver' } });
-    assert(loggerLogSpy.calledWith(eventReceiverResponseJson[0]));
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('retrieves list event receivers queried by url using name as option', async () => {
@@ -254,7 +252,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listUrl: 'Shared Documents', name: 'PnP Test Receiver' } });
-    assert(loggerLogSpy.calledWith(eventReceiverResponseJson[0]));
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('retrieves list event receivers queried by list id using name as option', async () => {
@@ -266,25 +264,25 @@ describe(commands.EVENTRECEIVER_GET, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listId: 'b17bd74f-d1b1-42bf-a21d-f865a903acc3', name: 'PnP Test Receiver' } });
-    assert(loggerLogSpy.calledWith(eventReceiverResponseJson[0]));
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('retrieves web event receiver using id as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/eventreceivers(guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
-        return eventReceiverValue.value[0];
+        return eventReceiverResponseJson;
       }
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', id: 'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec' } });
-    assert(loggerLogSpy.calledWith(eventReceiverResponseJson[0]));
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('retrieves site event receiver using id as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/site/eventreceivers(guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
-        return eventReceiverValue.value[0];
+        return eventReceiverResponseJson;
       }
       throw 'Invalid request';
     });
@@ -294,43 +292,43 @@ describe(commands.EVENTRECEIVER_GET, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/portal', scope: 'site', id: 'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec'
       }
     });
-    assert(loggerLogSpy.calledWith(eventReceiverResponseJson[0]));
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('retrieves list event receiver retrieved by list title using id as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/eventreceivers(guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
-        return eventReceiverValue.value[0];
+        return eventReceiverResponseJson;
       }
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listTitle: 'Documents', id: 'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec' } });
-    assert(loggerLogSpy.calledWith(eventReceiverResponseJson[0]));
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('retrieves list event receivers queried by url using id as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/GetList('%2Fsites%2Fportal%2FShared%20Documents')/eventreceivers(guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
-        return eventReceiverValue.value[0];
+        return eventReceiverResponseJson;
       }
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listUrl: 'Shared Documents', id: 'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec' } });
-    assert(loggerLogSpy.calledWith(eventReceiverResponseJson[0]));
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('retrieves list event receivers queried by list id using id as option', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists(guid'b17bd74f-d1b1-42bf-a21d-f865a903acc3')/eventreceivers(guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
-        return eventReceiverValue.value[0];
+        return eventReceiverResponseJson;
       }
       throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listId: 'b17bd74f-d1b1-42bf-a21d-f865a903acc3', id: 'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec' } });
-    assert(loggerLogSpy.calledWith(eventReceiverResponseJson[0]));
+    assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
 
   it('supports debug mode', () => {
