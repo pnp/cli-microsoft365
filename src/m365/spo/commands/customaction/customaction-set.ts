@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import { BasePermissions, PermissionKind } from '../../base-permissions';
@@ -158,12 +159,12 @@ class SpoCustomActionSetCommand extends SpoCommand {
         if (validation.isValidGuid(args.options.id) === false) {
           return `${args.options.id} is not valid. Custom action id (Guid) expected`;
         }
-    
+
         const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (!args.options.title && !args.options.name && !args.options.location &&
           !args.options.actionUrl && !args.options.clientSideComponentId && !args.options.clientSideComponentProperties &&
           !args.options.commandUIExtension && !args.options.group && !args.options.imageUrl &&
@@ -172,19 +173,19 @@ class SpoCustomActionSetCommand extends SpoCommand {
           !args.options.sequence) {
           return 'Please specify option to be updated';
         }
-    
+
         if (args.options.scriptSrc && args.options.scriptBlock) {
           return 'Either option scriptSrc or scriptBlock can be specified, but not both';
         }
-    
+
         if (args.options.sequence && (args.options.sequence < 0 || args.options.sequence > 65536)) {
           return 'Invalid option sequence. Expected value in range from 0 to 65536';
         }
-    
+
         if (args.options.clientSideComponentId && validation.isValidGuid(args.options.clientSideComponentId) === false) {
           return `ClientSideComponentId ${args.options.clientSideComponentId} is not a valid GUID`;
         }
-    
+
         if (args.options.scope &&
           args.options.scope !== 'Site' &&
           args.options.scope !== 'Web' &&
@@ -192,19 +193,19 @@ class SpoCustomActionSetCommand extends SpoCommand {
         ) {
           return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
         }
-    
+
         if (args.options.rights) {
           const rights = args.options.rights.split(',');
-    
+
           for (const item of rights) {
             const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
-    
+
             if (!kind) {
               return `Rights option '${item}' is not recognized as valid PermissionKind choice. Please note it is case-sensitive`;
             }
           }
         }
-    
+
         return true;
       }
     );
@@ -238,7 +239,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
     const requestBody: any = this.mapRequestBody(options);
 
     const requestOptions: any = {
-      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
+      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions('${formatting.encodeQueryParameter(options.id)}')`,
       headers: {
         accept: 'application/json;odata=nometadata',
         'X-HTTP-Method': 'MERGE'

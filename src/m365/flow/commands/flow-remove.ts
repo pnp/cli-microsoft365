@@ -3,6 +3,7 @@ import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
+import { formatting } from '../../../utils/formatting';
 import { validation } from '../../../utils/validation';
 import AzmgmtCommand from '../../base/AzmgmtCommand';
 import commands from '../commands';
@@ -67,7 +68,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
         if (!validation.isValidGuid(args.options.name)) {
           return `${args.options.name} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -80,7 +81,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
 
     const removeFlow: () => Promise<void> = async (): Promise<void> => {
       const requestOptions: any = {
-        url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+        url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
         resolveWithFullResponse: true,
         headers: {
           accept: 'application/json'

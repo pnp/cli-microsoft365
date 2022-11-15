@@ -1,5 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 import request from "../request";
+import { formatting } from "./formatting";
 
 const powerPlatformResource = 'https://api.bap.microsoft.com';
 
@@ -7,10 +8,10 @@ export const powerPlatform = {
   async getDynamicsInstanceApiUrl(environment: string, asAdmin?: boolean): Promise<string> {
     let url: string = '';
     if (asAdmin) {
-      url = `${powerPlatformResource}/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/${encodeURIComponent(environment)}`;
+      url = `${powerPlatformResource}/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/${formatting.encodeQueryParameter(environment)}`;
     }
     else {
-      url = `${powerPlatformResource}/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(environment)}`;
+      url = `${powerPlatformResource}/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(environment)}`;
     }
 
     const requestOptions: AxiosRequestConfig = {

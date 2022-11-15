@@ -7,6 +7,7 @@ import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -112,7 +113,7 @@ class TeamsChannelSetCommand extends GraphCommand {
 
       const data: any = this.mapRequestBody(args.options);
       const requestOptionsPatch: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}`,
+        url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels/${formatting.encodeQueryParameter(channelId)}`,
         headers: {
           'accept': 'application/json;odata.metadata=none'
         },
@@ -162,7 +163,7 @@ class TeamsChannelSetCommand extends GraphCommand {
     }
 
     const channelRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.name!)}'`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name!)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

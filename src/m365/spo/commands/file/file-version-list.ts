@@ -89,8 +89,8 @@ class SpoFileVersionListCommand extends SpoCommand {
       else {
         requestUrl += `/GetFileById('${args.options.fileId}')`;
       }
-      requestUrl += `/versions?$top=5000`;
-      
+      requestUrl += `/versions`;
+
       const requestOptions: AxiosRequestConfig = {
         url: requestUrl,
         headers: {

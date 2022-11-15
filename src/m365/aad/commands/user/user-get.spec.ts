@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -17,7 +18,7 @@ describe(commands.USER_GET, () => {
   const userId = "68be84bf-a585-4776-80b3-30aa5207aa21";
   const userName = "AarifS@contoso.onmicrosoft.com";
   const resultValue = { "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" };
-    
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -93,7 +94,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return userId; });    
+    sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return userId; });
     auth.service.connected = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
@@ -121,7 +122,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using user name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'`) > -1) {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) > -1) {
         return Promise.resolve({ value: [resultValue] });
       }
 
@@ -134,14 +135,14 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using @meusername token', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'`) > -1) {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) > -1) {
         return Promise.resolve({ value: [resultValue] });
       }
 
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return userName; });    
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return userName; });
     auth.service.connected = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
@@ -156,7 +157,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using email', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=mail eq '${encodeURIComponent(userName)}'`) > -1) {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(userName)}'`) > -1) {
         return Promise.resolve({ value: [resultValue] });
       }
 
@@ -169,7 +170,7 @@ describe(commands.USER_GET, () => {
 
   it('retrieves only the specified properties', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'&$select=id,mail`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'&$select=id,mail`) {
         return Promise.resolve({ value: [{ "id": "userId", "mail": null }] });
       }
 
@@ -213,7 +214,7 @@ describe(commands.USER_GET, () => {
 
   it('fails to get user when user with provided user name does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'`) > -1) {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'`) > -1) {
         return Promise.resolve({ value: [] });
       }
 
@@ -226,7 +227,7 @@ describe(commands.USER_GET, () => {
 
   it('fails to get user when user with provided email does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=mail eq '${encodeURIComponent(userName)}'`) > -1) {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(userName)}'`) > -1) {
         return Promise.resolve({ value: [] });
       }
 
@@ -256,7 +257,7 @@ describe(commands.USER_GET, () => {
         debug: false,
         email: userName
       }
-    }), new  CommandError(`Multiple users with email ${userName} found. Please disambiguate (user names): ${userName}, DebraB@contoso.onmicrosoft.com or (ids): ${userId}, 9b1b1e42-794b-4c71-93ac-5ed92488b67f`));
+    }), new CommandError(`Multiple users with email ${userName} found. Please disambiguate (user names): ${userName}, DebraB@contoso.onmicrosoft.com or (ids): ${userId}, 9b1b1e42-794b-4c71-93ac-5ed92488b67f`));
   });
 
   it('fails validation if id or email or userName options are not passed', async () => {

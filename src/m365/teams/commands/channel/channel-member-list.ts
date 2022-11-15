@@ -8,6 +8,7 @@ import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -128,7 +129,7 @@ class TeamsChannelMemberListCommand extends GraphCommand {
       }
 
       logger.log(memberships);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -156,7 +157,7 @@ class TeamsChannelMemberListCommand extends GraphCommand {
     }
 
     const channelRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.channelName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

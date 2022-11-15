@@ -3,6 +3,7 @@ import * as path from 'path';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
+import { formatting } from '../../../utils/formatting';
 import { validation } from '../../../utils/validation';
 import AzmgmtCommand from '../../base/AzmgmtCommand';
 import commands from '../commands';
@@ -89,33 +90,33 @@ class FlowExportCommand extends AzmgmtCommand {
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         if (args.options.format && (lowerCaseFormat !== 'json' && lowerCaseFormat !== 'zip')) {
           return 'Option format must be json or zip. Default is zip';
         }
-    
+
         if (lowerCaseFormat === 'json') {
           if (args.options.packageCreatedBy) {
             return 'packageCreatedBy cannot be specified with output of json';
           }
-    
+
           if (args.options.packageDescription) {
             return 'packageDescription cannot be specified with output of json';
           }
-    
+
           if (args.options.packageDisplayName) {
             return 'packageDisplayName cannot be specified with output of json';
           }
-    
+
           if (args.options.packageSourceEnvironment) {
             return 'packageSourceEnvironment cannot be specified with output of json';
           }
         }
-    
+
         if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
           return 'Specified path where to save the file does not exist';
         }
-    
+
         return true;
       }
     );
@@ -138,7 +139,7 @@ class FlowExportCommand extends AzmgmtCommand {
       }
       else {
         const requestOptions: any = {
-          url: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environmentName)}/listPackageResources?api-version=2016-11-01`,
+          url: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/listPackageResources?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
           },
@@ -163,8 +164,8 @@ class FlowExportCommand extends AzmgmtCommand {
 
       let requestOptions: any = {
         url: formatArgument === 'json' ?
-          `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.id)}?api-version=2016-11-01`
-          : `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environmentName)}/exportPackage?api-version=2016-11-01`,
+          `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.id)}?api-version=2016-11-01`
+          : `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/exportPackage?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'
         },
@@ -214,7 +215,7 @@ class FlowExportCommand extends AzmgmtCommand {
 
       requestOptions = {
         url: formatArgument === 'json' ?
-          `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
+          `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
           : downloadFileUrl,
         // Set responseType to arraybuffer, otherwise binary data will be encoded
         // to utf8 and binary data is corrupt

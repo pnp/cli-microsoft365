@@ -122,7 +122,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
       }
 
       const requestOptions: any = {
-        url: `${requestUrl}/ContentTypes('${encodeURIComponent(args.options.id)}')`,
+        url: `${requestUrl}/ContentTypes('${formatting.encodeQueryParameter(args.options.id)}')`,
         headers: {
           'X-HTTP-Method': 'DELETE',
           'If-Match': '*',

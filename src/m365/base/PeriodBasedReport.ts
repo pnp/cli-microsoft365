@@ -1,6 +1,7 @@
 import { Logger } from '../../cli/Logger';
 import GlobalOptions from '../../GlobalOptions';
 import request from '../../request';
+import { formatting } from '../../utils/formatting';
 import GraphCommand from "./GraphCommand";
 
 interface CommandArgs {
@@ -16,7 +17,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
 
   constructor() {
     super();
-    
+
     this.#initOptions();
     this.#initValidators();
   }
@@ -37,7 +38,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const endpoint: string = `${this.resource}/v1.0/reports/${this.usageEndpoint}(period='${encodeURIComponent(args.options.period)}')`;
+    const endpoint: string = `${this.resource}/v1.0/reports/${this.usageEndpoint}(period='${formatting.encodeQueryParameter(args.options.period)}')`;
     await this.executeReport(endpoint, logger, args.options.output);
   }
 

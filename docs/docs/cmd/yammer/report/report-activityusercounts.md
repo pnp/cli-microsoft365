@@ -37,3 +37,34 @@ Gets the trends on the number of unique users who posted, read, and liked Yammer
 ```sh
 m365 yammer report activityusercounts --period D7 --output json > "activityusercounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-11-09",
+        "Liked": "9",
+        "Posted": "5",
+        "Read": "64",
+        "Report Date": "2022-11-09",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Liked,Posted,Read,Report Date,Report Period
+    2022-11-09,9,5,64,2022-11-09,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Liked,Posted,Read,Report Date,Report Period
+    2022-11-09,9,5,64,2022-11-09,7
+    ```

@@ -1,6 +1,7 @@
 import { ServiceUpdateMessage } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -53,13 +54,13 @@ class TenantServiceAnnouncementMessageListCommand extends GraphCommand {
     let endpoint: string = `${this.resource}/v1.0/admin/serviceAnnouncement/messages`;
 
     if (args.options.service) {
-      endpoint += `?$filter=services/any(c:c+eq+'${encodeURIComponent(args.options.service)}')`;
+      endpoint += `?$filter=services/any(c:c+eq+'${formatting.encodeQueryParameter(args.options.service)}')`;
     }
 
     try {
       const items: ServiceUpdateMessage[] = await odata.getAllItems<ServiceUpdateMessage>(endpoint);
       logger.log(items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

@@ -229,7 +229,7 @@ class PlannerTaskAddCommand extends GraphCommand {
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
+      url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}/details`,
       headers: {
         accept: 'application/json'
       },

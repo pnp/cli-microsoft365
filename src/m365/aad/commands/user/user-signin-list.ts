@@ -1,6 +1,7 @@
 import { SignIn } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -80,7 +81,7 @@ class AadUserSigninListCommand extends GraphCommand {
         if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
           return `${args.options.appId} is not a valid GUID`;
         }
-        
+
         return true;
       }
     );
@@ -96,17 +97,17 @@ class AadUserSigninListCommand extends GraphCommand {
       let filter: string = "";
       if (args.options.userName || args.options.userId) {
         filter = args.options.userId ?
-          `?$filter=userId eq '${encodeURIComponent(args.options.userId as string)}'` :
-          `?$filter=userPrincipalName eq '${encodeURIComponent(args.options.userName as string)}'`;
+          `?$filter=userId eq '${formatting.encodeQueryParameter(args.options.userId as string)}'` :
+          `?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(args.options.userName as string)}'`;
       }
       if (args.options.appId || args.options.appDisplayName) {
         filter += filter ? " and " : "?$filter=";
         filter += args.options.appId ?
-          `appId eq '${encodeURIComponent(args.options.appId)}'` :
-          `appDisplayName eq '${encodeURIComponent(args.options.appDisplayName as string)}'`;
+          `appId eq '${formatting.encodeQueryParameter(args.options.appId)}'` :
+          `appDisplayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName as string)}'`;
       }
       endpoint += filter;
-      
+
       const signins = await odata.getAllItems<SignIn>(endpoint);
       logger.log(signins);
     }

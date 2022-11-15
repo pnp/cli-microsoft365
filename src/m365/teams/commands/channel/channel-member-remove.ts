@@ -8,6 +8,7 @@ import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { ConversationMember } from '../../ConversationMember';
+import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -125,7 +126,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
     const removeMember: () => Promise<void> = async (): Promise<void> => {
       try {
         await this.removeMemberFromChannel(args);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -144,7 +145,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the member ${userName} from the channel ${channelName} in team ${teamName}?`
       });
-      
+
       if (result.continue) {
         await removeMember();
       }
@@ -197,7 +198,7 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.channelName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

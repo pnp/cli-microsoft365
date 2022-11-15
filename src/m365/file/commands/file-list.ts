@@ -3,6 +3,7 @@ import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
+import { formatting } from '../../../utils/formatting';
 import { odata } from '../../../utils/odata';
 import { validation } from '../../../utils/validation';
 import GraphCommand from '../../base/GraphCommand';
@@ -35,12 +36,12 @@ class FileListCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -48,7 +49,7 @@ class FileListCommand extends GraphCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       { option: '-u, --webUrl <webUrl>' },
@@ -56,7 +57,7 @@ class FileListCommand extends GraphCommand {
       { option: '--recursive' }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
@@ -103,7 +104,7 @@ class FileListCommand extends GraphCommand {
 
     const url: URL = new URL(webUrl);
     const requestOptions: AxiosRequestConfig = {
-      url: `${this.resource}/v1.0/sites/${encodeURIComponent(url.host)}:${url.pathname}?$select=id`,
+      url: `${this.resource}/v1.0/sites/${formatting.encodeQueryParameter(url.host)}:${url.pathname}?$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

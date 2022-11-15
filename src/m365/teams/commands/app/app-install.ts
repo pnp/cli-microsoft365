@@ -4,6 +4,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
@@ -90,10 +91,10 @@ class TeamsAppInstallCommand extends GraphCommand {
 
       let url: string = `${this.resource}/v1.0`;
       if (args.options.teamId) {
-        url += `/teams/${encodeURIComponent(args.options.teamId)}/installedApps`;
+        url += `/teams/${formatting.encodeQueryParameter(args.options.teamId)}/installedApps`;
       }
       else {
-        url += `/users/${encodeURIComponent((args.options.userId ?? args.options.userName) as string)}/teamwork/installedApps`;
+        url += `/users/${formatting.encodeQueryParameter((args.options.userId ?? args.options.userName) as string)}/teamwork/installedApps`;
       }
 
       const requestOptions: any = {
@@ -109,7 +110,7 @@ class TeamsAppInstallCommand extends GraphCommand {
       };
 
       await request.post(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

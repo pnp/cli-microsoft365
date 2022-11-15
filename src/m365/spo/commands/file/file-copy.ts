@@ -10,6 +10,7 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import { Options as SpoFileRemoveOptions } from './file-remove';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 const removeCommand: Command = require('./file-remove');
 
 interface CommandArgs {
@@ -157,7 +158,7 @@ class SpoFileCopyCommand extends SpoCommand {
     const webServerRelativeUrl: string = webUrl.replace(tenantUrl, '');
     const fileServerRelativeUrl: string = `${webServerRelativeUrl}${sourceUrl}`;
 
-    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(fileServerRelativeUrl)}')/`;
+    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileServerRelativeUrl)}')/`;
     const requestOptions: any = {
       url: requestUrl,
       method: 'GET',
@@ -201,8 +202,8 @@ class SpoFileCopyCommand extends SpoCommand {
     }
     catch (err: any) {
       if (err.error !== undefined && err.error.message !== undefined && err.error.message.includes('does not exist')) {
-        
-      } 
+
+      }
       else {
         throw err;
       }

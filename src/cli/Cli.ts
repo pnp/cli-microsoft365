@@ -242,28 +242,23 @@ export class Cli {
     try {
       await command.action(logger, args as any);
 
-      // restoring the command and logger is done here instead of in a 'finally' because there were issues with the code coverage tool
-      // restore the original command name
-      cli.currentCommandName = parentCommandName;
-      // restore the original logger
-      request.logger = currentLogger;
-
       return ({
         stdout: log.join(os.EOL),
         stderr: logErr.join(os.EOL)
       });
     }
     catch (err: any) {
-      // restoring the command and logger is done here instead of in a 'finally' because there were issues with the code coverage tool
-      // restore the original command name
-      cli.currentCommandName = parentCommandName;
-      // restore the original logger
-      request.logger = currentLogger;
-      
       throw {
         error: err,
         stderr: logErr.join(os.EOL)
       };
+    }
+    /* c8 ignore next */
+    finally {
+      // restore the original command name
+      cli.currentCommandName = parentCommandName;
+      // restore the original logger
+      request.logger = currentLogger;
     }
   }
 

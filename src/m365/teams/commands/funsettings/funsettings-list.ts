@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -51,7 +52,7 @@ class TeamsFunSettingsListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}?$select=funSettings`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(args.options.teamId)}?$select=funSettings`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -61,7 +62,7 @@ class TeamsFunSettingsListCommand extends GraphCommand {
     try {
       const res: { funSettings: any } = await request.get<{ funSettings: any }>(requestOptions);
       logger.log(res.funSettings);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

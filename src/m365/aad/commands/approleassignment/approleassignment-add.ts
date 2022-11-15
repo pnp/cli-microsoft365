@@ -2,6 +2,7 @@ import * as os from 'os';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -98,13 +99,13 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
     let objectId: string = '';
     let queryFilter: string = '';
     if (args.options.appId) {
-      queryFilter = `$filter=appId eq '${encodeURIComponent(args.options.appId)}'`;
+      queryFilter = `$filter=appId eq '${formatting.encodeQueryParameter(args.options.appId)}'`;
     }
     else if (args.options.appObjectId) {
-      queryFilter = `$filter=id eq '${encodeURIComponent(args.options.appObjectId)}'`;
+      queryFilter = `$filter=id eq '${formatting.encodeQueryParameter(args.options.appObjectId)}'`;
     }
     else {
-      queryFilter = `$filter=displayName eq '${encodeURIComponent(args.options.appDisplayName as string)}'`;
+      queryFilter = `$filter=displayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName as string)}'`;
     }
 
     const getServicePrinciplesRequestOptions: any = {
@@ -123,7 +124,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
 
       objectId = servicePrincipalResult.value[0].id;
 
-      let resource: string = encodeURIComponent(args.options.resource);
+      let resource: string = formatting.encodeQueryParameter(args.options.resource);
 
       // try resolve aliases that the user might enter since these are seen in the Azure portal
       switch (args.options.resource.toLocaleLowerCase()) {

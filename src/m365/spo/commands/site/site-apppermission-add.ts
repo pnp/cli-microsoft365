@@ -2,6 +2,7 @@ import { Permission } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -117,10 +118,10 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
     let endpoint: string = "";
 
     if (args.options.appId) {
-      endpoint = `${this.resource}/v1.0/myorganization/applications?$filter=appId eq '${encodeURIComponent(args.options.appId as string)}'`;
+      endpoint = `${this.resource}/v1.0/myorganization/applications?$filter=appId eq '${formatting.encodeQueryParameter(args.options.appId as string)}'`;
     }
     else {
-      endpoint = `${this.resource}/v1.0/myorganization/applications?$filter=displayName eq '${encodeURIComponent(args.options.appDisplayName as string)}'`;
+      endpoint = `${this.resource}/v1.0/myorganization/applications?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName as string)}'`;
     }
 
     const appRequestOptions: any = {
@@ -207,13 +208,13 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
       this.siteId = await this.getSpoSiteId(args);
       const appInfo: AppInfo = await this.getAppInfo(args);
       let permission = await this.addPermissions(args, appInfo);
-        
+
       if (this.roleNeedsElevation(args.options.permission)) {
         permission = await this.elevatePermissions(args, permission);
       }
-      
+
       logger.log(permission);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -70,11 +71,11 @@ class SpoAppUninstallCommand extends SpoCommand {
             return `appCatalogScope must be either 'tenant' or 'sitecollection' if specified`;
           }
         }
-    
+
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         return validation.isValidSharePointUrl(args.options.siteUrl);
       }
     );
@@ -89,7 +90,7 @@ class SpoAppUninstallCommand extends SpoCommand {
       }
 
       const requestOptions: any = {
-        url: `${args.options.siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/uninstall`,
+        url: `${args.options.siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${formatting.encodeQueryParameter(args.options.id)}')/uninstall`,
         headers: {
           accept: 'application/json;odata=nometadata'
         }

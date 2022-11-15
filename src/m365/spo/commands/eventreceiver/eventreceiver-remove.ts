@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
-import { Cli, CommandOutput } from '../../../../cli/Cli';
+import { Cli } from '../../../../cli/Cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -10,6 +10,7 @@ import { Options as SpoEventReceiverGetOptions } from './eventreceiver-get';
 import commands from '../../commands';
 import request from '../../../../request';
 import { EventReceiver } from './EventReceiver';
+import { AxiosRequestConfig } from 'axios';
 
 const getCommand: Command = require('./eventreceiver-get');
 
@@ -52,10 +53,10 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
-        scope: typeof args.options.scope !== 'undefined',
+        scope: args.options.scope || 'web',
         id: typeof args.options.id !== 'undefined',
         name: typeof args.options.name !== 'undefined',
-        confirm: (!(!args.options.confirm)).toString()
+        confirm: !!args.options.confirm
       });
     });
   }
@@ -125,80 +126,61 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    try {
-      const getEventReceiversOutput = await this.getEventReceivers(args.options);
-      const eventReceivers: EventReceiver[] = JSON.parse(getEventReceiversOutput.stdout);
+    if (args.options.confirm) {
+      await this.removeEventReceiver(args.options);
+    }
+    else {
+      const result = await Cli.prompt<{ continue: boolean }>({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove event receiver with ${args.options.id ? `id ${args.options.id}` : `name ${args.options.name}`}?`
+      });
 
-      if (!eventReceivers.length) { 
-        throw Error(`Specified event receiver with ${args.options.id !== undefined ? `id ${args.options.id}` : `name ${args.options.name}`} cannot be found`); 
-      }
-
-      if (eventReceivers.length > 1) { 
-        throw Error(`Multiple eventreceivers with ${args.options.id !== undefined ? `id ${args.options.id} found` : `name ${args.options.name}, ids: ${eventReceivers.map(x => x.ReceiverId)} found`}`); 
-      }
-
-      if (args.options.confirm) {
+      if (result.continue) {
         await this.removeEventReceiver(args.options);
       }
-      else {
-        const result = await Cli.prompt<{ continue: boolean }>({
-          type: 'confirm',
-          name: 'continue',
-          default: false,
-          message: `Are you sure you want to remove event receiver with ${args.options.id !== undefined ? `id ${args.options.id}` : `name ${args.options.name}`}?`
-        });
-  
-        if (result.continue) {
-          await this.removeEventReceiver(args.options);
-        }
+    }
+  }
+
+  public async removeEventReceiver(options: Options): Promise<void> {
+    try {
+      let requestUrl = `${options.webUrl}/_api/${options.scope || 'web'}`;
+
+      if (options.listId) {
+        requestUrl += `/lists('${options.listId}')`;
       }
+      else if (options.listTitle) {
+        requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')`;
+      }
+      else if (options.listUrl) {
+        const listServerRelativeUrl = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
+        requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+      }
+
+      const rerId = await this.getEventReceiverId(options);
+      requestUrl += `/eventreceivers('${rerId}')`;
+
+      const requestOptions: AxiosRequestConfig = {
+        url: requestUrl,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      await request.delete(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  public async removeEventReceiver(options: Options): Promise<void> {
-    let requestUrl = `${options.webUrl}/_api/`;
-    let listUrl: string = '';
-    let filter: string = '?$filter=';
-
-    if (options.listId) {
-      listUrl = `lists(guid'${formatting.encodeQueryParameter(options.listId)}')/`;
-    }
-    else if (options.listTitle) {
-      listUrl = `lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')/`;
-    }
-    else if (options.listUrl) {
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
-      listUrl = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
-    }
-
-    if (!options.scope || options.scope === 'web') {
-      requestUrl += `web/${listUrl}eventreceivers`;
-    }
-    else {
-      requestUrl += 'site/eventreceivers';
-    }
-
+  private async getEventReceiverId(options: Options): Promise<string> {
     if (options.id) {
-      filter += `receiverid eq (guid'${options.id}')`;
+      return options.id;
     }
-    else {
-      filter += `receivername eq '${options.name}'`;
-    }
-    const requestOptions: any = {
-      url: requestUrl + filter,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
 
-    await request.delete<{ value: any[] }>(requestOptions);
-  }
-
-  private async getEventReceivers(options: Options): Promise<CommandOutput> {
     const getOptions: SpoEventReceiverGetOptions = {
       webUrl: options.webUrl,
       listId: options.listId,
@@ -211,7 +193,18 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    return await Cli.executeCommandWithOutput(getCommand as Command, { options: { ...getOptions, _: [] } });
+    const commandOutput = await Cli.executeCommandWithOutput(getCommand as Command, { options: { ...getOptions, _: [] } });
+    const eventReceivers: EventReceiver[] = JSON.parse(commandOutput.stdout);
+
+    if (!eventReceivers.length) {
+      throw Error(`Specified event receiver with name '${options.name}' cannot be found`);
+    }
+
+    if (eventReceivers.length > 1) {
+      throw Error(`Multiple eventreceivers with name '${options.name}' found: ${eventReceivers.map(x => x.ReceiverId)}`);
+    }
+
+    return eventReceivers[0].ReceiverId;
   }
 }
 

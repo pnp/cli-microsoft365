@@ -3,6 +3,7 @@ import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -103,7 +104,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
       };
 
       await request.put(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -115,7 +116,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/appCatalogs/teamsApps?$filter=displayName eq '${encodeURIComponent(args.options.name as string)}'`,
+      url: `${this.resource}/v1.0/appCatalogs/teamsApps?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

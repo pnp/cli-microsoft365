@@ -6,6 +6,7 @@ import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -103,7 +104,7 @@ class TeamsTeamArchiveCommand extends GraphCommand {
     try {
       const teamId: string = await this.getTeamId(args);
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/archive`,
+        url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/archive`,
         headers: {
           'content-type': 'application/json;odata=nometadata',
           'accept': 'application/json;odata.metadata=none'
