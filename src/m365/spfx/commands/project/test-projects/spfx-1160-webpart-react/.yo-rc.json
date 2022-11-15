@@ -7,13 +7,13 @@
       "@microsoft/microsoft-graph-client": "3.0.2",
       "@microsoft/teams-js": "2.4.1"
     },
-    "version": "1.16.0-rc.0",
-    "libraryName": "spfx-webpart-react",
-    "libraryId": "f491f8bb-7c1b-4e37-9a1d-622a432cd6dc",
+    "version": "1.16.0",
+    "libraryName": "hello-world",
+    "libraryId": "43bf1dee-e239-495a-93cd-fc999bd3b3c9",
     "environment": "spo",
     "packageManager": "npm",
-    "solutionName": "spfx-webpart-react",
-    "solutionShortDescription": "spfx-webpart-react description",
+    "solutionName": "HelloWorld",
+    "solutionShortDescription": "HelloWorld description",
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
     "componentType": "webpart"

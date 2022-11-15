@@ -1,8 +1,8 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "spfx-webpart-react-client-side-solution",
-    "id": "f491f8bb-7c1b-4e37-9a1d-622a432cd6dc",
+    "name": "hello-world-client-side-solution",
+    "id": "43bf1dee-e239-495a-93cd-fc999bd3b3c9",
     "version": "1.0.0.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
@@ -12,14 +12,14 @@
       "websiteUrl": "",
       "privacyUrl": "",
       "termsOfUseUrl": "",
-      "mpnId": "Undefined-1.16.0-rc.0"
+      "mpnId": "Undefined-1.16.0"
     },
     "metadata": {
       "shortDescription": {
-        "default": "spfx-webpart-react description"
+        "default": "HelloWorld description"
       },
       "longDescription": {
-        "default": "spfx-webpart-react description"
+        "default": "HelloWorld description"
       },
       "screenshotPaths": [],
       "videoUrl": "",
@@ -27,14 +27,14 @@
     },
     "features": [
       {
-        "title": "spfx-webpart-react Feature",
-        "description": "The feature that activates elements of the spfx-webpart-react solution.",
-        "id": "f3e29357-0bf8-42ce-a2c1-7db14de91aaf",
+        "title": "hello-world Feature",
+        "description": "The feature that activates elements of the hello-world solution.",
+        "id": "781d5e8e-a575-4b1c-bbe9-0b959be07bad",
         "version": "1.0.0.0"
       }
     ]
   },
   "paths": {
-    "zippedPackage": "solution/spfx-webpart-react.sppkg"
+    "zippedPackage": "solution/hello-world.sppkg"
   }
 }

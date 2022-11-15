@@ -1,5 +1,5 @@
 {
-  "name": "spfx-webpart-react",
+  "name": "hello-world",
   "version": "0.0.1",
   "private": true,
   "engines": {
@@ -16,18 +16,18 @@
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "office-ui-fabric-react": "^7.199.1",
-    "@microsoft/sp-core-library": "1.16.0-rc.0",
-    "@microsoft/sp-property-pane": "1.16.0-rc.0",
-    "@microsoft/sp-webpart-base": "1.16.0-rc.0",
-    "@microsoft/sp-lodash-subset": "1.16.0-rc.0",
-    "@microsoft/sp-office-ui-fabric-core": "1.16.0-rc.0"
+    "@microsoft/sp-core-library": "1.16.0",
+    "@microsoft/sp-property-pane": "1.16.0",
+    "@microsoft/sp-webpart-base": "1.16.0",
+    "@microsoft/sp-lodash-subset": "1.16.0",
+    "@microsoft/sp-office-ui-fabric-core": "1.16.0"
   },
   "devDependencies": {
     "@microsoft/rush-stack-compiler-4.5": "0.2.2",
     "@rushstack/eslint-config": "2.5.1",
-    "@microsoft/eslint-plugin-spfx": "1.16.0-rc.0",
-    "@microsoft/eslint-config-spfx": "1.16.0-rc.0",
-    "@microsoft/sp-build-web": "1.16.0-rc.0",
+    "@microsoft/eslint-plugin-spfx": "1.16.0",
+    "@microsoft/eslint-config-spfx": "1.16.0",
+    "@microsoft/sp-build-web": "1.16.0",
     "@types/webpack-env": "~1.15.2",
     "ajv": "^6.12.5",
     "gulp": "4.0.2",
@@ -35,6 +35,6 @@
     "@types/react": "17.0.45",
     "@types/react-dom": "17.0.17",
     "eslint-plugin-react-hooks": "4.3.0",
-    "@microsoft/sp-module-interfaces": "1.16.0-rc.0"
+    "@microsoft/sp-module-interfaces": "1.16.0"
   }
 }
