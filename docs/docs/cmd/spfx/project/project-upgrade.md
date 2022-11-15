@@ -719,6 +719,7 @@ m365 spfx project upgrade --output tour
     EOF
     rm "config\copy-assets.json"
 
+
     ./.yo-rc.json
     -------------
     Update version in .yo-rc.json:
@@ -782,7 +783,6 @@ m365 spfx project upgrade --output tour
     From serve.json remove the api property:
 
 
-
     ./.gitignore
     ------------
     To .gitignore add the '.heft' folder:
@@ -833,7 +833,6 @@ m365 spfx project upgrade --output tour
     .vscode
 
 
-
     ./config/deploy-azure-storage.json
     ----------------------------------
     Update deploy-azure-storage.json workingDir:
@@ -855,7 +854,6 @@ m365 spfx project upgrade --output tour
     };
 
 
-
     ./tslint.json
     -------------
     Update tslint.json extends property:
@@ -870,4 +868,4 @@ m365 spfx project upgrade --output tour
     {
       "engines": "undefined"
     }
-	  ```
+    ```

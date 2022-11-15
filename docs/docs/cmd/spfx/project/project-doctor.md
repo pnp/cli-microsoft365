@@ -65,21 +65,23 @@ m365 spfx project doctor --output tour
 
 ## Response
 
+### Response with no issues
+
 === "JSON"
 
     ```json
     []
-	  ```
+    ```
 
 === "Text"
 
     ```text
     ✅ CLI for Microsoft 365 has found no issues in your project
-	  ```
+    ```
 
 === "Markdown"
 
-    ```md
+    ````
     # Validate project spfx-solution
 
     Date: 11/7/2022
@@ -87,4 +89,145 @@ m365 spfx project doctor --output tour
     ## Findings
 
     ✅ CLI for Microsoft 365 has found no issues in your project
-	  ```
+    ````
+
+### Response with issues reported
+
+When the npm packages related issues are reported. 
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "description": "Package @microsoft/rush-stack-compiler-4.2 is installed as a dependency. Install it as a devDependency instead",
+        "id": "FN021006",
+        "file": "./package.json",
+        "position": {
+          "line": 14,
+          "character": 19
+        },
+        "resolution": "npm i -DE @microsoft/rush-stack-compiler-4.2@^0.1.2",
+        "resolutionType": "cmd",
+        "severity": "Required",
+        "title": "@microsoft/rush-stack-compiler-4.2 installed as a dependency"
+      },
+      {
+        "description": "Install supported version of the office-ui-fabric-react package",
+        "id": "FN001022",
+        "file": "./package.json",
+        "position": {
+          "line": 24,
+          "character": 5
+        },
+        "resolution": "npm i -SE office-ui-fabric-react@7.174.1",
+        "resolutionType": "cmd",
+        "severity": "Required",
+        "title": "office-ui-fabric-react"
+      },
+      {
+        "description": "Uninstall unsupported version of @microsoft/rush-stack-compiler",
+        "id": "FN002019",
+        "file": "./package.json",
+        "position": {
+          "line": 14,
+          "character": 19
+        },
+        "resolution": "npm un -D @microsoft/rush-stack-compiler-4.2",
+        "resolutionType": "cmd",
+        "severity": "Required",
+        "title": "@microsoft/rush-stack-compiler-3.9"
+      },
+      {
+        "description": "If, after upgrading npm packages, when building the project you have errors similar to: \"error TS2345: Argument of type 'SPHttpClientConfiguration' is not assignable to parameter of type 'SPHttpClientConfiguration'\", try running 'npm dedupe' to cleanup npm packages.",
+        "id": "FN017001",
+        "file": "./package.json",
+        "resolution": "npm dedupe",
+        "resolutionType": "cmd",
+        "severity": "Optional",
+        "title": "Run npm dedupe"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Execute in command line
+    -----------------------
+    npm un -D @microsoft/rush-stack-compiler-4.2
+    npm i -SE office-ui-fabric-react@7.174.1
+    npm i -DE @microsoft/rush-stack-compiler-4.2@^0.1.2
+    npm dedupe
+    ```
+
+=== "Markdown"
+
+    ````
+    # Validate project react-page-navigator
+
+    Date: 11/15/2022
+
+    ## Findings
+
+    Following is the list of issues found in your project. [Summary](#Summary) of the recommended fixes is included at the end of the report.
+
+    ### FN021006 @microsoft/rush-stack-compiler-4.2 installed as a dependency | Required
+
+    Package @microsoft/rush-stack-compiler-4.2 is installed as a dependency. Install it as a devDependency instead
+
+    Execute the following command:
+
+    ```sh
+    npm i -DE @microsoft/rush-stack-compiler-4.2@^0.1.2
+    ```
+
+    File: [./package.json:14:19](./package.json)
+
+    ### FN001022 office-ui-fabric-react | Required
+
+    Install supported version of the office-ui-fabric-react package
+
+    Execute the following command:
+
+    ```sh
+    npm i -SE office-ui-fabric-react@7.174.1
+    ```
+
+    File: [./package.json:24:5](./package.json)
+
+    ### FN002019 @microsoft/rush-stack-compiler-3.9 | Required
+
+    Uninstall unsupported version of @microsoft/rush-stack-compiler
+
+    Execute the following command:
+
+    ```sh
+    npm un -D @microsoft/rush-stack-compiler-4.2
+    ```
+
+    File: [./package.json:14:19](./package.json)
+
+    ### FN017001 Run npm dedupe | Optional
+
+    If, after upgrading npm packages, when building the project you have errors similar to: "error TS2345: Argument of type 'SPHttpClientConfiguration' is not assignable to parameter of type 'SPHttpClientConfiguration'", try running 'npm dedupe' to cleanup npm packages.
+
+    Execute the following command:
+
+    ```sh
+    npm dedupe
+    ```
+
+    File: [./package.json](./package.json)
+
+    ## Summary
+
+    ### Execute script
+
+    ```sh
+    npm un -D @microsoft/rush-stack-compiler-4.2
+    npm i -SE office-ui-fabric-react@7.174.1
+    npm i -DE @microsoft/rush-stack-compiler-4.2@^0.1.2
+    npm dedupe
+    ```
+    ````
