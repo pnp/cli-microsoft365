@@ -8,12 +8,12 @@
       "@microsoft/teams-js": "2.4.1"
     },
     "version": "1.16.0",
-    "libraryName": "hello-world",
-    "libraryId": "43bf1dee-e239-495a-93cd-fc999bd3b3c9",
+    "libraryName": "spfx-webpart-react",
+    "libraryId": "a1044e35-6459-4f28-b8c9-aa38e49bb2de",
     "environment": "spo",
     "packageManager": "npm",
-    "solutionName": "HelloWorld",
-    "solutionShortDescription": "HelloWorld description",
+    "solutionName": "spfx-webpart-react",
+    "solutionShortDescription": "spfx-webpart-react description",
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
     "componentType": "webpart"

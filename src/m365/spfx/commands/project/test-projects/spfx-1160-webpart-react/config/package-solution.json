@@ -1,8 +1,8 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "hello-world-client-side-solution",
-    "id": "43bf1dee-e239-495a-93cd-fc999bd3b3c9",
+    "name": "spfx-webpart-react-client-side-solution",
+    "id": "a1044e35-6459-4f28-b8c9-aa38e49bb2de",
     "version": "1.0.0.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
@@ -16,10 +16,10 @@
     },
     "metadata": {
       "shortDescription": {
-        "default": "HelloWorld description"
+        "default": "spfx-webpart-react description"
       },
       "longDescription": {
-        "default": "HelloWorld description"
+        "default": "spfx-webpart-react description"
       },
       "screenshotPaths": [],
       "videoUrl": "",
@@ -27,14 +27,14 @@
     },
     "features": [
       {
-        "title": "hello-world Feature",
-        "description": "The feature that activates elements of the hello-world solution.",
-        "id": "781d5e8e-a575-4b1c-bbe9-0b959be07bad",
+        "title": "spfx-webpart-react Feature",
+        "description": "The feature that activates elements of the spfx-webpart-react solution.",
+        "id": "20d25fe5-4e38-41d1-ad56-f824457a310b",
         "version": "1.0.0.0"
       }
     ]
   },
   "paths": {
-    "zippedPackage": "solution/hello-world.sppkg"
+    "zippedPackage": "solution/spfx-webpart-react.sppkg"
   }
 }
