@@ -38,7 +38,7 @@ Add a specific publisher in a specific environment
 m365 pp solution publisher add --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --name "Contoso" --displayName "Contoso" --prefix "new" --choiceValuePrefix 10000
 ```
 
-Adds a specific publisher in a specific environmentas Admin
+Adds a specific publisher in a specific environment as Admin
 
 ```sh
 m365 pp solution publisher add --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --name "Contoso" --displayName "Contoso" --prefix "new" --choiceValuePrefix 10000 --asAdmin
