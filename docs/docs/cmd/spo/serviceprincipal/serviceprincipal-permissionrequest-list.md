@@ -18,8 +18,10 @@ m365 spo sp permissionrequest list
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
 !!! important
-    To use this command you have to have permissions to access the tenant admin site.
+    The admin role that's required to approve/deny permissions depends on the API. To approve permissions to any of the third-party APIs registered in the tenant, the application administrator role is sufficient. To approve permissions for Microsoft Graph or any other Microsoft API, the Global Administrator role is required.
 
 ## Examples
 
