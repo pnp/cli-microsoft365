@@ -579,7 +579,7 @@
 
 **SharePoint:**
 
-- [spo group user remove](../cmd/spo/group/group-user-remove.md) - removes the specified user from a SharePoint group [#2642](https://github.com/pnp/cli-microsoft365/issues/2642)
+- [spo group user remove](../cmd/spo/group/group-member-remove.md) - removes the specified user from a SharePoint group [#2642](https://github.com/pnp/cli-microsoft365/issues/2642)
 
 **Teams:**
 
@@ -772,7 +772,7 @@
 
 **SharePoint:**
 
-- [spo group user list](../cmd/spo/group/group-user-list.md) - list members of a SharePoint Group [#2640](https://github.com/pnp/cli-microsoft365/issues/2640)
+- [spo group user list](../cmd/spo/group/group-member-list.md) - list members of a SharePoint Group [#2640](https://github.com/pnp/cli-microsoft365/issues/2640)
 
 **Teams:**
 
@@ -813,7 +813,7 @@
 
 **SharePoint:**
 
-- [spo group user add](../cmd/spo/group/group-user-add.md) - add a user or multiple users to SharePoint Group [#2483](https://github.com/pnp/cli-microsoft365/issues/2483)
+- [spo group user add](../cmd/spo/group/group-member-add.md) - add a user or multiple users to SharePoint Group [#2483](https://github.com/pnp/cli-microsoft365/issues/2483)
 - [spo site apppermission remove](../cmd/spo/site/site-apppermission-remove.md) - removes a specific application permission from a site [#2209](https://github.com/pnp/cli-microsoft365/issues/2209)
 - [spo app instance list](../cmd/spo/app/app-instance-list.md) - retrieves apps installed in a site [#2025](https://github.com/pnp/cli-microsoft365/issues/2209)
 
