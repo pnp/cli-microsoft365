@@ -46,3 +46,7 @@ Undeclare a list item with a specific id as a record from a list retrieved by se
 ```sh
 m365 spo listitem record undeclare --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/Lists/Lists 1' --id 1
 ```
+
+## Response
+
+The command won't return a response on success.

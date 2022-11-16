@@ -52,3 +52,7 @@ Remove the list item with a specific ID from a list retrieved by server-relative
 ```sh
 m365 spo listitem remove --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/lists/TestList --id 1
 ```
+
+## Response
+
+The command won't return a response on success.

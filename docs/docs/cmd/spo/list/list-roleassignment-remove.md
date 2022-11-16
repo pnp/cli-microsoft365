@@ -55,3 +55,8 @@ Remove roleassignment from list by url based on principal Id
 ```sh
 m365 spo list roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --listUrl '/sites/contoso-sales/lists/Events' --principalId 2
 ```
+
+## Response
+
+
+The command won't return a response on success.
