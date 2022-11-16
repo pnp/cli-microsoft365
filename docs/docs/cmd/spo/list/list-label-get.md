@@ -50,3 +50,63 @@ Gets label set on the list with specified site-relative URL located in the speci
 m365 spo list label get --listUrl 'Shared Documents' --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "AcceptMessagesOnlyFromSendersOrMembers": false,
+      "AccessType": null,
+      "AllowAccessFromUnmanagedDevice": null,
+      "AutoDelete": false,
+      "BlockDelete": false,
+      "BlockEdit": false,
+      "ContainsSiteLabel": false,
+      "DisplayName": "Label A",
+      "EncryptionRMSTemplateId": null,
+      "HasRetentionAction": false,
+      "IsEventTag": false,
+      "Notes": null,
+      "RequireSenderAuthenticationEnabled": false,
+      "ReviewerEmail": null,
+      "SharingCapabilities": null,
+      "SuperLock": false,
+      "TagDuration": 0,
+      "TagId": "4d535433-2a7b-40b0-9dad-8f0f8f3b3841",
+      "TagName": "Sensitive",
+      "TagRetentionBasedOn": null
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    AcceptMessagesOnlyFromSendersOrMembers: false
+    AccessType                            : null
+    AllowAccessFromUnmanagedDevice        : null
+    AutoDelete                            : false
+    BlockDelete                           : false
+    BlockEdit                             : false
+    ContainsSiteLabel                     : false
+    DisplayName                           : Label A
+    EncryptionRMSTemplateId               : null
+    HasRetentionAction                    : false
+    IsEventTag                            : false
+    Notes                                 : null
+    RequireSenderAuthenticationEnabled    : false
+    ReviewerEmail                         : null
+    SharingCapabilities                   : null
+    SuperLock                             : false
+    TagDuration                           : 0
+    TagId                                 : 4d535433-2a7b-40b0-9dad-8f0f8f3b3841
+    TagName                               : Sensitive
+    TagRetentionBasedOn                   : null
+    ```
+
+=== "CSV"
+
+    ```csv
+    AcceptMessagesOnlyFromSendersOrMembers,AccessType,AllowAccessFromUnmanagedDevice,AutoDelete,BlockDelete,BlockEdit,ContainsSiteLabel,DisplayName,EncryptionRMSTemplateId,HasRetentionAction,IsEventTag,Notes,RequireSenderAuthenticationEnabled,ReviewerEmail,SharingCapabilities,SuperLock,TagDuration,TagId,TagName,TagRetentionBasedOn
+    false,,,false,false,false,false,Label A,,false,false,,false,,,false,0,4d535433-2a7b-40b0-9dad-8f0f8f3b3841,Sensitive,
+    ```

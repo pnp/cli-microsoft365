@@ -65,3 +65,6 @@ Move field with title _Custom field_ to position _1_ in view with title _All Doc
 m365 spo list view field set --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/Shared Documents' --viewTitle 'All Documents' --fieldTitle 'Custom field' --fieldPosition 1
 ```
 
+## Response
+
+The command won't return a response on success.
