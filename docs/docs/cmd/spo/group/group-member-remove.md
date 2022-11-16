@@ -1,11 +1,11 @@
-# spo group user remove
+# spo group member remove
 
 Removes the specified user from a SharePoint group
 
 ## Usage
 
 ```sh
-m365 spo group user remove [options]
+m365 spo group member remove [options]
 ```
 
 ## Options
@@ -29,11 +29,11 @@ m365 spo group user remove [options]
 Remove a user from SharePoint group with id _5_ available on the web _https://contoso.sharepoint.com/sites/SiteA_
 
 ```sh
-m365 spo group user remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userName "Alex.Wilber@contoso.com"
+m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userName "Alex.Wilber@contoso.com"
 ```
 
 Remove a user from SharePoint group with Name _Site A Visitors_ available on the web _https://contoso.sharepoint.com/sites/SiteA_
 
 ```sh
-m365 spo group user remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Site A Visitors" --userName "Alex.Wilber@contoso.com"
+m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Site A Visitors" --userName "Alex.Wilber@contoso.com"
 ```

@@ -10,11 +10,12 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-const command: Command = require('./group-user-list');
+const command: Command = require('./group-member-list');
 
-describe(commands.GROUP_USER_LIST, () => {
+describe(commands.GROUP_MEMBER_LIST, () => {
   let log: string[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   const JSONSPGroupMembersList =
@@ -78,6 +79,7 @@ describe(commands.GROUP_USER_LIST, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -97,7 +99,7 @@ describe(commands.GROUP_USER_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUP_USER_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.GROUP_MEMBER_LIST), true);
   });
 
   it('has a description', () => {
@@ -123,6 +125,7 @@ describe(commands.GROUP_USER_LIST, () => {
         groupId: 3
       }
     });
+    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList.value));
   });
 
   it('Getting the members of a SharePoint Group using groupId (DEBUG)', async () => {
@@ -140,6 +143,7 @@ describe(commands.GROUP_USER_LIST, () => {
         groupId: 3
       }
     });
+    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList.value));
   });
 
   it('Getting the members of a SharePoint Group using groupName (DEBUG)', async () => {
@@ -157,6 +161,7 @@ describe(commands.GROUP_USER_LIST, () => {
         groupName: "Contoso Site Owners"
       }
     });
+    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList.value));
   });
 
   it('Correctly Handles Error when listing members of the group', async () => {

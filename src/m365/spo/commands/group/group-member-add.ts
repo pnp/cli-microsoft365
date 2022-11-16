@@ -24,9 +24,9 @@ interface Options extends GlobalOptions {
   email?: string;
 }
 
-class SpoGroupUserAddCommand extends SpoCommand {
+class SpoGroupMemberAddCommand extends SpoCommand {
   public get name(): string {
-    return commands.GROUP_USER_ADD;
+    return commands.GROUP_MEMBER_ADD;
   }
 
   public get description(): string {
@@ -221,4 +221,4 @@ class SpoGroupUserAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoGroupUserAddCommand();
+module.exports = new SpoGroupMemberAddCommand();

@@ -16,9 +16,9 @@ interface Options extends GlobalOptions {
   groupName?: string;
 }
 
-class SpoGroupUserListCommand extends SpoCommand {
+class SpoGroupMemberListCommand extends SpoCommand {
   public get name(): string {
-    return commands.GROUP_USER_LIST;
+    return commands.GROUP_MEMBER_LIST;
   }
 
   public get description(): string {
@@ -96,7 +96,7 @@ class SpoGroupUserListCommand extends SpoCommand {
 
     try {
       const response = await request.get<any>(requestOptions);
-      logger.log(response);
+      logger.log(response.value);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -104,4 +104,4 @@ class SpoGroupUserListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoGroupUserListCommand();
+module.exports = new SpoGroupMemberListCommand();

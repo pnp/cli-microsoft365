@@ -1,11 +1,11 @@
-# spo group user add
+# spo group member add
 
 Add a user or multiple users to SharePoint Group
 
 ## Usage
 
 ```sh
-m365 spo group user add [options]
+m365 spo group member add [options]
 ```
 
 ## Options
@@ -36,23 +36,23 @@ For the `--userName` or `--email` options you can specify multiple values by sep
 Add a user with name _Alex.Wilber@contoso.com_ to the SharePoint group with id _5_ available on the web _https://contoso.sharepoint.com/sites/SiteA_
 
 ```sh
-m365 spo group user add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userName "Alex.Wilber@contoso.com"
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userName "Alex.Wilber@contoso.com"
 ```
 
 Add multiple users by name to the SharePoint group with id _5_ available on the web _https://contoso.sharepoint.com/sites/SiteA_
 
 ```sh
-m365 spo group user add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userName "Alex.Wilber@contoso.com, Adele.Vance@contoso.com"
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userName "Alex.Wilber@contoso.com, Adele.Vance@contoso.com"
 ```
 
 Add a user with email _Alex.Wilber@contoso.com_ to the SharePoint group with name _Contoso Site Owners_ available on the web _https://contoso.sharepoint.com/sites/SiteA_
 
 ```sh
-m365 spo group user add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Owners" --email "Alex.Wilber@contoso.com"
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Owners" --email "Alex.Wilber@contoso.com"
 ```
 
 Add multiple users by email to the SharePoint group with name _Contoso Site Owners_ available on the web _https://contoso.sharepoint.com/sites/SiteA_
 
 ```sh
-m365 spo group user add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Owners" --email "Alex.Wilber@contoso.com, Adele.Vance@contoso.com"
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Owners" --email "Alex.Wilber@contoso.com, Adele.Vance@contoso.com"
 ```

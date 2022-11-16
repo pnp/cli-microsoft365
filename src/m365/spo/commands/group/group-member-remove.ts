@@ -19,9 +19,9 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class SpoGroupUserRemoveCommand extends SpoCommand {
+class SpoGroupMemberRemoveCommand extends SpoCommand {
   public get name(): string {
-    return commands.GROUP_USER_REMOVE;
+    return commands.GROUP_MEMBER_REMOVE;
   }
 
   public get description(): string {
@@ -131,4 +131,4 @@ class SpoGroupUserRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoGroupUserRemoveCommand();
+module.exports = new SpoGroupMemberRemoveCommand();
