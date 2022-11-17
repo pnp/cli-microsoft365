@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   confirm?: boolean;
-  skipRecycleBin?: boolean;
+  skipRecycleBin: boolean;
 }
 
 class AadO365GroupRemoveCommand extends GraphCommand {
@@ -37,7 +37,7 @@ class AadO365GroupRemoveCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         confirm: (!(!args.options.confirm)).toString(),
-        skipRecycleBin: (!(!args.options.skipRecycleBin)).toString()
+        skipRecycleBin: args.options.skipRecycleBin
       });
     });
   }
@@ -62,7 +62,7 @@ class AadO365GroupRemoveCommand extends GraphCommand {
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );

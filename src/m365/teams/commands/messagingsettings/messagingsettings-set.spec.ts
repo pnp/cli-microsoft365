@@ -88,7 +88,7 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowUserEditMessages: 'true' }
+      options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowUserEditMessages: true }
     } as any);
   });
 
@@ -109,7 +109,7 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowOwnerDeleteMessages: 'true', allowTeamMentions: 'true', allowChannelMentions: 'true' }
+      options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowOwnerDeleteMessages: true, allowTeamMentions: true, allowChannelMentions: true }
     } as any);
   });
 
@@ -131,12 +131,15 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', 
-      allowOwnerDeleteMessages: 'true', 
-      allowTeamMentions: 'true', 
-      allowChannelMentions: 'true' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
+        allowOwnerDeleteMessages: true,
+        allowTeamMentions: true,
+        allowChannelMentions: true
+      }
+    } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });
 
   it('fails validation if the teamId is not a valid GUID', async () => {
@@ -149,21 +152,11 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if allowUserEditMessages is not a valid boolean', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
-        allowUserEditMessages: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if allowUserEditMessages is doublicated', async () => {
     const actual = await command.validate({
       options: {
         teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
-        allowUserEditMessages: ['true', 'false']
+        allowUserEditMessages: [true, false]
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -173,7 +166,7 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
-        allowUserEditMessages: 'false'
+        allowUserEditMessages: false
       }
     }, commandInfo);
     assert.strictEqual(actual, true);

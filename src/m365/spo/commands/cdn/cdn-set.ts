@@ -12,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   type: string;
-  enabled: string;
+  enabled: boolean;
   noDefaultOrigins?: boolean;
 }
 
@@ -30,6 +30,7 @@ class SpoCdnSetCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -37,7 +38,7 @@ class SpoCdnSetCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         cdnType: args.options.type || 'Public',
-        enabled: args.options.enabled === 'true',
+        enabled: args.options.enabled,
         noDefaultOrigins: (!(!args.options.noDefaultOrigins)).toString()
       });
     });
@@ -59,6 +60,10 @@ class SpoCdnSetCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.boolean.push('enabled');
+  }
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -69,11 +74,6 @@ class SpoCdnSetCommand extends SpoCommand {
           }
         }
 
-        if (args.options.enabled !== 'true' &&
-          args.options.enabled !== 'false') {
-          return `${args.options.enabled} is not a valid boolean value. Allowed values are true|false`;
-        }
-
         return true;
       }
     );
@@ -81,7 +81,7 @@ class SpoCdnSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const cdnTypeString: string = args.options.type || 'Public';
-    const enabled: boolean = args.options.enabled === 'true';
+    const enabled: boolean = args.options.enabled;
     let cdnType: number = 0;
     let spoAdminUrl: string = '';
 
