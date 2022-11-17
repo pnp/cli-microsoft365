@@ -1,11 +1,11 @@
-# spo group user list
+# spo group member list
 
-List members of a SharePoint Group
+List the members of a SharePoint Group
 
 ## Usage
 
 ```sh
-m365 spo group user list [options]
+m365 spo group member list [options]
 ```
 
 ## Options
@@ -26,11 +26,11 @@ m365 spo group user list [options]
 List the members of the group with ID _5_ for web _https://contoso.sharepoint.com/sites/SiteA_
 
 ```sh
-m365 spo group user list --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5
+m365 spo group member list --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5
 ```
 
 List the members of the group with name _Contoso Site Members_ for web _https://contoso.sharepoint.com/sites/SiteA_
 
 ```sh
-m365 spo group user list --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Members"
+m365 spo group member list --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Members"
 ```
