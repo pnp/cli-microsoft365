@@ -1,6 +1,6 @@
 # status
 
-Adds the context in the .m365rc.json file
+Initiates CLI for Microsoft 365 context in the current working folder
 
 ## Usage
 
@@ -14,7 +14,7 @@ m365 context init [options]
 
 ## Examples
 
-Adds the current context to the .m365rc.json file
+Initiates CLI for Microsoft 365 context in the current working folder
 
 ```sh
 m365 context init
