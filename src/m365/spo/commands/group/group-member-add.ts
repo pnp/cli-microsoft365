@@ -30,7 +30,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Add a user or multiple users to SharePoint Group';
+    return 'Add members to a SharePoint Group';
   }
 
   public defaultProperties(): string[] | undefined {

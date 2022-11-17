@@ -25,7 +25,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Removes the specified user from a SharePoint group';
+    return 'Removes the specified member from a SharePoint group';
   }
 
   constructor() {

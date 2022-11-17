@@ -1,6 +1,6 @@
 # spo group member add
 
-Add a user or multiple users to SharePoint Group
+Add members to a SharePoint Group
 
 ## Usage
 
@@ -14,16 +14,16 @@ m365 spo group member add [options]
 : URL of the site where the SharePoint group is available
 
 `--groupId [groupId]`
-: Id of the SharePoint Group to which user needs to be added, specify either `groupId` or `groupName`
+: Id of the SharePoint Group to which the user needs to be added, specify either `groupId` or `groupName`
 
 `--groupName [groupName]`
-: Name of the SharePoint Group to which user needs to be added, specify either `groupId` or `groupName`
+: Name of the SharePoint Group to which the user needs to be added, specify either `groupId` or `groupName`
 
 `--userName [userName]`
-: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users needs to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com), specify either `userName` or `email`
+: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com), specify either `userName` or `email`
 
 `--email [email]`
-: User's email (eg. megan.bowen@contoso.com). If multiple users needs to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com), specify either `userName` or `email`
+: User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com), specify either `userName` or `email`
 
 --8<-- "docs/cmd/_global.md"
 

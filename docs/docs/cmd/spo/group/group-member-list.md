@@ -1,6 +1,6 @@
 # spo group member list
 
-List members of a SharePoint Group
+List the members of a SharePoint Group
 
 ## Usage
 
