@@ -56,6 +56,10 @@ describe(commands.GROUP_MEMBER_LIST, () => {
       }
     ];
 
+  const groupMembersList = {
+    value: JSONSPGroupMembersList
+  };
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -109,12 +113,12 @@ describe(commands.GROUP_MEMBER_LIST, () => {
   });
 
   it('Getting the members of a SharePoint Group using groupId', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.resolve(JSONSPGroupMembersList);
+        return groupMembersList;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
       options: {
@@ -123,16 +127,16 @@ describe(commands.GROUP_MEMBER_LIST, () => {
         groupId: 3
       }
     });
-    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList.value));
+    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList));
   });
 
   it('Getting the members of a SharePoint Group using groupId (DEBUG)', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.resolve(JSONSPGroupMembersList);
+        return groupMembersList;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
       options: {
@@ -141,16 +145,16 @@ describe(commands.GROUP_MEMBER_LIST, () => {
         groupId: 3
       }
     });
-    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList.value));
+    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList));
   });
 
   it('Getting the members of a SharePoint Group using groupName (DEBUG)', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetByName') > -1) {
-        return Promise.resolve(JSONSPGroupMembersList);
+        return groupMembersList;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
       options: {
@@ -159,16 +163,16 @@ describe(commands.GROUP_MEMBER_LIST, () => {
         groupName: "Contoso Site Owners"
       }
     });
-    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList.value));
+    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList));
   });
 
   it('Correctly Handles Error when listing members of the group', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
