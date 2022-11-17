@@ -194,9 +194,17 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
     };
 
     const commandOutput = await Cli.executeCommandWithOutput(getCommand as Command, { options: { ...getOptions, _: [] } });
-    const eventReceiver: EventReceiver = JSON.parse(commandOutput.stdout);
+    const eventReceivers: EventReceiver[] = JSON.parse(commandOutput.stdout);
 
-    return eventReceiver.ReceiverId;
+    if (!eventReceivers.length) {
+      throw Error(`Specified event receiver with name '${options.name}' cannot be found`);
+    }
+
+    if (eventReceivers.length > 1) {
+      throw Error(`Multiple eventreceivers with name '${options.name}' found: ${eventReceivers.map(x => x.ReceiverId)}`);
+    }
+
+    return eventReceivers[0].ReceiverId;
   }
 }
 

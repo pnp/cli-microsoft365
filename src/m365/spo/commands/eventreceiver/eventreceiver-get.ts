@@ -88,24 +88,24 @@ class SpoEventreceiverGetCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-
+    
         const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
         if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
           return `Specify either list id or title or list url`;
         }
-
+    
         if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
           return `${args.options.listId} is not a valid GUID`;
         }
-
+    
         if (args.options.scope && ['web', 'site'].indexOf(args.options.scope) === -1) {
           return `${args.options.scope} is not a valid type value. Allowed values web|site.`;
         }
-
+    
         if (args.options.scope && args.options.scope === 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
           return 'Scope cannot be set to site when retrieving list event receivers.';
         }
-
+    
         return true;
       }
     );
@@ -139,8 +139,7 @@ class SpoEventreceiverGetCommand extends SpoCommand {
     }
 
     if (args.options.id) {
-      requestUrl += `(guid'${args.options.id}')`;
-      filter = "";
+      filter += `receiverid eq (guid'${args.options.id}')`;
     }
     else {
       filter += `receivername eq '${args.options.name}'`;
@@ -156,16 +155,7 @@ class SpoEventreceiverGetCommand extends SpoCommand {
 
     try {
       const res = await request.get<{ value: EventReceiver[] }>(requestOptions);
-
-      if (res.value && res.value.length === 0) {
-        throw `The specified eventreceiver '${args.options.id || args.options.name}' does not exist.`;
-      }
-
-      if (res.value && res.value.length > 1) {
-        throw Error(`Multiple eventreceivers with name '${args.options.name}' found: ${res.value.map(x => x.ReceiverId)}`);
-      }
-
-      logger.log(args.options.id ? res : res.value[0]);
+      logger.log(res.value);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
