@@ -116,6 +116,17 @@ class SpoEventreceiverGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const eventReceiver: EventReceiver = await this.getEventReceiver(args);
+
+      logger.log(eventReceiver);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private async getEventReceiver(args: CommandArgs): Promise<EventReceiver> {
     let requestUrl = `${args.options.webUrl}/_api/`;
     let listUrl: string = '';
     let filter: string = '?$filter=';
@@ -138,23 +149,24 @@ class SpoEventreceiverGetCommand extends SpoCommand {
       requestUrl += 'site/eventreceivers';
     }
 
-    if (args.options.id) {
-      requestUrl += `(guid'${args.options.id}')`;
-      filter = "";
-    }
-    else {
-      filter += `receivername eq '${args.options.name}'`;
-    }
-
     const requestOptions: AxiosRequestConfig = {
-      url: requestUrl + filter,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    try {
+    if (args.options.id) {
+      requestUrl += `(guid'${args.options.id}')`;
+      requestOptions.url = requestUrl;
+
+      const res = await request.get<any>(requestOptions);
+      return res;
+    }
+    else {
+      filter += `receivername eq '${args.options.name}'`;
+      requestOptions.url = requestUrl + filter;
+
       const res = await request.get<{ value: EventReceiver[] }>(requestOptions);
 
       if (res.value && res.value.length === 0) {
@@ -165,10 +177,7 @@ class SpoEventreceiverGetCommand extends SpoCommand {
         throw Error(`Multiple eventreceivers with name '${args.options.name}' found: ${res.value.map(x => x.ReceiverId)}`);
       }
 
-      logger.log(args.options.id ? res : res.value[0]);
-    }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+      return res.value[0];
     }
   }
 }
