@@ -160,7 +160,7 @@ class SpoEventreceiverGetCommand extends SpoCommand {
       requestUrl += `(guid'${args.options.id}')`;
       requestOptions.url = requestUrl;
 
-      const res = await request.get<any>(requestOptions);
+      const res = await request.get<EventReceiver>(requestOptions);
       return res;
     }
     else {
