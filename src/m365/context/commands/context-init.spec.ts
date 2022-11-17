@@ -10,7 +10,7 @@ import * as fs from 'fs';
 import commands from '../commands';
 const command: Command = require('./context-init');
 
-describe(commands.CONTEXT_INIT, () => {
+describe(commands.INIT, () => {
   let log: any[];
   let logger: Logger;
 
@@ -57,7 +57,7 @@ describe(commands.CONTEXT_INIT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CONTEXT_INIT), true);
+    assert.strictEqual(command.name.startsWith(commands.INIT), true);
   });
 
   it('has a description', () => {

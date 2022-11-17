@@ -7,7 +7,7 @@ import commands from '../commands';
 
 class ContextInitCommand extends Command {
   public get name(): string {
-    return commands.CONTEXT_INIT;
+    return commands.INIT;
   }
 
   public get description(): string {
