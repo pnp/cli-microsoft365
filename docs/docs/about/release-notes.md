@@ -96,6 +96,7 @@
 - Included response output for yammer commands [#3928](https://github.com/pnp/cli-microsoft365/issues/3928)
 - Updates GitHub actions to Node@16 [#3870](https://github.com/pnp/cli-microsoft365/issues/3870)
 - Updates docs for 'spo eventreceiver remove' command [#4050](https://github.com/pnp/cli-microsoft365/issues/4050)
+- Updates 'spo group user <verb>' to 'spo group member <verb>' [#4087](https://github.com/pnp/cli-microsoft365/issues/4087)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
