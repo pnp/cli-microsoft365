@@ -10,9 +10,9 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-const command: Command = require('./group-user-add');
+const command: Command = require('./group-member-add');
 
-describe(commands.GROUP_USER_ADD, () => {
+describe(commands.GROUP_MEMBER_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -143,7 +143,7 @@ describe(commands.GROUP_USER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.GROUP_USER_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.GROUP_MEMBER_ADD), true);
   });
 
   it('has a description', () => {

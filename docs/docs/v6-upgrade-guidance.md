@@ -157,6 +157,15 @@ Current JSON command output:
 ### What action do I need to take?
 
 Update your scripts to expect an object instead of an array.
+## Updated `spo group user <verb>` commands
+
+We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possibly scenario's. In the near future we'll be adding support to add Azure AD Groups as group member. Using `spo group member` better fits the intended situation of adding either users or Azure AD groups.
+
+As a side issue, we've also updated the response output of the `spo group member list` command in JSON output mode. This returned a member array within a parent `value` object. In the new situation, the command returns the array without the parent `value` object.
+
+### What action do I need to take?
+
+Update your scripts to use the new `member` noun instead of `user`. If you are using the output of `spo group member list` in JSON output mode, update your scripts and remove the `value` object. 
 
 ## Aligned options with naming convention
 
