@@ -5,7 +5,7 @@ import Command from '../../../Command';
 import { M365RcJson } from '../../base/M365RcJson';
 import commands from '../commands';
 
-class ContextCommand extends Command {
+class ContextInitCommand extends Command {
   public get name(): string {
     return commands.CONTEXT_INIT;
   }
@@ -63,4 +63,4 @@ class ContextCommand extends Command {
 
 }
 
-module.exports = new ContextCommand();
+module.exports = new ContextInitCommand();
