@@ -208,7 +208,7 @@ class SpoListSetCommand extends SpoCommand {
       SpoListSetCommand.booleanOptions.forEach(o => {
         const value: boolean = (args.options as any)[o];
         if (value !== undefined) {
-          telemetryProps[o] = value.toString();
+          telemetryProps[o] = value;
         }
       });
 

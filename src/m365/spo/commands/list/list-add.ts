@@ -231,7 +231,7 @@ class SpoListAddCommand extends SpoCommand {
       ].forEach(o => {
         const value: any = (args.options as any)[o];
         if (value) {
-          telemetryProps[o] = value.toString();
+          telemetryProps[o] = value;
         }
       });
 
