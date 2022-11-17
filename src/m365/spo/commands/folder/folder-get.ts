@@ -114,14 +114,13 @@ class SpoFolderGetCommand extends SpoCommand {
     try {
       const folder = await request.get<FolderProperties>(requestOptions);
       if (args.options.withPermissions) {
-        if (folder?.ListItemAllFields?.RoleAssignments?.includes ?? true) {
-          throw new CommandError('Ensure folder URL or Id is not root folder url or root folder id. Use spo list get instead.');
+        const listItemAllFields = folder.ListItemAllFields;
+        if (!(listItemAllFields ?? false)) {
+          throw Error('Please ensure the specified folder URL or folder Id does not refer to a root folder. Use \'spo list get\' with withPermissions instead.');
         }
-        else {
-          folder.ListItemAllFields?.RoleAssignments?.forEach(r => {
-            r.Member.PrincipalTypeString = ListPrincipalType[r.Member.PrincipalType];
-          });
-        }
+        listItemAllFields.RoleAssignments.forEach(r => {
+          r.Member.PrincipalTypeString = ListPrincipalType[r.Member.PrincipalType];
+        });
       }
       logger.log(folder);
     }

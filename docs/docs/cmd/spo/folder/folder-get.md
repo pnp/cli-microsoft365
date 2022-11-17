@@ -19,6 +19,9 @@ m365 spo folder get [options]
 `-i, --id [id]`
 : The UniqueId (GUID) of the folder to retrieve. Specify either `url` or `id` but not both
 
+`--withPermissions`
+: Set if you want to return associated roles and permissions of the folder. For root level folder, please use the command 'spo list get'.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks

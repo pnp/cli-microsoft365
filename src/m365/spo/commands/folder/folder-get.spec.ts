@@ -535,17 +535,23 @@ describe(commands.FOLDER_GET, () => {
   });
 
   it('should show tip when root folder is used withPermissions', async () => {
-    sinon.stub(request, 'get').rejects({ statusCode: 500 });
+    const error = "Please ensure the specified folder URL or folder Id does not refer to a root folder. Use \'spo list get\' with withPermissions instead.";
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl('%2FShared%20Documents')?$expand=ListItemAllFields/HasUniqueRoleAssignments,ListItemAllFields/RoleAssignments/Member,ListItemAllFields/RoleAssignments/RoleDefinitionBindings`)) {
+        return Promise.resolve({ "data": { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 2, "Name": "Shared Documents", "ProgID": null, "ServerRelativeUrl": "/Shared Documents", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" } });
+      }
+      return Promise.reject(error);
+    });
 
     await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
-        url: '/Shared Documents',
+        url: 'Shared Documents',
         withPermissions: true
       }
-    } as any), new CommandError('Ensure folder URL or Id is not root folder url or root folder id. Use spo list get instead.'));
+    } as any), new CommandError(error));
   });
-
   it('supports debug mode', () => {
     const options = command.options;
     let containsDebugOption = false;
