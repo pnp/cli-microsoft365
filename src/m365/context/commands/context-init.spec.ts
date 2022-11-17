@@ -1,6 +1,5 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import * as fs from 'fs';
 import commands from '../commands';
 import { Logger } from '../../../cli/Logger';
 import { sinonUtil } from '../../../utils/sinonUtil';
@@ -38,10 +37,7 @@ describe(commands.INIT, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
-      fs.existsSync,
-      fs.readFileSync,
-      fs.writeFileSync
+      appInsights.trackEvent
     ]);
   });
 
@@ -63,8 +59,7 @@ describe(commands.INIT, () => {
     sinon.stub(ContextCommand, 'default').callsFake(async () => { });
 
     await command.action(logger, { options: { verbose: true } });
-    const test = loggerLogSpy.lastCall;
-    assert.strictEqual(Object.keys(test.args[0]).length, Object.keys(contextInfo).length);
+    assert.strictEqual(Object.keys(loggerLogSpy.lastCall.args[0]).length, Object.keys(contextInfo).length);
   });
 
 });
