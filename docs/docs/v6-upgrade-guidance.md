@@ -120,43 +120,15 @@ Current JSON command output:
 
 Update your scripts to read the `id` property of the command output.
 
-## Updated `spo eventreceiver get` command output
+## Updated `spo group user <verb>` commands
 
-In the past versions, `spo eventreceiver get` returned an array with a single object. This has been adjusted, now the command will return the object.
+We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possibly scenario's. In the near future we'll be adding support to add Azure AD Groups as group member. Using `spo group member` better fits the intended situation of adding either users or Azure AD groups.
 
-Previous JSON command output:
-```json
-[
-  {
-    "ReceiverAssembly": "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
-    "ReceiverClass": "Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver",
-    "ReceiverId": "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec",
-    "ReceiverName": "PnP Test Receiver",
-    "SequenceNumber": 10000,
-    "Synchronization": 2,
-    "EventType": 10204,
-    "ReceiverUrl": "https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b"
-  }
-]
-```
-
-Current JSON command output:
-```json
-{
-  "ReceiverAssembly": "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
-  "ReceiverClass": "Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver",
-  "ReceiverId": "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec",
-  "ReceiverName": "PnP Test Receiver",
-  "SequenceNumber": 10000,
-  "Synchronization": 2,
-  "EventType": 10204,
-  "ReceiverUrl": "https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b"
-}
-```
+As a side issue, we've also updated the response output of the `spo group member list` command in JSON output mode. This returned a member array within a parent `value` object. In the new situation, the command returns the array without the parent `value` object.
 
 ### What action do I need to take?
 
-Update your scripts to expect an object instead of an array.
+Update your scripts to use the new `member` noun instead of `user`. If you are using the output of `spo group member list` in JSON output mode, update your scripts and remove the `value` object. 
 
 ## Aligned options with naming convention
 
