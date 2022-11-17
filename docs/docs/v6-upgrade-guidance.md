@@ -120,6 +120,16 @@ Current JSON command output:
 
 Update your scripts to read the `id` property of the command output.
 
+## Updated `spo group user <verb>` commands
+
+We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possibly scenario's. In the near future we'll be adding support to add Azure AD Groups as group member. Using `spo group member` better fits the intended situation of adding either users or Azure AD groups.
+
+As a side issue, we've also updated the response output of the `spo group member list` command in JSON output mode. This returned a member array within a parent `value` object. In the new situation, the command returns the array without the parent `value` object.
+
+### What action do I need to take?
+
+Update your scripts to use the new `member` noun instead of `user`. If you are using the output of `spo group member list` in JSON output mode, update your scripts and remove the `value` object. 
+
 ## Aligned options with naming convention
 
 As we've been adding more commands to the CLI, we noticed that several commands were using inconsistent options names. Our naming convention states that options that refer to the last noun in the command, don't need that noun as a prefix. for example: the option `--webUrl` for `m365 spo web list` has been renamed to `--url` as the last noun is `web`. In version 6 of the CLI for Microsoft 365, we updated all these options to be consistent and make it easier for you to use the CLI.
