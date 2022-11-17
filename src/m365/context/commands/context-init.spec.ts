@@ -8,7 +8,7 @@ import { pid } from '../../../utils/pid';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import * as fs from 'fs';
 import commands from '../commands';
-const command: Command = require('./context');
+const command: Command = require('./context-init');
 
 describe(commands.CONTEXT_INIT, () => {
   let log: any[];
