@@ -212,7 +212,7 @@ Add-PnPFieldToContentType|PnP.PowerShell|[spo contenttype field set](../cmd/spo/
 Add-PnPFile|PnP.PowerShell|[spo file add](../cmd/spo/file/file-add.md)
 Add-PnPFileToSiteTemplate|PnP.PowerShell|
 Add-PnPFolder|PnP.PowerShell|[spo folder add](../cmd/spo/folder/folder-add.md)
-Add-PnPGroupMember|PnP.PowerShell|[group user add](../cmd/spo/group/group-user-add.md)
+Add-PnPGroupMember|PnP.PowerShell|[spo group member add](../cmd/spo/group/group-member-add.md)
 Add-PnPHtmlPublishingPageLayout|PnP.PowerShell|
 Add-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite connect](../cmd/spo/site/site-hubsite-connect.md)
 Add-PnPHubToHubAssociation|PnP.PowerShell|
@@ -368,7 +368,7 @@ Get-PnPFooter|PnP.PowerShell|
 Get-PnPGraphAccessToken|PnP.PowerShell|[util accesstoken get](../cmd/util/accesstoken/accesstoken-get.md)
 Get-PnPGraphSubscription|PnP.PowerShell|
 Get-PnPGroup|PnP.PowerShell|[spo group get](../cmd/spo/group/group-get.md), [spo group list](../cmd/spo/group/group-list.md)
-Get-PnPGroupMember|PnP.PowerShell|[spo group user list](../cmd/spo/group/group-user-list.md)
+Get-PnPGroupMember|PnP.PowerShell|[spo group member list](../cmd/spo/group/group-member-list.md)
 Get-PnPGroupPermissions|PnP.PowerShell|
 Get-PnPHideDefaultThemes|PnP.PowerShell|[spo hidedefaultthemes get](../cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md)
 Get-PnPHomePage|PnP.PowerShell|
@@ -602,7 +602,7 @@ Remove-PnPFlow|PnP.PowerShell|[flow remove](../cmd/flow/flow-remove.md)
 Remove-PnPFolder|PnP.PowerShell|[spo folder remove](../cmd/spo/folder/folder-remove.md)
 Remove-PnPGraphSubscription|PnP.PowerShell|
 Remove-PnPGroup|PnP.PowerShell|[spo group remove](../cmd/spo/group/group-remove.md)
-Remove-PnPGroupMember|PnP.PowerShell|[spo group user remove](../cmd/spo/group/group-user-remove.md)
+Remove-PnPGroupMember|PnP.PowerShell|[spo group member remove](../cmd/spo/group/group-member-remove.md)
 Remove-PnPHomeSite|PnP.PowerShell|[spo homesite remove](../cmd/spo/homesite/homesite-remove.md)
 Remove-PnPHubSiteAssociation|PnP.PowerShell|[spo hubsite disconnect](../cmd/spo/site/site-hubsite-disconnect.md)
 Remove-PnPHubToHubAssociation|PnP.PowerShell|

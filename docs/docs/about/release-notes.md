@@ -18,6 +18,7 @@
 - [pp card clone](../cmd/pp/card/card-clone.md) - clones a specific Microsoft Power Platform card in the specified Power Platform environment [#3790](https://github.com/pnp/cli-microsoft365/issues/3790)
 - [pp card remove](../cmd/pp/card/card-remove.md) - removes the specified Microsoft Power Platform card in the specified Power Platform environment [#3781](https://github.com/pnp/cli-microsoft365/issues/3781)
 - [pp dataverse table get](../cmd/pp/dataverse/dataverse-table-get.md) - lists a dataverse table in a given environment [#3726](https://github.com/pnp/cli-microsoft365/issues/3726)
+- [pp dataverse table remove](../cmd/pp/dataverse/dataverse-table-remove.md) - removes a dataverse table in a given environment [#4031](https://github.com/pnp/cli-microsoft365/issues/4031)
 - [pp solution remove](../cmd/pp/solution/solution-remove.md) - removes the specified solution in the specified Power Platform environment [#3723](https://github.com/pnp/cli-microsoft365/issues/3723)
 - [pp solution publisher get](../cmd/pp/solution/solution-publisher-get.md) - gets information about the specified publisher in a given environment [#3949](https://github.com/pnp/cli-microsoft365/issues/3949)
 - [pp solution publisher list](../cmd/pp/solution/solution-publisher-list.md) - lists publishers in a given environment [#3766](https://github.com/pnp/cli-microsoft365/issues/3766)
@@ -90,6 +91,12 @@
 - fixed retrieving all solutions for 'pp solution list' [#3802](https://github.com/pnp/cli-microsoft365/issues/3802)
 - fixed command output of 'teams app publish' [#4010](https://github.com/pnp/cli-microsoft365/issues/4010)
 - Fixed 'spo eventreceiver remove' command [#4033](https://github.com/pnp/cli-microsoft365/issues/4033)
+- Fixed infinite loop in 'yammer groups list' command [#4048](https://github.com/pnp/cli-microsoft365/issues/4048)
+- Added accept header to 'yammer search' command [#4049](https://github.com/pnp/cli-microsoft365/issues/4049)
+- Included response output for yammer commands [#3928](https://github.com/pnp/cli-microsoft365/issues/3928)
+- Updates GitHub actions to Node@16 [#3870](https://github.com/pnp/cli-microsoft365/issues/3870)
+- Updates docs for 'spo eventreceiver remove' command [#4050](https://github.com/pnp/cli-microsoft365/issues/4050)
+- Updates 'spo group user <verb>' to 'spo group member <verb>' [#4087](https://github.com/pnp/cli-microsoft365/issues/4087)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
@@ -573,7 +580,7 @@
 
 **SharePoint:**
 
-- [spo group user remove](../cmd/spo/group/group-user-remove.md) - removes the specified user from a SharePoint group [#2642](https://github.com/pnp/cli-microsoft365/issues/2642)
+- [spo group user remove](../cmd/spo/group/group-member-remove.md) - removes the specified user from a SharePoint group [#2642](https://github.com/pnp/cli-microsoft365/issues/2642)
 
 **Teams:**
 
@@ -766,7 +773,7 @@
 
 **SharePoint:**
 
-- [spo group user list](../cmd/spo/group/group-user-list.md) - list members of a SharePoint Group [#2640](https://github.com/pnp/cli-microsoft365/issues/2640)
+- [spo group user list](../cmd/spo/group/group-member-list.md) - list members of a SharePoint Group [#2640](https://github.com/pnp/cli-microsoft365/issues/2640)
 
 **Teams:**
 
@@ -807,7 +814,7 @@
 
 **SharePoint:**
 
-- [spo group user add](../cmd/spo/group/group-user-add.md) - add a user or multiple users to SharePoint Group [#2483](https://github.com/pnp/cli-microsoft365/issues/2483)
+- [spo group user add](../cmd/spo/group/group-member-add.md) - add a user or multiple users to SharePoint Group [#2483](https://github.com/pnp/cli-microsoft365/issues/2483)
 - [spo site apppermission remove](../cmd/spo/site/site-apppermission-remove.md) - removes a specific application permission from a site [#2209](https://github.com/pnp/cli-microsoft365/issues/2209)
 - [spo app instance list](../cmd/spo/app/app-instance-list.md) - retrieves apps installed in a site [#2025](https://github.com/pnp/cli-microsoft365/issues/2209)
 

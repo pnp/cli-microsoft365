@@ -266,6 +266,7 @@ nav:
       - dataverse:
         - dataverse table get: 'cmd/pp/dataverse/dataverse-table-get.md'
         - dataverse table list: 'cmd/pp/dataverse/dataverse-table-list.md'
+        - dataverse table remove: 'cmd/pp/dataverse/dataverse-table-remove.md'
       - environment:
         - environment get: 'cmd/pp/environment/environment-get.md'
         - environment list: 'cmd/pp/environment/environment-list.md'
@@ -402,9 +403,9 @@ nav:
         - group list: 'cmd/spo/group/group-list.md'
         - group remove: 'cmd/spo/group/group-remove.md'
         - group set: 'cmd/spo/group/group-set.md'
-        - group user add: 'cmd/spo/group/group-user-add.md'
-        - group user list: 'cmd/spo/group/group-user-list.md'
-        - group user remove: 'cmd/spo/group/group-user-remove.md'
+        - group member add: 'cmd/spo/group/group-member-add.md'
+        - group member list: 'cmd/spo/group/group-member-list.md'
+        - group member remove: 'cmd/spo/group/group-member-remove.md'
       - hidedefaultthemes:
         - hidedefaultthemes get: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md'
         - hidedefaultthemes set: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md'

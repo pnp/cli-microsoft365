@@ -50,3 +50,39 @@ Gets details about Yammer activity by user for the last week and exports the rep
 ```sh
 m365 yammer report activityuserdetail --period D7 --output json > "activityuserdetail.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-11-09",
+        "User Principal Name": "0439A166C614C2E8C7B4075DC4752054",
+        "Display Name": "2236A6E43D08F619FE695DF3B163A32F",
+        "User State": "",
+        "State Change Date": "",
+        "Last Activity Date": "",
+        "Posted Count": "0",
+        "Read Count": "0",
+        "Liked Count": "0",
+        "Assigned Products": "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,User Principal Name,Display Name,User State,State Change Date,Last Activity Date,Posted Count,Read Count,Liked Count,Assigned Products,Report Period
+    2022-11-09,77E5979DD60BA6EAA53E814DBEEEFA5F,4291DA7C39EE3263E97336B42734A667,,,,0,0,0,MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING),7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,User Principal Name,Display Name,User State,State Change Date,Last Activity Date,Posted Count,Read Count,Liked Count,Assigned Products,Report Period
+    2022-11-09,77E5979DD60BA6EAA53E814DBEEEFA5F,4291DA7C39EE3263E97336B42734A667,,,,0,0,0,MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING),7
+    ```
