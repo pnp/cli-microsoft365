@@ -15,8 +15,7 @@ class ContextInitCommand extends ContextCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    const contextInfo = await this.saveContextInfo({}, logger);
-    logger.log(contextInfo);
+    await this.saveContextInfo({}, logger);
   }
 }
 

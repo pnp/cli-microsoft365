@@ -5,7 +5,7 @@ import { M365RcJson } from './M365RcJson';
 import { Hash } from '../../utils/types';
 
 export default abstract class ContextCommand extends AnonymousCommand {
-  public saveContextInfo(context: Hash, logger: Logger): Promise<any> {
+  public saveContextInfo(context: Hash, logger: Logger): void {
     const filePath: string = '.m365rc.json';
 
     let m365rc: M365RcJson = {};
@@ -18,7 +18,7 @@ export default abstract class ContextCommand extends AnonymousCommand {
       }
       catch (e) {
         logger.logToStderr(`Error reading ${filePath}: ${e}. Please add context info to ${filePath} manually.`);
-        return Promise.resolve(context);
+        return;
       }
     }
 
@@ -32,7 +32,5 @@ export default abstract class ContextCommand extends AnonymousCommand {
         logger.logToStderr(`Error writing ${filePath}: ${e}. Please add context info to ${filePath} manually.`);
       }
     }
-
-    return Promise.resolve(context);
   }
 }

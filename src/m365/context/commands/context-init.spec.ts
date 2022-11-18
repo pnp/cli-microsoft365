@@ -5,15 +5,13 @@ import { Logger } from '../../../cli/Logger';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import appInsights from '../../../appInsights';
 import Command from '../../../Command';
-import * as ContextCommand from '../../base/ContextCommand';
-import { Hash } from '../../../utils/types';
 const command: Command = require('./context-init');
 
 describe(commands.INIT, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
-  const contextInfo: Hash = {};
+  // let loggerLogSpy: sinon.SinonSpy;
+  // const contextInfo: Hash = {};
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -32,7 +30,6 @@ describe(commands.INIT, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -55,11 +52,9 @@ describe(commands.INIT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves a context', async () => {
-    sinon.stub(ContextCommand, 'default').callsFake(async () => { });
-
+  it('writes a context to the .m365rc.json file', async () => {
     await command.action(logger, { options: { verbose: true } });
-    assert.strictEqual(Object.keys(loggerLogSpy.lastCall.args[0]).length, Object.keys(contextInfo).length);
+    assert.deepStrictEqual((command as any).saveContextInfo(), undefined);
   });
 
 });
