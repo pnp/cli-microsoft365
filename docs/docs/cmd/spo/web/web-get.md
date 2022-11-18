@@ -23,19 +23,19 @@ m365 spo web get [options]
 
 ## Examples
 
-Retrieve information about the site _https://contoso.sharepoint.com/subsite_
+Retrieve information about a site
 
 ```sh
 m365 spo web get --url https://contoso.sharepoint.com/subsite
 ```
 
-Retrieve information about the site _https://contoso.sharepoint.com/subsite_ along with associated groups for the web
+Retrieve information about a site along with associated groups for the web
 
 ```sh
 m365 spo web get --url https://contoso.sharepoint.com/subsite --withGroups
 ```
 
-Retrieve information about the site _https://contoso.sharepoint.com/subsite_ along with the RoleAssignments for the web
+Retrieve information about a site along with the RoleAssignments for the web
 
 ```sh
 m365 spo web get --url https://contoso.sharepoint.com/subsite --withPermissions

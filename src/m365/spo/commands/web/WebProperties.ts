@@ -1,3 +1,5 @@
+import { RoleAssignment } from "@microsoft/microsoft-graph-types";
+
 export interface WebProperties {
   AllowRssFeeds: boolean;
   AlternateCssUrl: string;
@@ -34,7 +36,7 @@ export interface WebProperties {
   UIVersionConfigurationEnabled: boolean;
   Url: string;
   WebTemplate: string;
-  RoleAssignments?: any;
+  RoleAssignments?: RoleAssignment[];
 }
 
 export interface CurrentChangeToken {
