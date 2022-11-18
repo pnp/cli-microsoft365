@@ -16,6 +16,7 @@ export default {
   MANAGEMENTAPP_LIST: `${prefix} managementapp list`,
   SOLUTION_GET: `${prefix} solution get`,
   SOLUTION_LIST: `${prefix} solution list`,
+  SOLUTION_PUBLISH: `${prefix} solution publish`,
   SOLUTION_REMOVE: `${prefix} solution remove`,
   SOLUTION_PUBLISHER_GET: `${prefix} solution publisher get`,
   SOLUTION_PUBLISHER_LIST: `${prefix} solution publisher list`,
