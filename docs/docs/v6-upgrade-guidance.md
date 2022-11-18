@@ -109,7 +109,7 @@ Previous JSON command output:
 Current JSON command output:
 ```json
 {
-    "id": "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
+    "id": "fbdfd207-83ee-45d8-9c98-5039a1a01207",
     "externalId": "b5561ec9-8cab-4aa3-8aa2-d8d7172e4311",
     "displayName": "Test App",
     "distributionMethod": "organization"
@@ -119,6 +119,44 @@ Current JSON command output:
 ### What action do I need to take?
 
 Update your scripts to read the `id` property of the command output.
+
+## Updated `spo eventreceiver get` command output
+
+In the past versions, `spo eventreceiver get` returned an array with a single object. This has been adjusted, now the command will only return the object.
+
+Previous JSON command output:
+```json
+[
+  {
+    "ReceiverAssembly": "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
+    "ReceiverClass": "Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver",
+    "ReceiverId": "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec",
+    "ReceiverName": "PnP Test Receiver",
+    "SequenceNumber": 10000,
+    "Synchronization": 2,
+    "EventType": 10204,
+    "ReceiverUrl": "https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b"
+  }
+]
+```
+
+Current JSON command output:
+```json
+{
+  "ReceiverAssembly": "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
+  "ReceiverClass": "Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver",
+  "ReceiverId": "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec",
+  "ReceiverName": "PnP Test Receiver",
+  "SequenceNumber": 10000,
+  "Synchronization": 2,
+  "EventType": 10204,
+  "ReceiverUrl": "https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b"
+}
+```
+
+### What action do I need to take?
+
+Update your scripts to expect a single object instead of an array.
 
 ## Updated `spo group user <verb>` commands
 
