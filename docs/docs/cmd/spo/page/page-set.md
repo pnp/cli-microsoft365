@@ -17,10 +17,10 @@ m365 spo page set [options]
 : URL of the site where the page to update is located
 
 `-l, --layoutType [layoutType]`
-: Layout of the page. Allowed values `Article`, `Home`, `SingleWebPartAppPage`, `RepostPage`,`HeaderlessSearchResults`, `Spaces`, `Topic`
+: Layout of the page. Allowed values `Article`, `Home`, `SingleWebPartAppPage`, `RepostPage`, `HeaderlessSearchResults`, `Spaces`, `Topic`
 
 `-p, --promoteAs [promoteAs]`
-: Update the page purpose. Allowed values `HomePage`, `NewsPage`
+: Update the page purpose. Allowed values `HomePage`, `NewsPage`, `Template`
 
 `--commentsEnabled [commentsEnabled]`
 : Set to `true`, to enable comments on the page. Allowed values `true`, `false`

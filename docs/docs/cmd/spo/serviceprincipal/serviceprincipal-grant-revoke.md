@@ -21,10 +21,10 @@ m365 spo sp grant revoke
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
+
+!!! important
+    To use this command you must be a Global administrator.
 
 The permission grant you want to revoke is denoted using its `ObjectId`. You can retrieve it using the [spo serviceprincipal grant list](./serviceprincipal-grant-list.md) command.
 
