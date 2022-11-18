@@ -32,8 +32,7 @@ Specify either `listTitle`, `listId` or `listUrl`.
 : The id of the event receiver to retrieve. Specify either `name` or `id` but not both.
 
 `-s, --scope [scope]`
-: The scope of which to retrieve the Event Receivers.
-Can be either "site" or "web". Defaults to "web". Only applicable when not specifying any of the list properties.
+: The scope of which to retrieve the event receivers. Can be either `site` or `web`. Defaults to `web`. Only applicable when not specifying any of the list properties.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -68,3 +67,44 @@ Retrieve event receivers for list with url _/sites/contoso-sales/lists/Events_ i
 ```sh
 m365 spo eventreceiver list --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl '/sites/contoso-sales/lists/Events' --name 'PnP Test Receiver'
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "ReceiverAssembly": "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
+      "ReceiverClass": "Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver",
+      "ReceiverId": "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec",
+      "ReceiverName": "PnP Test Receiver",
+      "SequenceNumber": 10000,
+      "Synchronization": 2,
+      "EventType": 10204,
+      "ReceiverUrl": "https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    EventType       : 10204
+    ReceiverAssembly: Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c
+    ReceiverClass   : Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver
+    ReceiverId      : c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec
+    ReceiverName    : PnP Test Receiver
+    ReceiverUrl     : https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b
+    SequenceNumber  : 10000
+    Synchronization : 2
+    ```
+
+=== "CSV"
+
+    ```csv
+    ReceiverAssembly,ReceiverClass,ReceiverId,ReceiverName,SequenceNumber,Synchronization,EventType,ReceiverUrl
+    "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver,c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec,PnP Test Receiver,10000,2,10204,https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b
+    ```
+
+
+
+

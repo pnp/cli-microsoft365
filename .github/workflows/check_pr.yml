@@ -111,4 +111,15 @@ jobs:
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
           path: coverage.tar
-  
+  test_docs:
+    if: github.repository_owner == 'pnp'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: pip install -r docs/pip_requirements.txt
+      - run: mkdocs build --strict
+        working-directory: docs
