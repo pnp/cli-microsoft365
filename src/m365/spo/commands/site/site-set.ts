@@ -513,7 +513,7 @@ class SpoSiteSetCommand extends SpoCommand {
       if (typeof args.options.isPublic !== 'undefined') {
         const commandOptions: AadO365GroupSetCommandOptions = {
           id: this.groupId as string,
-          isPrivate: (args.options.isPublic === 'false').toString(),
+          isPrivate: (args.options.isPublic === 'false'),
           debug: this.debug,
           verbose: this.verbose
         };
