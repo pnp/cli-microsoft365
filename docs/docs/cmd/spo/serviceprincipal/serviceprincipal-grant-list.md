@@ -18,8 +18,10 @@ m365 spo sp grant list
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
 !!! important
-    To use this command you have to have permissions to access the tenant admin site.
+    To use this command you must be a Global administrator.
 
 ## Examples
 
