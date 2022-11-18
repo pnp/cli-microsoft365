@@ -10,8 +10,6 @@ const command: Command = require('./context-init');
 describe(commands.INIT, () => {
   let log: any[];
   let logger: Logger;
-  // let loggerLogSpy: sinon.SinonSpy;
-  // const contextInfo: Hash = {};
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
