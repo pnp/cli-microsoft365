@@ -70,3 +70,9 @@ Update the field _Title_ and _CustomHyperlink_ of an item with a specific id in 
 ```sh
 m365 spo listitem set --listUrl '/sites/project-x/lists/Demo List' --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
 ```
+
+Update an item with a specific Title and multi-choice value
+
+```sh
+m365 spo listitem set --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --MultiChoiceField "Choice 1;#Choice 2;#Choice 3"
+```

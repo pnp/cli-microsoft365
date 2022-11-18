@@ -88,24 +88,24 @@ class SpoEventreceiverGetCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
         if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
           return `Specify either list id or title or list url`;
         }
-    
+
         if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
           return `${args.options.listId} is not a valid GUID`;
         }
-    
+
         if (args.options.scope && ['web', 'site'].indexOf(args.options.scope) === -1) {
           return `${args.options.scope} is not a valid type value. Allowed values web|site.`;
         }
-    
+
         if (args.options.scope && args.options.scope === 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
           return 'Scope cannot be set to site when retrieving list event receivers.';
         }
-    
+
         return true;
       }
     );
@@ -116,49 +116,72 @@ class SpoEventreceiverGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let requestUrl = `${args.options.webUrl}/_api/`;
-    let listUrl: string = '';
-    let filter: string = '?$filter=';
+    try {
+      const eventReceiver: EventReceiver = await this.getEventReceiver(args);
 
-    if (args.options.listId) {
-      listUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
+      logger.log(eventReceiver);
     }
-    else if (args.options.listTitle) {
-      listUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/`;
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
-    else if (args.options.listUrl) {
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-      listUrl = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
-    }
+  }
 
-    if (!args.options.scope || args.options.scope === 'web') {
-      requestUrl += `web/${listUrl}eventreceivers`;
-    }
-    else {
-      requestUrl += 'site/eventreceivers';
-    }
-
-    if (args.options.id) {
-      filter += `receiverid eq (guid'${args.options.id}')`;
-    }
-    else {
-      filter += `receivername eq '${args.options.name}'`;
-    }
-
+  private async getEventReceiver(args: CommandArgs): Promise<EventReceiver> {
     const requestOptions: AxiosRequestConfig = {
-      url: requestUrl + filter,
+      url: `${args.options.webUrl}/_api`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    try {
-      const res = await request.get<{ value: EventReceiver[] }>(requestOptions);
-      logger.log(res.value);
+    if (!args.options.scope || args.options.scope === 'web') {
+      requestOptions.url += `/web`;
     }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+    else {
+      requestOptions.url += '/site';
+    }
+
+    if (args.options.listId) {
+      requestOptions.url += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+    }
+    else if (args.options.listTitle) {
+      requestOptions.url += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      requestOptions.url += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
+
+    requestOptions.url += '/eventreceivers';
+
+
+    if (args.options.id) {
+      requestOptions.url += `(guid'${args.options.id}')`;
+
+      const res = await request.get<EventReceiver>(requestOptions);
+
+      // Instead of failing, the request will return an 'odata.null' object if the event receiver doesn't exist.
+      if (res && (res as any)['odata.null']) {
+        throw `The specified event receiver '${args.options.id}' does not exist.`;
+      }
+
+      return res;
+    }
+    else {
+      requestOptions.url += `?$filter=receivername eq '${args.options.name}'`;
+
+      const res = await request.get<{ value: EventReceiver[] }>(requestOptions);
+
+      if (res.value.length === 0) {
+        throw `The specified event receiver '${args.options.name}' does not exist.`;
+      }
+
+      if (res.value && res.value.length > 1) {
+        throw `Multiple event receivers with name '${args.options.name}' found: ${res.value.map(x => x.ReceiverId)}`;
+      }
+
+      return res.value[0];
     }
   }
 }
