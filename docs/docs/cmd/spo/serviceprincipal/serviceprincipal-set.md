@@ -24,10 +24,10 @@ m365 spo sp set
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
+
+!!! important
+    To use this command you must be a Global administrator.
 
 Using the `-e, --enabled` option you can specify whether the service principal should be enabled or disabled. Use `true` to enable the service principal and `false` to disable it.
 
