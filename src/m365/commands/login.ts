@@ -25,6 +25,8 @@ interface Options extends GlobalOptions {
 }
 
 class LoginCommand extends Command {
+  private static allowedAuthTypes: string[] = ['certificate', 'deviceCode', 'password', 'identity', 'browser', 'secret'];
+
   public get name(): string {
     return commands.LOGIN;
   }
@@ -35,12 +37,12 @@ class LoginCommand extends Command {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -48,12 +50,12 @@ class LoginCommand extends Command {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
         option: '-t, --authType [authType]',
-        autocomplete: ['certificate', 'deviceCode', 'password', 'identity', 'browser']
+        autocomplete: LoginCommand.allowedAuthTypes
       },
       {
         option: '-u, --userName [userName]'
@@ -81,7 +83,7 @@ class LoginCommand extends Command {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -89,34 +91,39 @@ class LoginCommand extends Command {
           if (!args.options.userName) {
             return 'Required option userName missing';
           }
-    
+
           if (!args.options.password) {
             return 'Required option password missing';
           }
         }
-    
+
         if (args.options.authType === 'certificate') {
           if (args.options.certificateFile && args.options.certificateBase64Encoded) {
             return 'Specify either certificateFile or certificateBase64Encoded, but not both.';
           }
-    
+
           if (!args.options.certificateFile && !args.options.certificateBase64Encoded) {
             return 'Specify either certificateFile or certificateBase64Encoded';
           }
-    
+
           if (args.options.certificateFile) {
             if (!fs.existsSync(args.options.certificateFile)) {
               return `File '${args.options.certificateFile}' does not exist`;
             }
           }
         }
-    
+
+        if (args.options.authType &&
+          LoginCommand.allowedAuthTypes.indexOf(args.options.authType) < 0) {
+          return `'${args.options.authType}' is not a valid authentication type. Allowed authentication types are ${LoginCommand.allowedAuthTypes.join(', ')}`;
+        }
+
         if (args.options.authType === 'secret') {
           if (!args.options.secret) {
             return 'Required option secret missing';
           }
         }
-    
+
         return true;
       }
     );
@@ -153,7 +160,7 @@ class LoginCommand extends Command {
         case 'identity':
           auth.service.authType = AuthType.Identity;
           auth.service.userName = args.options.userName;
-          break;        
+          break;
         case 'browser':
           auth.service.authType = AuthType.Browser;
           break;
@@ -167,7 +174,7 @@ class LoginCommand extends Command {
         await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
         auth.service.connected = true;
       }
-      catch(error: any) {
+      catch (error: any) {
         if (this.debug) {
           logger.logToStderr('Error:');
           logger.logToStderr(error);

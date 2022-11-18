@@ -18,44 +18,17 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
-  const eventReceiverResponseMultiple = JSON.stringify(
-    [
-      {
-        "ReceiverAssembly": "Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
-        "ReceiverClass": "Microsoft.SharePoint.Internal.SitePages.Sharing.PageSharingEventReceiver",
-        "ReceiverId": "625b1f4c-2869-457f-8b41-bed72059bb2b",
-        "ReceiverName": "Microsoft.SharePoint.Internal.SitePages.Sharing.PageSharingEventReceiver",
-        "SequenceNumber": 10000,
-        "Synchronization": 1,
-        "EventType": 309,
-        "ReceiverUrl": null
-      },
-      {
-        "ReceiverAssembly": "Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
-        "ReceiverClass": "Microsoft.SharePoint.Internal.SitePages.Sharing.PageSharingEventReceiver",
-        "ReceiverId": "41ad359e-ac6a-4a5e-8966-a85492ca4f52",
-        "ReceiverName": "Microsoft.SharePoint.Internal.SitePages.Sharing.PageSharingEventReceiver",
-        "SequenceNumber": 10000,
-        "Synchronization": 1,
-        "EventType": 310,
-        "ReceiverUrl": null
-      }
-    ]
-  );
-
-  const eventReceiverResponseSingle = JSON.stringify(
-    [
-      {
-        "ReceiverAssembly": "Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
-        "ReceiverClass": "Microsoft.SharePoint.Internal.SitePages.Sharing.PageSharingEventReceiver",
-        "ReceiverId": "625b1f4c-2869-457f-8b41-bed72059bb2b",
-        "ReceiverName": "Microsoft.SharePoint.Internal.SitePages.Sharing.PageSharingEventReceiver",
-        "SequenceNumber": 10000,
-        "Synchronization": 1,
-        "EventType": 309,
-        "ReceiverUrl": null
-      }
-    ]
+  const eventReceiverResponse = JSON.stringify(
+    {
+      "ReceiverAssembly": "Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
+      "ReceiverClass": "Microsoft.SharePoint.Internal.SitePages.Sharing.PageSharingEventReceiver",
+      "ReceiverId": "625b1f4c-2869-457f-8b41-bed72059bb2b",
+      "ReceiverName": "Microsoft.SharePoint.Internal.SitePages.Sharing.PageSharingEventReceiver",
+      "SequenceNumber": 10000,
+      "Synchronization": 1,
+      "EventType": 309,
+      "ReceiverUrl": null
+    }
   );
 
   before(() => {
@@ -201,7 +174,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
       return ({
-        stdout: eventReceiverResponseSingle
+        stdout: eventReceiverResponse
       });
     });
 
@@ -219,7 +192,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     });
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
       return ({
-        stdout: eventReceiverResponseSingle
+        stdout: eventReceiverResponse
       });
     });
     sinonUtil.restore(Cli.prompt);
@@ -240,7 +213,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     });
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
       return ({
-        stdout: eventReceiverResponseSingle
+        stdout: eventReceiverResponse
       });
     });
     sinonUtil.restore(Cli.prompt);
@@ -261,7 +234,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     });
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
       return ({
-        stdout: eventReceiverResponseSingle
+        stdout: eventReceiverResponse
       });
     });
     sinonUtil.restore(Cli.prompt);
@@ -282,7 +255,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     });
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
       return ({
-        stdout: eventReceiverResponseSingle
+        stdout: eventReceiverResponse
       });
     });
     sinonUtil.restore(Cli.prompt);
@@ -303,7 +276,7 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     });
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
       return ({
-        stdout: eventReceiverResponseSingle
+        stdout: eventReceiverResponse
       });
     });
     sinonUtil.restore(Cli.prompt);
@@ -314,43 +287,26 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
     assert(requestDeleteStub.called);
   });
 
-  it('shows error when no event receiver is found by name', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
-      return ({
-        stdout: "[]"
-      });
-    });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
-    await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/portal',
-        scope: 'site',
-        name: 'PnP Test Receiver'
-      }
-    }), new CommandError(`Specified event receiver with name 'PnP Test Receiver' cannot be found`));
-  });
+  it('correctly handles API OData error', async () => {
+    const errorMessage = 'Something went wrong';
 
-  it('shows error when multiple event receivers are found by name', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (): Promise<any> => {
       return ({
-        stdout: eventReceiverResponseMultiple
+        stdout: eventReceiverResponse
       });
     });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
+
+    sinon.stub(request, 'delete').callsFake(async () => { throw { error: { error: { message: errorMessage } } }; });
 
     await assert.rejects(command.action(logger, {
       options: {
+        debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/portal',
         scope: 'site',
-        name: 'PnP Test Receiver'
+        name: 'PnP Test Receiver',
+        confirm: true
       }
-    }), new CommandError(`Multiple eventreceivers with name 'PnP Test Receiver' found: 625b1f4c-2869-457f-8b41-bed72059bb2b,41ad359e-ac6a-4a5e-8966-a85492ca4f52`));
+    }), new CommandError(errorMessage));
   });
 
   it('supports debug mode', () => {
