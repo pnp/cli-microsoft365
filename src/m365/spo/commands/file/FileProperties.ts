@@ -1,3 +1,5 @@
+import { RoleAssignment } from "@microsoft/microsoft-graph-types";
+
 export interface FileProperties {
   ListItemAllFields: any;
   CheckInComment: string;
@@ -21,5 +23,5 @@ export interface FileProperties {
   UIVersion: number;
   UIVersionLabel: string;
   UniqueId: string;
-  RoleAssignments?: any
+  RoleAssignments?: RoleAssignment[];
 }

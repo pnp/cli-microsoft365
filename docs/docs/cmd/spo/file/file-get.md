@@ -38,55 +38,55 @@ m365 spo file get [options]
 
 ## Examples
 
-Get file properties for file with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get file properties for a file with id (UniqueId) parameter located in a site
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6'
 ```
 
-Get contents of the file with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get contents of the file with id (UniqueId) parameter located in a site
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asString
 ```
 
-Get list item properties for file with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Get list item properties for a file with id (UniqueId) parameter located in a site
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asListItem
 ```
 
-Save file with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_ to local file _/Users/user/documents/SavedAsTest1.docx_
+Saves the file with id (UniqueId) parameter located in a site to a local file
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asFile --path /Users/user/documents/SavedAsTest1.docx
 ```
 
-Return file properties for file with server-relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Return file properties for a file with server-relative url located in a site
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx'
 ```
 
-Return file as string for file with server-relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Returns a file as string for a file with server-relative url located in a site
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asString
 ```
 
-Return list item properties for file with server-relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Returna the list item properties for a file with the server-relative url located in a site
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asListItem
 ```
 
-Save file with server-relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_ to local file _/Users/user/documentsSavedAsTest1.docx_
+Saves a file with the server-relative url located in a site to a local file
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asFile --path /Users/user/documents/SavedAsTest1.docx
 ```
 
-Get file properties for file with id (UniqueId) _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_ with permissions
+Gets the file properties for a file with id (UniqueId) parameter located in a site with permissions
 
 ```sh
 m365 spo file get --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --withPermissions
