@@ -1,3 +1,5 @@
+import { RoleDefinition } from "../roledefinition/RoleDefinition";
+
 export interface FolderProperties {
   Exists: boolean;
   IsWOPIEnabled: boolean;
@@ -16,6 +18,7 @@ export interface ListItemAllFields {
 }
 export interface RoleAssignment {
   Member: Member;
+  RoleDefinitionBindings: RoleDefinition[];
 }
 export interface Member {
   PrincipalType: number;

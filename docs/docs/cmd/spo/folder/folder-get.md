@@ -42,3 +42,8 @@ Get folder properties for folder with id (UniqueId) _b2307a39-e878-458b-bc90-03b
 ```sh
 m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/project-x --id "b2307a39-e878-458b-bc90-03bc578531d6"
 ```
+Get folder properties for folder with server-relative url _'/Shared Documents/Test1'_ located in site _https://contoso.sharepoint.com/sites/test
+
+```sh
+m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/test --url "Shared Documents/Test1" --withPermissions
+```

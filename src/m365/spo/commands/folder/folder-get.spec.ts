@@ -375,15 +375,15 @@ describe(commands.FOLDER_GET, () => {
             "Member": {
               "Id": 3,
               "IsHiddenInUI": false,
-              "LoginName": "MySite Owners",
-              "Title": "MySite Owners",
+              "LoginName": "Test_Site Owners",
+              "Title": "Test_Site Owners",
               "PrincipalType": 8,
               "AllowMembersEditMembership": false,
               "AllowRequestToJoinLeave": false,
               "AutoAcceptRequestToJoinLeave": false,
               "Description": null,
               "OnlyAllowMembersViewMembership": false,
-              "OwnerTitle": "MySite Owners",
+              "OwnerTitle": "Test_Site Owners",
               "RequestToJoinLeaveEmailSetting": "",
               "PrincipalTypeString": "SharePointGroup"
             },
@@ -398,7 +398,45 @@ describe(commands.FOLDER_GET, () => {
                 "Id": 1073741829,
                 "Name": "Full Control",
                 "Order": 1,
-                "RoleTypeKind": 5
+                "RoleTypeKind": 5,
+                "BasePermissionsValue": [
+                  "ViewListItems",
+                  "AddListItems",
+                  "EditListItems",
+                  "DeleteListItems",
+                  "ApproveItems",
+                  "OpenItems",
+                  "ViewVersions",
+                  "DeleteVersions",
+                  "CancelCheckout",
+                  "ManagePersonalViews",
+                  "ManageLists",
+                  "ViewFormPages",
+                  "AnonymousSearchAccessList",
+                  "Open",
+                  "ViewPages",
+                  "AddAndCustomizePages",
+                  "ApplyThemeAndBorder",
+                  "ApplyStyleSheets",
+                  "ViewUsageData",
+                  "CreateSSCSite",
+                  "ManageSubwebs",
+                  "CreateGroups",
+                  "ManagePermissions",
+                  "BrowseDirectories",
+                  "BrowseUserInfo",
+                  "AddDelPrivateWebParts",
+                  "UpdatePersonalWebParts",
+                  "ManageWeb",
+                  "AnonymousSearchAccessWebLists",
+                  "UseClientIntegration",
+                  "UseRemoteAPIs",
+                  "ManageAlerts",
+                  "CreateAlerts",
+                  "EditMyUserInfo",
+                  "EnumeratePermissions"
+                ],
+                "RoleTypeKindValue": "Administrator"
               }
             ],
             "PrincipalId": 3
@@ -407,15 +445,15 @@ describe(commands.FOLDER_GET, () => {
             "Member": {
               "Id": 4,
               "IsHiddenInUI": false,
-              "LoginName": "MySite Visitors",
-              "Title": "MySite Visitors",
+              "LoginName": "Test_Site Visitors",
+              "Title": "Test_Site Visitors",
               "PrincipalType": 8,
               "AllowMembersEditMembership": false,
               "AllowRequestToJoinLeave": false,
               "AutoAcceptRequestToJoinLeave": false,
               "Description": null,
               "OnlyAllowMembersViewMembership": false,
-              "OwnerTitle": "MySite Owners",
+              "OwnerTitle": "Test_Site Owners",
               "RequestToJoinLeaveEmailSetting": "",
               "PrincipalTypeString": "SharePointGroup"
             },
@@ -430,7 +468,21 @@ describe(commands.FOLDER_GET, () => {
                 "Id": 1073741826,
                 "Name": "Read",
                 "Order": 128,
-                "RoleTypeKind": 2
+                "RoleTypeKind": 2,
+                "BasePermissionsValue": [
+                  "ViewListItems",
+                  "OpenItems",
+                  "ViewVersions",
+                  "ViewFormPages",
+                  "Open",
+                  "ViewPages",
+                  "CreateSSCSite",
+                  "BrowseUserInfo",
+                  "UseClientIntegration",
+                  "UseRemoteAPIs",
+                  "CreateAlerts"
+                ],
+                "RoleTypeKindValue": "Reader"
               }
             ],
             "PrincipalId": 4
@@ -439,15 +491,15 @@ describe(commands.FOLDER_GET, () => {
             "Member": {
               "Id": 5,
               "IsHiddenInUI": false,
-              "LoginName": "MySite Members",
-              "Title": "MySite Members",
+              "LoginName": "Test_Site Members",
+              "Title": "Test_Site Members",
               "PrincipalType": 8,
               "AllowMembersEditMembership": true,
               "AllowRequestToJoinLeave": false,
               "AutoAcceptRequestToJoinLeave": false,
               "Description": null,
               "OnlyAllowMembersViewMembership": false,
-              "OwnerTitle": "MySite Owners",
+              "OwnerTitle": "Test_Site Owners",
               "RequestToJoinLeaveEmailSetting": "",
               "PrincipalTypeString": "SharePointGroup"
             },
@@ -462,45 +514,166 @@ describe(commands.FOLDER_GET, () => {
                 "Id": 1073741830,
                 "Name": "Edit",
                 "Order": 48,
-                "RoleTypeKind": 6
+                "RoleTypeKind": 6,
+                "BasePermissionsValue": [
+                  "ViewListItems",
+                  "AddListItems",
+                  "EditListItems",
+                  "DeleteListItems",
+                  "OpenItems",
+                  "ViewVersions",
+                  "DeleteVersions",
+                  "ManagePersonalViews",
+                  "ManageLists",
+                  "ViewFormPages",
+                  "Open",
+                  "ViewPages",
+                  "CreateSSCSite",
+                  "BrowseDirectories",
+                  "BrowseUserInfo",
+                  "AddDelPrivateWebParts",
+                  "UpdatePersonalWebParts",
+                  "UseClientIntegration",
+                  "UseRemoteAPIs",
+                  "CreateAlerts",
+                  "EditMyUserInfo"
+                ],
+                "RoleTypeKindValue": "Editor"
               }
             ],
             "PrincipalId": 5
           },
           {
             "Member": {
-              "Id": 12,
+              "Id": 10,
               "IsHiddenInUI": false,
-              "LoginName": "i:0#.f|membership|user@contoso.onmicrosoft.com",
-              "Title": "User",
+              "LoginName": "i:0#.f|membership|reshmeeauckloo@reshmeeauckloo.onmicrosoft.com",
+              "Title": "Reshmee Auckloo",
               "PrincipalType": 1,
-              "Email": "user@contoso.onmicrosoft.com",
+              "Email": "reshmeeauckloo@reshmeeauckloo.onmicrosoft.com",
               "Expiration": "",
               "IsEmailAuthenticationGuestUser": false,
               "IsShareByEmailGuestUser": false,
               "IsSiteAdmin": false,
               "UserId": {
-                "NameId": "10032000f65ded70",
+                "NameId": "10032000decdad9a",
                 "NameIdIssuer": "urn:federation:microsoftonline"
               },
-              "UserPrincipalName": "user@contoso.onmicrosoft.com",
+              "UserPrincipalName": "reshmeeauckloo@reshmeeauckloo.onmicrosoft.com",
               "PrincipalTypeString": "User"
             },
             "RoleDefinitionBindings": [
               {
                 "BasePermissions": {
-                  "High": "176",
-                  "Low": "138612833"
+                  "High": "432",
+                  "Low": "1011030767"
                 },
-                "Description": "Can view pages and list items and download documents.",
+                "Description": "Can add, edit and delete lists; can view, add, update and delete list items and documents.",
                 "Hidden": false,
-                "Id": 1073741826,
-                "Name": "Read",
-                "Order": 128,
-                "RoleTypeKind": 2
+                "Id": 1073741830,
+                "Name": "Edit",
+                "Order": 48,
+                "RoleTypeKind": 6,
+                "BasePermissionsValue": [
+                  "ViewListItems",
+                  "AddListItems",
+                  "EditListItems",
+                  "DeleteListItems",
+                  "OpenItems",
+                  "ViewVersions",
+                  "DeleteVersions",
+                  "ManagePersonalViews",
+                  "ManageLists",
+                  "ViewFormPages",
+                  "Open",
+                  "ViewPages",
+                  "CreateSSCSite",
+                  "BrowseDirectories",
+                  "BrowseUserInfo",
+                  "AddDelPrivateWebParts",
+                  "UpdatePersonalWebParts",
+                  "UseClientIntegration",
+                  "UseRemoteAPIs",
+                  "CreateAlerts",
+                  "EditMyUserInfo"
+                ],
+                "RoleTypeKindValue": "Editor"
               }
             ],
-            "PrincipalId": 12
+            "PrincipalId": 10
+          },
+          {
+            "Member": {
+              "Id": 11,
+              "IsHiddenInUI": false,
+              "LoginName": "i:0#.w|nt service\\spsearch",
+              "Title": "spsearch",
+              "PrincipalType": 1,
+              "Email": "",
+              "Expiration": "",
+              "IsEmailAuthenticationGuestUser": false,
+              "IsShareByEmailGuestUser": false,
+              "IsSiteAdmin": false,
+              "UserId": {
+                "NameId": "s-1-5-80-87383287-2054257049-3601873072-440163018-3271026472",
+                "NameIdIssuer": "urn:office:idp:activedirectory"
+              },
+              "UserPrincipalName": null,
+              "PrincipalTypeString": "User"
+            },
+            "RoleDefinitionBindings": [
+              {
+                "BasePermissions": {
+                  "High": "2147483647",
+                  "Low": "4294967295"
+                },
+                "Description": "Has full control.",
+                "Hidden": false,
+                "Id": 1073741829,
+                "Name": "Full Control",
+                "Order": 1,
+                "RoleTypeKind": 5,
+                "BasePermissionsValue": [
+                  "ViewListItems",
+                  "AddListItems",
+                  "EditListItems",
+                  "DeleteListItems",
+                  "ApproveItems",
+                  "OpenItems",
+                  "ViewVersions",
+                  "DeleteVersions",
+                  "CancelCheckout",
+                  "ManagePersonalViews",
+                  "ManageLists",
+                  "ViewFormPages",
+                  "AnonymousSearchAccessList",
+                  "Open",
+                  "ViewPages",
+                  "AddAndCustomizePages",
+                  "ApplyThemeAndBorder",
+                  "ApplyStyleSheets",
+                  "ViewUsageData",
+                  "CreateSSCSite",
+                  "ManageSubwebs",
+                  "CreateGroups",
+                  "ManagePermissions",
+                  "BrowseDirectories",
+                  "BrowseUserInfo",
+                  "AddDelPrivateWebParts",
+                  "UpdatePersonalWebParts",
+                  "ManageWeb",
+                  "AnonymousSearchAccessWebLists",
+                  "UseClientIntegration",
+                  "UseRemoteAPIs",
+                  "ManageAlerts",
+                  "CreateAlerts",
+                  "EditMyUserInfo",
+                  "EnumeratePermissions"
+                ],
+                "RoleTypeKindValue": "Administrator"
+              }
+            ],
+            "PrincipalId": 11
           }
         ],
         "HasUniqueRoleAssignments": true,
