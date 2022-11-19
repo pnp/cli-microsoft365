@@ -174,7 +174,7 @@ export class Cli {
   public static async executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
     const logger: Logger = {
       log: (message: any): void => {
-        const output: any = Cli.formatOutput(message, args.options);
+        const output: any = Cli.formatOutput(command, message, args.options);
         Cli.log(output);
       },
       logRaw: (message: any): void => Cli.log(message),
@@ -213,14 +213,14 @@ export class Cli {
     const logErr: string[] = [];
     const logger: Logger = {
       log: (message: any): void => {
-        const formattedMessage = Cli.formatOutput(message, args.options);
+        const formattedMessage = Cli.formatOutput(command, message, args.options);
         if (listener && listener.stdout) {
           listener.stdout(formattedMessage);
         }
         log.push(formattedMessage);
       },
       logRaw: (message: any): void => {
-        const formattedMessage = Cli.formatOutput(message, args.options);
+        const formattedMessage = Cli.formatOutput(command, message, args.options);
         if (listener && listener.stdout) {
           listener.stdout(formattedMessage);
         }
@@ -471,7 +471,7 @@ export class Cli {
     });
   }
 
-  private static formatOutput(logStatement: any, options: GlobalOptions): any {
+  private static formatOutput(command: Command, logStatement: any, options: GlobalOptions): any {
     if (logStatement instanceof Date) {
       return logStatement.toString();
     }
@@ -506,10 +506,7 @@ export class Cli {
     }
 
     if (!options.output || options.output === 'json') {
-      return JSON
-        .stringify(logStatement, null, 2)
-        // replace unescaped newlines with escaped newlines #2807
-        .replace(/([^\\])\\n/g, '$1\\\\\\n');
+      return command.getJsonOutput(logStatement);
     }
 
     if (logStatement instanceof CommandError) {
@@ -569,58 +566,13 @@ export class Cli {
       }
     }
 
-    if (options.output === 'csv') {
-      const { stringify } = require('csv-stringify/sync');
-      const cli = Cli.getInstance();
-
-      // https://csv.js.org/stringify/options/
-      return stringify(logStatement, {
-        header: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvHeader, true),
-        escape: cli.getSettingWithDefaultValue(settingsNames.csvEscape, '"'),
-        quote: cli.config.get(settingsNames.csvQuote),
-        quoted: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuoted, false),
-        quotedEmpty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false)
-      });
-    }
-
-    // display object as a list of key-value pairs
-    if (logStatement.length === 1) {
-      const obj: any = logStatement[0];
-      const propertyNames: string[] = [];
-      Object.getOwnPropertyNames(obj).forEach(p => {
-        propertyNames.push(p);
-      });
-
-      let longestPropertyLength: number = 0;
-      propertyNames.forEach(p => {
-        if (p.length > longestPropertyLength) {
-          longestPropertyLength = p.length;
-        }
-      });
-
-      const output: string[] = [];
-      propertyNames.sort().forEach(p => {
-        output.push(`${p.length < longestPropertyLength ? p + new Array(longestPropertyLength - p.length + 1).join(' ') : p}: ${Array.isArray(obj[p]) || typeof obj[p] === 'object' ? JSON.stringify(obj[p]) : obj[p]}`);
-      });
-
-      return output.join('\n') + '\n';
-    }
-    // display object as a table where each property is a column
-    else {
-      const Table = require('easy-table');
-      const t = new Table();
-      logStatement.forEach((r: any) => {
-        if (typeof r !== 'object') {
-          return;
-        }
-
-        Object.getOwnPropertyNames(r).forEach(p => {
-          t.cell(p, r[p]);
-        });
-        t.newRow();
-      });
-
-      return t.toString();
+    switch (options.output) {
+      case 'csv':
+        return command.getCsvOutput(logStatement);
+      case 'md':
+        return command.getMdOutput(logStatement, command, options);
+      default:
+        return command.getTextOutput(logStatement);
     }
   }
 
