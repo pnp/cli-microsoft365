@@ -17,6 +17,7 @@ export interface RoleMember {
   OwnerTitle: string,
   RequestToJoinLeaveEmailSetting: string
 }
+
 export interface RoleDefinition {
   BasePermissions: BasePermissions;
   Description: string;
