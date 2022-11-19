@@ -5,6 +5,9 @@ import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { accessToken } from '../../../../utils/accessToken';
+import auth from '../../../../Auth';
+import { AxiosRequestConfig } from 'axios';
 
 interface CommandArgs {
   options: Options;
@@ -14,6 +17,10 @@ export interface Options extends GlobalOptions {
   objectId?: string;
   userPrincipalName?: string;
   accountEnabled?: boolean;
+  resetPassword?: boolean;
+  forceChangePasswordNextSignIn?: boolean;
+  currentPassword?: string;
+  newPassword?: string;
 }
 
 class AadUserSetCommand extends GraphCommand {
@@ -44,7 +51,12 @@ class AadUserSetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         objectId: typeof args.options.objectId !== 'undefined',
         userPrincipalName: typeof args.options.userPrincipalName !== 'undefined',
-        accountEnabled: args.options.accountEnabled
+        accountEnabled: !!args.options.accountEnabled,
+        resetPassword: !!args.options.resetPassword,
+        forceChangePasswordNextSignIn: !!args.options.forceChangePasswordNextSignIn,
+        password: typeof args.options.password !== 'undefined',
+        currentPassword: typeof args.options.currentPassword !== 'undefined',
+        newPassword: typeof args.options.newPassword !== 'undefined'
       });
     });
   }
@@ -60,6 +72,18 @@ class AadUserSetCommand extends GraphCommand {
       {
         option: '--accountEnabled [accountEnabled]',
         autocomplete: ['true', 'false']
+      },
+      {
+        option: '--resetPassword'
+      },
+      {
+        option: '--forceChangePasswordNextSignIn'
+      },
+      {
+        option: '--currentPassword [currentPassword]'
+      },
+      {
+        option: '--newPassword [newPassword]'
       }
     );
   }
@@ -76,6 +100,18 @@ class AadUserSetCommand extends GraphCommand {
           return `${args.options.objectId} is not a valid GUID`;
         }
 
+        if (!args.options.resetPassword && ((args.options.currentPassword && !args.options.newPassword) || (args.options.newPassword && !args.options.currentPassword))) {
+          return `Specify both currentPassword and newPassword when you are wanting to change the password of your user`;
+        }
+
+        if (args.options.resetPassword && args.options.currentPassword) {
+          return `Specify only the option 'newPassword' when wanting to reset the password of a user instead of specifying both 'currentPassword' and 'newPassword'`;
+        }
+
+        if (args.options.resetPassword && !args.options.newPassword) {
+          return `Please specify the option 'newPassword' that you wish to set for the user`;
+        }
+
         return true;
       }
     );
@@ -87,18 +123,41 @@ class AadUserSetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      if (this.verbose) {
+        logger.logToStderr(`Updating user ${args.options.userPrincipalName || args.options.objectId}`);
+      }
+
+      if (args.options.currentPassword) {
+        if (args.options.objectId && args.options.objectId !== accessToken.getUserIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)) {
+          throw `You can only change your own password. Please use --objectId @meId to reference to your own userId`;
+        }
+        else if (args.options.userPrincipalName && args.options.userPrincipalName.toLowerCase() !== accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken).toLowerCase()) {
+          throw 'You can only change your own password. Please use --userPrincipalName @meUserName to reference to your own userPrincipalName';
+        }
+      }
+
+      const requestUrl = `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.objectId ? args.options.objectId : args.options.userPrincipalName as string)}`;
       const manifest: any = this.mapRequestBody(args.options);
 
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.objectId ? args.options.objectId : args.options.userPrincipalName as string)}`,
-        headers: {
-          accept: 'application/json'
-        },
-        responseType: 'json',
-        data: manifest
-      };
+      if (Object.keys(manifest).length > 0) {
+        if (this.verbose) {
+          logger.logToStderr(`Setting the updated properties for the user ${args.options.userPrincipalName || args.options.objectId}`);
+        }
+        const requestOptions: AxiosRequestConfig = {
+          url: requestUrl,
+          headers: {
+            accept: 'application/json'
+          },
+          responseType: 'json',
+          data: manifest
+        };
 
-      await request.patch(requestOptions);
+        await request.patch(requestOptions);
+      }
+
+      if (args.options.currentPassword) {
+        await this.changePassword(requestUrl, args.options, logger);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -116,7 +175,11 @@ class AadUserSetCommand extends GraphCommand {
       'i',
       'userPrincipalName',
       'n',
-      'accountEnabled'
+      'resetPassword',
+      'accountEnabled',
+      'currentPassword',
+      'newPassword',
+      'forceChangePasswordNextSignIn'
     ];
 
     if (options.accountEnabled !== undefined) {
@@ -128,7 +191,35 @@ class AadUserSetCommand extends GraphCommand {
         requestBody[key] = `${(<any>options)[key]}`;
       }
     });
+
+    if (options.resetPassword) {
+      requestBody.passwordProfile = {
+        forceChangePasswordNextSignIn: options.forceChangePasswordNextSignIn || false,
+        password: options.newPassword
+      };
+    }
+
     return requestBody;
+  }
+
+  private async changePassword(requestUrl: string, options: Options, logger: Logger): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Changing password for user ${options.userPrincipalName || options.objectId}`);
+    }
+
+    const requestBody = {
+      currentPassword: options.currentPassword,
+      newPassword: options.newPassword
+    };
+    const requestOptions: AxiosRequestConfig = {
+      url: `${requestUrl}/changePassword`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: requestBody
+    };
+    await request.post(requestOptions);
   }
 }
 

@@ -29,6 +29,12 @@ describe(commands.USER_GET, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+    if (!auth.service.accessTokens[auth.defaultResource]) {
+      auth.service.accessTokens[auth.defaultResource] = {
+        expiresOn: '123',
+        accessToken: 'abc'
+      };
+    }
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -51,7 +57,9 @@ describe(commands.USER_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      accessToken.getUserIdFromAccessToken,
+      accessToken.getUserNameFromAccessToken
     ]);
   });
 
@@ -95,13 +103,6 @@ describe(commands.USER_GET, () => {
     });
 
     sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return userId; });
-    auth.service.connected = true;
-    if (!auth.service.accessTokens[auth.defaultResource]) {
-      auth.service.accessTokens[auth.defaultResource] = {
-        expiresOn: '123',
-        accessToken: 'abc'
-      };
-    }
 
     await command.action(logger, { options: { id: '@meid' } });
     assert(loggerLogSpy.calledWith(resultValue));
@@ -143,13 +144,6 @@ describe(commands.USER_GET, () => {
     });
 
     sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return userName; });
-    auth.service.connected = true;
-    if (!auth.service.accessTokens[auth.defaultResource]) {
-      auth.service.accessTokens[auth.defaultResource] = {
-        expiresOn: '123',
-        accessToken: 'abc'
-      };
-    }
 
     await command.action(logger, { options: { userName: '@meusername' } });
     assert(loggerLogSpy.calledWith(resultValue));
