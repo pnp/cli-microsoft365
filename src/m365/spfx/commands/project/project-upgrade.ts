@@ -361,6 +361,12 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     }
   }
 
+  public getMdOutput(logStatement: any): string {
+    // overwrite markdown output to return the output as-is
+    // because the command already implements its own logic to format the output
+    return logStatement;
+  }
+
   private writeReportTourFolder(findingsToReport: any): void {
     const toursFolder: string = path.join(this.projectRootPath as string, '.tours');
 
