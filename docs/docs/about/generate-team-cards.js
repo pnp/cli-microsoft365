@@ -622,7 +622,7 @@ const contributors = [{
     name: 'Smita Nachan',
     company: '',
     github: 'SmitaNachan',
-    twitter: 'mitanachan'
+    twitter: 'smitanachan'
   },
   {
     name: 'Stefan Bauer',
