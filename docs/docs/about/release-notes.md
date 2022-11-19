@@ -35,7 +35,7 @@
 - [spo file version clear](../cmd/spo/file/file-version-clear.md) - removes all version history of a specified file [#3957](https://github.com/pnp/cli-microsoft365/issues/3957)
 - [spo file version remove](../cmd/spo/file/file-version-remove.md) - removes a specific version of a specified file [#3955](https://github.com/pnp/cli-microsoft365/issues/3955)
 
-**Teams**
+**Teams:**
 
 - [teams meeting list](../cmd/teams/meeting/meeting-list.md) - retrieve all online meetings for a given user or shared mailbox [#3899](https://github.com/pnp/cli-microsoft365/issues/3899)
 
@@ -104,6 +104,9 @@
 - extended 'spfx project doctor' command with support for SPFx v1.16.0 [#4083](https://github.com/pnp/cli-microsoft365/issues/4083)
 - extended 'spo project upgrade' command with support for SPFx v1.16.0 [#4081](https://github.com/pnp/cli-microsoft365/issues/4081)
 - added building docs to the PR build [#3984](https://github.com/pnp/cli-microsoft365/issues/3984)
+- extended teams cache remove to check if cache folder exists [#3449](https://github.com/pnp/cli-microsoft365/issues/3449)
+- updated mkdocs configuration (and page headers) to ensure consistency [#3859](https://github.com/pnp/cli-microsoft365/issues/3859)
+- extended 'spo list' commands to have all available list options [#3808](https://github.com/pnp/cli-microsoft365/issues/3808)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 

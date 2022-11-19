@@ -44,7 +44,7 @@ m365 aad user guest add --emailAddress john.doe@contoso.com --displayName "John 
 Invite a user with a custom email and custom redirect url
 
 ```sh
-m365 aad user guest add --emailAddress john.doe@contoso.com --welcomeMessage "Hi John, welcome to the organization!" --sendInvitationMessage
+m365 aad user guest add --emailAddress john.doe@contoso.com --welcomeMessage "Hi John, welcome to the organization!" --inviteRedirectUrl https://contoso.sharepoint.com --sendInvitationMessage
 ```
 
 Invite a user and send an invitation mail in Dutch
