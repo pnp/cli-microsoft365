@@ -1,19 +1,21 @@
+import * as fs from 'fs';
+import { homedir } from 'os';
 import * as util from 'util';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
+import GlobalOptions from '../../../../GlobalOptions';
 import AnonymousCommand from '../../../base/AnonymousCommand';
-import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends AnonymousCommand {
+interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class TeamsCacheRemoveCommand extends GraphCommand {
+class TeamsCacheRemoveCommand extends AnonymousCommand {
   public get name(): string {
     return commands.CACHE_REMOVE;
   }
@@ -52,11 +54,11 @@ class TeamsCacheRemoveCommand extends GraphCommand {
         if (process.env.CLIMICROSOFT365_ENV === 'docker') {
           return 'Because you\'re running CLI for Microsoft 365 in a Docker container, we can\'t clear the cache on your host. Instead run this command on your host using "npx ..."';
         }
-    
+
         if (process.platform !== 'win32' && process.platform !== 'darwin') {
           return `${process.platform} platform is unsupported for this command`;
         }
-    
+
         return true;
       }
     );
@@ -71,19 +73,19 @@ class TeamsCacheRemoveCommand extends GraphCommand {
         logger.logToStderr('This command will execute the following steps.');
         logger.logToStderr('- Stop the Microsoft Teams client.');
         logger.logToStderr('- Clear the Microsoft Teams cached files.');
-  
+
         const result = await Cli.prompt<{ continue: boolean }>({
           type: 'confirm',
           name: 'continue',
           default: false,
           message: `Are you sure you want to clear your Microsoft Teams cache?`
         });
-        
+
         if (result.continue) {
           await this.clearTeamsCache(logger);
         }
-      }      
-    } 
+      }
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -91,19 +93,54 @@ class TeamsCacheRemoveCommand extends GraphCommand {
 
   private async clearTeamsCache(logger: Logger): Promise<void> {
     try {
-      await this.killRunningProcess(logger);
-      await this.removeCacheFiles(logger);
+      const filePath = this.getTeamsCacheFolderPath(logger);
+      const folderExists = await this.checkIfCacheFolderExists(filePath, logger);
+
+      if (folderExists) {
+        await this.killRunningProcess(logger);
+        await this.removeCacheFiles(filePath, logger);
+        logger.logToStderr('Teams cache cleared!');
+      }
+      else {
+        logger.logToStderr('Cache folder does not exist. Nothing to remove.');
+      }
     }
     catch (e: any) {
       throw e.message as string;
     }
+  }
 
-    logger.logToStderr('Teams cache cleared!');
+  private getTeamsCacheFolderPath(logger: Logger): string {
+    const platform = process.platform;
+
+    if (this.verbose) {
+      logger.logToStderr(`Getting path of Teams cache folder for platform ${platform}...`);
+    }
+
+    let filePath = '';
+
+    switch (platform) {
+      case 'win32':
+        filePath = `${process.env.APPDATA}\\Microsoft\\Teams`;
+        break;
+      case 'darwin':
+        filePath = `${homedir}/Library/Application Support/Microsoft/Teams`;
+        break;
+    }
+    return filePath;
+  }
+
+  private checkIfCacheFolderExists(filePath: string, logger: Logger): boolean {
+    if (this.verbose) {
+      logger.logToStderr(`Checking if Teams cache folder exists at ${filePath}...`);
+    }
+
+    return fs.existsSync(filePath);
   }
 
   private async killRunningProcess(logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr('Stop Teams client');
+      logger.logToStderr('Stopping Teams client...');
     }
 
     const platform = process.platform;
@@ -147,9 +184,9 @@ class TeamsCacheRemoveCommand extends GraphCommand {
     }
   }
 
-  private async removeCacheFiles(logger: Logger): Promise<void> {
+  private async removeCacheFiles(filePath: string, logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr('Clear Teams cached files');
+      logger.logToStderr('Removing Teams cache files...');
     }
 
     const platform = process.platform;
@@ -157,10 +194,10 @@ class TeamsCacheRemoveCommand extends GraphCommand {
 
     switch (platform) {
       case 'win32':
-        cmd = 'cd %userprofile% && rmdir /s /q AppData\\Roaming\\Microsoft\\Teams';
+        cmd = `rmdir /s /q "${filePath}"`;
         break;
       case 'darwin':
-        cmd = 'rm -r ~/Library/Application\\ Support/Microsoft/Teams';
+        cmd = `rm -r "${filePath}"`;
         break;
     }
 

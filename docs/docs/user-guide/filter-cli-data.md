@@ -1,4 +1,4 @@
-# Filter CLI data using JMESPath queries
+# Filter CLI for Microsoft 365 data
 
 CLI for Microsoft 365 supports filtering, sorting, and querying data using [JMESPath](http://jmespath.org/) queries. By specifying the `--query` option on each command you can create complex queries.
 
