@@ -23,6 +23,11 @@ export interface Options extends GlobalOptions {
   wait?: boolean;
 }
 
+export interface SolutionComponent {
+  msdyn_componentlogicalname: string;
+  msdyn_name: string;
+}
+
 class PpSolutionPublishCommand extends PowerPlatformCommand {
   public get name(): string {
     return commands.SOLUTION_PUBLISH;
@@ -97,27 +102,46 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
-      this.getSolutionComponents(args, dynamicsApiUrl);
+
+      const parameterXml = await this.getSolutionComponents(args, dynamicsApiUrl);
+
+      const requestOptions: AxiosRequestConfig = {
+        url: `${dynamicsApiUrl}/api/data/v9.0/PublishXml`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: {
+          ParameterXml: parameterXml
+        }
+      };
+
+      if (args.options.wait) {
+        await request.post(requestOptions);
+      }
+      else {
+        request.post(requestOptions);
+      }
+
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getSolutionComponents(args: CommandArgs, dynamicsApiUrl: string): Promise<any> {
+  private async getSolutionComponents(args: CommandArgs, dynamicsApiUrl: string): Promise<string> {
     const solutionId = await this.getSolutionId(args);
     const requestOptions: AxiosRequestConfig = {
-      url: `${dynamicsApiUrl}/api/data/v9.0/msdyn_solutioncomponentsummaries?$filter=(msdyn_solutionid eq ${solutionId})&$orderby=msdyn_displayname asc&api-version=9.1`,
+      url: `${dynamicsApiUrl}/api/data/v9.0/msdyn_solutioncomponentsummaries?$filter=(msdyn_solutionid eq ${solutionId})&$select=msdyn_componentlogicalname,msdyn_name&$orderby=msdyn_componentlogicalname asc&api-version=9.1`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
 
+    const response = await request.get<{ value: SolutionComponent[] }>(requestOptions);
 
-    const response = await request.get<any>(requestOptions);
-    Cli.log(response);
-
+    return this.formatAsXml(response.value);
   }
 
   private async getSolutionId(args: CommandArgs): Promise<string> {
@@ -136,6 +160,38 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
     const output = await Cli.executeCommandWithOutput(PpSolutionGetCommand as Command, { options: { ...options, _: [] } });
     const getSolutionOutput = JSON.parse(output.stdout);
     return getSolutionOutput.solutionid;
+  }
+
+  private formatAsXml(solutionComponents: SolutionComponent[]): string {
+    const result = solutionComponents.reduce(function (r, a) {
+      const key = a.msdyn_componentlogicalname.slice(-1) === 'y' ?
+        a.msdyn_componentlogicalname.substring(0, a.msdyn_componentlogicalname.length - 1) + 'ies' :
+        a.msdyn_componentlogicalname + 's';
+      r[key] = r[key] || [];
+
+      r[key].push({ [a.msdyn_componentlogicalname]: a.msdyn_name });
+      return r;
+    }, Object.create(null));
+
+    return `<importexportxml>${this.objectToXml(result)}</importexportxml>`;
+  }
+
+  private objectToXml(obj: any): string {
+    let xml = '';
+    for (const prop in obj) {
+      xml += "<" + prop + ">";
+      if (obj[prop] instanceof Array) {
+        for (const array in obj[prop]) {
+          xml += this.objectToXml(new Object(obj[prop][array]));
+        }
+      }
+      else {
+        xml += obj[prop];
+      }
+      xml += "</" + prop + ">";
+    }
+    xml = xml.replace(/<\/?[0-9]{1,}>/g, '');
+    return xml;
   }
 
 }
