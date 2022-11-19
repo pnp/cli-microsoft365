@@ -73,3 +73,9 @@ Add an item with a specific title to a list retrieved by server-relative URL in 
 ```sh
 m365 spo listitem add --contentType Item --listUrl /sites/project-x/Documents --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Item"
 ```
+
+Add an item with a specific Title and multi-choice value
+
+```sh
+m365 spo listitem add --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --MultiChoiceField "Choice 1;#Choice 2;#Choice 3"
+```

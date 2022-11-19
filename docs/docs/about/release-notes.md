@@ -35,7 +35,7 @@
 - [spo file version clear](../cmd/spo/file/file-version-clear.md) - removes all version history of a specified file [#3957](https://github.com/pnp/cli-microsoft365/issues/3957)
 - [spo file version remove](../cmd/spo/file/file-version-remove.md) - removes a specific version of a specified file [#3955](https://github.com/pnp/cli-microsoft365/issues/3955)
 
-**Teams**
+**Teams:**
 
 - [teams meeting list](../cmd/teams/meeting/meeting-list.md) - retrieve all online meetings for a given user or shared mailbox [#3899](https://github.com/pnp/cli-microsoft365/issues/3899)
 
@@ -90,13 +90,23 @@
 - fixed prompt issue when false [#4020](https://github.com/pnp/cli-microsoft365/issues/4020)
 - fixed retrieving all solutions for 'pp solution list' [#3802](https://github.com/pnp/cli-microsoft365/issues/3802)
 - fixed command output of 'teams app publish' [#4010](https://github.com/pnp/cli-microsoft365/issues/4010)
-- Fixed 'spo eventreceiver remove' command [#4033](https://github.com/pnp/cli-microsoft365/issues/4033)
-- Fixed infinite loop in 'yammer groups list' command [#4048](https://github.com/pnp/cli-microsoft365/issues/4048)
-- Added accept header to 'yammer search' command [#4049](https://github.com/pnp/cli-microsoft365/issues/4049)
-- Included response output for yammer commands [#3928](https://github.com/pnp/cli-microsoft365/issues/3928)
-- Updates GitHub actions to Node@16 [#3870](https://github.com/pnp/cli-microsoft365/issues/3870)
-- Updates docs for 'spo eventreceiver remove' command [#4050](https://github.com/pnp/cli-microsoft365/issues/4050)
-- Updates 'spo group user <verb>' to 'spo group member <verb>' [#4087](https://github.com/pnp/cli-microsoft365/issues/4087)
+- fixed 'spo eventreceiver remove' command [#4033](https://github.com/pnp/cli-microsoft365/issues/4033)
+- fixed infinite loop in 'yammer groups list' command [#4048](https://github.com/pnp/cli-microsoft365/issues/4048)
+- added accept header to 'yammer search' command [#4049](https://github.com/pnp/cli-microsoft365/issues/4049)
+- included response output for yammer commands [#3928](https://github.com/pnp/cli-microsoft365/issues/3928)
+- updated GitHub actions to Node@16 [#3870](https://github.com/pnp/cli-microsoft365/issues/3870)
+- updated docs for 'spo eventreceiver remove' command [#4050](https://github.com/pnp/cli-microsoft365/issues/4050)
+- updated 'spo group user <verb>' to 'spo group member <verb>' [#4087](https://github.com/pnp/cli-microsoft365/issues/4087)
+- updated 'login' command with auth authType validation [#3724](https://github.com/pnp/cli-microsoft365/issues/3724)
+- updated 'spo eventreceiver get' command output structure [#4035](https://github.com/pnp/cli-microsoft365/issues/4035)
+- updated required permission set for 'spo serviceprincipal' command docs [#4076](https://github.com/pnp/cli-microsoft365/issues/4076)
+- extended 'spfx doctor' command with support for SPFx v1.16.0 [#4082](https://github.com/pnp/cli-microsoft365/issues/4082)
+- extended 'spfx project doctor' command with support for SPFx v1.16.0 [#4083](https://github.com/pnp/cli-microsoft365/issues/4083)
+- extended 'spo project upgrade' command with support for SPFx v1.16.0 [#4081](https://github.com/pnp/cli-microsoft365/issues/4081)
+- added building docs to the PR build [#3984](https://github.com/pnp/cli-microsoft365/issues/3984)
+- extended teams cache remove to check if cache folder exists [#3449](https://github.com/pnp/cli-microsoft365/issues/3449)
+- updated mkdocs configuration (and page headers) to ensure consistency [#3859](https://github.com/pnp/cli-microsoft365/issues/3859)
+- extended 'spo list' commands to have all available list options [#3808](https://github.com/pnp/cli-microsoft365/issues/3808)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
