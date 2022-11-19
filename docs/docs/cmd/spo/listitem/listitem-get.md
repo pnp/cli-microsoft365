@@ -39,31 +39,31 @@ If you want to specify a lookup type in the `properties` option, define which co
 
 ## Examples
 
-Get an item with ID _147_ from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
+Get an item with the ID parameter from a given list in a given site
 
 ```sh
 m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
-Get an items _Title_ and _Created_ column with ID _147_ from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
+Get an item columns with the ID parameter from a given list in a given site
 
 ```sh
 m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created"
 ```
 
-Get an items _Title_, _Created_ column and lookup column _Company_ with ID _147_ from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
+Get an item columns and lookup column with the ID parameter from a given list in a given site
 
 ```sh
 m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created,Company/Title"
 ```
 
-Get an item with specific properties from a list retrieved by server-relative URL in a specific site
+Get an item with specific properties from a given list based on the server-relative URL in a specific site
 
 ```sh
 m365 spo listitem get --listUrl /sites/project-x/documents --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created,Company/Title"
 ```
 
-Get an item with ID _147_ from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_ with permissions
+Get an item with ID parameter from a given list based on the server-relative URL in a specific site with permissions
 
 ```sh
 m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --withPermissions

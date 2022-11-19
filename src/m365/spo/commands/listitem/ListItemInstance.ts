@@ -1,3 +1,5 @@
+import { RoleAssignment } from "../roledefinition/RoleDefinition";
+
 export interface ListItemInstance {
   Attachments: boolean;
   AuthorId: number;
@@ -9,4 +11,5 @@ export interface ListItemInstance {
   ID?: number;
   Modified: Date;
   Title: string;
+  RoleAssignments: RoleAssignment[];
 } 
