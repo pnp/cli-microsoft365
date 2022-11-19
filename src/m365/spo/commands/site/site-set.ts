@@ -24,10 +24,10 @@ interface CommandArgs {
 
 export interface Options extends GlobalOptions {
   classification?: string;
-  disableFlows?: string;
-  isPublic?: string;
+  disableFlows?: boolean;
+  isPublic?: boolean;
   owners?: string;
-  shareByEmailEnabled?: string;
+  shareByEmailEnabled?: boolean;
   siteDesignId?: string;
   title?: string;
   description?: string;
@@ -38,9 +38,9 @@ export interface Options extends GlobalOptions {
   resourceQuotaWarningLevel?: string | number;
   storageQuota?: string | number;
   storageQuotaWarningLevel?: string | number;
-  allowSelfServiceUpgrade?: string;
+  allowSelfServiceUpgrade?: boolean;
   lockState?: string;
-  noScriptSite?: string;
+  noScriptSite?: boolean;
   wait?: boolean;
 }
 
@@ -106,16 +106,19 @@ class SpoSiteSetCommand extends SpoCommand {
         option: '--classification [classification]'
       },
       {
-        option: '--disableFlows [disableFlows]'
+        option: '--disableFlows [disableFlows]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--isPublic [isPublic]'
+        option: '--isPublic [isPublic]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--owners [owners]'
       },
       {
-        option: '--shareByEmailEnabled [shareByEmailEnabled]'
+        option: '--shareByEmailEnabled [shareByEmailEnabled]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--siteDesignId [siteDesignId]'
@@ -146,14 +149,16 @@ class SpoSiteSetCommand extends SpoCommand {
         option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
       },
       {
-        option: '--allowSelfServiceUpgrade [allowSelfServiceUpgrade]'
+        option: '--allowSelfServiceUpgrade [allowSelfServiceUpgrade]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--lockState [lockState]',
         autocomplete: ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess']
       },
       {
-        option: '--noScriptSite [noScriptSite]'
+        option: '--noScriptSite [noScriptSite]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--wait'
@@ -191,21 +196,6 @@ class SpoSiteSetCommand extends SpoCommand {
 
         if (typeof args.options.siteLogoUrl !== 'undefined' && typeof args.options.siteLogoUrl !== 'string') {
           return `${args.options.siteLogoUrl} is not a valid value for the siteLogoUrl option. Specify the logo URL or an empty string "" to unset the logo.`;
-        }
-
-        if (typeof args.options.disableFlows === 'string' &&
-          !validation.isValidBoolean(args.options.disableFlows)) {
-          return `${args.options.disableFlows} is not a valid value for the disableFlow option. Allowed values are true|false`;
-        }
-
-        if (typeof args.options.isPublic === 'string' &&
-          !validation.isValidBoolean(args.options.isPublic)) {
-          return `${args.options.isPublic} is not a valid value for the isPublic option. Allowed values are true|false`;
-        }
-
-        if (typeof args.options.shareByEmailEnabled === 'string' &&
-          !validation.isValidBoolean(args.options.shareByEmailEnabled)) {
-          return `${args.options.shareByEmailEnabled} is not a valid value for the shareByEmailEnabled option. Allowed values are true|false`;
         }
 
         if (args.options.siteDesignId) {
@@ -251,19 +241,9 @@ class SpoSiteSetCommand extends SpoCommand {
           return `storageQuotaWarningLevel must not exceed the storageQuota`;
         }
 
-        if (args.options.allowSelfServiceUpgrade &&
-          !validation.isValidBoolean(args.options.allowSelfServiceUpgrade)) {
-          return `${args.options.allowSelfServiceUpgrade} is not a valid boolean value`;
-        }
-
         if (args.options.lockState &&
           ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess'].indexOf(args.options.lockState) === -1) {
           return `${args.options.lockState} is not a valid value for the lockState option. Allowed values Unlock|NoAdditions|ReadOnly|NoAccess`;
-        }
-
-        if (args.options.noScriptSite &&
-          !validation.isValidBoolean(args.options.noScriptSite)) {
-          return `${args.options.noScriptSite} is not a valid boolean value`;
         }
 
         return true;
@@ -273,6 +253,7 @@ class SpoSiteSetCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('classification');
+    this.types.boolean.push('isPublic', 'disableFlows', 'shareByEmailEnabled', 'allowSelfServiceUpgrade', 'noScriptSite');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -513,7 +494,7 @@ class SpoSiteSetCommand extends SpoCommand {
       if (typeof args.options.isPublic !== 'undefined') {
         const commandOptions: AadO365GroupSetCommandOptions = {
           id: this.groupId as string,
-          isPrivate: (args.options.isPublic === 'false'),
+          isPrivate: (args.options.isPublic === false),
           debug: this.debug,
           verbose: this.verbose
         };
@@ -647,18 +628,18 @@ class SpoSiteSetCommand extends SpoCommand {
         if (typeof args.options.classification === 'string') {
           payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="Classification"><Parameter Type="String">${formatting.escapeXml(args.options.classification)}</Parameter></SetProperty>`);
         }
-        if (typeof args.options.disableFlows === 'string') {
-          payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="DisableFlows"><Parameter Type="Boolean">${args.options.disableFlows === 'true'}</Parameter></SetProperty>`);
+        if (typeof args.options.disableFlows !== 'undefined') {
+          payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="DisableFlows"><Parameter Type="Boolean">${args.options.disableFlows}</Parameter></SetProperty>`);
         }
-        if (typeof args.options.shareByEmailEnabled === 'string') {
-          payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="ShareByEmailEnabled"><Parameter Type="Boolean">${args.options.shareByEmailEnabled === 'true'}</Parameter></SetProperty>`);
+        if (typeof args.options.shareByEmailEnabled !== 'undefined') {
+          payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="ShareByEmailEnabled"><Parameter Type="Boolean">${args.options.shareByEmailEnabled}</Parameter></SetProperty>`);
         }
         if (args.options.sharingCapability) {
           const sharingCapability: SharingCapabilities = SharingCapabilities[(args.options.sharingCapability as keyof typeof SharingCapabilities)];
           payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">${sharingCapability}</Parameter></SetProperty>`);
         }
         if (typeof args.options.noScriptSite !== 'undefined') {
-          const noScriptSite: number = args.options.noScriptSite === 'true' ? 2 : 1;
+          const noScriptSite: number = args.options.noScriptSite ? 2 : 1;
           payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">${noScriptSite}</Parameter></SetProperty>`);
         }
 
