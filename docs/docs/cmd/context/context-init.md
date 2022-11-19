@@ -1,4 +1,4 @@
-# status
+# context init
 
 Initiates CLI for Microsoft 365 context in the current working folder
 
@@ -19,3 +19,7 @@ Initiates CLI for Microsoft 365 context in the current working folder
 ```sh
 m365 context init
 ```
+
+## Response
+
+The command won't return a response on success.
