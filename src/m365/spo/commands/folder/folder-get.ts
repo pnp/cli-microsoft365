@@ -101,10 +101,12 @@ class SpoFolderGetCommand extends SpoCommand {
       const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
       requestUrl += `/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
+    if (args.options.withPermissions) {
+      requestUrl += `?$expand=ListItemAllFields/HasUniqueRoleAssignments,ListItemAllFields/RoleAssignments/Member,ListItemAllFields/RoleAssignments/RoleDefinitionBindings`;
+    }
 
-    const propertiesPermissions = args.options.withPermissions ? `?$expand=ListItemAllFields/HasUniqueRoleAssignments,ListItemAllFields/RoleAssignments/Member,ListItemAllFields/RoleAssignments/RoleDefinitionBindings` : ``;
     const requestOptions: any = {
-      url: requestUrl + propertiesPermissions,
+      url: requestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -128,10 +130,11 @@ class SpoFolderGetCommand extends SpoCommand {
       if (err.statusCode && err.statusCode === 500) {
         throw new CommandError('Please check the folder URL. Folder might not exist on the specified URL');
       }
-
       this.handleRejectedODataJsonPromise(err);
     }
   }
+
+
 }
 
 module.exports = new SpoFolderGetCommand();

@@ -20,7 +20,7 @@ m365 spo folder get [options]
 : The UniqueId (GUID) of the folder to retrieve. Specify either `url` or `id` but not both
 
 `--withPermissions`
-: Set if you want to return associated roles and permissions of the folder. For root level folder, please use the command 'spo list get'.
+: Set if you want to return associated roles and permissions of the folder. 
 
 --8<-- "docs/cmd/_global.md"
 
@@ -28,6 +28,7 @@ m365 spo folder get [options]
 
 If no folder exists at the specified URL, you will get a `Please check the folder URL. Folder might not exist on the specified URL` error.
 
+If root level folder is passed, you will get a `Please ensure the specified folder URL or folder Id does not refer to a root folder. Use \'spo list get\' with withPermissions instead' error.` Please use the command 'spo list get'.
 ## Examples
 
 Get folder properties for folder with server-relative url _'/Shared Documents'_ located in site _https://contoso.sharepoint.com/sites/project-x_

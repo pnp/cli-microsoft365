@@ -9,8 +9,7 @@ export interface FolderProperties {
   TimeLastModified: string;
   UniqueId: string;
   WelcomePage: string;
-  ListItemAllFields: ListItemAllFields,
-
+  ListItemAllFields: ListItemAllFields;
 }
 export interface ListItemAllFields {
   RoleAssignments: RoleAssignment[];
