@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -51,7 +52,10 @@ describe(commands.CACHE_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.prompt
+      fs.existsSync,
+      Cli.prompt,
+      (command as any).exec,
+      (process as any).kill
     ]);
   });
 
@@ -124,31 +128,44 @@ describe(commands.CACHE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails to remove teams cache when exec fails', async () => {
+  it('fails to remove teams cache when exec fails randomly when killing teams.exe process', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    const error = new Error('ERROR: The process "Teams.exe" not found.');
-    const exec = sinon.stub(command, 'exec' as any).throws(error);
-
-    await assert.rejects(command.action(logger, { options: { confirm: true, verbose: true } } as any), new CommandError('ERROR: The process "Teams.exe" not found.'));
-    exec.restore();
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const error = new Error('random error');
+    sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
+      if (opts === 'taskkill /IM "Teams.exe" /F') {
+        throw error;
+      }
+      throw 'Invalid request';
+    });
+    await assert.rejects(command.action(logger, { options: { confirm: true } } as any), new CommandError('random error'));
   });
 
-  it('fails to remove teams cache when exec fails randomly', async () => {
+  it('fails to remove teams cache when exec fails randomly when removing cache folder', async () => {
     sinon.stub(process, 'platform').value('win32');
-    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    const error = new Error('random error');
-    const exec = sinon.stub(command, 'exec' as any).throws(error);
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming' });
 
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const error = new Error('random error');
+    sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
+      if (opts === 'taskkill /IM "Teams.exe" /F') {
+        return { stdout: '' };
+      }
+      if (opts === 'rmdir /s /q "C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Teams"') {
+        throw error;
+      }
+      throw 'Invalid request';
+    });
     await assert.rejects(command.action(logger, { options: { confirm: true } } as any), new CommandError('random error'));
-    exec.restore();
   });
 
   it('removes Teams cache from macOs platform without prompting.', async () => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    const exec = sinon.stub(command, 'exec' as any).returns({ stdout: 'pid' });
-    const kill = sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(command, 'exec' as any).returns({ stdout: '' });
+    sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     await command.action(logger, {
       options: {
@@ -157,14 +174,39 @@ describe(commands.CACHE_REMOVE, () => {
       }
     });
     assert(true);
-    exec.restore();
-    kill.restore();
+  });
+
+  it('removes teams cache when teams is currently not active', async () => {
+    sinon.stub(process, 'platform').value('win32');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '', APPDATA: 'C:\\Users\\Administrator\\AppData\\Roaming' });
+
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const error = new Error('ERROR: The process "Teams.exe" not found.');
+    sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(command, 'exec' as any).callsFake(async (opts) => {
+      if (opts === 'taskkill /IM "Teams.exe" /F') {
+        throw error;
+      }
+      if (opts === 'rmdir /s /q "C:\\Users\\Administrator\\AppData\\Roaming\\Microsoft\\Teams"') {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        confirm: true,
+        verbose: true
+      }
+    });
+    assert(true);
   });
 
   it('removes Teams cache from win32 platform without prompting.', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    const exec = sinon.stub(command, 'exec' as any).returns({ stdout: '' });
+    sinon.stub(command, 'exec' as any).returns({ stdout: '' });
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     await command.action(logger, {
       options: {
@@ -173,14 +215,14 @@ describe(commands.CACHE_REMOVE, () => {
       }
     });
     assert(true);
-    exec.restore();
   });
 
   it('removes Teams cache from darwin platform with prompting.', async () => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    const exec = sinon.stub(command, 'exec' as any).returns({ stdout: 'pid' });
-    const kill = sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(command, 'exec' as any).returns({ stdout: 'pid' });
+    sinon.stub(process, 'kill' as any).returns(null);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     await command.action(logger, {
       options: {
@@ -188,8 +230,18 @@ describe(commands.CACHE_REMOVE, () => {
       }
     });
     assert(true);
-    exec.restore();
-    kill.restore();
+  });
+
+  it('aborts cache clearing when no cache folder is found', async () => {
+    sinon.stub(process, 'platform').value('darwin');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+
+    await command.action(logger, {
+      options: {
+        verbose: true
+      }
+    });
   });
 
   it('aborts cache clearing from Teams when prompt not confirmed', async () => {

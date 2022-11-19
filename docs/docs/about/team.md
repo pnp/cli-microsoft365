@@ -1,6 +1,6 @@
-<script id="cli-cards-generator" src="../generate-team-cards.js" defer></script>
-
 # Meet the Team
+
+<script id="cli-cards-generator" src="../generate-team-cards.js" defer></script>
 
 Do you want to know the curious and bright minds behind the CLI for Microsoft 365? Look no further! Below you will find a list of all our hard-working maintainers and brilliant contributors.
 
