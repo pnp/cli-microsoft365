@@ -3,7 +3,7 @@ import ContextCommand from '../../base/ContextCommand';
 
 import commands from '../commands';
 
-class ContextInitCommand extends ContextCommand {
+class ContextRemoveCommand extends ContextCommand {
   public get name(): string {
     return commands.REMOVE;
   }
@@ -17,4 +17,4 @@ class ContextInitCommand extends ContextCommand {
   }
 }
 
-module.exports = new ContextInitCommand();
+module.exports = new ContextRemoveCommand();
