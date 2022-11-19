@@ -267,6 +267,7 @@ nav:
       - chatbot:
         - chatbot get: cmd/pp/chatbot/chatbot-get.md
         - chatbot list: cmd/pp/chatbot/chatbot-list.md
+        - chatbot remove: cmd/pp/chatbot/chatbot-remove.md
       - dataverse:
         - dataverse table get: cmd/pp/dataverse/dataverse-table-get.md
         - dataverse table list: cmd/pp/dataverse/dataverse-table-list.md
