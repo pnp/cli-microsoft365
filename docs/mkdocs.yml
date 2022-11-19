@@ -265,6 +265,7 @@ nav:
         - card list: cmd/pp/card/card-list.md
         - card remove: cmd/pp/card/card-remove.md
       - chatbot:
+        - chatbot get: cmd/pp/chatbot/chatbot-get.md
         - chatbot list: cmd/pp/chatbot/chatbot-list.md
       - dataverse:
         - dataverse table get: cmd/pp/dataverse/dataverse-table-get.md
