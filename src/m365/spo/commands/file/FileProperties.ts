@@ -1,4 +1,4 @@
-import { RoleAssignment } from "@microsoft/microsoft-graph-types";
+import { RoleAssignment } from "../roledefinition/RoleDefinition";
 
 export interface FileProperties {
   ListItemAllFields: any;

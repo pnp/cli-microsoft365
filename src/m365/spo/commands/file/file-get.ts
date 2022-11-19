@@ -8,7 +8,7 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import { BasePermissions } from '../../base-permissions';
 import commands from '../../commands';
-import { RoleDefinition } from '../roledefinition/RoleDefinition';
+import { RoleAssignment, RoleDefinition } from '../roledefinition/RoleDefinition';
 import { RoleType } from '../roledefinition/RoleType';
 import { FileProperties } from './FileProperties';
 
@@ -223,7 +223,7 @@ class SpoFileGetCommand extends SpoCommand {
     }
   }
 
-  private setFriendlyPermissions(response: any[]): any[] {
+  private setFriendlyPermissions(response: any[]): RoleAssignment[] {
     response.forEach((r: any) => {
       r.RoleDefinitionBindings.forEach((r: RoleDefinition) => {
         const permissions: BasePermissions = new BasePermissions();
