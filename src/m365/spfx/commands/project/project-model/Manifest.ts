@@ -2,8 +2,9 @@ import { JsonFile } from ".";
 
 export interface Manifest extends JsonFile {
   path: string;
-  
+
   $schema: string;
+  alias?: string;
   componentType: string;
   extensionType?: string;
   id?: string;
