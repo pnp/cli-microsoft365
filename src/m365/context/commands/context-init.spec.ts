@@ -5,6 +5,7 @@ import { Logger } from '../../../cli/Logger';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import appInsights from '../../../appInsights';
 import Command from '../../../Command';
+import * as fs from 'fs';
 const command: Command = require('./context-init');
 
 describe(commands.INIT, () => {
@@ -32,7 +33,9 @@ describe(commands.INIT, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      fs.existsSync,
+      fs.readFileSync
     ]);
   });
 
@@ -52,7 +55,11 @@ describe(commands.INIT, () => {
 
   it('writes a context to the .m365rc.json file', async () => {
     await command.action(logger, { options: { verbose: true } });
-    assert.deepStrictEqual((command as any).saveContextInfo(), undefined);
+
+    const fileContent = fs.readFileSync('.m365rc.json', 'utf8');
+    const contextInfo = JSON.parse(fileContent);
+
+    assert.deepStrictEqual(Object.keys(contextInfo).indexOf('context') > -1, true);
   });
 
 });
