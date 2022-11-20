@@ -119,6 +119,10 @@ class PpChatbotGetCommand extends PowerPlatformCommand {
     requestOptions.url = `${dynamicsApiUrl}/api/data/v9.1/bots?$filter=name eq '${options.name}'`;
     const result = await request.get<{ value: any[] }>(requestOptions);
 
+    if (result.value.length > 1) {
+      throw `Multiple chatbots with name '${options.name}' found: ${result.value.map(x => x.botid).join(',')}`;
+    }
+
     if (result.value.length === 0) {
       throw `The specified chatbot '${options.name}' does not exist.`;
     }

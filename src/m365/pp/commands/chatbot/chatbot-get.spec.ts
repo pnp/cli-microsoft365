@@ -150,6 +150,33 @@ describe(commands.CHATBOT_GET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('throws error when multiple chatbots found with the same name', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    const multipleBotsResponse = {
+      value: [
+        { botid: '69703efe-4149-ed11-bba2-000d3adf7537' },
+        { botid: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
+      ]
+    };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots?$filter=name eq '${validName}'`)) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return multipleBotsResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        environment: validEnvironment,
+        name: validName
+      }
+    }), new CommandError(`Multiple chatbots with name '${validName}' found: ${multipleBotsResponse.value.map(x => x.botid).join(',')}`));
+  });
+
   it('throws error when no chatbot with name was found', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
