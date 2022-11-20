@@ -50,7 +50,7 @@ m365 flow get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --n
 
 === "JSON"
 
-    ``` json
+    ```json
     {
       "name": "ca76d7b8-3b76-4050-8c03-9fb310ad172f",
       "id": "/providers/Microsoft.ProcessSimple/environments/Default-00000000-0000-0000-0000-000000000000/flows/ca76d7b8-3b76-4050-8c03-9fb310ad172f",
@@ -403,7 +403,7 @@ m365 flow get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --n
 
 === "Text"
 
-    ``` text
+    ```text
     actions    : OpenApiConnection-AnalyzeImageV2, Compose, InitializeVariable, OpenApiConnection-HttpRequest, ParseJson, OpenApiConnection-PatchFileItem
     description:
     displayName: My Flow
@@ -413,7 +413,7 @@ m365 flow get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --n
 
 === "CSV"
 
-    ``` text
+    ```csv
     name,displayName,description,triggers,actions
     ca76d7b8-3b76-4050-8c03-9fb310ad172f,My Flow,,OpenApiConnection,"OpenApiConnection-AnalyzeImageV2, Compose, InitializeVariable, OpenApiConnection-HttpRequest, ParseJson, OpenApiConnection-PatchFileItem"
     ```

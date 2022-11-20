@@ -36,7 +36,7 @@ m365 flow environment get --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 
 === "JSON"
 
-    ``` json
+    ```json
     {
       "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
       "location": "india",
@@ -112,7 +112,7 @@ m365 flow environment get --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 
 === "Text"
 
-    ``` text
+    ```text
     azureRegionHint  : centralindia
     displayName      : contoso (default)
     environmentSku   : Default
@@ -125,7 +125,7 @@ m365 flow environment get --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 
 === "CSV"
 
-    ``` text
+    ```csv
     name,id,location,displayName,provisioningState,environmentSku,azureRegionHint,isDefault
     Default-d87a7535-dd31-4437-bfe1-95340acd55c5,/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5,india,contoso (default),Succeeded,Default,centralindia,1  
     ```

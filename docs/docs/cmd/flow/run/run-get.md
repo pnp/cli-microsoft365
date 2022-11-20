@@ -47,7 +47,7 @@ m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 
 === "JSON"
 
-    ``` json
+    ```json
     {
       "name": "08585329112602833828909892130CU17",
       "id": "/providers/Microsoft.ProcessSimple/environments/Default-de348bc7-1aeb-4406-8cb3-97db021cadb4/flows/170fb67e-a514-4d84-8727-582022bd13a9/runs/08585329112602833828909892130CU17",
@@ -96,7 +96,7 @@ m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 
 === "Text"
 
-    ``` text
+    ```text
     endTime    :
     name       : 08585329112602833828909892130CU17
     startTime  : 2022-11-17T14:33:45.2763872Z
@@ -106,7 +106,7 @@ m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 
 === "CSV"
 
-    ``` text
+    ```csv
     name,startTime,endTime,status,triggerName
     08585329112602833828909892130CU17,2022-11-17T14:33:45.2763872Z,,Running,When_a_new_response_is_submitted
     ```

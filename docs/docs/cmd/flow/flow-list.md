@@ -47,7 +47,7 @@ m365 flow list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --
 
 === "JSON"
 
-    ``` json
+    ```json
     [
       {
         "name": "00afcb83-df7b-4fe0-ab9c-1542a1dc66a9",
@@ -129,148 +129,21 @@ m365 flow list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --
           "isManaged": false
         },
         "displayName": "Contoso Invoicing Flow"
-      },
-      {
-        "name": "15ce8985-fc2d-4043-9d8a-06a971495a99",
-        "id": "/providers/Microsoft.ProcessSimple/environments/Default-00000000-0000-0000-0000-000000000000/flows/15ce8985-fc2d-4043-9d8a-06a971495a99",
-        "type": "Microsoft.ProcessSimple/environments/flows",
-        "properties": {
-          "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
-          "displayName": "Recruitment Approval",
-          "userType": "Owner",
-          "state": "Started",
-          "connectionReferences": {
-            "shared_sharepointonline": {
-              "connectionName": "shared-sharepointonl-1c433d0f-a030-45eb-9795-8c2585f84781",
-              "source": "Embedded",
-              "id": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
-              "displayName": "SharePoint",
-              "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1610-greyhound-localization-RelayFix/1.0.1610.3091/sharepointonline/icon.png",
-              "brandColor": "#036C70",
-              "tier": "Standard"
-            }
-          },
-          "createdTime": "2022-10-17T15:25:55.1266576Z",
-          "lastModifiedTime": "2022-10-17T15:25:58.8108454Z",
-          "environment": {
-            "name": "Default-00000000-0000-0000-0000-000000000000",
-            "type": "Microsoft.ProcessSimple/environments",
-            "id": "/providers/Microsoft.ProcessSimple/environments/Default-00000000-0000-0000-0000-000000000000"
-          },
-          "definitionSummary": {
-            "triggers": [
-              {
-                "type": "OpenApiConnection",
-                "swaggerOperationId": "GetOnUpdatedItems",
-                "metadata": {
-                  "operationMetadataId": "a7c43f84-ba84-4961-b4b4-a212a60cdb9d"
-                }
-              }
-            ],
-            "actions": [
-              {
-                "type": "If",
-                "metadata": {
-                  "operationMetadataId": "462baceb-7316-42fc-9436-d60716ad55b4"
-                }
-              },
-              {
-                "type": "OpenApiConnection",
-                "swaggerOperationId": "PatchItem",
-                "metadata": {
-                  "operationMetadataId": "698b9b79-abf9-4f63-8f8b-ff584c2b8677"
-                }
-              },
-              {
-                "type": "OpenApiConnection",
-                "swaggerOperationId": "PatchItem",
-                "metadata": {
-                  "operationMetadataId": "96f3fd44-9c7c-4521-a552-65f5f81438a0"
-                }
-              }
-            ]
-          },
-          "creator": {
-            "tenantId": "00000000-0000-0000-0000-000000000000",
-            "objectId": "00000000-0000-0000-0000-000000000000",
-            "userId": "00000000-0000-0000-0000-000000000000",
-            "userType": "ActiveDirectory"
-          },
-          "provisioningMethod": "FromDefinition",
-          "flowFailureAlertSubscribed": true,
-          "isManaged": false
-        },
-        "displayName": "Recruitment Approval"
-      },
-      {
-        "name": "536131e8-1dd0-4792-806d-309131261a3d",
-        "id": "/providers/Microsoft.ProcessSimple/environments/Default-00000000-0000-0000-0000-000000000000/flows/536131e8-1dd0-4792-806d-309131261a3d",
-        "type": "Microsoft.ProcessSimple/environments/flows",
-        "properties": {
-          "apiId": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
-          "displayName": "Get Group Owners",
-          "userType": "Owner",
-          "state": "Suspended",
-          "connectionReferences": {},
-          "createdTime": "2020-01-29T07:02:43.4138109Z",
-          "lastModifiedTime": "2020-01-30T06:55:31.2413475Z",
-          "environment": {
-            "name": "Default-00000000-0000-0000-0000-000000000000",
-            "type": "Microsoft.ProcessSimple/environments",
-            "id": "/providers/Microsoft.ProcessSimple/environments/Default-00000000-0000-0000-0000-000000000000"
-          },
-          "definitionSummary": {
-            "triggers": [
-              {
-                "type": "Request",
-                "kind": "Http"
-              }
-            ],
-            "actions": [
-              {
-                "type": "InitializeVariable"
-              },
-              {
-                "type": "InitializeVariable"
-              },
-              {
-                "type": "InitializeVariable"
-              },
-              {
-                "type": "Http"
-              }
-            ]
-          },
-          "creator": {
-            "tenantId": "00000000-0000-0000-0000-000000000000",
-            "objectId": "00000000-0000-0000-0000-000000000000",
-            "userId": "00000000-0000-0000-0000-000000000000",
-            "userType": "ActiveDirectory"
-          },
-          "provisioningMethod": "FromDefinition",
-          "flowFailureAlertSubscribed": true,
-          "isManaged": false
-        },
-        "displayName": "Get Group Owners"
       }
     ]
     ```
 
 === "Text"
 
-    ``` text
+    ```text
     name                                  displayName
     ------------------------------------  -----------------------------------------------
     00afcb83-df7b-4fe0-ab9c-1542a1dc66a9  Contoso Invoicing Flow
-    15ce8985-fc2d-4043-9d8a-06a971495a99  Recruitment Approval
-    536131e8-1dd0-4792-806d-309131261a3d  Get Group Owners
     ```
 
 === "CSV"
 
-    ``` text
+    ```csv
     name,displayName
     00afcb83-df7b-4fe0-ab9c-1542a1dc66a9,Contoso Invoicing Flow
-    15ce8985-fc2d-4043-9d8a-06a971495a99,Recruitment Approval
-    536131e8-1dd0-4792-806d-309131261a3d,Get Group Owners
     ```
