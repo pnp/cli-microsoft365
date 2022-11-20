@@ -25,18 +25,18 @@ class ContextRemoveCommand extends ContextCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
-      await this.removeContextInfo(logger);
+      await this.removeContext(logger);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the Microsoft Power App ${args.options.name}?`
+        message: `Are you sure you want to remove the context?`
       });
 
       if (result.continue) {
-        await this.removeContextInfo(logger);
+        await this.removeContext(logger);
       }
     }
   }
@@ -64,7 +64,7 @@ class ContextRemoveCommand extends ContextCommand {
     );
   }
 
-  public removeContextInfo(logger: Logger): void {
+  public removeContext(logger: Logger): void {
     const filePath: string = '.m365rc.json';
 
     let m365rc: M365RcJson = {};
