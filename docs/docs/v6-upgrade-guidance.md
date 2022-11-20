@@ -80,6 +80,33 @@ If you have configured the `autoOpenBrowserOnLogin` key, you'll now need to conf
 m365 cli config set --key autoOpenLinksInBrowser --value true
 ```
 
+## Updated `spo file copy` options
+
+The command [spo file copy](./cmd/spo/file/file-copy.md) has been updated under the hood. This rework gives us more flexibility while copying files, right now it's even possible to copy files over 2GB. This rework comes with some changes. When you specify an URL for options `webUrl`, `sourceUrl` and `targetUrl`, make sure that you specify a decoded URL. Specifying an encoded URL will result in a `File Not Found` error. For example, `/sites/IT/Shared%20Documents/Document.pdf` will not work while `/sites/IT/Shared Documents/Document.pdf` will work just fine.
+
+Because of this rework, we were able to add new options, but we also removed existing ones.
+
+**Removed options:**
+
+- `--deleteIfAlreadyExists`
+- `--allowSchemaMismatch`
+
+**New options:**
+
+Option | Description
+--- | ---
+`--nameConflictBehavior [nameConflictBehavior]` | Behavior when a document with the same name is already present at the destination. Possible values: `fail`, `replace`, `rename`. Default is `fail`.
+`--newName [newName]` | New name of the destination file.
+`--bypassSharedLock` | This indicates whether a file with a share lock can still be copied. Use this option to copy a file that is locked.
+
+### What action do I need to take?
+
+Update your scripts with the following:
+
+- Ensure all the URLs you provide are **decoded**.
+- Remove the option `--allowSchemaMismatch`.
+- Replace option `--deleteIfAlreadyExists` with `--nameConflictBehavior replace`.
+
 ## In `teams channel` commands, changed short options
 
 In the following commands we've changed some shorts:
@@ -160,7 +187,7 @@ Update your scripts to expect a single object instead of an array.
 
 ## Updated `spo group user <verb>` commands
 
-We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possibly scenario's. In the near future we'll be adding support to add Azure AD Groups as group member. Using `spo group member` better fits the intended situation of adding either users or Azure AD groups.
+We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possible scenarios. In the near future we'll be adding support to add Azure AD Groups as group member. Using `spo group member` better fits the intended situation of adding either users or Azure AD groups.
 
 As a side issue, we've also updated the response output of the `spo group member list` command in JSON output mode. This returned a member array within a parent `value` object. In the new situation, the command returns the array without the parent `value` object.
 

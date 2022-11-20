@@ -11,50 +11,60 @@ m365 spo file copy [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: The URL of the site where the file is located
+: The URL of the site where the file is located.
 
 `-s, --sourceUrl <sourceUrl>`
-: Site-relative URL of the file to copy
+: Server-relative or absolute URL of the file.
 
 `-t, --targetUrl <targetUrl>`
-: Server-relative URL where to copy the file
+: Server-relative or absolute URL of the location.
 
-`--deleteIfAlreadyExists`
-: If a file already exists at the targetUrl, it will be moved to the recycle bin. If omitted, the copy operation will be canceled if the file already exists at the targetUrl location
+`--newName [newName]`
+: New name of the destination file.
 
-`--allowSchemaMismatch`
-: Ignores any missing fields in the target document library and copies the file anyway
+`--nameConflictBehavior [nameConflictBehavior]`
+: Behavior when a document with the same name is already present at the destination. Possible values: `fail`, `replace`, `rename`. Default is `fail`.
+
+`--bypassSharedLock`
+: This indicates whether a file with a share lock can still be copied. Use this option to copy a file that is locked.
 
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-When you copy a file using the `spo file copy` command, only the latest version of the file is copied.
+!!! important
+    The required URLs `webUrl`, `sourceUrl` and `targetUrl` cannot be encoded. When you do so, you will get a `File Not Found` error.
+
+When you specify a value for `nameConflictBehavior`, consider the following:
+
+- `fail` will throw an error when the destination file already exists.
+- `replace` will replace the destination file if it already exists.
+- `rename` will add a suffix (e.g. Document1.pdf) when the destination file already exists.
 
 ## Examples
 
-Copy file to a document library in another site collection
+Copy a file to a document library in another site collection with server relative URLs
 
 ```sh
-m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
+m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl /sites/project/Shared Documents/Document.pdf --targetUrl /sites/IT/Shared Documents
 ```
 
-Copy file to a document library in the same site collection
+Copy a file to a document library in another site collection with absolute URLs
 
 ```sh
-m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
+m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl https://contoso.sharepoint.com/sites/project/Shared Documents/Document.pdf --targetUrl https://contoso.sharepoint.com/sites/IT/Shared Documents
 ```
 
-Copy file to a document library in another site collection. If a file with the same name already exists in the target document library, move it to the recycle bin
+Copy file to a document library in another site collection with a new name
 
 ```sh
-m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
+m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl /sites/project/Shared Documents/Document.pdf --targetUrl /sites/IT/Shared Documents --newName "Report.pdf"
 ```
 
-Copy file to a document library in another site collection. Will ignore any missing fields in the target destination and copy anyway
+Copy file to a document library in another site collection with a new name, rename the file if it already exists
 
 ```sh
-m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+m365 spo file copy --webUrl https://contoso.sharepoint.com/sites/project --sourceUrl /sites/project/Shared Documents/Document.pdf --targetUrl /sites/IT/Shared Documents --newName "Report.pdf" --nameConflictBehavior rename
 ```
 
 ## More information
