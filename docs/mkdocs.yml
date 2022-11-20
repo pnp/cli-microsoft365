@@ -208,6 +208,7 @@ nav:
         - plan get: cmd/planner/plan/plan-get.md
         - plan list: cmd/planner/plan/plan-list.md
         - plan remove: cmd/planner/plan/plan-remove.md
+        - plan set: cmd/planner/plan/plan-set.md
       - task:
         - task add: cmd/planner/task/task-add.md
         - task get: cmd/planner/task/task-get.md
