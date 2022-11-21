@@ -233,6 +233,10 @@ Update the Title of a list retrieved by it's original Title
 m365 spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --title Documents --newTitle 'Different Title'
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - SPList Class Members information: [https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.list_members.aspx](https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.list_members.aspx)

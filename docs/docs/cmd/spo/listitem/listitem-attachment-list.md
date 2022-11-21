@@ -46,3 +46,37 @@ Gets the attachments from a specific list item in a specific list obtained by se
 ```sh
 m365 spo listitem attachment list --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/Documents --itemId 147
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "FileName": "DummyDocument.docx",
+        "FileNameAsPath": {
+          "DecodedUrl": "DummyDocument.docx"
+        },
+        "ServerRelativePath": {
+          "DecodedUrl": "/Lists/Test/Attachments/236/DummyDocument.docx"
+        },
+        "ServerRelativeUrl": "/Lists/Test/Attachments/236/DummyDocument.docx"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    FileName            ServerRelativeUrl  
+    ------------------  ----------------------------------------------
+    DummyDocument.docx  /Lists/Test/Attachments/236/DummyDocument.docx
+    ```
+
+=== "CSV"
+
+    ```csv
+    FileName,ServerRelativeUrl
+    DummyDocument.docx,/Lists/Test/Attachments/236/DummyDocument.docx
+    ```
