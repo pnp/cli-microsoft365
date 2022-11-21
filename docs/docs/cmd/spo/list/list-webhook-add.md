@@ -53,3 +53,36 @@ Add a web hook to the list retrieved by ID located in a specific site with a spe
 ```sh
 m365 spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listId '3d6aefa0-f438-4789-b0cd-6e865f5d65b5' --notificationUrl https://contoso-funcions.azurewebsites.net/webhook --expirationDateTime '2019-03-02T18:15' --clientState "Hello State!"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "clientState": "random client state",
+      "expirationDateTime": "2019-05-29T23:00:00.000Z",
+      "id": "ef69c37d-cb0e-46d9-9758-5ebdeffd6959",
+      "notificationUrl": "https://contoso-funcions.azurewebsites.net/webhook",
+      "resource": "0987cfd9-f02c-479b-9fb4-3f0550462848",
+      "resourceData": null
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    clientState       : random client state
+    expirationDateTime: 2019-05-29T23:00:00.000Z
+    id                : ef69c37d-cb0e-46d9-9758-5ebdeffd6959
+    notificationUrl   : https://contoso-funcions.azurewebsites.net/webhook
+    resource          : 0987cfd9-f02c-479b-9fb4-3f0550462848
+    resourceData      : null
+    ```
+
+=== "CSV"
+
+    ```csv
+    clientState,expirationDateTime,id,notificationUrl,resource,resourceData
+    random client state,2019-05-29T23:00:00.000Z,ef69c37d-cb0e-46d9-9758-5ebdeffd6959,https://contoso-funcions.azurewebsites.net/webhook,0987cfd9-f02c-479b-9fb4-3f0550462848,
+    ```

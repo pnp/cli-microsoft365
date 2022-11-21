@@ -49,3 +49,7 @@ Sets classification label "Confidential" and disables editing and deleting items
 ```sh
 m365 spo list label set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --label 'Confidential' --blockEdit --blockDelete --syncToItems
 ```
+
+## Response
+
+The command won't return a response on success.

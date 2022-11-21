@@ -55,3 +55,7 @@ Remove field with title _Custom field_ from view with title _Custom view_ from t
 ```sh
 m365 spo list view field remove --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listUrl '/sites/project-x/lists/Events' --viewTitle 'Custom view'
 ```
+
+## Response
+
+The command won't return a response on success.

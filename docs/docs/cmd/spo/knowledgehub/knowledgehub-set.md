@@ -29,3 +29,23 @@ Sets the Knowledge Hub Site for your tenant
 ```sh
 m365 spo knowledgehub set --siteUrl https://contoso.sharepoint.com/sites/knowledgesite
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    "The knowledge hub site with url \"https://contoso.sharepoint.com\" is added to list."
+    ```
+
+=== "Text"
+
+    ```text
+    The knowledge hub site with url "https://contoso.sharepoint.com" is added to list.
+    ```
+
+=== "CSV"
+
+    ```csv
+    The knowledge hub site with url "https://contoso.sharepoint.com" is added to list.
+    ```
