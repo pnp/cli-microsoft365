@@ -56,3 +56,7 @@ Generate a web part that shows the weather for Amsterdam. Load web part contents
 ```sh
 m365 spfx package generate --webPartTitle "Amsterdam weather" --webPartDescription "Shows weather in Amsterdam" --name amsterdam-weather --html @amsterdam-weather.html --allowTenantWideDeployment --enableForTeams all
 ```
+
+## Response
+
+The command won't return a response on success.

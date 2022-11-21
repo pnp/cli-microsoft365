@@ -22,6 +22,9 @@ m365 spo page set [options]
 `-p, --promoteAs [promoteAs]`
 : Update the page purpose. Allowed values `HomePage`, `NewsPage`, `Template`
 
+`--demoteFrom [demoteFrom]`
+: Update the page purpose back to a regular article. Allowed values `NewsPage`
+
 `--commentsEnabled [commentsEnabled]`
 : Set to `true`, to enable comments on the page. Allowed values `true`, `false`
 
@@ -65,6 +68,12 @@ Promote the existing article page as a template
 m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs Template
 ```
 
+Demote the existing newspage
+
+```sh
+m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --demoteFrom NewsPage
+```
+
 Change the page's layout to Home and set it as the site's home page
 
 ```sh
@@ -88,3 +97,7 @@ Set page description
 ```sh
 m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --description "Description to add for the page"
 ```
+
+## Response
+
+The command won't return a response on success.

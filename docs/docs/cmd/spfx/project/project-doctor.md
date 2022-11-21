@@ -62,3 +62,95 @@ Validate if your project is correctly set up and get instructions to fix any iss
 ```sh
 m365 spfx project doctor --output tour
 ```
+
+## Response
+
+### Response with no issues
+
+=== "JSON"
+
+    ```json
+    []
+    ```
+
+=== "Text"
+
+    ```text
+    ✅ CLI for Microsoft 365 has found no issues in your project
+    ```
+
+=== "Markdown"
+
+    ````md
+    # Validate project spfx-solution
+
+    Date: 11/7/2022
+
+    ## Findings
+
+    ✅ CLI for Microsoft 365 has found no issues in your project
+    ````
+
+### Response with issues reported
+
+When the npm packages related issues are reported. 
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "description": "Install supported version of the office-ui-fabric-react package",
+        "id": "FN001022",
+        "file": "./package.json",
+        "position": {
+          "line": 24,
+          "character": 5
+        },
+        "resolution": "npm i -SE office-ui-fabric-react@7.174.1",
+        "resolutionType": "cmd",
+        "severity": "Required",
+        "title": "office-ui-fabric-react"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Execute in command line
+    -----------------------
+    npm i -SE office-ui-fabric-react@7.174.1
+    ```
+
+=== "Markdown"
+
+    ````md
+    # Validate project react-page-navigator
+
+    Date: 11/15/2022
+
+    ## Findings
+
+    Following is the list of issues found in your project. [Summary](#Summary) of the recommended fixes is included at the end of the report.
+
+    ### FN001022 office-ui-fabric-react | Required
+
+    Install supported version of the office-ui-fabric-react package
+
+    Execute the following command:
+
+    ```sh
+    npm i -SE office-ui-fabric-react@7.174.1
+    ```
+
+    File: [./package.json:24:5](./package.json)
+
+    ## Summary
+
+    ### Execute script
+
+    ```sh
+    npm i -SE office-ui-fabric-react@7.174.1
+    ```
+    ````

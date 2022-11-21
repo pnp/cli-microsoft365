@@ -64,3 +64,7 @@ Remove view with ID _cc27a922-8224-4296-90a5-ebbc54da2e81_ from a list with titl
 ```sh
 m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

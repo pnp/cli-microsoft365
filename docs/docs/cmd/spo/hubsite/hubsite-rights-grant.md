@@ -46,6 +46,10 @@ Grant user with email _PattiF@contoso.com_ permission to join sites to the hub s
 m365 spo hubsite rights grant --hubSiteUrl https://contoso.sharepoint.com/sites/sales --principals PattiF@contoso.com --rights Join
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - SharePoint hub sites new in Microsoft 365: [https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547](https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547)
