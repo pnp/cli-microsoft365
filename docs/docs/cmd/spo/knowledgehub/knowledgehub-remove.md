@@ -31,3 +31,23 @@ Removes the Knowledge Hub Site setting for your tenant without confirmation
 ```sh
 m365 spo knowledgehub remove --confirm
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    "The knowledge hub site setting was removed."
+    ```
+
+=== "Text"
+
+    ```text
+    The knowledge hub site setting was removed.
+    ```
+
+=== "CSV"
+
+    ```csv
+    The knowledge hub site setting was removed.
+    ```
