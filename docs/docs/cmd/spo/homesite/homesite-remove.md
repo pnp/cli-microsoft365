@@ -26,6 +26,26 @@ Removes the current Home Site without confirmation
 m365 spo homesite remove --confirm
 ```
 
+## Response
+
+=== "JSON"
+
+    ```json
+    "https://contoso.sharepoint.com has been removed as a Home site. It may take some time for the change to apply. Check aka.ms/homesites for details."
+    ```
+
+=== "Text"
+
+    ```text
+    https://contoso.sharepoint.com has been removed as a Home site. It may take some time for the change to apply. Check aka.ms/homesites for details.
+    ```
+
+=== "CSV"
+
+    ```csv
+    https://contoso.sharepoint.com has been removed as a Home site. It may take some time for the change to apply. Check aka.ms/homesites for details.
+    ```
+
 ## More information
 
 - SharePoint home sites, a landing for your organization on the intelligent intranet: [https://techcommunity.microsoft.com/t5/Microsoft-SharePoint-Blog/SharePoint-home-sites-a-landing-for-your-organization-on-the/ba-p/621933](https://techcommunity.microsoft.com/t5/Microsoft-SharePoint-Blog/SharePoint-home-sites-a-landing-for-your-organization-on-the/ba-p/621933)

@@ -40,6 +40,10 @@ Revoke rights to join sites to the hub site with URL _https://contoso.sharepoint
 m365 spo hubsite rights revoke --hubSiteUrl https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --confirm
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - SharePoint hub sites new in Microsoft 365: [https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547](https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547)

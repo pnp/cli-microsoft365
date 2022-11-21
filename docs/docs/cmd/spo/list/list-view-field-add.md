@@ -65,3 +65,6 @@ Add field with title _Custom field_ to view with title _All Documents_ of the li
 m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --viewTitle 'All Documents' --fieldTitle 'Custom field'
 ```
 
+## Response
+
+The command won't return a response on success.

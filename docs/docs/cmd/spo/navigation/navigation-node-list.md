@@ -31,3 +31,32 @@ Retrieve nodes from the quick launch
 ```sh
 m365 spo navigation node list --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Id": 2032,
+        "Title": "Navigation Link",
+        "Url": "https://contoso.sharepoint.com"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Id    Title            Url
+    ----  ---------------  ------------------------------
+    2032  Navigation Link  https://contoso.sharepoint.com
+    ```
+
+=== "CSV"
+
+    ```csv
+    Id,Title,Url
+    2032,Navigation Link,https://contoso.sharepoint.com
+    ```

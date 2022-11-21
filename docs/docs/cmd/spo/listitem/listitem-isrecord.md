@@ -47,3 +47,22 @@ Check whether a document with a specific id in a list retrieved by server-relati
 m365 spo listitem isrecord --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/documents --id 1
 ```
 
+## Response
+
+=== "JSON"
+
+    ```json
+    false
+    ```
+
+=== "Text"
+
+    ```text
+    false
+    ```
+
+=== "CSV"
+
+    ```csv
+    false
+    ```

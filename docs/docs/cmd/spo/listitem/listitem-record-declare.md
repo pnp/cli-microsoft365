@@ -55,3 +55,32 @@ Declare a document with a specific id as a record with a record declaration date
 ```sh
 m365 spo listitem record declare --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/Lists/Demo List' --listItemId 1 --date 2013-09-03
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "SchemaVersion": "15.0.0.0",
+      "LibraryVersion": "16.0.23102.12004",
+      "ErrorInfo": null,
+      "TraceCorrelationId": "064779a0-d05b-5000-843d-c36803e58f12"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    ErrorInfo         : null
+    LibraryVersion    : 16.0.23102.12004
+    SchemaVersion     : 15.0.0.0
+    TraceCorrelationId: 0a4779a0-c0ca-5000-d29d-4321a1739425
+    ```
+
+=== "CSV"
+
+    ```csv
+    SchemaVersion,LibraryVersion,ErrorInfo,TraceCorrelationId
+    15.0.0.0,16.0.23102.12004,,0d4779a0-609c-5000-843d-c98e4764c937
+    ```
