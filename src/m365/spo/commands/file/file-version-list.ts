@@ -27,6 +27,10 @@ class SpoFileVersionListCommand extends SpoCommand {
     return 'Retrieves all versions of a file';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Created', 'ID', 'IsCurrentVersion', 'VersionLabel'];
+  }
+
   constructor() {
     super();
 
