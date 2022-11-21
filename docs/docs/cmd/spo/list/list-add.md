@@ -221,6 +221,139 @@ Add a list with title _Announcements_, baseTemplate _Announcements_ in site _htt
 m365 spo list add --webUrl https://contoso.sharepoint.com/sites/project-x --title Announcements --baseTemplate Announcements --contentTypesEnabled true --enableVersioning true --majorVersionLimit 50
 ```
 
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "AllowContentTypes": true,
+      "BaseTemplate": 100,
+      "BaseType": 0,
+      "ContentTypesEnabled": false,
+      "CrawlNonDefaultViews": false,
+      "Created": "2022-11-16T19:51:42Z",
+      "CurrentChangeToken": {
+        "StringValue": "1;3;ea3dc19f-bc1f-4b77-afb8-14e08f4c0f6d;638042251016970000;564165920"
+      },
+      "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
+      "DefaultItemOpenUseListSetting": false,
+      "Description": "",
+      "Direction": "none",
+      "DisableCommenting": false,
+      "DisableGridEditing": false,
+      "DocumentTemplateUrl": null,
+      "DraftVersionVisibility": 0,
+      "EnableAttachments": true,
+      "EnableFolderCreation": false,
+      "EnableMinorVersions": false,
+      "EnableModeration": false,
+      "EnableRequestSignOff": true,
+      "EnableVersioning": true,
+      "EntityTypeName": "TestList",
+      "ExemptFromBlockDownloadOfNonViewableFiles": false,
+      "FileSavePostProcessingEnabled": false,
+      "ForceCheckout": false,
+      "HasExternalDataSource": false,
+      "Hidden": false,
+      "Id": "ea3dc19f-bc1f-4b77-afb8-14e08f4c0f6d",
+      "ImagePath": {
+        "DecodedUrl": "/_layouts/15/images/itgen.png?rev=47"
+      },
+      "ImageUrl": "/_layouts/15/images/itgen.png?rev=47",
+      "DefaultSensitivityLabelForLibrary": "",
+      "IrmEnabled": false,
+      "IrmExpire": false,
+      "IrmReject": false,
+      "IsApplicationList": false,
+      "IsCatalog": false,
+      "IsPrivate": false,
+      "ItemCount": 0,
+      "LastItemDeletedDate": "2022-11-16T19:51:42Z",
+      "LastItemModifiedDate": "2022-11-16T19:51:42Z",
+      "LastItemUserModifiedDate": "2022-11-16T19:51:42Z",
+      "ListExperienceOptions": 0,
+      "ListItemEntityTypeFullName": "SP.Data.TestListItem",
+      "MajorVersionLimit": 50,
+      "MajorWithMinorVersionsLimit": 0,
+      "MultipleDataList": false,
+      "NoCrawl": false,
+      "ParentWebPath": {
+        "DecodedUrl": "/"
+      },
+      "ParentWebUrl": "/",
+      "ParserDisabled": false,
+      "ServerTemplateCanCreateFolders": true,
+      "TemplateFeatureId": "00bfea71-de22-43b2-a848-c05709900100",
+      "Title": "Test"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    AllowContentTypes                        : true
+    BaseTemplate                             : 100
+    BaseType                                 : 0
+    ContentTypesEnabled                      : false
+    CrawlNonDefaultViews                     : false
+    Created                                  : 2022-11-16T19:52:16Z
+    CurrentChangeToken                       : {"StringValue":"1;3;4d66e81a-ac73-4894-9e33-7999edaa36bc;638042251364530000;564166119"}
+    DefaultContentApprovalWorkflowId         : 00000000-0000-0000-0000-000000000000
+    DefaultItemOpenUseListSetting            : false
+    DefaultSensitivityLabelForLibrary        :
+    Description                              :
+    Direction                                : none
+    DisableCommenting                        : false
+    DisableGridEditing                       : false
+    DocumentTemplateUrl                      : null
+    DraftVersionVisibility                   : 0
+    EnableAttachments                        : true
+    EnableFolderCreation                     : false
+    EnableMinorVersions                      : false
+    EnableModeration                         : false
+    EnableRequestSignOff                     : true
+    EnableVersioning                         : true
+    EntityTypeName                           : TestList
+    ExemptFromBlockDownloadOfNonViewableFiles: false
+    FileSavePostProcessingEnabled            : false
+    ForceCheckout                            : false
+    HasExternalDataSource                    : false
+    Hidden                                   : false
+    Id                                       : 4d66e81a-ac73-4894-9e33-7999edaa36bc
+    ImagePath                                : {"DecodedUrl":"/_layouts/15/images/itgen.png?rev=47"}
+    ImageUrl                                 : /_layouts/15/images/itgen.png?rev=47
+    IrmEnabled                               : false
+    IrmExpire                                : false
+    IrmReject                                : false
+    IsApplicationList                        : false
+    IsCatalog                                : false
+    IsPrivate                                : false
+    ItemCount                                : 0
+    LastItemDeletedDate                      : 2022-11-16T19:52:16Z
+    LastItemModifiedDate                     : 2022-11-16T19:52:16Z
+    LastItemUserModifiedDate                 : 2022-11-16T19:52:16Z
+    ListExperienceOptions                    : 0
+    ListItemEntityTypeFullName               : SP.Data.TestListItem
+    MajorVersionLimit                        : 50
+    MajorWithMinorVersionsLimit              : 0
+    MultipleDataList                         : false
+    NoCrawl                                  : false
+    ParentWebPath                            : {"DecodedUrl":"/"}
+    ParentWebUrl                             : /
+    ParserDisabled                           : false
+    ServerTemplateCanCreateFolders           : true
+    TemplateFeatureId                        : 00bfea71-de22-43b2-a848-c05709900100
+    Title                                    : Test
+    ```
+
+=== "CSV"
+
+    ```csv
+    AllowContentTypes,BaseTemplate,BaseType,ContentTypesEnabled,CrawlNonDefaultViews,Created,CurrentChangeToken,DefaultContentApprovalWorkflowId,DefaultItemOpenUseListSetting,Description,Direction,DisableCommenting,DisableGridEditing,DocumentTemplateUrl,DraftVersionVisibility,EnableAttachments,EnableFolderCreation,EnableMinorVersions,EnableModeration,EnableRequestSignOff,EnableVersioning,EntityTypeName,ExemptFromBlockDownloadOfNonViewableFiles,FileSavePostProcessingEnabled,ForceCheckout,HasExternalDataSource,Hidden,Id,ImagePath,ImageUrl,DefaultSensitivityLabelForLibrary,IrmEnabled,IrmExpire,IrmReject,IsApplicationList,IsCatalog,IsPrivate,ItemCount,LastItemDeletedDate,LastItemModifiedDate,LastItemUserModifiedDate,ListExperienceOptions,ListItemEntityTypeFullName,MajorVersionLimit,MajorWithMinorVersionsLimit,MultipleDataList,NoCrawl,ParentWebPath,ParentWebUrl,ParserDisabled,ServerTemplateCanCreateFolders,TemplateFeatureId,Title
+    1,100,0,,,2022-11-16T19:52:41Z,"{""StringValue"":""1;3;3b6bd39e-1e62-4ddf-ac8e-020bf5353891;638042251616230000;564166296""}",00000000-0000-0000-0000-000000000000,,,none,,,,0,1,,,,1,1,TestList,,,,,,3b6bd39e-1e62-4ddf-ac8e-020bf5353891,"{""DecodedUrl"":""/_layouts/15/images/itgen.png?rev=47""}",/_layouts/15/images/itgen.png?rev=47,,,,,,,,0,2022-11-16T19:52:41Z,2022-11-16T19:52:42Z,2022-11-16T19:52:41Z,0,SP.Data.TestListItem,50,0,,,"{""DecodedUrl"":""/""}",/,,1,00bfea71-de22-43b2-a848-c05709900100,Test
+    ```
+
 ## More information
 
 - SPList Class Members information: [https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.list_members.aspx](https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.list_members.aspx)

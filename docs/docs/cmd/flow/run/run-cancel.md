@@ -39,3 +39,7 @@ Cancel the given run of the specified flow
 ```sh
 m365 flow run cancel --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
 ```
+
+## Response
+
+The command won't return a response on success.

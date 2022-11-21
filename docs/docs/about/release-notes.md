@@ -107,6 +107,10 @@
 - extended teams cache remove to check if cache folder exists [#3449](https://github.com/pnp/cli-microsoft365/issues/3449)
 - updated mkdocs configuration (and page headers) to ensure consistency [#3859](https://github.com/pnp/cli-microsoft365/issues/3859)
 - extended 'spo list' commands to have all available list options [#3808](https://github.com/pnp/cli-microsoft365/issues/3808)
+- added docs response for 'spfx' commands [#3925](https://github.com/pnp/cli-microsoft365/issues/3925)
+- added docs response for 'flow' commands [#4086](https://github.com/pnp/cli-microsoft365/issues/4086)
+- added docs response for 'spo homesite' until 'spo navigation' commands [#3931](https://github.com/pnp/cli-microsoft365/issues/3931)
+- extended 'spo page set' with support to demote news pages [#2226](https://github.com/pnp/cli-microsoft365/issues/2226)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
