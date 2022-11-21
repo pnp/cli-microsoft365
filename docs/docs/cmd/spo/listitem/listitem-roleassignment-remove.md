@@ -65,3 +65,7 @@ Remove roleassignment from listitem getting list by url based on principal Id wi
 ```sh
 m365 spo listitem roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --listUrl '/sites/contoso-sales/lists/Events' --listItemId 1 --principalId 2 --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

@@ -33,6 +33,100 @@ List hub sites, including their associated sites, in the current tenant. Associa
 m365 spo hubsite list --includeAssociatedSites --output json
 ```
 
+## Response
+
+### Standard response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Description": "Intranet Hub Site",
+        "EnablePermissionsSync": false,
+        "EnforcedECTs": null,
+        "EnforcedECTsVersion": 0,
+        "HideNameInNavigation": false,
+        "ID": "af80c11f-0138-4d72-bb37-514542c3aabb",
+        "LogoUrl": "https://contoso.sharepoint.com/sites/intra/SiteAssets/work.png",
+        "ParentHubSiteId": "ec78f3aa-5a74-4f16-be49-3396df045f34",
+        "PermissionsSyncTag": 0,
+        "RequiresJoinApproval": false,
+        "SiteDesignId": "184644fb-90ed-4841-a7ad-6930cf819060",
+        "SiteId": "af80c11f-0138-4d72-bb37-514542c3aabb",
+        "SiteUrl": "https://contoso.sharepoint.com/sites/intra",
+        "Targets": null,
+        "TenantInstanceId": "5d128b52-7228-46b5-8765-5b338476054d",
+        "Title": "Intranet"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    ID                                    SiteUrl                                     Title
+    ------------------------------------  ------------------------------------------  --------
+    af80c11f-0138-4d72-bb37-514542c3aabb  https://contoso.sharepoint.com/sites/intra  Intranet
+    ```
+
+=== "CSV"
+
+    ```csv
+    ID,SiteUrl,Title
+    af80c11f-0138-4d72-bb37-514542c3aabb,https://contoso.sharepoint.com/sites/intra,Intranet
+    ```
+
+### `includeAssociatedSites` response
+
+When we make use of the option `includeAssociatedSites` the response will differ. 
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Description": "Intranet Hub Site",
+        "EnablePermissionsSync": false,
+        "EnforcedECTs": null,
+        "EnforcedECTsVersion": 0,
+        "HideNameInNavigation": false,
+        "ID": "af80c11f-0138-4d72-bb37-514542c3aabb",
+        "LogoUrl": "https://contoso.sharepoint.com/sites/intra/SiteAssets/work.png",
+        "ParentHubSiteId": "ec78f3aa-5a74-4f16-be49-3396df045f34",
+        "PermissionsSyncTag": 0,
+        "RequiresJoinApproval": false,
+        "SiteDesignId": "184644fb-90ed-4841-a7ad-6930cf819060",
+        "SiteId": "af80c11f-0138-4d72-bb37-514542c3aabb",
+        "SiteUrl": "https://contoso.sharepoint.com/sites/intra",
+        "Targets": null,
+        "TenantInstanceId": "5d128b52-7228-46b5-8765-5b338476054d",
+        "Title": "Intranet",
+        "AssociatedSites": [
+          {
+            "Title": "About Us",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/about-us"
+          }
+        ]
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    ID                                    SiteUrl                                     Title
+    ------------------------------------  ------------------------------------------  --------
+    af80c11f-0138-4d72-bb37-514542c3aabb  https://contoso.sharepoint.com/sites/intra  Intranet
+    ```
+
+=== "CSV"
+
+    ```csv
+    ID,SiteUrl,Title
+    af80c11f-0138-4d72-bb37-514542c3aabb,https://contoso.sharepoint.com/sites/intra,Intranet
+    ```
+
 ## More information
 
 - SharePoint hub sites new in Microsoft 365: [https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547](https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547)
