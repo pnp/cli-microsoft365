@@ -39,7 +39,7 @@ $ m365 spo app get -i e6362993-d4fd-4c5a-8254-fd095a7291ad
 
 ### Arrays
 
-If the command returns information about multiple objects, the command will return a JSON array with each array item representing one object. For example, getting the list of available app, will return output similar to:
+If the command returns information about multiple objects, the command will return a JSON array with each array item representing one object. For example, getting the list of available apps, will return output similar to:
 
 ```sh
 $ m365 spo app list -o json
@@ -123,7 +123,7 @@ Title                 : spfx-140-online-client-side-solution
 
 ### Arrays
 
-If the command returns information about multiple objects, the output is formatted as a table. For example, getting the list of available app, will return output similar to:
+If the command returns information about multiple objects, the output is formatted as a table. For example, getting the list of available apps, will return output similar to:
 
 ```sh
 $ m365 spo app list -o text
@@ -141,6 +141,40 @@ AppCatalogVersion: 1.0.0.0
 Deployed         : false
 ID               : e6362993-d4fd-4c5a-8254-fd095a7291ad
 Title            : spfx-140-online-client-side-solution
+```
+
+## CSV output mode
+
+Optionally, you can have all CLI for Microsoft 365 commands return their output as comma separated values. Depending on the command output, the value is presented as-is or formatted for readability.
+
+### Simple values
+
+If the command output is a simple value, such as a number, boolean or a string, the value is returned as-is. For example, if the Microsoft 365 Public CDN is enabled on the currently connected tenant, executing the `spo cdn get` command, will return `true`:
+
+```sh
+$ m365 spo cdn get -o csv
+true
+```
+
+### Objects
+
+If the command returns information about an object such as a site, list or an app, that contains a number of properties, the output in csv mode is formatted as comma separated values. For example, getting information about a specific app, will return output similar to:
+
+```sh
+$ m365 spo app get -i e6362993-d4fd-4c5a-8254-fd095a7291ad -o csv
+AppCatalogVersion,CanUpgrade,CurrentVersionDeployed,Deployed,ID,InstalledVersion,IsClientSideSolution,Title
+1.0.0.0,false,false,false,e6362993-d4fd-4c5a-8254-fd095a7291ad,,true,spfx-140-online-client-side-solution
+```
+
+### Arrays
+
+If the command returns information about multiple objects, the output is formatted as multiple lines of comma-separated values. For example, getting the list of available apps, will return output similar to:
+
+```sh
+$ m365 spo app list -o csv
+Title,ID,Deployed,AppCatalogVersion
+spfx-140-online-client-side-solution,e6362993-d4fd-4c5a-8254-fd095a7291ad,false,1.0.0.0
+spfx-134-client-side-solution,5ae74650-b00b-46a9-925f-9c9bd70a0cb6,false,1.0.0.0
 ```
 
 ## Processing command output with JMESPath
