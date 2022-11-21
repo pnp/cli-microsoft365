@@ -15,7 +15,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;

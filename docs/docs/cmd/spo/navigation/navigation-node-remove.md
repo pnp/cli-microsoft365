@@ -37,3 +37,7 @@ Remove a node from the quick launch without prompting for confirmation
 ```sh
 m365 spo navigation node remove --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --id 2003 --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

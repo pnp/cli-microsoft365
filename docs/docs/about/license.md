@@ -1,7 +1,5 @@
 # License
 
-Copyright (c) Microsoft Corporation. All rights reserved.
-
 MIT License
 
 Permission is hereby granted, free of charge, to any person obtaining
