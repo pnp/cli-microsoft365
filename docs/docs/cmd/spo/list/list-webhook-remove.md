@@ -52,3 +52,7 @@ Remove webhook with a specific ID from a list retrieved by URL in a specific sit
 ```sh
 m365 spo list webhook remove --webUrl https://contoso.sharepoint.com/sites/ninja --listUrl '/sites/ninja/Documents' --id cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

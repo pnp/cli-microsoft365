@@ -45,3 +45,7 @@ Enables Power Automate flow owned by another user
 ```sh
 m365 flow enable --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin
 ```
+
+## Response
+
+The command won't return a response on success.

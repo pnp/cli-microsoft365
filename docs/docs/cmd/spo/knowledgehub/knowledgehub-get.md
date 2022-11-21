@@ -22,3 +22,23 @@ Gets the Knowledge Hub Site URL for your tenant
 ```sh
 m365 spo knowledgehub get
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    "https://contoso.sharepoint.com"
+    ```
+
+=== "Text"
+
+    ```text
+    https://contoso.sharepoint.com
+    ```
+
+=== "CSV"
+
+    ```csv
+    https://contoso.sharepoint.com
+    ```
