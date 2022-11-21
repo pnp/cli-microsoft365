@@ -33,10 +33,10 @@ nav:
         - app get: cmd/aad/app/app-get.md
         - app list: cmd/aad/app/app-list.md
         - app remove: cmd/aad/app/app-remove.md
+        - app set: cmd/aad/app/app-set.md
         - app role add: cmd/aad/app/app-role-add.md
         - app role list: cmd/aad/app/app-role-list.md
-        - app role remove: cmd/aad/app/app-role-remove.md
-        - app set: cmd/aad/app/app-set.md
+        - app role remove: cmd/aad/app/app-role-remove.md        
       - approleassignment:
         - approleassignment add: cmd/aad/approleassignment/approleassignment-add.md
         - approleassignment list: cmd/aad/approleassignment/approleassignment-list.md
@@ -54,19 +54,19 @@ nav:
         - groupsettingtemplate list: cmd/aad/groupsettingtemplate/groupsettingtemplate-list.md
       - o365group:
         - o365group add: cmd/aad/o365group/o365group-add.md
-        - o365group conversation list: cmd/aad/o365group/o365group-conversation-list.md
-        - o365group conversation post list: cmd/aad/o365group/o365group-conversation-post-list.md
         - o365group get: cmd/aad/o365group/o365group-get.md
         - o365group list: cmd/aad/o365group/o365group-list.md
-        - o365group recyclebinitem clear: cmd/aad/o365group/o365group-recyclebinitem-clear.md
-        - o365group recyclebinitem list: cmd/aad/o365group/o365group-recyclebinitem-list.md
-        - o365group recyclebinitem remove: cmd/aad/o365group/o365group-recyclebinitem-remove.md
-        - o365group recyclebinitem restore: cmd/aad/o365group/o365group-recyclebinitem-restore.md
         - o365group remove: cmd/aad/o365group/o365group-remove.md
         - o365group renew: cmd/aad/o365group/o365group-renew.md
         - o365group restore: cmd/aad/o365group/o365group-recyclebinitem-restore.md
         - o365group set: cmd/aad/o365group/o365group-set.md
         - o365group teamify: cmd/aad/o365group/o365group-teamify.md
+        - o365group conversation list: cmd/aad/o365group/o365group-conversation-list.md
+        - o365group conversation post list: cmd/aad/o365group/o365group-conversation-post-list.md
+        - o365group recyclebinitem clear: cmd/aad/o365group/o365group-recyclebinitem-clear.md
+        - o365group recyclebinitem list: cmd/aad/o365group/o365group-recyclebinitem-list.md
+        - o365group recyclebinitem remove: cmd/aad/o365group/o365group-recyclebinitem-remove.md
+        - o365group recyclebinitem restore: cmd/aad/o365group/o365group-recyclebinitem-restore.md
         - o365group report activitycounts: cmd/aad/o365group/o365group-report-activitycounts.md
         - o365group report activitydetail: cmd/aad/o365group/o365group-report-activitydetail.md
         - o365group report activityfilecounts: cmd/aad/o365group/o365group-report-activityfilecounts.md
@@ -92,12 +92,12 @@ nav:
         - sp add: cmd/aad/sp/sp-add.md
         - sp get: cmd/aad/sp/sp-get.md
       - user:
-        - user get: cmd/aad/user/user-get.md
-        - user guest add: cmd/aad/user/user-guest-add.md
+        - user get: cmd/aad/user/user-get.md        
         - user hibp: cmd/aad/user/user-hibp.md
         - user list: cmd/aad/user/user-list.md
-        - user password validate: cmd/aad/user/user-password-validate.md
         - user set: cmd/aad/user/user-set.md
+        - user password validate: cmd/aad/user/user-password-validate.md
+        - user guest add: cmd/aad/user/user-guest-add.md
         - user signin list: cmd/aad/user/user-signin-list.md
     - Adaptive Card (adaptivecard):
       - send: cmd/adaptivecard/adaptivecard-send.md
@@ -201,8 +201,8 @@ nav:
         - bucket add: cmd/planner/bucket/bucket-add.md
         - bucket get: cmd/planner/bucket/bucket-get.md
         - bucket list: cmd/planner/bucket/bucket-list.md
-        - bucket set: cmd/planner/bucket/bucket-set.md
         - bucket remove: cmd/planner/bucket/bucket-remove.md
+        - bucket set: cmd/planner/bucket/bucket-set.md        
       - plan:
         - plan add: cmd/planner/plan/plan-add.md
         - plan get: cmd/planner/plan/plan-get.md
@@ -210,16 +210,16 @@ nav:
         - plan remove: cmd/planner/plan/plan-remove.md
       - task:
         - task add: cmd/planner/task/task-add.md
+        - task get: cmd/planner/task/task-get.md
+        - task list: cmd/planner/task/task-list.md
+        - task remove: cmd/planner/task/task-remove.md
+        - task set: cmd/planner/task/task-set.md
         - task checklistitem add: cmd/planner/task/task-checklistitem-add.md
         - task checklistitem list: cmd/planner/task/task-checklistitem-list.md
         - task checklistitem remove: cmd/planner/task/task-checklistitem-remove.md
-        - task get: cmd/planner/task/task-get.md
-        - task list: cmd/planner/task/task-list.md
         - task reference add: cmd/planner/task/task-reference-add.md
         - task reference list: cmd/planner/task/task-reference-list.md
         - task reference remove: cmd/planner/task/task-reference-remove.md
-        - task remove: cmd/planner/task/task-remove.md
-        - task set: cmd/planner/task/task-set.md
       - tenant:
         - tenant settings list: cmd/planner/tenant/tenant-settings-list.md
         - tenant settings set: cmd/planner/tenant/tenant-settings-set.md
@@ -314,32 +314,32 @@ nav:
         - app deploy: cmd/spo/app/app-deploy.md
         - app get: cmd/spo/app/app-get.md
         - app install: cmd/spo/app/app-install.md
-        - app instance list: cmd/spo/app/app-instance-list.md
         - app list: cmd/spo/app/app-list.md
         - app remove: cmd/spo/app/app-remove.md
         - app retract: cmd/spo/app/app-retract.md
-        - app teamspackage download: cmd/spo/app/app-teamspackage-download.md
         - app uninstall: cmd/spo/app/app-uninstall.md
         - app upgrade: cmd/spo/app/app-upgrade.md
+        - app instance list: cmd/spo/app/app-instance-list.md
+        - app teamspackage download: cmd/spo/app/app-teamspackage-download.md
       - apppage:
         - apppage add: cmd/spo/apppage/apppage-add.md
         - apppage set: cmd/spo/apppage/apppage-set.md
       - cdn:
         - cdn get: cmd/spo/cdn/cdn-get.md
+        - cdn set: cmd/spo/cdn/cdn-set.md
         - cdn origin add: cmd/spo/cdn/cdn-origin-add.md
         - cdn origin list: cmd/spo/cdn/cdn-origin-list.md
         - cdn origin remove: cmd/spo/cdn/cdn-origin-remove.md
         - cdn policy list: cmd/spo/cdn/cdn-policy-list.md
         - cdn policy set: cmd/spo/cdn/cdn-policy-set.md
-        - cdn set: cmd/spo/cdn/cdn-set.md
       - contenttype:
         - contenttype add: cmd/spo/contenttype/contenttype-add.md
         - contenttype get: cmd/spo/contenttype/contenttype-get.md
-        - contenttype remove: cmd/spo/contenttype/contenttype-remove.md
+        - contenttype list: cmd/spo/contenttype/contenttype-list.md
+        - contenttype remove: cmd/spo/contenttype/contenttype-remove.md 
+        - contenttype set: cmd/spo/contenttype/contenttype-set.md
         - contenttype field remove: cmd/spo/contenttype/contenttype-field-remove.md
         - contenttype field set: cmd/spo/contenttype/contenttype-field-set.md
-        - contenttype list: cmd/spo/contenttype/contenttype-list.md
-        - contenttype set: cmd/spo/contenttype/contenttype-set.md
       - contenttypehub:
         - contenttypehub get: cmd/spo/contenttypehub/contenttypehub-get.md
       - customaction:
@@ -415,15 +415,15 @@ nav:
         - homesite set: cmd/spo/homesite/homesite-set.md
       - hubsite:
         - hubsite connect: cmd/spo/hubsite/hubsite-connect.md
-        - hubsite data get: cmd/spo/hubsite/hubsite-data-get.md
         - hubsite disconnect: cmd/spo/hubsite/hubsite-disconnect.md
         - hubsite get: cmd/spo/hubsite/hubsite-get.md
         - hubsite list: cmd/spo/hubsite/hubsite-list.md
         - hubsite register: cmd/spo/hubsite/hubsite-register.md
-        - hubsite rights grant: cmd/spo/hubsite/hubsite-rights-grant.md
-        - hubsite rights revoke: cmd/spo/hubsite/hubsite-rights-revoke.md
         - hubsite set: cmd/spo/hubsite/hubsite-set.md
         - hubsite unregister: cmd/spo/hubsite/hubsite-unregister.md
+        - hubsite data get: cmd/spo/hubsite/hubsite-data-get.md
+        - hubsite rights grant: cmd/spo/hubsite/hubsite-rights-grant.md
+        - hubsite rights revoke: cmd/spo/hubsite/hubsite-rights-revoke.md
       - knowledgehub:
         - knowledgehub get: cmd/spo/knowledgehub/knowledgehub-get.md
         - knowledgehub remove: cmd/spo/knowledgehub/knowledgehub-remove.md
@@ -433,26 +433,26 @@ nav:
         - list get: cmd/spo/list/list-get.md
         - list list: cmd/spo/list/list-list.md
         - list remove: cmd/spo/list/list-remove.md
-        - list roleassignment remove: cmd/spo/list/list-roleassignment-remove.md
-        - list roleassignment add: cmd/spo/list/list-roleassignment-add.md
-        - list roleinheritance break: cmd/spo/list/list-roleinheritance-break.md
-        - list roleinheritance reset: cmd/spo/list/list-roleinheritance-reset.md
         - list set: cmd/spo/list/list-set.md
         - list contenttype add: cmd/spo/list/list-contenttype-add.md
+        - list contenttype default set: cmd/spo/list/list-contenttype-default-set.md
         - list contenttype list: cmd/spo/list/list-contenttype-list.md
         - list contenttype remove: cmd/spo/list/list-contenttype-remove.md
-        - list contenttype default set: cmd/spo/list/list-contenttype-default-set.md
+        - list roleassignment add: cmd/spo/list/list-roleassignment-add.md
+        - list roleassignment remove: cmd/spo/list/list-roleassignment-remove.md
+        - list roleinheritance break: cmd/spo/list/list-roleinheritance-break.md
+        - list roleinheritance reset: cmd/spo/list/list-roleinheritance-reset.md
         - list label get: cmd/spo/list/list-label-get.md
         - list label set: cmd/spo/list/list-label-set.md
         - list sitescript get: cmd/spo/list/list-sitescript-get.md
         - list view add: cmd/spo/list/list-view-add.md
-        - list view get: cmd/spo/list/list-view-get.md
-        - list view list: cmd/spo/list/list-view-list.md
-        - list view remove: cmd/spo/list/list-view-remove.md
-        - list view set: cmd/spo/list/list-view-set.md
         - list view field add: cmd/spo/list/list-view-field-add.md
         - list view field remove: cmd/spo/list/list-view-field-remove.md
         - list view field set: cmd/spo/list/list-view-field-set.md
+        - list view get: cmd/spo/list/list-view-get.md
+        - list view list: cmd/spo/list/list-view-list.md
+        - list view remove: cmd/spo/list/list-view-remove.md
+        - list view set: cmd/spo/list/list-view-set.md        
         - list webhook add: cmd/spo/list/list-webhook-add.md
         - list webhook get: cmd/spo/list/list-webhook-get.md
         - list webhook list: cmd/spo/list/list-webhook-list.md
@@ -460,16 +460,16 @@ nav:
         - list webhook set: cmd/spo/list/list-webhook-set.md
       - listitem:
         - listitem add: cmd/spo/listitem/listitem-add.md
-        - listitem attachment list: cmd/spo/listitem/listitem-attachment-list.md
         - listitem get: cmd/spo/listitem/listitem-get.md
         - listitem isrecord: cmd/spo/listitem/listitem-isrecord.md
         - listitem list: cmd/spo/listitem/listitem-list.md
+        - listitem set: cmd/spo/listitem/listitem-set.md
         - listitem remove: cmd/spo/listitem/listitem-remove.md
+        - listitem attachment list: cmd/spo/listitem/listitem-attachment-list.md
         - listitem roleassignment add: cmd/spo/listitem/listitem-roleassignment-add.md
         - listitem roleassignment remove: cmd/spo/listitem/listitem-roleassignment-remove.md
         - listitem roleinheritance break: cmd/spo/listitem/listitem-roleinheritance-break.md
         - listitem roleinheritance reset: cmd/spo/listitem/listitem-roleinheritance-reset.md
-        - listitem set: cmd/spo/listitem/listitem-set.md
         - listitem record declare: cmd/spo/listitem/listitem-record-declare.md
         - listitem record undeclare: cmd/spo/listitem/listitem-record-undeclare.md
       - mail:
@@ -526,24 +526,19 @@ nav:
         - roledefinition list: cmd/spo/roledefinition/roledefinition-list.md
         - roledefinition remove: cmd/spo/roledefinition/roledefinition-remove.md
       - serviceprincipal:
+        - serviceprincipal set: cmd/spo/serviceprincipal/serviceprincipal-set.md
         - serviceprincipal grant add: cmd/spo/serviceprincipal/serviceprincipal-grant-add.md
         - serviceprincipal grant list: cmd/spo/serviceprincipal/serviceprincipal-grant-list.md
         - serviceprincipal grant revoke: cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md
         - serviceprincipal permissionrequest approve: cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md
         - serviceprincipal permissionrequest deny: cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md
         - serviceprincipal permissionrequest list: cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.md
-        - serviceprincipal set: cmd/spo/serviceprincipal/serviceprincipal-set.md
       - site:
         - site add: cmd/spo/site/site-add.md
         - site ensure: cmd/spo/site/site-ensure.md
         - site get: cmd/spo/site/site-get.md
         - site groupify: cmd/spo/site/site-groupify.md
-        - site hubsite connect: cmd/spo/site/site-hubsite-connect.md
-        - site hubsite disconnect: cmd/spo/site/site-hubsite-disconnect.md
-        - site hubsite theme sync: cmd/spo/site/site-hubsite-theme-sync.md
         - site list: cmd/spo/site/site-list.md
-        - site recyclebinitem list: cmd/spo/site/site-recyclebinitem-list.md
-        - site recyclebinitem restore: cmd/spo/site/site-recyclebinitem-restore.md
         - site remove: cmd/spo/site/site-remove.md
         - site rename: cmd/spo/site/site-rename.md
         - site set: cmd/spo/site/site-set.md
@@ -556,7 +551,12 @@ nav:
         - site apppermission set: cmd/spo/site/site-apppermission-set.md
         - site chrome set: cmd/spo/site/site-chrome-set.md
         - site commsite enable: cmd/spo/site/site-commsite-enable.md
+        - site hubsite connect: cmd/spo/site/site-hubsite-connect.md
+        - site hubsite disconnect: cmd/spo/site/site-hubsite-disconnect.md
+        - site hubsite theme sync: cmd/spo/site/site-hubsite-theme-sync.md
         - site inplacerecordsmanagement set: cmd/spo/site/site-inplacerecordsmanagement-set.md
+        - site recyclebinitem list: cmd/spo/site/site-recyclebinitem-list.md
+        - site recyclebinitem restore: cmd/spo/site/site-recyclebinitem-restore.md
       - sitedesign:
         - sitedesign add: cmd/spo/sitedesign/sitedesign-add.md
         - sitedesign apply: cmd/spo/sitedesign/sitedesign-apply.md
@@ -616,17 +616,17 @@ nav:
         - userprofile set: cmd/spo/userprofile/userprofile-set.md
       - web:
         - web add: cmd/spo/web/web-add.md
-        - web clientsidewebpart list: cmd/spo/web/web-clientsidewebpart-list.md
         - web get: cmd/spo/web/web-get.md
-        - web installedlanguage list: cmd/spo/web/web-installedlanguage-list.md
         - web list: cmd/spo/web/web-list.md
         - web reindex: cmd/spo/web/web-reindex.md
         - web remove: cmd/spo/web/web-remove.md
+        - web set: cmd/spo/web/web-set.md
+        - web clientsidewebpart list: cmd/spo/web/web-clientsidewebpart-list.md
+        - web installedlanguage list: cmd/spo/web/web-installedlanguage-list.md
         - web roleassignment add: cmd/spo/web/web-roleassignment-add.md
         - web roleassignment remove: cmd/spo/web/web-roleassignment-remove.md
         - web roleinheritance break: cmd/spo/web/web-roleinheritance-break.md
         - web roleinheritance reset: cmd/spo/web/web-roleinheritance-reset.md
-        - web set: cmd/spo/web/web-set.md
     - Teams (teams):
       - app:
         - app install: cmd/teams/app/app-install.md
@@ -641,12 +641,12 @@ nav:
         - channel add: cmd/teams/channel/channel-add.md
         - channel get: cmd/teams/channel/channel-get.md
         - channel list: cmd/teams/channel/channel-list.md
+        - channel remove: cmd/teams/channel/channel-remove.md
+        - channel set: cmd/teams/channel/channel-set.md
         - channel member add: cmd/teams/channel/channel-member-add.md
         - channel member list: cmd/teams/channel/channel-member-list.md
         - channel member remove: cmd/teams/channel/channel-member-remove.md
         - channel member set: cmd/teams/channel/channel-member-set.md
-        - channel remove: cmd/teams/channel/channel-remove.md
-        - channel set: cmd/teams/channel/channel-set.md
       - chat:
         - chat get: cmd/teams/chat/chat-get.md
         - chat list: cmd/teams/chat/chat-list.md
