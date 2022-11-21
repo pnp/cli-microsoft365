@@ -49,3 +49,42 @@ Add a navigation node below an existing node
 ```sh
 m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "AudienceIds": null,
+      "CurrentLCID": 1033,
+      "Id": 2030,
+      "IsDocLib": true,
+      "IsExternal": true,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "Navigation Link",
+      "Url": "https://contoso.sharepoint.com"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    AudienceIds     : null
+    CurrentLCID     : 1033
+    Id              : 2031
+    IsDocLib        : true
+    IsExternal      : true
+    IsVisible       : true
+    ListTemplateType: 0
+    Title           : Navigation Link
+    Url             : https://contoso.sharepoint.com
+    ```
+
+=== "CSV"
+
+    ```csv
+    AudienceIds,CurrentLCID,Id,IsDocLib,IsExternal,IsVisible,ListTemplateType,Title,Url
+    ,1033,2032,1,1,1,0,Navigation Link,https://contoso.sharepoint.com
+    ```

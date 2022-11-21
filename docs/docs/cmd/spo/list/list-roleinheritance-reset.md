@@ -52,3 +52,7 @@ Restores role inheritance of list a specific list by title without prompting for
 ```sh
 m365 spo list roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle test --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

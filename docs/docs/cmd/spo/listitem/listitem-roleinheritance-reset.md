@@ -49,3 +49,7 @@ Restore role inheritance of a list item with a specific id in a list retrieved b
 ```sh
 m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --listItemId 8 --listUrl /sites/project-x/lists/test --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

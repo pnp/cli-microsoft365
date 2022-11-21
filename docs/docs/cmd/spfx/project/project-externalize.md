@@ -40,6 +40,8 @@ The `spfx project externalize` command helps you externalize your SharePoint Fra
 
 This command doesn't change your project files. Instead, it gives you a report with all steps necessary to externalize your project dependencies. Externalizing project dependencies is error-prone, especially when it comes to updating your solution's code. This is why at this moment, this command produces a report that you can use yourself to perform the necessary changes and verify that everything is working as expected.
 
+Supported SharePoint Framework versions are 1.0.0, 1.0.1, 1.0.2, 1.1.0, 1.1.1, 1.1.3, 1.2.0, 1.3.0, 1.3.1, 1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0, 1.5.1, 1.6.0, 1.7.0, 1.7.1, 1.8.0, 1.8.1, 1.8.2, 1.9.1.
+
 ## Examples
 
 Get instructions to externalize the current SharePoint Framework project dependencies and save the findings in a Markdown file
@@ -53,3 +55,117 @@ Get instructions to externalize the current SharePoint Framework project depende
 ```sh
 m365 spfx project externalize
 ```
+
+## Response
+
+Below output will be produced to externalize the SharePoint Framework project dependencies.
+
+=== "JSON"
+
+    ```json
+    {
+      "externalConfiguration": {
+        "externals": {
+          "@pnp/sp": {
+            "path": "https://unpkg.com/@pnp/sp@^1.3.11/dist/sp.es5.umd.min.js",
+            "globalName": "pnp.sp",
+            "globalDependencies": [
+              "@pnp/logging",
+              "@pnp/common",
+              "@pnp/odata",
+              "tslib"
+            ]
+          },
+          "tslib": {
+            "path": "https://unpkg.com/tslib@^1.10.0/tslib.js",
+            "globalName": "tslib"
+          }
+        }
+      },
+      "edits": [
+        {
+          "action": "add",
+          "path": "C:\\react-global-news-sp2019\\src\\webparts\\news\\NewsWebPart.ts",
+          "targetValue": "require(\"tslib\");"
+        }
+      ]
+    }
+    ```
+
+
+=== "Text"
+
+    ```text
+    In the config/config.json file update the externals property to:
+
+    {
+      "externalConfiguration": {
+        "externals": {
+          "@pnp/sp": {
+            "path": "https://unpkg.com/@pnp/sp@^1.3.11/dist/sp.es5.umd.min.js",
+            "globalName": "pnp.sp",
+            "globalDependencies": [
+              "@pnp/logging",
+              "@pnp/common",
+              "@pnp/odata",
+              "tslib"
+            ]
+          },
+          "tslib": {
+            "path": "https://unpkg.com/tslib@^1.10.0/tslib.js",
+            "globalName": "tslib"
+          }
+        }
+      },
+      "edits": [
+        {
+          "action": "add",
+          "path": "C:\\react-global-news-sp2019\\src\\webparts\\news\\NewsWebPart.ts",
+          "targetValue": "require(\"tslib\");"
+        }
+      ]
+    }
+    ```
+
+=== "Markdown"
+
+    ````md
+    # Externalizing dependencies of project react-global-news-sp2019
+
+    Date: 11/7/2022
+
+    ## Findings
+
+    ### Modify files
+
+    #### [config.json](config/config.json)
+
+    Replace the externals property (or add if not defined) with
+    
+    ```json
+    {
+      "externals": {
+        "@pnp/sp": {
+          "path": "https://unpkg.com/@pnp/sp@^1.3.11/dist/sp.es5.umd.min.js",
+          "globalName": "pnp.sp",
+          "globalDependencies": [
+            "@pnp/logging",
+            "@pnp/common",
+            "@pnp/odata",
+            "tslib"
+          ]
+        },
+        "tslib": {
+          "path": "https://unpkg.com/tslib@^1.10.0/tslib.js",
+          "globalName": "tslib"
+        }
+      }
+    }
+    ```
+    
+    #### [C:\react-global-news-sp2019\src\webparts\news\NewsWebPart.ts](C:\react-global-news-sp2019\src\webparts\news\NewsWebPart.ts)
+    add
+    ```JavaScript
+    require("tslib");
+    ```
+    ````
