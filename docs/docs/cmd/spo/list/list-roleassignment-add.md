@@ -76,3 +76,7 @@ add role assignment to list _someList_ located in site _https://contoso.sharepoi
 ```sh
 m365 spo list roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --listTitle "someList" --principalId 11 --roleDefinitionName "Full Control"
 ```
+
+## Response
+
+The command won't return a response on success.

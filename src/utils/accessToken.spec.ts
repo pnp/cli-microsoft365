@@ -6,7 +6,7 @@ describe('utils/accessToken', () => {
     const actual = accessToken.isAppOnlyAccessToken(undefined as any);
     assert.strictEqual(actual, false);
   });
-  
+
   it('isAppOnlyAccessToken returns false when access token is empty', () => {
     const actual = accessToken.isAppOnlyAccessToken('');
     assert.strictEqual(actual, false);
@@ -107,7 +107,7 @@ describe('utils/accessToken', () => {
     assert.strictEqual(actual, '');
   });
 
-  it('returns empty user id when invalid access token passed', () => {
+  it('returns empty user id when incomplete access token passed', () => {
     const actual = accessToken.getUserIdFromAccessToken('abc.def');
     assert.strictEqual(actual, '');
   });
