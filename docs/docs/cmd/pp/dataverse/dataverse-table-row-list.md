@@ -16,7 +16,7 @@ pp dataverse table row list [options]
 `-n, --name <name>`
 : The name of the table. Note that this is the logical name in the plural
 
-`-a, --asAdmin`
+`--asAdmin`
 : Set, to retrieve the dataverse table rows as admin for environments you are not a member of.
 
 --8<-- "docs/cmd/_global.md"
