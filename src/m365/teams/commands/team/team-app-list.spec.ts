@@ -7,7 +7,6 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import { aadGroup } from '../../../../utils/aadGroup';
-//, { CommandError } 
 import { odata } from '../../../../utils/odata';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
