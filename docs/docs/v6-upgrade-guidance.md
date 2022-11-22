@@ -194,6 +194,13 @@ Affected commands:
 
 Update your scripts to use `--asAdmin` instead of `-a`.
 
+## Updated `teams app list` command
+The logic to list the installed apps in a specified team is moved to a new command [teams team app list](./cmd/teams/team/team-app-list.md). As a result, the command [teams app list](./cmd/teams/app/app-list.md) only displays the installed apps from the Microsoft Teams app catalog. The command [teams app list](./cmd/teams/app/app-list.md) does no longer contain the options `all`, `teamId` and `teamName`. In addition, there is a new option for this command that allows you to indicate which installed apps from the Microsoft Teams app catalog you want to list according to the distribution method.
+
+### What action do I need to take?
+
+Update your scripts to use the [teams app list](./cmd/teams/app/app-list.md) command if you want to list the installed apps in the Microsoft Teams app catalog. If you want to list the installed apps in a specified team, use the [teams team app list](./cmd/teams/team/team-app-list.md) command instead.
+
 ## Aligned options with naming convention
 
 As we've been adding more commands to the CLI, we noticed that several commands were using inconsistent options names. Our naming convention states that options that refer to the last noun in the command, don't need that noun as a prefix. for example: the option `--webUrl` for `m365 spo web list` has been renamed to `--url` as the last noun is `web`. In version 6 of the CLI for Microsoft 365, we updated all these options to be consistent and make it easier for you to use the CLI.
