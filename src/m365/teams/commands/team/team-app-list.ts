@@ -1,4 +1,3 @@
-import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
@@ -6,11 +5,7 @@ import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
-import { AxiosRequestConfig } from 'axios';
-
-interface ExtendedGroup extends Group {
-  resourceProvisioningOptions: string[];
-}
+import { odata } from '../../../../utils/odata';
 
 interface CommandArgs {
   options: Options;
@@ -84,26 +79,36 @@ class TeamsTeamAppListCommand extends GraphCommand {
       return args.options.id;
     }
 
-    const group = await aadGroup.getGroupByDisplayName(args.options.name!);
-    if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
+    const group: any = await aadGroup.getGroupByDisplayName(args.options.name!);
+    if (group.resourceProvisioningOptions.indexOf('Team') === -1) {
       throw `The specified team does not exist in the Microsoft Teams`;
     }
 
-    return group.id!;
+    return group.id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving installed apps for team ${args.options.id || args.options.name}`);
+      }
+
       const teamId: string = await this.getTeamId(args);
-      const requestOptions: AxiosRequestConfig = {
-        url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/installedApps?$expand=teamsApp,teamsAppDefinition`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-      const res = await odata.get<>(requestOptions);
-      logger.log(res);
+      const res = await odata.getAllItems<any>(`${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/installedApps?$expand=teamsApp,teamsAppDefinition`);
+
+      if (!args.options.output || args.options.output === 'json') {
+        logger.log(res);
+      }
+      else {
+        //converted to text friendly output
+        logger.log(res.map(i => {
+          return {
+            id: i.id,
+            displayName: i.teamsApp.displayName,
+            distributionMethod: i.teamsApp.distributionMethod
+          };
+        }));
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
