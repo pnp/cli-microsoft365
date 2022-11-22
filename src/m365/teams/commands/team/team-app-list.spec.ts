@@ -118,15 +118,6 @@ describe(commands.TEAM_APP_LIST, () => {
     assert(loggerLogSpy.calledWith(jsonResponse));
   });
 
-  it('lists team apps for team specified by id', async () => {
-    sinon.stub(odata, 'getAllItems').callsFake(async (): Promise<any> => {
-      return jsonResponse;
-    });
-
-    await command.action(logger, { options: { id: teamId, verbose: true } });
-    assert(loggerLogSpy.calledWith(jsonResponse));
-  });
-
   it('lists team apps for team specified by id with output csv', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (): Promise<any> => {
       return JSON.parse(jsonResponse);
