@@ -168,6 +168,17 @@ As a side issue, we've also updated the response output of the `spo group member
 
 Update your scripts to use the new `member` noun instead of `user`. If you are using the output of `spo group member list` in JSON output mode, update your scripts and remove the `value` object. 
 
+## Logic to retrieve installed team apps with `teams app list` has changed
+The logic to list the installed apps in a specified team is moved to a new command `teams team app list`. As a result, the command `teams app list` only displays the installed apps from the Microsoft Teams app catalog. The command `teams app list` does no longer contains the options `all`, `teamId` and `teamName`. In addition, there is a new option for this command that allows you to indicate which installed apps from the Microsoft Teams app catalog you want to list according to the distribution method.
+
+The updated documentation of these commands
+- [teams app list](./cmd/teams/app/app-list.md)
+- [teams team app list](./cmd/teams/team/app-list.md)
+
+### What action do I need to take?
+
+Update your scripts to use the `teams app list` command if you want to list the installed apps in the Microsoft Teams app catalog. If you want to list the installed apps in a specified team, use the `teams team app list` command.
+
 ## Aligned options with naming convention
 
 As we've been adding more commands to the CLI, we noticed that several commands were using inconsistent options names. Our naming convention states that options that refer to the last noun in the command, don't need that noun as a prefix. for example: the option `--webUrl` for `m365 spo web list` has been renamed to `--url` as the last noun is `web`. In version 6 of the CLI for Microsoft 365, we updated all these options to be consistent and make it easier for you to use the CLI.
