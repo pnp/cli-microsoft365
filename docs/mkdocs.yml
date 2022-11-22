@@ -696,6 +696,7 @@ nav:
         - team remove: cmd/teams/team/team-remove.md
         - team set: cmd/teams/team/team-set.md
         - team unarchive: cmd/teams/team/team-unarchive.md
+        - team app list: cmd/teams/team/team-app-list.md
       - user:
         - user add: cmd/aad/o365group/o365group-user-add.md
         - user list: cmd/teams/user/user-list.md

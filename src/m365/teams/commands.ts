@@ -48,6 +48,7 @@ export default {
   TAB_LIST: `${prefix} tab list`,
   TAB_REMOVE: `${prefix} tab remove`,
   TEAM_ADD: `${prefix} team add`,
+  TEAM_APP_LIST: `${prefix} team app list`,
   TEAM_ARCHIVE: `${prefix} team archive`,
   TEAM_CLONE: `${prefix} team clone`,
   TEAM_GET: `${prefix} team get`,
