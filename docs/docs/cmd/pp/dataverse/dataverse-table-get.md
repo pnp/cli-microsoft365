@@ -16,7 +16,7 @@ pp dataverse table get [options]
 `-n, --name<name>`
 : The name of the dataverse table to retrieve rows from.
 
-`-a, --asAdmin`
+`--asAdmin`
 : Set, to retrieve the dataverse table as admin for environments you are not a member of.
 
 --8<-- "docs/cmd/_global.md"
