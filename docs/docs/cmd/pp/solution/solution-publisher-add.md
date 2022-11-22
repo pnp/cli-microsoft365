@@ -25,7 +25,7 @@ m365 pp solution publisher add [options]
 `--choiceValuePrefix <choiceValuePrefix>`
 : The choice value prefix of the publisher
 
-`-a, --asAdmin`
+`--asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
 
 --8<-- "docs/cmd/_global.md"

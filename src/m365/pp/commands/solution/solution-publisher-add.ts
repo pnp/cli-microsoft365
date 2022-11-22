@@ -66,7 +66,7 @@ class PpSolutionPublisherAddCommand extends PowerPlatformCommand {
         option: '--choiceValuePrefix <choiceValuePrefix>'
       },
       {
-        option: '-a, --asAdmin'
+        option: '--asAdmin'
       }
     );
   }
