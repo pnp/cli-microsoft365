@@ -19,7 +19,7 @@ m365 pp solution get [options]
 `-n, --name [name]`
 : The unique name (not the display name) of the solution. Specify either `id` or `name` but not both.
 
-`-a, --asAdmin`
+`--asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
 
 --8<-- "docs/cmd/_global.md"

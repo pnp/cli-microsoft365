@@ -19,7 +19,7 @@ pp dataverse table remove [options]
 `--confirm`
 : Don't prompt for confirmation
 
-`-a, --asAdmin`
+`--asAdmin`
 : Set, to remove the dataverse table as admin for environments you are not a member of.
 
 --8<-- "docs/cmd/_global.md"
