@@ -35,8 +35,6 @@ m365 teams team app list --name "Team Name"
 
 ## Response
 
-### Standard response
-
 === "JSON"
 
     ``` json

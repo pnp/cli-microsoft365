@@ -61,7 +61,7 @@ class TeamsTeamAppListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id!)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
@@ -96,7 +96,7 @@ class TeamsTeamAppListCommand extends GraphCommand {
       const teamId: string = await this.getTeamId(args);
       const res = await odata.getAllItems<any>(`${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/installedApps?$expand=teamsApp,teamsAppDefinition`);
 
-      if (!args.options.output || args.options.output === 'json') {
+      if (args.options.output === 'json') {
         logger.log(res);
       }
       else {
