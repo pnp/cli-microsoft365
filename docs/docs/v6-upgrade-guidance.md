@@ -173,7 +173,7 @@ The logic to list the installed apps in a specified team is moved to a new comma
 
 The updated documentation of these commands
 - [teams app list](./cmd/teams/app/app-list.md)
-- [teams team app list](./cmd/teams/team/app-list.md)
+`- [teams team app list](./cmd/teams/team/app-list.md)`
 
 ### What action do I need to take?
 
