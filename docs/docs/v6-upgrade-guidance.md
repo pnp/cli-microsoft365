@@ -166,7 +166,33 @@ As a side issue, we've also updated the response output of the `spo group member
 
 ### What action do I need to take?
 
-Update your scripts to use the new `member` noun instead of `user`. If you are using the output of `spo group member list` in JSON output mode, update your scripts and remove the `value` object. 
+Update your scripts to use the new `member` noun instead of `user`. If you are using the output of `spo group member list` in JSON output mode, update your scripts and remove the `value` object.
+
+## Removed short notation for option asAdmin in pp commands
+
+We've decided to remove all short notations for option `--asAdmin` in pp commands. In previous versions, many commands had the notation `-a, --asAdmin`. This has been changed to `--adAdmin`, we removed the short notation to align it with our naming convention.
+
+Affected commands:
+
+- [pp card clone](./cmd/pp/card/card-clone.md)
+- [pp card get](./cmd/pp/card/card-get.md)
+- [pp card list](./cmd/pp/card/card-list.md)
+- [pp card remove](./cmd/pp/card/card-remove.md)
+- [pp dataverse table get](./cmd/pp/dataverse/dataverse-table-get.md)
+- [pp dataverse table list](./cmd/pp/dataverse/dataverse-table-list.md)
+- [pp dataverse table remove](./cmd/pp/dataverse/dataverse-table-remove.md)
+- [pp environment get](./cmd/pp/environment/environment-get.md)
+- [pp environment list](./cmd/pp/environment/environment-list.md)
+- [pp solution get](./cmd/pp/solution/solution-get.md)
+- [pp solution list](./cmd/pp/solution/solution-list.md)
+- [pp solution remove](./cmd/pp/solution/solution-remove.md)
+- [pp solution publisher get](./cmd/pp/solution/solution-publisher-get.md)
+- [pp solution publisher list](./cmd/pp/solution/solution-publisher-list.md)
+- [pp solution publisher remove](./cmd/pp/solution/solution-publisher-remove.md)
+
+### What action do I need to take?
+
+Update your scripts to use `--asAdmin` instead of `-a`.
 
 ## Aligned options with naming convention
 
