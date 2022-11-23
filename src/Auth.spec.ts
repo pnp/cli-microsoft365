@@ -1513,7 +1513,7 @@ describe('Auth', () => {
     });
   });
 
-  it('calls api with correct params using system managed identity flow when authType identity and Azure Cloud Shell api', (done) => {
+  it('calls api with correct params using MSI when authType identity and Azure Cloud Shell api', (done) => {
     process.env = {
       MSI_ENDPOINT: 'http://localhost:50342/oauth2/token'
     };

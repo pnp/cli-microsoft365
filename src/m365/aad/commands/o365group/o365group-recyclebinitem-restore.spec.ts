@@ -240,17 +240,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
     }), new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports specifying id', () => {
     const options = command.options;
     let containsOption = false;
