@@ -33,12 +33,14 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         isExternal: args.options.isExternal,
+        location: typeof args.options.location !== 'undefined',
         parentNodeId: typeof args.options.parentNodeId !== 'undefined'
       });
     });
@@ -90,6 +92,12 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
 
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['location', 'parentNodeId']
     );
   }
 

@@ -20,7 +20,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -62,6 +62,30 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('fails validation if both location and parentNodeId options are not passed', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+        title: 'About',
+        url: '/sites/team-a/sitepages/about.aspx'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both location and parentNodeId options are passed', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+        title: 'About',
+        url: '/sites/team-a/sitepages/about.aspx',
+        location: 'TopNavigationBar',
+        parentNodeId: 1000
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('excludes options from URL processing', () => {
