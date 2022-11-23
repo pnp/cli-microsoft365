@@ -285,7 +285,7 @@ describe(commands.MEETING_GET, () => {
         return { value: [] };
       }
 
-      throw `Meeting with join URL ${joinUrl} not found!`;
+      throw `The specified meeting was not found`;
     });
 
     await assert.rejects(command.action(logger, {
@@ -294,7 +294,7 @@ describe(commands.MEETING_GET, () => {
         userId: userId,
         joinUrl: joinUrl
       }
-    }), new CommandError(`Meeting with join URL ${joinUrl} not found!`));
+    }), new CommandError(`The specified meeting was not found`));
   });
 
   it('correctly handles error when getting specified meeting details', async () => {

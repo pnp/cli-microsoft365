@@ -93,41 +93,40 @@ class TeamsMeetingGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[this.resource].accessToken);
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving meeting for ${isAppOnlyAuth ? 'specific user' : 'currently logged in user'}`);
+    }
+
+    let requestUrl = `${this.resource}/v1.0/`;
+    if (isAppOnlyAuth) {
+      if (!args.options.userId && !args.options.userName && !args.options.email) {
+        this.handleError(`The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only permissions`);
+      }
+
+      requestUrl += 'users/';
+      if (args.options.userId) {
+        requestUrl += args.options.userId;
+      }
+      else if (args.options.userName) {
+        requestUrl += args.options.userName;
+      }
+      else if (args.options.email) {
+        const userId = await this.getUserId(args.options.email);
+        requestUrl += userId;
+      }
+    }
+    else {
+      if (args.options.userId || args.options.userName || args.options.email) {
+        this.handleError(`The options 'userId', 'userName' and 'email' cannot be used when retrieving meetings using delegated permissions`);
+      }
+
+      requestUrl += `me`;
+    }
+
+    requestUrl += `/onlineMeetings?$filter=JoinWebUrl eq '${encodeURIComponent(args.options.joinUrl)}'`;
+
     try {
-      const isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[this.resource].accessToken);
-      if (this.verbose) {
-        logger.logToStderr(`Retrieving meeting for ${isAppOnlyAuth ? 'specific user' : 'currently logged in user'}`);
-      }
-
-      let requestUrl = `${this.resource}/v1.0/`;
-      if (isAppOnlyAuth) {
-        if (!args.options.userId && !args.options.userName && !args.options.email) {
-          throw `The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only permissions`;
-        }
-
-        requestUrl += 'users/';
-        if (args.options.userId) {
-          requestUrl += args.options.userId;
-        }
-        else if (args.options.userName) {
-          requestUrl += args.options.userName;
-        }
-        else if (args.options.email) {
-          const userId = await this.getUserId(args.options.email);
-          requestUrl += userId;
-        }
-      }
-      else {
-        if (args.options.userId || args.options.userName || args.options.email) {
-          throw `The options 'userId', 'userName' and 'email' cannot be used when retrieving meetings using delegated permissions`;
-        }
-
-        requestUrl += `me`;
-      }
-
-      requestUrl += `/onlineMeetings?$filter=JoinWebUrl eq '${encodeURIComponent(args.options.joinUrl)}'`;
-
-      console.log(requestUrl);
       const requestOptions: AxiosRequestConfig = {
         url: requestUrl,
         headers: {
@@ -138,11 +137,11 @@ class TeamsMeetingGetCommand extends GraphCommand {
 
       const res = await request.get<{ value: Meeting[] }>(requestOptions);
 
-      if (res.value && res.value.length > 0) {
+      if (res.value.length > 0) {
         logger.log(res.value[0]);
       }
       else {
-        throw new Error(`Meeting with join URL ${args.options.joinUrl} not found!`);
+        throw `The specified meeting was not found`;
       }
     }
     catch (err: any) {
