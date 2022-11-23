@@ -60,6 +60,7 @@
         "eslint-config-standard": "^17.0.0",
         "eslint-plugin-cli-microsoft365": "file:eslint-rules",
         "eslint-plugin-import": "^2.26.0",
+        "eslint-plugin-mocha": "^10.1.0",
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-promise": "^6.1.1",
         "mocha": "^10.1.0",
@@ -2291,6 +2292,22 @@
       "resolved": "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz",
       "integrity": "sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=",
       "dev": true
+    },
+    "node_modules/eslint-plugin-mocha": {
+      "version": "10.1.0",
+      "resolved": "https://registry.npmjs.org/eslint-plugin-mocha/-/eslint-plugin-mocha-10.1.0.tgz",
+      "integrity": "sha512-xLqqWUF17llsogVOC+8C6/jvQ+4IoOREbN7ZCHuOHuD6cT5cDD4h7f2LgsZuzMAiwswWE21tO7ExaknHVDrSkw==",
+      "dev": true,
+      "dependencies": {
+        "eslint-utils": "^3.0.0",
+        "rambda": "^7.1.0"
+      },
+      "engines": {
+        "node": ">=14.0.0"
+      },
+      "peerDependencies": {
+        "eslint": ">=7.0.0"
+      }
     },
     "node_modules/eslint-plugin-n": {
       "version": "15.2.0",
@@ -4614,6 +4631,12 @@
           "url": "https://feross.org/support"
         }
       ]
+    },
+    "node_modules/rambda": {
+      "version": "7.4.0",
+      "resolved": "https://registry.npmjs.org/rambda/-/rambda-7.4.0.tgz",
+      "integrity": "sha512-A9hihu7dUTLOUCM+I8E61V4kRXnN4DwYeK0DwCBydC1MqNI1PidyAtbtpsJlBBzK4icSctEcCQ1bGcLpBuETUQ==",
+      "dev": true
     },
     "node_modules/randombytes": {
       "version": "2.1.0",
@@ -7382,6 +7405,16 @@
         }
       }
     },
+    "eslint-plugin-mocha": {
+      "version": "10.1.0",
+      "resolved": "https://registry.npmjs.org/eslint-plugin-mocha/-/eslint-plugin-mocha-10.1.0.tgz",
+      "integrity": "sha512-xLqqWUF17llsogVOC+8C6/jvQ+4IoOREbN7ZCHuOHuD6cT5cDD4h7f2LgsZuzMAiwswWE21tO7ExaknHVDrSkw==",
+      "dev": true,
+      "requires": {
+        "eslint-utils": "^3.0.0",
+        "rambda": "^7.1.0"
+      }
+    },
     "eslint-plugin-n": {
       "version": "15.2.0",
       "resolved": "https://registry.npmjs.org/eslint-plugin-n/-/eslint-plugin-n-15.2.0.tgz",
@@ -9025,6 +9058,12 @@
       "version": "1.2.3",
       "resolved": "https://registry.npmjs.org/queue-microtask/-/queue-microtask-1.2.3.tgz",
       "integrity": "sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==",
+      "dev": true
+    },
+    "rambda": {
+      "version": "7.4.0",
+      "resolved": "https://registry.npmjs.org/rambda/-/rambda-7.4.0.tgz",
+      "integrity": "sha512-A9hihu7dUTLOUCM+I8E61V4kRXnN4DwYeK0DwCBydC1MqNI1PidyAtbtpsJlBBzK4icSctEcCQ1bGcLpBuETUQ==",
       "dev": true
     },
     "randombytes": {

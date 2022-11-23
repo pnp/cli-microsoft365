@@ -640,11 +640,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('getRegistrationType returns 1 if registrationType value is List', () => {
-    const registrationType: number = (command as any)['getRegistrationType']('List');
-    assert(registrationType === 1);
-  });
-
   it('should map independently location', () => {
     const result: number = (command as any)['mapRequestBody']({ location: 'abc' });
     assert(JSON.stringify(result) === `{"Location":"abc"}`);

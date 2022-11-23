@@ -239,7 +239,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
   });
 
-  it('removes the specified channel by name when prompt confirmed (debug)', async () => {
+  it('removes the specified channel by name and teamName when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'`) {
         return {
@@ -278,7 +278,7 @@ describe(commands.CHANNEL_REMOVE, () => {
   });
 
 
-  it('removes the specified channel by name when prompt confirmed (debug)', async () => {
+  it('removes the specified channel by name and teamId when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(name)}'`) {
         return {
