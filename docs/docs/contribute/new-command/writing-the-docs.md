@@ -1,0 +1,231 @@
+# Write the command specs
+
+Each command has a corresponding manual page. The contents of this page are almost identical to the help implemented in the command itself. This way, users working with the CLI can get help directly inside the CLI, while users interested in the capabilities of the CLI, can browse through the help pages published in our documentation. In the CLI for Microsoft 365, we extend this basic information with additional remarks and examples to help users work with the CLI. This will also be published in the terminal when users execute your command with the `--help` flag. 
+
+All the command help files are written in [Markdown](https://www.markdownguide.org/cheat-sheet/#overview) and can be found in the folder `docs/docs/cmd`. This will have a similar look and file to the src folder structure for the commands. One difference here is that the command groups with a lot of similar commands won't be bundled in a `commands` folder. For our example, we can create a new file named `group-get.md` in the folder `docs/docs/cmd/spo/group`.
+
+## Minimum help file 
+
+With our help file created, we can start work writing down the command specs. A help file for a command will have at minimum the following topics. The command name as the title, a description, the usage, options, a few examples on how to use them, and a sample response output. We'll start with the `title`, `description`, and `usage`.
+
+````md title="group-get.md"
+# spo group get
+
+Gets site group
+
+## Usage
+
+```sh
+m365 spo group get [options]
+```
+````
+
+### Options
+
+Most commands will have unique options but every command will make use of our global options. This can be achieved by including `--8<-- "docs/cmd/_global.md"` under the heading options
+
+```md
+`-u, --webUrl <webUrl>`
+: URL of the site where the group is located.
+
+`-i, --id [id]`
+: ID of the site group to get. Use either `id`, `name` or `associatedGroup` but not multiple.
+
+`--name [name]`
+: Name of the site group to get. Use either `id`, `name` or `associatedGroup` but not multiple.
+
+`--associatedGroup [associatedGroup]`
+: Type of the associated group to get. Available values: `Owner`, `Member`, `Visitor`. Use either `id`, `name` or `associatedGroup` but not multiple.
+
+--8<-- "docs/cmd/_global.md"
+```
+
+!!! tip
+
+    When listing available options for the particular command, CLI for Microsoft 365 follows the naming convention where required options are wrapped in angle brackets (`< >`) while optional options are wrapped in square brackets (`[ ]`).
+
+### Examples
+
+As they say, a picture is worth a thousand words, same goes for examples of code. This is why we strive to add several examples for each command with some logical option data. This gives more insight to users on how they can implement the command in their script.
+
+````md title="group-get.md"
+## Examples
+
+Get group with ID _7_ for web _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --id 7
+```
+
+Get group with name _Team Site Members_ for web _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --name "Team Site Members"
+```
+
+Get the associated owner group of a specified site
+
+```sh
+m365 spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --associatedGroup Owner
+```
+````
+
+Some pointers to keep in mind when including sample data in our examples.
+
+- We normalize the data. For example, URLs are converted to 'contoso' as the tenant name
+- We change any personal information included in the output
+
+
+### Response
+
+We include the response output for each command to give more insight into what users can expect from this command. 
+
+````md title="group-get.md"
+## Response
+
+=== "JSON"
+
+    ``` json
+    {
+      "Id": 1,
+      "IsHiddenInUI": false,
+      "LoginName": "Contoso Visitors",
+      "Title": "Contoso Visitors",
+      "PrincipalType": 8,
+      "AllowMembersEditMembership": false,
+      "AllowRequestToJoinLeave": false,
+      "AutoAcceptRequestToJoinLeave": false,
+      "Description": "Contoso Visitors",
+      "OnlyAllowMembersViewMembership": false,
+      "OwnerTitle": "Contoso Owners",
+      "RequestToJoinLeaveEmailSetting": ""
+    }
+    ```
+
+=== "Text"
+
+    ``` text
+    AllowMembersEditMembership    : false
+    AllowRequestToJoinLeave       : false
+    AutoAcceptRequestToJoinLeave  : false
+    Description                   : Contoso Visitors
+    Id                            : 1
+    IsHiddenInUI                  : false
+    LoginName                     : Contoso Visitors
+    OnlyAllowMembersViewMembership: false
+    OwnerTitle                    : Contoso Owners
+    PrincipalType                 : 8
+    RequestToJoinLeaveEmailSetting:
+    Title                         : Contoso Visitors
+    ```
+
+=== "CSV"
+
+    ``` text
+    Id,IsHiddenInUI,LoginName,Title,PrincipalType,AllowMembersEditMembership,AllowRequestToJoinLeave,AutoAcceptRequestToJoinLeave,Description,OnlyAllowMembersViewMembership,OwnerTitle,RequestToJoinLeaveEmailSetting
+    1,,Contoso Visitors,Contoso Visitors,8,,,,Contoso Visitors,,Contoso Owners,
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo group get --id "1" --webUrl "https://contoso.sharepoint.com/sites/contoso"
+
+    Date: 1/2/2023
+
+    ## Contoso Visitors (1)
+
+    Property | Value
+    ---------|-------
+    Id | 1
+    IsHiddenInUI | false
+    LoginName | Contoso Visitors
+    Title | Contoso Visitors
+    PrincipalType | 8
+    AllowMembersEditMembership | false
+    AllowRequestToJoinLeave | false
+    AutoAcceptRequestToJoinLeave | false
+    Description | Contoso Visitors
+    OnlyAllowMembersViewMembership | false
+    OwnerTitle | Contoso Owners
+    RequestToJoinLeaveEmailSetting |
+    ```
+```` 
+
+Each different verb of command can return a different type of response. This means that a `get` command will return a single object response while a `list` command returns an object list. Below you'll find different examples for different scenarios.
+
+- **A single object response** (planner plan get)
+
+[The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-get/)
+[The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-get.md?plain=1)
+
+- **An object list response** (planner plan list)
+
+[The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-list/)
+[The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-list.md?plain=1)
+
+!!! Note
+
+    Make sure the `Text` output is also in the list format with a single object.
+
+- **Multiple responses based on the options used** (planner plan add)
+
+[The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-add/)
+[The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-add.md?plain=1)
+
+- **No response** (planner plan remove)
+
+[The docs article](https://pnp.github.io/cli-microsoft365/cmd/planner/plan/plan-remove/)
+[The MarkDown file location](https://github.com/pnp/cli-microsoft365/blob/main/docs/docs/cmd/planner/plan/plan-remove.md?plain=1)
+
+Some general pointers to keep in mind when writing the verbose output.
+
+- We display every output format (JSON, Text, CSV, Markdown)
+- We normalize the data. For example, URLs are converted to 'contoso' as the tenant name
+- We change any personal information included in the output
+- If option A returns a different output than option B, then we include both results
+- If the command doesn't return an output. We write `The command won't return a response on success.`
+- We added the `Response` header below the `Examples` header
+- We don't shorten the output for readability
+- Every list command will contain `[` `]` and a single response within the JSON output
+
+## Additional headings
+
+It is possible that a command needs to include some more information. Some additional headings that could be added are `Remarks` or `More information`.
+
+### Remarks
+
+This heading can be used to communicate some important details about your command to the user. This could be to communicate that you used a preview API or that a number option is specified as a 0-based index. Remarks headings are most commonly placed between the headings `Options` and `Examples`.
+
+```md title="graph/schemaextension/schemaextension-list.md"
+## Remarks
+
+pageNumber is specified as a 0-based index. A value of 2 returns the third page of items. 
+```
+
+### More information
+
+Here we can include some links to the APIs we used in the command or some documentation pages that explain the command usage in more detail. This isn't required but it is nice to have. This heading is most commonly placed at the end of your help page.
+
+```md title="spo/homesite/homesite-get.md"
+## More information
+
+- SharePoint home sites: a landing for your organization on the intelligent intranet: https://techcommunity.microsoft.com/t5/Microsoft-SharePoint-Blog/SharePoint-home-sites-a-landing-for-your-organization-on-the/ba-p/621933
+```
+
+## Include into the command navigation
+
+Now that your page is finished, we need to make it available from the command navigation, most commonly found on the left side of the page. To include this, we need to edit the file `mkdocs.yml` found in the folder `docs`. Navigate through the section `nav` and locate your commands command group. Here you can add the path to your new help page. 
+
+```yml title="mkdocs.yml"
+nav:
+  # ...
+  - Commands:
+    # ...
+    - SharePoint Online (spo):
+      # ...
+      - group:
+        # group commands earlier in the alphabetical order
+        - group get: cmd/spo/group/group-get.md
+        # group commands later in the alphabetical order
+```
