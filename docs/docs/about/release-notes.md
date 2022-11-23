@@ -111,6 +111,10 @@
 - added docs response for 'flow' commands [#4086](https://github.com/pnp/cli-microsoft365/issues/4086)
 - added docs response for 'spo homesite' until 'spo navigation' commands [#3931](https://github.com/pnp/cli-microsoft365/issues/3931)
 - extended 'spo page set' with support to demote news pages [#2226](https://github.com/pnp/cli-microsoft365/issues/2226)
+- extended 'spo web get' with RoleAssignments [#4038](https://github.com/pnp/cli-microsoft365/issues/4038)
+- extended 'spo listitem get' with RoleAssignments [#4039](https://github.com/pnp/cli-microsoft365/issues/4039)
+- extended 'spo file get' with RoleAssignments [#4040](https://github.com/pnp/cli-microsoft365/issues/4040)
+- extended 'spo folder get' command with RoleAssignments [#4041](https://github.com/pnp/cli-microsoft365/issues/4041)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
