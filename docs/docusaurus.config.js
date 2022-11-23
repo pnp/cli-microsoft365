@@ -100,6 +100,12 @@ const config = {
           },
           {            
             type: 'docSidebar',
+            label: 'Contributing',            
+            sidebarId: 'contributing',
+            position: 'left'
+          },
+          {            
+            type: 'docSidebar',
             label: 'About',            
             sidebarId: 'about',
             position: 'left'
