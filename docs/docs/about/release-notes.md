@@ -115,6 +115,8 @@
 - extended 'spo listitem get' with RoleAssignments [#4039](https://github.com/pnp/cli-microsoft365/issues/4039)
 - extended 'spo file get' with RoleAssignments [#4040](https://github.com/pnp/cli-microsoft365/issues/4040)
 - extended 'spo folder get' command with RoleAssignments [#4041](https://github.com/pnp/cli-microsoft365/issues/4041)
+- adds support for configuring how to display help. [#3782](https://github.com/pnp/cli-microsoft365/issues/3782)
+- refactors the option sets interface to support validating optional and dependent options. [#3884](https://github.com/pnp/cli-microsoft365/issues/3884)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
