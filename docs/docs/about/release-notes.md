@@ -37,6 +37,7 @@
 
 **Teams:**
 
+- [teams meeting get](../cmd/teams/meeting/meeting-get.md) - get specified meeting details [#3900](https://github.com/pnp/cli-microsoft365/issues/3900)
 - [teams meeting list](../cmd/teams/meeting/meeting-list.md) - retrieve all online meetings for a given user or shared mailbox [#3899](https://github.com/pnp/cli-microsoft365/issues/3899)
 
 ### Changes
@@ -115,8 +116,9 @@
 - extended 'spo listitem get' with RoleAssignments [#4039](https://github.com/pnp/cli-microsoft365/issues/4039)
 - extended 'spo file get' with RoleAssignments [#4040](https://github.com/pnp/cli-microsoft365/issues/4040)
 - extended 'spo folder get' command with RoleAssignments [#4041](https://github.com/pnp/cli-microsoft365/issues/4041)
-- adds support for configuring how to display help. [#3782](https://github.com/pnp/cli-microsoft365/issues/3782)
-- refactors the option sets interface to support validating optional and dependent options. [#3884](https://github.com/pnp/cli-microsoft365/issues/3884)
+- adds support for configuring how to display help [#3782](https://github.com/pnp/cli-microsoft365/issues/3782)
+- refactors the option sets interface to support validating optional and dependent options [#3884](https://github.com/pnp/cli-microsoft365/issues/3884)
+- removed short notation for 'asAdmin' option in pp commands [#4132](https://github.com/pnp/cli-microsoft365/issues/4132)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
