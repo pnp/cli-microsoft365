@@ -69,7 +69,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['url', 'alias']
+      { options: ['url', 'alias'] }
     );
   }
 

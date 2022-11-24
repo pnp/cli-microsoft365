@@ -143,7 +143,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['url', 'alias']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['url', 'alias'] }]);
   });
 
   it('prompts before removal when confirm option not passed', async () => {

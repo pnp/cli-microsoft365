@@ -1,5 +1,5 @@
-`-h, --help`
-: output usage information
+`-h, --help [help]`
+: Output usage information. Optionally, specify which section of command's help you want to see. Allowed values are `options`, `examples`, `remarks`, `response`, `full`. Default is `full`.
 
 `--query [query]`
 : JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples

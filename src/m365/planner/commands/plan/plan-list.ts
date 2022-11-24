@@ -57,18 +57,18 @@ class PlannerPlanListCommand extends GraphCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {    
+      async (args: CommandArgs) => {
         if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
           return `${args.options.ownerGroupId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['ownerGroupId', 'ownerGroupName']);
+    this.optionSets.push({ options: ['ownerGroupId', 'ownerGroupName'] });
   }
 
   public defaultProperties(): string[] | undefined {

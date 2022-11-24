@@ -51,6 +51,11 @@ export interface CommandArgs {
   options: GlobalOptions;
 }
 
+export interface OptionSet {
+  options: string[];
+  runsWhen?: (args: any) => boolean;
+}
+
 export default abstract class Command {
   protected debug: boolean = false;
   protected verbose: boolean = false;
@@ -63,7 +68,7 @@ export default abstract class Command {
   }
 
   public options: CommandOption[] = [];
-  public optionSets: string[][] = [];
+  public optionSets: OptionSet[] = [];
   public types: CommandTypes = {
     boolean: [],
     string: []
@@ -184,21 +189,23 @@ export default abstract class Command {
   }
 
   private async validateOptionSets(args: CommandArgs, command: CommandInfo): Promise<string | boolean> {
-    const optionsSets: string[][] | undefined = command.command.optionSets;
+    const optionsSets: OptionSet[] | undefined = command.command.optionSets;
     if (!optionsSets || optionsSets.length === 0) {
       return true;
     }
 
     const argsOptions: string[] = Object.keys(args.options);
     for (const optionSet of optionsSets) {
-      const commonOptions = argsOptions.filter(opt => optionSet.includes(opt));
+      if (optionSet.runsWhen === undefined || optionSet.runsWhen(args)) {
+        const commonOptions = argsOptions.filter(opt => optionSet.options.includes(opt));
 
-      if (commonOptions.length === 0) {
-        return `Specify one of the following options: ${optionSet.map(opt => opt).join(', ')}.`;
-      }
+        if (commonOptions.length === 0) {
+          return `Specify one of the following options: ${optionSet.options.map(opt => opt).join(', ')}.`;
+        }
 
-      if (commonOptions.length > 1) {
-        return `Specify one of the following options: ${optionSet.map(opt => opt).join(', ')}, but not multiple.`;
+        if (commonOptions.length > 1) {
+          return `Specify one of the following options: ${optionSet.options.map(opt => opt).join(', ')}, but not multiple.`;
+        }
       }
     }
 

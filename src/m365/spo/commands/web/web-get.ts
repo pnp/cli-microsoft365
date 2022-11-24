@@ -3,8 +3,11 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
+import { BasePermissions } from '../../base-permissions';
 import commands from '../../commands';
-import { WebPropertiesCollection } from "./WebPropertiesCollection";
+import { RoleAssignment, RoleDefinition } from '../roledefinition/RoleDefinition';
+import { RoleType } from '../roledefinition/RoleType';
+import { WebProperties } from './WebProperties';
 
 interface CommandArgs {
   options: Options;
@@ -13,6 +16,7 @@ interface CommandArgs {
 export interface Options extends GlobalOptions {
   url: string;
   withGroups?: boolean;
+  withPermissions?: boolean;
 }
 
 class SpoWebGetCommand extends SpoCommand {
@@ -35,7 +39,8 @@ class SpoWebGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        withGroups: typeof args.options.withGroups !== 'undefined'
+        withGroups: !!args.options.withGroups,
+        withPermissions: !!args.options.withPermissions
       });
     });
   }
@@ -47,6 +52,9 @@ class SpoWebGetCommand extends SpoCommand {
       },
       {
         option: '--withGroups'
+      },
+      {
+        option: '--withPermissions'
       }
     );
   }
@@ -71,12 +79,32 @@ class SpoWebGetCommand extends SpoCommand {
     };
 
     try {
-      const webProperties: WebPropertiesCollection = await request.get<WebPropertiesCollection>(requestOptions);
+      const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
+      if (args.options.withPermissions) {
+        requestOptions.url = `${args.options.url}/_api/web/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
+        const response = await request.get<{ value: any[] }>(requestOptions);
+        const roleAssignments = this.setFriendlyPermissions(response.value);
+        webProperties.RoleAssignments = roleAssignments;
+      }
       logger.log(webProperties);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private setFriendlyPermissions(response: any[]): RoleAssignment[] {
+    response.forEach((r: any) => {
+      r.RoleDefinitionBindings.forEach((r: RoleDefinition) => {
+        const permissions: BasePermissions = new BasePermissions();
+        permissions.high = r.BasePermissions.High as number;
+        permissions.low = r.BasePermissions.Low as number;
+        r.BasePermissionsValue = permissions.parse();
+        r.RoleTypeKindValue = RoleType[r.RoleTypeKind];
+      });
+    });
+
+    return response;
   }
 }
 

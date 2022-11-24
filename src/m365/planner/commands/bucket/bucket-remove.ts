@@ -88,47 +88,47 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id) {
-	      if (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
-	        return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
-	      }
-	    }
-	    else {
-	      if (!args.options.planId && !args.options.planTitle) {
-	        return 'Specify either planId or planTitle when using name';
-	      }
+          if (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
+            return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
+          }
+        }
+        else {
+          if (!args.options.planId && !args.options.planTitle) {
+            return 'Specify either planId or planTitle when using name';
+          }
 
-	      if (args.options.planId && args.options.planTitle) {
-	        return 'Specify either planId or planTitle when using name but not both';  
-	      }
+          if (args.options.planId && args.options.planTitle) {
+            return 'Specify either planId or planTitle when using name but not both';
+          }
 
-	      if (args.options.planTitle) {
-	        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-	          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-	        }
+          if (args.options.planTitle) {
+            if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
+              return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+            }
 
-	        if (args.options.ownerGroupId && args.options.ownerGroupName) {
-	          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-	        }
+            if (args.options.ownerGroupId && args.options.ownerGroupName) {
+              return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+            }
 
-	        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
-	          return `${args.options.ownerGroupId} is not a valid GUID`;
-	        }
-	      }
-	      else {
-	        if (args.options.ownerGroupId || args.options.ownerGroupName) {
-	          return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
-	        }
-	      }
-	    }
+            if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
+              return `${args.options.ownerGroupId} is not a valid GUID`;
+            }
+          }
+          else {
+            if (args.options.ownerGroupId || args.options.ownerGroupName) {
+              return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
+            }
+          }
+        }
 
-	    return true;
+        return true;
       }
     );
   }
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'name']
+      { options: ['id', 'name'] }
     );
   }
 
@@ -162,7 +162,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       await removeBucket();
     }
     else {
-      const result = await Cli.prompt<{continue: boolean}>({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,

@@ -96,7 +96,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
   it('defines correct option sets', () => {
     assert.deepStrictEqual(command.optionSets, [
-      ['id', 'title']
+      { options: ['id', 'title'] }
     ]);
   });
 
@@ -232,7 +232,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    
+
     try {
       await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } } as any);
       assert(postCallsSpy.calledOnce);
@@ -583,10 +583,10 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should fail validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: 'foo'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: 'foo'
+      }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -594,10 +594,10 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should fail validation if the id option is not a valid guid', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "foo",
-          webUrl: 'https://contoso.sharepoint.com'
-        }
+      {
+        id: "foo",
+        webUrl: 'https://contoso.sharepoint.com'
+      }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -605,10 +605,10 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should pass validation when the id and url options specified', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com"
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com"
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -616,11 +616,11 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should pass validation when the id, url and scope options specified', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com",
-          scope: "Site"
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com",
+        scope: "Site"
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -628,10 +628,10 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should pass validation when the id and url option specified', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com"
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com"
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -639,11 +639,11 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should accept scope to be All', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'All'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'All'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -651,11 +651,11 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should accept scope to be Site', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'Site'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'Site'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -663,11 +663,11 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should accept scope to be Web', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'Web'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'Web'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -700,10 +700,10 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const actual = await command.validate(
       {
         options:
-          {
-            id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-            webUrl: "https://contoso.sharepoint.com"
-          }
+        {
+          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+          webUrl: "https://contoso.sharepoint.com"
+        }
       }, commandInfo);
     assert.strictEqual(actual, true);
   });

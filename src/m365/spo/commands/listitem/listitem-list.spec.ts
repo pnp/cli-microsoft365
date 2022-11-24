@@ -166,7 +166,7 @@ describe(commands.LISTITEM_LIST, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['listId', 'listTitle']
+      { options: ['listId', 'listTitle'] }
     ]);
   });
 

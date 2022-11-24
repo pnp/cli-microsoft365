@@ -72,7 +72,7 @@ class TeamsTeamGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {

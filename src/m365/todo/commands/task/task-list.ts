@@ -57,7 +57,7 @@ class TodoTaskListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listName']);
+    this.optionSets.push({ options: ['listId', 'listName'] });
   }
 
   private getTodoListId(args: CommandArgs): Promise<string> {
@@ -105,7 +105,7 @@ class TodoTaskListCommand extends GraphCommand {
           };
         }));
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
