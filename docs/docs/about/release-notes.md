@@ -137,6 +137,7 @@
 
 **SharePoint:**
 
+- [spo listitem batch add](../cmd/spo/listitem/listitem-batch-add.md) - creates list items in a batch. [#2029](https://github.com/pnp/cli-microsoft365/issues/2029)
 - [spo eventreceiver remove](../cmd/spo/eventreceiver/eventreceiver-remove.md) - removes event receivers for the specified web, site, or list. [#3307](https://github.com/pnp/cli-microsoft365/issues/3307)
 - [spo file roleassignment add](../cmd/spo/file/file-roleassignment-add.md) - adds role assignment to a file [#3702](https://github.com/pnp/cli-microsoft365/issues/3702)
 - [spo file roleassignment remove](../cmd/spo/file/file-roleassignment-remove.md) - removes a role assignment from a file [#3693](https://github.com/pnp/cli-microsoft365/issues/3693)
@@ -204,6 +205,7 @@
 - extended spo listitem with listUrl [#3814](https://github.com/pnp/cli-microsoft365/issues/3814)
 - extended spo field add and spo field set with listId and listUrl [#3807](https://github.com/pnp/cli-microsoft365/issues/3807)
 - extended spo listitem with listUrl [#3813](https://github.com/pnp/cli-microsoft365/issues/3813)
+- updated spo commands with odata-version 4.0 [#4014](https://github.com/pnp/cli-microsoft365/issues/4014)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
