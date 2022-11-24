@@ -34,6 +34,7 @@
 - [spo file version get](../cmd/spo/file/file-version-get.md) - gets information about a specific version of a specified file [#3954](https://github.com/pnp/cli-microsoft365/issues/3954)
 - [spo file version clear](../cmd/spo/file/file-version-clear.md) - removes all version history of a specified file [#3957](https://github.com/pnp/cli-microsoft365/issues/3957)
 - [spo file version remove](../cmd/spo/file/file-version-remove.md) - removes a specific version of a specified file [#3955](https://github.com/pnp/cli-microsoft365/issues/3955)
+- [spo listitem batch add](../cmd/spo/listitem/listitem-batch-add.md) - creates list items in a batch. [#2029](https://github.com/pnp/cli-microsoft365/issues/2029)
 
 **Teams:**
 
@@ -119,6 +120,7 @@
 - adds support for configuring how to display help [#3782](https://github.com/pnp/cli-microsoft365/issues/3782)
 - refactors the option sets interface to support validating optional and dependent options [#3884](https://github.com/pnp/cli-microsoft365/issues/3884)
 - removed short notation for 'asAdmin' option in pp commands [#4132](https://github.com/pnp/cli-microsoft365/issues/4132)
+- updated spo commands with odata-version 4.0 [#4014](https://github.com/pnp/cli-microsoft365/issues/4014)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
@@ -137,7 +139,6 @@
 
 **SharePoint:**
 
-- [spo listitem batch add](../cmd/spo/listitem/listitem-batch-add.md) - creates list items in a batch. [#2029](https://github.com/pnp/cli-microsoft365/issues/2029)
 - [spo eventreceiver remove](../cmd/spo/eventreceiver/eventreceiver-remove.md) - removes event receivers for the specified web, site, or list. [#3307](https://github.com/pnp/cli-microsoft365/issues/3307)
 - [spo file roleassignment add](../cmd/spo/file/file-roleassignment-add.md) - adds role assignment to a file [#3702](https://github.com/pnp/cli-microsoft365/issues/3702)
 - [spo file roleassignment remove](../cmd/spo/file/file-roleassignment-remove.md) - removes a role assignment from a file [#3693](https://github.com/pnp/cli-microsoft365/issues/3693)
@@ -205,7 +206,6 @@
 - extended spo listitem with listUrl [#3814](https://github.com/pnp/cli-microsoft365/issues/3814)
 - extended spo field add and spo field set with listId and listUrl [#3807](https://github.com/pnp/cli-microsoft365/issues/3807)
 - extended spo listitem with listUrl [#3813](https://github.com/pnp/cli-microsoft365/issues/3813)
-- updated spo commands with odata-version 4.0 [#4014](https://github.com/pnp/cli-microsoft365/issues/4014)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
