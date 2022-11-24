@@ -11,10 +11,10 @@ m365 teams team app list [options]
 ## Options
 
 `-i, --teamId [teamId]`
-: The id of the Microsoft Teams Team from. Specify either `teamId` or `teamName` but not both.
+: The id of the Microsoft Teams Team. Specify either `teamId` or `teamName` but not both.
 
 `-n, --teamName [teamName]`
-: The name of the Microsoft Teams Team apps from. Specify either `teamId` or `teamName` but not both.
+: The name of the Microsoft Teams Team. Specify either `teamId` or `teamName` but not both.
 
 
 --8<-- "docs/cmd/_global.md"
