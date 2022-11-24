@@ -74,7 +74,7 @@ class TeamsTeamAppListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['teamId', 'teamName']);
+    this.optionSets.push({ options: ['teamId', 'teamName'] });
   }
 
   private async getTeamId(args: CommandArgs): Promise<string> {
