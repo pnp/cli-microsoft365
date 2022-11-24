@@ -172,6 +172,7 @@ Update your scripts to use the new `member` noun instead of `user`. If you are u
 The logic to list the installed apps in a specified team is moved to a new command `teams team app list`. As a result, the command `teams app list` only displays the installed apps from the Microsoft Teams app catalog. The command `teams app list` does no longer contains the options `all`, `teamId` and `teamName`. In addition, there is a new option for this command that allows you to indicate which installed apps from the Microsoft Teams app catalog you want to list according to the distribution method.
 
 The updated documentation of these commands
+
 - [teams app list](./cmd/teams/app/app-list.md)
 `- [teams team app list](./cmd/teams/team/app-list.md)`
 
