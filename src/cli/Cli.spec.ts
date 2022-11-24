@@ -1749,7 +1749,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  6 commands'));
+      assert(cliLogStub.calledWith('  cli *  7 commands'));
       done();
     }
     catch (e) {
@@ -1789,7 +1789,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  6 commands'));
+      assert(cliLogStub.calledWith('  cli *  7 commands'));
       done();
     }
     catch (e) {
