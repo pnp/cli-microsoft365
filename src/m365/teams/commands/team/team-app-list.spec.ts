@@ -6,11 +6,11 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
-import { aadGroup } from '../../../../utils/aadGroup';
 import { odata } from '../../../../utils/odata';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import * as TeamGetCommand from './team-get';
 const command: Command = require('./team-app-list');
 
 describe(commands.TEAM_APP_LIST, () => {
@@ -52,7 +52,7 @@ describe(commands.TEAM_APP_LIST, () => {
   afterEach(() => {
     sinonUtil.restore([
       odata.getAllItems,
-      aadGroup.getGroupByDisplayName
+      Cli.executeCommandWithOutput
     ]);
   });
 
@@ -73,57 +73,56 @@ describe(commands.TEAM_APP_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both teamId and teamName options are not passed', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both teamId and teamName options are passed', async () => {
-    const actual = await command.validate({ options: { id: teamId, name: teamName } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the teamId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
+    const actual = await command.validate({ options: { teamId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the teamId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: teamId } }, commandInfo);
+    const actual = await command.validate({ options: { teamId: teamId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('fails when team does not exist in tenant', async () => {
-    sinon.stub(aadGroup, 'getGroupByDisplayName').callsFake(async (displayName): Promise<any> => {
-      if (displayName === teamName) {
-        return { "id": teamId, "resourceProvisioningOptions": [] };
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === TeamGetCommand) {
+        throw 'The specified team does not exist in the Microsoft Teams';
       }
+      throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { name: teamName, verbose: true } }), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, { options: { teamName: teamName, verbose: true } }), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('lists team apps for team specified by name with output json', async () => {
-    sinon.stub(aadGroup, 'getGroupByDisplayName').callsFake(async (displayName): Promise<any> => {
-      if (displayName === teamName) {
-        return { "id": teamId, "resourceProvisioningOptions": ["Team"] };
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === TeamGetCommand) {
+        return { "stdout": JSON.stringify({ id: teamId }) };
       }
+      throw 'Invalid request';
     });
 
-    sinon.stub(odata, 'getAllItems').callsFake(async (): Promise<any> => {
-      return jsonResponse;
+    sinon.stub(odata, 'getAllItems').callsFake(async (url: string): Promise<any> => {
+      if (url === `https://graph.microsoft.com/v1.0/teams/${teamId}/installedApps?$expand=teamsApp,teamsAppDefinition`) {
+        return jsonResponse;
+      }
+      throw 'Invalid response';
     });
 
-    await command.action(logger, { options: { name: teamName, verbose: true, output: 'json' } });
+    await command.action(logger, { options: { teamName: teamName, verbose: true, output: 'json' } });
     assert(loggerLogSpy.calledWith(jsonResponse));
   });
 
   it('lists team apps for team specified by id with output csv', async () => {
-    sinon.stub(odata, 'getAllItems').callsFake(async (): Promise<any> => {
-      return JSON.parse(jsonResponse);
+    sinon.stub(odata, 'getAllItems').callsFake(async (url: string): Promise<any> => {
+      if (url === `https://graph.microsoft.com/v1.0/teams/${teamId}/installedApps?$expand=teamsApp,teamsAppDefinition`) {
+        return JSON.parse(jsonResponse);
+      }
+      throw 'Invalid response';
+
     });
 
-    await command.action(logger, { options: { id: teamId, verbose: true, output: 'csv' } });
+    await command.action(logger, { options: { teamId: teamId, verbose: true, output: 'csv' } });
     assert(loggerLogSpy.calledWith(friendlyResponse));
   });
 

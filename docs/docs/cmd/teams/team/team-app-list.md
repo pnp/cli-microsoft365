@@ -10,34 +10,34 @@ m365 teams team app list [options]
 
 ## Options
 
-`-i, --id [id]`
-: The id of the Microsoft Team to list installed apps from. Specify either `id` or `name` but not both.
+`-i, --teamId [teamId]`
+: The id of the Microsoft Teams Team from. Specify either `teamId` or `teamName` but not both.
 
-`-n, --name [name]`
-: The name of the Microsoft Team to list installed apps from. Specify either `id` or `name` but not both.
+`-n, --teamName [teamName]`
+: The name of the Microsoft Teams Team apps from. Specify either `teamId` or `teamName` but not both.
 
 
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
 
-List applications installed in the specified Microsoft Team by id
+List applications installed in the specified Microsoft Teams Team by id
 
 ```sh
-m365 teams team app list --id 2eaf7dcd-7e83-4c3a-94f7-932a1299c844
+m365 teams team app list --teamId 2eaf7dcd-7e83-4c3a-94f7-932a1299c844
 ```
 
-List applications installed in the specified Microsoft Team by name
+List applications installed in the specified Microsoft Teams Team by name
 
 ```sh
-m365 teams team app list --name "Team Name"
+m365 teams team app list --teamName "Team Name"
 ```
 
 ## Response
 
 === "JSON"
 
-    ``` json
+    ```json
     [
        {
         "id": "MGFkNTViNWQtNmE3OS00NjdiLWFkMjEtZDRiZWY3OTQ4YTc5IyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=",
@@ -64,7 +64,7 @@ m365 teams team app list --name "Team Name"
 
 === "Text"
 
-    ``` text
+    ```text
     id                                                                                                    displayName  distributionMethod
     ----------------------------------------------------------------------------------------------------  -----------  ------------------
     MGFkNTViNWQtNmE3OS00NjdiLWFkMjEtZDRiZWY3OTQ4YTc5IyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=  Activity     store
@@ -72,7 +72,7 @@ m365 teams team app list --name "Team Name"
 
 === "CSV"
 
-    ``` text
+    ```csv
     id,displayName,distributionMethod
     MGFkNTViNWQtNmE3OS00NjdiLWFkMjEtZDRiZWY3OTQ4YTc5IyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=,Activity,store
     ```

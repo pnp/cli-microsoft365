@@ -1,19 +1,22 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
+import { Cli } from '../../../../cli/Cli';
+import { Options as TeamsTeamGetOptions } from './team-get';
+import * as TeamGetCommand from './team-get';
+import Command from '../../../../Command';
 
 interface CommandArgs {
   options: Options;
 }
 
 interface Options extends GlobalOptions {
-  id?: string;
-  name?: string;
+  teamId?: string;
+  teamName?: string;
 }
 
 class TeamsTeamAppListCommand extends GraphCommand {
@@ -41,8 +44,8 @@ class TeamsTeamAppListCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
-        name: typeof args.options.name !== 'undefined'
+        teamId: typeof args.options.teamId !== 'undefined',
+        teamName: typeof args.options.teamName !== 'undefined'
       });
     });
   }
@@ -50,10 +53,10 @@ class TeamsTeamAppListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id [id]'
+        option: '-i, --teamId [teamId]'
       },
       {
-        option: '-n, --name [name]'
+        option: '-n, --teamName [teamName]'
       }
     );
   }
@@ -61,8 +64,8 @@ class TeamsTeamAppListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id!)) {
-          return `${args.options.id} is not a valid GUID`;
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
+          return `${args.options.teamId} is not a valid GUID`;
         }
 
         return true;
@@ -71,26 +74,29 @@ class TeamsTeamAppListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push(['teamId', 'teamName']);
   }
 
   private async getTeamId(args: CommandArgs): Promise<string> {
-    if (args.options.id) {
-      return args.options.id;
+    if (args.options.teamId) {
+      return args.options.teamId;
     }
 
-    const group: any = await aadGroup.getGroupByDisplayName(args.options.name!);
-    if (group.resourceProvisioningOptions.indexOf('Team') === -1) {
-      throw `The specified team does not exist in the Microsoft Teams`;
-    }
+    const teamGetOptions: TeamsTeamGetOptions = {
+      name: args.options.teamName,
+      debug: this.debug,
+      verbose: this.verbose
+    };
 
-    return group.id;
+    const commandOutput = await Cli.executeCommandWithOutput(TeamGetCommand as Command, { options: { ...teamGetOptions, _: [] } });
+    const team = JSON.parse(commandOutput.stdout);
+    return team.id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Retrieving installed apps for team ${args.options.id || args.options.name}`);
+        logger.logToStderr(`Retrieving installed apps for team ${args.options.teamId || args.options.teamId}`);
       }
 
       const teamId: string = await this.getTeamId(args);
