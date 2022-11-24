@@ -39,23 +39,7 @@ describe(commands.MEETING_ATTENDANCEREPORT_LIST, () => {
         "meetingEndDateTime": "2022-11-22T22:44:12.893Z"
       }
     ];
-  // const meetingResponseText: any = [
-  //   {
-  //     "subject": "Test",
-  //     "start": "2022-06-26T12:30:00.0000000",
-  //     "end": "2022-06-26T13:00:00.0000000"
-  //   },
-  //   {
-  //     "subject": "Test",
-  //     "start": "2022-04-08T11:30:00.0000000",
-  //     "end": "2022-04-08T12:00:00.0000000"
-  //   },
-  //   {
-  //     "subject": "Online meeting test",
-  //     "start": "2022-03-15T05:00:00.0000000",
-  //     "end": "2022-03-15T05:30:00.0000000"
-  //   }
-  // ];
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
