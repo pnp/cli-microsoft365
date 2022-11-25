@@ -51,51 +51,49 @@ m365 onedrive report activityuserdetail --period D7 --output json > "onedriveact
 
 === "JSON"
 
-```json
-[
-  {
-    "Report Refresh Date": "2022-10-25",
-    "User Principal Name": "C53803D3F8266856872FF413A333714F",
-    "Is Deleted": "False",
-    "Deleted Date": "",
-    "Last Activity Date": "2022-10-25",
-    "Viewed Or Edited File Count": "10",
-    "Synced File Count": "125",
-    "Shared Internally File Count": "6",
-    "Shared Externally File Count": "0",
-    "Assigned Products": "MICROSOFT 365 E3+POWER BI PREMIUM PER USER ADD-ON+POWER BI PRO+MICROSOFT POWER APPS PLAN 2 TRIAL+POWER BI (FREE)+AZURE ACTIVE DIRECTORY BASIC",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "User Principal Name": "C5E18087B685EA9F06A4517222C79046",
-    "Is Deleted": "False",
-    "Deleted Date": "",
-    "Last Activity Date": "",
-    "Viewed Or Edited File Count": "0",
-    "Synced File Count": "0",
-    "Shared Internally File Count": "0",
-    "Shared Externally File Count": "0",
-    "Assigned Products": "MICROSOFT 365 E3",
-    "Report Period": "7"
-  }
-]
-```
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-10-25",
+        "User Principal Name": "C53803D3F8266856872FF413A333714F",
+        "Is Deleted": "False",
+        "Deleted Date": "",
+        "Last Activity Date": "2022-10-25",
+        "Viewed Or Edited File Count": "10",
+        "Synced File Count": "125",
+        "Shared Internally File Count": "6",
+        "Shared Externally File Count": "0",
+        "Assigned Products": "MICROSOFT 365 E3+POWER BI PREMIUM PER USER ADD-ON+POWER BI PRO+MICROSOFT POWER APPS PLAN 2 TRIAL+POWER BI (FREE)+AZURE ACTIVE DIRECTORY BASIC",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "User Principal Name": "C5E18087B685EA9F06A4517222C79046",
+        "Is Deleted": "False",
+        "Deleted Date": "",
+        "Last Activity Date": "",
+        "Viewed Or Edited File Count": "0",
+        "Synced File Count": "0",
+        "Shared Internally File Count": "0",
+        "Shared Externally File Count": "0",
+        "Assigned Products": "MICROSOFT 365 E3",
+        "Report Period": "7"
+      }
+    ]
+    ```
 
 === "Text"
 
-    ``` text
-
-Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Viewed Or Edited File Count,Synced File Count,Shared Internally File Count,Shared Externally File Count,Assigned Products,Report Period
-2022-10-25,C53803D3F8266856872FF413A333714F,False,,2022-10-25,10,125,6,0,MICROSOFT 365 E3+POWER BI PREMIUM PER USER ADD-ON+POWER BI PRO+MICROSOFT POWER APPS PLAN 2 TRIAL+POWER BI (FREE)+AZURE ACTIVE DIRECTORY BASIC,7
-2022-10-25,C5E18087B685EA9F06A4517222C79046,False,,,0,0,0,0,MICROSOFT 365 E3,7
-
-````
+    ```csv
+    Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Viewed Or Edited File Count,Synced File Count,Shared Internally File Count,Shared Externally File Count,Assigned Products,Report Period
+    2022-10-25,C53803D3F8266856872FF413A333714F,False,,2022-10-25,10,125,6,0,MICROSOFT 365 E3+POWER BI PREMIUM PER USER ADD-ON+POWER BI PRO+MICROSOFT POWER APPS PLAN 2 TRIAL+POWER BI (FREE)+AZURE ACTIVE DIRECTORY BASIC,7
+    2022-10-25,C5E18087B685EA9F06A4517222C79046,False,,,0,0,0,0,MICROSOFT 365 E3,7
+    ```
 
 === "CSV"
 
-    ``` text
-Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Viewed Or Edited File Count,Synced File Count,Shared Internally File Count,Shared Externally File Count,Assigned Products,Report Period
-2022-10-25,C53803D3F8266856872FF413A333714F,False,,2022-10-25,10,125,6,0,MICROSOFT 365 E3+POWER BI PREMIUM PER USER ADD-ON+POWER BI PRO+MICROSOFT POWER APPS PLAN 2 TRIAL+POWER BI (FREE)+AZURE ACTIVE DIRECTORY BASIC,7
-2022-10-25,C5E18087B685EA9F06A4517222C79046,False,,,0,0,0,0,MICROSOFT 365 E3,7
-````
+    ```csv
+    Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Viewed Or Edited File Count,Synced File Count,Shared Internally File Count,Shared Externally File Count,Assigned Products,Report Period
+    2022-10-25,C53803D3F8266856872FF413A333714F,False,,2022-10-25,10,125,6,0,MICROSOFT 365 E3+POWER BI PREMIUM PER USER ADD-ON+POWER BI PRO+MICROSOFT POWER APPS PLAN 2 TRIAL+POWER BI (FREE)+AZURE ACTIVE DIRECTORY BASIC,7
+    2022-10-25,C5E18087B685EA9F06A4517222C79046,False,,,0,0,0,0,MICROSOFT 365 E3,7
+    ```

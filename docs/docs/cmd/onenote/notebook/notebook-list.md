@@ -73,56 +73,54 @@ m365 onenote notebook list --webUrl https://contoso.sharepoint.com/sites/testsit
 
 === "JSON"
 
-```json
-[
-  {
-    "id": "1-db46efb2-1b80-4a28-987d-507cff465418",
-    "self": "https://graph.microsoft.com/v1.0/users/cfa02cf8-e903-4b76-a17b-15e43d4cf81e/onenote/notebooks/1-db46efb2-1b80-4a28-987d-507cff465418",
-    "createdDateTime": "2017-11-24T11:00:46Z",
-    "displayName": "TeamsNotebook(Shared)",
-    "lastModifiedDateTime": "2017-11-24T11:00:46Z",
-    "isDefault": false,
-    "userRole": "Owner",
-    "isShared": false,
-    "sectionsUrl": "https://graph.microsoft.com/v1.0/users/cfa02cf8-e903-4b76-a17b-15e43d4cf81e/onenote/notebooks/1-db46efb2-1b80-4a28-987d-507cff465418/sections",
-    "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/users/cfa02cf8-e903-4b76-a17b-15e43d4cf81e/onenote/notebooks/1-db46efb2-1b80-4a28-987d-507cff465418/sectionGroups",
-    "createdBy": {
-      "user": {
-        "id": "cfa02cf8-e903-4b76-a17b-15e43d4cf81e",
-        "displayName": "Demo User1"
+    ```json
+    [
+      {
+        "id": "1-db46efb2-1b80-4a28-987d-507cff465418",
+        "self": "https://graph.microsoft.com/v1.0/users/cfa02cf8-e903-4b76-a17b-15e43d4cf81e/onenote/notebooks/1-db46efb2-1b80-4a28-987d-507cff465418",
+        "createdDateTime": "2017-11-24T11:00:46Z",
+        "displayName": "TeamsNotebook(Shared)",
+        "lastModifiedDateTime": "2017-11-24T11:00:46Z",
+        "isDefault": false,
+        "userRole": "Owner",
+        "isShared": false,
+        "sectionsUrl": "https://graph.microsoft.com/v1.0/users/cfa02cf8-e903-4b76-a17b-15e43d4cf81e/onenote/notebooks/1-db46efb2-1b80-4a28-987d-507cff465418/sections",
+        "sectionGroupsUrl": "https://graph.microsoft.com/v1.0/users/cfa02cf8-e903-4b76-a17b-15e43d4cf81e/onenote/notebooks/1-db46efb2-1b80-4a28-987d-507cff465418/sectionGroups",
+        "createdBy": {
+          "user": {
+            "id": "cfa02cf8-e903-4b76-a17b-15e43d4cf81e",
+            "displayName": "Demo User1"
+          }
+        },
+        "lastModifiedBy": {
+          "user": {
+            "id": "cfa02cf8-e903-4b76-a17b-15e43d4cf81e",
+            "displayName": "Demo User1"
+          }
+        },
+        "links": {
+          "oneNoteClientUrl": {
+            "href": "onenote:https://contoso-my.sharepoint.com/personal/user1_contoso_com/Documents/Notebooks/TeamsNotebook(Shared)"
+          },
+          "oneNoteWebUrl": {
+            "href": "https://contoso-my.sharepoint.com/personal/user1_contoso_com/Documents/Notebooks/TeamsNotebook(Shared)"
+          }
+        }
       }
-    },
-    "lastModifiedBy": {
-      "user": {
-        "id": "cfa02cf8-e903-4b76-a17b-15e43d4cf81e",
-        "displayName": "Demo User1"
-      }
-    },
-    "links": {
-      "oneNoteClientUrl": {
-        "href": "onenote:https://contoso-my.sharepoint.com/personal/user1_contoso_com/Documents/Notebooks/TeamsNotebook(Shared)"
-      },
-      "oneNoteWebUrl": {
-        "href": "https://contoso-my.sharepoint.com/personal/user1_contoso_com/Documents/Notebooks/TeamsNotebook(Shared)"
-      }
-    }
-  }
-]
-```
+    ]
+    ```
 
 === "Text"
 
-    ``` text
-
-createdDateTime: 2017-11-24T11:00:46Z
-displayName : TeamsNotebook(Shared)
-id : 1-db46efb2-1b80-4a28-987d-507cff465418
-
-````
+    ```text
+    createdDateTime: 2017-11-24T11:00:46Z
+    displayName : TeamsNotebook(Shared)
+    id : 1-db46efb2-1b80-4a28-987d-507cff465418
+    ```
 
 === "CSV"
 
-    ``` text
-createdDateTime,displayName,id
-2017-11-24T11:00:46Z,TeamsNotebook(Shared),1-db46efb2-1b80-4a28-987d-507cff465418
-````
+    ```csv
+    createdDateTime,displayName,id
+    2017-11-24T11:00:46Z,TeamsNotebook(Shared),1-db46efb2-1b80-4a28-987d-507cff465418
+    ```

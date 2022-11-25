@@ -31,44 +31,42 @@ m365 graph schemaextension get --id domain_myExtension
 
 === "JSON"
 
-```json
-{
-  "id": "extun3653mb_MySchemaExtension",
-  "description": "My Schema Extension",
-  "targetTypes": [
-    "Group"
-  ],
-  "status": "InDevelopment",
-  "owner": "3e789cfc-4c9b-4c5a-a8b0-6b90a28a36f1",
-  "properties": [
+    ```json
     {
-      "name": "myProp1",
-      "type": "Integer"
-    },
-    {
-      "name": "myProp2",
-      "type": "String"
+      "id": "extun3653mb_MySchemaExtension",
+      "description": "My Schema Extension",
+      "targetTypes": [
+        "Group"
+      ],
+      "status": "InDevelopment",
+      "owner": "3e789cfc-4c9b-4c5a-a8b0-6b90a28a36f1",
+      "properties": [
+        {
+          "name": "myProp1",
+          "type": "Integer"
+        },
+        {
+          "name": "myProp2",
+          "type": "String"
+        }
+      ]
     }
-  ]
-}
-```
+    ```
 
 === "Text"
 
-    ``` text
-description: My Schema Extension
-id         : extun3653mb_MySchemaExtension
-owner      : 3e789cfc-4c9b-4c5a-a8b0-6b90a28a36f1
-properties : [{"name":"myProp1","type":"Integer"},{"name":"myProp2","type":"String"}]
-status     : InDevelopment
-targetTypes: ["Group"]    
-````
+    ```text
+    description: My Schema Extension
+    id         : extun3653mb_MySchemaExtension
+    owner      : 3e789cfc-4c9b-4c5a-a8b0-6b90a28a36f1
+    properties : [{"name":"myProp1","type":"Integer"},{"name":"myProp2","type":"String"}]
+    status     : InDevelopment
+    targetTypes: ["Group"]    
+    ```
 
 === "CSV"
 
-    ``` text
-id,description,targetTypes,status,owner,properties
-extun3653mb_MySchemaExtension,My Schema Extension,"[""Group""]",InDevelopment,3e789cfc-4c9b-4c5a-a8b0-6b90a28a36f1,"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]"
-
-
-````
+    ```csv
+    id,description,targetTypes,status,owner,properties
+    extun3653mb_MySchemaExtension,My Schema Extension,"[""Group""]",InDevelopment,3e789cfc-4c9b-4c5a-a8b0-6b90a28a36f1,"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]"
+    ```

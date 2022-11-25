@@ -42,98 +42,96 @@ m365 onedrive report activityfilecounts --period D7 --output json > "activityfil
 
 === "JSON"
 
-```json
-[
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Viewed Or Edited": "69",
-    "Synced": "22",
-    "Shared Internally": "7",
-    "Shared Externally": "",
-    "Report Date": "2022-10-25",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Viewed Or Edited": "61",
-    "Synced": "352",
-    "Shared Internally": "7",
-    "Shared Externally": "",
-    "Report Date": "2022-10-24",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Viewed Or Edited": "87",
-    "Synced": "91",
-    "Shared Internally": "",
-    "Shared Externally": "",
-    "Report Date": "2022-10-23",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Viewed Or Edited": "9",
-    "Synced": "10",
-    "Shared Internally": "",
-    "Shared Externally": "",
-    "Report Date": "2022-10-22",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Viewed Or Edited": "38",
-    "Synced": "61",
-    "Shared Internally": "4",
-    "Shared Externally": "",
-    "Report Date": "2022-10-21",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Viewed Or Edited": "40",
-    "Synced": "23",
-    "Shared Internally": "9",
-    "Shared Externally": "2",
-    "Report Date": "2022-10-20",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Viewed Or Edited": "201",
-    "Synced": "105",
-    "Shared Internally": "6",
-    "Shared Externally": "",
-    "Report Date": "2022-10-19",
-    "Report Period": "7"
-  }
-]
-```
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Viewed Or Edited": "69",
+        "Synced": "22",
+        "Shared Internally": "7",
+        "Shared Externally": "",
+        "Report Date": "2022-10-25",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Viewed Or Edited": "61",
+        "Synced": "352",
+        "Shared Internally": "7",
+        "Shared Externally": "",
+        "Report Date": "2022-10-24",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Viewed Or Edited": "87",
+        "Synced": "91",
+        "Shared Internally": "",
+        "Shared Externally": "",
+        "Report Date": "2022-10-23",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Viewed Or Edited": "9",
+        "Synced": "10",
+        "Shared Internally": "",
+        "Shared Externally": "",
+        "Report Date": "2022-10-22",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Viewed Or Edited": "38",
+        "Synced": "61",
+        "Shared Internally": "4",
+        "Shared Externally": "",
+        "Report Date": "2022-10-21",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Viewed Or Edited": "40",
+        "Synced": "23",
+        "Shared Internally": "9",
+        "Shared Externally": "2",
+        "Report Date": "2022-10-20",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Viewed Or Edited": "201",
+        "Synced": "105",
+        "Shared Internally": "6",
+        "Shared Externally": "",
+        "Report Date": "2022-10-19",
+        "Report Period": "7"
+      }
+    ]
+    ```
 
 === "Text"
 
-    ``` text
-
-Report Refresh Date,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
-2022-10-25,69,22,7,,2022-10-25,7
-2022-10-25,61,352,7,,2022-10-24,7
-2022-10-25,87,91,,,2022-10-23,7
-2022-10-25,9,10,,,2022-10-22,7
-2022-10-25,38,61,4,,2022-10-21,7
-2022-10-25,40,23,9,2,2022-10-20,7
-2022-10-25,201,105,6,,2022-10-19,7
-
-````
+    ```csv
+    Report Refresh Date,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
+    2022-10-25,69,22,7,,2022-10-25,7
+    2022-10-25,61,352,7,,2022-10-24,7
+    2022-10-25,87,91,,,2022-10-23,7
+    2022-10-25,9,10,,,2022-10-22,7
+    2022-10-25,38,61,4,,2022-10-21,7
+    2022-10-25,40,23,9,2,2022-10-20,7
+    2022-10-25,201,105,6,,2022-10-19,7
+    ```
 
 === "CSV"
 
-    ``` text
-Report Refresh Date,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
-2022-10-25,69,22,7,,2022-10-25,7
-2022-10-25,61,352,7,,2022-10-24,7
-2022-10-25,87,91,,,2022-10-23,7
-2022-10-25,9,10,,,2022-10-22,7
-2022-10-25,38,61,4,,2022-10-21,7
-2022-10-25,40,23,9,2,2022-10-20,7
-2022-10-25,201,105,6,,2022-10-19,7
-````
+    ```csv
+    Report Refresh Date,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
+    2022-10-25,69,22,7,,2022-10-25,7
+    2022-10-25,61,352,7,,2022-10-24,7
+    2022-10-25,87,91,,,2022-10-23,7
+    2022-10-25,9,10,,,2022-10-22,7
+    2022-10-25,38,61,4,,2022-10-21,7
+    2022-10-25,40,23,9,2,2022-10-20,7
+    2022-10-25,201,105,6,,2022-10-19,7
+    ```

@@ -42,147 +42,145 @@ m365 onedrive report usagestorage --period D7 --output json > "usagestorage.json
 
 === "JSON"
 
-```json
-[
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "OneDrive",
-    "Storage Used (Byte)": "2079158662703",
-    "Report Date": "2022-10-25",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Storage Used (Byte)": "2079158662703",
-    "Report Date": "2022-10-25",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "OneDrive",
-    "Storage Used (Byte)": "2079158662703",
-    "Report Date": "2022-10-24",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Storage Used (Byte)": "2079158662703",
-    "Report Date": "2022-10-24",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "OneDrive",
-    "Storage Used (Byte)": "2079174134177",
-    "Report Date": "2022-10-23",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Storage Used (Byte)": "2079174134177",
-    "Report Date": "2022-10-23",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "OneDrive",
-    "Storage Used (Byte)": "2078145067718",
-    "Report Date": "2022-10-22",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Storage Used (Byte)": "2078145067718",
-    "Report Date": "2022-10-22",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "OneDrive",
-    "Storage Used (Byte)": "2070117199614",
-    "Report Date": "2022-10-21",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Storage Used (Byte)": "2070117199614",
-    "Report Date": "2022-10-21",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "OneDrive",
-    "Storage Used (Byte)": "2070117199614",
-    "Report Date": "2022-10-20",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Storage Used (Byte)": "2070117199614",
-    "Report Date": "2022-10-20",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "OneDrive",
-    "Storage Used (Byte)": "2069382310800",
-    "Report Date": "2022-10-19",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Storage Used (Byte)": "2069382310800",
-    "Report Date": "2022-10-19",
-    "Report Period": "7"
-  }
-]
-```
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "OneDrive",
+        "Storage Used (Byte)": "2079158662703",
+        "Report Date": "2022-10-25",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Storage Used (Byte)": "2079158662703",
+        "Report Date": "2022-10-25",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "OneDrive",
+        "Storage Used (Byte)": "2079158662703",
+        "Report Date": "2022-10-24",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Storage Used (Byte)": "2079158662703",
+        "Report Date": "2022-10-24",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "OneDrive",
+        "Storage Used (Byte)": "2079174134177",
+        "Report Date": "2022-10-23",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Storage Used (Byte)": "2079174134177",
+        "Report Date": "2022-10-23",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "OneDrive",
+        "Storage Used (Byte)": "2078145067718",
+        "Report Date": "2022-10-22",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Storage Used (Byte)": "2078145067718",
+        "Report Date": "2022-10-22",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "OneDrive",
+        "Storage Used (Byte)": "2070117199614",
+        "Report Date": "2022-10-21",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Storage Used (Byte)": "2070117199614",
+        "Report Date": "2022-10-21",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "OneDrive",
+        "Storage Used (Byte)": "2070117199614",
+        "Report Date": "2022-10-20",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Storage Used (Byte)": "2070117199614",
+        "Report Date": "2022-10-20",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "OneDrive",
+        "Storage Used (Byte)": "2069382310800",
+        "Report Date": "2022-10-19",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Storage Used (Byte)": "2069382310800",
+        "Report Date": "2022-10-19",
+        "Report Period": "7"
+      }
+    ]
+    ```
 
 === "Text"
 
-    ``` text
-
-Report Refresh Date,Site Type,Storage Used (Byte),Report Date,Report Period
-2022-10-25,OneDrive,2079158662703,2022-10-25,7
-2022-10-25,All,2079158662703,2022-10-25,7
-2022-10-25,OneDrive,2079158662703,2022-10-24,7
-2022-10-25,All,2079158662703,2022-10-24,7
-2022-10-25,OneDrive,2079174134177,2022-10-23,7
-2022-10-25,All,2079174134177,2022-10-23,7
-2022-10-25,OneDrive,2078145067718,2022-10-22,7
-2022-10-25,All,2078145067718,2022-10-22,7
-2022-10-25,OneDrive,2070117199614,2022-10-21,7
-2022-10-25,All,2070117199614,2022-10-21,7
-2022-10-25,OneDrive,2070117199614,2022-10-20,7
-2022-10-25,All,2070117199614,2022-10-20,7
-2022-10-25,OneDrive,2069382310800,2022-10-19,7
-2022-10-25,All,2069382310800,2022-10-19,7
-
-````
+    ```csv
+    Report Refresh Date,Site Type,Storage Used (Byte),Report Date,Report Period
+    2022-10-25,OneDrive,2079158662703,2022-10-25,7
+    2022-10-25,All,2079158662703,2022-10-25,7
+    2022-10-25,OneDrive,2079158662703,2022-10-24,7
+    2022-10-25,All,2079158662703,2022-10-24,7
+    2022-10-25,OneDrive,2079174134177,2022-10-23,7
+    2022-10-25,All,2079174134177,2022-10-23,7
+    2022-10-25,OneDrive,2078145067718,2022-10-22,7
+    2022-10-25,All,2078145067718,2022-10-22,7
+    2022-10-25,OneDrive,2070117199614,2022-10-21,7
+    2022-10-25,All,2070117199614,2022-10-21,7
+    2022-10-25,OneDrive,2070117199614,2022-10-20,7
+    2022-10-25,All,2070117199614,2022-10-20,7
+    2022-10-25,OneDrive,2069382310800,2022-10-19,7
+    2022-10-25,All,2069382310800,2022-10-19,7
+    ```
 
 === "CSV"
 
-    ``` text
-Report Refresh Date,Site Type,Storage Used (Byte),Report Date,Report Period
-2022-10-25,OneDrive,2079158662703,2022-10-25,7
-2022-10-25,All,2079158662703,2022-10-25,7
-2022-10-25,OneDrive,2079158662703,2022-10-24,7
-2022-10-25,All,2079158662703,2022-10-24,7
-2022-10-25,OneDrive,2079174134177,2022-10-23,7
-2022-10-25,All,2079174134177,2022-10-23,7
-2022-10-25,OneDrive,2078145067718,2022-10-22,7
-2022-10-25,All,2078145067718,2022-10-22,7
-2022-10-25,OneDrive,2070117199614,2022-10-21,7
-2022-10-25,All,2070117199614,2022-10-21,7
-2022-10-25,OneDrive,2070117199614,2022-10-20,7
-2022-10-25,All,2070117199614,2022-10-20,7
-2022-10-25,OneDrive,2069382310800,2022-10-19,7
-2022-10-25,All,2069382310800,2022-10-19,7
-````
+    ```csv
+    Report Refresh Date,Site Type,Storage Used (Byte),Report Date,Report Period
+    2022-10-25,OneDrive,2079158662703,2022-10-25,7
+    2022-10-25,All,2079158662703,2022-10-25,7
+    2022-10-25,OneDrive,2079158662703,2022-10-24,7
+    2022-10-25,All,2079158662703,2022-10-24,7
+    2022-10-25,OneDrive,2079174134177,2022-10-23,7
+    2022-10-25,All,2079174134177,2022-10-23,7
+    2022-10-25,OneDrive,2078145067718,2022-10-22,7
+    2022-10-25,All,2078145067718,2022-10-22,7
+    2022-10-25,OneDrive,2070117199614,2022-10-21,7
+    2022-10-25,All,2070117199614,2022-10-21,7
+    2022-10-25,OneDrive,2070117199614,2022-10-20,7
+    2022-10-25,All,2070117199614,2022-10-20,7
+    2022-10-25,OneDrive,2069382310800,2022-10-19,7
+    2022-10-25,All,2069382310800,2022-10-19,7
+    ```

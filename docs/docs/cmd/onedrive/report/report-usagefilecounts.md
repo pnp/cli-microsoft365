@@ -46,52 +46,49 @@ m365 onedrive report usagefilecounts --period D7 --output json > "usagefilecount
 
 === "JSON"
 
-```json
-[
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Total": "581190",
-    "Active": "88",
-    "Report Date": "2022-10-25",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Total": "581190",
-    "Active": "394",
-    "Report Date": "2022-10-24",
-    "Report Period": "7"
-  }
-]
-```
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Total": "581190",
+        "Active": "88",
+        "Report Date": "2022-10-25",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Total": "581190",
+        "Active": "394",
+        "Report Date": "2022-10-24",
+        "Report Period": "7"
+      }
+    ]
+    ```
 
 === "Text"
 
-    ``` text
-
-Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
-2022-10-25,All,581190,88,2022-10-25,7
-2022-10-25,All,581190,394,2022-10-24,7
-2022-10-25,All,581190,95,2022-10-23,7
-2022-10-25,All,581096,19,2022-10-22,7
-2022-10-25,All,581051,87,2022-10-21,7
-2022-10-25,All,581051,61,2022-10-20,7
-2022-10-25,All,580954,251,2022-10-19,7
-
-````
+    ```csv
+    Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
+    2022-10-25,All,581190,88,2022-10-25,7
+    2022-10-25,All,581190,394,2022-10-24,7
+    2022-10-25,All,581190,95,2022-10-23,7
+    2022-10-25,All,581096,19,2022-10-22,7
+    2022-10-25,All,581051,87,2022-10-21,7
+    2022-10-25,All,581051,61,2022-10-20,7
+    2022-10-25,All,580954,251,2022-10-19,7
+    ```
 
 === "CSV"
 
-    ``` text
-Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
-2022-10-25,All,581190,88,2022-10-25,7
-2022-10-25,All,581190,394,2022-10-24,7
-2022-10-25,All,581190,95,2022-10-23,7
-2022-10-25,All,581096,19,2022-10-22,7
-2022-10-25,All,581051,87,2022-10-21,7
-2022-10-25,All,581051,61,2022-10-20,7
-2022-10-25,All,580954,251,2022-10-19,7
-
-````
+    ```csv
+    Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
+    2022-10-25,All,581190,88,2022-10-25,7
+    2022-10-25,All,581190,394,2022-10-24,7
+    2022-10-25,All,581190,95,2022-10-23,7
+    2022-10-25,All,581096,19,2022-10-22,7
+    2022-10-25,All,581051,87,2022-10-21,7
+    2022-10-25,All,581051,61,2022-10-20,7
+    2022-10-25,All,580954,251,2022-10-19,7
+    ```

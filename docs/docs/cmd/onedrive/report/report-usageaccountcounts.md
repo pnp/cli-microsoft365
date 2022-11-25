@@ -46,91 +46,89 @@ m365 onedrive report usageaccountcounts --period D7 --output json > "usageaccoun
 
 === "JSON"
 
-```json
-[
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Total": "69",
-    "Active": "61",
-    "Report Date": "2022-10-25",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Total": "69",
-    "Active": "59",
-    "Report Date": "2022-10-24",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Total": "69",
-    "Active": "20",
-    "Report Date": "2022-10-23",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Total": "69",
-    "Active": "10",
-    "Report Date": "2022-10-22",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Total": "69",
-    "Active": "54",
-    "Report Date": "2022-10-21",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Total": "69",
-    "Active": "51",
-    "Report Date": "2022-10-20",
-    "Report Period": "7"
-  },
-  {
-    "Report Refresh Date": "2022-10-25",
-    "Site Type": "All",
-    "Total": "69",
-    "Active": "69",
-    "Report Date": "2022-10-19",
-    "Report Period": "7"
-  }
-]
-```
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Total": "69",
+        "Active": "61",
+        "Report Date": "2022-10-25",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Total": "69",
+        "Active": "59",
+        "Report Date": "2022-10-24",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Total": "69",
+        "Active": "20",
+        "Report Date": "2022-10-23",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Total": "69",
+        "Active": "10",
+        "Report Date": "2022-10-22",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Total": "69",
+        "Active": "54",
+        "Report Date": "2022-10-21",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Total": "69",
+        "Active": "51",
+        "Report Date": "2022-10-20",
+        "Report Period": "7"
+      },
+      {
+        "Report Refresh Date": "2022-10-25",
+        "Site Type": "All",
+        "Total": "69",
+        "Active": "69",
+        "Report Date": "2022-10-19",
+        "Report Period": "7"
+      }
+    ]
+    ```
 
 === "Text"
 
-    ``` text
-
-Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
-2022-10-25,All,69,61,2022-10-25,7
-2022-10-25,All,69,59,2022-10-24,7
-2022-10-25,All,69,20,2022-10-23,7
-2022-10-25,All,69,10,2022-10-22,7
-2022-10-25,All,69,54,2022-10-21,7
-2022-10-25,All,69,51,2022-10-20,7
-2022-10-25,All,69,69,2022-10-19,7
-
-````
+    ```csv
+    Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
+    2022-10-25,All,69,61,2022-10-25,7
+    2022-10-25,All,69,59,2022-10-24,7
+    2022-10-25,All,69,20,2022-10-23,7
+    2022-10-25,All,69,10,2022-10-22,7
+    2022-10-25,All,69,54,2022-10-21,7
+    2022-10-25,All,69,51,2022-10-20,7
+    2022-10-25,All,69,69,2022-10-19,7
+    ```
 
 === "CSV"
 
-    ``` text
-Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
-2022-10-25,All,69,61,2022-10-25,7
-2022-10-25,All,69,59,2022-10-24,7
-2022-10-25,All,69,20,2022-10-23,7
-2022-10-25,All,69,10,2022-10-22,7
-2022-10-25,All,69,54,2022-10-21,7
-2022-10-25,All,69,51,2022-10-20,7
-2022-10-25,All,69,69,2022-10-19,7
-````
+    ```csv
+    Report Refresh Date,Site Type,Total,Active,Report Date,Report Period
+    2022-10-25,All,69,61,2022-10-25,7
+    2022-10-25,All,69,59,2022-10-24,7
+    2022-10-25,All,69,20,2022-10-23,7
+    2022-10-25,All,69,10,2022-10-22,7
+    2022-10-25,All,69,54,2022-10-21,7
+    2022-10-25,All,69,51,2022-10-20,7
+    2022-10-25,All,69,69,2022-10-19,7
+    ```
