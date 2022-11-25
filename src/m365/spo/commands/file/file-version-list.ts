@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -95,16 +94,8 @@ class SpoFileVersionListCommand extends SpoCommand {
       }
       requestUrl += `/versions`;
 
-      const requestOptions: AxiosRequestConfig = {
-        url: requestUrl,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const response = await request.get<{ value: any[] }>(requestOptions);
-      logger.log(response.value);
+      const response = await odata.getAllItems<any>(requestUrl);
+      logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

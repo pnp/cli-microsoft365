@@ -57,23 +57,24 @@ export const formatting = {
     return response;
   },
 
-  parseCsvToJson(s: string): any {
-    const rows: string[] = s.split('\n');
-    const jsonObj: any = [];
-    const headers: string[] = rows[0].split(',');
+  parseCsvToJson(s: string, quoteChar: string = '"', delimiter: string = ','): any {
+    const regex = new RegExp(`\\s*(${quoteChar})?(.*?)\\1\\s*(?:${delimiter}|$)`, 'gs');
+    const lines: string[] = s.split('\n');
 
-    for (let i = 1; i < rows.length; i++) {
-      const data: string[] = rows[i].split(',');
-      const obj: any = {};
-      for (let j = 0; j < data.length; j++) {
-        const value = data[j].trim();
-        const numValue = parseInt(value);
-        obj[headers[j].trim()] = isNaN(numValue) || numValue.toString() !== value ? value : numValue;
-      }
-      jsonObj.push(obj);
-    }
+    const match = (line: string): string[] => [...line.matchAll(regex)]
+      .map(m => m[2])  // we only want the second capture group
+      .slice(0, -1);   // cut off blank match at the end
 
-    return jsonObj;
+    const heads = match(lines[0]);
+
+    return lines.slice(1).map(line => {
+      return match(line).reduce((acc, cur, i) => {
+        const val = cur;
+        const numValue = parseInt(val);
+        const key = heads[i];
+        return { ...acc, [key]: isNaN(numValue) || numValue.toString() !== val ? val : numValue };
+      }, {});
+    });
   },
 
   encodeQueryParameter(value: string): string {
