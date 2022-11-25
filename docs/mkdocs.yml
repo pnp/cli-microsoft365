@@ -95,9 +95,9 @@ nav:
         - user get: cmd/aad/user/user-get.md        
         - user hibp: cmd/aad/user/user-hibp.md
         - user list: cmd/aad/user/user-list.md
-        - user set: cmd/aad/user/user-set.md
-        - user password validate: cmd/aad/user/user-password-validate.md
+        - user set: cmd/aad/user/user-set.md        
         - user guest add: cmd/aad/user/user-guest-add.md
+        - user password validate: cmd/aad/user/user-password-validate.md
         - user signin list: cmd/aad/user/user-signin-list.md
     - Adaptive Card (adaptivecard):
       - send: cmd/adaptivecard/adaptivecard-send.md
@@ -435,9 +435,9 @@ nav:
         - list remove: cmd/spo/list/list-remove.md
         - list set: cmd/spo/list/list-set.md
         - list contenttype add: cmd/spo/list/list-contenttype-add.md
-        - list contenttype default set: cmd/spo/list/list-contenttype-default-set.md
         - list contenttype list: cmd/spo/list/list-contenttype-list.md
         - list contenttype remove: cmd/spo/list/list-contenttype-remove.md
+        - list contenttype default set: cmd/spo/list/list-contenttype-default-set.md
         - list roleassignment add: cmd/spo/list/list-roleassignment-add.md
         - list roleassignment remove: cmd/spo/list/list-roleassignment-remove.md
         - list roleinheritance break: cmd/spo/list/list-roleinheritance-break.md
@@ -446,13 +446,13 @@ nav:
         - list label set: cmd/spo/list/list-label-set.md
         - list sitescript get: cmd/spo/list/list-sitescript-get.md
         - list view add: cmd/spo/list/list-view-add.md
-        - list view field add: cmd/spo/list/list-view-field-add.md
-        - list view field remove: cmd/spo/list/list-view-field-remove.md
-        - list view field set: cmd/spo/list/list-view-field-set.md
         - list view get: cmd/spo/list/list-view-get.md
         - list view list: cmd/spo/list/list-view-list.md
         - list view remove: cmd/spo/list/list-view-remove.md
-        - list view set: cmd/spo/list/list-view-set.md        
+        - list view set: cmd/spo/list/list-view-set.md
+        - list view field add: cmd/spo/list/list-view-field-add.md
+        - list view field remove: cmd/spo/list/list-view-field-remove.md
+        - list view field set: cmd/spo/list/list-view-field-set.md
         - list webhook add: cmd/spo/list/list-webhook-add.md
         - list webhook get: cmd/spo/list/list-webhook-get.md
         - list webhook list: cmd/spo/list/list-webhook-list.md
@@ -660,6 +660,7 @@ nav:
         - guestsettings list: cmd/teams/guestsettings/guestsettings-list.md
         - guestsettings set: cmd/teams/guestsettings/guestsettings-set.md
       - meeting:
+        - meeting get: 'cmd/teams/meeting/meeting-get.md'
         - meeting list: cmd/teams/meeting/meeting-list.md
       - membersettings:
         - membersettings list: cmd/teams/membersettings/membersettings-list.md
