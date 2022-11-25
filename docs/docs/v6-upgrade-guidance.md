@@ -169,16 +169,11 @@ As a side issue, we've also updated the response output of the `spo group member
 Update your scripts to use the new `member` noun instead of `user`. If you are using the output of `spo group member list` in JSON output mode, update your scripts and remove the `value` object. 
 
 ## Logic to retrieve installed team apps with `teams app list` has changed
-The logic to list the installed apps in a specified team is moved to a new command `teams team app list`. As a result, the command `teams app list` only displays the installed apps from the Microsoft Teams app catalog. The command `teams app list` does no longer contains the options `all`, `teamId` and `teamName`. In addition, there is a new option for this command that allows you to indicate which installed apps from the Microsoft Teams app catalog you want to list according to the distribution method.
-
-The updated documentation of these commands
-
-- [teams app list](./cmd/teams/app/app-list.md)
-`- [teams team app list](./cmd/teams/team/app-list.md)`
+The logic to list the installed apps in a specified team is moved to a new command `[teams team app list](./cmd/teams/team/app-list.md)`. As a result, the command [teams app list](./cmd/teams/app/app-list.md) only displays the installed apps from the Microsoft Teams app catalog. The command [teams app list](./cmd/teams/app/app-list.md) does no longer contains the options `all`, `teamId` and `teamName`. In addition, there is a new option for this command that allows you to indicate which installed apps from the Microsoft Teams app catalog you want to list according to the distribution method.
 
 ### What action do I need to take?
 
-Update your scripts to use the `teams app list` command if you want to list the installed apps in the Microsoft Teams app catalog. If you want to list the installed apps in a specified team, use the `teams team app list` command.
+Update your scripts to use the [teams app list](./cmd/teams/app/app-list.md) command if you want to list the installed apps in the Microsoft Teams app catalog. If you want to list the installed apps in a specified team, use the `[teams team app list](./cmd/teams/team/app-list.md)` command.
 
 ## Aligned options with naming convention
 

@@ -1,12 +1,9 @@
-// import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils/odata';
-// import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { TeamsApp } from '../../TeamsApp';
-// import { formatting } from '../../../../utils/formatting';
 
 interface CommandArgs {
   options: Options;
@@ -42,7 +39,7 @@ class TeamsAppListCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        distributionMethod: typeof args.options.distributionMethod !== 'undefined'
+        distributionMethod: args.options.distributionMethod || false
       });
     });
   }
@@ -50,7 +47,7 @@ class TeamsAppListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--distributionMethod',
+        option: '--distributionMethod [distributionMethod]',
         autocomplete: TeamsAppListCommand.allowedDistributionMethods
       }
     );
@@ -61,7 +58,7 @@ class TeamsAppListCommand extends GraphCommand {
       async (args: CommandArgs) => {
         if (args.options.distributionMethod &&
           TeamsAppListCommand.allowedDistributionMethods.indexOf(args.options.distributionMethod) < 0) {
-          return `'${args.options.distributionMethod}' is not a valid distribution method. Allowed distribution methods are ${TeamsAppListCommand.allowedDistributionMethods.join(', ')}`;
+          return `'${args.options.distributionMethod}' is not a valid distributionMethod. Allowed distribution methods are: ${TeamsAppListCommand.allowedDistributionMethods.join(', ')}`;
         }
 
         return true;
@@ -71,7 +68,11 @@ class TeamsAppListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const requestUrl: string = `${this.resource}/v1.0/appCatalogs/teamsApps${args.options.distributionMethod ? `?$filter=distributionMethod eq '${args.options.distributionMethod}'` : ''}`;
+      let requestUrl: string = `${this.resource}/v1.0/appCatalogs/teamsApps`;
+
+      if (args.options.distributionMethod) {
+        requestUrl += `?$filter=distributionMethod eq '${args.options.distributionMethod}'`;
+      }
 
       const items = await odata.getAllItems<TeamsApp>(requestUrl);
 

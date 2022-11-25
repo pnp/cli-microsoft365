@@ -10,8 +10,8 @@ m365 teams app list [options]
 
 ## Options
 
-: `--distributionMethod`
-: The distribution method for which apps must be listed. Allowed values `store, organization, sideloaded`.
+`--distributionMethod [distributionMethod]`
+: The distribution method. Allowed values `store`, `organization`, `sideloaded`.
 
 --8<-- "docs/cmd/_global.md"
 
