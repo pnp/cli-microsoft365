@@ -80,7 +80,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
 
   it('prompts before removing the Org Assets Library when confirm option is not passed', async () => {
     await command.action(logger, { options: { debug: true } } as any);
-    
+
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -205,7 +205,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, confirm: true } } as any), 
+    await assert.rejects(command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, confirm: true } } as any),
       new CommandError(`Run Add-SPOOrgAssetsLibrary first to set up the organization assets library feature for your organization.`));
   });
 
@@ -217,16 +217,5 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
         confirm: true
       }
     } as any), new CommandError(`An error has occurred`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

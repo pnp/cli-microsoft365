@@ -127,22 +127,11 @@ describe(commands.MESSAGE_REMOVE, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 10123190123123, confirm: true  } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 10123190123123, confirm: true } } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation with parameters', async () => {
     const actual = await command.validate({ options: { id: 10123123 } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

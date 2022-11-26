@@ -74,17 +74,6 @@ describe(commands.FOLDER_ROLEASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: '/Shared Documents/FolderPermission', principalId: 11 } }, commandInfo);
     assert.notStrictEqual(actual, true);

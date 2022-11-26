@@ -349,17 +349,6 @@ describe(commands.GROUP_LIST, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
 
-    await assert.rejects(command.action(logger, { options: {  } }), new CommandError(errorMessage));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError(errorMessage));
   });
 });

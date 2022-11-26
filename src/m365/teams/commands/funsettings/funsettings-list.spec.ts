@@ -20,7 +20,7 @@ describe(commands.FUNSETTINGS_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -134,9 +134,12 @@ describe(commands.FUNSETTINGS_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if teamId is not a valid GUID', async () => {
@@ -151,16 +154,5 @@ describe(commands.FUNSETTINGS_LIST, () => {
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66' }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

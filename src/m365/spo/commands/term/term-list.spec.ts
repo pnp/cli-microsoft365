@@ -22,7 +22,7 @@ describe(commands.TERM_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -944,11 +944,14 @@ describe(commands.TERM_LIST, () => {
         }
       ]));
     });
-    
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', 
-      termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed',
+        termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles term group not found via name', async () => {
@@ -962,10 +965,13 @@ describe(commands.TERM_LIST, () => {
       ]));
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      termSetName: 'PnP-CollabFooter-SharedLinks', 
-      termGroupName: 'PnPTermSets' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        termSetName: 'PnP-CollabFooter-SharedLinks',
+        termGroupName: 'PnPTermSets'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles term set not found via id', async () => {
@@ -978,10 +984,13 @@ describe(commands.TERM_LIST, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', 
-      termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed',
+        termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles term set not found via name', async () => {
@@ -995,10 +1004,13 @@ describe(commands.TERM_LIST, () => {
       ]));
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      termSetName: 'PnP-CollabFooter-SharedLinks', 
-      termGroupName: 'PnPTermSets' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        termSetName: 'PnP-CollabFooter-SharedLinks',
+        termGroupName: 'PnPTermSets'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when retrieving taxonomy terms', async () => {
@@ -1011,11 +1023,14 @@ describe(commands.TERM_LIST, () => {
         }
       ]));
     });
-    
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      termSetName: 'PnP-Organizations', 
-      termGroupName: 'PnPTermSets' } } as any), new CommandError('File Not Found.'));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        termSetName: 'PnP-Organizations',
+        termGroupName: 'PnPTermSets'
+      }
+    } as any), new CommandError('File Not Found.'));
   });
 
   it('correctly handles no terms found', async () => {
@@ -1082,25 +1097,17 @@ describe(commands.TERM_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('handles promise rejection', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      termSetName: 'PnP-Organizations', 
-      termGroupName: 'PnPTermSets', 
-      output: 'json' } } as any), new CommandError('getRequestDigest error'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        termSetName: 'PnP-Organizations',
+        termGroupName: 'PnPTermSets',
+        output: 'json'
+      }
+    } as any), new CommandError('getRequestDigest error'));
   });
 });

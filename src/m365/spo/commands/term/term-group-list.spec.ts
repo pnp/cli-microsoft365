@@ -19,7 +19,7 @@ describe(commands.TERM_GROUP_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -219,7 +219,7 @@ describe(commands.TERM_GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
     await command.action(logger, { options: { debug: true } });
-    
+
     assert(loggerLogSpy.calledWith([{
       "_ObjectType_": "SP.Taxonomy.TermGroup",
       "_ObjectIdentity_": "40bc8e9e-c0f3-0000-2b65-64d3c82fb3d9|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUQElpjbqF1pFvtTv+GIkLe8=",
@@ -525,17 +525,6 @@ describe(commands.TERM_GROUP_LIST, () => {
       ]));
     });
     await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('File Not Found.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('handles promise rejection', async () => {

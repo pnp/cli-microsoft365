@@ -23,7 +23,7 @@ describe(commands.THEME_APPLY, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -446,10 +446,13 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Contoso',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any), new CommandError('requestObjectIdentity ClientSvc error'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Contoso',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+      }
+    } as any), new CommandError('requestObjectIdentity ClientSvc error'));
   });
 
   it('handles unknown error command error correctly', async () => {
@@ -460,11 +463,14 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Contoso',
-      filePath: 'theme.json',
-      inverted: false } } as any), new CommandError('ClientSvc unknown error'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Contoso',
+        filePath: 'theme.json',
+        inverted: false
+      }
+    } as any), new CommandError('ClientSvc unknown error'));
   });
 
   it('handles command error correctly', async () => {
@@ -487,11 +493,14 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Some color',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      sharePointTheme: true } } as any), new CommandError('Access denied. You do not have permission to perform this action or access this resource.'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Some color',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        sharePointTheme: true
+      }
+    } as any), new CommandError('Access denied. You do not have permission to perform this action or access this resource.'));
     let correctRequestIssued = false;
 
     requests.forEach(r => {
@@ -506,21 +515,13 @@ describe(commands.THEME_APPLY, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'Some color',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'Some color',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
-    });
-    assert(containsDebugOption);
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('passes validation when name is passed', async () => {

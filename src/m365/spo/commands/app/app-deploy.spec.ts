@@ -21,7 +21,7 @@ describe(commands.APP_DEPLOY, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -164,7 +164,7 @@ describe(commands.APP_DEPLOY, () => {
       return Promise.reject('Invalid request');
     });
 
-          
+
     try {
       await command.action(logger, { options: { debug: false, appCatalogScope: 'sitecollection', id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } });
       let correctRequestIssued = false;
@@ -326,7 +326,7 @@ describe(commands.APP_DEPLOY, () => {
 
       return Promise.reject('Invalid request');
     });
-     
+
     try {
       await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', skipFeatureDeployment: true } });
       let correctRequestIssued = false;
@@ -438,8 +438,8 @@ describe(commands.APP_DEPLOY, () => {
       return Promise.reject('Invalid request');
     });
 
-    
-      
+
+
     try {
       await command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } });
       let correctRequestIssued = false;
@@ -475,7 +475,7 @@ describe(commands.APP_DEPLOY, () => {
 
       return Promise.reject('Invalid request');
     });
-      
+
     try {
       await command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } });
       let correctRequestIssued = false;
@@ -515,7 +515,7 @@ describe(commands.APP_DEPLOY, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { appCatalogUrl: 'https://contoso.sharepoint.com' }
     ));
-    
+
     try {
       await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
       let correctRequestIssued = false;
@@ -562,7 +562,7 @@ describe(commands.APP_DEPLOY, () => {
       return Promise.reject('Invalid request');
     });
 
-    
+
     try {
       await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
@@ -598,7 +598,7 @@ describe(commands.APP_DEPLOY, () => {
       return Promise.reject('Invalid request');
     });
 
-    
+
     try {
       await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
@@ -699,7 +699,7 @@ describe(commands.APP_DEPLOY, () => {
       return Promise.reject('Invalid request');
     });
 
-    
+
     try {
       await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError('An error has occurred'));
@@ -888,16 +888,5 @@ describe(commands.APP_DEPLOY, () => {
   it('passes validation when the scope is specified with \'sitecollection\'', async () => {
     const actual = await command.validate({ options: { name: 'solution', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 });

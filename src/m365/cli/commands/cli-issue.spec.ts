@@ -110,15 +110,4 @@ describe(commands.ISSUE, () => {
     } as any);
     openBrowserSpy.calledWith("https://aka.ms/cli-m365/new-sample-script");
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

@@ -99,18 +99,6 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('validates for a correct input', async () => {
     const actual = await command.validate({
       options: {
@@ -592,10 +580,13 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
-      channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
-      messageId: "1501527481624" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
+        messageId: "1501527481624"
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 });

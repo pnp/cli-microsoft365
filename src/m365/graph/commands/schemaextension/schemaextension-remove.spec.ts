@@ -20,7 +20,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -79,7 +79,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false,id:'exttyee4dv5_MySchemaExtension', confirm: true } });
+    await command.action(logger, { options: { debug: false, id: 'exttyee4dv5_MySchemaExtension', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -92,7 +92,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, id:'exttyee4dv5_MySchemaExtension', confirm: true } });
+    await command.action(logger, { options: { debug: true, id: 'exttyee4dv5_MySchemaExtension', confirm: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -115,7 +115,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, id:'exttyee4dv5_MySchemaExtension' } });
+    await command.action(logger, { options: { debug: false, id: 'exttyee4dv5_MySchemaExtension' } });
   });
 
   it('removes schema extension when prompt confirmed', async () => {
@@ -131,7 +131,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, id:'exttyee4dv5_MySchemaExtension' } });
+    await command.action(logger, { options: { debug: false, id: 'exttyee4dv5_MySchemaExtension' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -140,7 +140,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject({ error: 'An error has occurred' });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id:'exttyee4dv5_MySchemaExtension', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'exttyee4dv5_MySchemaExtension', confirm: true } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -151,17 +151,6 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
 
     await assert.rejects(command.action(logger, { options: { debug: false, id: 'exttyee4dv5_MySchemaExtension', confirm: true } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying id', () => {

@@ -2429,17 +2429,6 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports specifying site url', () => {
     const options = command.options;
     let containsOption = false;

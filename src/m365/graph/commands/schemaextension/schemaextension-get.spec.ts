@@ -115,7 +115,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
             "type": "String"
           }
         ]
-      })); 
+      }));
     }
     finally {
       sinonUtil.restore(request.get);
@@ -189,16 +189,5 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
         id: 'adatumisv_exo2'
       }
     } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

@@ -34,7 +34,7 @@ describe('PeriodBasedReport', () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -55,7 +55,7 @@ describe('PeriodBasedReport', () => {
       logToStderr: (msg: string) => {
         log.push(msg);
       }
-    };    
+    };
     (mockCommand as any).items = [];
   });
 
@@ -154,7 +154,7 @@ describe('PeriodBasedReport', () => {
     await mockCommand.action(logger, { options: { debug: false, period: 'D7' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-  }); 
+  });
 
   it('fails validation if the date option is not a valid date string', async () => {
     const actual = await mockCommand.validate({
@@ -189,16 +189,5 @@ describe('PeriodBasedReport', () => {
 
     await assert.rejects(mockCommand.action(logger, { options: { debug: false, period: 'D7' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = mockCommand.options;
-    let containsOption = false;
-    options.forEach((o: any) => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

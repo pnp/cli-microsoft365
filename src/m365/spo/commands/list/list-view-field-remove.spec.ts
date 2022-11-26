@@ -506,15 +506,4 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
       }
     } as any), new CommandError('An error has occurred'));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
 });

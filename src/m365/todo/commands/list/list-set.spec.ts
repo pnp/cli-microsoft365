@@ -165,10 +165,13 @@ describe(commands.LIST_SET, () => {
       return Promise.resolve();
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false,
-      name: "InvalidFooList",
-      newName: "foo" } } as any), new CommandError('The list InvalidFooList cannot be found'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: "InvalidFooList",
+        newName: "foo"
+      }
+    } as any), new CommandError('The list InvalidFooList cannot be found'));
   });
 
   it('handles error correctly', async () => {
@@ -180,7 +183,7 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {  debug: false, id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=", newName: "Foo" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { debug: false, id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=", newName: "Foo" } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if new name is not set', async () => {
@@ -225,16 +228,5 @@ describe(commands.LIST_SET, () => {
     }, commandInfo);
 
     assert.equal(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

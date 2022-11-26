@@ -63,17 +63,6 @@ describe(commands.ROLEDEFINITION_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', name: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);

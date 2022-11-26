@@ -19,7 +19,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
   let commandInfo: CommandInfo;
 
   //#region mocks
-  const applicationMock = { "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications", "value": [ { "id": "313f219e-b8a1-4454-84f0-ca05daa0fc4e", "deletedDateTime": null, "appId": "89ea5c94-7736-4e25-95ad-3fa95f62b66e", "applicationTemplateId": null, "createdDateTime": "2021-03-05T17:05:53Z", "displayName": "Foo App", "description": null, "groupMembershipClaims": null, "identifierUris": [], "isDeviceOnlyAuthSupported": null, "isFallbackPublicClient": null, "notes": null, "optionalClaims": null, "publisherDomain": "contoso.onmicrosoft.com", "signInAudience": "AzureADandPersonalMicrosoftAccount", "tags": [], "tokenEncryptionKeyId": null, "verifiedPublisher": { "displayName": null, "verifiedPublisherId": null, "addedDateTime": null }, "defaultRedirectUri": null, "addIns": [], "api": { "acceptMappedClaims": null, "knownClientApplications": [], "requestedAccessTokenVersion": 2, "oauth2PermissionScopes": [], "preAuthorizedApplications": [] }, "appRoles": [], "info": { "logoUrl": null, "marketingUrl": null, "privacyStatementUrl": null, "supportUrl": null, "termsOfServiceUrl": null }, "keyCredentials": [], "parentalControlSettings": { "countriesBlockedForMinors": [], "legalAgeGroupRule": "Allow" }, "passwordCredentials": [ { "customKeyIdentifier": null, "displayName": "Foo App", "endDateTime": "2299-12-31T00:00:00Z", "hint": "Sl4", "keyId": "85b90a55-0e86-4e2a-a1b5-889d6badb2ec", "secretText": null, "startDateTime": "2021-03-05T17:15:46.052Z" }, { "customKeyIdentifier": null, "displayName": null, "endDateTime": "2026-03-05T00:00:00Z", "hint": "gwY", "keyId": "0a67f4f2-67d5-446a-8b06-8fb84f699d16", "secretText": null, "startDateTime": "2021-03-05T17:05:55.9580541Z" } ], "publicClient": { "redirectUris": [] }, "requiredResourceAccess": [], "web": { "homePageUrl": null, "logoutUrl": null, "redirectUris": [], "implicitGrantSettings": { "enableAccessTokenIssuance": false, "enableIdTokenIssuance": false } }, "spa": { "redirectUris": [] } }] };
+  const applicationMock = { "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications", "value": [{ "id": "313f219e-b8a1-4454-84f0-ca05daa0fc4e", "deletedDateTime": null, "appId": "89ea5c94-7736-4e25-95ad-3fa95f62b66e", "applicationTemplateId": null, "createdDateTime": "2021-03-05T17:05:53Z", "displayName": "Foo App", "description": null, "groupMembershipClaims": null, "identifierUris": [], "isDeviceOnlyAuthSupported": null, "isFallbackPublicClient": null, "notes": null, "optionalClaims": null, "publisherDomain": "contoso.onmicrosoft.com", "signInAudience": "AzureADandPersonalMicrosoftAccount", "tags": [], "tokenEncryptionKeyId": null, "verifiedPublisher": { "displayName": null, "verifiedPublisherId": null, "addedDateTime": null }, "defaultRedirectUri": null, "addIns": [], "api": { "acceptMappedClaims": null, "knownClientApplications": [], "requestedAccessTokenVersion": 2, "oauth2PermissionScopes": [], "preAuthorizedApplications": [] }, "appRoles": [], "info": { "logoUrl": null, "marketingUrl": null, "privacyStatementUrl": null, "supportUrl": null, "termsOfServiceUrl": null }, "keyCredentials": [], "parentalControlSettings": { "countriesBlockedForMinors": [], "legalAgeGroupRule": "Allow" }, "passwordCredentials": [{ "customKeyIdentifier": null, "displayName": "Foo App", "endDateTime": "2299-12-31T00:00:00Z", "hint": "Sl4", "keyId": "85b90a55-0e86-4e2a-a1b5-889d6badb2ec", "secretText": null, "startDateTime": "2021-03-05T17:15:46.052Z" }, { "customKeyIdentifier": null, "displayName": null, "endDateTime": "2026-03-05T00:00:00Z", "hint": "gwY", "keyId": "0a67f4f2-67d5-446a-8b06-8fb84f699d16", "secretText": null, "startDateTime": "2021-03-05T17:05:55.9580541Z" }], "publicClient": { "redirectUris": [] }, "requiredResourceAccess": [], "web": { "homePageUrl": null, "logoutUrl": null, "redirectUris": [], "implicitGrantSettings": { "enableAccessTokenIssuance": false, "enableIdTokenIssuance": false } }, "spa": { "redirectUris": [] } }] };
   //#endregion
 
   before(() => {
@@ -148,10 +148,13 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       return Promise.reject(siteError);
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing',
-      permission: "write",
-      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e" } } as any), new CommandError('Requested site could not be found'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing',
+        permission: "write",
+        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+      }
+    } as any), new CommandError('Requested site could not be found'));
   });
 
   it('fails to get Azure AD app when Azure AD app does not exists', async () => {
@@ -179,11 +182,14 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         return Promise.reject('The specified Azure AD app does not exist');
       });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-      permission: "write",
-      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e" } } as any), new CommandError('The specified Azure AD app does not exist'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+        permission: "write",
+        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+      }
+    } as any), new CommandError('The specified Azure AD app does not exist'));
   });
 
   it('fails when multiple Azure AD apps with same name exists', async () => {
@@ -370,10 +376,13 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         return Promise.reject('Multiple Azure AD app with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7');
       });
 
-    await assert.rejects(command.action(logger, { options: {
-      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-      permission: "write",
-      appDisplayName: "Foo App" } } as any), new CommandError('Multiple Azure AD app with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+        permission: "write",
+        appDisplayName: "Foo App"
+      }
+    } as any), new CommandError('Multiple Azure AD app with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7'));
   });
 
   it('adds an application permission to the site by appId', async () => {
@@ -643,7 +652,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         output: "json"
       }
     });
-    
+
     assert(loggerLogSpy.calledWith({
       "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
       "roles": [
@@ -657,16 +666,5 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         }
       ]
     }));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

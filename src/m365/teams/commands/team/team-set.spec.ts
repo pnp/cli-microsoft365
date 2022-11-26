@@ -185,15 +185,4 @@ describe(commands.TEAM_SET, () => {
     }, commandInfo);
     assert.notStrictEqual(actual, false);
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

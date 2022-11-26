@@ -312,26 +312,18 @@ describe(commands.WEB_SET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      welcomePage: 'https://contoso.sharepoint.com/sites/team-a/SitePages/Home.aspx', 
-      url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('The WelcomePage property must be a path that is relative to the folder, and the path cannot contain two consecutive periods (..).'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        welcomePage: 'https://contoso.sharepoint.com/sites/team-a/SitePages/Home.aspx',
+        url: 'https://contoso.sharepoint.com/sites/team-a'
+      }
+    } as any), new CommandError('The WelcomePage property must be a path that is relative to the folder, and the path cannot contain two consecutive periods (..).'));
   });
 
   it('allows unknown properties', () => {
     const allowUnknownOptions = command.allowUnknownOptions();
     assert.strictEqual(allowUnknownOptions, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying url', () => {

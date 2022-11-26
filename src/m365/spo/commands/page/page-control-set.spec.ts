@@ -283,19 +283,6 @@ describe(commands.PAGE_CONTROL_SET, () => {
       new CommandError('An error has occurred'));
   });
 
-  // OPTIONS
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   // VALIDATION
 
   it('fails validation if the specified id is not a valid GUID', async () => {

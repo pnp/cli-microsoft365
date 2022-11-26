@@ -158,15 +158,4 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
     const actual = await command.validate({ options: { siteUrl: 'site.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
-  });
 });

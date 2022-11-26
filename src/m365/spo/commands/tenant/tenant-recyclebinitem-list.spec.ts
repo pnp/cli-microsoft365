@@ -75,17 +75,6 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['DaysRemaining', 'DeletionTime', 'Url']);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('handles client.svc promise error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {

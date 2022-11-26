@@ -22,7 +22,7 @@ describe(commands.TERM_GROUP_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -233,9 +233,12 @@ describe(commands.TERM_GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      id: '36a62501-17ea-455a-bed4-eff862242def' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        id: '36a62501-17ea-455a-bed4-eff862242def'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles term group not found via name', async () => {
@@ -269,7 +272,7 @@ describe(commands.TERM_GROUP_GET, () => {
         }
       ]));
     });
-    
+
     await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('File Not Found.'));
   });
 
@@ -296,17 +299,6 @@ describe(commands.TERM_GROUP_GET, () => {
   it('passes validation when name specified', async () => {
     const actual = await command.validate({ options: { name: 'People' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('handles promise rejection', async () => {

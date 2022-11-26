@@ -745,7 +745,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
   });
 
-  it('deletes an app role when the role is in enabled state and valid appId, role id and --confirm option specified (debug)', async ()=> {
+  it('deletes an app role when the role is in enabled state and valid appId, role id and --confirm option specified (debug)', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -2010,25 +2010,4 @@ describe(commands.APP_ROLE_REMOVE, () => {
     const actual = await command.validate({ options: { appName: 'My App', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-
-
-
-
-
-
-
-
-
 });

@@ -519,17 +519,6 @@ describe(commands.FIELD_REMOVE, () => {
       new CommandError("List 'Documents' does not exist at site with URL 'https://contoso.sharepoint.com/sites/portal'."));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('supports specifying URL', () => {
     const options = command.options;
     let containsTypeOption = false;

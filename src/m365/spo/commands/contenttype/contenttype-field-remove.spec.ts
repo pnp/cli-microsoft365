@@ -211,17 +211,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('configures contentTypeId as string option', () => {
     const types = command.types;
     ['i', 'contentTypeId'].forEach(o => {

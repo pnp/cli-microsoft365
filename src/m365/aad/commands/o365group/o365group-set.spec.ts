@@ -201,7 +201,7 @@ describe(commands.O365GROUP_SET, () => {
       return {} as any;
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } } as any), 
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -467,17 +467,6 @@ describe(commands.O365GROUP_SET, () => {
       fs.lstatSync
     ]);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying id', () => {

@@ -131,11 +131,14 @@ describe(commands.THEME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Contoso',
-      theme: '{"isInverted":true,"name":"Contoso","palette":123}',
-      inverted: false } } as any), new CommandError('requestObjectIdentity ClientSvc error'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Contoso',
+        theme: '{"isInverted":true,"name":"Contoso","palette":123}',
+        inverted: false
+      }
+    } as any), new CommandError('requestObjectIdentity ClientSvc error'));
   });
 
   it('handles unknown error command error correctly', async () => {
@@ -146,11 +149,14 @@ describe(commands.THEME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Contoso',
-      theme: '{"isInverted":true,"name":"Contoso","palette":123}',
-      inverted: false } } as any), new CommandError('ClientSvc unknown error'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Contoso',
+        theme: '{"isInverted":true,"name":"Contoso","palette":123}',
+        inverted: false
+      }
+    } as any), new CommandError('ClientSvc unknown error'));
   });
 
   it('fails validation if the specified theme is invalid', async () => {
@@ -187,16 +193,5 @@ describe(commands.THEME_SET, () => {
     const actual = await command.validate({ options: { name: 'contoso-blue', theme, isInverted: false } }, commandInfo);
 
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

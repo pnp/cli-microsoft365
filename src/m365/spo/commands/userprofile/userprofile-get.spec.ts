@@ -170,17 +170,6 @@ describe(commands.USERPROFILE_GET, () => {
     }));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports specifying userName', () => {
     const options = command.options;
     let containsOption = false;
@@ -197,9 +186,12 @@ describe(commands.USERPROFILE_GET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false,
-      userName: 'john.doe@contoso.onmicrosoft.com' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        userName: 'john.doe@contoso.onmicrosoft.com'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the user principal name is not a valid', async () => {

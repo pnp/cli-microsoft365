@@ -534,17 +534,6 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
     }), new CommandError(err));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('Retrieves Sharing Information When Site ID is Passed - JSON Output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {

@@ -344,15 +344,4 @@ describe(commands.USER_SIGNIN_LIST, () => {
     const actual = await command.validate({ options: { appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-  
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

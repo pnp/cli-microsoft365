@@ -292,17 +292,6 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports specifying appId', () => {
     const options = command.options;
     let containsOption = false;

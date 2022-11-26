@@ -21,7 +21,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -157,22 +157,14 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', 
-      principals: 'PattiF', 
-      rights: 'View' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
+        principals: 'PattiF',
+        rights: 'View'
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying id', () => {

@@ -63,17 +63,6 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('fails validation if the siteUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { siteUrl: 'foo', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } }, commandInfo);
     assert.notStrictEqual(actual, true);

@@ -225,17 +225,6 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
-  });
-
   it('supports suppressing confirmation prompt', () => {
     const options = command.options;
     let containsConfirmOption = false;

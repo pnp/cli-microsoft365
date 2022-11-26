@@ -13,7 +13,7 @@ import commands from '../../commands';
 const command: Command = require('./serviceannouncement-health-get');
 
 describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
-  const serviceHealthResponse =  {
+  const serviceHealthResponse = {
     "service": "Exchange Online",
     "status": "serviceOperational",
     "id": "Exchange"
@@ -116,7 +116,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'status', 'service']);
   });
-  
+
   it('passes validation when command called', async () => {
     const actual = await command.validate({
       options: {
@@ -149,11 +149,11 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
       serviceName: "Exchange Online"
     };
 
-    await command.action(logger, {options} as any);
+    await command.action(logger, { options } as any);
     assert(loggerLogSpy.calledWith(serviceHealthResponse));
   });
 
-  
+
   it('correctly returns service health as csv with issues flag', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews/Exchange Online`) {
@@ -169,7 +169,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
       output: "csv"
     };
 
-    await command.action(logger, {options} as any);
+    await command.action(logger, { options } as any);
     assert(loggerLogSpy.calledWith(serviceHealthResponseCSV));
   });
 
@@ -187,7 +187,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
       issues: true
     };
 
-    await command.action(logger, {options} as any);
+    await command.action(logger, { options } as any);
     assert(loggerLogSpy.calledWith(serviceHealthIssueResponse));
   });
 
@@ -196,16 +196,5 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

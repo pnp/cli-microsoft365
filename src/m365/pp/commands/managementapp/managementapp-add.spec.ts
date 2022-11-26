@@ -246,15 +246,4 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
     assert.strictEqual(call.args[0].applicationId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

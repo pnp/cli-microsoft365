@@ -109,17 +109,6 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('prompts when confirmation argument not passed', async () => {
     await command.action(logger, { options: { debug: false, messageId: 1231231, enable: 'false' } });
 

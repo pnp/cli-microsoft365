@@ -232,24 +232,17 @@ describe(commands.TAB_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
-      channelId: '19:eab8fda0837c48edb542574d419ff8ab@thread.skype/tabs',
-      appId: 'com.microsoft.teamspace.tab.web',
-      appName: 'testweb',
-      contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
-      websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
+        channelId: '19:eab8fda0837c48edb542574d419ff8ab@thread.skype/tabs',
+        appId: 'com.microsoft.teamspace.tab.web',
+        appName: 'testweb',
+        contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

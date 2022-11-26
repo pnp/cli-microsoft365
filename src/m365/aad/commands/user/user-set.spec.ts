@@ -109,7 +109,7 @@ describe(commands.USER_SET, () => {
       new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c844' does not exist or one of its queried reference-property objects are not present.`));
   });
 
-  it('correctly updates information about the specified user', async () => {    
+  it('correctly updates information about the specified user', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/users/`) > -1) {
         return Promise.resolve({});
@@ -128,7 +128,7 @@ describe(commands.USER_SET, () => {
     assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly enables the specified user', async () => {    
+  it('correctly enables the specified user', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/users/`) > -1) {
         return Promise.resolve({});
@@ -144,16 +144,5 @@ describe(commands.USER_SET, () => {
       }
     } as any);
     assert(loggerLogSpy.notCalled);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

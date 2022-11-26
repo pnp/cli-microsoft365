@@ -24,7 +24,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -267,17 +267,6 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
 
     await assert.rejects(command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying hub site URL', () => {

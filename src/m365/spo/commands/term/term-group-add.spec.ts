@@ -22,7 +22,7 @@ describe(commands.TERM_GROUP_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -374,10 +374,13 @@ describe(commands.TERM_GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: true, 
-      name: 'PnPTermSets', 
-      id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8' } } as any), new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'PnPTermSets',
+        id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8'
+      }
+    } as any), new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.'));
   });
 
   it('correctly handles error when setting the description', async () => {
@@ -551,16 +554,5 @@ describe(commands.TERM_GROUP_ADD, () => {
   it('passes validation when name specified', async () => {
     const actual = await command.validate({ options: { name: 'People' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

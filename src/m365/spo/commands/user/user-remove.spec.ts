@@ -72,17 +72,6 @@ describe(commands.USER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('fails validation if id or loginName options are not passed', async () => {
     const actual = await command.validate({
       options: {
@@ -144,7 +133,7 @@ describe(commands.USER_REMOVE, () => {
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;
     }
-    
+
     assert(promptIssued);
   });
 
@@ -192,7 +181,7 @@ describe(commands.USER_REMOVE, () => {
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')`) > -1 && 
+      if (r.url.indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')`) > -1 &&
         r.headers['accept'] === 'application/json;odata=nometadata') {
         correctRequestIssued = true;
       }
@@ -321,9 +310,12 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      webUrl: "https://contoso.sharepoint.com/subsite",
-      id: 10,
-      confirm: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: "https://contoso.sharepoint.com/subsite",
+        id: 10,
+        confirm: true
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 });

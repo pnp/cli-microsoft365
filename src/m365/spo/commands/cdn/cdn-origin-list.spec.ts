@@ -21,7 +21,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     auth.service.tenantId = 'abc';
@@ -93,7 +93,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     });
 
     await command.action(logger, { options: { debug: true, type: 'Public' } });
-    assert(loggerLogSpy.calledWith(['/master','*/cdn']));
+    assert(loggerLogSpy.calledWith(['/master', '*/cdn']));
   });
 
   it('retrieves the settings of the private CDN when type set to Private', async () => {
@@ -211,17 +211,6 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 
   it('supports specifying CDN type', () => {

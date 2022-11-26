@@ -22,7 +22,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -187,21 +187,10 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
   it('correctly handles error when site script not found', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('File Not Found.' );
+      return Promise.reject('File Not Found.');
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } } as any), new CommandError('File Not Found.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying id', () => {

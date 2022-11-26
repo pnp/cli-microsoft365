@@ -214,17 +214,6 @@ describe(commands.O365GROUP_REMOVE, () => {
       new CommandError('File Not Found.'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports specifying id', () => {
     const options = command.options;
     let containsOption = false;

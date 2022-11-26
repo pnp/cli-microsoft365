@@ -20,7 +20,7 @@ describe(commands.O365GROUP_USER_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -319,7 +319,7 @@ describe(commands.O365GROUP_USER_SET, () => {
         promoteMemberIssued = true;
         return Promise.resolve();
       }
-    
+
       return Promise.reject('Invalid request');
     });
 
@@ -383,21 +383,10 @@ describe(commands.O365GROUP_USER_SET, () => {
         return Promise.resolve();
       }
 
-      return Promise.reject('Invalid request');      
+      return Promise.reject('Invalid request');
     });
 
     await command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } } as any);
     assert(demoteOwnerIssued);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

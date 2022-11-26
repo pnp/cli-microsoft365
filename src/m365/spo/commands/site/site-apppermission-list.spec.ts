@@ -639,20 +639,12 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         return Promise.reject('Invalid request');
       });
 
-    await assert.rejects(command.action(logger, { options: {
-      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-      output: 'json',
-      appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c' } } as any), new CommandError('Item not found'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+        output: 'json',
+        appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c'
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('Item not found'));
   });
 });

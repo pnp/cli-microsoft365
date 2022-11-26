@@ -20,7 +20,7 @@ describe(commands.APP_INSTALL, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -252,7 +252,7 @@ describe(commands.APP_INSTALL, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.reject({ error: JSON.stringify({message: 'An error has occurred'}) });
+          return Promise.reject({ error: JSON.stringify({ message: 'An error has occurred' }) });
         }
       }
 
@@ -321,16 +321,5 @@ describe(commands.APP_INSTALL, () => {
   it('passes validation when valid id and site url', async () => {
     const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 });

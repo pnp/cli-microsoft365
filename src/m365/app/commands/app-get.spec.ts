@@ -181,15 +181,4 @@ describe(commands.GET, () => {
     const call: sinon.SinonSpyCall = loggerLogToStderrSpy.firstCall;
     assert(call.args[0].includes('Executing command aad app get with options'));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

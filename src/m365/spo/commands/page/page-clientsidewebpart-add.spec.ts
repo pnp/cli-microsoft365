@@ -2735,17 +2735,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     }));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports verbose mode', () => {
     const options = command.options;
     let containsOption = false;

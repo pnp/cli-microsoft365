@@ -20,7 +20,7 @@ describe(commands.LIST_VIEW_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -152,17 +152,6 @@ describe(commands.LIST_VIEW_GET, () => {
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listId: 'dac05e4a-5f6c-41dd-bba3-2be1104c711e', id: 'ba84217c-8561-4234-aa95-265081e74be9' } });
     assert.strictEqual(loggerLogSpy.lastCall.args[0].Title, 'All Items');
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {

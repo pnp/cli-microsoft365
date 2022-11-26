@@ -197,15 +197,4 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
     await assert.rejects(command.action(logger, { options: { debug: false } }),
       new CommandError('An error has occurred'));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
-  });
 });

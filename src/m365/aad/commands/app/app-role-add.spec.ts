@@ -352,26 +352,32 @@ describe(commands.APP_ROLE_ADD, () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
-      name: 'Role',
-      description: 'Custom role',
-      allowedMembers: 'usersGroups',
-      claim: 'Custom.Role' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        name: 'Role',
+        description: 'Custom role',
+        allowedMembers: 'usersGroups',
+        claim: 'Custom.Role'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error when retrieving information about app through appName failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      appName: 'My app',
-      name: 'Role',
-      description: 'Custom role',
-      allowedMembers: 'usersGroups',
-      claim: 'Custom.Role' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        appName: 'My app',
+        name: 'Role',
+        description: 'Custom role',
+        allowedMembers: 'usersGroups',
+        claim: 'Custom.Role'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error when retrieving app roles failed', async () => {
@@ -384,13 +390,16 @@ describe(commands.APP_ROLE_ADD, () => {
     });
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('PATCH request executed'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-      name: 'Role',
-      description: 'Custom role',
-      allowedMembers: 'usersGroups',
-      claim: 'Custom.Role' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+        name: 'Role',
+        description: 'Custom role',
+        allowedMembers: 'usersGroups',
+        claim: 'Custom.Role'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error when updating app roles failed', async () => {
@@ -417,13 +426,16 @@ describe(commands.APP_ROLE_ADD, () => {
     });
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-      name: 'Role',
-      description: 'Custom role',
-      allowedMembers: 'usersGroups',
-      claim: 'Custom.Role' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+        name: 'Role',
+        description: 'Custom role',
+        allowedMembers: 'usersGroups',
+        claim: 'Custom.Role'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if appId and appObjectId specified', async () => {
@@ -479,17 +491,6 @@ describe(commands.APP_ROLE_ADD, () => {
   it('passes validation if required options specified (appName)', async () => {
     const actual = await command.validate({ options: { appName: 'My app', name: 'Role', description: 'Custom role', allowedMembers: 'usersGroups', claim: 'Custom.Role' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('returns an empty array for an invalid member type', () => {

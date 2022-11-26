@@ -2551,17 +2551,6 @@ describe(commands.O365GROUP_LIST, () => {
     await assert.rejects(command.action(logger, { options: { debug: false, includeSiteUrl: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('fails validation if both deleted and includeSiteUrl options set', async () => {
     const actual = await command.validate({ options: { deleted: true, includeSiteUrl: true } }, commandInfo);
     assert.notStrictEqual(actual, true);

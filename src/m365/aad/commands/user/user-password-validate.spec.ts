@@ -215,18 +215,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, password: 'cli365P@ssW0rd079654' } } as any), 
+    await assert.rejects(command.action(logger, { options: { debug: false, password: 'cli365P@ssW0rd079654' } } as any),
       new CommandError(`An error has occurred`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

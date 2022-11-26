@@ -538,17 +538,6 @@ describe(commands.FIELD_ADD, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'site.com', xml: '<Field />' } }, commandInfo);
     assert.notStrictEqual(actual, true);

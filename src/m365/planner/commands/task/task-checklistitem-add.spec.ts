@@ -198,15 +198,4 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
       }
     }), new CommandError('This command does not support application permissions.'));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

@@ -447,15 +447,4 @@ describe(commands.MEETING_LIST, () => {
     await assert.rejects(command.action(logger, { options: { verbose: true, startDateTime: '2022-04-04', userName: userName } } as any),
       new CommandError(`The options 'userId', 'userName' and 'email' cannot be used when retrieving meetings using delegated permissions`));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

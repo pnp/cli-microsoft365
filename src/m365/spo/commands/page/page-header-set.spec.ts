@@ -142,7 +142,7 @@ describe(commands.PAGE_HEADER_SET, () => {
           Title: 'Page'
         });
       }
-      
+
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$expand=ListItemAllFields`) > -1) {
         return Promise.resolve({ CanvasContent1: mockCanvasContent });
       }
@@ -483,17 +483,6 @@ describe(commands.PAGE_HEADER_SET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('fails validation if webUrl is not an absolute URL', async () => {

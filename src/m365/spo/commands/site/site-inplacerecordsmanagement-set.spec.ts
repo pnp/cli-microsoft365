@@ -158,17 +158,6 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
     assert.strictEqual(requestStub.lastCall.args[0].data.force, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports specifying siteUrl', () => {
     const options = command.options;
     let containsOption = false;

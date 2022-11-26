@@ -20,7 +20,7 @@ describe(commands.MESSAGE_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -92,18 +92,6 @@ describe(commands.MESSAGE_GET, () => {
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('validates for a correct input', async () => {
@@ -256,10 +244,13 @@ describe(commands.MESSAGE_GET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
-      channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
-      id: "1540911392778" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
+        channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
+        id: "1540911392778"
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 });

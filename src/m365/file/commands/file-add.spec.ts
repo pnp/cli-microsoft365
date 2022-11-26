@@ -959,11 +959,13 @@ describe(commands.ADD, () => {
 
   it(`fails validation if the specified siteUrl is invalid`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = await command.validate({ options: {
-      filePath: 'file.pdf',
-      folderUrl: 'https://contoso.sharepoint.com/Shared Documents',
-      siteUrl: '/'
-    } }, commandInfo);
+    const actual = await command.validate({
+      options: {
+        filePath: 'file.pdf',
+        folderUrl: 'https://contoso.sharepoint.com/Shared Documents',
+        siteUrl: '/'
+      }
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -971,16 +973,5 @@ describe(commands.ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = await command.validate({ options: { filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

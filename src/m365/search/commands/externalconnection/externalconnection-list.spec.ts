@@ -108,15 +108,4 @@ describe(commands.EXTERNALCONNECTION_LIST, () => {
     await command.action(logger, { options: { debug: true } } as any);
     assert(loggerLogSpy.calledWith(externalConnections.value));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

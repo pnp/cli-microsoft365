@@ -486,7 +486,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
 
-    await assert.rejects(command.action(logger, { options: { } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError(errorMessage));
   });
 
   it('passes validation if the owner is a valid GUID', async () => {
@@ -520,16 +520,5 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   it('passes validation if the pageSize is a positive number', async () => {
     const actual = await command.validate({ options: { pageSize: '2' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

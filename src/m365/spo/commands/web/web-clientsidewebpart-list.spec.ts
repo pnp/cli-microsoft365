@@ -21,7 +21,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -66,17 +66,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('should fail validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({
       options:
@@ -104,10 +93,13 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       return Promise.resolve('abc');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      output: 'json',
-      debug: false,
-      webUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError('Error'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        output: 'json',
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    } as any), new CommandError('Error'));
   });
 
   it('handles no client side webparts', async () => {

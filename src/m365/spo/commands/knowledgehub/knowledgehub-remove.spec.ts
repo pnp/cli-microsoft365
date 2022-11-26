@@ -193,17 +193,6 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
     await assert.rejects(command.action(logger, { options: { debug: false, confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
-  });
-
   it('supports suppressing confirmation prompt', () => {
     const options = command.options;
     let containsConfirmOption = false;

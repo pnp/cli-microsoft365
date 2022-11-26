@@ -21,7 +21,7 @@ describe(commands.PAGE_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -82,7 +82,7 @@ describe(commands.PAGE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json'}} as any);
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json' } } as any);
     assert.strictEqual(loggerLogSpy.lastCall.args[0].numControls, sectionMock.numControls);
     assert.strictEqual(loggerLogSpy.lastCall.args[0].numSections, sectionMock.numSections);
   });
@@ -100,7 +100,7 @@ describe(commands.PAGE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx'}} as any);
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any);
     assert(loggerLogSpy.calledWith({
       ...pageListItemMock,
       canvasContentJson: controlsMock.CanvasContent1,
@@ -121,7 +121,7 @@ describe(commands.PAGE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', output: 'json' }} as any);
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', output: 'json' } } as any);
     assert(loggerLogSpy.calledWith({
       ...pageListItemMock,
       canvasContentJson: controlsMock.CanvasContent1,
@@ -142,7 +142,7 @@ describe(commands.PAGE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', output: 'json' }} as any);
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', output: 'json' } } as any);
     assert(loggerLogSpy.calledWith({
       ...pageListItemMock,
       canvasContentJson: controlsMock.CanvasContent1,
@@ -178,15 +178,17 @@ describe(commands.PAGE_GET, () => {
 
   it('correctly handles page not found', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({ error: {
-        "odata.error": {
-          "code": "-2130575338, Microsoft.SharePoint.SPException",
-          "message": {
-            "lang": "en-US",
-            "value": "The file /sites/team-a/SitePages/home1.aspx does not exist."
+      return Promise.reject({
+        error: {
+          "odata.error": {
+            "code": "-2130575338, Microsoft.SharePoint.SPException",
+            "message": {
+              "lang": "en-US",
+              "value": "The file /sites/team-a/SitePages/home1.aspx does not exist."
+            }
           }
         }
-      } });
+      });
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any),
@@ -200,17 +202,6 @@ describe(commands.PAGE_GET, () => {
 
     await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying metadataOnly flag', () => {

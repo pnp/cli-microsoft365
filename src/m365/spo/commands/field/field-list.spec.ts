@@ -114,17 +114,6 @@ describe(commands.FIELD_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('correctly handles list not found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists/getByTitle('Documents')/fields`) > -1) {

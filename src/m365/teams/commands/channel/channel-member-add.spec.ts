@@ -365,17 +365,6 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('adds conversation members using teamName, channelId, and userId', async () => {
     await command.action(logger, {
       options: {

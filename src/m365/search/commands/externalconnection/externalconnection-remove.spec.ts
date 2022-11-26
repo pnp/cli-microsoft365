@@ -227,15 +227,4 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       }
     } as any), new CommandError("Multiple external connections with name My HR found. Please disambiguate (IDs): fabrikamhr, contosohr"));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

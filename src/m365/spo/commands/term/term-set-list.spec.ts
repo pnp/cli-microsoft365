@@ -22,7 +22,7 @@ describe(commands.TERM_SET_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -505,7 +505,7 @@ describe(commands.TERM_SET_LIST, () => {
   });
 
   it('fails validation when neither id nor name specified', async () => {
-    const actual = await command.validate({ options: { } }, commandInfo);
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -527,17 +527,6 @@ describe(commands.TERM_SET_LIST, () => {
   it('passes validation when name specified', async () => {
     const actual = await command.validate({ options: { termGroupName: 'PnPTermSets' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('handles promise rejection', async () => {

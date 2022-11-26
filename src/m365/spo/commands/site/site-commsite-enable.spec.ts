@@ -147,17 +147,6 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
     await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('requires site URL', () => {
     const options = command.options;
     assert(options.find(o => o.option.indexOf('<url>') > -1));

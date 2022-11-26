@@ -20,7 +20,7 @@ describe(commands.SITEDESIGN_RUN_STATUS_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -115,21 +115,13 @@ describe(commands.SITEDESIGN_RUN_STATUS_GET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'Value does not fall within the expected range' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      webUrl: 'https://contoso.sharepoint.com/sites/team-a', 
-      runId: 'b4411557-308b-4545-a3c4-55297d5cd8c8' } } as any), new CommandError('Value does not fall within the expected range'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com/sites/team-a',
+        runId: 'b4411557-308b-4545-a3c4-55297d5cd8c8'
       }
-    });
-    assert(containsDebugOption);
+    } as any), new CommandError('Value does not fall within the expected range'));
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {

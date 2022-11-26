@@ -370,17 +370,23 @@ describe(commands.APP_ROLE_LIST, () => {
   it('handles error when retrieving information about app through appId failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error when retrieving information about app through appName failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
-    
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      appName: 'My app' } } as any), new CommandError('An error has occurred'));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        appName: 'My app'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if appId and appObjectId specified', async () => {
@@ -416,16 +422,5 @@ describe(commands.APP_ROLE_LIST, () => {
   it('passes validation if appName specified', async () => {
     const actual = await command.validate({ options: { appName: 'My app' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

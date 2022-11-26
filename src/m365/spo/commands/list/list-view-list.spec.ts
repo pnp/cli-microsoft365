@@ -166,15 +166,4 @@ describe(commands.LIST_VIEW_LIST, () => {
       }
     }), new CommandError(errorMessage));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
 });

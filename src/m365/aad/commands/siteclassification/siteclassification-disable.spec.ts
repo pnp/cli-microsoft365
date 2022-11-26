@@ -18,7 +18,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -68,17 +68,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('prompts before disabling siteclassification when confirm option not passed', async () => {
     await command.action(logger, { options: { debug: false } });
     let promptIssued = false;
@@ -102,7 +91,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any), 
+    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any),
       new CommandError('Site classification is not enabled.'));
   });
 

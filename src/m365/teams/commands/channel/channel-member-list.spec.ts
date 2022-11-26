@@ -241,9 +241,12 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
       return Promise.reject('The specified team does not exist in the Microsoft Teams');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      teamName: 'Team Name' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        teamName: 'Team Name'
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('correctly get teams id by team name', async () => {
@@ -379,10 +382,13 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
       return Promise.reject('The specified channel does not exist in the Microsoft Teams team');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelName: "Channel name" } } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelName: "Channel name"
+      }
+    } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
   it('correctly handles error when retrieving all teams', async () => {
@@ -390,9 +396,12 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: '00000000-0000-0000-0000-000000000000' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        teamId: '00000000-0000-0000-0000-000000000000'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('outputs all data in json output mode', async () => {
@@ -682,16 +691,5 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
         }
       ]
     ));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

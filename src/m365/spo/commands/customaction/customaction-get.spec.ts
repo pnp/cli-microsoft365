@@ -541,17 +541,6 @@ describe(commands.CUSTOMACTION_GET, () => {
     }), new CommandError(err));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsVerboseOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsVerboseOption = true;
-      }
-    });
-    assert(containsVerboseOption);
-  });
-
   it('supports specifying scope', () => {
     const options = command.options;
     let containsScopeOption = false;

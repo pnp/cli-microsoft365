@@ -22,7 +22,7 @@ describe(commands.TERM_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -167,11 +167,14 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      name: 'IT', 
-      termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', 
-      termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'IT',
+        termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef',
+        termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles term not found by id', async () => {
@@ -201,11 +204,14 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      name: 'IT', 
-      termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', 
-      termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'IT',
+        termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef',
+        termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles term set not found', async () => {
@@ -220,11 +226,14 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      name: 'IT', 
-      termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', 
-      termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'IT',
+        termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef',
+        termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('escapes XML in term name', async () => {
@@ -333,17 +342,6 @@ describe(commands.TERM_GET, () => {
   it('passes validation when name, termGroupId and termSetId specified', async () => {
     const actual = await command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: '9e54299e-208a-4000-8546-cc4139091b2a' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('handles promise rejection', async () => {

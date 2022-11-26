@@ -655,22 +655,14 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', 
-      webTemplate: 'TeamSite', 
-      siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
+        webTemplate: 'TeamSite',
+        siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24'
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying id', () => {

@@ -275,15 +275,4 @@ describe(commands.MESSAGE_GET, () => {
     await assert.rejects(command.action(logger, { options: { debug: false, id: messageId, userId: userId, userPrincipalName: userPrincipalName } } as any),
       new CommandError(`Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using delegated credentials`));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

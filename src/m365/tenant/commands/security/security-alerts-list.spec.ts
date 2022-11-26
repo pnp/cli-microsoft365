@@ -179,7 +179,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
     "uriClickSecurityStates": [],
     "vulnerabilityStates": []
   };
-  
+
   const alertIPC = {
     "id": "33aed7062fce896e48e2f63fe3971153b0bb959a3ac25fd3b282c469b2cb54a7",
     "azureTenantId": "b8e1599d-b418-4be9-8f39-df03c3abe27a",
@@ -701,18 +701,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
-    
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 });

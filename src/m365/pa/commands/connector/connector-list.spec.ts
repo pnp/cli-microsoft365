@@ -229,17 +229,6 @@ describe(commands.CONNECTOR_LIST, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports specifying environment name', () => {
     const options = command.options;
     let containsOption = false;

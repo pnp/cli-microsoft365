@@ -19,7 +19,7 @@ describe(commands.THEME_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -167,20 +167,12 @@ describe(commands.THEME_REMOVE, () => {
       { continue: true }
     ));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Contoso',
-      confirm: true } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Contoso',
+        confirm: true
       }
-    });
-    assert(containsDebugOption);
+    } as any), new CommandError('An error has occurred'));
   });
 });

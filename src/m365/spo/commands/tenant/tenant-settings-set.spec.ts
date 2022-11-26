@@ -98,17 +98,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('handles client.svc promise error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -140,7 +129,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     });
 
     assert.strictEqual(request.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="ExcludedFileExtensionsForSyncClient"><Parameter Type="Array"><Object Type="String">xml</Object><Object Type="String">xslt</Object><Object Type="String">xsd</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
-   
+
   });
 
   it('sends xml as array of guids for option allowedDomainListForSyncClient', async () => {
@@ -153,7 +142,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     });
 
     assert.strictEqual(request.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="AllowedDomainListForSyncClient"><Parameter Type="Array"><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b79}</Object><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b77}</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
-    
+
   });
 
   it('sends xml as array of guids for option disabledWebPartIds', async () => {

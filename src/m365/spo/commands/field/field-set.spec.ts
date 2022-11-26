@@ -671,17 +671,6 @@ describe(commands.FIELD_SET, () => {
     assert.strictEqual(allowUnknownOptions, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'invalid', listId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', title: 'MyColumn' } }, commandInfo);
     assert.notStrictEqual(actual, true);

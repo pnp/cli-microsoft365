@@ -153,7 +153,7 @@ describe(commands.HOMESITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    
+
     await command.action(logger, { options: { confirm: true } });
     assert(homeSiteRemoveCallIssued);
   });
@@ -187,16 +187,5 @@ describe(commands.HOMESITE_REMOVE, () => {
         confirm: true
       }
     } as any), new CommandError(`An error has occurred`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

@@ -131,12 +131,15 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', 
-      allowOwnerDeleteMessages: 'true', 
-      allowTeamMentions: 'true', 
-      allowChannelMentions: 'true' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
+        allowOwnerDeleteMessages: 'true',
+        allowTeamMentions: 'true',
+        allowChannelMentions: 'true'
+      }
+    } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });
 
   it('fails validation if the teamId is not a valid GUID', async () => {
@@ -177,16 +180,5 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

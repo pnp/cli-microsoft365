@@ -91,17 +91,6 @@ describe(commands.GROUP_USER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('calls the service if the current user is added to the group', async () => {
     const requestPostedStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/group_memberships.json') {

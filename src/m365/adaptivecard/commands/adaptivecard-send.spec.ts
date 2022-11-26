@@ -842,15 +842,4 @@ describe(commands.SEND, () => {
   it('supports specifying unknown options', () => {
     assert.strictEqual(command.allowUnknownOptions(), true);
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

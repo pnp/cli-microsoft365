@@ -640,7 +640,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any), 
+    await assert.rejects(command.action(logger, { options: { debug: false, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -665,17 +665,6 @@ describe(commands.CONNECTOR_EXPORT, () => {
     sinon.stub(fs, 'existsSync').callsFake((folder) => folder.toString().indexOf('connector') < 0);
     const actual = await command.validate({ options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa', outputFolder: '123' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying environment name', () => {

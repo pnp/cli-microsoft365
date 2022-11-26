@@ -69,17 +69,6 @@ describe(commands.CHAT_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'topic', 'chatType']);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('fails validation for an incorrect chatType.', async () => {
     const actual = await command.validate({
       options: {

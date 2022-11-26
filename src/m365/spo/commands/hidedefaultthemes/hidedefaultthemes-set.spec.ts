@@ -150,17 +150,6 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     } as any), new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('fails validation if hideDefaultThemes is not set', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);

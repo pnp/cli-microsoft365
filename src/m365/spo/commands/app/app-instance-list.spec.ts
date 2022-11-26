@@ -168,15 +168,4 @@ describe(commands.APP_INSTANCE_LIST, () => {
       }
     } as any), new CommandError('An error has occurred'));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
-  });
 });

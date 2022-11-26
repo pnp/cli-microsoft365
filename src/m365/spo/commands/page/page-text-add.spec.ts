@@ -22,7 +22,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon
       .stub(spo, 'getRequestDigest')
       .callsFake(() => Promise.resolve({
@@ -152,7 +152,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -240,7 +240,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
           debug: true,
@@ -328,7 +328,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
           debug: true,
@@ -419,7 +419,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -510,7 +510,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -602,7 +602,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -623,7 +623,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -705,7 +705,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -775,7 +775,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -853,7 +853,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -932,7 +932,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -1012,7 +1012,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -1023,17 +1023,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
           column: 1
         }
       }), new CommandError("Unexpected end of JSON input"));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports verbose mode', () => {

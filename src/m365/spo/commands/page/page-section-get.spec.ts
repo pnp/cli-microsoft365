@@ -393,17 +393,6 @@ describe(commands.PAGE_SECTION_GET, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', pageName: 'home.aspx', section: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);

@@ -150,15 +150,4 @@ describe(commands.USER_GET, () => {
     const actual = await command.validate({ options: { id: 1496550646, email: "pl@nubo.eu" } }, commandInfo);
     assert.strictEqual(actual, "You are only allowed to search by ID or e-mail but not both");
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

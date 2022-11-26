@@ -3469,17 +3469,6 @@ describe(commands.APP_LIST, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('fails validation if asAdmin specified without environment', async () => {
     const actual = await command.validate({ options: { asAdmin: true } }, commandInfo);
     assert.notStrictEqual(actual, true);

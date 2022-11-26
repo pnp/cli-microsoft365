@@ -420,17 +420,4 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       }
     }), new CommandError(`The selected permission level is not valid.`));
   });
-
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
 });

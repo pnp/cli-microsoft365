@@ -207,17 +207,6 @@ describe(commands.CDN_POLICY_SET, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
-  });
-
   it('requires CDN policy name', () => {
     const options = command.options;
     let requiresCdnPolicyName = false;

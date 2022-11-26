@@ -1789,15 +1789,4 @@ describe(commands.CONVERT_PDF, () => {
     const actual = await command.validate({ options: { sourceFile: 'file.docx', targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

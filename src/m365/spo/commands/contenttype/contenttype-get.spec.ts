@@ -257,17 +257,6 @@ describe(commands.CONTENTTYPE_GET, () => {
     });
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'site.com', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } }, commandInfo);
     assert.notStrictEqual(actual, false);

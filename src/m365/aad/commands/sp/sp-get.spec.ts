@@ -150,7 +150,7 @@ describe(commands.SP_GET, () => {
       new CommandError('An error has occurred'));
   });
 
-  
+
   it('fails when Azure AD app with same name exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
@@ -252,17 +252,6 @@ describe(commands.SP_GET, () => {
   it('fails validation if appObjectId and appDisplayName are specified', async () => {
     const actual = await command.validate({ options: { appDisplayName: 'abc', appObjectId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying appId', () => {

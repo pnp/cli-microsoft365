@@ -975,7 +975,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    
+
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
         return Promise.resolve();
@@ -988,7 +988,7 @@ describe(commands.SITE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    
+
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true } });
   });
 
@@ -1073,7 +1073,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    
+
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
         return Promise.resolve();
@@ -1134,17 +1134,18 @@ describe(commands.SITE_REMOVE, () => {
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        return Promise.reject({ 
-          response: { 
+        return Promise.reject({
+          response: {
             status: 404,
             data: {
-              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } } }
+              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } }
+            }
           }
         });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$select=id&$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
-        return Promise.resolve({ 
+        return Promise.resolve({
           value: []
         });
       }
@@ -1191,11 +1192,12 @@ describe(commands.SITE_REMOVE, () => {
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        return Promise.reject({ 
-          response: { 
+        return Promise.reject({
+          response: {
             status: 400,
             data: {
-              error: { 'odata.error': { message: { value: "Invalid object identifier '0z013f997-c1aa-424d-a530-c4e3a05de704'." } } } }
+              error: { 'odata.error': { message: { value: "Invalid object identifier '0z013f997-c1aa-424d-a530-c4e3a05de704'." } } }
+            }
           }
         });
       }
@@ -1237,17 +1239,18 @@ describe(commands.SITE_REMOVE, () => {
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        return Promise.reject({ 
-          response: { 
+        return Promise.reject({
+          response: {
             status: 404,
             data: {
-              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } } }
+              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } }
+            }
           }
         });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$select=id&$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
-        return Promise.resolve({ 
+        return Promise.resolve({
           value: [{
             "id": "58587cc9-560c-4adb-a849-e669bd37c5f8"
           }]
@@ -1296,21 +1299,23 @@ describe(commands.SITE_REMOVE, () => {
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
-        return Promise.reject({ 
-          response: { 
+        return Promise.reject({
+          response: {
             status: 404,
             data: {
-              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } } }
+              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } }
+            }
           }
         });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
-        return Promise.reject({ 
-          response: { 
+        return Promise.reject({
+          response: {
             status: 400,
             data: {
-              error: { 'odata.error': { message: { value: "Invalid object identifier '0z013f997-c1aa-424d-a530-c4e3a05de704'." } } } }
+              error: { 'odata.error': { message: { value: "Invalid object identifier '0z013f997-c1aa-424d-a530-c4e3a05de704'." } } }
+            }
           }
         });
       }
@@ -1464,16 +1469,5 @@ describe(commands.SITE_REMOVE, () => {
     });
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeinvalid', confirm: true, debug: true } }),
       new CommandError('Cannot get site https://contoso.sharepoint.com/sites/demositeinvalid.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 });

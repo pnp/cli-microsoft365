@@ -623,7 +623,7 @@ describe(commands.SITE_ENSURE, () => {
 
       return Promise.reject(new CommandError('Unknown case'));
     });
-    
+
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1', isPublic: true, shareByEmailEnabled: true } } as any);
   });
 
@@ -854,17 +854,6 @@ describe(commands.SITE_ENSURE, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1' } } as any));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('fails validation if the specified url is a single word', async () => {

@@ -436,10 +436,13 @@ describe(commands.TEAM_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      verbose: true,
-      name: 'Architecture',
-      description: 'Architecture Discussion' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true,
+        name: 'Architecture',
+        description: 'Architecture Discussion'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly handles operation error when creating a Team when waiting for command to complete', async () => {
@@ -500,12 +503,15 @@ describe(commands.TEAM_ADD, () => {
       fn();
       return {} as any;
     });
-    await assert.rejects(command.action(logger, { options: {
-      wait: true,
-      name: 'Sample Classroom Team',
-      description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-      template } } as any), new CommandError('An error has occurred'));
-    
+    await assert.rejects(command.action(logger, {
+      options: {
+        wait: true,
+        name: 'Sample Classroom Team',
+        description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
+        template
+      }
+    } as any), new CommandError('An error has occurred'));
+
     assert.deepEqual(requestStub.getCall(0).args[0].data, {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       displayName: 'Sample Classroom Team',
@@ -585,16 +591,5 @@ describe(commands.TEAM_ADD, () => {
       description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
     });
     assert(loggerLogSpy.called);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

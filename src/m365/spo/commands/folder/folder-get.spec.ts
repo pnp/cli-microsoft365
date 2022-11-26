@@ -563,14 +563,4 @@ describe(commands.FOLDER_GET, () => {
       }
     } as any), new CommandError(error));
   });
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
 });

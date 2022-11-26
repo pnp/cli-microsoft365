@@ -161,7 +161,7 @@ describe(commands.RUN_CANCEL, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async() => (
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
     await command.action(logger, {
@@ -318,17 +318,6 @@ describe(commands.RUN_CANCEL, () => {
         confirm: true
       }
     } as any), new CommandError(`Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying name', () => {

@@ -20,7 +20,7 @@ describe(commands.APP_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -120,7 +120,7 @@ describe(commands.APP_REMOVE, () => {
         return Promise.resolve();
       }
 
-      return Promise.reject('Invalid request');      
+      return Promise.reject('Invalid request');
     });
 
     sinon.stub(Cli, 'prompt').callsFake(async () => (
@@ -145,20 +145,12 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      filePath: 'teamsapp.zip', 
-      id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        filePath: 'teamsapp.zip',
+        id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 });

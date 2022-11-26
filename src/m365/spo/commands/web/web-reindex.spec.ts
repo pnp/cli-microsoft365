@@ -23,7 +23,7 @@ describe(commands.WEB_REINDEX, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -231,7 +231,7 @@ describe(commands.WEB_REINDEX, () => {
           ]
         });
       }
-      
+
       if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
         return Promise.resolve({});
       }
@@ -320,7 +320,7 @@ describe(commands.WEB_REINDEX, () => {
           ]
         });
       }
-      
+
       if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
         return Promise.resolve({});
       }
@@ -413,17 +413,6 @@ describe(commands.WEB_REINDEX, () => {
     sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake(() => Promise.reject('ClientSvc unknown error'));
 
     await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('ClientSvc unknown error'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('fails validation if url is not a valid SharePoint URL', async () => {

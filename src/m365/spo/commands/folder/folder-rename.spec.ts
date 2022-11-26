@@ -276,17 +276,6 @@ describe(commands.FOLDER_RENAME, () => {
       new CommandError('ClientSvc unknown error'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsVerboseOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsVerboseOption = true;
-      }
-    });
-    assert(containsVerboseOption);
-  });
-
   it('fails validation if the webUrl option is not valid', async () => {
     const actual = await command.validate({ options: { webUrl: 'abc', url: '/Shared Documents/test', name: 'abc' } }, commandInfo);
     assert.strictEqual(actual, "abc is not a valid SharePoint Online site URL");

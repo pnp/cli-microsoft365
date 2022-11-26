@@ -171,17 +171,6 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
     await assert.rejects(command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('supports specifying site url', () => {
     const options = command.options;
     for (let i = 0; i < options.length; i++) {

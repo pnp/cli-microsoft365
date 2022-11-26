@@ -414,17 +414,6 @@ describe(commands.CONTENTTYPE_ADD, () => {
       new CommandError("List 'My list' does not exist at site with URL 'https://contoso.sharepoint.com/sites/sales'."));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'site.com', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } }, commandInfo);
     assert.notStrictEqual(actual, true);

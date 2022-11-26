@@ -467,17 +467,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     await assert.rejects(command.action(logger, { options: { confirm: true } }), new CommandError(errorMessage));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports specifying confirmation flag', () => {
     const options = command.options;
     let containsOption = false;

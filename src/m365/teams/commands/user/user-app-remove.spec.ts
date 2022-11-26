@@ -164,20 +164,12 @@ describe(commands.USER_APP_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-      id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
-      confirm: true } } as any), new CommandError(error));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        id: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
+        confirm: true
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError(error));
   });
 });

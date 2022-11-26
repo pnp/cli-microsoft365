@@ -169,15 +169,4 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     await assert.rejects(command.action(logger, { options: { debug: false, profile: profilePath } } as any), new CommandError(error));
     assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

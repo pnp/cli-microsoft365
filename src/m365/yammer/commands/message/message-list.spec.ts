@@ -152,17 +152,6 @@ describe(commands.MESSAGE_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('returns messages without more results', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages.json') {
@@ -318,7 +307,7 @@ describe(commands.MESSAGE_LIST, () => {
         });
       }
     });
-    
+
     await assert.rejects(command.action(logger, { options: { output: 'json' } } as any), new CommandError('An error has occurred.'));
   });
 

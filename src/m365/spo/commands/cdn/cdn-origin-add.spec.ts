@@ -176,7 +176,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
-    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any), 
+    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -221,17 +221,6 @@ describe(commands.CDN_ORIGIN_ADD, () => {
     });
 
     assert(isDone);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 
   it('requires CDN origin name', () => {
