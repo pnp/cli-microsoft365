@@ -26,7 +26,6 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
 
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -49,7 +48,6 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -69,18 +67,14 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SOLUTION_PUBLISHER_ADD), true);
+    assert.strictEqual(command.name, commands.SOLUTION_PUBLISHER_ADD);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['publisherid', 'uniquename', 'friendlyname']);
-  });
-
-  it('fails validation if choiceValuePrefix contains invalid format.', async () => {
+  it('fails validation if choiceValuePrefix is not a number', async () => {
     const actual = await command.validate({
       options: {
         environment: validEnvironment,
@@ -88,6 +82,32 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
         displayName: validDisplayName,
         prefix: validPrefix,
         choiceValuePrefix: 'Not A Number'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if choiceValuePrefix is not between 10000 and 99999', async () => {
+    const actual = await command.validate({
+      options: {
+        environment: validEnvironment,
+        name: validName,
+        displayName: validDisplayName,
+        prefix: validPrefix,
+        choiceValuePrefix: 100000
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if name is not a valid value', async () => {
+    const actual = await command.validate({
+      options: {
+        environment: validEnvironment,
+        name: '9_PublisherName',
+        displayName: validDisplayName,
+        prefix: validPrefix,
+        choiceValuePrefix: validChoiceValuePrefix
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -112,7 +132,6 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
     });
 
     await command.action(logger, { options: { verbose: true, environment: validEnvironment, name: validName, displayName: validDisplayName, prefix: validPrefix, choiceValuePrefix: validChoiceValuePrefix } });
-    assert(loggerLogToStderrSpy.called);
   });
 
   it('correctly handles API OData error', async () => {

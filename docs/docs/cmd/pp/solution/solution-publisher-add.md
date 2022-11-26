@@ -1,6 +1,6 @@
 # pp solution publisher add
 
-Adds a specified publisher in a given environment.
+Adds a specified publisher in a given environment
 
 ## Usage
 
@@ -13,17 +13,17 @@ m365 pp solution publisher add [options]
 `-e, --environment <environment>`
 : The name of the environment.
 
-`-n, --name [name]`
+`-n, --name <name>`
 : The unique name of the publisher.
 
 `--displayName <displayName>`
-: The friendly name of the publisher
+: The friendly name of the publisher.
 
 `--prefix <prefix>`
-: The prefix of the publisher
+: The prefix of the publisher.
 
 `--choiceValuePrefix <choiceValuePrefix>`
-: The choice value prefix of the publisher
+: The choice value prefix of the publisher.
 
 `--asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
