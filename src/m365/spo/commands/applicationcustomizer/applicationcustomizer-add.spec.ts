@@ -25,7 +25,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   const solutionId = 'ac555cb1-e5ac-409e-86dc-61e6651b1e66';
   const solution = { "FileSystemObjectType": 0, "Id": 40, "ServerRedirectedEmbedUri": null, "ServerRedirectedEmbedUrl": "", "ClientComponentId": clientSideComponentId, "SolutionId": solutionId, "Created": "2022-11-03T11:25:17", "Modified": "2022-11-03T11:26:03" };
   const solutionResponse = [solution];
-  const application = { "FileSystemObjectType": 0, "Id": 31, "ServerRedirectedEmbedUri": null, "ServerRedirectedEmbedUrl": "", "SkipFeatureDeployment": true, "Modified": "2022-11-03T11:26:03", "CheckoutUserId": null, "EditorId": 9 };
+  const application = { "FileSystemObjectType": 0, "Id": 31, "ServerRedirectedEmbedUri": null, "ServerRedirectedEmbedUrl": "", "SkipFeatureDeployment": true, "ContainsTenantWideExtension": true, "Modified": "2022-11-03T11:26:03", "CheckoutUserId": null, "EditorId": 9 };
   const applicationResponse = [application];
 
   let log: string[];
@@ -151,23 +151,6 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
       new CommandError('No component found with the specified clientSideComponentId found in the component manifest list. Make sure that the application is added to the application catalog'));
   });
 
-  it('throws an error when specific client side component is found multiple times in manifest list', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
-      if (command === spoListItemListCommand) {
-        if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
-          return { 'stdout': JSON.stringify([solution, solution]) };
-        }
-      }
-      if (command === spoTenantAppCatalogUrlGetCommand) {
-        return { 'stdout': appCatalogUrl };
-      }
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, { options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, verbose: true } }),
-      new CommandError('Multiple components found with the specified clientSideComponentId. Make sure that this is unique'));
-  });
-
   it('throws an error when solution is not found in app catalog', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
@@ -188,14 +171,16 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
       new CommandError(`No component found with the solution id ${solutionId}. Make sure that the solution is available in the app catalog`));
   });
 
-  it('throws an error when solution is found multiple times in app catalog', async () => {
+  it('throws an error when solution does not contain extension that can be deployed tenant-wide', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
           return { 'stdout': JSON.stringify(solutionResponse) };
         }
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/AppCatalog`) {
-          return { 'stdout': JSON.stringify([application, application]) };
+          const faultyApplication = { ...application };
+          faultyApplication.ContainsTenantWideExtension = false;
+          return { 'stdout': JSON.stringify([faultyApplication]) };
         }
       }
       if (command === spoTenantAppCatalogUrlGetCommand) {
@@ -205,17 +190,19 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, verbose: true } }),
-      new CommandError(`Multiple components found with the solution id ${solutionId}. Make sure that this is unique`));
+      new CommandError(`The solution does not contain an extension that can be deployed to all sites. Make sure that you've entered the correct component Id.`));
   });
 
-  it('throws an error when solution is not deployed globally', async () => {
+  it('throws an error when solution is not dpeloyed globally', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command, args): Promise<any> => {
       if (command === spoListItemListCommand) {
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`) {
           return { 'stdout': JSON.stringify(solutionResponse) };
         }
         if (args.options.listUrl === `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/AppCatalog`) {
-          return { 'stdout': JSON.stringify([{ "FileSystemObjectType": 0, "Id": 31, "ServerRedirectedEmbedUri": null, "ServerRedirectedEmbedUrl": "", "SkipFeatureDeployment": false, "Modified": "2022-11-03T11:26:03", "CheckoutUserId": null, "EditorId": 9 }]) };
+          const faultyApplication = { ...application };
+          faultyApplication.SkipFeatureDeployment = false;
+          return { 'stdout': JSON.stringify([faultyApplication]) };
         }
       }
       if (command === spoTenantAppCatalogUrlGetCommand) {
@@ -225,7 +212,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { title: customizerTitle, clientSideComponentId: clientSideComponentId, verbose: true } }),
-      new CommandError('The solution has not been deployed to all sites. Make sure to deploy this solution to all sites'));
+      new CommandError(`The solution has not been deployed to all sites. Make sure to deploy this solution to all sites.`));
   });
 
   it('fails validation if clientSideComponentId is not a valid Guid', async () => {
