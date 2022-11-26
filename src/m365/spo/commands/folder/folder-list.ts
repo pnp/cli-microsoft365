@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -84,17 +83,11 @@ class SpoFolderListCommand extends SpoCommand {
 
   private async getFolderList(webUrl: string, parentFolderUrl: string, recursive?: boolean, folders: FolderProperties[] = []): Promise<FolderProperties[]> {
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, parentFolderUrl);
-    const requestOptions: AxiosRequestConfig = {
-      url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/folders`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
 
-    const resp = await request.get<{ value: FolderProperties[] }>(requestOptions);
-    if (resp.value.length > 0) {
-      for (const folder of resp.value) {
+
+    const resp = await odata.getAllItems<FolderProperties>(`${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/folders`);
+    if (resp.length > 0) {
+      for (const folder of resp) {
         folders.push(folder);
         if (recursive) {
           await this.getFolderList(webUrl, folder.ServerRelativeUrl, recursive, folders);

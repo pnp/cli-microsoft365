@@ -107,7 +107,7 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['fileId', 'fileUrl']);
+    this.optionSets.push({ options: ['fileId', 'fileUrl'] });
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

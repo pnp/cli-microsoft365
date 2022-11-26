@@ -108,7 +108,7 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['principalId', 'upn', 'groupName']
+      { options: ['principalId', 'upn', 'groupName'] }
     ]);
   });
 

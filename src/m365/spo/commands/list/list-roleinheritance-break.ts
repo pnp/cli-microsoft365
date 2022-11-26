@@ -92,7 +92,7 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -146,7 +146,7 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
         default: false,
         message: `Are you sure you want to break the role inheritance of ${args.options.listId ?? args.options.listTitle}?`
       });
-      
+
       if (result.continue) {
         await breakListRoleInheritance();
       }

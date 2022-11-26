@@ -13,7 +13,7 @@ pp dataverse table list [options]
 `-e, --environment <environment>`
 : The name of the environment to list all tables for
 
-`-a, --asAdmin`
+`--asAdmin`
 : Set, to retrieve the dataverse tables as admin for environments you are not a member of.
 
 --8<-- "docs/cmd/_global.md"

@@ -17,6 +17,7 @@
 
 - [pp card clone](../cmd/pp/card/card-clone.md) - clones a specific Microsoft Power Platform card in the specified Power Platform environment [#3790](https://github.com/pnp/cli-microsoft365/issues/3790)
 - [pp card remove](../cmd/pp/card/card-remove.md) - removes the specified Microsoft Power Platform card in the specified Power Platform environment [#3781](https://github.com/pnp/cli-microsoft365/issues/3781)
+- [pp chatbot list](../cmd/pp/chatbot/chatbot-list.md) - lists Microsoft Power Platform chatbot in the specified Power Platform environment [#3650](https://github.com/pnp/cli-microsoft365/issues/3650)
 - [pp dataverse table get](../cmd/pp/dataverse/dataverse-table-get.md) - lists a dataverse table in a given environment [#3726](https://github.com/pnp/cli-microsoft365/issues/3726)
 - [pp dataverse table remove](../cmd/pp/dataverse/dataverse-table-remove.md) - removes a dataverse table in a given environment [#4031](https://github.com/pnp/cli-microsoft365/issues/4031)
 - [pp solution remove](../cmd/pp/solution/solution-remove.md) - removes the specified solution in the specified Power Platform environment [#3723](https://github.com/pnp/cli-microsoft365/issues/3723)
@@ -34,10 +35,13 @@
 - [spo file version get](../cmd/spo/file/file-version-get.md) - gets information about a specific version of a specified file [#3954](https://github.com/pnp/cli-microsoft365/issues/3954)
 - [spo file version clear](../cmd/spo/file/file-version-clear.md) - removes all version history of a specified file [#3957](https://github.com/pnp/cli-microsoft365/issues/3957)
 - [spo file version remove](../cmd/spo/file/file-version-remove.md) - removes a specific version of a specified file [#3955](https://github.com/pnp/cli-microsoft365/issues/3955)
+- [spo listitem batch add](../cmd/spo/listitem/listitem-batch-add.md) - creates list items in a batch. [#2029](https://github.com/pnp/cli-microsoft365/issues/2029)
 
 **Teams:**
 
+- [teams meeting get](../cmd/teams/meeting/meeting-get.md) - get specified meeting details [#3900](https://github.com/pnp/cli-microsoft365/issues/3900)
 - [teams meeting list](../cmd/teams/meeting/meeting-list.md) - retrieve all online meetings for a given user or shared mailbox [#3899](https://github.com/pnp/cli-microsoft365/issues/3899)
+- [teams team app list](../cmd/teams/team/team-app-list.md) - list apps installed in the specified team [#4129](https://github.com/pnp/cli-microsoft365/issues/4129)
 
 ### Changes
 
@@ -111,6 +115,16 @@
 - added docs response for 'flow' commands [#4086](https://github.com/pnp/cli-microsoft365/issues/4086)
 - added docs response for 'spo homesite' until 'spo navigation' commands [#3931](https://github.com/pnp/cli-microsoft365/issues/3931)
 - extended 'spo page set' with support to demote news pages [#2226](https://github.com/pnp/cli-microsoft365/issues/2226)
+- extended 'spo web get' with RoleAssignments [#4038](https://github.com/pnp/cli-microsoft365/issues/4038)
+- extended 'spo listitem get' with RoleAssignments [#4039](https://github.com/pnp/cli-microsoft365/issues/4039)
+- extended 'spo file get' with RoleAssignments [#4040](https://github.com/pnp/cli-microsoft365/issues/4040)
+- extended 'spo folder get' command with RoleAssignments [#4041](https://github.com/pnp/cli-microsoft365/issues/4041)
+- adds support for configuring how to display help [#3782](https://github.com/pnp/cli-microsoft365/issues/3782)
+- refactors the option sets interface to support validating optional and dependent options [#3884](https://github.com/pnp/cli-microsoft365/issues/3884)
+- removed short notation for 'asAdmin' option in pp commands [#4132](https://github.com/pnp/cli-microsoft365/issues/4132)
+- updated spo commands with odata-version 4.0 [#4014](https://github.com/pnp/cli-microsoft365/issues/4014)
+- updated 'teams app list' command to not return apps from a team [#4130](https://github.com/pnp/cli-microsoft365/issues/4130)
+- enforced unique test names using eslint [#4124](https://github.com/pnp/cli-microsoft365/issues/4124)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 

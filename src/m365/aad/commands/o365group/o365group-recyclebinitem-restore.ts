@@ -30,22 +30,22 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
   constructor() {
     super();
 
-  	this.#initTelemetry();
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
   }
 
   #initTelemetry(): void {
-  	this.telemetry.push((args: CommandArgs) => {
+    this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
-	    displayName: typeof args.options.displayName !== 'undefined',
-	    mailNickname: typeof args.options.mailNickname !== 'undefined'
+        displayName: typeof args.options.displayName !== 'undefined',
+        mailNickname: typeof args.options.mailNickname !== 'undefined'
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -59,21 +59,21 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
-	      return `${args.options.id} is not a valid GUID`;
-	    }
+          return `${args.options.id} is not a valid GUID`;
+        }
 
-	    return true;
+        return true;
       }
     );
   }
 
   #initOptionSets(): void {
-  	this.optionSets.push(['id', 'displayName', 'mailNickname']);
+    this.optionSets.push({ options: ['id', 'displayName', 'mailNickname'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -131,7 +131,7 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
         if (groups.length === 0) {
           return Promise.reject(`The specified group '${displayName || mailNickname}' does not exist.`);
         }
-    
+
         if (groups.length > 1) {
           return Promise.reject(`Multiple groups with name '${displayName || mailNickname}' found: ${groups.map(x => x.id).join(',')}.`);
         }

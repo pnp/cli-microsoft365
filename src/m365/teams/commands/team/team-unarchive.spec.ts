@@ -68,7 +68,7 @@ describe(commands.TEAM_UNARCHIVE, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'name']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
   });
 
   it('fails validation if the id is not a valid guid.', async () => {

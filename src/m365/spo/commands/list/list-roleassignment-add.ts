@@ -125,9 +125,9 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['listId', 'listTitle', 'listUrl'],
-      ['principalId', 'upn', 'groupName'],
-      ['roleDefinitionId', 'roleDefinitionName']
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['principalId', 'upn', 'groupName'] },
+      { options: ['roleDefinitionId', 'roleDefinitionName'] }
     );
   }
 

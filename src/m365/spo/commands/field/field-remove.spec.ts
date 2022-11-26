@@ -364,7 +364,7 @@ describe(commands.FIELD_REMOVE, () => {
       return Promise.reject(err);
     });
 
-    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', confirm: true } } as any), 
+    await assert.rejects(command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', group: 'MyGroup', confirm: true } } as any),
       new CommandError(err));
     assert(getStub.called);
     assert(deletion.notCalled);
@@ -543,7 +543,7 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title', 'group']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title', 'group'] }]);
   });
 
   it('fails validation if both id and title options are not passed', async () => {

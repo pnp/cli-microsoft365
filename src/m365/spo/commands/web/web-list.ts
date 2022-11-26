@@ -1,10 +1,10 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { WebPropertiesCollection } from "./WebPropertiesCollection";
+import { WebProperties } from './WebProperties';
 
 interface CommandArgs {
   options: Options;
@@ -59,18 +59,10 @@ class SpoWebListCommand extends SpoCommand {
       requestUrl += '?$select=Title,Id,URL';
     }
 
-    const requestOptions: any = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const webProperties: WebPropertiesCollection = await request.get<WebPropertiesCollection>(requestOptions);
-      logger.log(webProperties.value);
-    } 
+      const webProperties: WebProperties[] = await odata.getAllItems<WebProperties>(requestUrl);
+      logger.log(webProperties);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

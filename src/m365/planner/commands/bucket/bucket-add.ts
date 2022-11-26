@@ -101,7 +101,7 @@ class PlannerBucketAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['planId', 'planTitle']);
+    this.optionSets.push({ options: ['planId', 'planTitle'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

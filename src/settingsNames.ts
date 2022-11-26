@@ -7,6 +7,7 @@ const settingsNames = {
   csvQuoted: 'csvQuoted',
   csvQuotedEmpty: 'csvQuotedEmpty',
   errorOutput: 'errorOutput',
+  helpMode: 'helpMode',
   output: 'output',
   printErrorsAsPlainText: 'printErrorsAsPlainText',
   prompt: 'prompt',

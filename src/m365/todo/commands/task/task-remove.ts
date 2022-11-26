@@ -61,7 +61,7 @@ class TodoTaskRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listName', 'listId']);
+    this.optionSets.push({ options: ['listName', 'listId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -76,8 +76,8 @@ class TodoTaskRemoveCommand extends GraphCommand {
           responseType: 'json'
         };
         const response: { value: { id: string }[] } = await request.get<{ value: { id: string }[] }>(requestOptions);
-          
-        return response.value && response.value.length === 1 ? response.value[0].id : undefined;  
+
+        return response.value && response.value.length === 1 ? response.value[0].id : undefined;
       }
 
       return Promise.resolve(args.options.listId as string);
@@ -100,7 +100,7 @@ class TodoTaskRemoveCommand extends GraphCommand {
         };
 
         await request.delete(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -116,7 +116,7 @@ class TodoTaskRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the task ${args.options.id} from list ${args.options.listId || args.options.listName}?`
       });
-      
+
       if (result.continue) {
         await removeToDoTask();
       }

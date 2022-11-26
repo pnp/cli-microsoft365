@@ -181,7 +181,7 @@ describe(commands.TASK_GET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title'] }]);
   });
 
   it('fails validation when bucket name is used without id', async () => {

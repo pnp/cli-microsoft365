@@ -78,7 +78,7 @@ class TeamsTeamArchiveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'name']
+      { options: ['id', 'name'] }
     );
   }
 

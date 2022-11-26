@@ -5,16 +5,17 @@ import * as inquirer from 'inquirer';
 import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import { Cli, CommandOutput } from './Cli';
 import appInsights from '../appInsights';
 import Command, { CommandError } from '../Command';
 import AnonymousCommand from '../m365/base/AnonymousCommand';
+import * as cliCompletionUpdateCommand from '../m365/cli/commands/completion/completion-clink-update';
 import { settingsNames } from '../settingsNames';
 import { md } from '../utils/md';
+import { pid } from '../utils/pid';
 import { sinonUtil } from '../utils/sinonUtil';
+import { Cli, CommandOutput } from './Cli';
 import { Logger } from './Logger';
 import Table = require('easy-table');
-import { pid } from '../utils/pid';
 const packageJSON = require('../../package.json');
 
 class MockCommand extends AnonymousCommand {
@@ -59,9 +60,31 @@ class MockCommandWithOptionSets extends AnonymousCommand {
       },
       {
         option: '--opt2 [name]'
+      },
+      {
+        option: '--opt3 [name]'
+      },
+      {
+        option: '--opt4 [name]'
+      },
+      {
+        option: '--opt5 [name]'
+      },
+      {
+        option: '--opt6 [name]'
       }
     );
-    this.optionSets.push(['opt1', 'opt2']);
+    this.optionSets.push(
+      { options: ['opt1', 'opt2'] },
+      {
+        options: ['opt3', 'opt4'],
+        runsWhen: (args) => typeof args.options.opt2 !== 'undefined' // validate when opt2 is set
+      },
+      {
+        options: ['opt5', 'opt6'],
+        runsWhen: (args) => { return args.options.opt5 || args.options.opt6; } // validate when opt5 or opt6 is set
+      }
+    );
   }
   public async commandAction(): Promise<void> {
   }
@@ -162,12 +185,15 @@ describe('Cli', () => {
   let mockCommandWithOptionSets: Command;
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
+  let log: string[] = [];
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
 
-    cliLogStub = sinon.stub((Cli as any), 'log').callsFake(_ => { });
+    cliLogStub = sinon.stub((Cli as any), 'log').callsFake(message => {
+      log.push(message ?? '');
+    });
     cliErrorStub = sinon.stub((Cli as any), 'error');
     cliFormatOutputSpy = sinon.spy((Cli as any), 'formatOutput');
     processExitStub = sinon.stub(process, 'exit');
@@ -188,17 +214,19 @@ describe('Cli', () => {
   });
 
   beforeEach(() => {
+    log = [];
     cli = Cli.getInstance();
     (cli as any).loadCommand(mockCommand);
     (cli as any).loadCommand(mockCommandWithOptionSets);
     (cli as any).loadCommand(mockCommandWithAlias);
     (cli as any).loadCommand(mockCommandWithValidation);
+    (cli as any).loadCommand(cliCompletionUpdateCommand);
   });
 
   afterEach(() => {
     (Cli as any).instance = undefined;
-    cliLogStub.reset();
-    cliErrorStub.reset();
+    cliLogStub.resetHistory();
+    cliErrorStub.resetHistory();
     cliFormatOutputSpy.resetHistory();
     processExitStub.reset();
     md2plainSpy.resetHistory();
@@ -386,6 +414,95 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
+  it('shows full help when specified -h with a number', (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', '1'])
+      .then(_ => {
+        try {
+          assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
+          assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('shows full help when specified -h with full', (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'full'])
+      .then(_ => {
+        try {
+          assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
+          assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('shows help with options section when specified -h with options', (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'options'])
+      .then(_ => {
+        try {
+          assert(log.some(l => l.indexOf('OPTIONS') > -1), 'Options section not found');
+          assert(log.some(l => l.indexOf('EXAMPLES') === -1), 'Examples section found');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('shows help with examples section when specified -h with examples', (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'examples'])
+      .then(_ => {
+        try {
+          assert(log.some(l => l.indexOf('OPTIONS') === -1), 'Options section found');
+          assert(log.some(l => l.indexOf('EXAMPLES') > -1), 'Examples section not found');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('shows help with remarks section when specified -h with remarks', (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'remarks'])
+      .then(_ => {
+        try {
+          assert(log.some(l => l.indexOf('REMARKS') > -1), 'Remarks section not found');
+          assert(log.some(l => l.indexOf('OPTIONS') === -1), 'Options section found');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('shows error when specified -h with an invalid value', (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', 'invalid'])
+      .then(_ => done('Expected error to be thrown'), _ => {
+        try {
+          assert(cliErrorStub.getCalls().some(c => c.firstArg.indexOf('Unknown help mode invalid. Allowed values are') > -1));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
   it(`passes options validation if the command doesn't allow unknown options and specified options match command options`, (done) => {
     cli
       .execute(rootFolder, ['cli', 'mock', '-x', '123', '-y', '456'])
@@ -463,7 +580,7 @@ describe('Cli', () => {
       });
   });
 
-  it(`shows error when optionSets validation fails - at least one option is specified`, (done) => {
+  it(`shows validation error when no option from a required set is specified`, (done) => {
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -477,7 +594,7 @@ describe('Cli', () => {
       });
   });
 
-  it(`shows error when optionSets validation fails - multiple options are specified`, (done) => {
+  it(`shows validation error when multiple options from a required set are specified`, (done) => {
     cli
       .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -489,6 +606,76 @@ describe('Cli', () => {
           done(e);
         }
       });
+  });
+
+  it(`passes validation when one option from a required set is specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue'])
+      .then(_ => {
+        try {
+          assert(cliErrorStub.notCalled);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, _ => done('Promise rejected while success expected'));
+  });
+
+  it(`shows validation error when no option from a dependent set is set`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt3, opt4.')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it(`passes validation when one option from a dependent set is specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue'])
+      .then(_ => {
+        try {
+          assert(cliErrorStub.notCalled);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, _ => done('Promise rejected while success expected'));
+  });
+
+  it(`shows validation error when multiple options from an optional set are specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt5', 'testvalue', '--opt6', 'testvalue'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt5, opt6, but not multiple.')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it(`passes validation when one option from an optional set is specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'testvalue', '--opt5', 'testvalue'])
+      .then(_ => {
+        try {
+          assert(cliErrorStub.notCalled);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, _ => done('Promise rejected while success expected'));
   });
 
   it(`prompts for required options`, (done) => {
@@ -838,8 +1025,8 @@ describe('Cli', () => {
       .execute(cliCommandsFolder, ['cli', 'mock', '-x', '1'])
       .then(_ => {
         try {
-          // 12 commands from the folder + 3 mocks
-          assert.strictEqual(cli.commands.length, 12 + 4);
+          // 12 commands from the folder + 4 mocks + cli completion clink update
+          assert.strictEqual(cli.commands.length, 12 + 4 + 1);
           done();
         }
         catch (e) {
@@ -1432,7 +1619,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  5 commands'));
+      assert(cliLogStub.calledWith('  cli *  6 commands'));
       done();
     }
     catch (e) {
@@ -1452,7 +1639,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli mock *   3 commands'));
+      assert(cliLogStub.calledWith('  cli mock *        3 commands'));
       done();
     }
     catch (e) {
@@ -1472,7 +1659,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  5 commands'));
+      assert(cliLogStub.calledWith('  cli *  6 commands'));
       done();
     }
     catch (e) {

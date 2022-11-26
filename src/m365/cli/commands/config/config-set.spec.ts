@@ -238,4 +238,34 @@ describe(commands.CONFIG_SET, () => {
     const actual = await command.validate({ options: { key: settingsNames.errorOutput, value: 'stderr' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
+
+  it('fails validation if specified help mode is invalid', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation for help mode options', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'options' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for help mode examples', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'examples' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for help mode remarks', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'remarks' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for help mode response', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'response' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for help mode full', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'full' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
 });

@@ -74,12 +74,12 @@ describe(commands.FILE_GET, () => {
 
   it('command correctly handles file get reject request', async () => {
     const err = 'Invalid request';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
-        return Promise.reject(err);
+        throw err;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -92,12 +92,12 @@ describe(commands.FILE_GET, () => {
   });
 
   it('uses correct API url when output json option is passed', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('select123=') > -1) {
-        return Promise.resolve('Correct Url1');
+        return 'Correct Url1';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -113,12 +113,12 @@ describe(commands.FILE_GET, () => {
 
   it('retrieves file as binary string object', async () => {
     const returnValue: string = 'BinaryFileString';
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
-        return Promise.resolve(returnValue);
+        return returnValue;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -133,9 +133,9 @@ describe(commands.FILE_GET, () => {
   });
 
   it('retrieves and prints all details of file as ListItem object', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('?$expand=ListItemAllFields') > -1) {
-        return Promise.resolve({
+        return {
           "ListItemAllFields": {
             "FileSystemObjectType": 0,
             "Id": 4,
@@ -175,10 +175,10 @@ describe(commands.FILE_GET, () => {
           "UIVersion": 1536,
           "UIVersionLabel": "3.0",
           "UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -209,13 +209,199 @@ describe(commands.FILE_GET, () => {
     }));
   });
 
-  it('uses correct API url when id option is passed', async () => {
-    const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
-        return Promise.resolve('Correct Url');
+  it('retrieves and prints all details of file as ListItem object with permissions', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('?$expand=ListItemAllFields') > -1) {
+        return {
+          "ListItemAllFields": {
+            "FileSystemObjectType": 0,
+            "Id": 4,
+            "ServerRedirectedEmbedUri": "https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview",
+            "ServerRedirectedEmbedUrl": "https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview",
+            "ContentTypeId": "0x0101008E462E3ACE8DB844B3BEBF9473311889",
+            "ComplianceAssetId": null,
+            "Title": null,
+            "ID": 4,
+            "Created": "2018-02-05T09:42:36",
+            "AuthorId": 1,
+            "Modified": "2018-02-05T09:44:03",
+            "EditorId": 1,
+            "OData__CopySource": null,
+            "CheckoutUserId": null,
+            "OData__UIVersionString": "3.0",
+            "GUID": "2054f49e-0f76-46d4-ac55-50e1c057941c"
+          },
+          "CheckInComment": "",
+          "CheckOutType": 2,
+          "ContentTag": "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
+          "CustomizedPageStatus": 0,
+          "ETag": "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
+          "Exists": true,
+          "IrmEnabled": false,
+          "Length": "331673",
+          "Level": 1,
+          "LinkingUri": "https://contoso.sharepoint.com/sites/project-x/Documents/Test1.docx?d=wf09c4efeb8c04e89a16603418661b89b",
+          "LinkingUrl": "https://contoso.sharepoint.com/sites/project-x/Documents/Test1.docx?d=wf09c4efeb8c04e89a16603418661b89b",
+          "MajorVersion": 3,
+          "MinorVersion": 0,
+          "Name": "Opendag maart 2018.docx",
+          "ServerRelativeUrl": "/sites/project-x/Documents/Test1.docx",
+          "TimeCreated": "2018-02-05T08:42:36Z",
+          "TimeLastModified": "2018-02-05T08:44:03Z",
+          "Title": "",
+          "UIVersion": 1536,
+          "UIVersionLabel": "3.0",
+          "UniqueId": "b2307a39-e878-458b-bc90-03bc578531d6"
+        };
       }
 
-      return Promise.reject('Invalid request');
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativePath(DecodedUrl='/sites/project-x/Documents/Test1.docx')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`) {
+        return {
+          value: [
+            {
+              "Member": {
+                "Id": 3,
+                "IsHiddenInUI": false,
+                "LoginName": "Communication site Owners",
+                "Title": "Communication site Owners",
+                "PrincipalType": 8,
+                "AllowMembersEditMembership": false,
+                "AllowRequestToJoinLeave": false,
+                "AutoAcceptRequestToJoinLeave": false,
+                "Description": null,
+                "OnlyAllowMembersViewMembership": false,
+                "OwnerTitle": "Communication site Owners",
+                "RequestToJoinLeaveEmailSetting": ""
+              },
+              "RoleDefinitionBindings": [
+                {
+                  "BasePermissions": {
+                    "High": "2147483647",
+                    "Low": "4294967295"
+                  },
+                  "Description": "Has full control.",
+                  "Hidden": false,
+                  "Id": 1073741829,
+                  "Name": "Full Control",
+                  "Order": 1,
+                  "RoleTypeKind": 5
+                }
+              ],
+              "PrincipalId": 3
+            }]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        asListItem: true,
+        withPermissions: true
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      "FileSystemObjectType": 0,
+      "Id": 4,
+      "ServerRedirectedEmbedUri": "https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview",
+      "ServerRedirectedEmbedUrl": "https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview",
+      "ContentTypeId": "0x0101008E462E3ACE8DB844B3BEBF9473311889",
+      "ComplianceAssetId": null,
+      "Title": null,
+      "ID": 4,
+      "Created": "2018-02-05T09:42:36",
+      "AuthorId": 1,
+      "Modified": "2018-02-05T09:44:03",
+      "EditorId": 1,
+      "OData__CopySource": null,
+      "CheckoutUserId": null,
+      "OData__UIVersionString": "3.0",
+      "GUID": "2054f49e-0f76-46d4-ac55-50e1c057941c",
+      "RoleAssignments": [
+        {
+          "Member": {
+            "Id": 3,
+            "IsHiddenInUI": false,
+            "LoginName": "Communication site Owners",
+            "Title": "Communication site Owners",
+            "PrincipalType": 8,
+            "AllowMembersEditMembership": false,
+            "AllowRequestToJoinLeave": false,
+            "AutoAcceptRequestToJoinLeave": false,
+            "Description": null,
+            "OnlyAllowMembersViewMembership": false,
+            "OwnerTitle": "Communication site Owners",
+            "RequestToJoinLeaveEmailSetting": ""
+          },
+          "RoleDefinitionBindings": [
+            {
+              "BasePermissions": {
+                "High": "2147483647",
+                "Low": "4294967295"
+              },
+              "Description": "Has full control.",
+              "Hidden": false,
+              "Id": 1073741829,
+              "Name": "Full Control",
+              "Order": 1,
+              "RoleTypeKind": 5,
+              "BasePermissionsValue": [
+                "ViewListItems",
+                "AddListItems",
+                "EditListItems",
+                "DeleteListItems",
+                "ApproveItems",
+                "OpenItems",
+                "ViewVersions",
+                "DeleteVersions",
+                "CancelCheckout",
+                "ManagePersonalViews",
+                "ManageLists",
+                "ViewFormPages",
+                "AnonymousSearchAccessList",
+                "Open",
+                "ViewPages",
+                "AddAndCustomizePages",
+                "ApplyThemeAndBorder",
+                "ApplyStyleSheets",
+                "ViewUsageData",
+                "CreateSSCSite",
+                "ManageSubwebs",
+                "CreateGroups",
+                "ManagePermissions",
+                "BrowseDirectories",
+                "BrowseUserInfo",
+                "AddDelPrivateWebParts",
+                "UpdatePersonalWebParts",
+                "ManageWeb",
+                "AnonymousSearchAccessWebLists",
+                "UseClientIntegration",
+                "UseRemoteAPIs",
+                "ManageAlerts",
+                "CreateAlerts",
+                "EditMyUserInfo",
+                "EnumeratePermissions"
+              ],
+              "RoleTypeKindValue": "Administrator"
+            }
+          ],
+          "PrincipalId": 3
+        }
+      ]
+    }));
+  });
+
+  it('uses correct API url when id option is passed', async () => {
+    const getStub: any = sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
+        return 'Correct Url';
+      }
+
+      throw 'Invalid request';
     });
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
@@ -231,12 +417,12 @@ describe(commands.FILE_GET, () => {
   });
 
   it('uses correct API url when url option is passed', async () => {
-    const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
+    const getStub: any = sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -250,12 +436,12 @@ describe(commands.FILE_GET, () => {
   });
 
   it('uses correct API url when url option is passed to get file as list item', async () => {
-    const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
+    const getStub: any = sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -270,12 +456,12 @@ describe(commands.FILE_GET, () => {
   });
 
   it('uses correct API url when tenant root URL option is passed', async () => {
-    const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
+    const getStub: any = sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
-        return Promise.resolve('Correct Url');
+        return 'Correct Url';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -291,7 +477,7 @@ describe(commands.FILE_GET, () => {
   it('should handle promise rejection', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File Not Found." } } });
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject(expectedError);
+      throw expectedError;
     });
 
     await assert.rejects(command.action(logger, {
@@ -322,14 +508,14 @@ describe(commands.FILE_GET, () => {
       writeStream.emit('close');
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
-        return Promise.resolve({
+        return {
           data: responseStream
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const options = {
@@ -365,14 +551,14 @@ describe(commands.FILE_GET, () => {
       writeStream.emit('error', "Writestream throws error");
     }, 5);
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
-        return Promise.resolve({
+        return {
           data: responseStream
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     const options = {

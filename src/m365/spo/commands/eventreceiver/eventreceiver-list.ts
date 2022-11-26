@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -126,17 +125,9 @@ class SpoEventreceiverListCommand extends SpoCommand {
       requestUrl += 'site/eventreceivers';
     }
 
-    const requestOptions: AxiosRequestConfig = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const res = await request.get<{ value: EventReceiver[] }>(requestOptions);
-      logger.log(res.value);
+      const res = await odata.getAllItems<EventReceiver>(requestUrl);
+      logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

@@ -1327,6 +1327,6 @@ describe(commands.LIST_GET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title', 'url']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title', 'url'] }]);
   });
 });

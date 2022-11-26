@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import { BasePermissions } from '../../base-permissions';
@@ -55,17 +55,9 @@ class SpoRoleDefinitionListCommand extends SpoCommand {
       logger.logToStderr(`Getting role definitions list from ${args.options.webUrl}...`);
     }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/roledefinitions`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const res = await request.get<{ value: any[] }>(requestOptions);
-      const response = this.setFriendlyPermissions(res.value);
+      const res = await odata.getAllItems<any>(`${args.options.webUrl}/_api/web/roledefinitions`);
+      const response = this.setFriendlyPermissions(res);
       logger.log(response);
     }
     catch (err: any) {

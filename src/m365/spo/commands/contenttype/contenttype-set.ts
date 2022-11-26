@@ -32,14 +32,14 @@ class SpoContentTypeSetCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initTypes();
     this.#initOptionSets();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -51,7 +51,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -74,7 +74,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
       },
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -90,7 +90,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
         if ((args.options.listId && (args.options.listTitle || args.options.listUrl)) || (args.options.listTitle && args.options.listUrl)) {
           return `Specify either listTitle, listId or listUrl.`;
         }
-    
+
         return true;
       }
     );
@@ -101,8 +101,8 @@ class SpoContentTypeSetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-  	this.optionSets.push(
-      ['id', 'name']
+    this.optionSets.push(
+      { options: ['id', 'name'] }
     );
   }
 
@@ -167,7 +167,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
     requestOptions.url += `/ContentTypes?$filter=Name eq '${formatting.encodeQueryParameter(options.name!)}'&$select=Id`;
 
     const res = await request.get<{ value: { Id: { StringValue: string } }[] }>(requestOptions);
-    
+
     if (res.value.length === 0) {
       throw `The specified content type '${options.name}' does not exist`;
     }

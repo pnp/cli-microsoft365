@@ -96,7 +96,7 @@ class PlannerPlanAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['ownerGroupId', 'ownerGroupName']);
+    this.optionSets.push({ options: ['ownerGroupId', 'ownerGroupName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

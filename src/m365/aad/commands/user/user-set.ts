@@ -76,7 +76,7 @@ class AadUserSetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['objectId', 'userPrincipalName']);
+    this.optionSets.push({ options: ['objectId', 'userPrincipalName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -87,7 +87,7 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'appId', 'appDisplayName']);
+    this.optionSets.push({ options: ['id', 'appId', 'appDisplayName'] });
   }
 
   private getSpoSiteId(args: CommandArgs): Promise<string> {
@@ -168,7 +168,7 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
 
       const res = await request.patch(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

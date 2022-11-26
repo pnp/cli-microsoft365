@@ -95,7 +95,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['listId', 'listTitle', 'listUrl']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['listId', 'listTitle', 'listUrl'] }]);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
@@ -192,7 +192,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
     });
   });
 
-  it('reset role inheritance on list item by list url', async () => {
+  it('reset role inheritance on list item by list url without confirmation prompt', async () => {
     const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
     const listUrl = '/sites/project-x/lists/TestList';
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);

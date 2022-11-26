@@ -83,7 +83,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appDisplayName', 'id']);
+    this.optionSets.push({ options: ['appId', 'appDisplayName', 'id'] });
   }
 
   private getSpoSiteId(args: CommandArgs): Promise<string> {
@@ -171,7 +171,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
 
         const res = await Promise.all(tasks);
         logger.log(res);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -187,7 +187,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the specified application permission from site ${args.options.siteUrl}?`
       });
-      
+
       if (result.continue) {
         await removeSiteAppPermission();
       }

@@ -85,7 +85,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['fileId', 'fileUrl']);
+    this.optionSets.push({ options: ['fileId', 'fileUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from "axios";
 import request from "../request";
 
 export interface ODataResponse<T> {
@@ -21,10 +22,11 @@ export const odata = {
   async getAllItems<T>(url: string, metadata?: 'none' | 'minimal' | 'full'): Promise<T[]> {
     let items: T[] = [];
 
-    const requestOptions: any = {
+    const requestOptions: AxiosRequestConfig = {
       url: url,
       headers: {
-        accept: `application/json;odata.metadata=${metadata ?? 'none'}`
+        accept: `application/json;odata.metadata=${metadata ?? 'none'}`,
+        'odata-version': '4.0'
       },
       responseType: 'json'
     };
@@ -37,7 +39,7 @@ export const odata = {
       const nextPageItems = await odata.getAllItems<T>(nextLink, metadata);
       items = items.concat(nextPageItems);
     }
-    
+
     return items;
   }
 };

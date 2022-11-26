@@ -111,8 +111,8 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['principalId', 'upn', 'groupName'],
-      ['roleDefinitionId', 'roleDefinitionName']
+      { options: ['principalId', 'upn', 'groupName'] },
+      { options: ['roleDefinitionId', 'roleDefinitionName'] }
     ]);
   });
 

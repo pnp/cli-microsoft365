@@ -13,7 +13,7 @@ pp card list [options]
 `-e, --environment <environment>`
 : The name of the environment.
 
-`-a, --asAdmin`
+`--asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
 
 --8<-- "docs/cmd/_global.md"

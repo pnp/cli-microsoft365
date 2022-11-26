@@ -7,6 +7,7 @@ export default {
   CARD_REMOVE: `${prefix} card remove`,
   CHATBOT_GET: `${prefix} chatbot get`,
   CHATBOT_REMOVE: `${prefix} chatbot remove`,
+  CHATBOT_LIST: `${prefix} chatbot list`,
   DATAVERSE_TABLE_LIST: `${prefix} dataverse table list`,
   DATAVERSE_TABLE_GET: `${prefix} dataverse table get`,
   DATAVERSE_TABLE_REMOVE: `${prefix} dataverse table remove`,

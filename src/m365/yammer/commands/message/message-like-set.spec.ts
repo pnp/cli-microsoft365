@@ -44,7 +44,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
       return { continue: false };
-    });    
+    });
   });
 
   afterEach(() => {
@@ -99,7 +99,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if enabled set to "true"', async () => {
+  it('passes validation if enabled set to "false"', async () => {
     const actual = await command.validate({ options: { messageId: 10123123, enable: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -140,7 +140,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231 } } );
+    await command.action(logger, { options: { debug: true, messageId: 1231231 } });
     assert(requestPostedStub.called);
   });
 

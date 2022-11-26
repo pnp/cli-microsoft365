@@ -74,7 +74,7 @@ class PaAppGetCommand extends PowerAppsCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['name', 'displayName']);
+    this.optionSets.push({ options: ['name', 'displayName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
