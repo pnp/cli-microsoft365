@@ -95,8 +95,8 @@ class TeamsChannelGetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['teamId', 'teamName'],
-      ['id', 'name', 'primary']
+      { options: ['teamId', 'teamName'] },
+      { options: ['id', 'name', 'primary'] }
     );
   }
 

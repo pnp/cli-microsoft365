@@ -1,10 +1,10 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ListInstanceCollection } from "./ListInstanceCollection";
+import { ListInstance } from './ListInstance';
 
 interface CommandArgs {
   options: Options;
@@ -53,22 +53,13 @@ class SpoListListCommand extends SpoCommand {
       logger.logToStderr(`Retrieving all lists in site at ${args.options.webUrl}...`);
     }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/lists?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl,*`,
-      method: 'GET',
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const listInstances = await request.get<ListInstanceCollection>(requestOptions);
-      listInstances.value.forEach(l => {
+      const listInstances = await odata.getAllItems<ListInstance>(`${args.options.webUrl}/_api/web/lists?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl,*`);
+      listInstances.forEach(l => {
         l.Url = l.RootFolder.ServerRelativeUrl;
       });
 
-      logger.log(listInstances.value);
+      logger.log(listInstances);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

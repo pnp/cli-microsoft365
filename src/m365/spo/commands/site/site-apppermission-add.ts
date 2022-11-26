@@ -89,7 +89,7 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appDisplayName']);
+    this.optionSets.push({ options: ['appId', 'appDisplayName'] });
   }
 
   private getSpoSiteId(args: CommandArgs): Promise<string> {

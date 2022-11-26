@@ -71,7 +71,7 @@ class SpoTermGroupGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -106,10 +106,10 @@ class SpoTermGroupGetCommand extends SpoCommand {
       termGroup.Id = termGroup.Id.replace('/Guid(', '').replace(')/', '');
       termGroup.LastModifiedDate = new Date(Number(termGroup.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
       logger.log(termGroup);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedPromise(err);
-    }    
+    }
   }
 }
 

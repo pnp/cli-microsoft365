@@ -6542,7 +6542,7 @@ describe(commands.APP_ADD, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['name', 'manifest']
+      { options: ['name', 'manifest'] }
     ]);
   });
 

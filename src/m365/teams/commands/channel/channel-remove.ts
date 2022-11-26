@@ -96,8 +96,8 @@ class TeamsChannelRemoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'name'],
-      ['teamId', 'teamName']
+      { options: ['id', 'name'] },
+      { options: ['teamId', 'teamName'] }
     );
   }
 

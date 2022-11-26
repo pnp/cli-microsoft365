@@ -36,23 +36,23 @@ class SpoHubSiteGetCommand extends SpoCommand {
   constructor() {
     super();
 
-  	this.#initTelemetry();
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
     this.#initOptionSets();
   }
 
   #initTelemetry(): void {
-  	this.telemetry.push((args: CommandArgs) => {
+    this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
-	    title: typeof args.options.title !== 'undefined',
-	    url: typeof args.options.url !== 'undefined',
-	    includeAssociatedSites: args.options.includeAssociatedSites === true
+        title: typeof args.options.title !== 'undefined',
+        url: typeof args.options.url !== 'undefined',
+        includeAssociatedSites: args.options.includeAssociatedSites === true
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       { option: '-i, --id [id]' },
@@ -61,25 +61,25 @@ class SpoHubSiteGetCommand extends SpoCommand {
       { option: '--includeAssociatedSites' }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
-	      return `${args.options.id} is not a valid GUID`;
-	    }
+          return `${args.options.id} is not a valid GUID`;
+        }
 
-	    if (args.options.url) {
-	      return validation.isValidSharePointUrl(args.options.url);
-	    }
+        if (args.options.url) {
+          return validation.isValidSharePointUrl(args.options.url);
+        }
 
-	    return true;
+        return true;
       }
     );
   }
 
   #initOptionSets(): void {
-  	this.optionSets.push(['id', 'title', 'url']);
+    this.optionSets.push({ options: ['id', 'title', 'url'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

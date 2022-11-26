@@ -87,14 +87,14 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['chatId', 'userEmails', 'chatName']);
+    this.optionSets.push({ options: ['chatId', 'userEmails', 'chatName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const chatId = await this.getChatId(logger, args);
       await this.sendChatMessage(chatId as string, args);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

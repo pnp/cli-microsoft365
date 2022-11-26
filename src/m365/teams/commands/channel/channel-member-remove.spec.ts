@@ -87,9 +87,9 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
 
   it('defines correct option sets', () => {
     assert.deepStrictEqual(command.optionSets, [
-      ['teamId', 'teamName'],
-      ['channelId', 'channelName'],
-      ['userId', 'userName', 'id']
+      { options: ['teamId', 'teamName'] },
+      { options: ['channelId', 'channelName'] },
+      { options: ['userId', 'userName', 'id'] }
     ]);
   });
 

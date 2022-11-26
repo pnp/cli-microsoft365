@@ -96,7 +96,7 @@ class SpoListLabelSetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -116,7 +116,7 @@ class SpoListLabelSetCommand extends SpoCommand {
         else {
           listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
         }
-  
+
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder`,
           headers: {
@@ -147,7 +147,7 @@ class SpoListLabelSetCommand extends SpoCommand {
       };
 
       await request.post(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

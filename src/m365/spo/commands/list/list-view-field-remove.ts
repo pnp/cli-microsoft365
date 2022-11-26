@@ -122,9 +122,9 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['listId', 'listTitle', 'listUrl'],
-      ['viewId', 'viewTitle'],
-      ['id', 'title']
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['viewId', 'viewTitle'] },
+      { options: ['id', 'title'] }
     );
   }
 

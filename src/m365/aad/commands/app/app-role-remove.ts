@@ -80,8 +80,8 @@ class AadAppRoleRemoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['appId', 'appObjectId', 'appName'],
-      ['name', 'claim', 'id']
+      { options: ['appId', 'appObjectId', 'appName'] },
+      { options: ['name', 'claim', 'id'] }
     );
   }
 

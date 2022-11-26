@@ -74,7 +74,7 @@ describe(commands.TEAM_REMOVE, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'name']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
   });
 
   it('fails validation if the id is not a valid guid.', async () => {
@@ -113,10 +113,13 @@ describe(commands.TEAM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false,
-      name: 'Finance',
-      confirm: true }} as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: 'Finance',
+        confirm: true
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('prompts before removing the specified team by id when confirm option not passed', async () => {
@@ -231,7 +234,7 @@ describe(commands.TEAM_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    
+
     await assert.rejects(command.action(logger, { options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });
 

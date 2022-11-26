@@ -55,7 +55,7 @@ class PpSolutionPublisherListCommand extends PowerPlatformCommand {
         option: '--includeMicrosoftPublishers'
       },
       {
-        option: '-a, --asAdmin'
+        option: '--asAdmin'
       }
     );
   }

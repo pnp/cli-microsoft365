@@ -55,7 +55,7 @@ class TodoListSetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['name', 'id']);
+    this.optionSets.push({ options: ['name', 'id'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -82,7 +82,7 @@ class TodoListSetCommand extends GraphCommand {
       };
 
       await request.patch(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

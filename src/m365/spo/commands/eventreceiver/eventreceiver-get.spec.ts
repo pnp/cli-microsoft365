@@ -83,7 +83,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['name', 'id']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['name', 'id'] }]);
   });
 
   it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
