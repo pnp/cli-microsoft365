@@ -324,15 +324,4 @@ gulp package-solution - TODO
     assert.strictEqual(fileSyncContent, replacedContent);
     assert.strictEqual(loggerLogToStderrSpy.getCall(5).args[0], `Updated README.md`);
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

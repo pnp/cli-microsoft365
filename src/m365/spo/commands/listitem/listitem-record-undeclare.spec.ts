@@ -128,7 +128,6 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       listItemId: 147,
       webUrl: 'https://returnerror.com/sites/project-y'
@@ -187,24 +186,12 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       listItemId: 47,
       webUrl: 'https://rejectme.com/sites/project-y'
     };
 
     await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Failed request'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {

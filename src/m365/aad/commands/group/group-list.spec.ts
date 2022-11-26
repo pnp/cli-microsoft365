@@ -207,7 +207,7 @@ describe(commands.GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, deleted: true } });
+    await command.action(logger, { options: { deleted: true } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
@@ -349,17 +349,6 @@ describe(commands.GROUP_LIST, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
 
-    await assert.rejects(command.action(logger, { options: {  } }), new CommandError(errorMessage));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError(errorMessage));
   });
 });

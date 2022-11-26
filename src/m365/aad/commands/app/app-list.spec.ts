@@ -17,7 +17,7 @@ describe(commands.APP_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => undefined);
     auth.service.connected = true;
   });
@@ -127,16 +127,5 @@ describe(commands.APP_LIST, () => {
       command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred')
     );
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

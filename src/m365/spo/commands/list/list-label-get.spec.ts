@@ -528,15 +528,4 @@ describe(commands.LIST_LABEL_GET, () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [{ options: ['listId', 'listTitle', 'listUrl'] }]);
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
 });

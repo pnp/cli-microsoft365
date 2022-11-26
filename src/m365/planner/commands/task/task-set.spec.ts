@@ -904,7 +904,6 @@ describe(commands.TASK_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
         bucketName: 'My Planner Bucket',
         planTitle: 'My Planner Plan',
@@ -985,17 +984,6 @@ describe(commands.TASK_SET, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });
