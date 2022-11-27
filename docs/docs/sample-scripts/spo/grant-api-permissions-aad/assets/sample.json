@@ -1,0 +1,49 @@
+[
+  {
+    "name": "pnp-grant-api-permissions-aad",
+    "source": "pnp",
+    "title": "Grant API permissions to SharePoint Azure AD Application",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/grant-api-permissions-aad",
+    "creationDateTime": "2021-03-19",
+    "updateDateTime": "2021-03-19",
+    "shortDescription": "Grants API permissions to SharePoint Azure AD Application.",
+    "longDescription": [
+      "Grants API permissions to SharePoint Azure AD Application."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "security"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/grant-api-permissions-aad/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "michaelmaillot",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/44271458?v=4",
+        "name": "Michaël Maillot (onepoint)"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

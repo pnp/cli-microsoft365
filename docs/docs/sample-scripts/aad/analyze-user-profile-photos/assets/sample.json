@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-analyze-user-profile-photos",
+    "source": "pnp",
+    "title": "Analyze User Profile Photos using Azure Computer Vision API",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/analyze-user-profile-photos",
+    "creationDateTime": "2020-11-05",
+    "updateDateTime": "2020-11-05",
+    "shortDescription": "This script uses Azure Cognitive Service API and Microsoft 365 CLI to analyze user profile pictures.",
+    "longDescription": [
+      "This script uses Azure Cognitive Service API and Microsoft 365 CLI to analyze user profile pictures and assess whether they meet the standards placed by the organization. It can be customized to ban content within an org channel or collaboration network where employees post pictures, memes, etc."
+    ],
+    "products": [
+      "AAD"
+    ],
+    "categories": [],
+    "tags": [
+      "ai",
+      "azure",
+      "users"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/aad/analyze-user-profile-photos/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "sprider",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/21008316?v=4",
+        "name": "Joseph Velliah"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

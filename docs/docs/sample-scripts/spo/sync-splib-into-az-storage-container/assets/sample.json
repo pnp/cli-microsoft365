@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-sync-splib-into-az-storage-container",
+    "source": "pnp",
+    "title": "Sync SharePoint Document Library Documents with Azure Storage Container",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/sync-splib-into-az-storage-container",
+    "creationDateTime": "2020-06-15",
+    "updateDateTime": "2020-06-15",
+    "shortDescription": "This script shows how to download and sync documents in a SharePoint Document Library into an Azure Storage Container.",
+    "longDescription": [
+      "This PowerShell script shows how to download and sync documents in a SharePoint Document Library into an Azure Storage Container using CLI for Microsoft 365 and Azure CLI commands."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "azure",
+      "files",
+      "migration"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/sync-splib-into-az-storage-container/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "sprider",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/21008316?v=4",
+        "name": "Joseph Velliah"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

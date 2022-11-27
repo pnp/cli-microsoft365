@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-remove-orphaned-redirect-sites",
+    "source": "pnp",
+    "title": "CLI - Remove orphaned redirect sites",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/remove-orphaned-redirect-sites",
+    "creationDateTime": "2020-09-06",
+    "updateDateTime": "2020-09-06",
+    "shortDescription": "This script provides you with an overview of all orphaned redirect sites and allows you to quickly delete them.",
+    "longDescription": [
+      "Changing the URL of a site results in a new site type: a Redirect Site. However this redirect site does not get removed if you delete the newly renamed site. This could result in orphaned redirect site collections that redirect to nothing. This script provides you with an overview of all orphaned redirect sites and allows you to quickly delete them."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "cleanup",
+      "sites"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/remove-orphaned-redirect-sites/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "appieschot",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/15227781?v=4",
+        "name": "Albert-Jan Schot"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

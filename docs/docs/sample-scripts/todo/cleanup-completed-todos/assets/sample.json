@@ -3,7 +3,7 @@
     "name": "pnp-cli-microsoft365-cleanup-completed-todos",
     "source": "pnp",
     "title": "Cleanup completed Microsoft To Do tasks",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/todo/cleanup-completed-todos",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/todo/cleanup-completed-todos",
     "creationDateTime": "2021-04-09",
     "updateDateTime": "2021-04-09",
     "shortDescription": "This script iterates across all of the task lists and removes the tasks that have been marked as complete.",
@@ -15,10 +15,8 @@
     ],
     "categories": [],
     "tags": [
-      "Microsoft To Do",
-      "m365 todo task remove",
-      "m365 todo task list",
-      "m365 todo list list"
+      "cleanup",
+      "tasks"
     ],
     "metadata": [
       {

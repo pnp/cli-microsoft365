@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-change-owner-group-membership",
+    "source": "pnp",
+    "title": "Change group membership of all SharePoint Online sites",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/change-owner-group-membership",
+    "creationDateTime": "2022-03-19",
+    "updateDateTime": "2022-03-19",
+    "shortDescription": "Script which downgrades the permission to the default member group.",
+    "longDescription": [
+      "This is a script which takes a subset or all members of the default owner group and downgrades the permission to the default member group."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "users",
+      "groups",
+      "security"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/change-owner-group-membership/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "arjunumenon",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/10369964?v=4",
+        "name": "Arjun Menon"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

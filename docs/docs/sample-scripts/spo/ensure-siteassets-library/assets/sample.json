@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-ensure-siteassets-library",
+    "source": "pnp",
+    "title": "Ensure the Site Assets Library is created",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/ensure-siteassets-library",
+    "creationDateTime": "2020-04-12",
+    "updateDateTime": "2020-04-12",
+    "shortDescription": "Ensure that the Site Assets library is created.",
+    "longDescription": [
+      "There are occasions when creating a new modern SharePoint site using the CLI/REST API that the Site Assets library isn't created, use this script to ensure that the Site Assets library is created."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "provisioning",
+      "lists"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/ensure-siteassets-library/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "",
+        "pictureUrl": "",
+        "name": "Phil Harding"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

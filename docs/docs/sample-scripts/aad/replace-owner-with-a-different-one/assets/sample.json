@@ -1,0 +1,52 @@
+[
+  {
+    "name": "pnp-replace-owner-with-a-different-one",
+    "source": "pnp",
+    "title": "CLI - Replace an owner in a Microsoft 365 Group or Microsoft Team",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/replace-owner-with-a-different-one",
+    "creationDateTime": "2021-04-28",
+    "updateDateTime": "2021-04-28",
+    "shortDescription": "Find all the Microsoft 365 Groups that a user is an Owner of and replace them with someone else.",
+    "longDescription": [
+      "Find all the Microsoft 365 Groups that a user is an Owner of and replace them with someone else useful for when an employee leaves and ownership needs to be updated."
+    ],
+    "products": [
+      "AAD"
+    ],
+    "categories": [],
+    "tags": [
+      "users",
+      "groups",
+      "security",
+      "teams"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/aad/replace-owner-with-a-different-one/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "plamber",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/18241305?v=4",
+        "name": "Patrick Lamber"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

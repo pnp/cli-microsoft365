@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-disable-tenant-wide-extension",
+    "source": "pnp",
+    "title": "Disable specified Tenant-wide Extension",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/disable-tenant-wide-extension",
+    "creationDateTime": "2020-05-20",
+    "updateDateTime": "2020-05-20",
+    "shortDescription": "Script helps to disable the specified tenant wide extension based on the id parameter.",
+    "longDescription": [
+      "Tenant Wide Extensions list from the App Catalog helps to manage the activation / deactivation of the tenant wide extensions. The below sample script helps to disable the specified tenant wide extension based on the id parameter."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "customizations",
+      "provisioning"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/disable-tenant-wide-extension/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "ktskumar",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/34408892?v=4",
+        "name": "Shantha Kumar T"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

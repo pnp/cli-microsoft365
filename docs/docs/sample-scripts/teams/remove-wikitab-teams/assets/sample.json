@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-remove-wikitab-teams",
+    "source": "pnp",
+    "title": "Remove Wiki tab in a Microsoft Teams channel",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/remove-wikitab-teams",
+    "creationDateTime": "2020-08-23",
+    "updateDateTime": "2020-08-23",
+    "shortDescription": "Removes the wiki tab of a Microsoft Teams Team's channel.",
+    "longDescription": [
+      "Removes the wiki tab of a Microsoft Teams Team's channel."
+    ],
+    "products": [
+      "Teams"
+    ],
+    "categories": [],
+    "tags": [
+      "cleanup",
+      "teams"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/remove-wikitab-teams/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "rabwill",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/20379311?v=4",
+        "name": "Rabia Williams"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
