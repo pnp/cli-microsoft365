@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-export-flow-logicapp",
+    "source": "pnp",
+    "title": "Export a single flow to a Logic App",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/flow/export-flow-logicapp",
+    "creationDateTime": "2021-02-07",
+    "updateDateTime": "2021-02-07",
+    "shortDescription": "This script will export the Power Automate flow.",
+    "longDescription": [
+      "This script will export the Power Automate flow *Your sample test flow*, make sure to pass the correct name in the script, and your flow will be exported right away."
+    ],
+    "products": [
+      "Power Automate"
+    ],
+    "categories": [],
+    "tags": [
+      "migration",
+      "flows",
+      "azure"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/flow/export-flow-logicapp/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "appieschot",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/15227781?v=4",
+        "name": "Albert-Jan Schot"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-export-all-channels-teams",
+    "source": "pnp",
+    "title": "Export all channels in Microsoft Teams teams in the tenant",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/export-all-channels-teams",
+    "creationDateTime": "2021-11-02",
+    "updateDateTime": "2021-11-02",
+    "shortDescription": "Export all the channels from Microsoft Team in a CSV.",
+    "longDescription": [
+      "Export all the channels from Microsoft Team in a CSV."
+    ],
+    "products": [
+      "Teams"
+    ],
+    "categories": [],
+    "tags": [
+      "migration",
+      "teams"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/export-all-channels-teams/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "sudharsank",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/10280385?v=4",
+        "name": "Sudharsan Kesavanarayanan"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

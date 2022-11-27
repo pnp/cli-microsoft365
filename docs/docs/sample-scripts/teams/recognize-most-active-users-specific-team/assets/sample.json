@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-recognize-most-active-users-specific-team",
+    "source": "pnp",
+    "title": "Recognize most active users for a specific Team",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/recognize-most-active-users-specific-team",
+    "creationDateTime": "2021-08-27",
+    "updateDateTime": "2021-08-27",
+    "shortDescription": "Retrieves all activities for a specific Microsoft Teams Team and shares the top 3 contributors.",
+    "longDescription": [
+      "Retrieves all activities for a specific Microsoft Teams Team and shares the top 3 contributors based on their score as an adaptive card to the specified webhook url."
+    ],
+    "products": [
+      "Teams"
+    ],
+    "categories": [],
+    "tags": [
+      "adoption",
+      "users"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/recognize-most-active-users-specific-team/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "appieschot",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/15227781?v=4",
+        "name": "Albert-Jan Schot"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-create-team-and-add-members-and-owners",
+    "source": "pnp",
+    "title": "Create a Microsoft Teams team and bulk add members from CSV file",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/create-team-and-add-members-and-owners",
+    "creationDateTime": "2021-04-10",
+    "updateDateTime": "2021-04-10",
+    "shortDescription": "This sample script shows you how to create a Team and add members and owners using a CSV.",
+    "longDescription": [
+      "This sample script shows you how to create a Team and add members and owners using a CSV."
+    ],
+    "products": [
+      "Teams"
+    ],
+    "categories": [],
+    "tags": [
+      "users",
+      "provisioning",
+      "teams"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/create-team-and-add-members-and-owners/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "plamber",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/18241305?v=4",
+        "name": "Patrick Lamber"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

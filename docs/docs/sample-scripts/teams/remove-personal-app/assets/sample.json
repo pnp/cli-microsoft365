@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-remove-personal-app",
+    "source": "pnp",
+    "title": "Removes Microsoft Teams personal app from users and Microsoft Teams app catalog",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/remove-personal-app",
+    "creationDateTime": "2020-10-27",
+    "updateDateTime": "2020-10-27",
+    "shortDescription": "Uninstalls an app from the specified users and / or unpublish it from the Microsoft Teams app catalog based on the App Id.",
+    "longDescription": [
+      "Uninstalls an app from the specified users and / or unpublish it from the Microsoft Teams app catalog based on the App Id available in the `manifest.json` of the Teams app."
+    ],
+    "products": [
+      "Teams"
+    ],
+    "categories": [],
+    "tags": [
+      "apps",
+      "cleanup"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/remove-personal-app/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "sebastienlevert",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/7620955?v=4",
+        "name": "Sébastien Levert"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

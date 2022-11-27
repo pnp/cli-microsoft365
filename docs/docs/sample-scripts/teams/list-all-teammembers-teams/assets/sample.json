@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-list-all-teammembers-teams",
+    "source": "pnp",
+    "title": "List all team members in Microsoft Teams teams in the tenant",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/list-all-teammembers-teams",
+    "creationDateTime": "2021-09-02",
+    "updateDateTime": "2021-09-02",
+    "shortDescription": "List all team members in Microsoft Teams teams in the tenant and exports the results in a CSV.",
+    "longDescription": [
+      "List all team members in Microsoft Teams teams in the tenant and exports the results in a CSV."
+    ],
+    "products": [
+      "Teams"
+    ],
+    "categories": [],
+    "tags": [
+      "users",
+      "reports",
+      "teams"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/list-all-teammembers-teams/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "sudharsank",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/10280385?v=4",
+        "name": "Sudharsan Kesavanarayanan"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
