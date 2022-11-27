@@ -1006,8 +1006,7 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
-        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
-        debug: false
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'
       }
     });
   });

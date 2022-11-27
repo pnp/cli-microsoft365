@@ -173,7 +173,6 @@ describe(commands.FILE_LIST, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared Documents'
       }
@@ -300,7 +299,6 @@ describe(commands.FILE_LIST, () => {
     await command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared Documents',
         recursive: true
@@ -476,7 +474,6 @@ describe(commands.FILE_LIST, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared Documents',
         recursive: true
@@ -532,7 +529,6 @@ describe(commands.FILE_LIST, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: `Shared Documents/Fo'lde'r`
       }
@@ -601,7 +597,6 @@ describe(commands.FILE_LIST, () => {
     await command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         folder: 'Shared Documents'
       }

@@ -196,7 +196,6 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       Title: "fail adding me"
@@ -274,7 +273,6 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       contentType: "Unexpected content type",
@@ -290,7 +288,6 @@ describe(commands.LISTITEM_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: 'Demo List',
         webUrl: webUrl,
         Title: expectedTitle,

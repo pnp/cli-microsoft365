@@ -153,7 +153,6 @@ describe(commands.FEATURE_ENABLE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         id: "b2307a39-e878-458b-bc90-03bc578531d6",
         scope: 'web'

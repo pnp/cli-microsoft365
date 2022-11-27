@@ -122,7 +122,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('retrieves the details of an existing tenant property without a comment', async () => {
-    await command.action(logger, { options: { debug: false, key: 'propertywithoutcomments', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: { key: 'propertywithoutcomments', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
     assert(loggerLogSpy.calledWith({
       Key: 'propertywithoutcomments',
       Value: 'dolor',
@@ -132,7 +132,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('handles a non-existent tenant property', async () => {
-    await command.action(logger, { options: { debug: false, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: { key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
   });
 
   it('handles a non-existent tenant property (debug)', async () => {

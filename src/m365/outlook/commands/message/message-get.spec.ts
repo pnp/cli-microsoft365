@@ -178,7 +178,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: messageId } } as any),
+    await assert.rejects(command.action(logger, { options: { id: messageId } } as any),
       new CommandError(`Graph error occured`));
   });
 
@@ -223,7 +223,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: messageId, userId: userId } } as any),
+    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId } } as any),
       new CommandError(`Graph error occured`));
   });
 
@@ -238,7 +238,7 @@ describe(commands.MESSAGE_GET, () => {
       throw `Invalid request`;
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: messageId, userPrincipalName: userPrincipalName } } as any),
+    await assert.rejects(command.action(logger, { options: { id: messageId, userPrincipalName: userPrincipalName } } as any),
       new CommandError(`Graph error occured`));
   });
 
@@ -256,7 +256,7 @@ describe(commands.MESSAGE_GET, () => {
     sinonUtil.restore([Auth.isAppOnlyAuth]);
     sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: messageId } } as any),
+    await assert.rejects(command.action(logger, { options: { id: messageId } } as any),
       new CommandError(`The option 'userId' or 'userPrincipalName' is required when retrieving an email using app only credentials`));
   });
 
@@ -264,7 +264,7 @@ describe(commands.MESSAGE_GET, () => {
     sinonUtil.restore([Auth.isAppOnlyAuth]);
     sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: messageId, userId: userId, userPrincipalName: userPrincipalName } } as any),
+    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userPrincipalName: userPrincipalName } } as any),
       new CommandError(`Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using app only credentials`));
   });
 
@@ -272,7 +272,7 @@ describe(commands.MESSAGE_GET, () => {
     sinonUtil.restore([Auth.isAppOnlyAuth]);
     sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => false);
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: messageId, userId: userId, userPrincipalName: userPrincipalName } } as any),
+    await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId, userPrincipalName: userPrincipalName } } as any),
       new CommandError(`Both options 'userId' and 'userPrincipalName' cannot be set when retrieving an email using delegated credentials`));
   });
 });

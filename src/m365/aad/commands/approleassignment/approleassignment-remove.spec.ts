@@ -92,7 +92,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('prompts before removing the app role assignment when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scope: 'Sites.Read.All' } });
+    await command.action(logger, { options: { appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scope: 'Sites.Read.All' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -253,7 +253,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { appId: '36e3a540-6f25-4483-9542-9f5fa00bb633', confirm: true } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 

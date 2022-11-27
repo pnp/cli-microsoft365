@@ -77,7 +77,6 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
     }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
@@ -94,7 +93,6 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My app'
       }
     }), new CommandError(`No Azure AD application registration with name My app found`));
@@ -116,7 +114,6 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My app'
       }
     }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
@@ -127,7 +124,6 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
     }), new CommandError(`An error has occurred`));
@@ -138,7 +134,6 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My app'
       }
     }), new CommandError(`An error has occurred`));

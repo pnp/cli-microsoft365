@@ -450,7 +450,6 @@ describe(commands.LIST_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
         webUrl: 'https://contoso.sharepoint.com',
         withPermissions: true
@@ -791,7 +790,6 @@ describe(commands.LIST_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
         webUrl: 'https://contoso.sharepoint.com',
         properties: 'Title,Id',
@@ -1084,7 +1082,6 @@ describe(commands.LIST_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         title: 'Documents',
         webUrl: 'https://contoso.sharepoint.com',
         properties: 'Title,Id',
@@ -1265,7 +1262,6 @@ describe(commands.LIST_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com'
       }

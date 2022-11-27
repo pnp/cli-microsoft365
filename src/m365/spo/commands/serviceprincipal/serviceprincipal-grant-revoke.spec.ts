@@ -127,7 +127,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
+    await command.action(logger, { options: { id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -141,13 +141,13 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('The given key was not present in the dictionary.'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred'));
   });
 

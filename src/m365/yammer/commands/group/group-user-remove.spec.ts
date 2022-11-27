@@ -79,7 +79,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       { continue: true }
     ));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation with parameters', async () => {
@@ -149,7 +149,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       { continue: false }
     ));
 
-    await command.action(logger, { options: { debug: false, groupId: 1231231, id: 989998789 } });
+    await command.action(logger, { options: { groupId: 1231231, id: 989998789 } });
 
     assert(promptStub.called);
   });
@@ -159,7 +159,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       { continue: false }
     ));
 
-    await command.action(logger, { options: { debug: false, groupId: 1231231, id: 989998789 } });
+    await command.action(logger, { options: { groupId: 1231231, id: 989998789 } });
 
     assert(requests.length === 0);
   });

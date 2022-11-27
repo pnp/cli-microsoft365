@@ -197,7 +197,7 @@ describe(commands.APP_UPDATE, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    await command.action(logger, { options: { debug: false, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
+    await command.action(logger, { options: { filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
     assert(updateTeamsAppCalled);
   });
 
@@ -264,6 +264,6 @@ describe(commands.APP_UPDATE, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    await assert.rejects(command.action(logger, { options: { debug: false, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } } as any), new CommandError('An error has occurred'));
   });
 });

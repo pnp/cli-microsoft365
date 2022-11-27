@@ -249,7 +249,7 @@ describe(commands.APPPAGE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
+    await assert.rejects(command.action(logger, { options: { title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
       new CommandError(`Failed to create a single-part app page`));
   });
 
@@ -271,7 +271,7 @@ describe(commands.APPPAGE_ADD, () => {
     });
 
 
-    await assert.rejects(command.action(logger, { options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
+    await assert.rejects(command.action(logger, { options: { title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
       new CommandError(`Page not found`));
   });
 
@@ -351,7 +351,7 @@ describe(commands.APPPAGE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
+    await assert.rejects(command.action(logger, { options: { title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any),
       new CommandError('An error has occurred'));
   });
 

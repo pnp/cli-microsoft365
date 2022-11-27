@@ -227,8 +227,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
-        confirm: true,
-        debug: false
+        confirm: true
       }
     } as any);
     assert(postCallbackStub.called);
@@ -241,8 +240,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
-        confirm: false,
-        debug: false
+        confirm: false
       }
     } as any);
     let promptIssued = false;
@@ -264,8 +262,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        updateChildContentTypes: false,
-        debug: false
+        updateChildContentTypes: false
       }
     } as any);
     assert(postCallbackStub.called);
@@ -281,8 +278,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        updateChildContentTypes: true,
-        debug: false
+        updateChildContentTypes: true
       }
     } as any);
     assert(postCallbackStub.notCalled);
@@ -334,8 +330,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: true,
-        debug: false
+        confirm: true
       }
     } as any);
     assert(loggerLogSpy.notCalled);
@@ -347,8 +342,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     await command.action(logger, {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        updateChildContentTypes: true,
-        debug: false
+        updateChildContentTypes: true
       }
     } as any);
     let promptIssued = false;
@@ -370,8 +364,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: false,
-        debug: false
+        confirm: false
       }
     } as any);
     assert(postCallbackStub.called);
@@ -388,8 +381,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: false,
-        debug: false
+        confirm: false
       }
     } as any);
     assert(postCallbackStub.notCalled);
@@ -461,8 +453,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     await command.action(logger, {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        confirm: true,
-        debug: false
+        confirm: true
       }
     } as any);
     assert(postCallbackStub.called);
@@ -476,8 +467,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     await command.action(logger, {
       options: {
         webUrl: WEB_URL, listId: LIST_ID, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        confirm: true,
-        debug: false
+        confirm: true
       }
     } as any);
     assert(postCallbackStub.called);
@@ -491,8 +481,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     await command.action(logger, {
       options: {
         webUrl: WEB_URL, listUrl: LIST_URL, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        confirm: true,
-        debug: false
+        confirm: true
       }
     } as any);
     assert(postCallbackStub.called);
@@ -505,8 +494,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        debug: false
+        webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID
       }
     } as any);
     let promptIssued = false;
@@ -530,8 +518,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
-        confirm: true,
-        debug: false
+        confirm: true
       }
     } as any);
     assert(postCallbackStub.called);
@@ -550,8 +537,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: false,
-        confirm: false,
-        debug: false
+        confirm: false
       }
     } as any);
     assert(postCallbackStub.notCalled);
@@ -671,8 +657,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: true,
-        debug: false
+        confirm: true
       }
     } as any), new CommandError('Unknown Error'));
   });
@@ -697,8 +682,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: false,
-        debug: false
+        confirm: false
       }
     } as any), new CommandError('Unknown Error'));
   });

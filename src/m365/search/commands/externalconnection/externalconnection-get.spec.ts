@@ -90,7 +90,6 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false
       }
     }), new CommandError('An error has occurred'));
   });

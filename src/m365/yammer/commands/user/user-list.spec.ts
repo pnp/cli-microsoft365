@@ -229,7 +229,7 @@ describe(commands.USER_LIST, () => {
         });
       }
     });
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('sorts users in reverse order', async () => {
@@ -305,7 +305,7 @@ describe(commands.USER_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation without parameters', async () => {

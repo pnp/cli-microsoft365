@@ -261,7 +261,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('gets the service health issues available in Microsoft 365', async () => {
@@ -274,7 +274,6 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
     assert(loggerLogSpy.calledWith(jsonOutput.value));
@@ -306,8 +305,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        service: 'Microsoft Forms',
-        debug: false
+        service: 'Microsoft Forms'
       }
     } as any);
     assert(loggerLogSpy.calledWith(jsonOutputMicrosoftForms.value));
@@ -324,8 +322,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST, () => {
     await command.action(logger, {
       options: {
         service: 'Microsoft Forms',
-        output: 'text',
-        debug: false
+        output: 'text'
       }
     });
     assert(loggerLogSpy.calledWith(jsonOutputMicrosoftForms.value));

@@ -188,7 +188,6 @@ describe(commands.USERPROFILE_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         userName: 'john.doe@contoso.onmicrosoft.com'
       }
     } as any), new CommandError('An error has occurred'));

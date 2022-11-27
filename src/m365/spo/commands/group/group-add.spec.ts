@@ -117,6 +117,6 @@ describe(commands.GROUP_ADD, () => {
       return Promise.reject("An error has occurred.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
   });
 }); 

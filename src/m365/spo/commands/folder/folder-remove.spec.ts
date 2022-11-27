@@ -89,7 +89,7 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('prompts before removing folder when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
     let promptIssued = false;
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;
@@ -103,7 +103,7 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
     assert(requests.length === 0);
   });
 
@@ -117,7 +117,6 @@ describe(commands.FOLDER_REMOVE, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         url: '/Shared Documents/Folder1'
       }

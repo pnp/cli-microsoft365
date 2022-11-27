@@ -126,7 +126,7 @@ describe(commands.APP_PUBLISH, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    await command.action(logger, { options: { debug: false, filePath: 'teamsapp.zip' } });
+    await command.action(logger, { options: { filePath: 'teamsapp.zip' } });
     assert(loggerLogSpy.calledWith(appResponse));
   });
 
@@ -152,6 +152,6 @@ describe(commands.APP_PUBLISH, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    await assert.rejects(command.action(logger, { options: { debug: false, filePath: 'teamsapp.zip' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { filePath: 'teamsapp.zip' } } as any), new CommandError('An error has occurred'));
   });
 });

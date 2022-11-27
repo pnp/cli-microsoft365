@@ -301,7 +301,6 @@ describe(commands.CONTENTTYPE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/test'
       }
     });
@@ -562,7 +561,6 @@ describe(commands.CONTENTTYPE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         category: 'List Content Types',
         webUrl: 'https://contoso.sharepoint.com/sites/test'
       }

@@ -184,7 +184,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: testIncorrectId } } as any), new CommandError(resResourceNotExist.error.message));
+    await assert.rejects(command.action(logger, { options: { id: testIncorrectId } } as any), new CommandError(resResourceNotExist.error.message));
   });
 
   it('lists all properties for output json', async () => {

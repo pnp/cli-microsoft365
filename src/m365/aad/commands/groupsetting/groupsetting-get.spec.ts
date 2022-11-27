@@ -83,7 +83,7 @@ describe(commands.GROUPSETTING_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
     assert(loggerLogSpy.calledWith({
       "displayName": "Group Setting",
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
@@ -150,7 +150,7 @@ describe(commands.GROUPSETTING_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843' } } as any),
       new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c843' does not exist or one of its queried reference-property objects are not present.`));
   });
 

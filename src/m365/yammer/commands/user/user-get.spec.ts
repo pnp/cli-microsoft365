@@ -118,7 +118,7 @@ describe(commands.USER_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('correctly handles 404 error', async () => {
@@ -128,7 +128,7 @@ describe(commands.USER_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Not found (404)'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Not found (404)'));
   });
 
   it('passes validation without parameters', async () => {

@@ -104,7 +104,7 @@ describe(commands.MESSAGE_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('calls the messaging endpoint with id and json and json', async () => {

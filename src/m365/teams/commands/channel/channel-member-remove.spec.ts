@@ -575,7 +575,6 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         confirm: true,
         teamId: '00000000-0000-0000-0000-000000000000'
       }

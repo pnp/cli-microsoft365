@@ -172,7 +172,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('prompts before removing group when confirmation argument not passed (id)', async () => {
-    await command.action(logger, { options: { debug: false, id: 7, webUrl: 'https://contoso.sharepoint.com/mysite' } });
+    await command.action(logger, { options: { id: 7, webUrl: 'https://contoso.sharepoint.com/mysite' } });
     let promptIssued = false;
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;
@@ -182,7 +182,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('prompts before removing group when confirmation argument not passed (name)', async () => {
-    await command.action(logger, { options: { debug: false, name: 'Team Site Owners', webUrl: 'https://contoso.sharepoint.com/mysite' } });
+    await command.action(logger, { options: { name: 'Team Site Owners', webUrl: 'https://contoso.sharepoint.com/mysite' } });
     let promptIssued = false;
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;

@@ -194,7 +194,6 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     const options: any = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
       itemId: itemId,

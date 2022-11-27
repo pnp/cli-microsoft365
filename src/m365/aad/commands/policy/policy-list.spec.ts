@@ -100,7 +100,6 @@ describe(commands.POLICY_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         type: "authorization"
       }
     });
@@ -150,7 +149,6 @@ describe(commands.POLICY_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         type: "tokenLifetime"
       }
     });
@@ -262,7 +260,6 @@ describe(commands.POLICY_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
     assert(loggerLogSpy.calledWith([
@@ -319,7 +316,7 @@ describe(commands.POLICY_LIST, () => {
       return Promise.reject("An error has occurred.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, type: "foo" } } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: { type: "foo" } } as any), new CommandError("An error has occurred."));
   });
 
   it('correctly handles API OData error for all policies', async () => {
@@ -327,7 +324,7 @@ describe(commands.POLICY_LIST, () => {
       return Promise.reject("An error has occurred.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
   });
 
   it('accepts type to be activityBasedTimeout', async () => {

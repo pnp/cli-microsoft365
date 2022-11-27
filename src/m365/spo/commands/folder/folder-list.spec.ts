@@ -200,7 +200,6 @@ describe(commands.FOLDER_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: webUrl,
         parentFolderUrl: parentFolderUrl
       }

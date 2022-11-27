@@ -511,7 +511,7 @@ describe(commands.TERM_GROUP_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
   });
 
   it('correctly handles error when retrieving taxonomy term groups', async () => {
@@ -524,13 +524,13 @@ describe(commands.TERM_GROUP_LIST, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('File Not Found.'));
   });
 
   it('handles promise rejection', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('getRequestDigest error'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('getRequestDigest error'));
   });
 });

@@ -314,7 +314,6 @@ describe(commands.CHANNEL_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion'
       }
@@ -342,7 +341,6 @@ describe(commands.CHANNEL_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion',
         type: 'private',
@@ -372,7 +370,6 @@ describe(commands.CHANNEL_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion',
         type: 'shared',
@@ -451,7 +448,6 @@ describe(commands.CHANNEL_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion'
       }

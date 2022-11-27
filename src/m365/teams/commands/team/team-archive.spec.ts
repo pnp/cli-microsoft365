@@ -235,8 +235,7 @@ describe(commands.TEAM_ARCHIVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
-        debug: false
+        id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
       }
     } as any), new CommandError('An error has occurred'));
   });

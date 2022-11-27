@@ -85,7 +85,7 @@ describe(commands.O365GROUP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: false } });
+    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: false } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -103,7 +103,7 @@ describe(commands.O365GROUP_REMOVE, () => {
   });
 
   it('prompts before removing the specified group when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -130,7 +130,7 @@ describe(commands.O365GROUP_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postSpy.notCalled);
   });
 
@@ -150,7 +150,7 @@ describe(commands.O365GROUP_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postStub.called);
   });
 
@@ -210,7 +210,7 @@ describe(commands.O365GROUP_REMOVE, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
+    await assert.rejects(command.action(logger, { options: { confirm: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
       new CommandError('File Not Found.'));
   });
 

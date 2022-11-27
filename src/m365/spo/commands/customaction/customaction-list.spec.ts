@@ -81,7 +81,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     const getCustomActionsSpy = sinon.spy((command as any), 'getCustomActions');
     const options = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
     };
@@ -90,7 +89,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
       await command.action(logger, { options: options } as any);
       assert(getRequestSpy.calledOnce);
       assert(getCustomActionsSpy.calledWith({
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web'
       }));
@@ -112,7 +110,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     const getCustomActionsSpy = sinon.spy((command as any), 'getCustomActions');
     const options = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site'
     };
@@ -121,7 +118,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
       await command.action(logger, { options: options } as any);
       assert(getRequestSpy.calledOnce);
       assert(getCustomActionsSpy.calledWith({
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Site'
       }));
@@ -142,7 +138,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
     });
 
     const options = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site',
       output: 'json'
@@ -198,7 +193,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
     const options = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: "All"
     };
@@ -231,7 +225,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
@@ -255,7 +248,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
@@ -276,7 +268,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
@@ -299,7 +290,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'

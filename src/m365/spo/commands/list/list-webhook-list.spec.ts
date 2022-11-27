@@ -106,7 +106,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         verbose: true
@@ -176,7 +175,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
@@ -224,7 +222,6 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         output: 'json'

@@ -233,7 +233,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('gets the service update messages available in Microsoft 365', async () => {
@@ -246,7 +246,6 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
     assert(loggerLogSpy.calledWith(jsonOutput.value));
@@ -278,8 +277,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        service: 'Microsoft Teams',
-        debug: false
+        service: 'Microsoft Teams'
       }
     } as any);
     assert(loggerLogSpy.calledWith(jsonOutputMicrosoftTeams.value));
@@ -296,8 +294,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
     await command.action(logger, {
       options: {
         service: 'Microsoft Teams',
-        output: 'text',
-        debug: false
+        output: 'text'
       }
     });
     assert(loggerLogSpy.calledWith(jsonOutputMicrosoftTeams.value));

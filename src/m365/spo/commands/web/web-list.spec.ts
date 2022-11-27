@@ -189,7 +189,6 @@ describe(commands.WEB_LIST, () => {
     await command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         url: 'https://contoso.sharepoint.com'
       }
     });

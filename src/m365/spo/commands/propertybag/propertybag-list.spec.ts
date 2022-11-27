@@ -197,8 +197,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('abc1'); }));
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options = {
-      webUrl: 'https://contoso.sharepoint.com',
-      debug: false
+      webUrl: 'https://contoso.sharepoint.com'
     };
 
     await assert.rejects(command.action(logger, { options: options } as any),

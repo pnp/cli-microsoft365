@@ -105,7 +105,7 @@ describe(commands.USER_SET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, objectId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', NonExistingProperty: 'Value' } } as any),
+    await assert.rejects(command.action(logger, { options: { objectId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', NonExistingProperty: 'Value' } } as any),
       new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c844' does not exist or one of its queried reference-property objects are not present.`));
   });
 
@@ -119,7 +119,6 @@ describe(commands.USER_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         objectId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844',
         Department: 'Sales & Marketing',
         CompanyName: 'Contoso'
@@ -138,7 +137,6 @@ describe(commands.USER_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         userPrincipalName: 'steve@contoso.onmicrosoft.com',
         accountEnabled: true
       }

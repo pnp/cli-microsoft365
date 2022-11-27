@@ -97,7 +97,6 @@ describe(commands.RUN_CANCEL, () => {
   it('prompts before cancelling the specified Microsoft FlowName when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
@@ -121,7 +120,6 @@ describe(commands.RUN_CANCEL, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
@@ -188,7 +186,6 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161',
@@ -215,7 +212,6 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
@@ -242,7 +238,6 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161'
@@ -263,7 +258,6 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161',
@@ -290,7 +284,6 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762688CP233'
@@ -311,7 +304,6 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762688CP233',

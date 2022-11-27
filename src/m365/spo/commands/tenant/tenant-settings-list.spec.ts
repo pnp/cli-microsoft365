@@ -80,7 +80,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error while getting tenant appcatalog', async () => {
@@ -98,7 +98,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('lists the tenant settings (debug)', async () => {
@@ -166,6 +166,6 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Timed out'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Timed out'));
   });
 });

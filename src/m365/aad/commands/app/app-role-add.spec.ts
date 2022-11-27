@@ -163,7 +163,6 @@ describe(commands.APP_ROLE_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'Role',
         description: 'Custom role',
@@ -267,7 +266,6 @@ describe(commands.APP_ROLE_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'Role',
         description: 'Custom role',
@@ -289,7 +287,6 @@ describe(commands.APP_ROLE_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         name: 'Role',
         description: 'Custom role',
@@ -311,7 +308,6 @@ describe(commands.APP_ROLE_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'My app',
         name: 'Role',
         description: 'Custom role',
@@ -338,7 +334,6 @@ describe(commands.APP_ROLE_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'My app',
         name: 'Role',
         description: 'Custom role',
@@ -354,7 +349,6 @@ describe(commands.APP_ROLE_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         name: 'Role',
         description: 'Custom role',
@@ -370,7 +364,6 @@ describe(commands.APP_ROLE_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'My app',
         name: 'Role',
         description: 'Custom role',
@@ -392,7 +385,6 @@ describe(commands.APP_ROLE_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'Role',
         description: 'Custom role',
@@ -428,7 +420,6 @@ describe(commands.APP_ROLE_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'Role',
         description: 'Custom role',

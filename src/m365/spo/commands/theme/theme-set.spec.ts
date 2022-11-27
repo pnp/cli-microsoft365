@@ -89,7 +89,6 @@ describe(commands.THEME_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'Contoso',
         theme: '123',
         isInverted: false

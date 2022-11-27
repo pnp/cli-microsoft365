@@ -181,7 +181,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.resolve();
     });
 
-    await command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
     assert(addMemberRequestIssued);
   });
 
@@ -233,7 +233,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.resolve();
     });
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } });
     assert(addMemberRequestIssued);
   });
 
@@ -272,7 +272,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews.not.found@contoso.onmicrosoft.com" } } as any), new CommandError("Resource 'anne.matthews.not.found%40contoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present."));
+    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews.not.found@contoso.onmicrosoft.com" } } as any), new CommandError("Resource 'anne.matthews.not.found%40contoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present."));
   });
 
   it('correctly handles error when user cannot be retrieved', async () => {
@@ -284,7 +284,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "doesnotexist.matthews@contoso.onmicrosoft.com" } } as any),
+    await assert.rejects(command.action(logger, { options: { teamId: "00000000-0000-0000-0000-000000000000", userName: "doesnotexist.matthews@contoso.onmicrosoft.com" } } as any),
       new CommandError('Resource \'doesnotexist.matthews@contoso.onmicrosoft.com\' does not exist or one of its queried reference-property objects are not present.'));
   });
 
@@ -308,7 +308,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
+    await assert.rejects(command.action(logger, { options: { teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
       new CommandError('Invalid object identifier'));
   });
 });

@@ -92,7 +92,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -112,7 +112,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
   });
 
   it('prompts before disconnecting the specified site from its hub site when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -128,7 +128,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(postSpy.notCalled);
   });
 
@@ -140,7 +140,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(postStub.called);
   });
 
@@ -159,7 +159,7 @@ describe(commands.SITE_HUBSITE_DISCONNECT, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
       new CommandError('Exception of type \'Microsoft.SharePoint.Client.ResourceNotFoundException\' was thrown.'));
   });
 

@@ -73,7 +73,7 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserDetail");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -89,10 +89,10 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, output: 'json' } });
+    await command.action(logger, { options: { output: 'json' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationsUserDetail");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-    assert(loggerLogSpy.calledWith([{"Report Refresh Date":"2021-05-25","User Principal Name":"user1@contoso.onmicrosoft.com","Display Name":"User1","Product Type":"MICROSOFT 365 APPS FOR ENTERPRISE","Last Activated Date":"","Windows":0,"Mac":0,"Windows 10 Mobile":0,"iOS":0,"Android":0,"Activated On Shared Computer":"False"},{"Report Refresh Date":"2021-05-25","User Principal Name":"user1@contoso.onmicrosoft.com","Display Name":"User1","Product Type":"MICROSOFT EXCEL ADVANCED ANALYTICS","Last Activated Date":"","Windows":0,"Mac":0,"Windows 10 Mobile":0,"iOS":0,"Android":0,"Activated On Shared Computer":"False"}]));
+    assert(loggerLogSpy.calledWith([{ "Report Refresh Date": "2021-05-25", "User Principal Name": "user1@contoso.onmicrosoft.com", "Display Name": "User1", "Product Type": "MICROSOFT 365 APPS FOR ENTERPRISE", "Last Activated Date": "", "Windows": 0, "Mac": 0, "Windows 10 Mobile": 0, "iOS": 0, "Android": 0, "Activated On Shared Computer": "False" }, { "Report Refresh Date": "2021-05-25", "User Principal Name": "user1@contoso.onmicrosoft.com", "Display Name": "User1", "Product Type": "MICROSOFT EXCEL ADVANCED ANALYTICS", "Last Activated Date": "", "Windows": 0, "Mac": 0, "Windows 10 Mobile": 0, "iOS": 0, "Android": 0, "Activated On Shared Computer": "False" }]));
   });
 
   it('handles error correctly', async () => {
@@ -100,6 +100,6 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

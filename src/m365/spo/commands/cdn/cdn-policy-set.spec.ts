@@ -130,7 +130,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('sets ExcludeRestrictedSiteClassifications CDN policy on the public CDN when no type specified', async () => {
-    await assert.rejects(command.action(logger, { options: { debug: false, policy: 'ExcludeRestrictedSiteClassifications', value: 'foo' } }));
+    await assert.rejects(command.action(logger, { options: { policy: 'ExcludeRestrictedSiteClassifications', value: 'foo' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -169,7 +169,7 @@ describe(commands.CDN_POLICY_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, policy: 'IncludeFileExtensions', value: '<WOFF' } });
+    await command.action(logger, { options: { policy: 'IncludeFileExtensions', value: '<WOFF' } });
     assert.strictEqual(log.length, 0);
   });
 
@@ -203,7 +203,7 @@ describe(commands.CDN_POLICY_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, policy: 'IncludeFileExtensions', value: '<WOFF' } } as any),
+    await assert.rejects(command.action(logger, { options: { policy: 'IncludeFileExtensions', value: '<WOFF' } } as any),
       new CommandError('An error has occurred'));
   });
 

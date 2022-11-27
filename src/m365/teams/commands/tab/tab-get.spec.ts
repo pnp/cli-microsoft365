@@ -235,7 +235,6 @@ describe(commands.TAB_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '29:00000000000000000000000000000000@thread.skype',
         id: '00000000-0000-0000-0000-000000000000'

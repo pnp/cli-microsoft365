@@ -87,7 +87,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com' } } as any);
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any);
   });
 
   it('enables communication site features on the specified site (debug)', async () => {

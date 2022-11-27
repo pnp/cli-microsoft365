@@ -105,7 +105,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
   });
 
   it('removes site collection app catalog (debug=true)', async () => {

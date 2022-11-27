@@ -82,7 +82,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, verbose: true } });
+    await command.action(logger, { options: { verbose: true } });
     assert.strictEqual(svcListRequest.callCount, 1);
     assert(loggerLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1']));
   });
@@ -98,7 +98,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, verbose: false } });
+    await command.action(logger, { options: { verbose: false } });
     assert.strictEqual(svcListRequest.callCount, 1);
     assert(loggerLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1', 'http://contoso.sharepoint.com/sites/site2']));
   });

@@ -99,9 +99,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       return Promise.reject('Invalid request');
     });
     await command.action(logger, {
-      options: {
-        debug: false
-      }
+      options: {}
     });
     try {
       assert(loggerLogSpy.calledWith([{
@@ -181,9 +179,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       return Promise.reject('Invalid request');
     });
     await command.action(logger, {
-      options: {
-        debug: false
-      }
+      options: {}
     });
     try {
       assert(loggerLogSpy.lastCall.args[0][1].id === 'adatumisv_exo3');
@@ -231,7 +227,6 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         owner: '07d21ad2-c8f9-4316-a14a-347db702bd3c'
       }
     });
@@ -307,7 +302,6 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         pageNumber: 1
       }
     });
@@ -383,7 +377,6 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         pageNumber: 1,
         pageSize: 1
       }

@@ -126,7 +126,7 @@ describe(commands.O365GROUP_CONVERSATION_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000" } } as any),
       new CommandError('An error has occurred'));
   });
 });

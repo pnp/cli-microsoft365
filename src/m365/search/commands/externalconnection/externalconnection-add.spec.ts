@@ -94,7 +94,6 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
     const options: any = {
-      debug: false,
       id: 'TestConnectionForCLI',
       name: 'Test Connection for CLI',
       description: 'Test connection that will not do anything'
@@ -111,7 +110,6 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
     const options: any = {
-      debug: false,
       id: 'TestConnectionForCLI',
       name: 'Test Connection for CLI',
       description: 'Test connection that will not do anything',
@@ -129,7 +127,6 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
     const options: any = {
-      debug: false,
       id: 'TestConnectionForCLI',
       name: 'Test Connection for CLI',
       description: 'Test connection that will not do anything',
@@ -153,7 +150,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),
+    await assert.rejects(command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),
       new CommandError(`An error has occurred`));
   });
 

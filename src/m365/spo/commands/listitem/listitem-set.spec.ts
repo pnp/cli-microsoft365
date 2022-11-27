@@ -251,7 +251,6 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -305,7 +304,6 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-y',
@@ -339,7 +337,6 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-y',
@@ -413,7 +410,6 @@ describe(commands.LISTITEM_SET, () => {
     actualId = 0;
 
     const options: any = {
-      debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       id: 147,
       webUrl: 'https://returnerror.com/sites/project-y',

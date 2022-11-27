@@ -133,7 +133,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('prompts before removing the specified user from the specified Microsoft 365 Group when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -160,7 +160,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
     assert(postSpy.notCalled);
   });
 
@@ -221,7 +221,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
     assert(memberDeleteCallIssued);
   });
 
@@ -269,7 +269,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -319,7 +319,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -369,7 +369,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -422,7 +422,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     });
 
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -475,7 +475,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -498,7 +498,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
       new CommandError('Invalid object identifier'));
   });
 
@@ -543,7 +543,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
       new CommandError('Invalid object identifier'));
   });
 
@@ -598,7 +598,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
       new CommandError('Invalid object identifier'));
   });
 

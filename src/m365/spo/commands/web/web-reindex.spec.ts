@@ -115,7 +115,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } });
     assert(loggerLogSpy.notCalled, 'Something has been logged');
     assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
     assert.strictEqual(propertyValue, '1', 'Incorrect property value stored in the property bag');
@@ -245,7 +245,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } });
     assert(loggerLogSpy.notCalled, 'Something has been logged');
     assert.strictEqual(propertyName[0], 'vti_searchversion');
     assert.strictEqual(propertyName[1], 'vti_searchversion');
@@ -412,7 +412,7 @@ describe(commands.WEB_REINDEX, () => {
     sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').callsFake(() => Promise.resolve(true));
     sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake(() => Promise.reject('ClientSvc unknown error'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('ClientSvc unknown error'));
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('ClientSvc unknown error'));
   });
 
   it('fails validation if url is not a valid SharePoint URL', async () => {

@@ -89,7 +89,6 @@ describe(commands.LIST_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=",
         newName: "Bar"
       }
@@ -141,7 +140,6 @@ describe(commands.LIST_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "FooList",
         newName: "Bar"
       }
@@ -167,7 +165,6 @@ describe(commands.LIST_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: "InvalidFooList",
         newName: "foo"
       }
@@ -183,13 +180,12 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=", newName: "Foo" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=", newName: "Foo" } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if new name is not set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA="
       }
     }, commandInfo);
@@ -199,7 +195,6 @@ describe(commands.LIST_SET, () => {
   it('fails validation if neither id nor name is not set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         newName: "Foo"
       }
     }, commandInfo);
@@ -209,7 +204,6 @@ describe(commands.LIST_SET, () => {
   it('fails validation if both id and name are set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=",
         name: "FooList",
         newName: "Foo"
@@ -221,7 +215,6 @@ describe(commands.LIST_SET, () => {
   it('passes validation when all parameters are valid', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=",
         newName: 'Foo'
       }

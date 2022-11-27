@@ -99,7 +99,7 @@ describe(commands.O365GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,
@@ -227,7 +227,7 @@ describe(commands.O365GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
+    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,
@@ -363,7 +363,7 @@ describe(commands.O365GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
+    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,

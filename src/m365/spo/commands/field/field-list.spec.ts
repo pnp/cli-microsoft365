@@ -189,7 +189,7 @@ describe(commands.FIELD_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal' } });
     assert(loggerLogSpy.calledWith([
       {
         "AutoIndexed": false,

@@ -77,7 +77,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('gets the tenant appcatalog url (debug)', async () => {
@@ -110,7 +110,6 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
   });

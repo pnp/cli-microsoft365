@@ -207,7 +207,6 @@ describe(commands.PLAN_LIST, () => {
     });
 
     const options: any = {
-      debug: false,
       ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
     };
 
@@ -317,7 +316,6 @@ describe(commands.PLAN_LIST, () => {
     });
 
     const options: any = {
-      debug: false,
       ownerGroupName: 'spridermvp'
     };
 
@@ -421,7 +419,6 @@ describe(commands.PLAN_LIST, () => {
     });
 
     const options: any = {
-      debug: false,
       ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
     };
 
@@ -434,6 +431,6 @@ describe(commands.PLAN_LIST, () => {
       return Promise.reject("An error has occurred.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
   });
 });

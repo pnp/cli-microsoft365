@@ -532,7 +532,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     try {
       await assert.rejects(command.action(logger, {
         options: {
-          debug: false,
           id: actionId,
           webUrl: 'https://contoso.sharepoint.com',
           scope: 'All'
@@ -562,7 +561,6 @@ describe(commands.CUSTOMACTION_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',

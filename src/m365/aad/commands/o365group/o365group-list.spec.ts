@@ -134,7 +134,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -544,7 +544,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: 'Team' } });
+    await command.action(logger, { options: { displayName: 'Team' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -661,7 +661,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, mailNickname: 'team' } });
+    await command.action(logger, { options: { mailNickname: 'team' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -778,7 +778,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: 'Team', mailNickname: 'team' } });
+    await command.action(logger, { options: { displayName: 'Team', mailNickname: 'team' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -895,7 +895,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, deleted: true } });
+    await command.action(logger, { options: { deleted: true } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1246,7 +1246,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, deleted: true, displayName: 'Deleted' } });
+    await command.action(logger, { options: { deleted: true, displayName: 'Deleted' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1363,7 +1363,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, deleted: true, mailNickname: 'd_team' } });
+    await command.action(logger, { options: { deleted: true, mailNickname: 'd_team' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1480,7 +1480,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, deleted: true, displayName: 'Deleted', mailNickname: 'd_team' } });
+    await command.action(logger, { options: { deleted: true, displayName: 'Deleted', mailNickname: 'd_team' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1598,7 +1598,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: displayName } });
+    await command.action(logger, { options: { displayName: displayName } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1665,7 +1665,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, mailNickname: mailNickName } });
+    await command.action(logger, { options: { mailNickname: mailNickName } });
     assert(loggerLogSpy.calledWith([]));
   });
 
@@ -1789,7 +1789,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -1962,7 +1962,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -2028,7 +2028,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, output: 'json' } });
+    await command.action(logger, { options: { output: 'json' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -2157,7 +2157,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, includeSiteUrl: true } });
+    await command.action(logger, { options: { includeSiteUrl: true } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -2419,7 +2419,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, includeSiteUrl: true } });
+    await command.action(logger, { options: { includeSiteUrl: true } });
     assert(loggerLogSpy.calledWith([
       <Group>{
         "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
@@ -2548,7 +2548,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, includeSiteUrl: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { includeSiteUrl: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if both deleted and includeSiteUrl options set', async () => {

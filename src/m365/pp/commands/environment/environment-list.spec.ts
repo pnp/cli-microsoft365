@@ -381,7 +381,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith(env.value));
   });
 
@@ -541,7 +541,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { asAdmin: true, debug: false } });
+    await command.action(logger, { options: { asAdmin: true } });
     assert(loggerLogSpy.calledWith(env.value));
   });
   it('correctly handles no environments', async () => {
@@ -559,7 +559,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -577,7 +577,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

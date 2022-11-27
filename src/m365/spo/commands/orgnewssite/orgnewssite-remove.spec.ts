@@ -94,7 +94,6 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         confirm: true,
         url: "http://contoso.sharepoint.com/sites/site1"
@@ -121,7 +120,6 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         confirm: false,
         url: "http://contoso.sharepoint.com/sites/site1"

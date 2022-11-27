@@ -145,7 +145,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
@@ -308,7 +307,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
@@ -394,7 +392,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
@@ -481,7 +478,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
@@ -568,7 +564,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
@@ -695,7 +690,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
@@ -823,7 +817,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
@@ -1118,7 +1111,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
@@ -1286,7 +1278,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
@@ -1454,7 +1445,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
@@ -1622,7 +1612,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap'
@@ -1749,7 +1738,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap'
@@ -1937,7 +1925,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'foo.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
@@ -1964,7 +1951,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
@@ -1995,7 +1981,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
@@ -2032,11 +2017,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
-          webPartProperties: '{"foo", }'
+          webPartProperties: '{"foo" }'
         }
       });
     assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
@@ -2158,7 +2142,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-aaaaaaaaaa'
@@ -2188,7 +2171,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-aaaaaaaaaa'
@@ -2215,7 +2197,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
@@ -2243,7 +2224,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09',
@@ -2282,7 +2262,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           standardWebPart: 'BingMap',
@@ -2658,7 +2637,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'

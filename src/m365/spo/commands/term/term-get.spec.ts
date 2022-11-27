@@ -87,7 +87,7 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } });
+    await command.action(logger, { options: { id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:05:07.600Z", "Id": "16573ae2-0cc4-42fa-a2ff-8bf0407bd385", "LastModifiedDate": "2018-08-22T14:05:07.600Z", "Name": "Engineering", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Engineering", "TermsCount": 0 }));
   });
 
@@ -119,7 +119,7 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetName: 'Department' } });
+    await command.action(logger, { options: { name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetName: 'Department' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -135,7 +135,7 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } });
+    await command.action(logger, { options: { name: 'IT', termGroupName: 'People', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -151,7 +151,7 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department' } });
+    await command.action(logger, { options: { name: 'IT', termGroupName: 'People', termSetName: 'Department' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -169,7 +169,6 @@ describe(commands.TERM_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'IT',
         termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef',
         termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f'
@@ -189,7 +188,7 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } });
+    await command.action(logger, { options: { id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } });
   });
 
   it('correctly handles term group not found', async () => {
@@ -206,7 +205,6 @@ describe(commands.TERM_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'IT',
         termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef',
         termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f'
@@ -228,7 +226,6 @@ describe(commands.TERM_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'IT',
         termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef',
         termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f'
@@ -248,7 +245,7 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT>', termGroupName: 'People', termSetName: 'Department' } });
+    await command.action(logger, { options: { name: 'IT>', termGroupName: 'People', termSetName: 'Department' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT>", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT>", "TermsCount": 0 }));
   });
 
@@ -264,7 +261,7 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People>', termSetName: 'Department' } });
+    await command.action(logger, { options: { name: 'IT', termGroupName: 'People>', termSetName: 'Department' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -280,7 +277,7 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department>' } });
+    await command.action(logger, { options: { name: 'IT', termGroupName: 'People', termSetName: 'Department>' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -348,6 +345,6 @@ describe(commands.TERM_GET, () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department>' } } as any), new CommandError('getRequestDigest error'));
+    await assert.rejects(command.action(logger, { options: { name: 'IT', termGroupName: 'People', termSetName: 'Department>' } } as any), new CommandError('getRequestDigest error'));
   });
 });

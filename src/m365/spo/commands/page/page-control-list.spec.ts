@@ -80,7 +80,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } });
     assert(loggerLogSpy.calledWith(mockControlListDataOutput));
   });
 
@@ -106,7 +106,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home' } });
     assert(loggerLogSpy.calledWith(mockControlListDataOutput));
   });
 
@@ -132,7 +132,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any);
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any);
     assert(loggerLogSpy.calledWith(mockControlListDataWithTextOutput));
   });
 
@@ -141,7 +141,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.resolve({ CanvasContent1: null });
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any);
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any);
     assert([]);
   });
 
@@ -160,7 +160,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
       new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
   });
 
@@ -169,7 +169,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
       new CommandError('An error has occurred'));
   });
 

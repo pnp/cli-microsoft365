@@ -242,7 +242,7 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
+    await command.action(logger, { options: { appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
     assert(loggerLogSpy.calledWith([
       {
         "allowedMemberTypes": [
@@ -280,7 +280,7 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
+    await command.action(logger, { options: { appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
     assert(loggerLogSpy.calledWith([]));
   });
 
@@ -305,7 +305,6 @@ describe(commands.APP_ROLE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230'
       }
     }), new CommandError(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
@@ -322,7 +321,6 @@ describe(commands.APP_ROLE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
     }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
@@ -339,7 +337,6 @@ describe(commands.APP_ROLE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'My app'
       }
     }), new CommandError(`No Azure AD application registration with name My app found`));
@@ -361,7 +358,6 @@ describe(commands.APP_ROLE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'My app'
       }
     }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
@@ -372,7 +368,6 @@ describe(commands.APP_ROLE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
     } as any), new CommandError('An error has occurred'));
@@ -383,7 +378,6 @@ describe(commands.APP_ROLE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'My app'
       }
     } as any), new CommandError('An error has occurred'));

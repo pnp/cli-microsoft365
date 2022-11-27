@@ -158,7 +158,6 @@ describe(commands.FILE_VERSION_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: validWebUrl,
         label: validLabel,
         fileUrl: `Shared Documents/Fo'lde'r`

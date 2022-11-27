@@ -127,7 +127,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 10123190123123, confirm: true } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: { id: 10123190123123, confirm: true } } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation with parameters', async () => {

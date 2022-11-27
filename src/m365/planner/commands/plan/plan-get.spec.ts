@@ -186,7 +186,6 @@ describe(commands.PLAN_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: validId
       }
     });
@@ -212,7 +211,6 @@ describe(commands.PLAN_GET, () => {
     });
 
     const options: any = {
-      debug: false,
       title: validTitle,
       ownerGroupId: validOwnerGroupId
     };
@@ -254,7 +252,6 @@ describe(commands.PLAN_GET, () => {
     });
 
     const options: any = {
-      debug: false,
       title: validTitle,
       ownerGroupName: validOwnerGroupName
     };
@@ -273,7 +270,6 @@ describe(commands.PLAN_GET, () => {
     });
 
     const options: any = {
-      debug: false,
       title: validTitle,
       ownerGroupId: validOwnerGroupId
     };
@@ -288,6 +284,6 @@ describe(commands.PLAN_GET, () => {
     });
 
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError('An error has occurred.'));
   });
 });

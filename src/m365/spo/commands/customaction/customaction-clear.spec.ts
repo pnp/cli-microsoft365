@@ -148,7 +148,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
     const options = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web',
       confirm: true
@@ -158,7 +157,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       await command.action(logger, { options: options } as any);
       assert(postCallsSpy.calledOnce);
       assert(clearScopedCustomActionsSpy.calledWith({
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web',
         confirm: true

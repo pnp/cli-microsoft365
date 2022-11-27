@@ -101,7 +101,7 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([
       {
         "Description": null,
@@ -215,7 +215,7 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, output: 'json' } });
+    await command.action(logger, { options: { output: 'json' } });
     assert(loggerLogSpy.calledWith([
       {
         "Description": null,
@@ -322,7 +322,7 @@ describe(commands.HUBSITE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } });
+    await command.action(logger, { options: { includeAssociatedSites: true, output: 'json' } });
     assert.strictEqual((firstPagedRequest && secondPagedRequest && thirdPagedRequest), true);
   });
 
@@ -551,7 +551,7 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } });
+    await command.action(logger, { options: { includeAssociatedSites: true, output: 'json' } });
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify([
       {
         "Description": null,
@@ -659,7 +659,7 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -695,7 +695,7 @@ describe(commands.HUBSITE_LIST, () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
-    await assert.rejects(command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } } as any),
+    await assert.rejects(command.action(logger, { options: { includeAssociatedSites: true, output: 'json' } } as any),
       new CommandError('An error has occurred'));
   });
 

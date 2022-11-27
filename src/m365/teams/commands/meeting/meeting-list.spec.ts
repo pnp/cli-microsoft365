@@ -352,7 +352,7 @@ describe(commands.MEETING_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, userName: userName, startDateTime: startDateTime } });
+    await command.action(logger, { options: { userName: userName, startDateTime: startDateTime } });
     assert(loggerLogSpy.calledWith(meetingResponse.value));
   });
 
@@ -366,7 +366,7 @@ describe(commands.MEETING_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, userId: userId, startDateTime: startDateTime, endDateTime: endDateTime, output: 'text' } });
+    await command.action(logger, { options: { userId: userId, startDateTime: startDateTime, endDateTime: endDateTime, output: 'text' } });
     assert(loggerLogSpy.calledWith(meetingResponseText));
   });
 
@@ -387,7 +387,7 @@ describe(commands.MEETING_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, email: userName, startDateTime: startDateTime, endDateTime: endDateTime, output: 'text' } });
+    await command.action(logger, { options: { email: userName, startDateTime: startDateTime, endDateTime: endDateTime, output: 'text' } });
     assert(loggerLogSpy.calledWith(meetingResponseText));
   });
 

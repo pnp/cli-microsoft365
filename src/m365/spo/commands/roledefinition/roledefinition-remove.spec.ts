@@ -112,7 +112,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
   });
 
   it('prompts before removing role definition when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -127,7 +127,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } });
     assert(requests.length === 0);
   });
 

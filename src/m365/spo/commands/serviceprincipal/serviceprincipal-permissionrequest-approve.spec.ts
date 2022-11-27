@@ -136,7 +136,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
+    await command.action(logger, { options: { id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
     assert(loggerLogSpy.calledWith({
       ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       ConsentType: "AllPrincipals",
@@ -157,13 +157,13 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('Permission entry already exists.'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred'));
   });
 

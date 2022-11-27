@@ -245,7 +245,7 @@ describe(commands.APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(log.length, 0);
   });
 
@@ -271,7 +271,7 @@ describe(commands.APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
+    await command.action(logger, { options: { appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
     assert.strictEqual(log.length, 0);
   });
 
@@ -291,7 +291,7 @@ describe(commands.APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, verbose: true } });
+    await command.action(logger, { options: { verbose: true } });
     let correctLogStatement = false;
     log.forEach(l => {
       if (!l || typeof l !== 'string') {

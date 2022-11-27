@@ -91,7 +91,6 @@ describe(commands.EXTERNALCONNECTION_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false
       }
     }), new CommandError('An error has occurred'));
   });

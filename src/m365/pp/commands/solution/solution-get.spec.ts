@@ -228,7 +228,7 @@ describe(commands.SOLUTION_GET, () => {
 
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' } } as any),
+    await assert.rejects(command.action(logger, { options: { environment: '4be50206-9576-4237-8b17-38d8aadfaa36', name: 'Default' } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

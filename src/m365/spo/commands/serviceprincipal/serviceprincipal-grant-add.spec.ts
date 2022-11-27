@@ -123,7 +123,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } });
+    await command.action(logger, { options: { resource: 'Microsoft Graph', scope: 'Mail.Read' } });
     assert(loggerLogSpy.calledWith({
       "ClientId": "868668f8-583a-4c66-b3ce-d4e14bc9ceb3", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "-GiGhjpYZkyzztThS8nOs8VG6EHn4S1OjgiedYOfUrQ", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "41e846c5-e1e7-4e2d-8e08-9e75839f52b4", "Scope": "Mail.Read"
     }));
@@ -139,7 +139,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'Microsoft Graph1', scope: 'Mail.Read' } } as any),
+    await assert.rejects(command.action(logger, { options: { resource: 'Microsoft Graph1', scope: 'Mail.Read' } } as any),
       new CommandError('A service principal with the name Microsoft Graph1 could not be found.\r\nParameter name: resourceName'));
   });
 
@@ -153,7 +153,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Calendar.Read' } } as any),
+    await assert.rejects(command.action(logger, { options: { resource: 'Microsoft Graph', scope: 'Calendar.Read' } } as any),
       new CommandError('An OAuth permission with the scope Calendar.Read could not be found.\r\nParameter name: permissionRequest'));
   });
 
@@ -167,13 +167,13 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any),
+    await assert.rejects(command.action(logger, { options: { resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any),
       new CommandError('An OAuth permission with the resource Microsoft Graph and scope Mail.Read already exists.\r\nParameter name: permissionRequest'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any),
+    await assert.rejects(command.action(logger, { options: { resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any),
       new CommandError('An error has occurred'));
   });
 

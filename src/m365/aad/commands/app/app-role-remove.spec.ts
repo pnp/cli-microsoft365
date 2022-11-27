@@ -139,7 +139,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         claim: 'Product.Read',
         confirm: true
@@ -215,7 +214,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'ProductRead',
         confirm: true
@@ -291,7 +289,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         confirm: true
@@ -384,7 +381,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         claim: 'Product.Read',
         confirm: true
@@ -477,7 +473,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         name: 'ProductRead',
         confirm: true
@@ -568,7 +563,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         confirm: true
@@ -907,7 +901,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         confirm: true
@@ -986,7 +979,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         claim: 'Product.Read',
         confirm: true
@@ -1065,7 +1057,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         name: 'ProductRead',
         confirm: true
@@ -1333,7 +1324,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         claim: 'Product.Read',
         confirm: true
@@ -1409,7 +1399,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         name: 'ProductRead',
         confirm: true
@@ -1448,7 +1437,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         name: 'ProductRead',
         confirm: true
@@ -1487,7 +1475,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         claim: 'Product.Read',
         confirm: true
@@ -1526,7 +1513,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         confirm: true
@@ -1535,7 +1521,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('prompts before removing the specified app role when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, appName: 'App-Name', claim: 'Product.Read' } });
+    await command.action(logger, { options: { appName: 'App-Name', claim: 'Product.Read' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -1728,7 +1714,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         name: 'ProductRead',
         confirm: false
@@ -1839,7 +1824,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, appName: 'App-Name', claim: 'Product.Read' } });
+    await command.action(logger, { options: { appName: 'App-Name', claim: 'Product.Read' } });
     assert(patchStub.notCalled);
   });
 
@@ -1875,7 +1860,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'App-Role',
         confirm: true
@@ -1894,7 +1878,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         name: 'App-Role',
         confirm: true
@@ -1913,7 +1896,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'My app',
         name: 'App-Role',
         confirm: true

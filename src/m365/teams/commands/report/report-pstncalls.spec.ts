@@ -158,7 +158,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } });
+    await command.action(logger, { options: { fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/communications/callRecords/getPstnCalls(fromDateTime=2019-11-01,toDateTime=2019-12-01)");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -176,7 +176,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, fromDateTime: '2019-11-01' } });
+    await command.action(logger, { options: { fromDateTime: '2019-11-01' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, `https://graph.microsoft.com/v1.0/communications/callRecords/getPstnCalls(fromDateTime=2019-11-01,toDateTime=${toDateTime})`);
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
     fakeTimers.restore();
@@ -185,6 +185,6 @@ describe(commands.REPORT_PSTNCALLS, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false, fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } } as any), new CommandError('An error has occurred'));
   });
 });

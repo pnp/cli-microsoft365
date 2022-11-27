@@ -89,7 +89,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
   });
 
   it('creates modern team site using the correct endpoint (debug)', async () => {
@@ -116,7 +116,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite', title: expected } });
+    await command.action(logger, { options: { type: 'TeamSite', title: expected } });
     assert.strictEqual(actual, expected);
   });
 
@@ -132,7 +132,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite', alias: expected } });
+    await command.action(logger, { options: { type: 'TeamSite', alias: expected } });
     assert.strictEqual(actual, expected);
   });
 
@@ -148,7 +148,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite', isPublic: true } });
+    await command.action(logger, { options: { type: 'TeamSite', isPublic: true } });
     assert.strictEqual(actual, expected);
   });
 
@@ -164,7 +164,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite' } });
+    await command.action(logger, { options: { type: 'TeamSite' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -180,7 +180,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite', description: expected } });
+    await command.action(logger, { options: { type: 'TeamSite', description: expected } });
     assert.strictEqual(actual, expected);
   });
 
@@ -196,7 +196,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite' } });
+    await command.action(logger, { options: { type: 'TeamSite' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -212,7 +212,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite', classification: expected } });
+    await command.action(logger, { options: { type: 'TeamSite', classification: expected } });
     assert.strictEqual(actual, expected);
   });
 
@@ -228,7 +228,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite' } });
+    await command.action(logger, { options: { type: 'TeamSite' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -244,7 +244,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite', lcid: 1033 } });
+    await command.action(logger, { options: { type: 'TeamSite', lcid: 1033 } });
     assert.strictEqual(actual, expected);
   });
 
@@ -260,7 +260,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com' } });
+    await command.action(logger, { options: { type: 'TeamSite', owners: 'admin@contoso.com' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -276,7 +276,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com,steve@contoso.com' } });
+    await command.action(logger, { options: { type: 'TeamSite', owners: 'admin@contoso.com,steve@contoso.com' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -292,7 +292,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com, steve@contoso.com' } });
+    await command.action(logger, { options: { type: 'TeamSite', owners: 'admin@contoso.com, steve@contoso.com' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -305,7 +305,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, type: 'TeamSite' } } as any), new CommandError('The group alias already exists.'));
+    await assert.rejects(command.action(logger, { options: { type: 'TeamSite' } } as any), new CommandError('The group alias already exists.'));
   });
 
   it('correctly handles OData error when creating a modern team site', async () => {
@@ -313,7 +313,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, type: 'TeamSite' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { type: 'TeamSite' } } as any), new CommandError('An error has occurred'));
   });
 
   it('creates communication site using the correct endpoint', async () => {
@@ -325,7 +325,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite' } });
+    await command.action(logger, { options: { type: 'CommunicationSite' } });
   });
 
   it('sets specified title for communication site', async () => {
@@ -340,7 +340,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, type: 'CommunicationSite', title: expected } }));
+    await assert.rejects(command.action(logger, { options: { type: 'CommunicationSite', title: expected } }));
     assert.strictEqual(actual, expected);
   });
 
@@ -353,7 +353,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite' } });
+    await command.action(logger, { options: { type: 'CommunicationSite' } });
   });
 
   it('sets specified title for communication site when owners option is passed', async () => {
@@ -368,7 +368,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', title: expected, owners: 'abc@email.com' } });
+    await command.action(logger, { options: { type: 'CommunicationSite', title: expected, owners: 'abc@email.com' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -384,7 +384,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', url: expected } });
+    await command.action(logger, { options: { type: 'CommunicationSite', url: expected } });
     assert.strictEqual(actual, expected);
   });
 
@@ -400,7 +400,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', shareByEmailEnabled: true } });
+    await command.action(logger, { options: { type: 'CommunicationSite', shareByEmailEnabled: true } });
     assert.strictEqual(actual, expected);
   });
 
@@ -416,7 +416,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite' } });
+    await command.action(logger, { options: { type: 'CommunicationSite' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -432,7 +432,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', description: expected } });
+    await command.action(logger, { options: { type: 'CommunicationSite', description: expected } });
     assert.strictEqual(actual, expected);
   });
 
@@ -448,7 +448,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite' } });
+    await command.action(logger, { options: { type: 'CommunicationSite' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -464,7 +464,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', classification: expected } });
+    await command.action(logger, { options: { type: 'CommunicationSite', classification: expected } });
     assert.strictEqual(actual, expected);
   });
 
@@ -480,7 +480,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite' } });
+    await command.action(logger, { options: { type: 'CommunicationSite' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -496,7 +496,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', siteDesign: 'Topic' } });
+    await command.action(logger, { options: { type: 'CommunicationSite', siteDesign: 'Topic' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -512,7 +512,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', siteDesign: 'Showcase' } });
+    await command.action(logger, { options: { type: 'CommunicationSite', siteDesign: 'Showcase' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -528,7 +528,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', siteDesign: 'Blank' } });
+    await command.action(logger, { options: { type: 'CommunicationSite', siteDesign: 'Blank' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -544,7 +544,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite' } });
+    await command.action(logger, { options: { type: 'CommunicationSite' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -560,7 +560,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', siteDesignId: expected } });
+    await command.action(logger, { options: { type: 'CommunicationSite', siteDesignId: expected } });
     assert.strictEqual(actual, expected);
   });
 
@@ -576,7 +576,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', lcid: expected } });
+    await command.action(logger, { options: { type: 'CommunicationSite', lcid: expected } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1058,7 +1058,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1186,7 +1186,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1246,7 +1246,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1308,7 +1308,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1329,7 +1329,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } } as any), new CommandError('An error has occurred.'));
   });
 
   it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, error while checking if deleted site exists in the recycle bin', async () => {
@@ -1359,7 +1359,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } } as any), new CommandError('An error has occurred.'));
   });
 
   it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, site exists in the recycle bin', async () => {
@@ -1428,7 +1428,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1498,7 +1498,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1611,7 +1611,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } } as any), new CommandError('An error has occurred.'));
   });
 
   it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, site doesn\'t exist. refreshes expired token', async () => {
@@ -1672,7 +1672,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1770,7 +1770,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1840,7 +1840,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1891,7 +1891,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1987,7 +1987,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -2179,7 +2179,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    await command.action(logger, { options: { debug: false, verbose: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } });
+    await command.action(logger, { options: { verbose: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -2239,7 +2239,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } } as any), new CommandError('An error has occurred.'));
   });
 
   it('creates classic site with minimal options. remove deleted site. site exists in the recycle bin. wait for completion two rounds', async () => {
@@ -2345,7 +2345,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    await command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } });
+    await command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -2405,7 +2405,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } } as any), new CommandError('A site already exists at url https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam.'));
+    await assert.rejects(command.action(logger, { options: { type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } } as any), new CommandError('A site already exists at url https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam.'));
   });
 
   it('fails validation if the url is not specified', async () => {

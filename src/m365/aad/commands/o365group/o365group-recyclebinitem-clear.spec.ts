@@ -135,7 +135,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true } });
+    await command.action(logger, { options: { confirm: true } });
     assert(deleteStub.calledTwice);
   });
 
@@ -237,7 +237,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true } });
+    await command.action(logger, { options: { confirm: true } });
     assert(deleteStub.calledThrice);
   });
 
@@ -255,12 +255,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true } });
+    await command.action(logger, { options: { confirm: true } });
     assert(deleteStub.notCalled);
   });
 
   it('prompts before clearing the O365 Group recycle bin items when --confirm option is not passed', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -276,7 +276,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(deleteSpy.notCalled);
   });
 
@@ -358,7 +358,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(deleteStub.calledTwice);
   });
 

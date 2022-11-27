@@ -91,7 +91,6 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         id: 'adatumisv_exo2'
       }
     });

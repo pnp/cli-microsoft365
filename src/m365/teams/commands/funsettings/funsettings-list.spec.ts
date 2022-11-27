@@ -83,7 +83,6 @@ describe(commands.FUNSETTINGS_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
       }
     });
@@ -136,7 +135,6 @@ describe(commands.FUNSETTINGS_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
       }
     } as any), new CommandError('An error has occurred'));

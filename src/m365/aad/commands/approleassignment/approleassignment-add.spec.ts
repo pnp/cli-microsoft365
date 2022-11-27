@@ -220,7 +220,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } } as any),
+    await assert.rejects(command.action(logger, { options: { appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 

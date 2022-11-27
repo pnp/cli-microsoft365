@@ -224,10 +224,12 @@ describe(commands.USER_GET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false,
-      webUrl: 'https://contoso.sharepoint.com',
-      loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: 'https://contoso.sharepoint.com',
+        loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying URL', () => {

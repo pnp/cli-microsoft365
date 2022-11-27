@@ -75,7 +75,7 @@ describe(commands.CONTENTTYPE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } });
     assert(loggerLogSpy.calledWith(contentTypeByIdResponse));
   });
 
@@ -88,7 +88,7 @@ describe(commands.CONTENTTYPE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Alert' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Alert' } });
     assert(loggerLogSpy.calledWith(contentTypeByNameResponse.value[0]));
   });
 

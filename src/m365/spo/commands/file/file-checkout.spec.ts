@@ -161,7 +161,6 @@ describe(commands.FILE_CHECKOUT, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
@@ -174,7 +173,6 @@ describe(commands.FILE_CHECKOUT, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         url: '/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com'
       }

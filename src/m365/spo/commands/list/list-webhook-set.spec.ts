@@ -74,7 +74,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listId: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
@@ -95,7 +94,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
@@ -181,7 +179,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
@@ -209,7 +206,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
@@ -289,7 +285,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
@@ -334,7 +329,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',

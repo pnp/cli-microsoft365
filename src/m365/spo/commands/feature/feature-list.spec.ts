@@ -86,7 +86,6 @@ describe(commands.FEATURE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Site'
@@ -126,7 +125,6 @@ describe(commands.FEATURE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web'
@@ -170,7 +168,6 @@ describe(commands.FEATURE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
@@ -250,7 +247,6 @@ describe(commands.FEATURE_LIST, () => {
     });
 
     const options: any = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site'
     };
@@ -269,7 +265,6 @@ describe(commands.FEATURE_LIST, () => {
     });
 
     const options: any = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
     };
@@ -289,7 +284,6 @@ describe(commands.FEATURE_LIST, () => {
 
     const options: any = {
       verbose: true,
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site'
     };
@@ -318,7 +312,6 @@ describe(commands.FEATURE_LIST, () => {
 
     const options: any = {
       verbose: true,
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
     };
@@ -348,7 +341,6 @@ describe(commands.FEATURE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web'
       }
@@ -367,7 +359,6 @@ describe(commands.FEATURE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Site'

@@ -74,7 +74,6 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
   });

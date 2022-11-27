@@ -123,7 +123,6 @@ describe(commands.CHAT_GET, () => {
   it('fails validation if id and name and participants are not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

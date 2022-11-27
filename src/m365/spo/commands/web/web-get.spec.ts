@@ -435,7 +435,6 @@ describe(commands.WEB_GET, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         url: 'https://contoso.sharepoint.com'
       }
     });
@@ -483,7 +482,6 @@ describe(commands.WEB_GET, () => {
     await command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         url: 'https://contoso.sharepoint.com'
       }
     });

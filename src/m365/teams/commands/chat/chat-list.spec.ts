@@ -167,7 +167,6 @@ describe(commands.CHAT_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
     assert(loggerLogSpy.calledWith([
@@ -208,7 +207,6 @@ describe(commands.CHAT_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         type: "oneOnOne"
       }
     });
@@ -236,7 +234,6 @@ describe(commands.CHAT_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         type: "group"
       }
     });
@@ -264,7 +261,6 @@ describe(commands.CHAT_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         type: "meeting"
       }
     });
@@ -294,7 +290,6 @@ describe(commands.CHAT_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json'
       }
     });
@@ -306,6 +301,6 @@ describe(commands.CHAT_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

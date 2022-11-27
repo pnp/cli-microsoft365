@@ -79,7 +79,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
   it('prompts before removing content type from list when confirmation argument not passed (listId)', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         listId: listId,
         webUrl: webUrl,
         id: contentTypeId
@@ -97,7 +96,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
   it('prompts before removing content type from list when confirmation argument not passed (listTitle)', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: listTitle,
         webUrl: webUrl,
         id: contentTypeId
@@ -119,7 +117,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         listId: listId,
         webUrl: webUrl,
         contentTypeId: contentTypeId
@@ -266,7 +263,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: listId,
         webUrl: webUrl,
         id: contentTypeId
@@ -296,7 +292,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: listTitle,
         webUrl: webUrl,
         id: contentTypeId
@@ -338,7 +333,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: listTitle,
         webUrl: webUrl,
         id: contentTypeId,
@@ -360,7 +354,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: listId,
         webUrl: webUrl,
         id: contentTypeId,

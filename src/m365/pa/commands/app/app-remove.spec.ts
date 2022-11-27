@@ -93,7 +93,6 @@ describe(commands.APP_REMOVE, () => {
   it('prompts before removing the specified Microsoft Power App when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     });
@@ -114,7 +113,6 @@ describe(commands.APP_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     });
@@ -216,7 +214,6 @@ describe(commands.APP_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     } as any), new CommandError(`App 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`));
@@ -230,7 +227,6 @@ describe(commands.APP_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
@@ -250,7 +246,6 @@ describe(commands.APP_REMOVE, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     } as any);
@@ -264,7 +259,6 @@ describe(commands.APP_REMOVE, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
@@ -306,7 +300,6 @@ describe(commands.APP_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     } as any), new CommandError("Something went wrong"));

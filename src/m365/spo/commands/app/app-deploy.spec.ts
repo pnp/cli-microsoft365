@@ -128,7 +128,7 @@ describe(commands.APP_DEPLOY, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+      await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1 &&
@@ -166,7 +166,7 @@ describe(commands.APP_DEPLOY, () => {
 
 
     try {
-      await command.action(logger, { options: { debug: false, appCatalogScope: 'sitecollection', id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+      await command.action(logger, { options: { appCatalogScope: 'sitecollection', id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1 &&
@@ -214,7 +214,7 @@ describe(commands.APP_DEPLOY, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'solution.sppkg' } });
+    await command.action(logger, { options: { name: 'solution.sppkg' } });
   });
 
   it('deploys app specified using its name in the sitecollection app catalog', async () => {
@@ -245,7 +245,7 @@ describe(commands.APP_DEPLOY, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, appCatalogScope: 'sitecollection', name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { appCatalogScope: 'sitecollection', name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com' } });
   });
 
   it('deploys app specified using its name in the tenant app catalog (debug)', async () => {
@@ -328,7 +328,7 @@ describe(commands.APP_DEPLOY, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', skipFeatureDeployment: true } });
+      await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', skipFeatureDeployment: true } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1 &&
@@ -365,7 +365,7 @@ describe(commands.APP_DEPLOY, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', skipFeatureDeployment: true, appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+      await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', skipFeatureDeployment: true, appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1 &&
@@ -402,7 +402,7 @@ describe(commands.APP_DEPLOY, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+      await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1 &&
@@ -517,7 +517,7 @@ describe(commands.APP_DEPLOY, () => {
     ));
 
     try {
-      await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+      await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1 &&
@@ -564,7 +564,7 @@ describe(commands.APP_DEPLOY, () => {
 
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+      await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
     }
     finally {
@@ -600,7 +600,7 @@ describe(commands.APP_DEPLOY, () => {
 
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+      await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
     }
     finally {
@@ -630,7 +630,7 @@ describe(commands.APP_DEPLOY, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } } as any),
+    await assert.rejects(command.action(logger, { options: { name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } } as any),
       new CommandError('File Not Found.'));
   });
 
@@ -656,7 +656,7 @@ describe(commands.APP_DEPLOY, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'solution.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+    await assert.rejects(command.action(logger, { options: { name: 'solution.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
       new CommandError('File Not Found.'));
   });
 
@@ -675,7 +675,7 @@ describe(commands.APP_DEPLOY, () => {
     });
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+      await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError('An error has occurred'));
     }
     finally {
@@ -701,7 +701,7 @@ describe(commands.APP_DEPLOY, () => {
 
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+      await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError('An error has occurred'));
     }
     finally {
@@ -725,7 +725,7 @@ describe(commands.APP_DEPLOY, () => {
     });
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+      await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError('{"message":"An error has occurred"}'));
     }
     finally {
@@ -748,7 +748,7 @@ describe(commands.APP_DEPLOY, () => {
     });
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+      await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError('{"message":"An error has occurred"}'));
     }
     finally {
@@ -780,7 +780,7 @@ describe(commands.APP_DEPLOY, () => {
     });
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+      await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError('An error has occurred'));
     }
     finally {
@@ -812,7 +812,7 @@ describe(commands.APP_DEPLOY, () => {
     });
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+      await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError('An error has occurred'));
     }
     finally {

@@ -136,7 +136,7 @@ describe(commands.GROUPSETTING_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([{
       "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
       "displayName": "Group.Unified",
@@ -402,7 +402,7 @@ describe(commands.GROUPSETTING_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, output: 'json' } });
+    await command.action(logger, { options: { output: 'json' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
@@ -486,6 +486,6 @@ describe(commands.GROUPSETTING_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

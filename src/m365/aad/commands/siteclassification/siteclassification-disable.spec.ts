@@ -69,7 +69,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
   });
 
   it('prompts before disabling siteclassification when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -505,7 +505,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(postSpy.notCalled);
   });
 
@@ -599,7 +599,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(deleteRequestIssued);
   });
 });

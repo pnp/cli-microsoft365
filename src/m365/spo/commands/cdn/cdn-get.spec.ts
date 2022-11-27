@@ -125,7 +125,7 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'Private' } });
+    await command.action(logger, { options: { type: 'Private' } });
     let correctLogStatement = false;
     log.forEach(l => {
       if (l === false) {
@@ -247,7 +247,7 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying CDN type', () => {

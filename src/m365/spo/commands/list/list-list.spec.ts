@@ -287,7 +287,6 @@ describe(commands.LIST_LIST, () => {
     await command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
     });

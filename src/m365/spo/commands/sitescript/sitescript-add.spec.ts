@@ -93,7 +93,7 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } });
+    await command.action(logger, { options: { title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } });
     assert(loggerLogSpy.calledWith({
       "Content": null,
       "Description": "My contoso script",
@@ -149,7 +149,7 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', description: '', content: JSON.stringify({ "abc": "def" }) } });
+    await command.action(logger, { options: { title: 'Contoso', description: '', content: JSON.stringify({ "abc": "def" }) } });
     assert(loggerLogSpy.calledWith({
       "Content": null,
       "Description": "",
@@ -192,7 +192,7 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, title: 'Contoso', content: JSON.stringify({}) } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { title: 'Contoso', content: JSON.stringify({}) } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying title', () => {

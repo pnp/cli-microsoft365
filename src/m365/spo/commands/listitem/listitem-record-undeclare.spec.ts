@@ -128,7 +128,6 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       listItemId: 147,
       webUrl: 'https://returnerror.com/sites/project-y'
@@ -187,7 +186,6 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       listItemId: 47,
       webUrl: 'https://rejectme.com/sites/project-y'

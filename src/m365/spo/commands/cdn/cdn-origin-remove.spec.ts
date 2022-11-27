@@ -99,7 +99,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the public CDN when Public type specified without prompting with confirmation argument', async () => {
-    await command.action(logger, { options: { debug: false, origin: '*/cdn', confirm: true, type: 'Public' } });
+    await command.action(logger, { options: { origin: '*/cdn', confirm: true, type: 'Public' } });
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -113,7 +113,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the private CDN when Private type specified without prompting with confirmation argument', async () => {
-    await assert.rejects(command.action(logger, { options: { debug: false, origin: '*/cdn', confirm: true, type: 'Private' } }));
+    await assert.rejects(command.action(logger, { options: { origin: '*/cdn', confirm: true, type: 'Private' } }));
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -141,7 +141,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the public CDN when no type specified without prompting with confirmation argument', async () => {
-    await command.action(logger, { options: { debug: false, origin: '*/cdn', confirm: true } });
+    await command.action(logger, { options: { origin: '*/cdn', confirm: true } });
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -221,7 +221,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, origin: '*/cdn', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { origin: '*/cdn', confirm: true } } as any),
       new CommandError('An error has occurred'));
   });
 

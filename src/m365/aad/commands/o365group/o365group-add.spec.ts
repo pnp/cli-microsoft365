@@ -114,7 +114,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } });
+    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } });
     assert(loggerLogSpy.calledWith({
       id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
       deletedDateTime: null,
@@ -250,7 +250,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: true } });
+    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: true } });
     assert(loggerLogSpy.calledWith({
       id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
       deletedDateTime: null,
@@ -395,7 +395,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any);
+    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any);
     assert(loggerLogSpy.calledWith({
       id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
       deletedDateTime: null,
@@ -549,7 +549,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.gif' } });
+    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.gif' } });
     assert(loggerLogSpy.calledWith({
       id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
       deletedDateTime: null,
@@ -628,7 +628,7 @@ describe(commands.O365GROUP_ADD, () => {
       return {} as any;
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any),
+    await assert.rejects(command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any),
       new CommandError('Invalid request'));
   });
 
@@ -752,7 +752,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } });
+    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } });
     assert(loggerLogSpy.calledWith({
       id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
       deletedDateTime: null,
@@ -923,7 +923,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } });
+    await command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } });
     assert(loggerLogSpy.calledWith({
       id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
       deletedDateTime: null,
@@ -1054,7 +1054,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
+    await assert.rejects(command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
       new CommandError("Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com"));
   });
 
@@ -1106,7 +1106,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
+    await assert.rejects(command.action(logger, { options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
       new CommandError("Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com"));
   });
 
@@ -1150,7 +1150,7 @@ describe(commands.O365GROUP_ADD, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } } as any),
+    await assert.rejects(command.action(logger, { options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } } as any),
       new CommandError('Invalid request'));
   });
 

@@ -75,7 +75,7 @@ describe(commands.FIELD_REMOVE, () => {
   });
 
   it('prompts before removing field when confirmation argument not passed (id)', async () => {
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -86,7 +86,7 @@ describe(commands.FIELD_REMOVE, () => {
   });
 
   it('prompts before removing field when confirmation argument not passed (title)', async () => {
-    await command.action(logger, { options: { debug: false, title: 'myfield1', webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { title: 'myfield1', webUrl: 'https://contoso.sharepoint.com' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -97,7 +97,7 @@ describe(commands.FIELD_REMOVE, () => {
   });
 
   it('prompts before removing list column when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, title: 'myfield1', webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List' } });
+    await command.action(logger, { options: { title: 'myfield1', webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -112,7 +112,7 @@ describe(commands.FIELD_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
     assert(requests.length === 0);
   });
 
@@ -121,7 +121,7 @@ describe(commands.FIELD_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, group: 'MyGroup', webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { group: 'MyGroup', webUrl: 'https://contoso.sharepoint.com' } });
     assert(requests.length === 0);
   });
 
@@ -144,7 +144,7 @@ describe(commands.FIELD_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } }));
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } }));
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/fields/getbyid('`) > -1 &&
@@ -191,7 +191,6 @@ describe(commands.FIELD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true

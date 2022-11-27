@@ -72,7 +72,6 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   it('fails validation if chatId is not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -253,7 +252,6 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
       }
     });
@@ -379,7 +377,6 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: "text",
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
       }
@@ -506,7 +503,6 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
       }
@@ -521,7 +517,6 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
       }
     } as any), new CommandError('An error has occurred'));

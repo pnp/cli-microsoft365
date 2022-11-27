@@ -408,7 +408,7 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, folderName: 'inbox' } });
+    await command.action(logger, { options: { folderName: 'inbox' } });
     assert(loggerLogSpy.calledWith(emailOutput));
   });
 
@@ -434,7 +434,7 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, folderId: 'inbox' } });
+    await command.action(logger, { options: { folderId: 'inbox' } });
     assert(loggerLogSpy.calledWith(emailOutput));
   });
 
@@ -456,7 +456,7 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, folderName: 'Inbox' } });
+    await command.action(logger, { options: { folderName: 'Inbox' } });
     assert(loggerLogSpy.calledWith(emailOutput));
   });
 
@@ -469,7 +469,7 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } });
+    await command.action(logger, { options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } });
     assert(loggerLogSpy.calledWith(emailOutput));
   });
 
@@ -484,7 +484,7 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, folderName: 'Imbox' } } as any),
+    await assert.rejects(command.action(logger, { options: { folderName: 'Imbox' } } as any),
       new CommandError(`Folder with name 'Imbox' not found`));
   });
 
@@ -506,7 +506,7 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, folderName: 'Archives' } } as any),
+    await assert.rejects(command.action(logger, { options: { folderName: 'Archives' } } as any),
       new CommandError(`Multiple folders with name 'Archives' found. Please disambiguate:${os.EOL}${['- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', '- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB='].join(os.EOL)}`));
   });
 
@@ -519,14 +519,14 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, folderName: 'inbox', output: 'json' } });
+    await command.action(logger, { options: { folderName: 'inbox', output: 'json' } });
     assert(loggerLogSpy.calledWith(emailResponse.value));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred'));
   });
 

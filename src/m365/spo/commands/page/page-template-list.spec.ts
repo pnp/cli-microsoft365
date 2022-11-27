@@ -79,7 +79,7 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
     assert(loggerLogSpy.calledWith([...templatesMock.value]));
   });
 
@@ -105,7 +105,7 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -114,7 +114,7 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -123,7 +123,7 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
       return Promise.reject({ response: { status: 404 } });
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any);
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any);
     assert(loggerLogSpy.calledWith([]));
   });
 

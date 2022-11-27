@@ -123,7 +123,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('sets CDN origin on the public CDN when no type specified', async () => {
-    await command.action(logger, { options: { debug: false, origin: '*/cdn' } });
+    await command.action(logger, { options: { origin: '*/cdn' } });
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&

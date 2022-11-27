@@ -149,7 +149,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Flow Service",
@@ -329,7 +329,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Flow Service",
@@ -393,7 +393,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Graph",
@@ -423,7 +423,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([]));
   });
 
@@ -495,7 +495,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Graph",
@@ -635,7 +635,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Graph",
@@ -661,7 +661,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }),
+    await assert.rejects(command.action(logger, { options: {} }),
       new CommandError('No Azure AD application registration with ID 9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d found'));
   });
 
@@ -679,7 +679,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }),
+    await assert.rejects(command.action(logger, { options: {} }),
       new CommandError(`An error has occurred`));
   });
 
@@ -709,7 +709,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError(`An error has occurred`));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError(`An error has occurred`));
   });
 
   it('handles error when retrieving OAuth2 permission scopes for service principal', async () => {
@@ -784,7 +784,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError(`An error has occurred`));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError(`An error has occurred`));
   });
 
   it('handles error when retrieving app role assignments for service principal', async () => {
@@ -824,7 +824,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError(`An error has occurred`));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError(`An error has occurred`));
   });
 
   it('handles error when retrieving app roles for service principal', async () => {
@@ -899,7 +899,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError(`An error has occurred`));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError(`An error has occurred`));
   });
 
   it('handles error when retrieving AAD app registration', async () => {
@@ -917,7 +917,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError(`An error has occurred`));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError(`An error has occurred`));
   });
 
   it('handles non-existent service principal from app registration permissions', async () => {
@@ -941,7 +941,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "00000003-0000-0000-c000-000000000000",
@@ -1019,7 +1019,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Graph",
@@ -1119,7 +1119,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Flow Service",
@@ -1185,7 +1185,7 @@ describe(commands.PERMISSION_LIST, () => {
       }
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
       {
         "resource": "Microsoft Graph",

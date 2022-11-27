@@ -107,7 +107,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
   });
 
   it('creates site collection app catalog (debug=true)', async () => {

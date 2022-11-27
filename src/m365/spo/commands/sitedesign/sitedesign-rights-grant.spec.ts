@@ -90,7 +90,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } });
+    await command.action(logger, { options: { siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -110,7 +110,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF,AdeleV', rights: 'View' } });
+    await command.action(logger, { options: { siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF,AdeleV', rights: 'View' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -130,7 +130,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF@contoso.com,AdeleV@contoso.com', rights: 'View' } });
+    await command.action(logger, { options: { siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF@contoso.com,AdeleV@contoso.com', rights: 'View' } });
   });
 
   it('grants rights on the specified site design to the specified principals separated with an extra space', async () => {
@@ -149,7 +149,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF, AdeleV', rights: 'View' } });
+    await command.action(logger, { options: { siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF, AdeleV', rights: 'View' } });
   });
 
   it('correctly handles OData error when granting rights', async () => {
@@ -159,7 +159,6 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         siteDesignId: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
         principals: 'PattiF',
         rights: 'View'

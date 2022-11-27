@@ -93,11 +93,11 @@ describe(commands.SITESCRIPT_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(logger, { options: { confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
   });
 
   it('prompts before removing the specified site script when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -109,7 +109,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
   it('aborts removing site script when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert(postSpy.notCalled);
   });
 
@@ -120,7 +120,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert(postStub.called);
   });
 
@@ -129,7 +129,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: { confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports specifying id', () => {

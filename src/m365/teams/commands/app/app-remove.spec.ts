@@ -93,7 +93,7 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true } });
+    await command.action(logger, { options: { id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true } });
     assert(removeTeamsAppCalled);
   });
 
@@ -136,7 +136,7 @@ describe(commands.APP_REMOVE, () => {
       { continue: false }
     ));
 
-    command.action(logger, { options: { debug: false, id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
+    command.action(logger, { options: { id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
     assert(requests.length === 0);
   });
 
@@ -147,7 +147,6 @@ describe(commands.APP_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         filePath: 'teamsapp.zip',
         id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true
       }

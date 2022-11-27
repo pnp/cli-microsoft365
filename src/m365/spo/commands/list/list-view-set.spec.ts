@@ -130,7 +130,7 @@ describe(commands.LIST_VIEW_SET, () => {
       return 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, verbose: false, output: "text", webUrl: webUrl, listTitle: listTitle, title: viewTitle, Title: 'All events' } });
+    await command.action(logger, { options: { verbose: false, output: "text", webUrl: webUrl, listTitle: listTitle, title: viewTitle, Title: 'All events' } });
     assert.deepEqual(patchRequest.lastCall.args[0].data, { Title: 'All events' });
   });
 
@@ -149,7 +149,7 @@ describe(commands.LIST_VIEW_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: webUrl, listTitle: listTitle, title: viewTitle, Title: 'All events' } });
+    await command.action(logger, { options: { webUrl: webUrl, listTitle: listTitle, title: viewTitle, Title: 'All events' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -197,7 +197,6 @@ describe(commands.LIST_VIEW_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         webUrl: webUrl,
         listTitle: listTitle,
         title: viewTitle

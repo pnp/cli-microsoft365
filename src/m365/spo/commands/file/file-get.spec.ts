@@ -103,7 +103,6 @@ describe(commands.FILE_GET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         id: 'b2307a39-e878-458b-bc90-03bc578531d6'
       }
@@ -123,7 +122,6 @@ describe(commands.FILE_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         asString: true
@@ -408,7 +406,6 @@ describe(commands.FILE_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
@@ -427,7 +424,6 @@ describe(commands.FILE_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
@@ -446,7 +442,6 @@ describe(commands.FILE_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         asListItem: true
@@ -466,7 +461,6 @@ describe(commands.FILE_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         url: '/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com'
       }
@@ -482,7 +476,6 @@ describe(commands.FILE_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     }), new CommandError(expectedError));
@@ -562,7 +555,6 @@ describe(commands.FILE_GET, () => {
     });
 
     const options = {
-      debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       asFile: true,

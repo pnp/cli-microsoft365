@@ -83,7 +83,6 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         hideDefaultThemes: true
       }
     });

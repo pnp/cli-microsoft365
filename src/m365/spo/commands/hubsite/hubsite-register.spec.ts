@@ -90,7 +90,7 @@ describe(commands.HUBSITE_REGISTER, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -149,7 +149,7 @@ describe(commands.HUBSITE_REGISTER, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/sales' } } as any),
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales' } } as any),
       new CommandError('This site is already a HubSite.'));
   });
 

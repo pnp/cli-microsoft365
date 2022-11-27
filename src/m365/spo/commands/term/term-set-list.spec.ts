@@ -224,7 +224,7 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, termGroupName: 'PnPTermSets' } });
+    await command.action(logger, { options: { termGroupName: 'PnPTermSets' } });
     assert(loggerLogSpy.calledWith([{
       "_ObjectType_": "SP.Taxonomy.TermSet",
       "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
@@ -318,7 +318,7 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, termGroupName: 'PnPTermSets>' } });
+    await command.action(logger, { options: { termGroupName: 'PnPTermSets>' } });
     assert(loggerLogSpy.calledWith([{
       "_ObjectType_": "SP.Taxonomy.TermSet",
       "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
@@ -459,7 +459,7 @@ describe(commands.TERM_SET_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } });
+    await command.action(logger, { options: { termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } });
   });
 
   it('correctly handles error when retrieving taxonomy term sets', async () => {
@@ -473,7 +473,7 @@ describe(commands.TERM_SET_LIST, () => {
       ]));
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: { termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('File Not Found.'));
   });
 
   it('correctly handles error when the specified term group id doesn\'t exist', async () => {
@@ -487,7 +487,7 @@ describe(commands.TERM_SET_LIST, () => {
       ]));
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, { options: { termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when the specified term group name doesn\'t exist', async () => {
@@ -501,7 +501,7 @@ describe(commands.TERM_SET_LIST, () => {
       ]));
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, termGroupName: 'PnPTermSets' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, { options: { termGroupName: 'PnPTermSets' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('fails validation when neither id nor name specified', async () => {
@@ -533,6 +533,6 @@ describe(commands.TERM_SET_LIST, () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('getRequestDigest error'));
+    await assert.rejects(command.action(logger, { options: { termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('getRequestDigest error'));
   });
 });

@@ -79,7 +79,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         userName: "Alex.Wilber@contoso.com",
@@ -143,7 +142,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         userName: "Alex.Wilber@contoso.com",
@@ -162,7 +160,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         userName: "Alex.Wilber@contoso.com",
@@ -183,7 +180,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         userName: "Alex.Wilber@invalidcontoso.com",

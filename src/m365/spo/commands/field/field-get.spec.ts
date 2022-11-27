@@ -139,7 +139,7 @@ describe(commands.FIELD_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } });
     assert(loggerLogSpy.calledWith({
       "AutoIndexed": false,
       "CanBeDeleted": true,

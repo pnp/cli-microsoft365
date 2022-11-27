@@ -72,7 +72,6 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
   it('fails validation if teamId, channelId and messageId are not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -81,7 +80,6 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
   it('fails validation if channelId and messageId are not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
       }
     }, commandInfo);
@@ -356,7 +354,6 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
         channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
         messageId: "1501527481624"
@@ -500,7 +497,6 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
         channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
@@ -582,7 +578,6 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
         channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
         messageId: "1501527481624"

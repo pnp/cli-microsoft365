@@ -68,7 +68,6 @@ describe(commands.APPPAGE_SET, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           name: "failme",
           webUrl: "https://contoso.sharepoint.com/",
           webPartData: JSON.stringify({})
@@ -88,7 +87,6 @@ describe(commands.APPPAGE_SET, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: "demo",
           webUrl: "https://contoso.sharepoint.com/",
           webPartData: JSON.stringify({})

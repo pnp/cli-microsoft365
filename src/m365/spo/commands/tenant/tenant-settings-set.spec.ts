@@ -106,7 +106,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('sets the tenant settings successfully', async () => {
@@ -229,7 +229,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Timed out'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Timed out'));
   });
 
   it('should turn enums to int in the request successfully', async () => {

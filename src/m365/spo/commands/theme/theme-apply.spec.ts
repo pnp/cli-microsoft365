@@ -87,7 +87,6 @@ describe(commands.THEME_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'Contoso',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
@@ -142,7 +141,6 @@ describe(commands.THEME_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "Blue",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
@@ -182,7 +180,6 @@ describe(commands.THEME_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "Orange",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
@@ -222,7 +219,6 @@ describe(commands.THEME_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "Red",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
@@ -262,7 +258,6 @@ describe(commands.THEME_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "Purple",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
@@ -302,7 +297,6 @@ describe(commands.THEME_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "Green",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
@@ -342,7 +336,6 @@ describe(commands.THEME_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "Gray",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
@@ -382,7 +375,6 @@ describe(commands.THEME_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "Dark Yellow",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
@@ -422,7 +414,6 @@ describe(commands.THEME_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "Dark Blue",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
@@ -517,7 +508,6 @@ describe(commands.THEME_APPLY, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'Some color',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }

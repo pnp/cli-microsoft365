@@ -155,7 +155,7 @@ describe(commands.TERM_SET_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } });
+    await command.action(logger, { options: { id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } });
     assert(loggerLogSpy.calledWith({
       "CreatedDate": "2018-09-13T11:52:53.337Z",
       "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
@@ -359,7 +359,7 @@ describe(commands.TERM_SET_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupName: 'PnPTermSets' } });
+    await command.action(logger, { options: { id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupName: 'PnPTermSets' } });
     assert(loggerLogSpy.calledWith({
       "CreatedDate": "2018-09-13T11:52:53.337Z",
       "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
@@ -461,7 +461,7 @@ describe(commands.TERM_SET_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } });
+    await command.action(logger, { options: { name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } });
     assert(loggerLogSpy.calledWith({
       "CreatedDate": "2018-09-13T11:52:53.337Z",
       "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
@@ -563,7 +563,7 @@ describe(commands.TERM_SET_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets>' } });
+    await command.action(logger, { options: { name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets>' } });
     assert(loggerLogSpy.calledWith({
       "CreatedDate": "2018-09-13T11:52:53.337Z",
       "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
@@ -665,7 +665,7 @@ describe(commands.TERM_SET_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnP-CollabFooter-SharedLinks>', termGroupName: 'PnPTermSets' } });
+    await command.action(logger, { options: { name: 'PnP-CollabFooter-SharedLinks>', termGroupName: 'PnPTermSets' } });
     assert(loggerLogSpy.calledWith({
       "CreatedDate": "2018-09-13T11:52:53.337Z",
       "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
@@ -700,7 +700,6 @@ describe(commands.TERM_SET_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed',
         termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb'
       }
@@ -720,7 +719,6 @@ describe(commands.TERM_SET_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'PnP-CollabFooter-SharedLinks',
         termGroupName: 'PnPTermSets'
       }
@@ -740,7 +738,6 @@ describe(commands.TERM_SET_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed',
         termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb'
       }
@@ -760,7 +757,6 @@ describe(commands.TERM_SET_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'PnP-CollabFooter-SharedLinks',
         termGroupName: 'PnPTermSets'
       }
@@ -778,7 +774,7 @@ describe(commands.TERM_SET_GET, () => {
       ]));
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('File Not Found.'));
   });
 
   it('fails validation if neither id nor name specified', async () => {
@@ -837,7 +833,6 @@ describe(commands.TERM_SET_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'PnP-CollabFooter-SharedLinks',
         termGroupName: 'PnPTermSets'
       }

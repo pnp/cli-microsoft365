@@ -561,7 +561,6 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         fileId: 'b2307a39-e878-458b-bc90-03bc578531d6',
         output: 'json'

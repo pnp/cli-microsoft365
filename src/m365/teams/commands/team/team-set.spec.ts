@@ -86,7 +86,7 @@ describe(commands.TEAM_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' }
+      options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' }
     } as any);
   });
 
@@ -103,7 +103,7 @@ describe(commands.TEAM_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', mailNickName: 'NewNickName' }
+      options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', mailNickName: 'NewNickName' }
     } as any);
   });
 
@@ -159,7 +159,6 @@ describe(commands.TEAM_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
         name: 'NewName'
       }

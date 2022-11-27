@@ -111,7 +111,7 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, appId: '65415bb1-9267-4313-bbf5-ae259732ee12' } });
+    await command.action(logger, { options: { appId: '65415bb1-9267-4313-bbf5-ae259732ee12' } });
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
@@ -128,7 +128,7 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, appObjectId: '59e617e5-e447-4adc-8b88-00af644d7c92' } });
+    await command.action(logger, { options: { appObjectId: '59e617e5-e447-4adc-8b88-00af644d7c92' } });
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
@@ -146,7 +146,7 @@ describe(commands.SP_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
       new CommandError('An error has occurred'));
   });
 

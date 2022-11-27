@@ -85,7 +85,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } });
     assert(loggerLogSpy.calledWith({
       "themeKey": null,
       "name": "CommunicationSite",
@@ -114,7 +114,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X', forceRefresh: true } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/Project-X', forceRefresh: true } });
     assert(loggerLogSpy.calledWith({
       "themeKey": null,
       "name": "CommunicationSite",
@@ -163,7 +163,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -195,7 +195,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } } as any),
       new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 

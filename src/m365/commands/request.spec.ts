@@ -363,7 +363,6 @@ describe(commands.REQUEST, () => {
     });
 
     const options = {
-      debug: false,
       url: "https://contoso.sharepoint.com/_api/web/GetFileById('b2307a39-e878-458b-bc90-03bc578531d6')/$value",
       body: '{ "key": "value" }',
       'content-type': 'application/json',

@@ -240,7 +240,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -270,7 +269,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -292,7 +290,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -309,7 +306,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       webUrl: webUrl,
       id: expectedId,
@@ -342,7 +338,6 @@ describe(commands.LISTITEM_GET, () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     const options: any = {
-      debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       webUrl: webUrl,
       id: expectedId,

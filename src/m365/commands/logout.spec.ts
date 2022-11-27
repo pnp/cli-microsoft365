@@ -75,9 +75,9 @@ describe(commands.LOGOUT, () => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
-    
+
     try {
-      await command.action(logger, { options: { debug: false } });
+      await command.action(logger, { options: {} });
       assert(logoutSpy.called);
     }
     finally {
@@ -92,7 +92,7 @@ describe(commands.LOGOUT, () => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
-    
+
     try {
       await command.action(logger, { options: { debug: true } });
       assert(logoutSpy.called);
@@ -108,7 +108,7 @@ describe(commands.LOGOUT, () => {
   it('correctly handles error when restoring auth information', async () => {
     sinonUtil.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
-    
+
     try {
       await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
     }

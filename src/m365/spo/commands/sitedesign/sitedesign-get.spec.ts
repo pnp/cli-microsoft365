@@ -190,7 +190,7 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } });
+    await command.action(logger, { options: { id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "IsDefault": false,
@@ -260,7 +260,7 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso Site Design' } });
+    await command.action(logger, { options: { title: 'Contoso Site Design' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "IsDefault": false,
@@ -321,7 +321,7 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: { id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports specifying id', () => {

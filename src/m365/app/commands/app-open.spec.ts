@@ -97,7 +97,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId
       }
     });
@@ -108,7 +107,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         appId: appId
       }
@@ -120,7 +118,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId,
         preview: true
       }
@@ -135,7 +132,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId
       }
     });
@@ -149,7 +145,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId,
         preview: true
       }
@@ -166,7 +161,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: appId,
         preview: true
       }

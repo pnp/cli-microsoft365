@@ -192,7 +192,7 @@ describe(commands.DATAVERSE_TABLE_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment, name: validName } } as any),
+    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, name: validName } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

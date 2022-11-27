@@ -101,7 +101,6 @@ describe(commands.TASK_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "Tasks"
       }
@@ -139,7 +138,6 @@ describe(commands.TASK_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "Tasks",
         confirm: true
@@ -174,7 +172,6 @@ describe(commands.TASK_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listId: "BBMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhBBB="
       }
@@ -208,7 +205,6 @@ describe(commands.TASK_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "FooList"
       }
@@ -251,7 +247,6 @@ describe(commands.TASK_REMOVE, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "Tasks"
       }
@@ -268,7 +263,6 @@ describe(commands.TASK_REMOVE, () => {
   it('passes validation when all parameters are valid with listId', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listId: 'BBMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhBBB='
       }
@@ -280,7 +274,6 @@ describe(commands.TASK_REMOVE, () => {
   it('passes validation when all parameters are valid with listName', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listName: 'Tasks'
       }
@@ -292,7 +285,6 @@ describe(commands.TASK_REMOVE, () => {
   it('fails validation if both listName and listId are not set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listName: null,
         listId: null
@@ -304,7 +296,6 @@ describe(commands.TASK_REMOVE, () => {
   it('fails validation if both listName and listId are set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listName: 'Tasks',
         listId: 'BBMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhBBB='

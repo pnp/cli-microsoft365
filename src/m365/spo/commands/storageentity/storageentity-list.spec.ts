@@ -116,7 +116,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
   });
 
   it('doesn\'t fail if tenant properties web property value is empty', async () => {
@@ -157,7 +157,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
   });
 
   it('doesn\'t fail if tenant properties web property value is empty JSON object (debug)', async () => {

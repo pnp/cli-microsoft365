@@ -116,7 +116,6 @@ describe(commands.TEAM_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843'
       }
     } as any), new CommandError('No team found with Group Id 1caf7dcd-7e83-4c3a-94f7-932a1299c843'));
@@ -197,7 +196,7 @@ describe(commands.TEAM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "createdDateTime": "2017-11-29T03:27:05Z",
@@ -301,7 +300,7 @@ describe(commands.TEAM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'Finance' } });
+    await command.action(logger, { options: { name: 'Finance' } });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "createdDateTime": "2017-11-29T03:27:05Z",

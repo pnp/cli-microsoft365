@@ -179,7 +179,7 @@ describe(commands.CHATBOT_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment } } as any),
+    await assert.rejects(command.action(logger, { options: { environment: validEnvironment } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

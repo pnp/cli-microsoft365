@@ -285,7 +285,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app'
       }
     });
@@ -375,7 +374,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         multitenant: true
       }
@@ -475,7 +473,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         redirectUris: 'https://myapp.azurewebsites.net,http://localhost:4000',
         platform: 'web'
@@ -574,7 +571,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         redirectUris: 'https://login.microsoftonline.com/common/oauth2/nativeclient',
         platform: 'publicClient'
@@ -679,7 +675,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         withSecret: true
       }
@@ -941,7 +936,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         withSecret: true,
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
@@ -1104,7 +1098,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         withSecret: true,
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All',
@@ -1262,7 +1255,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         platform: 'spa',
         redirectUris: 'https://myspa.azurewebsites.net,http://localhost:8080',
@@ -1522,7 +1514,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         uri: 'https://contoso.onmicrosoft.com/myapp'
       }
@@ -1740,7 +1731,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         uri: 'api://caf406b91cd4.ngrok.io/_appId_',
         scopeName: 'access_as_user',
@@ -1860,7 +1850,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         uri: 'api://caf406b91cd4.ngrok.io/_appId_',
         scopeName: 'access_as_user',
@@ -1963,7 +1952,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         certificateDisplayName: 'some certificate',
         certificateFile: 'C:\\temp\\some-certificate.cer'
@@ -2061,7 +2049,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         certificateDisplayName: 'some certificate',
         certificateBase64Encoded: 'somecertificatebase64string'
@@ -2246,7 +2233,6 @@ describe(commands.APP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         withSecret: true,
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
@@ -2394,7 +2380,6 @@ describe(commands.APP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         platform: 'spa',
         apisDelegated: 'https://myapi.onmicrosoft.com/access_as_user',
@@ -2543,7 +2528,6 @@ describe(commands.APP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         platform: 'spa',
         apisDelegated: 'https://graph.microsoft.com/Read.Everything',
@@ -2639,7 +2623,6 @@ describe(commands.APP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         withSecret: true
       }
@@ -2657,7 +2640,6 @@ describe(commands.APP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app'
       }
     } as any), new CommandError('An error has occurred'));
@@ -2746,7 +2728,6 @@ describe(commands.APP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         uri: 'https://contoso.onmicrosoft.com/myapp'
       }
@@ -2892,7 +2873,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         platform: 'web',
         redirectUris: 'https://global.consent.azure-apim.net/redirect',
@@ -3143,7 +3123,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -3391,7 +3370,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -3626,7 +3604,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -3947,7 +3924,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -4268,7 +4244,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -4589,7 +4564,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -4899,7 +4873,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -5249,7 +5222,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -5633,7 +5605,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest),
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
       }
@@ -5725,7 +5696,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app'
       }
     });
@@ -5818,7 +5788,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
@@ -5919,7 +5888,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
@@ -6027,7 +5995,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
@@ -6241,7 +6208,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
@@ -6331,7 +6297,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
@@ -6420,7 +6385,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
@@ -6783,7 +6747,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest),
         platform: "spa",
         redirectUris: "http://localhost/auth,https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
@@ -7040,7 +7003,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest),
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
       }
@@ -7192,7 +7154,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifestWithSecret;
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         manifest: JSON.stringify(manifestWithSecret),
         withSecret: true
@@ -7352,7 +7313,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         manifest: JSON.stringify(basicManifest),
         certificateDisplayName: 'some certificate',
@@ -7504,7 +7464,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         manifest: JSON.stringify(basicManifest),
         platform: 'publicClient',
@@ -7656,7 +7615,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         manifest: JSON.stringify(basicManifest),
         implicitFlow: true,
@@ -7826,7 +7784,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         manifest: JSON.stringify(basicManifest),
         uri: 'api://caf406b91cd4.ngrok.io/_appId_',

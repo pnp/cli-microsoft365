@@ -119,7 +119,7 @@ describe(commands.SITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert(loggerLogSpy.calledWith(siteProperties));
   });
 

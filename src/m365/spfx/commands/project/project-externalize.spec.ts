@@ -458,7 +458,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       return Promise.resolve(JSON.stringify({ scriptType: 'script' }));
     });
 
-    await command.action(logger, { options: { output: 'json', debug: false } } as any);
+    await command.action(logger, { options: { output: 'json' } } as any);
     const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[0];
     assert.notStrictEqual(findings.edits.length, 0);
   });

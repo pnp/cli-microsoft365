@@ -148,7 +148,6 @@ describe(commands.APP_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
@@ -169,7 +168,6 @@ describe(commands.APP_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
       }
@@ -242,7 +240,6 @@ describe(commands.APP_SET, () => {
   it('skips updating uri if no uri specified', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230'
       }
     });
@@ -982,7 +979,6 @@ describe(commands.APP_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
@@ -1001,7 +997,6 @@ describe(commands.APP_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
@@ -1020,7 +1015,6 @@ describe(commands.APP_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My app',
         uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
@@ -1044,7 +1038,6 @@ describe(commands.APP_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My app',
         uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
@@ -1057,7 +1050,6 @@ describe(commands.APP_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }
@@ -1070,7 +1062,6 @@ describe(commands.APP_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My app',
         uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
       }

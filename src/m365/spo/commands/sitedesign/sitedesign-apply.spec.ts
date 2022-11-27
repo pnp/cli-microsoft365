@@ -83,7 +83,6 @@ describe(commands.SITEDESIGN_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
         webUrl: 'https://contoso.sharepoint.com'
       }
@@ -131,7 +130,6 @@ describe(commands.SITEDESIGN_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
         webUrl: 'https://contoso.sharepoint.com',
         asTask: true
@@ -147,7 +145,6 @@ describe(commands.SITEDESIGN_APPLY, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
         webUrl: 'https://contoso.sharepoint.com'
       }

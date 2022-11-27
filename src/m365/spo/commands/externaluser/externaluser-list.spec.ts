@@ -136,7 +136,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -352,7 +352,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com' } });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -559,7 +559,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
         }
       ]));
     });
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.notCalled);
   });
 

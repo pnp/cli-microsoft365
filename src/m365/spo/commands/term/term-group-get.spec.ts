@@ -133,7 +133,7 @@ describe(commands.TERM_GROUP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } });
+    await command.action(logger, { options: { id: '36a62501-17ea-455a-bed4-eff862242def' } });
     assert(loggerLogSpy.calledWith({
       "CreatedDate": "2018-06-20T07:23:21.033Z",
       "Id": "36a62501-17ea-455a-bed4-eff862242def",
@@ -235,7 +235,6 @@ describe(commands.TERM_GROUP_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         id: '36a62501-17ea-455a-bed4-eff862242def'
       }
     } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
@@ -259,7 +258,7 @@ describe(commands.TERM_GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'People' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, { options: { name: 'People' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when retrieving taxonomy term groups', async () => {
@@ -273,7 +272,7 @@ describe(commands.TERM_GROUP_GET, () => {
       ]));
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('File Not Found.'));
   });
 
   it('fails validation if neither id nor name specified', async () => {
@@ -305,6 +304,6 @@ describe(commands.TERM_GROUP_GET, () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } } as any), new CommandError('getRequestDigest error'));
+    await assert.rejects(command.action(logger, { options: { id: '36a62501-17ea-455a-bed4-eff862242def' } } as any), new CommandError('getRequestDigest error'));
   });
 });

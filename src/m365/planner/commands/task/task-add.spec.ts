@@ -876,7 +876,6 @@ describe(commands.TASK_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My Planner Bucket',
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
@@ -909,6 +908,6 @@ describe(commands.TASK_ADD, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

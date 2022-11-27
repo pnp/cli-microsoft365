@@ -319,7 +319,6 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         teamName: 'Team name',
         channelId: '19:00000000000000000000000000000000@thread.skype'
@@ -360,7 +359,6 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name'
@@ -398,7 +396,6 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000'
       }
     } as any), new CommandError('An error has occurred'));
@@ -448,7 +445,6 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype'
@@ -535,7 +531,6 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
@@ -601,7 +596,6 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
@@ -669,7 +663,6 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',

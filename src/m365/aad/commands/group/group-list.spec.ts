@@ -207,7 +207,7 @@ describe(commands.GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, deleted: true } });
+    await command.action(logger, { options: { deleted: true } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",

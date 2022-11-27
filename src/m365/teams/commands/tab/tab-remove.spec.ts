@@ -126,7 +126,6 @@ describe(commands.TAB_REMOVE, () => {
   it('prompts before removing the specified tab when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
@@ -237,7 +236,6 @@ describe(commands.TAB_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',

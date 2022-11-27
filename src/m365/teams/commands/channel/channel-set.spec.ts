@@ -178,7 +178,6 @@ describe(commands.CHANNEL_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: teamId,
         name: name,
         newName: newName,
@@ -216,7 +215,6 @@ describe(commands.CHANNEL_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamName: teamName,
         id: id,
         newName: newName,

@@ -115,7 +115,7 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnPTermSets' } });
+    await command.action(logger, { options: { name: 'PnPTermSets' } });
     assert(loggerLogSpy.calledWith({
       "Name": "PnPTermSets",
       "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",
@@ -219,7 +219,7 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnPTermSets', description: 'Term sets for PnP' } });
+    await command.action(logger, { options: { name: 'PnPTermSets', description: 'Term sets for PnP' } });
     assert(loggerLogSpy.calledWith({
       "Name": "PnPTermSets",
       "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",
@@ -300,7 +300,7 @@ describe(commands.TERM_GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'PnPTermSets' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { name: 'PnPTermSets' } } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly handles error when the specified name already exists', async () => {
@@ -334,7 +334,7 @@ describe(commands.TERM_GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'PnPTermSets' } } as any), new CommandError('Group names must be unique.'));
+    await assert.rejects(command.action(logger, { options: { name: 'PnPTermSets' } } as any), new CommandError('Group names must be unique.'));
   });
 
   it('correctly handles error when the specified id already exists', async () => {
@@ -477,7 +477,7 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnPTermSets>' } });
+    await command.action(logger, { options: { name: 'PnPTermSets>' } });
     assert(loggerLogSpy.calledWith({
       "Name": "PnPTermSets>",
       "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",
@@ -533,7 +533,7 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnPTermSets', description: 'Term sets for PnP>' } });
+    await command.action(logger, { options: { name: 'PnPTermSets', description: 'Term sets for PnP>' } });
     assert(loggerLogSpy.calledWith({
       "Name": "PnPTermSets",
       "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",

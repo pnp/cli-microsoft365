@@ -106,7 +106,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: { output: "json", debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } });
+    await command.action(logger, { options: { output: "json", webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } });
     assert(loggerLogSpy.called);
   });
 
@@ -173,7 +173,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list' } }));
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list' } }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -216,7 +216,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: { debug: false, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list', description: 'A tile' } });
+    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list', description: 'A tile' } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -255,7 +255,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: { debug: false, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listId: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99', description: 'A tile' } });
+    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listId: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99', description: 'A tile' } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -298,7 +298,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: { debug: false, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listUrl: '/sites/sales/documents', description: 'A tile' } });
+    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listUrl: '/sites/sales/documents', description: 'A tile' } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -341,7 +341,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Unknown case';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } } as any),
       new CommandError('Something went wrong obtaining the content types'));
   });
 
@@ -370,7 +370,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Unknown case';
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: '<PnP Tile', id: '<0x0100FF0B2E33A3718B46A3909298D240FD93', description: '<A tile', group: '<PnP Content Types' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: '<PnP Tile', id: '<0x0100FF0B2E33A3718B46A3909298D240FD93', description: '<A tile', group: '<PnP Content Types' } });
     assert(loggerLogSpy.called);
   });
 
@@ -389,7 +389,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } } as any),
       new CommandError("A duplicate content type \"PnP Tile\" was found."));
   });
 
@@ -410,7 +410,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list' } } as any),
       new CommandError("List 'My list' does not exist at site with URL 'https://contoso.sharepoint.com/sites/sales'."));
   });
 

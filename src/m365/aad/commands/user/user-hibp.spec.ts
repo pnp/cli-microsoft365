@@ -90,7 +90,7 @@ describe(commands.USER_HIBP, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, userName: 'account-exists@hibp-integration-tests.com', apiKey: "2975xc539c304xf797f665x43f8x557x" } });
+    await command.action(logger, { options: { userName: 'account-exists@hibp-integration-tests.com', apiKey: "2975xc539c304xf797f665x43f8x557x" } });
     assert(loggerLogSpy.calledWith([{ "Name": "Adobe" }]));
   });
 
@@ -118,7 +118,7 @@ describe(commands.USER_HIBP, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, userName: 'account-exists@hibp-integration-tests.com', apiKey: "2975xc539c304xf797f665x43f8x557x" } });
+    await command.action(logger, { options: { userName: 'account-exists@hibp-integration-tests.com', apiKey: "2975xc539c304xf797f665x43f8x557x" } });
     assert(loggerLogSpy.calledWith([{ "Name": "Adobe" }, { "Name": "Gawker" }, { "Name": "Stratfor" }]));
   });
 
@@ -132,7 +132,7 @@ describe(commands.USER_HIBP, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, userName: 'account-exists@hibp-integration-tests.com', domain: "adobe.com", apiKey: "2975xc539c304xf797f665x43f8x557x" } });
+    await command.action(logger, { options: { userName: 'account-exists@hibp-integration-tests.com', domain: "adobe.com", apiKey: "2975xc539c304xf797f665x43f8x557x" } });
     assert(loggerLogSpy.calledWith([{ "Name": "Adobe" }]));
   });
 
@@ -185,7 +185,7 @@ describe(commands.USER_HIBP, () => {
       return Promise.reject("Access denied due to improperly formed hibp-api-key.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, userName: 'account-notexists@hibp-integration-tests.com' } } as any),
+    await assert.rejects(command.action(logger, { options: { userName: 'account-notexists@hibp-integration-tests.com' } } as any),
       new CommandError("Access denied due to improperly formed hibp-api-key."));
   });
 

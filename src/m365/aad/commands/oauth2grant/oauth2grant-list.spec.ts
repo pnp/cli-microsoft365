@@ -141,7 +141,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
+    await command.action(logger, { options: { spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
     assert(loggerLogSpy.calledWith([{
       "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       "consentType": "AllPrincipals",
@@ -194,7 +194,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } });
+    await command.action(logger, { options: { spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } });
     assert(loggerLogSpy.calledWith([{
       "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       "consentType": "AllPrincipals",
@@ -228,7 +228,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
+    await command.action(logger, { options: { spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -246,7 +246,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, spObjectId: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: { spObjectId: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 

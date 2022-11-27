@@ -79,7 +79,7 @@ describe(commands.LIST_VIEW_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', title: 'All items' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', title: 'All items' } } as any),
       new CommandError("List does not exist.\n\nThe page you selected contains a list that does not exist. It may have been deleted by another user."));
   });
 
@@ -98,7 +98,7 @@ describe(commands.LIST_VIEW_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', title: 'All Items' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', title: 'All Items' } } as any),
       new CommandError("The specified view is invalid."));
   });
 
@@ -116,7 +116,7 @@ describe(commands.LIST_VIEW_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', id: 'ba84217c-8561-4234-aa95-265081e74be9' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', id: 'ba84217c-8561-4234-aa95-265081e74be9' } });
     assert.strictEqual(loggerLogSpy.lastCall.args[0].Id, 'ba84217c-8561-4234-aa95-265081e74be9');
   });
 
@@ -133,7 +133,7 @@ describe(commands.LIST_VIEW_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listUrl: 'lists/List1', title: 'All Items' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', listUrl: 'lists/List1', title: 'All Items' } });
     assert.strictEqual(loggerLogSpy.lastCall.args[0].Title, 'All Items');
   });
 

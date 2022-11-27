@@ -123,7 +123,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
+    await command.action(logger, { options: { id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -137,13 +137,13 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
       new CommandError('A permission request with the ID f0feaecf-24be-402b-a080-3a55738ec56a could not be found.'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
       new CommandError('An error has occurred'));
   });
 

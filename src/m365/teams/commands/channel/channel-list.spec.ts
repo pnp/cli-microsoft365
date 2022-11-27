@@ -158,7 +158,6 @@ describe(commands.CHANNEL_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000'
       }
     });
@@ -244,7 +243,6 @@ describe(commands.CHANNEL_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
         type: 'private'
       }
@@ -366,7 +364,6 @@ describe(commands.CHANNEL_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamName: 'Team Name'
       }
     });
@@ -451,7 +448,6 @@ describe(commands.CHANNEL_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000'
       }
@@ -493,7 +489,6 @@ describe(commands.CHANNEL_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000'
       }
     } as any), new CommandError('An error has occurred'));

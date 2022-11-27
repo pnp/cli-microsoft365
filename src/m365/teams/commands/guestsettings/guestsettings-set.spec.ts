@@ -88,7 +88,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'true' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'true' }
     } as any);
   });
 
@@ -108,7 +108,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: 'true', allowDeleteChannels: 'true' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: 'true', allowDeleteChannels: 'true' }
     } as any);
   });
 
@@ -117,7 +117,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'true' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'true' } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the teamId is not a valid GUID', async () => {

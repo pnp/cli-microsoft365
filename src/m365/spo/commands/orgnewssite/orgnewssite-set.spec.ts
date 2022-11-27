@@ -88,7 +88,6 @@ describe(commands.ORGNEWSSITE_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         url: "http://contoso.sharepoint.com/sites/site1"
       }

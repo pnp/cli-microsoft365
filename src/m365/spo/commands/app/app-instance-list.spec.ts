@@ -135,7 +135,7 @@ describe(commands.APP_INSTANCE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite', debug: false } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite' } });
     assert.strictEqual(log.length, 0);
   });
 

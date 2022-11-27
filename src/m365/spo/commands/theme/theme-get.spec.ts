@@ -83,7 +83,6 @@ describe(commands.THEME_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'Contoso'
       }
     });

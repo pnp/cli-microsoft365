@@ -306,7 +306,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
     assert(enableRequestIssued);
   });
 
@@ -394,7 +394,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
     assert(enableRequestIssued);
   });
 
@@ -482,7 +482,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
     assert(enableRequestIssued);
   });
 
@@ -570,7 +570,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any);
+    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any);
     assert(enableRequestIssued);
   });
 
@@ -665,7 +665,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any),
+    await assert.rejects(command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any),
       new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`));
   });
 });

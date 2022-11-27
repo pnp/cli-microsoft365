@@ -95,7 +95,6 @@ describe(commands.SEND, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4'
         }
@@ -170,7 +169,6 @@ describe(commands.SEND, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           description: 'New release of CLI for Microsoft 365'
         }
@@ -212,7 +210,6 @@ describe(commands.SEND, () => {
       });
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4',
           description: 'New release of CLI for Microsoft 365'
@@ -260,7 +257,6 @@ describe(commands.SEND, () => {
       });
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4',
           description: 'New release of CLI for Microsoft 365',
@@ -311,7 +307,6 @@ describe(commands.SEND, () => {
       });
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4',
           description: 'New release of CLI for Microsoft 365',
@@ -367,7 +362,6 @@ describe(commands.SEND, () => {
       });
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4',
           description: 'New release of CLI for Microsoft 365',
@@ -432,7 +426,6 @@ describe(commands.SEND, () => {
       });
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4',
           description: 'New release of CLI for Microsoft 365',
@@ -495,7 +488,6 @@ describe(commands.SEND, () => {
       });
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           card: '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${title}"},{"type":"TextBlock","text":"${description}","wrap":true},{"type":"FactSet","facts":[{"$data":"${properties}","title":"${key}:","value":"${value}"}]}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"${viewUrl}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}'
         }
@@ -553,7 +545,6 @@ describe(commands.SEND, () => {
       });
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           card: '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${title}"},{"type":"TextBlock","text":"${description}","wrap":true},{"type":"FactSet","facts":[{"$data":"${properties}","title":"${key}:","value":"${value}"}]}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"${viewUrl}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}',
           title: 'CLI for Microsoft 365 v3.4'
@@ -612,7 +603,6 @@ describe(commands.SEND, () => {
       });
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           card: '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${title}"},{"type":"TextBlock","text":"${description}","wrap":true},{"type":"FactSet","facts":[{"$data":"${properties}","title":"${key}:","value":"${value}"}]}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"${actionUrl}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}',
           title: 'CLI for Microsoft 365 v3.4',
@@ -674,7 +664,6 @@ describe(commands.SEND, () => {
       });
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           card: '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${Title}"},{"type":"TextBlock","text":"${description}","wrap":true},{"type":"FactSet","facts":[{"$data":"${properties}","title":"${key}:","value":"${value}"}]}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"${viewUrl}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}',
           Title: 'CLI for Microsoft 365 v3.4'
@@ -745,7 +734,6 @@ describe(commands.SEND, () => {
       });
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           card: '{"type":"AdaptiveCard","body":[{"type":"TextBlock","size":"Medium","weight":"Bolder","text":"${title}"},{"type":"TextBlock","text":"${description}","wrap":true},{"type":"FactSet","facts":[{"$data":"${properties}","title":"${key}:","value":"${value}"}]}],"actions":[{"type":"Action.OpenUrl","title":"View","url":"${viewUrl}"}],"$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.2"}',
           cardData: '{"title":"Publish Adaptive Card Schema","description":"Now that we have defined the main rules and features of the format, we need to produce a schema and publish it to GitHub. The schema will be the starting point of our reference documentation.","creator":{"name":"Matt Hidinger","profileImage":"https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg"},"createdUtc":"2017-02-14T06:08:39Z","viewUrl":"https://adaptivecards.io","properties":[{"key":"Board","value":"Adaptive Cards"},{"key":"List","value":"Backlog"},{"key":"Assigned to","value":"Matt Hidinger"},{"key":"Due date","value":"Not set"}]}'
@@ -757,7 +745,6 @@ describe(commands.SEND, () => {
       sinon.stub(request, 'post').callsFake(_ => Promise.resolve('Webhook message delivery failed with error: Microsoft Teams endpoint returned HTTP error 400 with ContextId MS-CV=Qn6afVIGzEq'));
       await assert.rejects(command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4'
         }
@@ -796,7 +783,6 @@ describe(commands.SEND, () => {
       });
       await command.action(logger, {
         options: {
-          debug: false,
           url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547',
           title: 'CLI for Microsoft 365 v3.4'
         }

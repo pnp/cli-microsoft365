@@ -155,7 +155,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -422,7 +421,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -513,7 +511,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world 1.1',
@@ -605,7 +602,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -626,7 +622,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'foo.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -708,7 +703,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -778,7 +772,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -856,7 +849,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
@@ -935,7 +927,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
@@ -1015,7 +1006,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',

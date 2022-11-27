@@ -890,7 +890,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: false, wait: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, wait: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1395,7 +1395,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: false, wait: true } } as any),
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, wait: true } } as any),
       new CommandError('An error has occurred.'));
   });
 

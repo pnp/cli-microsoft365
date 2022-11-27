@@ -136,7 +136,6 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/dummy',
         id: '0x0120'
@@ -190,7 +189,6 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/dummy',
         id: '0x0120'
@@ -230,7 +228,6 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com',
         id: '0x0120'
@@ -250,7 +247,6 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0120'
@@ -270,7 +266,6 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         listUrl: 'sites/documents',
         id: '0x0120'

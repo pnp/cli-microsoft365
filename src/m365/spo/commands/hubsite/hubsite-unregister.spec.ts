@@ -95,12 +95,12 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
   it('prompts before unregistering the hub site when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -115,7 +115,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales' } });
     assert(requests.length === 0);
   });
 
@@ -159,7 +159,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
       new CommandError("hubSiteId"));
   });
 

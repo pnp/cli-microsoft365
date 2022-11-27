@@ -122,7 +122,6 @@ describe(commands.GROUP_MEMBER_LIST, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 3
       }

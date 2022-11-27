@@ -82,7 +82,7 @@ describe(commands.MESSAGINGSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } });
+    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900" } });
     assert(loggerLogSpy.calledWith({
       "allowUserEditMessages": true,
       "allowUserDeleteMessages": true,
@@ -124,13 +124,12 @@ describe(commands.MESSAGINGSETTINGS_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900" } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if teamId is not a valid GUID', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         teamId: 'invalid'
       }
     }, commandInfo);
@@ -140,7 +139,6 @@ describe(commands.MESSAGINGSETTINGS_LIST, () => {
   it('passes validation when a valid teamId is specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         teamId: '2609af39-7775-4f94-a3dc-0dd67657e900'
       }
     }, commandInfo);
@@ -164,7 +162,7 @@ describe(commands.MESSAGINGSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", output: 'json', debug: false } });
+    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", output: 'json' } });
     assert(loggerLogSpy.calledWith({
       "allowUserEditMessages": true,
       "allowUserDeleteMessages": true,

@@ -129,7 +129,6 @@ describe(commands.TAB_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype'
       }
@@ -177,7 +176,6 @@ describe(commands.TAB_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype'
       }

@@ -489,7 +489,6 @@ describe(commands.FOLDER_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com',
         id: 'b2307a39-e878-458b-bc90-03bc578531d6'
@@ -504,7 +503,6 @@ describe(commands.FOLDER_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com',
         url: '/Shared Documents'
@@ -519,7 +517,6 @@ describe(commands.FOLDER_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
         url: 'Shared Documents/'
@@ -536,7 +533,6 @@ describe(commands.FOLDER_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
         url: 'Shared Documents/FolderPermission',
         withPermissions: true

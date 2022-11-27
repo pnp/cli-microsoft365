@@ -271,7 +271,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: false, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+      await command.action(logger, { options: { environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
       assert.fail('No error message thrown.');
     }
     catch (ex) {

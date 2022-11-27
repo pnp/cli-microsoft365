@@ -131,7 +131,6 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         title: 'YourAppCustomizer',
         webUrl: 'https://contoso.sharepoint.com'
       }
@@ -152,7 +151,6 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         title: 'YourAppCustomizer',
         webUrl: 'https://contoso.sharepoint.com'
       }
@@ -191,7 +189,6 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         webUrl: 'https://contoso.sharepoint.com'
       }
@@ -253,7 +250,6 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         title: 'Places',
         webUrl: 'https://contoso.sharepoint.com'
       }
@@ -292,7 +288,6 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     const getCustomActionSpy = sinon.spy((command as any), 'getCustomAction');
     const options = {
-      debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
@@ -302,7 +297,6 @@ describe(commands.CUSTOMACTION_GET, () => {
       await command.action(logger, { options: options } as any);
       assert(getRequestSpy.calledOnce, 'getRequestSpy.calledOnce');
       assert(getCustomActionSpy.calledWith({
-        debug: false,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web'
@@ -325,7 +319,6 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     const getCustomActionSpy = sinon.spy((command as any), 'getCustomAction');
     const options = {
-      debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site'
@@ -336,7 +329,6 @@ describe(commands.CUSTOMACTION_GET, () => {
       assert(getRequestSpy.calledOnce, 'getRequestSpy.calledOnce');
       assert(getCustomActionSpy.calledWith(
         {
-          debug: false,
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
           webUrl: 'https://contoso.sharepoint.com',
           scope: 'Site'
@@ -362,7 +354,6 @@ describe(commands.CUSTOMACTION_GET, () => {
     try {
       await command.action(logger, {
         options: {
-          debug: false,
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
           webUrl: 'https://contoso.sharepoint.com',
           scope: 'All'
@@ -418,7 +409,6 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
     const options = {
-      debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       webUrl: 'https://contoso.sharepoint.com',
       scope: "All"
@@ -455,7 +445,6 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
@@ -482,7 +471,6 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
@@ -506,7 +494,6 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
@@ -532,7 +519,6 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',

@@ -96,7 +96,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     await assert.rejects(command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
     } as any), new CommandError('Error'));
@@ -134,7 +133,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     await command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
     });

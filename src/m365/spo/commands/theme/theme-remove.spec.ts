@@ -71,7 +71,7 @@ describe(commands.THEME_REMOVE, () => {
   });
 
   it('should prompt before removing theme when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, name: 'Contoso' } });
+    await command.action(logger, { options: { name: 'Contoso' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -93,7 +93,6 @@ describe(commands.THEME_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'Contoso',
         confirm: true
       }

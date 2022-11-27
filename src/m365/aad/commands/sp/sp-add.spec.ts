@@ -159,7 +159,7 @@ describe(commands.SP_ADD, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
       new CommandError('An error has occurred'));
   });
 

@@ -280,7 +280,6 @@ describe(commands.BUCKET_LIST, () => {
 
   it('correctly lists planner buckets with planId', async () => {
     const options: any = {
-      debug: false,
       planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
     };
 
@@ -290,7 +289,6 @@ describe(commands.BUCKET_LIST, () => {
 
   it('correctly lists planner buckets with planTitle and ownerGroupName', async () => {
     const options: any = {
-      debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
     };
@@ -301,7 +299,6 @@ describe(commands.BUCKET_LIST, () => {
 
   it('correctly lists planner buckets with planTitle and ownerGroupId', async () => {
     const options: any = {
-      debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
@@ -321,7 +318,6 @@ describe(commands.BUCKET_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
       }
@@ -345,6 +341,6 @@ describe(commands.BUCKET_LIST, () => {
       return Promise.reject("An error has occurred.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
   });
 });

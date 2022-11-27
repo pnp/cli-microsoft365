@@ -67,7 +67,6 @@ describe(commands.MESSAGE_GET, () => {
   it('fails validation if teamId, channelId and id are not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -76,7 +75,6 @@ describe(commands.MESSAGE_GET, () => {
   it('fails validation if channelId and id are not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171"
       }
     }, commandInfo);
@@ -212,7 +210,6 @@ describe(commands.MESSAGE_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
         channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
         id: "1540911392778"
@@ -246,7 +243,6 @@ describe(commands.MESSAGE_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
         channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
         id: "1540911392778"
