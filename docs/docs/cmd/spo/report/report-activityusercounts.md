@@ -11,10 +11,10 @@ m365 spo report activityusercounts [options]
 ## Options
 
 `-p, --period <period>`
-: The length of time over which the report is aggregated. Supported values `D7,D30,D90,D180`
+: The length of time over which the report is aggregated. Supported values `D7`, `D30`, `D90`, `D180`.
 
 `-f, --outputFile [outputFile]`
-: Path to the file where the report should be stored in
+: Path to the file where the report should be stored in.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -41,3 +41,36 @@ Gets the trend in the number of active users for the last week and exports the r
 ```sh
 m365 spo report activityusercounts --period D7 --output json > "activityusercounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-11-26",
+        "Visited Page": "1",
+        "Viewed Or Edited": "1",
+        "Synced": "",
+        "Shared Internally": "",
+        "Shared Externally": "",
+        "Report Date": "2022-11-26",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Visited Page,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
+    2022-11-26,1,1,,,,2022-11-26,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Visited Page,Viewed Or Edited,Synced,Shared Internally,Shared Externally,Report Date,Report Period
+    2022-11-26,1,1,,,,2022-11-26,7
+    ```

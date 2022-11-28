@@ -17,7 +17,7 @@ m365 spo sp permissionrequest deny
 ## Options
 
 `-i, --id <id>`
-: ID of the permission request to deny
+: ID of the permission request to deny.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -30,8 +30,12 @@ The permission request you want to approve is denoted using its `ID`. You can re
 
 ## Examples
 
-Deny permission request with id _4dc4c043-25ee-40f2-81d3-b3bf63da7538_
+Deny permission request
 
 ```sh
 m365 spo serviceprincipal permissionrequest deny --id 4dc4c043-25ee-40f2-81d3-b3bf63da7538
 ```
+
+## Response
+
+The command won't return a response on success.

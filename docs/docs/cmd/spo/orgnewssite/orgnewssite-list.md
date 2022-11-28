@@ -22,3 +22,25 @@ List all organizational news sites
 ```sh
 m365 spo orgnewssite list
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      "https://contoso.sharepoint.com/sites/contosoNews"
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    https://contoso.sharepoint.com/sites/contosoNews
+    ```
+
+=== "CSV"
+
+    ```csv
+    https://contoso.sharepoint.com/sites/contosoNews
+    ```

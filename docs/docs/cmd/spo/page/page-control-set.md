@@ -11,19 +11,19 @@ m365 spo page control set [options]
 ## Options
 
 `-i, --id <id>`
-: ID of the control to update properties of
+: ID of the control to update properties of.
 
 `-n, --pageName <pageName>`
-: Name of the page where the control is located
+: Name of the page where the control is located.
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the page is located
+: URL of the site where the page is located.
 
 `--webPartData [webPartData]`
-: JSON string with web part data as retrieved from the web part maintenance mode. Specify `webPartProperties` or `webPartData` but not both
+: JSON string with web part data as retrieved from the web part maintenance mode. Specify either `webPartProperties` or `webPartData` but not both.
 
 `--webPartProperties [webPartProperties]`
-: JSON string with web part data as retrieved from the web part maintenance mode. Specify `webPartProperties` or `webPartData` but not both
+: JSON string with web part data as retrieved from the web part maintenance mode. Specify either `webPartProperties` or `webPartData` but not both.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -36,14 +36,18 @@ If the specified `pageName` doesn't refer to an existing modern page, you will g
 
 ## Examples
 
-Update web part data for the control with ID _3ede60d3-dc2c-438b-b5bf-cc40bb2351e1_ placed on a modern page with name _home.aspx_
+Update web part data for the control, placed on a modern page
 
 ```sh
 m365 spo page control set --id 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1 --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --webPartData '{"title":"New WP Title","properties": {"description": "New description"}}'
 ```
 
-Update web part properties for the control with ID _3ede60d3-dc2c-438b-b5bf-cc40bb2351e1_ placed on a modern page with name _home.aspx_
+Update web part properties for the control, placed on a modern page
 
 ```sh
 m365 spo page control set --id 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1 --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --webPartProperties '{"description": "New description"}'
 ```
+
+## Response
+
+The command won't return a response on success.
