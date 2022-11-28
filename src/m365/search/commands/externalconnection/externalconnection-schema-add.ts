@@ -82,7 +82,6 @@ class SearchExternalConnectionSearchAddCommand extends GraphCommand {
         if (!schemaObject.properties || schemaObject.properties.length > 128) {
           return `We need atleast one property and a maximum of 128 properties in the schema object`;
         }
-        // Validate schema
 
         return true;
       }
@@ -99,7 +98,8 @@ class SearchExternalConnectionSearchAddCommand extends GraphCommand {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      responseType: 'json'
+      responseType: 'json',
+      data: args.options.schema
     };
 
     try {
