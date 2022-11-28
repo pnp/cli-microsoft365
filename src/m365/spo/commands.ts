@@ -287,6 +287,7 @@ export default {
   WEB_LIST: `${prefix} web list`,
   WEB_REINDEX: `${prefix} web reindex`,
   WEB_REMOVE: `${prefix} web remove`,
+  WEB_RETENTIONLABEL_LIST: `${prefix} web retentionlabel list`,
   WEB_ROLEASSIGNMENT_REMOVE: `${prefix} web roleassignment remove`,
   WEB_ROLEASSIGNMENT_ADD: `${prefix} web roleassignment add`,
   WEB_ROLEINHERITANCE_BREAK: `${prefix} web roleinheritance break`,
