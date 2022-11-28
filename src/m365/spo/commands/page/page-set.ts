@@ -229,65 +229,53 @@ class SpoPageSetCommand extends SpoCommand {
             requestOptions.data = {
               WelcomePage: `SitePages/${pageName}`
             };
+            await request.post(requestOptions);
             break;
           case 'NewsPage':
-            requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields`;
-            requestOptions.headers = {
-              'X-RequestDigest': requestDigest,
-              'X-HTTP-Method': 'MERGE',
-              'IF-MATCH': '*',
-              'content-type': 'application/json;odata=nometadata',
-              accept: 'application/json;odata=nometadata'
-            };
-            requestOptions.data = {
+            const newsPageItemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl);
+            const listItemSetOptions: spoListItemSetOptions = {
+              webUrl: args.options.webUrl,
+              listUrl: listServerRelativeUrl,
+              id: newsPageItemId,
+              systemUpdate: true,
               PromotedState: 2,
-              FirstPublishedDate: new Date().toISOString().replace('Z', '')
+              FirstPublishedDate: new Date().toISOString(),
+              verbose: this.verbose,
+              debug: true
             };
+            await Cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
             break;
           case 'Template':
-            requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields`;
+            const templateItemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl)
             requestOptions.headers = {
-              'X-RequestDigest': requestDigest,
-              'content-type': 'application/json;odata=nometadata',
-              accept: 'application/json;odata=nometadata'
-            };
-            break;
-        }
-
-        const pageRes = await request.post<{ Id: string }>(requestOptions);
-        if (args.options.promoteAs === 'Template') {
-          const requestOptions: AxiosRequestConfig = {
-            responseType: 'json',
-            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageRes.Id})/SavePageAsTemplate`,
-            headers: {
               'X-RequestDigest': requestDigest,
               'content-type': 'application/json;odata=nometadata',
               'X-HTTP-Method': 'POST',
               'IF-MATCH': '*',
               accept: 'application/json;odata=nometadata'
             }
-          };
-
-          const res = await request.post<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }>(requestOptions);
-          if (fileNameWithoutExtension) {
-            pageData.Title = fileNameWithoutExtension;
-          }
-          if (pageDescription) {
-            pageData.Description = pageDescription;
-          }
-          if (res.BannerImageUrl) {
-            pageData.BannerImageUrl = res.BannerImageUrl;
-          }
-          if (res.LayoutWebpartsContent) {
-            pageData.LayoutWebpartsContent = res.LayoutWebpartsContent;
-          }
-          if (res.CanvasContent1) {
-            pageData.CanvasContent1 = res.CanvasContent1;
-          }
-
-          pageId = res.Id;
+            requestOptions.url = `${args.options.webUrl}/_api/SitePages/Pages(${templateItemId})/SavePageAsTemplate`;
+            const res = await request.post<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }>(requestOptions);
+            if (fileNameWithoutExtension) {
+              pageData.Title = fileNameWithoutExtension;
+            }
+            if (pageDescription) {
+              pageData.Description = pageDescription;
+            }
+            if (res.BannerImageUrl) {
+              pageData.BannerImageUrl = res.BannerImageUrl;
+            }
+            if (res.LayoutWebpartsContent) {
+              pageData.LayoutWebpartsContent = res.LayoutWebpartsContent;
+            }
+            if (res.CanvasContent1) {
+              pageData.CanvasContent1 = res.CanvasContent1;
+            }
+            pageId = res.Id;
+            break;
         }
       }
+
       if (args.options.promoteAs !== 'Template') {
         if (pageTitle) {
           pageData.Title = pageTitle;
@@ -361,20 +349,11 @@ class SpoPageSetCommand extends SpoCommand {
       }
 
       if (args.options.demoteFrom === 'NewsPage') {
-        const fileGetOptions: spoFileGetOptions = {
-          webUrl: args.options.webUrl,
-          url: serverRelativeFileUrl,
-          asListItem: true,
-          verbose: this.verbose,
-          debug: this.debug
-        };
-        const fileGetOutput: CommandOutput = await Cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...fileGetOptions, _: [] } });
-        const fileGetOutputJson = JSON.parse(fileGetOutput.stdout);
-
+        const fileId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl);
         const listItemSetOptions: spoListItemSetOptions = {
           webUrl: args.options.webUrl,
           listUrl: listServerRelativeUrl,
-          id: fileGetOutputJson.Id,
+          id: fileId,
           systemUpdate: true,
           PromotedState: 0,
           verbose: this.verbose,
@@ -417,6 +396,19 @@ class SpoPageSetCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async getFileListItemId(webUrl: string, serverRelativeFileUrl: string): Promise<string> {
+    const fileGetOptions: spoFileGetOptions = {
+      webUrl: webUrl,
+      url: serverRelativeFileUrl,
+      asListItem: true,
+      verbose: this.verbose,
+      debug: this.debug
+    };
+    const fileGetOutput: CommandOutput = await Cli.executeCommandWithOutput(spoFileGetCommand as Command, { options: { ...fileGetOptions, _: [] } });
+    const fileGetOutputJson = JSON.parse(fileGetOutput.stdout);
+    return fileGetOutputJson.Id;
   }
 }
 
