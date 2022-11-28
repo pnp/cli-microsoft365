@@ -481,7 +481,7 @@ describe(commands.PLAN_SET, () => {
         ownerGroupName: ownerGroupName,
         shareWithUserNames: shareWithUserNames
       }
-    }), new CommandError(`Cannot proceed with planner plan creation. The following users provided are invalid : ${user1}`));
+    }), new CommandError(`Cannot proceed with planner plan creation. The following users provided are invalid: ${user1}`));
   });
 
   it('correctly handles API OData error', async () => {

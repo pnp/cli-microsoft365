@@ -42,19 +42,19 @@ This command allows using unknown options.
 
 ## Examples
 
-Updates a Microsoft Planner plan title to New Title for the plan with id gndWOTSK60GfPQfiDDj43JgACDCb.
+Updates a Microsoft Planner plan title to New Title
 
 ```sh
 m365 planner plan set --id 'gndWOTSK60GfPQfiDDj43JgACDCb' --newTitle 'New Title'
 ```
 
-Share a Microsoft Planner plan with title Plan Title that is owned by the group My Group, with the users user1@contoso.com and user2@contoso.com
+Share a Microsoft Planner plan owned by the group, with the users
 
 ```sh
 m365 planner plan set --title 'Plan Title' --ownerGroupName 'My Group' --shareWithUserNames 'user1@contoso.com,user2@contoso.com'
 ```
 
-Updates a Microsoft Planner plan category label with the key 21 to ToDo also the category label with the key 25 to Urgent. This for the plan with id gndWOTSK60GfPQfiDDj43JgACDCb.
+Updates a Microsoft Planner plan category labels
 
 ```sh
 m365 planner plan set --id 'gndWOTSK60GfPQfiDDj43JgACDCb' --category21 'ToDo' --category25 'Urgent'

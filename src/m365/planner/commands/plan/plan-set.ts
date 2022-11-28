@@ -195,12 +195,11 @@ class PlannerPlanSetCommand extends GraphCommand {
       return Promise.resolve(options.shareWithUserIds.split(','));
     }
 
-    // Hitting this section means assignedToUserNames won't be undefined
     const userNames = options.shareWithUserNames as string;
     const userArr: string[] = userNames.split(',').map(o => o.trim());
 
     const promises: Promise<{ value: User[] }>[] = userArr.map(user => {
-      const requestOptions: any = {
+      const requestOptions: AxiosRequestConfig = {
         url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
         headers: {
           'content-type': 'application/json'
@@ -221,7 +220,7 @@ class PlannerPlanSetCommand extends GraphCommand {
         const invalidUsers = userArr.filter(user => !userUpns.some((upn) => upn?.toLowerCase() === user.toLowerCase()));
 
         if (invalidUsers && invalidUsers.length > 0) {
-          return Promise.reject(`Cannot proceed with planner plan creation. The following users provided are invalid : ${invalidUsers.join(',')}`);
+          return Promise.reject(`Cannot proceed with planner plan creation. The following users provided are invalid: ${invalidUsers.join(',')}`);
         }
 
         return Promise.resolve(userIds);
@@ -237,7 +236,7 @@ class PlannerPlanSetCommand extends GraphCommand {
   }
 
   private async getPlanEtag(planId: string): Promise<string> {
-    const requestOptions: any = {
+    const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/planner/plans/${planId}`,
       headers: {
         accept: 'application/json'
@@ -250,7 +249,7 @@ class PlannerPlanSetCommand extends GraphCommand {
   }
 
   private async getPlanDetailsEtag(planId: string): Promise<string> {
-    const requestOptions: any = {
+    const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/planner/plans/${planId}/details`,
       headers: {
         accept: 'application/json'
@@ -263,7 +262,7 @@ class PlannerPlanSetCommand extends GraphCommand {
   }
 
   private async getPlanDetails(plan: PlannerPlan): Promise<PlannerPlan & PlannerPlanDetails> {
-    const requestOptionsTaskDetails: any = {
+    const requestOptionsTaskDetails: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/planner/plans/${plan.id}/details`,
       headers: {
         'accept': 'application/json;odata.metadata=none',
@@ -306,7 +305,7 @@ class PlannerPlanSetCommand extends GraphCommand {
 
     const etag = await this.getPlanDetailsEtag(planId);
 
-    const requestOptionsPlanDetails: any = {
+    const requestOptionsPlanDetails: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/planner/plans/${planId}/details`,
       headers: {
         'accept': 'application/json;odata.metadata=none',
