@@ -158,9 +158,7 @@ class PlannerPlanSetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(
-      ['id', 'title']
-    );
+    this.optionSets.push(['id', 'title']);
   }
 
   public allowUnknownOptions(): boolean | undefined {
