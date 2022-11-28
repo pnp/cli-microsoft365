@@ -23,7 +23,7 @@ m365 search externalconnection schema add [options]
 Adds a new schema to a specific external connection.
 
 ```sh
-m365 search externalconnection schema add --externalConnectionId 'Koala' --schema '{"baseType":"microsoft.graph.externalItem","properties":[{"name":"ticketTitle","type":"String","isSearchable":"true","isRetrievable":"true","labels":["title"]},{"name":"priority","type":"String","isQueryable":"true","isRetrievable":"true","isSearchable":"false"},{"name":"assignee","type":"String","isRetrievable":"true"}]}'
+m365 search externalconnection schema add --externalConnectionId 'CliConnectionId' --schema '{"baseType":"microsoft.graph.externalItem","properties":[{"name":"ticketTitle","type":"String","isSearchable":"true","isRetrievable":"true","labels":["title"]},{"name":"priority","type":"String","isQueryable":"true","isRetrievable":"true","isSearchable":"false"},{"name":"assignee","type":"String","isRetrievable":"true"}]}'
 ```
 
 ## Response
