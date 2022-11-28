@@ -17,7 +17,7 @@ m365 spo sp grant revoke
 ## Options
 
 `-i, --id <id>`
-: `ObjectId` of the permission grant to revoke
+: `ObjectId` of the permission grant to revoke.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -30,8 +30,12 @@ The permission grant you want to revoke is denoted using its `ObjectId`. You can
 
 ## Examples
 
-Revoke permission grant with ObjectId _50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA_
+Revoke permission grant
 
 ```sh
 m365 spo serviceprincipal grant revoke --id 50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA
 ```
+
+## Response
+
+The command won't return a response on success.

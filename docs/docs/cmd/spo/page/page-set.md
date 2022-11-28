@@ -11,34 +11,34 @@ m365 spo page set [options]
 ## Options
 
 `-n, --name <name>`
-: Name of the page to update
+: Name of the page to update.
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the page to update is located
+: URL of the site where the page to update is located.
 
 `-l, --layoutType [layoutType]`
-: Layout of the page. Allowed values `Article`, `Home`, `SingleWebPartAppPage`, `RepostPage`, `HeaderlessSearchResults`, `Spaces`, `Topic`
+: Layout of the page. Allowed values `Article`, `Home`, `SingleWebPartAppPage`, `RepostPage`, `HeaderlessSearchResults`, `Spaces`, `Topic`.
 
 `-p, --promoteAs [promoteAs]`
-: Update the page purpose. Allowed values `HomePage`, `NewsPage`, `Template`
+: Update the page purpose. Allowed values `HomePage`, `NewsPage`, `Template`.
 
 `--demoteFrom [demoteFrom]`
-: Update the page purpose back to a regular article. Allowed values `NewsPage`
+: Update the page purpose back to a regular article. Allowed values `NewsPage`.
 
 `--commentsEnabled [commentsEnabled]`
-: Set to `true`, to enable comments on the page. Allowed values `true`, `false`
+: Set to `true`, to enable comments on the page. Allowed values `true`, `false`.
 
 `--publish`
-: Set to publish the page
+: Set to publish the page.
 
 `--publishMessage [publishMessage]`
-: Message to set when publishing the page
+: Message to set when publishing the page.
 
 `--description [description]`
-: The description to set for the page
+: The description to set for the page.
 
 `--title [title]`
-: The title to set for the page
+: The title to set for the page.
 
 --8<-- "docs/cmd/_global.md"
 

@@ -11,16 +11,16 @@ m365 spo page section add [options]
 ## Options
 
 `-n, --pageName <pageName>`
-: Name of the page to add section to
+: Name of the page to add section to.
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the page to retrieve is located
+: URL of the site where the page to retrieve is located.
 
 `-t, --sectionTemplate <sectionTemplate>`
-: Type of section to add. Allowed values `OneColumn,OneColumnFullWidth,TwoColumn,ThreeColumn,TwoColumnLeft,TwoColumnRight`
+: Type of section to add. Allowed values `OneColumn`, `OneColumnFullWidth`, `TwoColumn`, `ThreeColumn`, `TwoColumnLeft`, `TwoColumnRight`.
 
 `--order [order]`
-: Order of the section to add
+: Order of the section to add.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -30,8 +30,12 @@ If the specified `pageName` doesn't refer to an existing modern page, you will g
 
 ## Examples
 
-Add section to the modern page named _home.aspx_
+Add section to the modern page
 
 ```sh
-m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter  --sectionTemplate OneColumn --order 1
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter --sectionTemplate OneColumn --order 1
 ```
+
+## Response
+
+The command won't return a response on success.

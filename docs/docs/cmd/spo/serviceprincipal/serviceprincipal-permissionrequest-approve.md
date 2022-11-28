@@ -16,14 +16,14 @@ m365 spo sp permissionrequest approve
 
 ## Options
 
-`-i, --id [id]`
-: ID of the permission request to approve
+`-i, --id <id>`
+: ID of the permission request to approve.
 
 `--all`
-: approve all pending permission requests
+: approve all pending permission requests.
 
 `--resource [resource]`
-: The resource of the permissions requests to approve
+: The resource of the permissions requests to approve.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -36,22 +36,10 @@ The permission request you want to approve is denoted using its `ID`. You can re
 
 ## Examples
 
-Approve permission request with id
+Approve permission request
 
 ```sh
 m365 spo serviceprincipal permissionrequest approve --id 4dc4c043-25ee-40f2-81d3-b3bf63da7538
-```
-
-Approve all permission request
-
-```sh
-m365 spo serviceprincipal permissionrequest approve --all
-```
-
-Approve all permission request from a specific resource
-
-```sh
-m365 spo serviceprincipal permissionrequest approve --resource "Microsoft Graph"
 ```
 
 ## Response
@@ -60,81 +48,33 @@ m365 spo serviceprincipal permissionrequest approve --resource "Microsoft Graph"
 
     ```json
     {
-      "ClientId": "90a2c08e-e786-4100-9ea9-36c261be6c0d",
+      "ClientId": "6004a642-185c-479a-992a-15d1c23e2229",
       "ConsentType": "AllPrincipals",
       "IsDomainIsolated": false,
-      "ObjectId": "jsCikIbnAEGeqTbCYb5sDZXCr9YICndHoJUQvLfiOQM",
+      "ObjectId": "QqYEYFwYmkeZKhXRwj4iKRcAa6TiIbFNvGnKY1dqONY",
       "PackageName": null,
       "Resource": "Microsoft Graph",
-      "ResourceId": "d6afc295-0a08-4777-a095-10bcb7e23903",
-      "Scope": "User.Read.All"
+      "ResourceId": "a46b0017-21e2-4db1-bc69-ca63576a38d6",
+      "Scope": "Reports.Read.All"
     }
     ```
 
 === "Text"
 
     ```text
-    ClientId        : 90a2c08e-e786-4100-9ea9-36c261be6c0d
+    ClientId        : 6004a642-185c-479a-992a-15d1c23e2229
     ConsentType     : AllPrincipals
     IsDomainIsolated: false
-    ObjectId        : jsCikIbnAEGeqTbCYb5sDZXCr9YICndHoJUQvLfiOQM
+    ObjectId        : QqYEYFwYmkeZKhXRwj4iKRcAa6TiIbFNvGnKY1dqONY
     PackageName     : null
     Resource        : Microsoft Graph
-    ResourceId      : d6afc295-0a08-4777-a095-10bcb7e23903
-    Scope           : User.Read.All
+    ResourceId      : a46b0017-21e2-4db1-bc69-ca63576a38d6
+    Scope           : Directory.ReadWrite.All
     ```
 
 === "CSV"
 
     ```csv
     ClientId,ConsentType,IsDomainIsolated,ObjectId,PackageName,Resource,ResourceId,Scope
-    90a2c08e-e786-4100-9ea9-36c261be6c0d,AllPrincipals,,jsCikIbnAEGeqTbCYb5sDZXCr9YICndHoJUQvLfiOQM,,Microsoft Graph,d6afc295-0a08-4777-a095-10bcb7e23903,User.Read.All
-    ```
-
-### `all`, `resource` response
-
-When we make use of the option `all` or `resource` the response will differ.
-
-=== "JSON"
-
-    ```json
-    [
-      {
-        "ClientId": "90a2c08e-e786-4100-9ea9-36c261be6c0d",
-        "ConsentType": "AllPrincipals",
-        "IsDomainIsolated": false,
-        "ObjectId": "jsCikIbnAEGeqTbCYb5sDZXCr9YICndHoJUQvLfiOQM",
-        "PackageName": null,
-        "Resource": "Microsoft Graph",
-        "ResourceId": "d6afc295-0a08-4777-a095-10bcb7e23903",
-        "Scope": "User.Read.All"
-      },
-      {
-        "ClientId": "90a2c08e-e786-4100-9ea9-36c261be6c0d",
-        "ConsentType": "AllPrincipals",
-        "IsDomainIsolated": false,
-        "ObjectId": "jsCikIbnAEGeqTbCYb5sDZXCr9YICndHoJUQvLfiOQM",
-        "PackageName": null,
-        "Resource": "Microsoft Graph",
-        "ResourceId": "d6afc295-0a08-4777-a095-10bcb7e23903",
-        "Scope": "Sites.Read.All"
-      }
-    ]
-    ```
-
-=== "Text"
-
-    ```text
-    ClientId                              ConsentType    IsDomainIsolated  ObjectId                                     PackageName  Resource         ResourceId                            Scope
-    ------------------------------------  -------------  ----------------  -------------------------------------------  -----------  ---------------  ------------------------------------  -----------------------
-    90a2c08e-e786-4100-9ea9-36c261be6c0d  AllPrincipals  false             jsCikIbnAEGeqTbCYb5sDZXCr9YICndHoJUQvLfiOQM  null         Microsoft Graph  d6afc295-0a08-4777-a095-10bcb7e23903  User.Read.All
-    90a2c08e-e786-4100-9ea9-36c261be6c0d  AllPrincipals  false             jsCikIbnAEGeqTbCYb5sDZXCr9YICndHoJUQvLfiOQM  null         Microsoft Graph  d6afc295-0a08-4777-a095-10bcb7e23903  Sites.Read.All
-    ```
-
-=== "CSV"
-
-    ```csv
-    ClientId,ConsentType,IsDomainIsolated,ObjectId,PackageName,Resource,ResourceId,Scope
-    90a2c08e-e786-4100-9ea9-36c261be6c0d,AllPrincipals,,jsCikIbnAEGeqTbCYb5sDZXCr9YICndHoJUQvLfiOQM,,Microsoft Graph,d6afc295-0a08-4777-a095-10bcb7e23903,User.Read.All
-    90a2c08e-e786-4100-9ea9-36c261be6c0d,AllPrincipals,,jsCikIbnAEGeqTbCYb5sDZXCr9YICndHoJUQvLfiOQM,,Microsoft Graph,d6afc295-0a08-4777-a095-10bcb7e23903,Sites.Read.All
+    6004a642-185c-479a-992a-15d1c23e2229,AllPrincipals,false,QqYEYFwYmkeZKhXRwj4iKRcAa6TiIbFNvGnKY1dqONY,null,Microsoft Graph,a46b0017-21e2-4db1-bc69-ca63576a38d6,Directory.ReadWrite.All
     ```
