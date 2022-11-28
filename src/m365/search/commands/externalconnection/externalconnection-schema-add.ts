@@ -30,7 +30,7 @@ interface Property {
   type: string;
 }
 
-class SearchExternalConnectionSearchAddCommand extends GraphCommand {
+class SearchExternalConnectionSchemaAddCommand extends GraphCommand {
   public get name(): string {
     return commands.EXTERNALCONNECTION_SCHEMA_ADD;
   }
@@ -111,4 +111,4 @@ class SearchExternalConnectionSearchAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new SearchExternalConnectionSearchAddCommand();
+module.exports = new SearchExternalConnectionSchemaAddCommand();
