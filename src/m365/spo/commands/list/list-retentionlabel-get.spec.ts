@@ -10,9 +10,9 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-const command: Command = require('./list-label-get');
+const command: Command = require('./list-retentionlabel-get');
 
-describe(commands.LIST_LABEL_GET, () => {
+describe(commands.LIST_RETENTIONLABEL_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -58,7 +58,12 @@ describe(commands.LIST_LABEL_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_LABEL_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.LIST_RETENTIONLABEL_GET), true);
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.strictEqual((alias && alias.indexOf(commands.LIST_LABEL_GET) !== -1), true);
   });
 
   it('has a description', () => {

@@ -114,6 +114,8 @@ export default {
   LIST_LABEL_SET: `${prefix} list label set`,
   LIST_LIST: `${prefix} list list`,
   LIST_REMOVE: `${prefix} list remove`,
+  LIST_RETENTIONLABEL_GET: `${prefix} list retentionlabel get`,
+  LIST_RETENTIONLABEL_SET: `${prefix} list retentionlabel set`,
   LIST_ROLEASSIGNMENT_REMOVE: `${prefix} list roleassignment remove`,
   LIST_ROLEASSIGNMENT_ADD: `${prefix} list roleassignment add`,
   LIST_ROLEINHERITANCE_BREAK: `${prefix} list roleinheritance break`,

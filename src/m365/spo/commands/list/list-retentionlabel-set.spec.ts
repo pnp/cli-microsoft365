@@ -10,16 +10,16 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-const command: Command = require('./list-label-set');
+const command: Command = require('./list-retentionlabel-set');
 
-describe(commands.LIST_LABEL_SET, () => {
+describe(commands.LIST_RETENTIONLABEL_SET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -56,7 +56,12 @@ describe(commands.LIST_LABEL_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_LABEL_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.LIST_RETENTIONLABEL_SET), true);
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.strictEqual((alias && alias.indexOf(commands.LIST_LABEL_SET) !== -1), true);
   });
 
   it('has a description', () => {
