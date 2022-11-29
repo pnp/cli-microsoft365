@@ -20,13 +20,17 @@ interface Options extends GlobalOptions {
   listUrl?: string;
 }
 
-class SpoListLabelGetCommand extends SpoCommand {
+class SpoListRetentionLabelGetCommand extends SpoCommand {
   public get name(): string {
-    return commands.LIST_LABEL_GET;
+    return commands.LIST_RETENTIONLABEL_GET;
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.LIST_LABEL_GET];
   }
 
   public get description(): string {
-    return 'Gets label set on the specified list';
+    return 'Gets the default retention label set on the specified list or library.';
   }
 
   constructor() {
@@ -89,6 +93,8 @@ class SpoListLabelGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, commands.LIST_LABEL_GET, commands.LIST_RETENTIONLABEL_GET);
+
     try {
       if (this.verbose) {
         logger.logToStderr(`Getting label set on the list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
@@ -157,4 +163,4 @@ class SpoListLabelGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListLabelGetCommand();
+module.exports = new SpoListRetentionLabelGetCommand();

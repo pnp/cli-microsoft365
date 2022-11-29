@@ -23,13 +23,17 @@ interface Options extends GlobalOptions {
   blockEdit?: boolean;
 }
 
-class SpoListLabelSetCommand extends SpoCommand {
+class SpoListRetentionLabelSetCommand extends SpoCommand {
   public get name(): string {
-    return commands.LIST_LABEL_SET;
+    return commands.LIST_RETENTIONLABEL_SET;
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.LIST_LABEL_SET];
   }
 
   public get description(): string {
-    return 'Sets classification label on the specified list';
+    return 'Sets a default retention label on the specified list or library.';
   }
 
   constructor() {
@@ -100,6 +104,8 @@ class SpoListLabelSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    this.showDeprecationWarning(logger, commands.LIST_LABEL_SET, commands.LIST_RETENTIONLABEL_SET);
+
     try {
       let listRestUrl: string = '';
       let listServerRelativeUrl: string = '';
@@ -154,4 +160,4 @@ class SpoListLabelSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListLabelSetCommand();
+module.exports = new SpoListRetentionLabelSetCommand();
