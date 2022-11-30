@@ -64,28 +64,9 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both location and parentNodeId options are not passed', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/team-a',
-        title: 'About',
-        url: '/sites/team-a/sitepages/about.aspx'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both location and parentNodeId options are passed', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/team-a',
-        title: 'About',
-        url: '/sites/team-a/sitepages/about.aspx',
-        location: 'TopNavigationBar',
-        parentNodeId: 1000
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [{ options: ['location', 'parentNodeId'] }]);
   });
 
   it('excludes options from URL processing', () => {

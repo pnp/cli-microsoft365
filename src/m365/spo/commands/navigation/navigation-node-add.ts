@@ -97,7 +97,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['location', 'parentNodeId']
+      { options: ['location', 'parentNodeId'] }
     );
   }
 
