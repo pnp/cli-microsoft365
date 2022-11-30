@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-export-configs-tenant-wide-extensions",
+    "source": "pnp",
+    "title": "Export Configurations of Tenant Wide Extensions",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/export-configs-tenant-wide-extensions",
+    "creationDateTime": "2020-08-21",
+    "updateDateTime": "2020-08-21",
+    "shortDescription": "This script retrieves Tenant Wide Extension configurations from the App Catalog and exports the same to CSV file.",
+    "longDescription": [
+      "The SharePoint Admin Center provides various governance features, but there is no way to easily export Configurations of Tenant Wide Extensions from the SharePoint admin center for governance activities. This script retrieves Tenant Wide Extension configurations from the App Catalog and exports the same in a comma-separated values (CSV) file."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "customizations",
+      "reports"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/export-configs-tenant-wide-extensions/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "sprider",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/21008316?v=4",
+        "name": "Joseph Velliah"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

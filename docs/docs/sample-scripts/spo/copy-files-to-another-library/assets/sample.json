@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-copy-files-to-another-library",
+    "source": "pnp",
+    "title": "Copy files to another SharePoint Library in another site",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/copy-files-to-another-library",
+    "creationDateTime": "2021-04-20",
+    "updateDateTime": "2021-04-20",
+    "shortDescription": "This script shows how you can use the CLI to copy all files and folders from source library to a different library.",
+    "longDescription": [
+      "This script shows how you can use the CLI to copy all files and folders from source library to a different library."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "files",
+      "libraries",
+      "migration"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/copy-files-to-another-library/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "Adam-it",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/58668583?v=4",
+        "name": "Adam Wójcik"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

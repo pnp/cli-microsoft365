@@ -1,0 +1,49 @@
+[
+  {
+    "name": "pnp-empty-tenant-recyclebin",
+    "source": "pnp",
+    "title": "Empty the tenant recycle bin",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/empty-tenant-recyclebin",
+    "creationDateTime": "2021-06-13",
+    "updateDateTime": "2021-06-13",
+    "shortDescription": "Script deletes modern SharePoint sites from recycle bin.",
+    "longDescription": [
+      "Your deleted modern SharePoint sites are not going to disappear from the UI before they have been removed from the tenant recycle bin. You can either wait for three months, delete them manually via the SharePoint admin center, or run the CLI for Microsoft 365 script below."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "cleanup"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/empty-tenant-recyclebin/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "michaelmaillot",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/44271458?v=4",
+        "name": "Michaël Maillot (onepoint)"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

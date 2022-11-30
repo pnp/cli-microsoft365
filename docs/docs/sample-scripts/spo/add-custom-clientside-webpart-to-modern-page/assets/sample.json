@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-add-custom-clientside-webpart-to-modern-page",
+    "source": "pnp",
+    "title": "Add custom client-side web part to modern page",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/add-custom-clientside-webpart-to-modern-page",
+    "creationDateTime": "2020-05-20",
+    "updateDateTime": "2020-05-20",
+    "shortDescription": "This sample helps you add your web part to the page.",
+    "longDescription": [
+      "You've built an amazing new web part and now you want to programmatically add it to a modern page. This sample helps you add your web part to the page with your custom properties that might be dynamic according to your script."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "provisioning",
+      "migration",
+      "pages"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/add-custom-clientside-webpart-to-modern-page/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "ypcode",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/8345556?v=4",
+        "name": "Yannick Plenevaux"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
