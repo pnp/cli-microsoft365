@@ -17,8 +17,28 @@ m365 cli completion sh setup [options]
 Set up command completion for Zsh, Bash or Fish
 
 ```powershell
-cli completion sh setup
+m365 cli completion sh setup
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    "Command completion successfully registered. Restart your shell to load the completion"
+    ```
+
+=== "Text"
+
+    ```text
+    Command completion successfully registered. Restart your shell to load the completion
+    ```
+
+=== "CSV"
+
+    ```csv
+    Command completion successfully registered. Restart your shell to load the completion
+    ```
 
 ## More information
 

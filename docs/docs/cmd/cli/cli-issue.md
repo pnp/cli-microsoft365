@@ -32,3 +32,23 @@ Suggest a new command
 ```sh
 m365 cli issue --type command
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    "https://aka.ms/cli-m365/new-command"
+    ```
+
+=== "Text"
+
+    ```text
+    https://aka.ms/cli-m365/new-command
+    ```
+
+=== "CSV"
+
+    ```csv
+    https://aka.ms/cli-m365/new-command
+    ```
