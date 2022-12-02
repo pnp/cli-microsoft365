@@ -446,6 +446,7 @@ describe('Cli', () => {
   });
 
   it('shows full help when specified -h with a number', (done) => {
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(() => 'full');
     cli
       .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', '1'])
       .then(_ => {
