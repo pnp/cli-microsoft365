@@ -158,7 +158,7 @@ true
 
 ### Objects
 
-If the command returns information about an object such as a site, list or an app, that contains a number of properties, the output in csv mode is formatted as comma separated values. For example, getting information about a specific app, will return output similar to:
+If the command returns information about an object such as a site, list or an app, that contains a number of properties, the output in CSV mode is formatted as comma-separated values. For example, getting information about a specific app, will return output similar to the following:
 
 ```sh
 $ m365 spo app get -i e6362993-d4fd-4c5a-8254-fd095a7291ad -o csv
