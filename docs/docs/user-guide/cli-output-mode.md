@@ -168,7 +168,7 @@ AppCatalogVersion,CanUpgrade,CurrentVersionDeployed,Deployed,ID,InstalledVersion
 
 ### Arrays
 
-If the command returns information about multiple objects, the output is formatted as multiple lines of comma-separated values. For example, getting the list of available apps, will return output similar to:
+If the command returns information about multiple objects, the output is formatted as multiple lines of comma-separated values. For example, getting the list of available apps will return output similar to the following:
 
 ```sh
 $ m365 spo app list -o csv
