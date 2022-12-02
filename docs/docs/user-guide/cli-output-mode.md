@@ -145,7 +145,7 @@ Title            : spfx-140-online-client-side-solution
 
 ## CSV output mode
 
-Optionally, you can have all CLI for Microsoft 365 commands return their output as comma separated values. Depending on the command output, the value is presented as-is or formatted for readability.
+Optionally, you can have all CLI for Microsoft 365 commands return their output as comma-separated values. Depending on the command output, the value is presented as-is or formatted for readability.
 
 ### Simple values
 
