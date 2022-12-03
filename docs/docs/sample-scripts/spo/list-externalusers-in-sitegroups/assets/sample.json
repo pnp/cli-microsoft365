@@ -1,0 +1,53 @@
+[
+  {
+    "name": "pnp-list-externalusers-in-sitegroups",
+    "source": "pnp",
+    "title": "List all external users in site groups across all site collections",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/list-externalusers-in-sitegroups",
+    "creationDateTime": "2022-07-25",
+    "updateDateTime": "2022-07-25",
+    "shortDescription": "This script shows how you can check if external users are added to site groups.",
+    "longDescription": [
+      "This script shows how you can check if external users are added to site groups. It will show all external users across all site collections and the site groups they where added to."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "guests",
+      "groups",
+      "reports",
+      "sites",
+      "users"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/list-externalusers-in-sitegroups/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "martinlingstuyl",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/5267487?v=4",
+        "name": "Martin Lingstuyl"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]
