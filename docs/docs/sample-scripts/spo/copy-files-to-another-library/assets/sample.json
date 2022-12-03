@@ -35,6 +35,11 @@
     ],
     "authors": [
       {
+        "gitHubAccount": "garrytrinder",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/11563347?v=4",
+        "name": "Garry Trinder"
+      },
+      {
         "gitHubAccount": "Adam-it",
         "pictureUrl": "https://avatars.githubusercontent.com/u/58668583?v=4",
         "name": "Adam Wójcik"

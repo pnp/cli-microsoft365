@@ -28,9 +28,9 @@ Prerequisites:
 
 Source & Target Lists:
 
-[![pii-source-list](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-source-list.png)](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-source-list.png)
+[![pii-source-list](../../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-source-list.png)](../../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-source-list.png)
 
-[![pii-audit-report-list-schema](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list-schema.png)](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list-schema.png)
+[![pii-audit-report-list-schema](../../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list-schema.png)](../../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list-schema.png)
 
 === "PowerShell"
 
@@ -94,7 +94,7 @@ Source & Target Lists:
 
 Output:
 
-[![pii-audit-report-list](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list.png)](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list.png)
+[![pii-audit-report-list](../../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list.png)](../../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list.png)
 
-[![pii-audit-report-data](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-data.png)](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-data.png)
+[![pii-audit-report-data](../../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-data.png)](../../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-data.png)
 
