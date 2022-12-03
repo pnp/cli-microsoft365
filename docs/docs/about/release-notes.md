@@ -15,6 +15,11 @@
 - enhanced cli-output-mode doc [#4117](https://github.com/pnp/cli-microsoft365/issues/4117)
 - fixed 'spo navigation node add' command [#4093](https://github.com/pnp/cli-microsoft365/issues/4093)
 - enhanced spo lisitem set command [#4167](https://github.com/pnp/cli-microsoft365/issues/4167)
+- added support for upgrading SPFx projects to v1.16.1 [#4181](https://github.com/pnp/cli-microsoft365/issues/4181)
+- extended 'spfx doctor' with support for v1.16.1 projects [#4182](https://github.com/pnp/cli-microsoft365/issues/4182)
+- extended 'spfx project doctor' with support for v1.16.1 projects [#4183](https://github.com/pnp/cli-microsoft365/issues/4183)
+- enhanced parsing of boolean arguments [#3914](https://github.com/pnp/cli-microsoft365/issues/3914)
+- updated logic for upgrading SPFx projects to v1.14 [#4060](https://github.com/pnp/cli-microsoft365/issues/4060)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
