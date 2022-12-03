@@ -1,5 +1,21 @@
 # Release notes
 
+## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
+
+### New commands
+
+**Planner:**
+
+- [planner plan set](../cmd/planner/plan/plan-set.md) - updates a Microsoft Planner plan [#3346](https://github.com/pnp/cli-microsoft365/issues/3346)
+
+### Changes
+
+- updated 'spo roledefinition list' command [#4075](https://github.com/pnp/cli-microsoft365/issues/4075)
+- updated 'spo contenttype set' command with a flag to push updates to child content types [#3792](https://github.com/pnp/cli-microsoft365/issues/3792)
+- enhanced cli-output-mode doc [#4117](https://github.com/pnp/cli-microsoft365/issues/4117)
+- fixed 'spo navigation node add' command [#4093](https://github.com/pnp/cli-microsoft365/issues/4093)
+- enhanced spo lisitem set command [#4167](https://github.com/pnp/cli-microsoft365/issues/4167)
+
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
 ### New commands
