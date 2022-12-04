@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
-import ContextCommand from '../../base/ContextCommand';
+import AnonymousCommand from '../../base/AnonymousCommand';
 import { M365RcJson } from '../../base/M365RcJson';
 import commands from '../commands';
 
@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class ContextRemoveCommand extends ContextCommand {
+class ContextRemoveCommand extends AnonymousCommand {
   public get name(): string {
     return commands.REMOVE;
   }
