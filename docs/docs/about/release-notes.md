@@ -8,6 +8,10 @@
 
 - [planner plan set](../cmd/planner/plan/plan-set.md) - updates a Microsoft Planner plan [#3346](https://github.com/pnp/cli-microsoft365/issues/3346)
 
+**Teams:**
+
+- [teams meeting attendancereport list](../cmd/teams/meeting/meeting-attendancereport-list.md) - lists all attendance reports for a given meeting [#3907](https://github.com/pnp/cli-microsoft365/issues/3907)
+
 ### Changes
 
 - updated 'spo roledefinition list' command [#4075](https://github.com/pnp/cli-microsoft365/issues/4075)
@@ -20,6 +24,10 @@
 - extended 'spfx project doctor' with support for v1.16.1 projects [#4183](https://github.com/pnp/cli-microsoft365/issues/4183)
 - enhanced parsing of boolean arguments [#3914](https://github.com/pnp/cli-microsoft365/issues/3914)
 - updated logic for upgrading SPFx projects to v1.14 [#4060](https://github.com/pnp/cli-microsoft365/issues/4060)
+- added docs response for cli and search commands [#3921](https://github.com/pnp/cli-microsoft365/issues/3921)
+- fixed next publish build version stamping [#4194](https://github.com/pnp/cli-microsoft365/issues/4194)
+- added 'teams user app list' with teamsApp output [#4128](https://github.com/pnp/cli-microsoft365/issues/4128)
+- fixed 'spo listitem list' filter option [#4090](https://github.com/pnp/cli-microsoft365/issues/4090)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
