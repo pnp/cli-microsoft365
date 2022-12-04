@@ -308,8 +308,7 @@ export default abstract class Command {
     return commandName;
   }
 
-  protected handleRejectedODataPromise(rawResponse: any): void {
-    const res: any = JSON.parse(JSON.stringify(rawResponse));
+  protected handleRejectedODataPromise(res: any): void {
     if (res.error) {
       try {
         const err: ODataError = JSON.parse(res.error);
@@ -339,11 +338,11 @@ export default abstract class Command {
       }
     }
     else {
-      if (rawResponse instanceof Error) {
-        throw new CommandError(rawResponse.message);
+      if (res instanceof Error) {
+        throw new CommandError(res.message);
       }
       else {
-        throw new CommandError(rawResponse);
+        throw new CommandError(res);
       }
     }
   }
