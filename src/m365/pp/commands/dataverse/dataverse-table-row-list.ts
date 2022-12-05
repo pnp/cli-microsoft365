@@ -4,6 +4,7 @@ import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
 import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { AxiosRequestConfig } from 'axios';
 
 interface CommandArgs {
@@ -12,7 +13,8 @@ interface CommandArgs {
 
 export interface Options extends GlobalOptions {
   environment: string;
-  name: string;
+  entitySetName?: string;
+  tableName?: string;
   asAdmin?: boolean;
 }
 
@@ -23,7 +25,7 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'List all row from a specific dataverse table in the specified Power Platform environment.';
+    return 'Lists table rows for the given Dataverse table';
   }
 
   constructor() {
@@ -31,11 +33,14 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        entitySetName: typeof args.options.entitySetName !== 'undefined',
+        tableName: typeof args.options.tableName !== 'undefined',
         asAdmin: !!args.options.asAdmin
       });
     });
@@ -47,7 +52,10 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
         option: '-e, --environment <environment>'
       },
       {
-        option: '-n, --name <name>'
+        option: '-n, --entitySetName [entitySetName]'
+      },
+      {
+        option: '-t, --tableName [tableName]'
       },
       {
         option: '--asAdmin'
@@ -55,28 +63,46 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['entitySetName', 'tableName']
+    );
+  }
+
   public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of table rows for which the user is an admin...`);
+      logger.logToStderr(`Retrieving list of table rows`);
     }
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
-      const requestOptions: AxiosRequestConfig = {
-        url: `${dynamicsApiUrl}/api/data/v9.0/${args.options.name}`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
+      const entitySetName = await this.getEntityName(dynamicsApiUrl, args);
 
-      const res = await request.get<{ value: any[] }>(requestOptions);
-      logger.log(res.value);
+      const response = await odata.getAllItems<any[]>(`${dynamicsApiUrl}/api/data/v9.0/${entitySetName}`);
+      logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  protected async getEntityName(dynamicsApiUrl: string, args: any): Promise<string> {
+    if (args.options.entitySetName) {
+      return args.options.entitySetName;
+    }
+
+    const requestOptions: AxiosRequestConfig = {
+      url: `${dynamicsApiUrl}/api/data/v9.0/EntityDefinitions(LogicalName='${args.options.tableName}')?$select=EntitySetName`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const response = await request.get<{ EntitySetName: string, MetadataId: string }>(requestOptions);
+
+    return response.EntitySetName;
   }
 }
 

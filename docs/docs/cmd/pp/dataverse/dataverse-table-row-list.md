@@ -1,6 +1,6 @@
 # pp dataverse table row list
 
-Lists dataverse table rows in a given environment
+Lists table rows for the given Dataverse table
 
 ## Usage
 
@@ -11,28 +11,37 @@ pp dataverse table row list [options]
 ## Options
 
 `-e, --environment <environment>`
-: The name of the environment to list all table rows for
+: The name of the environment
 
-`-n, --name <name>`
-: The name of the table. Note that this is the logical name in the plural
+`-n, --entitySetName [entitySetName]`
+: The entity set name of the table. Specify either `entitySetName` or `tableName` but not both
+
+`-t, --tableName [tableName]`
+: The name of the table. Specify either `entitySetName` or `tableName` but not both
 
 `--asAdmin`
-: Set, to retrieve the dataverse table rows as admin for environments you are not a member of.
+: Run the command as admin for environments you do not have explicitly assigned permissions to
 
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
 
-List all table rows for the given environment
+List all table rows for the given environment based on entitySetName parameter
 
 ```sh
-m365 pp dataverse table row list -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "cr6c3_accounts"
+m365 pp dataverse table row list -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --entitySetName "cr6c3_accounts"
 ```
 
-List all table rows for the given environment as Admin
+List all table rows for the given environment based on tableName parameter
 
 ```sh
-m365 pp dataverse table row list -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --name "cr6c3_accounts" --asAdmin
+m365 pp dataverse table row list -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tableName "cr6c3_account"
+```
+
+List all table rows for the given environment based on entitySetName parameter as Admin
+
+```sh
+m365 pp dataverse table row list -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --entitySetName "cr6c3_accounts" --asAdmin
 ```
 
 ## Response

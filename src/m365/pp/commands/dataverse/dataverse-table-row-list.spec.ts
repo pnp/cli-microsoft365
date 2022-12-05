@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
+import { Cli } from '../../../../cli/Cli';
+import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
@@ -13,9 +15,15 @@ const command: Command = require('./dataverse-table-row-list');
 
 describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
   //#region Mocked Responses
+  let commandInfo: CommandInfo;
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
-  const validName = 'cr6c3_clitables';
+  const validTableName = 'cr6c3_clitable';
+  const validEntitySetName = 'cr6c3_clitables';
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
+  const tableResponse = {
+    EntitySetName: 'cr6c3_clitables',
+    MetadataId: 'd5179844-474d-ed11-bba1-000d3a2caf7f'
+  };
   const rowsResponse = {
     "value": [
       {
@@ -52,6 +60,7 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -87,18 +96,28 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.DATAVERSE_TABLE_ROW_LIST), true);
+    assert.strictEqual(command.name, commands.DATAVERSE_TABLE_ROW_LIST);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves dataverse table rows with the name parameter', async () => {
+  it('passes validation if required options specified (entitySetName)', async () => {
+    const actual = await command.validate({ options: { environment: validEnvironment, entitySetName: validEntitySetName } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if required options specified (name)', async () => {
+    const actual = await command.validate({ options: { environment: validEnvironment, tableName: validTableName } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('retrieves dataverse table rows with the entitySetName parameter', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/${validName}`)) {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/${validEntitySetName}`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
           return rowsResponse;
         }
@@ -107,7 +126,30 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { verbose: true, environment: validEnvironment, name: validName } });
+    await command.action(logger, { options: { verbose: true, environment: validEnvironment, entitySetName: validEntitySetName } });
+    assert(loggerLogSpy.calledWith(rowsResponse.value));
+  });
+
+  it('retrieves dataverse table rows with the tableName parameter', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/EntityDefinitions(LogicalName='${validTableName}')?$select=EntitySetName`)) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return tableResponse;
+        }
+      }
+
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/${validEntitySetName}`)) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return rowsResponse;
+        }
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await command.action(logger, { options: { verbose: true, environment: validEnvironment, tableName: validTableName } });
     assert(loggerLogSpy.calledWith(rowsResponse.value));
   });
 
@@ -115,7 +157,7 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/${validName}`)) {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/${validEntitySetName}`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
           throw {
             error: {
@@ -131,7 +173,7 @@ describe(commands.DATAVERSE_TABLE_ROW_LIST, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment, name: validName } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment, entitySetName: validEntitySetName } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
