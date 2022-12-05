@@ -76,7 +76,7 @@ describe(commands.CARD_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.CARD_REMOVE);
+    assert.strictEqual(command.name.startsWith(commands.CARD_REMOVE), true);
   });
 
   it('has a description', () => {
@@ -104,6 +104,7 @@ describe(commands.CARD_REMOVE, () => {
   });
 
   it('prompts before removing the specified card owned by the currently signed-in user when confirm option not passed', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
     await command.action(logger, {
       options: {
         environment: validEnvironment,
@@ -121,7 +122,10 @@ describe(commands.CARD_REMOVE, () => {
 
   it('aborts removing the specified card owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
     await command.action(logger, {
       options: {
         environment: validEnvironment,
@@ -158,7 +162,7 @@ describe(commands.CARD_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        verbose: true,
+        debug: true,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: 'CLI 365 Card'
       }
@@ -169,7 +173,7 @@ describe(commands.CARD_REMOVE, () => {
   it('removes the specified card without confirmation prompt', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
-    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards(${validId})`) {
         return;
       }
@@ -179,13 +183,13 @@ describe(commands.CARD_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        verbose: true,
+        debug: true,
         environment: validEnvironment,
         id: validId,
         confirm: true
       }
     });
-    assert(deleteStub.called);
+    assert(loggerLogToStderrSpy.called);
   });
 
   it('correctly handles API OData error', async () => {
@@ -197,11 +201,22 @@ describe(commands.CARD_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        verbose: true,
+        debug: true,
         environment: validEnvironment,
         id: validId,
         confirm: true
       }
     }), new CommandError(errorMessage));
+  });
+
+  it('supports debug mode', () => {
+    const options = command.options;
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option === '--debug') {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
   });
 });

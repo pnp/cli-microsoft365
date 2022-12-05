@@ -76,7 +76,7 @@ describe(commands.CHATBOT_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CHATBOT_REMOVE), true);
+    assert.strictEqual(command.name, commands.CHATBOT_REMOVE);
   });
 
   it('has a description', () => {
@@ -104,8 +104,6 @@ describe(commands.CHATBOT_REMOVE, () => {
   });
 
   it('prompts before removing the specified chatbot owned by the currently signed-in user when confirm option not passed', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
     await command.action(logger, {
       options: {
         environment: validEnvironment,
@@ -123,10 +121,7 @@ describe(commands.CHATBOT_REMOVE, () => {
 
   it('aborts removing the specified chatbot owned by the currently signed-in user when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+
     await command.action(logger, {
       options: {
         environment: validEnvironment,
@@ -149,7 +144,7 @@ describe(commands.CHATBOT_REMOVE, () => {
       throw new CommandError('Unknown case');
     });
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots(${validId})/Microsoft.Dynamics.CRM.PvaDeleteBot?tag=deprovisionbotondelete`) {
         return;
       }
@@ -163,12 +158,12 @@ describe(commands.CHATBOT_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: true,
+        verbose: true,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: 'CLI 365 Chatbot'
       }
     });
-    assert(loggerLogToStderrSpy.called);
+    assert(postStub.called);
   });
 
   it('removes the specified chatbot without confirmation prompt', async () => {
@@ -184,7 +179,7 @@ describe(commands.CHATBOT_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: true,
+        verbose: true,
         environment: validEnvironment,
         id: validId,
         confirm: true
@@ -208,16 +203,5 @@ describe(commands.CHATBOT_REMOVE, () => {
         confirm: true
       }
     }), new CommandError(errorMessage));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });
