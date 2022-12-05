@@ -69,7 +69,7 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving list of table rows`);
     }
@@ -87,7 +87,7 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
     }
   }
 
-  protected async getEntityName(dynamicsApiUrl: string, args: any): Promise<string> {
+  protected async getEntityName(dynamicsApiUrl: string, args: CommandArgs): Promise<string> {
     if (args.options.entitySetName) {
       return args.options.entitySetName;
     }
