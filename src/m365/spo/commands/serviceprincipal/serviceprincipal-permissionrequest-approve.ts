@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
 }
 
 class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
@@ -34,12 +34,13 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
       }
     );
   }
@@ -53,6 +54,12 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
 
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['id', 'name'] }
     );
   }
 
