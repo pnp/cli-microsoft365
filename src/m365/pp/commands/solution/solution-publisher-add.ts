@@ -79,9 +79,9 @@ class PpSolutionPublisherAddCommand extends PowerPlatformCommand {
           return 'option name may only consist of alphanumeric characters and underscores. The first character cannot be a number.';
         }
 
-        const prefixRegEx = new RegExp(/^(?!mscrm.*$)[a-zA-Z_][A-Za-z0-9_]{1,7}$/);
+        const prefixRegEx = new RegExp(/^(?!mscrm.*$)[a-zA-Z][A-Za-z0-9]{1,7}$/);
         if (!prefixRegEx.test(args.options.prefix)) {
-          return `optiong prefix may only consist of alphanumeric characters and underscores. The first character cannot be a number and may not start with 'mscrm'. Option prefix must be between 2 and 8 characters long.`;
+          return `option prefix may only consist of alphanumeric characters. The first character cannot be a number and may not start with 'mscrm'. Option prefix must be between 2 and 8 characters long.`;
         }
 
         return true;
