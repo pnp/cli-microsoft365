@@ -208,6 +208,7 @@ nav:
         - plan get: cmd/planner/plan/plan-get.md
         - plan list: cmd/planner/plan/plan-list.md
         - plan remove: cmd/planner/plan/plan-remove.md
+        - plan set: cmd/planner/plan/plan-set.md
       - task:
         - task add: cmd/planner/task/task-add.md
         - task get: cmd/planner/task/task-get.md
@@ -665,6 +666,7 @@ nav:
       - meeting:
         - meeting get: 'cmd/teams/meeting/meeting-get.md'
         - meeting list: cmd/teams/meeting/meeting-list.md
+        - meeting attendancereport list: cmd/teams/meeting/meeting-attendancereport-list.md
       - membersettings:
         - membersettings list: cmd/teams/membersettings/membersettings-list.md
         - membersettings set: cmd/teams/membersettings/membersettings-set.md

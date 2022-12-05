@@ -9,8 +9,6 @@ import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ListPrincipalType } from '../list/ListPrincipalType';
 import { FolderProperties } from './FolderProperties';
-import { BasePermissions } from '../../base-permissions';
-import { RoleType } from '../../commands/roledefinition/RoleType';
 interface CommandArgs {
   options: Options;
 }
@@ -123,13 +121,7 @@ class SpoFolderGetCommand extends SpoCommand {
         }
         listItemAllFields.RoleAssignments.forEach(r => {
           r.Member.PrincipalTypeString = ListPrincipalType[r.Member.PrincipalType];
-          r.RoleDefinitionBindings.forEach(rb => {
-            const permissions: BasePermissions = new BasePermissions();
-            permissions.high = rb.BasePermissions.High as number;
-            permissions.low = rb.BasePermissions.Low as number;
-            rb.BasePermissionsValue = permissions.parse();
-            rb.RoleTypeKindValue = RoleType[rb.RoleTypeKind];
-          });
+          r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
         });
       }
       logger.log(folder);

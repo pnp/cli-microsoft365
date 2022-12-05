@@ -224,21 +224,30 @@ describe(commands.LISTITEM_LIST, () => {
   });
 
   it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a list of fields and a filter specified', async () => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
+    const listTitle = `Test'list`;
+    const filter = `Title eq 'Demo list item'`;
+    const fields = 'Title,ID';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items?$select=${formatting.encodeQueryParameter(fields)}&$top=2&&$filter=${encodeURIComponent(filter)}`) {
+        returnArrayLength = 2;
+        return listItemResponse;
+      }
+      throw 'Invalid request';
+    });
 
     const options: any = {
       debug: true,
-      listTitle: 'Demo List',
+      listTitle: listTitle,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       output: "json",
       pageSize: 2,
-      filter: "Title eq 'Demo list item",
+      filter: filter,
       fields: "Title,ID"
     };
 
     await command.action(logger, { options: options } as any);
     assert.strictEqual(returnArrayLength, expectedArrayLength);
+    returnArrayLength = 0;
   });
 
   it('returns array of listItemInstance objects when a list of items is requested with an output type of json, a page number specified, a list of fields and a filter specified', async () => {

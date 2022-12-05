@@ -8,7 +8,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { Logger } from './Logger';
 import appInsights from '../appInsights';
-import Command, { CommandArgs, CommandError } from '../Command';
+import Command, { CommandArgs, CommandError, CommandTypes } from '../Command';
 import config from '../config';
 import GlobalOptions from '../GlobalOptions';
 import request from '../request';
@@ -18,6 +18,7 @@ import { fsUtil } from '../utils/fsUtil';
 import { md } from '../utils/md';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
+import { validation } from '../utils/validation';
 const packageJSON = require('../../package.json');
 
 export interface CommandOutput {
@@ -109,9 +110,17 @@ export class Cli {
       // we have found a command to execute. Parse args again taking into
       // account short and long options, option types and whether the command
       // supports known and unknown options or not
-      this.optionsFromArgs = {
-        options: this.getCommandOptionsFromArgs(rawArgs, this.commandToExecute)
-      };
+
+      try {
+        this.optionsFromArgs = {
+          options: this.getCommandOptionsFromArgs(rawArgs, this.commandToExecute)
+        };
+      }
+      catch (e: any) {
+        const optionsWithoutShorts = Cli.removeShortOptions({ options: parsedArgs });
+
+        return this.closeWithError(e.message, optionsWithoutShorts, false);
+      }
     }
     else {
       this.optionsFromArgs = {
@@ -250,6 +259,12 @@ export class Cli {
       });
     }
     catch (err: any) {
+      // restoring the command and logger is done here instead of in a 'finally' because there were issues with the code coverage tool
+      // restore the original command name
+      cli.currentCommandName = parentCommandName;
+      // restore the original logger
+      request.logger = currentLogger;
+
       throw {
         error: err,
         stderr: logErr.join(os.EOL)
@@ -397,21 +412,63 @@ export class Cli {
       alias: {}
     };
 
+    let argsToParse = args;
+
     if (commandInfo) {
       const commandTypes = commandInfo.command.types;
       if (commandTypes) {
         minimistOptions.string = commandTypes.string;
-        minimistOptions.boolean = commandTypes.boolean;
+
+        // minimist will parse unused boolean options to 'false' (unused options => options that are not included in the args) 
+        // But in the CLI booleans are nullable. They can can be true, false or undefined.
+        // For this reason we only pass boolean types that are actually used as arg.
+        minimistOptions.boolean = commandTypes.boolean.filter(optionName => args.some(arg => `--${optionName}` === arg || `-${optionName}` === arg));
       }
+
       minimistOptions.alias = {};
       commandInfo.options.forEach(option => {
         if (option.short && option.long) {
           (minimistOptions.alias as any)[option.short] = option.long;
         }
       });
+
+      argsToParse = this.getRewrittenArgs(args, commandTypes);
     }
 
-    return minimist(args, minimistOptions);
+    return minimist(argsToParse, minimistOptions);
+  }
+
+  /**
+   * Rewrites arguments (if necessary) before passing them into minimist.
+   * Currently only boolean values are checked and fixed.
+   * Args are only checked and rewritten if the option has been added to the 'types.boolean' array.
+   */
+  private getRewrittenArgs(args: string[], commandTypes: CommandTypes): string[] {
+    const booleanTypes = commandTypes.boolean;
+
+    if (booleanTypes.length === 0) {
+      return args;
+    }
+
+    return args.map((arg: string, index: number, array: string[]) => {
+      if (arg.startsWith('-') || index === 0) {
+        return arg;
+      }
+
+      // This line checks if the current arg is a value that belongs to a boolean option.
+      if (booleanTypes.some(t => `--${t}` === array[index - 1] || `-${t}` === array[index - 1])) {
+        const rewrittenBoolean = formatting.rewriteBooleanValue(arg);
+
+        if (!validation.isValidBoolean(rewrittenBoolean)) {
+          const optionName = array[index - 1];
+          throw new Error(`The value '${arg}' for option '${optionName}' is not a valid boolean`);
+        }
+
+        return rewrittenBoolean;
+      }
+
+      return arg;
+    });
   }
 
   private static formatOutput(logStatement: any, options: GlobalOptions): any {
