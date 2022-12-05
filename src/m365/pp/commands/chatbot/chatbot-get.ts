@@ -6,6 +6,7 @@ import commands from '../../commands';
 import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { AxiosRequestConfig } from 'axios';
+import { formatting } from '../../../../utils/formatting';
 
 interface CommandArgs {
   options: Options;
@@ -25,7 +26,7 @@ class PpChatbotGetCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Get specific Microsoft Power Platform chatbot in the specified Power Platform environment.';
+    return 'Get information about the specified chatbot';
   }
 
   public defaultProperties(): string[] | undefined {
@@ -77,7 +78,7 @@ class PpChatbotGetCommand extends PowerPlatformCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
@@ -86,9 +87,9 @@ class PpChatbotGetCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving a chatbot '${args.options.id || args.options.name}'...`);
+      logger.logToStderr(`Retrieving chatbot '${args.options.id || args.options.name}'...`);
     }
 
     try {
@@ -116,7 +117,7 @@ class PpChatbotGetCommand extends PowerPlatformCommand {
       return result;
     }
 
-    requestOptions.url = `${dynamicsApiUrl}/api/data/v9.1/bots?$filter=name eq '${options.name}'`;
+    requestOptions.url = `${dynamicsApiUrl}/api/data/v9.1/bots?$filter=name eq '${formatting.encodeQueryParameter(options.name!)}'`;
     const result = await request.get<{ value: any[] }>(requestOptions);
 
     if (result.value.length > 1) {

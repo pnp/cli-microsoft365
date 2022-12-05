@@ -1,6 +1,6 @@
 # pp chatbot get
 
-Gets a specific Microsoft Power Platform chatbot in the specified Power Platform environment
+Get information about the specified chatbot
 
 ## Usage
 
@@ -19,7 +19,7 @@ pp chatbot get [options]
 `-n, --name [name]`
 : The name of the chatbot. Specify either `id` or `name` but not both.
 
-`---asAdmin`
+`--asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
 
 --8<-- "docs/cmd/_global.md"

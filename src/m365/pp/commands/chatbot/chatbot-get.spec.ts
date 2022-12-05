@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import { sinonUtil } from '../../../../utils/sinonUtil';
@@ -119,7 +120,7 @@ describe(commands.CHATBOT_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CHATBOT_GET), true);
+    assert.strictEqual(command.name, commands.CHATBOT_GET);
   });
 
   it('has a description', () => {
@@ -160,7 +161,7 @@ describe(commands.CHATBOT_GET, () => {
       ]
     };
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots?$filter=name eq '${validName}'`)) {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots?$filter=name eq '${formatting.encodeQueryParameter(validName)}'`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
           return multipleBotsResponse;
         }
@@ -181,7 +182,7 @@ describe(commands.CHATBOT_GET, () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots?$filter=name eq '${validName}'`)) {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots?$filter=name eq '${formatting.encodeQueryParameter(validName)}'`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
           return ({ "value": [] });
         }
@@ -202,7 +203,7 @@ describe(commands.CHATBOT_GET, () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots?$filter=name eq '${validName}'`)) {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots?$filter=name eq '${formatting.encodeQueryParameter(validName)}'`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
           return botResponse;
         }
@@ -236,14 +237,14 @@ describe(commands.CHATBOT_GET, () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots?$filter=name eq '${validName}'`)) {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/bots?$filter=name eq '${formatting.encodeQueryParameter(validName)}'`)) {
         if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
           throw {
             error: {
               'odata.error': {
                 code: '-1, InvalidOperationException',
                 message: {
-                  value: `Resource '' does not exist or one of its queried reference-property objects are not present`
+                  value: `bot With Id = ${validId} Does Not Exist`
                 }
               }
             }
@@ -253,17 +254,6 @@ describe(commands.CHATBOT_GET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment, name: validName } } as any),
-      new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+      new CommandError(`bot With Id = ${validId} Does Not Exist`));
   });
 });
