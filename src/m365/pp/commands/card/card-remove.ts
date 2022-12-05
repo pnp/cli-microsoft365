@@ -30,7 +30,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Removes the specified chatbot';
+    return 'Removes a specific Microsoft Power Platform card in the specified Power Platform environment.';
   }
 
   constructor() {
@@ -91,7 +91,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+  public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Removing card '${args.options.id || args.options.name}'...`);
     }
@@ -139,7 +139,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
       const requestOptions: AxiosRequestConfig = {
         url: `${dynamicsApiUrl}/api/data/v9.1/cards(${cardId})`,
         headers: {
-          accept: 'application/json'
+          accept: 'application/json;odata.metadata=none'
         },
         responseType: 'json'
       };

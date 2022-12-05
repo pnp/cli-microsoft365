@@ -105,6 +105,7 @@ describe(commands.CARD_REMOVE, () => {
 
   it('prompts before removing the specified card owned by the currently signed-in user when confirm option not passed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
     await command.action(logger, {
       options: {
         environment: validEnvironment,

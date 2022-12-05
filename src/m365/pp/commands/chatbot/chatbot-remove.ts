@@ -30,7 +30,7 @@ class PpChatbotRemoveCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Removes a specific Microsoft Power Platform chatbot in the specified Power Platform environment.';
+    return 'Removes the specified chatbot';
   }
 
   constructor() {
@@ -91,7 +91,7 @@ class PpChatbotRemoveCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Removing chatbot '${args.options.id || args.options.name}'...`);
     }
@@ -139,8 +139,8 @@ class PpChatbotRemoveCommand extends PowerPlatformCommand {
       const requestOptions: AxiosRequestConfig = {
         url: `${dynamicsApiUrl}/api/data/v9.1/bots(${botId})/Microsoft.Dynamics.CRM.PvaDeleteBot?tag=deprovisionbotondelete`,
         headers: {
-          accept: 'application/json;odata.metadata=none',
-          'content-type': 'application/json;odata.metadata=none'
+          accept: 'application/json',
+          'content-type': 'application/json'
         },
         responseType: 'json'
       };
