@@ -1,6 +1,6 @@
 # pp chatbot remove
 
-Removes the specified Microsoft Power Platform chatbot in the specified Power Platform environment
+Removes the specified chatbot
 
 ## Usage
 
