@@ -415,18 +415,7 @@ describe('Cli', () => {
   });
 
   it('shows full help when specified -h with a number', (done) => {
-    const originalPath = cli.config.path;
-    let destinationPath;
-    try {
-      destinationPath = originalPath.replace(/(.*)\\.*(\.json$)/i, '$1\\temp-cli-m365-config$2');
-      fs.copyFileSync(originalPath, destinationPath);
-      cli.config.path = destinationPath;
-      cli.config.clear();
-    }
-    catch {
-      throw "Creation of temporary cli config file failed";
-    }
-
+    sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(() => 'full');
     cli
       .execute(rootFolder, ['cli', 'completion', 'clink', 'update', '-h', '1'])
       .then(_ => {
@@ -439,14 +428,6 @@ describe('Cli', () => {
           done(e);
         }
       }, e => done(e));
-
-    try {
-      cli.config.path = originalPath;
-      fs.unlinkSync(destinationPath);
-    }
-    catch {
-      throw "Removing the temporary cli config file failed";
-    }
   });
 
   it('shows full help when specified -h with full', (done) => {
