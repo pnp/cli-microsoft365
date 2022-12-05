@@ -65,7 +65,7 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['entitySetName', 'tableName']
+      { options: ['entitySetName', 'tableName'] }
     );
   }
 
