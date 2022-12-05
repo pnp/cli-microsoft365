@@ -78,7 +78,7 @@ describe(commands.FIELD_SET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title'] }]);
   });
 
   it('updates site column specified by title', async () => {

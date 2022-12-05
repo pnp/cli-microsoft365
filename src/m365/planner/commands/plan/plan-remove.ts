@@ -100,7 +100,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'title']);
+    this.optionSets.push({ options: ['id', 'title'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

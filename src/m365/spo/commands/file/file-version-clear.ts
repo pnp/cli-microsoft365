@@ -76,7 +76,7 @@ class SpoFileVersionClearCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['fileUrl', 'fileId']);
+    this.optionSets.push({ options: ['fileUrl', 'fileId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

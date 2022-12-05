@@ -10,7 +10,7 @@ m365 pp environment list [options]
 
 ## Options
 
-`-a, --asAdmin`
+`--asAdmin`
 : Run the command as admin and retrieve all environments. Lists only environments you have explicitly are assigned permissions to by default.
 
 --8<-- "docs/cmd/_global.md"

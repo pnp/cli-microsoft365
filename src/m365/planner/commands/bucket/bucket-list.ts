@@ -92,7 +92,7 @@ class PlannerBucketListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['planId', 'planTitle']);
+    this.optionSets.push({ options: ['planId', 'planTitle'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -100,7 +100,7 @@ class PlannerBucketListCommand extends GraphCommand {
       this.handleError('This command does not support application permissions.');
       return;
     }
-    
+
     try {
       const planId = await this.getPlanId(args);
       const buckets = await odata.getAllItems<PlannerBucket>(`${this.resource}/v1.0/planner/plans/${planId}/buckets`);

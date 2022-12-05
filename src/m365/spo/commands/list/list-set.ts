@@ -574,7 +574,7 @@ class SpoListSetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'title', 'url']
+      { options: ['id', 'title', 'url'] }
     );
   }
 

@@ -88,25 +88,25 @@ class SpoFieldRemoveCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-	    if (isValidSharePointUrl !== true) {
-	      return isValidSharePointUrl;
-	    }
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
 
-	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-	      return `${args.options.id} is not a valid GUID`;
-	    }
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
 
-	    if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-	      return `${args.options.listId} is not a valid GUID`;
-	    }
+        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
+        }
 
-	    return true;
+        return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'title', 'group']);
+    this.optionSets.push({ options: ['id', 'title', 'group'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

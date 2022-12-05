@@ -16,7 +16,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   id?: string;
   name?: string;
 }
@@ -72,7 +72,7 @@ class TeamsTeamGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {
@@ -101,7 +101,7 @@ class TeamsTeamGetCommand extends GraphCommand {
         },
         responseType: 'json'
       };
-      const res: Team = await request.get<Team>(requestOptions);
+      const res = await request.get<Team>(requestOptions);
       logger.log(res);
     }
     catch (err: any) {

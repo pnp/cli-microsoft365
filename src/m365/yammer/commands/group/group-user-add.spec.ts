@@ -81,7 +81,7 @@ describe(commands.GROUP_USER_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('id must be a number', async () => {
+  it('groupId must be a number', async () => {
     const actual = await command.validate({ options: { groupId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -109,7 +109,7 @@ describe(commands.GROUP_USER_ADD, () => {
       }
       return Promise.reject('Invalid request');
     });
-    
+
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
@@ -140,7 +140,7 @@ describe(commands.GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, groupId: 1231231, email: "suzy@contoso.com" } } );
+    await command.action(logger, { options: { debug: true, groupId: 1231231, email: "suzy@contoso.com" } });
 
     assert(requestPostedStub.called);
   });

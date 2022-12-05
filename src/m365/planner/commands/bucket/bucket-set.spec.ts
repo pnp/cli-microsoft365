@@ -147,7 +147,7 @@ describe(commands.BUCKET_SET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'name']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
   });
 
   it('fails validation id when id and plan details are specified', async () => {

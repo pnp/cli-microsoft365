@@ -1,6 +1,6 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/api.js",
@@ -127,6 +127,7 @@
     "Ghuge, Pramod <pramod7@gmail.com>",
     "Gölles, Thomas <thomy@outlook.at>",
     "Greuel, Dan <dgreuel@gmail.com>",
+    "Haerkens, Stijn <118855980+stijnhaerkenss@users.noreply.github.com>",
     "Hagström, Joakim <johags@johags-sb2.localdomain>",
     "Harding, Phil <pil.harding@platinumdogs.co.uk>",
     "Hawrylak, Paweł <phawrylak@outlook.com>",
@@ -260,6 +261,7 @@
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-cli-microsoft365": "file:eslint-rules",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-mocha": "^10.1.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
     "mocha": "^10.1.0",

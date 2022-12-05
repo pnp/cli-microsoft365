@@ -61,7 +61,7 @@ class TodoTaskGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listName']);
+    this.optionSets.push({ options: ['listId', 'listName'] });
   }
 
   private async getTodoListId(args: CommandArgs): Promise<string> {

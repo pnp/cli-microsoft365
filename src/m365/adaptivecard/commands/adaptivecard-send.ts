@@ -104,7 +104,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['title', 'card']
+      { options: ['title', 'card'] }
     );
   }
 

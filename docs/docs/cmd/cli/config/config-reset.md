@@ -31,6 +31,10 @@ Reset all configuration settings to default
 m365 cli config reset
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - [Configuring the CLI for Microsoft 365](../../../user-guide/configuring-cli.md)

@@ -244,7 +244,7 @@ class AadAppAddCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['name', 'manifest']
+      { options: ['name', 'manifest'] }
     );
   }
 

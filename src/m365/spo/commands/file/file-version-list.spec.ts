@@ -93,9 +93,13 @@ describe(commands.FILE_VERSION_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Created', 'ID', 'IsCurrentVersion', 'VersionLabel']);
+  });
+
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['fileUrl', 'fileId']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['fileUrl', 'fileId'] }]);
   });
 
   it('fails validation if fileId is not a valid guid', async () => {

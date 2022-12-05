@@ -104,8 +104,8 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['principalId', 'upn', 'groupName'],
-      ['roleDefinitionId', 'roleDefinitionName']
+      { options: ['principalId', 'upn', 'groupName'] },
+      { options: ['roleDefinitionId', 'roleDefinitionName'] }
     );
   }
 
