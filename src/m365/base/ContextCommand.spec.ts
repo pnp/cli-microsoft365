@@ -17,6 +17,10 @@ class MockCommand extends ContextCommand {
     return 'Mock command';
   }
 
+  public mockSaveContextInfo(contextInfo: Hash, logger: Logger) {
+    this.saveContextInfo(contextInfo, logger);
+  }
+
   public async commandAction(): Promise<void> {
   }
 
@@ -29,6 +33,8 @@ describe('ContextCommand', () => {
   let log: any[];
   let logger: Logger;
   const contextInfo: Hash = {};
+  let loggerLogSpy: sinon.SinonSpy;
+
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -48,6 +54,7 @@ describe('ContextCommand', () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -59,6 +66,31 @@ describe('ContextCommand', () => {
     ]);
   });
 
+  it('logs an error if an error occured while reading the .m365rc.json', async () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'readFileSync').callsFake(() => { throw new Error('An error has occurred'); });
+    cmd.mockSaveContextInfo(contextInfo, logger);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0], 'Error reading .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.');
+  });
+
+  it(`logs an error if the .m365rc.json file contents couldn't be parsed`, async () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'readFileSync').callsFake(() => '{');
+    cmd.mockSaveContextInfo(contextInfo, logger);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0], 'Error reading .m365rc.json: SyntaxError: Unexpected end of JSON input. Please add context info to .m365rc.json manually.');
+  });
+
+  it(`logs an error if the content can't be written to the .m365rc.json file`, async () => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+      "context": {}
+    }));
+    sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
+    cmd.mockSaveContextInfo(contextInfo, logger);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0], 'Error writing .m365rc.json: Error: An error has occurred. Please add context info to .m365rc.json manually.');
+  });
+
+
   it(`creates the .m365rc.json file if it doesn't exist and saves context info`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
@@ -69,7 +101,7 @@ describe('ContextCommand', () => {
       fileContents = contents as string;
     });
 
-    await cmd.saveContextInfo(contextInfo, logger);
+    cmd.mockSaveContextInfo(contextInfo, logger);
 
     assert.strictEqual(filePath, '.m365rc.json');
     assert.strictEqual(fileContents, JSON.stringify({
@@ -90,7 +122,7 @@ describe('ContextCommand', () => {
       fileContents = contents as string;
     });
 
-    await cmd.saveContextInfo(contextInfo, logger);
+    cmd.mockSaveContextInfo(contextInfo, logger);
 
     assert.strictEqual(filePath, '.m365rc.json');
     assert.strictEqual(fileContents, JSON.stringify({
@@ -105,7 +137,7 @@ describe('ContextCommand', () => {
     }));
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    await cmd.saveContextInfo(contextInfo, logger);
+    cmd.mockSaveContextInfo(contextInfo, logger);
 
     assert(fsWriteFileSyncSpy.notCalled);
   });
@@ -116,7 +148,7 @@ describe('ContextCommand', () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    await cmd.saveContextInfo(contextInfo, logger);
+    await cmd.mockSaveContextInfo(contextInfo, logger);
     assert(fsWriteFileSyncSpy.notCalled);
   });
 
@@ -124,6 +156,6 @@ describe('ContextCommand', () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
-    await cmd.saveContextInfo(contextInfo, logger), new CommandError('An error has occurred');
+    await cmd.mockSaveContextInfo(contextInfo, logger), new CommandError('An error has occurred');
   });
 });

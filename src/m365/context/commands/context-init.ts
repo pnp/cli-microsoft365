@@ -1,5 +1,3 @@
-
-
 import { Logger } from '../../../cli/Logger';
 import ContextCommand from '../../base/ContextCommand';
 

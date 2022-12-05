@@ -5,7 +5,7 @@ import { M365RcJson } from './M365RcJson';
 import { Hash } from '../../utils/types';
 
 export default abstract class ContextCommand extends AnonymousCommand {
-  public saveContextInfo(context: Hash, logger: Logger): void {
+  protected saveContextInfo(context: Hash, logger: Logger): void {
     const filePath: string = '.m365rc.json';
 
     let m365rc: M365RcJson = {};
