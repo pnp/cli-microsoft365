@@ -87,7 +87,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if choiceValuePrefix is not between 10000 and 99999', async () => {
+  it('fails validation if choiceValuePrefix is more then the upper bound', async () => {
     const actual = await command.validate({
       options: {
         environment: validEnvironment,
@@ -100,6 +100,19 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if choiceValuePrefix is less then the lower bound', async () => {
+    const actual = await command.validate({
+      options: {
+        environment: validEnvironment,
+        name: validName,
+        displayName: validDisplayName,
+        prefix: validPrefix,
+        choiceValuePrefix: 9999
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if name is not a valid value', async () => {
     const actual = await command.validate({
       options: {
@@ -107,6 +120,19 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
         name: '9_PublisherName',
         displayName: validDisplayName,
         prefix: validPrefix,
+        choiceValuePrefix: validChoiceValuePrefix
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if prefix is not a valid value', async () => {
+    const actual = await command.validate({
+      options: {
+        environment: validEnvironment,
+        name: validName,
+        displayName: validDisplayName,
+        prefix: 'mscrmtes',
         choiceValuePrefix: validChoiceValuePrefix
       }
     }, commandInfo);

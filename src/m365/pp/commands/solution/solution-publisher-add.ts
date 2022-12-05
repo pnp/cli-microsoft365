@@ -70,13 +70,18 @@ class PpSolutionPublisherAddCommand extends PowerPlatformCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.choiceValuePrefix && (isNaN(args.options.choiceValuePrefix) || args.options.choiceValuePrefix < 10000 || args.options.choiceValuePrefix > 99999 || !Number.isInteger(args.options.choiceValuePrefix))) {
+        if (isNaN(args.options.choiceValuePrefix) || args.options.choiceValuePrefix < 10000 || args.options.choiceValuePrefix > 99999 || !Number.isInteger(args.options.choiceValuePrefix)) {
           return 'choiceValuePrefix should be an integer between 10000 and 99999.';
         }
 
-        const nameRegEx = new RegExp(/^[a-zA-Z\_][A-Za-z0-9\_]+$/i);
+        const nameRegEx = new RegExp(/^[a-zA-Z_][A-Za-z0-9_]+$/);
         if (!nameRegEx.test(args.options.name)) {
-          return 'name may only consist of alphanumeric characters or a dash and first character may not be a number.';
+          return 'option name may only consist of alphanumeric characters and underscores. The first character cannot be a number.';
+        }
+
+        const prefixRegEx = new RegExp(/^(?!mscrm.*$)[a-zA-Z_][A-Za-z0-9_]{1,7}$/);
+        if (!prefixRegEx.test(args.options.prefix)) {
+          return `optiong prefix may only consist of alphanumeric characters and underscores. The first character cannot be a number and may not start with 'mscrm'. Option prefix must be between 2 and 8 characters long.`;
         }
 
         return true;
