@@ -7,8 +7,8 @@ import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
-import { Options as PpCardGetCommandOptions } from './card-get';
-import * as PpCardGetCommand from './card-get';
+import { Options as PpChatbotGetCommandOptions } from './chatbot-get';
+import * as PpChatbotGetCommand from './chatbot-get';
 import Command from '../../../../Command';
 
 interface CommandArgs {
@@ -23,14 +23,14 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class PpCardRemoveCommand extends PowerPlatformCommand {
+class PpChatbotRemoveCommand extends PowerPlatformCommand {
 
   public get name(): string {
-    return commands.CARD_REMOVE;
+    return commands.CHATBOT_REMOVE;
   }
 
   public get description(): string {
-    return 'Removes a specific Microsoft Power Platform card in the specified Power Platform environment.';
+    return 'Removes the specified chatbot';
   }
 
   constructor() {
@@ -91,34 +91,34 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing card '${args.options.id || args.options.name}'...`);
+      logger.logToStderr(`Removing chatbot '${args.options.id || args.options.name}'...`);
     }
 
     if (args.options.confirm) {
-      await this.deleteCard(args);
+      await this.deleteChatbot(args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove card '${args.options.id || args.options.name}'?`
+        message: `Are you sure you want to remove chatbot '${args.options.id || args.options.name}'?`
       });
 
       if (result.continue) {
-        await this.deleteCard(args);
+        await this.deleteChatbot(args);
       }
     }
   }
 
-  private async getCardId(args: CommandArgs): Promise<any> {
+  private async getChatbotId(args: CommandArgs): Promise<any> {
     if (args.options.id) {
       return args.options.id;
     }
 
-    const options: PpCardGetCommandOptions = {
+    const options: PpChatbotGetCommandOptions = {
       environment: args.options.environment,
       name: args.options.name,
       output: 'json',
@@ -126,25 +126,26 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(PpCardGetCommand as Command, { options: { ...options, _: [] } });
-    const getCardOutput = JSON.parse(output.stdout);
-    return getCardOutput.cardid;
+    const output = await Cli.executeCommandWithOutput(PpChatbotGetCommand as Command, { options: { ...options, _: [] } });
+    const getBotOutput = JSON.parse(output.stdout);
+    return getBotOutput.botid;
   }
 
-  private async deleteCard(args: CommandArgs): Promise<void> {
+  private async deleteChatbot(args: CommandArgs): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
-      const cardId = await this.getCardId(args);
+      const botId = await this.getChatbotId(args);
       const requestOptions: AxiosRequestConfig = {
-        url: `${dynamicsApiUrl}/api/data/v9.1/cards(${cardId})`,
+        url: `${dynamicsApiUrl}/api/data/v9.1/bots(${botId})/Microsoft.Dynamics.CRM.PvaDeleteBot?tag=deprovisionbotondelete`,
         headers: {
-          accept: 'application/json;odata.metadata=none'
+          accept: 'application/json',
+          'content-type': 'application/json'
         },
         responseType: 'json'
       };
 
-      await request.delete(requestOptions);
+      await request.post(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -152,4 +153,4 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpCardRemoveCommand();
+module.exports = new PpChatbotRemoveCommand();

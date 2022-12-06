@@ -8,6 +8,17 @@
 
 - [planner plan set](../cmd/planner/plan/plan-set.md) - updates a Microsoft Planner plan [#3346](https://github.com/pnp/cli-microsoft365/issues/3346)
 
+**Power Platform:**
+
+- [pp chatbot get](../cmd/pp/chatbot/chatbot-get.md) - get information about the specified chatbot [#4107](https://github.com/pnp/cli-microsoft365/issues/4107)
+- [pp chatbot remove](../cmd/pp/chatbot/chatbot-remove.md) - removes the specified chatbot [#4106](https://github.com/pnp/cli-microsoft365/issues/4106)
+- [pp dataverse table row list](../cmd/pp/dataverse/dataverse-table-row-list.md) - lists table rows for the given Dataverse table [#3791](https://github.com/pnp/cli-microsoft365/issues/3791)
+- [pp solution publisher add](../cmd/pp/solution/solution-publisher-add.md) - adds a specified publisher in a given environment [#3977](https://github.com/pnp/cli-microsoft365/issues/3977)
+
+**Purview:**
+
+- [purview retentionlabel list](../cmd/purview/retentionlabel/retentionlabel-list.md) - get a list of retention labels [#4144](https://github.com/pnp/cli-microsoft365/issues/4144)
+
 **Teams:**
 
 - [teams meeting attendancereport list](../cmd/teams/meeting/meeting-attendancereport-list.md) - lists all attendance reports for a given meeting [#3907](https://github.com/pnp/cli-microsoft365/issues/3907)
