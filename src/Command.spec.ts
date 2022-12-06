@@ -1,13 +1,13 @@
 import * as assert from 'assert';
 import * as chalk from 'chalk';
 import * as sinon from 'sinon';
-import appInsights from './appInsights';
 import auth from './Auth';
 import { Cli } from './cli/Cli';
 import { Logger } from './cli/Logger';
 import Command, {
   CommandError
 } from './Command';
+import { telemetry } from './telemetry';
 import { pid } from './utils/pid';
 import { sinonUtil } from './utils/sinonUtil';
 
@@ -125,15 +125,15 @@ class MockCommand4 extends Command {
 }
 
 describe('Command', () => {
-  let telemetry: any;
+  let telemetryCommandName: any;
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let cli: Cli;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
+    sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
+      telemetryCommandName = commandName;
     });
     logger = {
       log: () => { },
@@ -145,7 +145,7 @@ describe('Command', () => {
   });
 
   beforeEach(() => {
-    telemetry = null;
+    telemetryCommandName = null;
     auth.service.connected = true;
     cli.currentCommandName = undefined;
   });
@@ -159,9 +159,9 @@ describe('Command', () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
       pid.getProcessName,
-      auth.restoreAuth
+      auth.restoreAuth,
+      telemetry.trackEvent
     ]);
   });
 
@@ -254,7 +254,7 @@ describe('Command', () => {
     const mock = new MockCommand1();
     await mock.action(logger, { options: {} });
 
-    assert.strictEqual(telemetry.name, 'mock-command');
+    assert.strictEqual(telemetryCommandName, 'mock-command');
   });
 
   it('logs command alias in the telemetry when command alias used', async () => {
@@ -262,7 +262,7 @@ describe('Command', () => {
     const mock = new MockCommand1();
     await mock.action(logger, { options: {} });
 
-    assert.strictEqual(telemetry.name, 'mc1');
+    assert.strictEqual(telemetryCommandName, 'mc1');
   });
 
   it('logs empty command name in telemetry when command called using something else than name or alias', async () => {
@@ -270,7 +270,7 @@ describe('Command', () => {
     const mock = new MockCommand1();
     await mock.action(logger, { options: {} });
 
-    assert.strictEqual(telemetry.name, '');
+    assert.strictEqual(telemetryCommandName, '');
   });
 
   it('correctly handles error when instance of error returned from the promise', () => {
