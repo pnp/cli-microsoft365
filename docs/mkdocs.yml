@@ -770,6 +770,7 @@ nav:
         - meeting get: 'cmd/teams/meeting/meeting-get.md'
         - meeting list: cmd/teams/meeting/meeting-list.md
         - meeting attendancereport list: cmd/teams/meeting/meeting-attendancereport-list.md
+        - meeting transcript list: cmd/teams/meeting/meeting-transcript-list.md
       - membersettings:
         - membersettings list: cmd/teams/membersettings/membersettings-list.md
         - membersettings set: cmd/teams/membersettings/membersettings-set.md
