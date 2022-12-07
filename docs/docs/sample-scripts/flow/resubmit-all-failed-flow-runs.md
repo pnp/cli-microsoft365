@@ -23,7 +23,7 @@ This script will resubmit all failed flow runs of a Power Automate flow created 
       if ($run.status -eq "Failed") {
         Write-Output "Run details: " $run
         #Resubmit all the failed flows
-        m365 flow run resubmit --environment $flowEnvironment --flow $flowGUID --name $run.name --confirm
+        m365 flow run resubmit --environmentName $flowEnvironment --flowName $flowGUID --name $run.name --confirm
         Write-Output "Run resubmitted successfully"
       }
     }
