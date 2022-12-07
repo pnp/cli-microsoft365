@@ -18,7 +18,7 @@ This script will resubmit all failed flow runs of a Power Automate flow created 
     ```powershell
     $flowEnvironment = $args[0]
     $flowGUID = $args[1]
-    $flowRuns = m365 flow run list --environment $flowEnvironment --flow $flowGUID --output json | ConvertFrom-Json
+    $flowRuns = m365 flow run list --environmentName $flowEnvironment --flowName $flowGUID --output json | ConvertFrom-Json
     foreach ($run in $flowRuns) {
       if ($run.status -eq "Failed") {
         Write-Output "Run details: " $run
