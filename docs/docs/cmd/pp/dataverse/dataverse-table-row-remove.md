@@ -32,19 +32,19 @@ pp dataverse table row remove [options]
 Removes a row from a dataverse table in a given environment
 
 ```sh
-m365 pp dataverse table row remove -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" -t "aadusers" -i "21d01cf4-356c-ed11-9561-000d3a4bbea4"
+m365 pp dataverse table row remove --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tablename "aadusers" --id "21d01cf4-356c-ed11-9561-000d3a4bbea4"
 ```
 
 Removes a row from a dataverse table in a given environment as Admin
 
 ```sh
-m365 pp dataverse table row remove -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" -t "aadusers" -i "21d01cf4-356c-ed11-9561-000d3a4bbea4" --asAdmin
+m365 pp dataverse table row remove --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tablename "aadusers" --id "21d01cf4-356c-ed11-9561-000d3a4bbea4" --asAdmin
 ```
 
 Removes a row from a dataverse table in a given environment without prompting for confirmation
 
 ```sh
-m365 pp dataverse table row remove -e "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" -t "aadusers" -i "21d01cf4-356c-ed11-9561-000d3a4bbea4" --confirm
+m365 pp dataverse table row remove --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tablename "aadusers" --id "21d01cf4-356c-ed11-9561-000d3a4bbea4" --confirm
 ```
 
 ## Response

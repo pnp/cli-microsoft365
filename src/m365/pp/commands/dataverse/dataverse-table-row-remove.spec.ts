@@ -75,7 +75,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.DATAVERSE_TABLE_ROW_REMOVE), true);
+    assert.strictEqual(command.name, commands.DATAVERSE_TABLE_ROW_REMOVE);
   });
 
   it('has a description', () => {
@@ -97,11 +97,6 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     const actual = await command.validate({ options: { environment: validEnvironment, tablename: validTablename, id: validId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-
-  // it('passes validation if required options specified (name)', async () => {
-  //   const actual = await command.validate({ options: { environment: validEnvironment, name: validName } }, commandInfo);
-  //   assert.strictEqual(actual, true);
-  // });
 
   it('prompts before removing the specified row from a dataverse table owned by the currently signed-in user when confirm option not passed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
@@ -200,16 +195,5 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
         confirm: true
       }
     }), new CommandError(errorMessage));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });
