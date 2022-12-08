@@ -1,5 +1,45 @@
 # Release notes
 
+## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
+
+### New commands
+
+**Planner:**
+
+- [planner plan set](../cmd/planner/plan/plan-set.md) - updates a Microsoft Planner plan [#3346](https://github.com/pnp/cli-microsoft365/issues/3346)
+
+**Power Platform:**
+
+- [pp chatbot get](../cmd/pp/chatbot/chatbot-get.md) - get information about the specified chatbot [#4107](https://github.com/pnp/cli-microsoft365/issues/4107)
+- [pp chatbot remove](../cmd/pp/chatbot/chatbot-remove.md) - removes the specified chatbot [#4106](https://github.com/pnp/cli-microsoft365/issues/4106)
+- [pp dataverse table row list](../cmd/pp/dataverse/dataverse-table-row-list.md) - lists table rows for the given Dataverse table [#3791](https://github.com/pnp/cli-microsoft365/issues/3791)
+- [pp solution publisher add](../cmd/pp/solution/solution-publisher-add.md) - adds a specified publisher in a given environment [#3977](https://github.com/pnp/cli-microsoft365/issues/3977)
+
+**Purview:**
+
+- [purview retentionlabel list](../cmd/purview/retentionlabel/retentionlabel-list.md) - get a list of retention labels [#4144](https://github.com/pnp/cli-microsoft365/issues/4144)
+
+**Teams:**
+
+- [teams meeting attendancereport list](../cmd/teams/meeting/meeting-attendancereport-list.md) - lists all attendance reports for a given meeting [#3907](https://github.com/pnp/cli-microsoft365/issues/3907)
+
+### Changes
+
+- updated 'spo roledefinition list' command [#4075](https://github.com/pnp/cli-microsoft365/issues/4075)
+- updated 'spo contenttype set' command with a flag to push updates to child content types [#3792](https://github.com/pnp/cli-microsoft365/issues/3792)
+- enhanced cli-output-mode doc [#4117](https://github.com/pnp/cli-microsoft365/issues/4117)
+- fixed 'spo navigation node add' command [#4093](https://github.com/pnp/cli-microsoft365/issues/4093)
+- enhanced spo lisitem set command [#4167](https://github.com/pnp/cli-microsoft365/issues/4167)
+- added support for upgrading SPFx projects to v1.16.1 [#4181](https://github.com/pnp/cli-microsoft365/issues/4181)
+- extended 'spfx doctor' with support for v1.16.1 projects [#4182](https://github.com/pnp/cli-microsoft365/issues/4182)
+- extended 'spfx project doctor' with support for v1.16.1 projects [#4183](https://github.com/pnp/cli-microsoft365/issues/4183)
+- enhanced parsing of boolean arguments [#3914](https://github.com/pnp/cli-microsoft365/issues/3914)
+- updated logic for upgrading SPFx projects to v1.14 [#4060](https://github.com/pnp/cli-microsoft365/issues/4060)
+- added docs response for cli and search commands [#3921](https://github.com/pnp/cli-microsoft365/issues/3921)
+- fixed next publish build version stamping [#4194](https://github.com/pnp/cli-microsoft365/issues/4194)
+- added 'teams user app list' with teamsApp output [#4128](https://github.com/pnp/cli-microsoft365/issues/4128)
+- fixed 'spo listitem list' filter option [#4090](https://github.com/pnp/cli-microsoft365/issues/4090)
+
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
 ### New commands
@@ -17,6 +57,7 @@
 
 - [pp card clone](../cmd/pp/card/card-clone.md) - clones a specific Microsoft Power Platform card in the specified Power Platform environment [#3790](https://github.com/pnp/cli-microsoft365/issues/3790)
 - [pp card remove](../cmd/pp/card/card-remove.md) - removes the specified Microsoft Power Platform card in the specified Power Platform environment [#3781](https://github.com/pnp/cli-microsoft365/issues/3781)
+- [pp chatbot list](../cmd/pp/chatbot/chatbot-list.md) - lists Microsoft Power Platform chatbot in the specified Power Platform environment [#3650](https://github.com/pnp/cli-microsoft365/issues/3650)
 - [pp dataverse table get](../cmd/pp/dataverse/dataverse-table-get.md) - lists a dataverse table in a given environment [#3726](https://github.com/pnp/cli-microsoft365/issues/3726)
 - [pp dataverse table remove](../cmd/pp/dataverse/dataverse-table-remove.md) - removes a dataverse table in a given environment [#4031](https://github.com/pnp/cli-microsoft365/issues/4031)
 - [pp solution remove](../cmd/pp/solution/solution-remove.md) - removes the specified solution in the specified Power Platform environment [#3723](https://github.com/pnp/cli-microsoft365/issues/3723)
@@ -40,6 +81,7 @@
 
 - [teams meeting get](../cmd/teams/meeting/meeting-get.md) - get specified meeting details [#3900](https://github.com/pnp/cli-microsoft365/issues/3900)
 - [teams meeting list](../cmd/teams/meeting/meeting-list.md) - retrieve all online meetings for a given user or shared mailbox [#3899](https://github.com/pnp/cli-microsoft365/issues/3899)
+- [teams team app list](../cmd/teams/team/team-app-list.md) - list apps installed in the specified team [#4129](https://github.com/pnp/cli-microsoft365/issues/4129)
 
 ### Changes
 
@@ -117,10 +159,13 @@
 - extended 'spo listitem get' with RoleAssignments [#4039](https://github.com/pnp/cli-microsoft365/issues/4039)
 - extended 'spo file get' with RoleAssignments [#4040](https://github.com/pnp/cli-microsoft365/issues/4040)
 - extended 'spo folder get' command with RoleAssignments [#4041](https://github.com/pnp/cli-microsoft365/issues/4041)
-- adds support for configuring how to display help [#3782](https://github.com/pnp/cli-microsoft365/issues/3782)
-- refactors the option sets interface to support validating optional and dependent options [#3884](https://github.com/pnp/cli-microsoft365/issues/3884)
+- added support for configuring how to display help [#3782](https://github.com/pnp/cli-microsoft365/issues/3782)
+- refactored the option sets interface to support validating optional and dependent options [#3884](https://github.com/pnp/cli-microsoft365/issues/3884)
 - removed short notation for 'asAdmin' option in pp commands [#4132](https://github.com/pnp/cli-microsoft365/issues/4132)
 - updated spo commands with odata-version 4.0 [#4014](https://github.com/pnp/cli-microsoft365/issues/4014)
+- updated 'teams app list' command to not return apps from a team [#4130](https://github.com/pnp/cli-microsoft365/issues/4130)
+- enforced unique test names using eslint [#4124](https://github.com/pnp/cli-microsoft365/issues/4124)
+- extended 'spo file copy' with new options [#3911](https://github.com/pnp/cli-microsoft365/issues/3911)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 

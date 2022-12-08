@@ -21,8 +21,12 @@ This commands updates the list of commands and their options used by command com
 Update list of commands for PowerShell command completion
 
 ```powershell
-cli completion pwsh update
+m365 cli completion pwsh update
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

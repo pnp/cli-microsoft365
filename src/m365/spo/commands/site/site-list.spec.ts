@@ -85,11 +85,6 @@ describe(commands.SITE_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if type CommunicationSite specified', async () => {
-    const actual = await command.validate({ options: { type: 'CommunicationSite' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
   it('fails validation if non existing type specified', async () => {
     const actual = await command.validate({ options: { type: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);

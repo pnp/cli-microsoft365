@@ -80,6 +80,33 @@ If you have configured the `autoOpenBrowserOnLogin` key, you'll now need to conf
 m365 cli config set --key autoOpenLinksInBrowser --value true
 ```
 
+## Updated `spo file copy` options
+
+We updated the [spo file copy](./cmd/spo/file/file-copy.md) command. The improved functionality support copying files larger than 2GB and specify the name for the copied file. To support these changes, we had to do several changes to the command's options. When you specify an URL for options `webUrl`, `sourceUrl` and `targetUrl`, make sure that you specify a decoded URL. Specifying an encoded URL will result in a `File Not Found` error. For example, `/sites/IT/Shared%20Documents/Document.pdf` will not work while `/sites/IT/Shared Documents/Document.pdf` will work just fine.
+
+Because of this rework, we were able to add new options, but we also removed existing ones.
+
+**Removed options:**
+
+- `--deleteIfAlreadyExists`
+- `--allowSchemaMismatch`
+
+**New options:**
+
+Option | Description
+--- | ---
+`--nameConflictBehavior [nameConflictBehavior]` | Behavior when a document with the same name is already present at the destination. Possible values: `fail`, `replace`, `rename`. Default is `fail`.
+`--newName [newName]` | New name of the destination file.
+`--bypassSharedLock` | This indicates whether a file with a share lock can still be copied. Use this option to copy a file that is locked.
+
+### What action do I need to take?
+
+Update your scripts with the following:
+
+- Ensure all the URLs you provide are **decoded**.
+- Remove the option `--allowSchemaMismatch`.
+- Replace option `--deleteIfAlreadyExists` with `--nameConflictBehavior replace`.
+
 ## In `teams channel` commands, changed short options
 
 In the following commands we've changed some shorts:
@@ -101,12 +128,14 @@ Update the reference to the short options in your scripts.
 
 In the past versions, `teams app publish` returned just the app ID of the published app, or nothing at all. This has been adjusted, now the command will return the entire result object.
 
-Previous JSON command output:
+v5 JSON command output:
+
 ```json
 "fbdfd207-83ee-45d8-9c98-5039a1a01207"
 ```
 
-Current JSON command output:
+v6 JSON command output:
+
 ```json
 {
     "id": "fbdfd207-83ee-45d8-9c98-5039a1a01207",
@@ -124,7 +153,8 @@ Update your scripts to read the `id` property of the command output.
 
 In the past versions, `spo eventreceiver get` returned an array with a single object. This has been adjusted, now the command will only return the object.
 
-Previous JSON command output:
+v5 JSON command output:
+
 ```json
 [
   {
@@ -140,7 +170,8 @@ Previous JSON command output:
 ]
 ```
 
-Current JSON command output:
+v6 JSON command output:
+
 ```json
 {
   "ReceiverAssembly": "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
@@ -160,7 +191,7 @@ Update your scripts to expect a single object instead of an array.
 
 ## Updated `spo group user <verb>` commands
 
-We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possibly scenario's. In the near future we'll be adding support to add Azure AD Groups as group member. Using `spo group member` better fits the intended situation of adding either users or Azure AD groups.
+We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possible scenarios. In the near future we'll be adding support to add Azure AD Groups as group member. Using `spo group member` better fits the intended situation of adding either users or Azure AD groups.
 
 As a side issue, we've also updated the response output of the `spo group member list` command in JSON output mode. This returned a member array within a parent `value` object. In the new situation, the command returns the array without the parent `value` object.
 
@@ -193,6 +224,14 @@ Affected commands:
 ### What action do I need to take?
 
 Update your scripts to use `--asAdmin` instead of `-a`.
+
+## Updated `teams app list` command
+
+The logic to list the installed apps in a specified team is moved to a new command [teams team app list](./cmd/teams/team/team-app-list.md). As a result, the command [teams app list](./cmd/teams/app/app-list.md) only displays the installed apps from the Microsoft Teams app catalog. The command [teams app list](./cmd/teams/app/app-list.md) does no longer contain the options `all`, `teamId` and `teamName`. In addition, there is a new option for this command that allows you to indicate which installed apps from the Microsoft Teams app catalog you want to list according to the distribution method.
+
+### What action do I need to take?
+
+Update your scripts to use the [teams app list](./cmd/teams/app/app-list.md) command if you want to list the installed apps in the Microsoft Teams app catalog. If you want to list the installed apps in a specified team, use the [teams team app list](./cmd/teams/team/team-app-list.md) command instead.
 
 ## Aligned options with naming convention
 
