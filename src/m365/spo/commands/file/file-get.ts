@@ -21,6 +21,7 @@ export interface Options extends GlobalOptions {
   asListItem?: boolean;
   asFile?: boolean;
   path?: string;
+  withPermissions?: boolean;
 }
 
 class SpoFileGetCommand extends SpoCommand {
@@ -49,7 +50,8 @@ class SpoFileGetCommand extends SpoCommand {
         asString: args.options.asString || false,
         asListItem: args.options.asListItem || false,
         asFile: args.options.asFile || false,
-        path: (!(!args.options.path)).toString()
+        path: (!(!args.options.path)).toString(),
+        withPermissions: !!args.options.withPermissions
       });
     });
   }
@@ -76,6 +78,9 @@ class SpoFileGetCommand extends SpoCommand {
       },
       {
         option: '-p, --path [path]'
+      },
+      {
+        option: '--withPermissions'
       }
     );
   }
@@ -120,7 +125,7 @@ class SpoFileGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'url']);
+    this.optionSets.push({ options: ['id', 'url'] });
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -177,7 +182,6 @@ class SpoFileGetCommand extends SpoCommand {
         // Not possible to use async/await for this promise
         await new Promise<void>((resolve, reject) => {
           const writer = fs.createWriteStream(args.options.path as string);
-
           file.data.pipe(writer);
 
           writer.on('error', err => {
@@ -198,6 +202,17 @@ class SpoFileGetCommand extends SpoCommand {
         }
         else {
           const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
+          if (args.options.withPermissions) {
+            requestOptions.url = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${file.ServerRelativeUrl}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
+            const response = await request.get<{ value: any[] }>(requestOptions);
+            response.value.forEach((r: any) => {
+              r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
+            });
+            fileProperties.RoleAssignments = response.value;
+            if (args.options.asListItem) {
+              fileProperties.ListItemAllFields.RoleAssignments = response.value;
+            }
+          }
           logger.log(args.options.asListItem ? fileProperties.ListItemAllFields : fileProperties);
         }
       }

@@ -2866,7 +2866,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['standardWebPart', 'webPartId']
+      { options: ['standardWebPart', 'webPartId'] }
     ]);
   });
 

@@ -72,7 +72,7 @@ class SpoUserRemoveCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'loginName']);
+    this.optionSets.push({ options: ['id', 'loginName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

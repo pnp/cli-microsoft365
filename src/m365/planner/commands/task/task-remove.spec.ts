@@ -173,7 +173,7 @@ describe(commands.TASK_REMOVE, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title'] }]);
   });
 
   it('fails validation when title and id is used', async () => {

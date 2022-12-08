@@ -121,9 +121,9 @@ class SpoFileRoleAssignmentAddCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['fileId', 'fileUrl'],
-      ['principalId', 'upn', 'groupName'],
-      ['roleDefinitionId', 'roleDefinitionName']
+      { options: ['fileId', 'fileUrl'] },
+      { options: ['principalId', 'upn', 'groupName'] },
+      { options: ['roleDefinitionId', 'roleDefinitionName'] }
     );
   }
 

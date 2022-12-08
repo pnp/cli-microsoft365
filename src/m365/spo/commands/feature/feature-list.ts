@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -26,12 +26,12 @@ class SpoFeatureListCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -39,7 +39,7 @@ class SpoFeatureListCommand extends SpoCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -51,7 +51,7 @@ class SpoFeatureListCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -61,7 +61,7 @@ class SpoFeatureListCommand extends SpoCommand {
             return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
           }
         }
-    
+
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
@@ -69,18 +69,11 @@ class SpoFeatureListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const scope: string = (args.options.scope) ? args.options.scope : 'Web';
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/${scope}/Features?$select=DisplayName,DefinitionId`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
 
     try {
-      const features = await request.get<{ value: Feature[] }>(requestOptions);
-      if (features.value && features.value.length > 0) {
-        logger.log(features.value);
+      const features = await odata.getAllItems<Feature>(`${args.options.webUrl}/_api/${scope}/Features?$select=DisplayName,DefinitionId`);
+      if (features && features.length > 0) {
+        logger.log(features);
       }
       else {
         if (this.verbose) {

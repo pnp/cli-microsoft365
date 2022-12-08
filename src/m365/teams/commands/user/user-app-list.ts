@@ -72,13 +72,13 @@ class TeamsUserAppListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['userId', 'userName']);
+    this.optionSets.push({ options: ['userId', 'userName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const userId: string = (await this.getUserId(args)).value;
-      const endpoint: string = `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(userId)}/teamwork/installedApps?$expand=teamsAppDefinition`;
+      const endpoint: string = `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(userId)}/teamwork/installedApps?$expand=teamsAppDefinition,teamsApp`;
 
       const items = await odata.getAllItems<TeamsAppInstallation>(endpoint);
       items.forEach(i => {

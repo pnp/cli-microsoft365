@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -69,16 +69,8 @@ class SpoContentTypeListCommand extends SpoCommand {
         requestUrl += `?$filter=Group eq '${formatting.encodeQueryParameter(args.options.category as string)}'`;
       }
 
-      const requestOptions: any = {
-        url: requestUrl,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const res = await request.get<any>(requestOptions);
-      logger.log(res.value);
+      const res = await odata.getAllItems<any>(requestUrl);
+      logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

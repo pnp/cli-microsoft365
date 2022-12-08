@@ -11,22 +11,22 @@ m365 spo navigation node add [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: Absolute URL of the site to which navigation should be modified
+: Absolute URL of the site to which navigation should be modified.
 
 `-l, --location [location]`
-: Navigation type where the node should be added. Available options: `QuickLaunch`, `TopNavigationBar`
+: Navigation type where the node should be added. Available options: `QuickLaunch`, `TopNavigationBar`. Specify either `location` or `parentNodeId` but not both.
 
 `-t, --title <title>`
-: Navigation node title
+: Navigation node title.
 
 `--url <url>`
-: Navigation node URL
+: Navigation node URL.
 
 `--parentNodeId [parentNodeId]`
-: ID of the node below which the node should be added
+: ID of the node below which the node should be added. Specify either `location` or `parentNodeId` but not both.
 
 `--isExternal`
-: Set, if the navigation node points to an external URL
+: Set, if the navigation node points to an external URL.
 
 --8<-- "docs/cmd/_global.md"
 

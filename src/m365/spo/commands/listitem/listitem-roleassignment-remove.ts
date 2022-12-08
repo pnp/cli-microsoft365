@@ -121,8 +121,8 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['listId', 'listTitle', 'listUrl'],
-      ['principalId', 'upn', 'groupName']
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['principalId', 'upn', 'groupName'] }
     );
   }
 

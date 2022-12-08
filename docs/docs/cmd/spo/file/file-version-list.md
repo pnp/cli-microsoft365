@@ -63,14 +63,14 @@ m365 spo file version list --webUrl https://contoso.sharepoint.com/sites/project
 === "Text"
 
     ```text
-    CheckInComment  Created               ID    IsCurrentVersion  Length  Size   Url                                               VersionLabel
-    --------------  --------------------  ----  ----------------  ------  -----  ------------------------------------------------  ------------
-                    2022-10-30T12:03:06Z  512   false             18898   18898  _vti_history/512/Shared Documents/Document.docx   1.0
+    Created               ID    IsCurrentVersion  VersionLabel
+    --------------------  ----  ----------------  ------------
+    2022-10-30T12:03:06Z  512   false             1.0
     ```
 
 === "CSV"
 
     ```csv
-    CheckInComment,Created,ID,IsCurrentVersion,Length,Size,Url,VersionLabel
-    ,2022-10-30T12:03:06Z,512,,18898,18898,_vti_history/512/Shared Documents/Document.docx,1.0
+    Created,ID,IsCurrentVersion,VersionLabel
+    2022-10-30T12:03:06Z,512,false,1.0
     ```

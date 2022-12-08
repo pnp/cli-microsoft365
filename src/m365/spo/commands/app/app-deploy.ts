@@ -98,7 +98,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -150,7 +150,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
         responseType: 'json'
       };
 
-      await  request.post(requestOptions);
+      await request.post(requestOptions);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

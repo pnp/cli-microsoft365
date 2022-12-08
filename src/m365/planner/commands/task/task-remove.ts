@@ -84,26 +84,26 @@ class PlannerTaskRemoveCommand extends GraphCommand {
             return 'Don\'t specify bucketId,bucketName, planId, planTitle, ownerGroupId or ownerGroupName when using id';
           }
         }
-    
+
         if (args.options.title) {
           if (!args.options.bucketId && !args.options.bucketName) {
             return 'Specify either bucketId or bucketName when using title';
           }
-    
+
           if (args.options.bucketId && args.options.bucketName) {
             return 'Specify either bucketId or bucketName when using title but not both';
           }
-    
+
           if (args.options.bucketName) {
             if (!args.options.planId && !args.options.planTitle) {
               return 'Specify either planId or planTitle when using bucketName';
             }
-    
+
             if (args.options.planId && args.options.planTitle) {
               return 'Specify either planId or planTitle when using bucketName but not both';
             }
           }
-    
+
           if (args.options.planTitle) {
             if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
               return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
@@ -112,7 +112,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
               return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
             }
           }
-    
+
           if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
             return `${args.options.ownerGroupId} is not a valid GUID`;
           }
@@ -124,7 +124,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'title']
+      { options: ['id', 'title'] }
     );
   }
 
@@ -256,7 +256,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     if (ownerGroupId) {
       return Promise.resolve(ownerGroupId);
     }
-    
+
     return aadGroup
       .getGroupByDisplayName(ownerGroupName!)
       .then(group => group.id!);

@@ -88,8 +88,8 @@ class SpoTermSetGetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'name'],
-      ['termGroupId', 'termGroupName']
+      { options: ['id', 'name'] },
+      { options: ['termGroupId', 'termGroupName'] }
     );
   }
 
@@ -125,8 +125,8 @@ class SpoTermSetGetCommand extends SpoCommand {
       termSet.CreatedDate = new Date(Number(termSet.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
       termSet.Id = termSet.Id.replace('/Guid(', '').replace(')/', '');
       termSet.LastModifiedDate = new Date(Number(termSet.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-      logger.log(termSet);      
-    } 
+      logger.log(termSet);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

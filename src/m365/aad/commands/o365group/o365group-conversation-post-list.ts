@@ -72,7 +72,7 @@ class AadO365GroupConversationPostListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['groupId', 'groupDisplayName']);
+    this.optionSets.push({ options: ['groupId', 'groupDisplayName'] });
   }
 
   public defaultProperties(): string[] | undefined {

@@ -37,6 +37,7 @@ const dictionary = [
   'installed',
   'is',
   'issue',
+  'label',
   'list',
   'management',
   'member',
@@ -52,6 +53,7 @@ const dictionary = [
   'property',
   'records',
   'recycle',
+  'retention',
   'role',
   'room',
   'schema',
@@ -100,7 +102,8 @@ module.exports = {
   },
   "plugins": [
     "@typescript-eslint",
-    "cli-microsoft365"
+    "cli-microsoft365",
+    "mocha"
   ],
   "ignorePatterns": [
     "**/pcf-init/assets/**",
@@ -186,7 +189,8 @@ module.exports = {
         ]
       }
     ],
-    "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }]
+    "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }],
+    "mocha/no-identical-title": "error"
   },
   "overrides": [
     {

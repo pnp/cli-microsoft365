@@ -41,3 +41,7 @@ Adds a new external connection with a limited number of authorized apps
 ```sh
 m365 search externalconnection add --id MyApp --name "Test" --description "Test" --authorizedAppIds  "00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002"
 ```
+
+## Response
+
+The command won't return a response on success.

@@ -76,9 +76,9 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['fileId', 'fileUrl'],
-      ['principalId', 'upn', 'groupName'],
-      ['roleDefinitionId', 'roleDefinitionName']
+      { options: ['fileId', 'fileUrl'] },
+      { options: ['principalId', 'upn', 'groupName'] },
+      { options: ['roleDefinitionId', 'roleDefinitionName'] }
     ]);
   });
 
