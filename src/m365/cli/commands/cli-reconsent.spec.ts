@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as open from 'open';
 import * as sinon from 'sinon';
-import appInsights from '../../../appInsights';
+import { telemetry } from '../../../telemetry';
 import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
@@ -19,7 +19,7 @@ describe(commands.RECONSENT, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
   });
 
@@ -51,7 +51,7 @@ describe(commands.RECONSENT, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
