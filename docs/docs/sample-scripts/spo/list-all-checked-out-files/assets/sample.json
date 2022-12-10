@@ -3,7 +3,7 @@
     "name": "pnp-list-all-checked-out-files",
     "source": "pnp",
     "title": "List all checked out files in SharePoint",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/list-all-checked-out-files",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-checked-out-files",
     "creationDateTime": "2022-02-19",
     "updateDateTime": "2022-02-19",
     "shortDescription": "This script will retrieve all the checked out files in a particular site.",

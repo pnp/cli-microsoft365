@@ -3,7 +3,7 @@
     "name": "pnp-flow-runs-day-summary",
     "source": "pnp",
     "title": "Flow runs day summary report",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/flow/flow-runs-day-summary",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/flow-runs-day-summary",
     "creationDateTime": "2021-10-16",
     "updateDateTime": "2021-10-16",
     "shortDescription": "This script creates a report of all flow runs from current day.",

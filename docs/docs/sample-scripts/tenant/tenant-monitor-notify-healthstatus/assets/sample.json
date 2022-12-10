@@ -3,7 +3,7 @@
     "name": "pnp-monitor-and-notify-microsoft-365-health-status",
     "source": "pnp",
     "title": "Monitor and notify Microsoft 365 health status",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/tenant/tenant-monitor-notify-healthstatus",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/tenant/tenant-monitor-notify-healthstatus",
     "creationDateTime": "2021-03-25",
     "updateDateTime": "2021-03-25",
     "shortDescription": "This is a script which monitors the health status of your Microsoft 365 tenant and notifies if something is not normal.",

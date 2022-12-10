@@ -3,7 +3,7 @@
     "name": "pnp-remove-personal-app",
     "source": "pnp",
     "title": "Removes Microsoft Teams personal app from users and Microsoft Teams app catalog",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/remove-personal-app",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/remove-personal-app",
     "creationDateTime": "2020-10-27",
     "updateDateTime": "2020-10-27",
     "shortDescription": "Uninstalls an app from the specified users and / or unpublish it from the Microsoft Teams app catalog based on the App Id.",

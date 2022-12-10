@@ -3,7 +3,7 @@
     "name": "pnp-ensure-siteassets-library",
     "source": "pnp",
     "title": "Ensure the Site Assets Library is created",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/ensure-siteassets-library",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/ensure-siteassets-library",
     "creationDateTime": "2020-04-12",
     "updateDateTime": "2020-04-12",
     "shortDescription": "Ensure that the Site Assets library is created.",

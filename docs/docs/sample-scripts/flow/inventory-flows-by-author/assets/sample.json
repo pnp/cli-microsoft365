@@ -3,7 +3,7 @@
     "name": "pnp-inventory-flows-by-author",
     "source": "pnp",
     "title": "Inventory Flows By Creator",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/flow/inventory-flows-by-author",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/inventory-flows-by-author",
     "creationDateTime": "2020-05-05",
     "updateDateTime": "2020-05-05",
     "shortDescription": "This script retrieves Flows from the Default Environment and maps creator information from Azure AD to list Flows by owner.",

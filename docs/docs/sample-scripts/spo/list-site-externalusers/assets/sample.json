@@ -3,7 +3,7 @@
     "name": "pnp-list-site-externalusers",
     "source": "pnp",
     "title": "List all external users in all site collections",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/list-site-externalusers",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-site-externalusers",
     "creationDateTime": "2021-03-15",
     "updateDateTime": "2021-03-15",
     "shortDescription": "This script helps you to list all external users in all SharePoint Online sites.",

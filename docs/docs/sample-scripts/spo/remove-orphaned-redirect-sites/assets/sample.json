@@ -3,7 +3,7 @@
     "name": "pnp-remove-orphaned-redirect-sites",
     "source": "pnp",
     "title": "Remove orphaned redirect sites",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/remove-orphaned-redirect-sites",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/remove-orphaned-redirect-sites",
     "creationDateTime": "2020-09-06",
     "updateDateTime": "2020-09-06",
     "shortDescription": "This script provides you with an overview of all orphaned redirect sites and allows you to quickly delete them.",

@@ -3,7 +3,7 @@
     "name": "pnp-add-app-catalog",
     "source": "pnp",
     "title": "Add App Catalog to SharePoint site",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/add-app-catalog",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/add-app-catalog",
     "creationDateTime": "2020-03-28",
     "updateDateTime": "2020-03-28",
     "shortDescription": "Script will create an app catalog for that site.",

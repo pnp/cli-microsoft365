@@ -3,7 +3,7 @@
     "name": "pnp-export-teams-conversations",
     "source": "pnp",
     "title": "Export conversations from Microsoft Teams Channels",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/export-teams-conversations",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/export-teams-conversations",
     "creationDateTime": "2021-02-19",
     "updateDateTime": "2021-02-19",
     "shortDescription": "This script exports the conversations from Microsoft Teams Channels.",

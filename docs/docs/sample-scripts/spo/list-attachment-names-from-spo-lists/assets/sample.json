@@ -3,7 +3,7 @@
     "name": "pnp-list-attachment-names-from-spo-lists",
     "source": "pnp",
     "title": "List Attachment Names From SharePoint Lists For A Site",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/list-attachment-names-from-spo-lists",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-attachment-names-from-spo-lists",
     "creationDateTime": "2022-07-29",
     "updateDateTime": "2022-07-29",
     "shortDescription": "Lists Attachment Names From SharePoint Lists For A Site.",

@@ -3,7 +3,7 @@
     "name": "pnp-list-all-list-folders-itemcount",
     "source": "pnp",
     "title": "Lists number of files in all lists and folders for the given site",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/list-all-list-folders-itemcount",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-list-folders-itemcount",
     "creationDateTime": "2021-06-22",
     "updateDateTime": "2021-06-22",
     "shortDescription": "List all Lists, the folders and sub folders in a given site, and output the item count.",

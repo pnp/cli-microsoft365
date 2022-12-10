@@ -3,7 +3,7 @@
     "name": "pnp-replace-membership-of-selected-groups",
     "source": "pnp",
     "title": "Replace a user's membership in selected Microsoft 365 Groups or Teams",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/aad/replace-membership-of-selected-groups",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/replace-membership-of-selected-groups",
     "creationDateTime": "2021-05-04",
     "updateDateTime": "2021-05-04",
     "shortDescription": "This script can be used to replace the membership of a user for a selected list of Groups.",

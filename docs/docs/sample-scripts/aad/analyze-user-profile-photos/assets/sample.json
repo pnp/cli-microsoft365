@@ -3,7 +3,7 @@
     "name": "pnp-analyze-user-profile-photos",
     "source": "pnp",
     "title": "Analyze User Profile Photos using Azure Computer Vision API",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/aad/analyze-user-profile-photos",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/analyze-user-profile-photos",
     "creationDateTime": "2020-11-05",
     "updateDateTime": "2020-11-05",
     "shortDescription": "This script uses Azure Cognitive Service API and Microsoft 365 CLI to analyze user profile pictures.",

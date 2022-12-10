@@ -3,7 +3,7 @@
     "name": "pnp-copy-files-to-another-library",
     "source": "pnp",
     "title": "Copy files to another SharePoint Library in another site",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/copy-files-to-another-library",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/copy-files-to-another-library",
     "creationDateTime": "2021-04-20",
     "updateDateTime": "2021-04-20",
     "shortDescription": "This script shows how you can use the CLI to copy all files and folders from source library to a different library.",

@@ -3,7 +3,7 @@
     "name": "pnp-get-all-teams-specific-user-is-part-of",
     "source": "pnp",
     "title": "Get all the Teams a specific user is part of",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/get-all-teams-specific-user-is-part-of",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/get-all-teams-specific-user-is-part-of",
     "creationDateTime": "2021-09-14",
     "updateDateTime": "2021-09-14",
     "shortDescription": "Gets all the Teams a specific user is part of.",

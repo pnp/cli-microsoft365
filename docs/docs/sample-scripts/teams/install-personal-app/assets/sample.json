@@ -3,7 +3,7 @@
     "name": "pnp-install-personal-app",
     "source": "pnp",
     "title": "Deploy Microsoft Teams personal app and add it to users",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/install-personal-app",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/install-personal-app",
     "creationDateTime": "2020-10-18",
     "updateDateTime": "2020-10-18",
     "shortDescription": "Installs or updates a Microsoft Teams app.",

@@ -3,7 +3,7 @@
     "name": "pnp-list-site-app-catalogs",
     "source": "pnp",
     "title": "Lists active SharePoint site collection application catalogs",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/list-site-app-catalogs",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-site-app-catalogs",
     "creationDateTime": "2019-11-16",
     "updateDateTime": "2019-11-16",
     "shortDescription": "Script will find all installed site collection application catalogs within a tenant.",

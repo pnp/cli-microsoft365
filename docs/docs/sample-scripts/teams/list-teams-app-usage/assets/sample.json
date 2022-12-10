@@ -3,7 +3,7 @@
     "name": "pnp-list-teams-app-usage",
     "source": "pnp",
     "title": "List app usage in Microsoft Teams",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/list-teams-app-usage",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/list-teams-app-usage",
     "creationDateTime": "2020-07-17",
     "updateDateTime": "2020-07-17",
     "shortDescription": "Iterates through all the teams in your tenant and lists all apps in each team.",

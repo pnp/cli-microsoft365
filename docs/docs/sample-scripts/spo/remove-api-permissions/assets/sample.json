@@ -3,7 +3,7 @@
     "name": "pnp-remove-api-permissions",
     "source": "pnp",
     "title": "Remove SharePoint API permissions",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/remove-api-permissions",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/remove-api-permissions",
     "creationDateTime": "2021-06-17",
     "updateDateTime": "2021-06-17",
     "shortDescription": "This script helps you to quickly remove SharePoint API permissions.",

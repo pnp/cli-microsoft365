@@ -3,7 +3,7 @@
     "name": "pnp-list-failed-sitedesigns",
     "source": "pnp",
     "title": "List all failed site design for all sites",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/list-failed-sitedesigns",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-failed-sitedesigns",
     "creationDateTime": "2021-07-05",
     "updateDateTime": "2021-07-05",
     "shortDescription": "Script iterates through all site collections and lists all site design runs with errors.",

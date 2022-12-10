@@ -3,7 +3,7 @@
     "name": "pnp-list-environments-flows-apps",
     "source": "pnp",
     "title": "List all Power Platform Environments and their Flows and Apps",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/powerplatform/list-environments-flows-apps",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/powerplatform/list-environments-flows-apps",
     "creationDateTime": "2022-09-10",
     "updateDateTime": "2022-09-10",
     "shortDescription": "This script will retrieve all environments as an Administrator and loop through all Flows and Apps to provide you with a report indicating how much Power Platform components are in use in the tenant.",

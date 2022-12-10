@@ -3,7 +3,7 @@
     "name": "pnp-add-multiple-lists-in-multiple-sites",
     "source": "pnp",
     "title": "Add multiple lists in multiple sites",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/add-multiple-lists-in-multiple-sites",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/add-multiple-lists-in-multiple-sites",
     "creationDateTime": "2021-07-05",
     "updateDateTime": "2021-07-05",
     "shortDescription": "Adds multiple lists in multiple sites.",

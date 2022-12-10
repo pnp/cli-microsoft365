@@ -3,7 +3,7 @@
     "name": "pnp-resubmit-all-failed-flow-runs",
     "source": "pnp",
     "title": "Resubmit all failed flow runs for a flow in an environment",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/flow/resubmit-all-failed-flow-runs",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/resubmit-all-failed-flow-runs",
     "creationDateTime": "2021-06-04",
     "updateDateTime": "2021-06-04",
     "shortDescription": "This script will resubmit all failed flow runs.",

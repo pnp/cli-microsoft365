@@ -3,7 +3,7 @@
     "name": "pnp-add-bulk-users-teams",
     "source": "pnp",
     "title": "Bulk add members to Microsoft Teams team from CSV file",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/add-bulk-users-teams",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/add-bulk-users-teams",
     "creationDateTime": "2021-04-17",
     "updateDateTime": "2021-04-17",
     "shortDescription": "Adds bulk users from CSV file to MS Teams.",

@@ -3,7 +3,7 @@
     "name": "pnp-call-graph",
     "source": "pnp",
     "title": "Authenticate with and call the Microsoft Graph",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/graph/call-graph",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/graph/call-graph",
     "creationDateTime": "2020-05-02",
     "updateDateTime": "2022-10-20",
     "shortDescription": "This script shows different ways to call Graph API.",

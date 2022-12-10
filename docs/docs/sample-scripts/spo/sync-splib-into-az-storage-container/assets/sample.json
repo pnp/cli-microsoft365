@@ -3,7 +3,7 @@
     "name": "pnp-sync-splib-into-az-storage-container",
     "source": "pnp",
     "title": "Sync SharePoint Document Library Documents with Azure Storage Container",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/sync-splib-into-az-storage-container",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/sync-splib-into-az-storage-container",
     "creationDateTime": "2020-06-15",
     "updateDateTime": "2020-06-15",
     "shortDescription": "This script shows how to download and sync documents in a SharePoint Document Library into an Azure Storage Container.",

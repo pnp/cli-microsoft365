@@ -3,7 +3,7 @@
     "name": "pnp-list-all-items-with-unique-permissions",
     "source": "pnp",
     "title": "List all items with unique permissions",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/list-all-items-with-unique-permissions",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-items-with-unique-permissions",
     "creationDateTime": "2022-02-09",
     "updateDateTime": "2022-02-09",
     "shortDescription": "List all items for a specific SharePoint list on a site.",

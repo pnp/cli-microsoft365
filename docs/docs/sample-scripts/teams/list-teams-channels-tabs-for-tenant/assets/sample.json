@@ -3,7 +3,7 @@
     "name": "pnp-list-teams-channels-tabs-for-tenant",
     "source": "pnp",
     "title": "List Microsoft Teams teams, channels, and tabs in the tenant",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/list-teams-channels-tabs-for-tenant",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/list-teams-channels-tabs-for-tenant",
     "creationDateTime": "2021-10-16",
     "updateDateTime": "2021-10-16",
     "shortDescription": "This script allows you to list all teams, channels and tabs.",

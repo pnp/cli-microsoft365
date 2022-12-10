@@ -3,7 +3,7 @@
     "name": "pnp-flag-groups-with-user-names",
     "source": "pnp",
     "title": "Scan for Microsoft 365 Groups created with user's first or last name",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/aad/flag-groups-with-user-names",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/flag-groups-with-user-names",
     "creationDateTime": "2020-03-28",
     "updateDateTime": "2020-03-28",
     "shortDescription": "This sample script scans the Microsoft 365 groups that may contain user’s first or last name as the group mail.",

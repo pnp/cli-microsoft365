@@ -3,7 +3,7 @@
     "name": "pnp-setup-example-site",
     "source": "pnp",
     "title": "Replace site collection admin with another user",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/setup-example-site",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/setup-example-site",
     "creationDateTime": "2021-04-10",
     "updateDateTime": "2021-04-10",
     "shortDescription": "This script is a good starting point for a setup script to create site with some assets like columns, content types, lists, navigation etc.",

@@ -3,7 +3,7 @@
     "name": "pnp-add-custom-clientside-webpart-to-modern-page",
     "source": "pnp",
     "title": "Add custom client-side web part to modern page",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/add-custom-clientside-webpart-to-modern-page",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/add-custom-clientside-webpart-to-modern-page",
     "creationDateTime": "2020-05-20",
     "updateDateTime": "2020-05-20",
     "shortDescription": "This sample helps you add your web part to the page.",

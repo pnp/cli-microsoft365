@@ -3,7 +3,7 @@
     "name": "pnp-govern-orphan-teams",
     "source": "pnp",
     "title": "Govern orphaned Microsoft Teams",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/govern-orphan-teams",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/govern-orphan-teams",
     "creationDateTime": "2020-05-02",
     "updateDateTime": "2020-05-02",
     "shortDescription": "This script finds teams that no longer have an owner.",

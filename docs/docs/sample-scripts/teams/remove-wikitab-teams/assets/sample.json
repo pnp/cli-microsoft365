@@ -3,7 +3,7 @@
     "name": "pnp-remove-wikitab-teams",
     "source": "pnp",
     "title": "Remove Wiki tab in a Microsoft Teams channel",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/remove-wikitab-teams",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/remove-wikitab-teams",
     "creationDateTime": "2020-08-23",
     "updateDateTime": "2020-08-23",
     "shortDescription": "Removes the wiki tab of a Microsoft Teams Team's channel.",

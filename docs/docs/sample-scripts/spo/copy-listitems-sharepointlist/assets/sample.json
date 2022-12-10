@@ -3,7 +3,7 @@
     "name": "pnp-copy-listitems-sharepointlist",
     "source": "pnp",
     "title": "Copy list items between SharePoint lists",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/copy-listitems-sharepointlist",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/copy-listitems-sharepointlist",
     "creationDateTime": "2021-12-15",
     "updateDateTime": "2021-12-15",
     "shortDescription": "This script helps you to copy list items from one list to another list.",

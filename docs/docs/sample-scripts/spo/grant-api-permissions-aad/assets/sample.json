@@ -3,7 +3,7 @@
     "name": "pnp-grant-api-permissions-aad",
     "source": "pnp",
     "title": "Grant API permissions to SharePoint Azure AD Application",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/grant-api-permissions-aad",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/grant-api-permissions-aad",
     "creationDateTime": "2021-03-19",
     "updateDateTime": "2021-03-19",
     "shortDescription": "Grants API permissions to SharePoint Azure AD Application.",

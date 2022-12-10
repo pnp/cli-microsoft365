@@ -3,7 +3,7 @@
     "name": "pnp-analyze-users-haveibeenpwnd",
     "source": "pnp",
     "title": "Analyze users for known data breaches with have i been pwned",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/aad/analyze-users-haveibeenpwnd",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/analyze-users-haveibeenpwnd",
     "creationDateTime": "2022-02-07",
     "updateDateTime": "2022-02-07",
     "shortDescription": "Validate all your users against known breaches with the have i been pwned api.",

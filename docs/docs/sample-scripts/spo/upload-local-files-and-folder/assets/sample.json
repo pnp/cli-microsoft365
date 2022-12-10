@@ -3,7 +3,7 @@
     "name": "pnp-upload-local-files-and-folder",
     "source": "pnp",
     "title": "Upload local files and folders to SharePoint Online",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/upload-local-files-and-folder",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/upload-local-files-and-folder",
     "creationDateTime": "2021-04-13",
     "updateDateTime": "2021-04-13",
     "shortDescription": "This script shows how you can use the CLI to upload files located on a local folder to a SharePoint Online library.",

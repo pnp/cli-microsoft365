@@ -3,7 +3,7 @@
     "name": "pnp-planner-migrate-sharepoint-list",
     "source": "pnp",
     "title": "Planner migration to SharePoint list",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/planner-migrate-sharepoint-list",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/planner-migrate-sharepoint-list",
     "creationDateTime": "2022-03-12",
     "updateDateTime": "2022-03-12",
     "shortDescription": "This script migrates an existing plan to a SharePoint Online List with this sample.",

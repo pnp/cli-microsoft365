@@ -3,7 +3,7 @@
     "name": "pnp-recognize-most-active-users-specific-team",
     "source": "pnp",
     "title": "Recognize most active users for a specific Team",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/recognize-most-active-users-specific-team",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/recognize-most-active-users-specific-team",
     "creationDateTime": "2021-08-27",
     "updateDateTime": "2021-08-27",
     "shortDescription": "Retrieves all activities for a specific Microsoft Teams Team and shares the top 3 contributors.",

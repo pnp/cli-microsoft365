@@ -3,7 +3,7 @@
     "name": "pnp-disable-tenant-wide-extension",
     "source": "pnp",
     "title": "Disable specified Tenant-wide Extension",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/disable-tenant-wide-extension",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/disable-tenant-wide-extension",
     "creationDateTime": "2020-05-20",
     "updateDateTime": "2020-05-20",
     "shortDescription": "Script helps to disable the specified tenant wide extension based on the id parameter.",

@@ -3,7 +3,7 @@
     "name": "pnp-delete-non-group-connected-modern-sites",
     "source": "pnp",
     "title": "Delete all (non-group connected) modern SharePoint sites",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/delete-non-group-connected-modern-sites",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/delete-non-group-connected-modern-sites",
     "creationDateTime": "2020-06-25",
     "updateDateTime": "2020-06-25",
     "shortDescription": "The script handles the remaining modern sites: communication sites and groupless team sites.",

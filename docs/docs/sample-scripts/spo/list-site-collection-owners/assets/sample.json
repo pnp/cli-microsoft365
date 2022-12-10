@@ -3,7 +3,7 @@
     "name": "pnp-list-site-collection-owners",
     "source": "pnp",
     "title": "List site collection owners",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/list-site-collection-owners",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-site-collection-owners",
     "creationDateTime": "2021-02-27",
     "updateDateTime": "2021-02-27",
     "shortDescription": "This script helps you to list and export all site collection owners in your SharePoint Online sites.",

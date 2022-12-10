@@ -3,7 +3,7 @@
     "name": "pnp-list-all-tabs-teams",
     "source": "pnp",
     "title": "List all tabs in Microsoft Teams teams in the tenant",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/list-all-tabs-teams",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/list-all-tabs-teams",
     "creationDateTime": "2021-02-27",
     "updateDateTime": "2021-02-27",
     "shortDescription": "List all tabs in Microsoft Teams teams in the tenant and exports the results in a CSV.",

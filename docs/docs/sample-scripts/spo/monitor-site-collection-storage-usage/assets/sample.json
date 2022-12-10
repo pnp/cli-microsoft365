@@ -3,7 +3,7 @@
     "name": "pnp-monitor-site-collection-storage-usage",
     "source": "pnp",
     "title": "Monitor Site Collections Storage Usage",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/monitor-site-collection-storage-usage",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/monitor-site-collection-storage-usage",
     "creationDateTime": "2021-05-04",
     "updateDateTime": "2021-05-04",
     "shortDescription": "This script allows you to monitor Site Collections Storage Usage.",

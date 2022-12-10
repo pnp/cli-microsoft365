@@ -3,7 +3,7 @@
     "name": "pnp-remove-custom-themes",
     "source": "pnp",
     "title": "Delete custom color themes from SharePoint",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/remove-custom-themes",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/remove-custom-themes",
     "creationDateTime": "2019-10-13",
     "updateDateTime": "2019-10-13",
     "shortDescription": "This script removes custom color themes from SharePoint.",

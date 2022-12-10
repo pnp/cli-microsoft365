@@ -3,7 +3,7 @@
     "name": "pnp-manage-group-users",
     "source": "pnp",
     "title": "Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/aad/manage-group-users",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/manage-group-users",
     "creationDateTime": "2020-05-09",
     "updateDateTime": "2020-05-09",
     "shortDescription": "Sample script to add/remove bulk users to/from Microsoft Teams team or Microsoft 365 groupl.",

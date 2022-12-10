@@ -3,7 +3,7 @@
     "name": "pnp-export-configs-tenant-wide-extensions",
     "source": "pnp",
     "title": "Export Configurations of Tenant Wide Extensions",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/export-configs-tenant-wide-extensions",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/export-configs-tenant-wide-extensions",
     "creationDateTime": "2020-08-21",
     "updateDateTime": "2020-08-21",
     "shortDescription": "This script retrieves Tenant Wide Extension configurations from the App Catalog and exports the same to CSV file.",

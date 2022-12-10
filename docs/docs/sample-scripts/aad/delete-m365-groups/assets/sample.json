@@ -3,7 +3,7 @@
     "name": "pnp-delete-m365-groups",
     "source": "pnp",
     "title": "Delete all Microsoft 365 groups",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/aad/delete-m365-groups",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/delete-m365-groups",
     "creationDateTime": "2020-03-15",
     "updateDateTime": "2020-03-15",
     "shortDescription": "this script deletes the AAD groups you no longer need.",

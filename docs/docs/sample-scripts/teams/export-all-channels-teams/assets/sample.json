@@ -3,7 +3,7 @@
     "name": "pnp-export-all-channels-teams",
     "source": "pnp",
     "title": "Export all channels in Microsoft Teams teams in the tenant",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/teams/export-all-channels-teams",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/export-all-channels-teams",
     "creationDateTime": "2021-11-02",
     "updateDateTime": "2021-11-02",
     "shortDescription": "Export all the channels from Microsoft Team in a CSV.",

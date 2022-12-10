@@ -3,7 +3,7 @@
     "name": "pnp-perform-operations-not-covered-by-cli-for-microsoft-365",
     "source": "pnp",
     "title": "How to perform operations if a command is not covered by the CLI for Microsoft 365",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/perform-operations-not-covered-by-cli-for-microsoft-365",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/perform-operations-not-covered-by-cli-for-microsoft-365",
     "creationDateTime": "2021-10-24",
     "updateDateTime": "2021-10-24",
     "shortDescription": "This script shows how to perform operations if a command is not covered by the CLI for Microsoft 365.",

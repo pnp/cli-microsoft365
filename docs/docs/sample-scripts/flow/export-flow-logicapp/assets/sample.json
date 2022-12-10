@@ -3,7 +3,7 @@
     "name": "pnp-export-flow-logicapp",
     "source": "pnp",
     "title": "Export a single flow to a Logic App",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/flow/export-flow-logicapp",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/export-flow-logicapp",
     "creationDateTime": "2021-02-07",
     "updateDateTime": "2021-02-07",
     "shortDescription": "This script will export the Power Automate flow.",

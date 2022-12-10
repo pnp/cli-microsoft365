@@ -3,7 +3,7 @@
     "name": "pnp-add-multiple-folders-in-libraries-using-csv-file",
     "source": "pnp",
     "title": "Add multiple folders in libraries using a csv file",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/add-multiple-folders-in-libraries-using-csv-file",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/add-multiple-folders-in-libraries-using-csv-file",
     "creationDateTime": "2021-05-10",
     "updateDateTime": "2021-05-10",
     "shortDescription": "Adds multiple folders in libraries using a csv file.",

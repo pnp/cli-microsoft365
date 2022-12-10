@@ -3,7 +3,7 @@
     "name": "pnp-list-all-application-customizers",
     "source": "pnp",
     "title": "List all application customizers in a tenant",
-    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/spo/list-all-application-customizers",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-application-customizers",
     "creationDateTime": "2021-06-17",
     "updateDateTime": "2021-06-17",
     "shortDescription": "List all the application customizers in a tenant.",
