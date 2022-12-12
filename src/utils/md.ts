@@ -75,6 +75,16 @@ function removeTooManyEmptyLines(md: string): string {
   return md.replace(regex, Array(4).join(EOL));
 }
 
+function escapeMd(mdString: string | undefined): string | undefined {
+  if (!mdString) {
+    return mdString;
+  }
+
+  return mdString.toString()
+    .replace(/([_*~`|])/g, '\\$1')
+    .replace(/\n/g, '<br>');
+}
+
 const convertFunctions = [
   convertTitle,
   convertHeadings,
@@ -95,5 +105,6 @@ export const md = {
     });
 
     return md;
-  }
+  },
+  escapeMd
 };

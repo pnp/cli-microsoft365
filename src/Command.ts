@@ -11,6 +11,7 @@ import GlobalOptions from './GlobalOptions';
 import request from './request';
 import { settingsNames } from './settingsNames';
 import { accessToken } from './utils/accessToken';
+import { md } from './utils/md';
 import { GraphResponseError } from './utils/odata';
 
 export interface CommandOption {
@@ -64,7 +65,7 @@ export default abstract class Command {
   protected telemetryProperties: any = {};
 
   protected get allowedOutputs(): string[] {
-    return ['csv', 'json', 'text'];
+    return ['csv', 'json', 'md', 'text'];
   }
 
   public options: CommandOption[] = [];
@@ -307,8 +308,7 @@ export default abstract class Command {
     return commandName;
   }
 
-  protected handleRejectedODataPromise(rawResponse: any): void {
-    const res: any = JSON.parse(JSON.stringify(rawResponse));
+  protected handleRejectedODataPromise(res: any): void {
     if (res.error) {
       try {
         const err: ODataError = JSON.parse(res.error);
@@ -338,11 +338,11 @@ export default abstract class Command {
       }
     }
     else {
-      if (rawResponse instanceof Error) {
-        throw new CommandError(rawResponse.message);
+      if (res instanceof Error) {
+        throw new CommandError(res.message);
       }
       else {
-        throw new CommandError(rawResponse);
+        throw new CommandError(res);
       }
     }
   }
@@ -527,5 +527,117 @@ export default abstract class Command {
   private getTelemetryProperties(args: any): any {
     this.telemetry.forEach(t => t(args));
     return this.telemetryProperties;
+  }
+
+  public getTextOutput(logStatement: any[]): string {
+    // display object as a list of key-value pairs
+    if (logStatement.length === 1) {
+      const obj: any = logStatement[0];
+      const propertyNames: string[] = [];
+      Object.getOwnPropertyNames(obj).forEach(p => {
+        propertyNames.push(p);
+      });
+
+      let longestPropertyLength: number = 0;
+      propertyNames.forEach(p => {
+        if (p.length > longestPropertyLength) {
+          longestPropertyLength = p.length;
+        }
+      });
+
+      const output: string[] = [];
+      propertyNames.sort().forEach(p => {
+        output.push(`${p.length < longestPropertyLength ? p + new Array(longestPropertyLength - p.length + 1).join(' ') : p}: ${Array.isArray(obj[p]) || typeof obj[p] === 'object' ? JSON.stringify(obj[p]) : obj[p]}`);
+      });
+
+      return output.join('\n') + '\n';
+    }
+    // display object as a table where each property is a column
+    else {
+      const Table = require('easy-table');
+      const t = new Table();
+      logStatement.forEach((r: any) => {
+        if (typeof r !== 'object') {
+          return;
+        }
+
+        Object.getOwnPropertyNames(r).forEach(p => {
+          t.cell(p, r[p]);
+        });
+        t.newRow();
+      });
+
+      return t.toString();
+    }
+  }
+
+  public getJsonOutput(logStatement: any): string {
+    return JSON
+      .stringify(logStatement, null, 2)
+      // replace unescaped newlines with escaped newlines #2807
+      .replace(/([^\\])\\n/g, '$1\\\\\\n');
+  }
+
+  public getCsvOutput(logStatement: any[]): string {
+    const { stringify } = require('csv-stringify/sync');
+    const cli = Cli.getInstance();
+
+    // https://csv.js.org/stringify/options/
+    return stringify(logStatement, {
+      header: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvHeader, true),
+      escape: cli.getSettingWithDefaultValue(settingsNames.csvEscape, '"'),
+      quote: cli.config.get(settingsNames.csvQuote),
+      quoted: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuoted, false),
+      quotedEmpty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false)
+    });
+  }
+
+  public getMdOutput(logStatement: any[], command: Command, options: GlobalOptions): string {
+    const output: string[] = [
+      `# ${command.getCommandName()} ${Object.keys(options).filter(o => o !== 'output').map(k => `--${k} "${options[k]}"`).join(' ')}`, os.EOL,
+      os.EOL,
+      `Date: ${(new Date().toLocaleDateString())}`, os.EOL,
+      os.EOL
+    ];
+
+    if (logStatement && logStatement.length > 0) {
+      logStatement.forEach(l => {
+        if (!l) {
+          return;
+        }
+
+        output.push(
+          `## ${this.getLogItemTitle(l)} (${this.getLogItemId(l)})`, os.EOL,
+          os.EOL,
+          `Property | Value`, os.EOL,
+          `---------|-------`, os.EOL
+        );
+        output.push(Object.keys(l).map(k => {
+          const value = l[k];
+          let stringValue = value;
+          if (typeof value === 'object') {
+            stringValue = JSON.stringify(value);
+          }
+
+          return `${md.escapeMd(k)} | ${md.escapeMd(stringValue)}`;
+        }).join(os.EOL), os.EOL);
+        output.push(os.EOL);
+      });
+    }
+
+    return output.join('').trimEnd();
+  }
+
+  private getLogItemTitle(logItem: any): string | undefined {
+    return logItem.title ?? logItem.Title ??
+      logItem.displayName ?? logItem.DisplayName ??
+      logItem.name ?? logItem.Name;
+  }
+
+  private getLogItemId(logItem: any): string | undefined {
+    return logItem.id ?? logItem.Id ?? logItem.ID ??
+      logItem.uniqueId ?? logItem.UniqueId ??
+      logItem.objectId ?? logItem.ObjectId ??
+      logItem.url ?? logItem.Url ?? logItem.URL;
   }
 }

@@ -107,17 +107,6 @@ describe(commands.GROUP_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when invalid boolean is passed as option', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        id: validId,
-        autoAcceptRequestToJoinLeave: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation when invalid web URL is passed', async () => {
     const actual = await command.validate({
       options: {
@@ -133,7 +122,7 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         id: validId,
-        allowRequestToJoinLeave: 'true'
+        allowRequestToJoinLeave: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -152,7 +141,7 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         id: validId,
-        allowRequestToJoinLeave: 'true'
+        allowRequestToJoinLeave: true
       }
     });
   });
@@ -170,7 +159,7 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         name: validName,
-        allowRequestToJoinLeave: 'true'
+        allowRequestToJoinLeave: true
       }
     });
   });
@@ -254,7 +243,7 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         name: validName,
-        autoAcceptRequestToJoinLeave: 'true'
+        autoAcceptRequestToJoinLeave: true
       }
     }), new CommandError('An error has occurred'));
   });

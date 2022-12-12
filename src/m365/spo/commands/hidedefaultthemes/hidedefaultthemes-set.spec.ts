@@ -166,18 +166,13 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if hideDefaultThemes is not a valid boolean', async () => {
-    const actual = await command.validate({ options: { hideDefaultThemes: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation when hideDefaultThemes is true', async () => {
-    const actual = await command.validate({ options: { hideDefaultThemes: `true` } }, commandInfo);
+    const actual = await command.validate({ options: { hideDefaultThemes: true } }, commandInfo);
     assert(actual);
   });
 
   it('passes validation when hideDefaultThemes is false', async () => {
-    const actual = await command.validate({ options: { hideDefaultThemes: `false` } }, commandInfo);
+    const actual = await command.validate({ options: { hideDefaultThemes: false } }, commandInfo);
     assert(actual);
   });
 });

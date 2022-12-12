@@ -12,15 +12,15 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   teamId: string;
-  allowUserEditMessages?: string;
-  allowUserDeleteMessages?: string;
-  allowOwnerDeleteMessages?: string;
-  allowTeamMentions?: string;
-  allowChannelMentions?: string;
+  allowUserEditMessages?: boolean;
+  allowUserDeleteMessages?: boolean;
+  allowOwnerDeleteMessages?: boolean;
+  allowTeamMentions?: boolean;
+  allowChannelMentions?: boolean;
 }
 
 class TeamsMessagingSettingsSetCommand extends GraphCommand {
-  private static props: string[] = [
+  private static booleanProps: string[] = [
     'allowUserEditMessages',
     'allowUserDeleteMessages',
     'allowOwnerDeleteMessages',
@@ -41,13 +41,14 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
-      TeamsMessagingSettingsSetCommand.props.forEach((p: string) => {
-        this.telemetryProperties[p] = typeof (args.options as any)[p] !== 'undefined';
+      TeamsMessagingSettingsSetCommand.booleanProps.forEach((p: string) => {
+        this.telemetryProperties[p] = (args.options as any)[p];
       });
     });
   }
@@ -58,21 +59,30 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
         option: '-i, --teamId <teamId>'
       },
       {
-        option: '--allowUserEditMessages [allowUserEditMessages]'
+        option: '--allowUserEditMessages [allowUserEditMessages]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--allowUserDeleteMessages [allowUserDeleteMessages]'
+        option: '--allowUserDeleteMessages [allowUserDeleteMessages]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--allowOwnerDeleteMessages [allowOwnerDeleteMessages]'
+        option: '--allowOwnerDeleteMessages [allowOwnerDeleteMessages]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--allowTeamMentions [allowTeamMentions]'
+        option: '--allowTeamMentions [allowTeamMentions]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--allowChannelMentions [allowChannelMentions]'
+        option: '--allowChannelMentions [allowChannelMentions]',
+        autocomplete: ['true', 'false']
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('allowUserEditMessages', 'allowUserDeleteMessages', 'allowOwnerDeleteMessages', 'allowTeamMentions', 'allowChannelMentions');
   }
 
   #initValidators(): void {
@@ -84,7 +94,7 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
 
         let hasDuplicate: boolean = false;
         let property: string = '';
-        TeamsMessagingSettingsSetCommand.props.forEach((prop: string) => {
+        TeamsMessagingSettingsSetCommand.booleanProps.forEach((prop: string) => {
           if ((args.options as any)[prop] instanceof Array) {
             property = prop;
             hasDuplicate = true;
@@ -92,18 +102,6 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
         });
         if (hasDuplicate) {
           return `Duplicate option ${property} specified. Specify only one`;
-        }
-
-        let isValid: boolean = true;
-        let value: string = '';
-        TeamsMessagingSettingsSetCommand.props.every((p: string) => {
-          property = p;
-          value = (args.options as any)[p];
-          isValid = typeof value === 'undefined' || validation.isValidBoolean(value);
-          return isValid;
-        });
-        if (!isValid) {
-          return `Value ${value} for option ${property} is not a valid boolean`;
         }
 
         return true;
@@ -115,9 +113,9 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
     const data: any = {
       messagingSettings: {}
     };
-    TeamsMessagingSettingsSetCommand.props.forEach((p: string) => {
+    TeamsMessagingSettingsSetCommand.booleanProps.forEach((p: string) => {
       if (typeof (args.options as any)[p] !== 'undefined') {
-        data.messagingSettings[p] = (args.options as any)[p].toLowerCase() === 'true';
+        data.messagingSettings[p] = (args.options as any)[p];
       }
     });
 
