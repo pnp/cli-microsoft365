@@ -82,7 +82,7 @@ class TeamsAppInstallCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['teamId', 'userId', 'userName']);
+    this.optionSets.push({ options: ['teamId', 'userId', 'userName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

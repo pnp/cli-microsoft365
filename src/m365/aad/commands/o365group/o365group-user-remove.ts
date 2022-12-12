@@ -89,7 +89,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['groupId', 'teamId']);
+    this.optionSets.push({ options: ['groupId', 'teamId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

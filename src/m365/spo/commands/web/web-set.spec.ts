@@ -116,7 +116,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'false' } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: false } });
   });
 
   it('enables quick launch', async () => {
@@ -130,7 +130,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'true' } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: true } });
   });
 
   it('sets site header to compact', async () => {
@@ -228,7 +228,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'true' } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: true } });
   });
 
   it('sets site menu mode to cascading', async () => {
@@ -242,7 +242,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'false' } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: false } });
   });
 
   it('updates all properties', async () => {
@@ -254,7 +254,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: 'true', headerLayout: 'compact', headerEmphasis: 1, megaMenuEnabled: 'true', footerEnabled: 'true' } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: true, headerLayout: 'compact', headerEmphasis: 1, megaMenuEnabled: true, footerEnabled: true } });
   });
 
   it('Update Welcome page', async () => {
@@ -312,10 +312,13 @@ describe(commands.WEB_SET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      welcomePage: 'https://contoso.sharepoint.com/sites/team-a/SitePages/Home.aspx', 
-      url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('The WelcomePage property must be a path that is relative to the folder, and the path cannot contain two consecutive periods (..).'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        welcomePage: 'https://contoso.sharepoint.com/sites/team-a/SitePages/Home.aspx',
+        url: 'https://contoso.sharepoint.com/sites/team-a'
+      }
+    } as any), new CommandError('The WelcomePage property must be a path that is relative to the folder, and the path cannot contain two consecutive periods (..).'));
   });
 
   it('allows unknown properties', () => {
@@ -355,13 +358,8 @@ describe(commands.WEB_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if quickLaunchEnabled is not a valid boolean', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation when the url is a valid SharePoint URL and quickLaunch set to "true"', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -410,33 +408,23 @@ describe(commands.WEB_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if megaMenuEnabled is not a valid boolean', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if megaMenuEnabled is set to true', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if megaMenuEnabled is set to false', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'false' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if footerEnabled is not a valid boolean', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if footerEnabled is set to true', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if footerEnabled is set to false', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'false' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -451,7 +439,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'true' } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: true } });
   });
 
   it('disables footer', async () => {
@@ -465,7 +453,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'false' } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: false } });
   });
 
   it('fails validation if search scope is not valid', async () => {

@@ -23,3 +23,53 @@ Retrieve diagnostic information
 ```sh
 m365 cli doctor
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "os": {
+        "platform": "win32",
+        "version": "Windows 10 Pro",
+        "release": "10.0.19045"
+      },
+      "cliVersion": "6.1.0",
+      "nodeVersion": "v16.13.0",
+      "cliAadAppId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
+      "cliAadAppTenant": "common",
+      "authMode": "DeviceCode",
+      "cliEnvironment": "",
+      "cliConfig": {
+        "output": "json",
+        "showHelpOnFailure": false
+      },
+      "roles": [],
+      "scopes": [
+        "AllSites.FullControl"
+      ]
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    authMode       : DeviceCode
+    cliAadAppId    : 31359c7f-bd7e-475c-86db-fdb8c937548e
+    cliAadAppTenant: common
+    cliConfig      : {"output":"json","showHelpOnFailure":false}
+    cliEnvironment :
+    cliVersion     : 6.1.0
+    nodeVersion    : v16.13.0
+    os             : {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19045"}
+    roles          : []
+    scopes         : ["AllSites.FullControl"]
+    ```
+
+=== "CSV"
+
+    ```csv
+    os,cliVersion,nodeVersion,cliAadAppId,cliAadAppTenant,authMode,cliEnvironment,cliConfig,roles,scopes
+    "{""platform"":""win32"",""version"":""Windows 10 Pro"",""release"":""10.0.19045""}",6.1.0,v16.13.0,31359c7f-bd7e-475c-86db-fdb8c937548e,common,DeviceCode,,"{""output"":""json"",""showHelpOnFailure"":false}",[],"[""AllSites.FullControl""]"
+    ```

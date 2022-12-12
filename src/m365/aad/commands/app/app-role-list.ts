@@ -53,7 +53,7 @@ class AadAppRoleListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appObjectId', 'appName']);
+    this.optionSets.push({ options: ['appId', 'appObjectId', 'appName'] });
   }
 
   public defaultProperties(): string[] | undefined {

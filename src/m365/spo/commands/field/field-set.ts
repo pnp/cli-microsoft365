@@ -110,7 +110,7 @@ class SpoFieldSetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'title']);
+    this.optionSets.push({ options: ['id', 'title'] });
   }
 
   public allowUnknownOptions(): boolean | undefined {

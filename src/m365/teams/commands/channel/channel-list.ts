@@ -84,7 +84,7 @@ class TeamsChannelListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['teamId', 'teamName']);
+    this.optionSets.push({ options: ['teamId', 'teamName'] });
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {

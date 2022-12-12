@@ -173,29 +173,10 @@ describe(commands.SITE_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-
-  it('fails validation if allowSelfServiceUpgrade is invalid', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if lockState is invalid', async () => {
     const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if noScriptSite is invalid', async () => {
-    const actual = await command.validate({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'Invalid'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -211,11 +192,6 @@ describe(commands.SITE_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if invalid value specified for disableFlows', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if siteLogoUrl is not a string', async () => {
     const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -226,20 +202,10 @@ describe(commands.SITE_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if invalid value specified for shareByEmailEnabled', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if invalid value specified for isPublic', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if allowSelfServiceUpgrade is set to true', async () => {
     const actual = await command.validate({
       options: {
-        url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'true'
+        url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -248,7 +214,7 @@ describe(commands.SITE_SET, () => {
   it('passes validation if allowSelfServiceUpgrade is set to false', async () => {
     const actual = await command.validate({
       options: {
-        url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'false'
+        url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: false
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -293,7 +259,7 @@ describe(commands.SITE_SET, () => {
   it('passes validation if noScriptSite is set to true', async () => {
     const actual = await command.validate({
       options: {
-        url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'true'
+        url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -302,7 +268,7 @@ describe(commands.SITE_SET, () => {
   it('passes validation if noScriptSite is set to false', async () => {
     const actual = await command.validate({
       options: {
-        url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'false'
+        url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: false
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -314,8 +280,8 @@ describe(commands.SITE_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         resourceQuota: 100, resourceQuotaWarningLevel: 90,
         storageQuota: 100, storageQuotaWarningLevel: 90,
-        sharingCapability: 'Disabled', allowSelfServiceUpgrade: 'true',
-        owners: 'admin@contoso.com', lockState: 'Unlock', noScriptSite: 'true'
+        sharingCapability: 'Disabled', allowSelfServiceUpgrade: true,
+        owners: 'admin@contoso.com', lockState: 'Unlock', noScriptSite: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -332,37 +298,37 @@ describe(commands.SITE_SET, () => {
   });
 
   it('passes validation if url and disableFlows true specified', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if url and disableFlows false specified', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'false' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if url, id, classification and disableFlows specified', async () => {
-    const actual = await command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com', classification: 'HBI', disableFlows: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com', classification: 'HBI', disableFlows: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if true specified for isPublic', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if false specified for isPublic', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'false' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if true specified for shareByEmailEnabled', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if false specified for shareByEmailEnabled', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'false' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -695,7 +661,7 @@ describe(commands.SITE_SET, () => {
     await command.action(logger, { options: { debug: false, isPublic: true, description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any);
     const options = {
       id: 'e10a459e-60c8-4000-8240-a68d6a12d39e',
-      isPrivate: 'false',
+      isPrivate: false,
       debug: false,
       verbose: false,
       _: []
@@ -1032,7 +998,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', sharingCapability: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com', lockState: 'NoAccess', wait: true } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', sharingCapability: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: true, noScriptSite: true, owners: 'admin@contoso.com', lockState: 'NoAccess', wait: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1260,7 +1226,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'true' } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1298,7 +1264,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'true' } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1336,7 +1302,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'false' } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: false } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1512,7 +1478,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, classification: 'HBI', disableFlows: 'true', shareByEmailEnabled: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: false, classification: 'HBI', disableFlows: true, shareByEmailEnabled: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1801,7 +1767,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, disableFlows: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: false, disableFlows: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1829,7 +1795,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, disableFlows: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: false, disableFlows: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1857,7 +1823,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, disableFlows: 'false', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: false, disableFlows: false, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1885,7 +1851,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, shareByEmailEnabled: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: false, shareByEmailEnabled: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1913,7 +1879,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, shareByEmailEnabled: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: false, shareByEmailEnabled: true, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1941,7 +1907,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, shareByEmailEnabled: 'false', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: false, shareByEmailEnabled: false, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1969,7 +1935,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, shareByEmailEnabled: 'false', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { debug: false, shareByEmailEnabled: false, id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -2636,7 +2602,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title>', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com>', lockState: 'NoAccess', wait: true } });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title>', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: true, noScriptSite: true, owners: 'admin@contoso.com>', lockState: 'NoAccess', wait: true } });
     assert(loggerLogSpy.notCalled);
   });
 });

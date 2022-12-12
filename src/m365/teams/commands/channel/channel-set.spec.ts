@@ -123,8 +123,8 @@ describe(commands.CHANNEL_SET, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['id', 'name'],
-      ['teamId', 'teamName']
+      { options: ['id', 'name'] },
+      { options: ['teamId', 'teamName'] }
     ]);
   });
 

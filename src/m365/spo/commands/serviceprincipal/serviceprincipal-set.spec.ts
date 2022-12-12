@@ -23,7 +23,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -103,7 +103,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: true, enabled: 'true', confirm: true } });
+    await command.action(logger, { options: { debug: true, enabled: true, confirm: true } });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: true,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
@@ -134,7 +134,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, enabled: 'true', confirm: true } });
+    await command.action(logger, { options: { debug: false, enabled: true, confirm: true } });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: true,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
@@ -165,7 +165,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: true, enabled: 'false', confirm: true } });
+    await command.action(logger, { options: { debug: true, enabled: false, confirm: true } });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: false,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
@@ -190,7 +190,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   });
 
   it('prompts before enabling service principal when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, enabled: 'true' } });
+    await command.action(logger, { options: { debug: false, enabled: true } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -201,7 +201,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   });
 
   it('prompts before disabling service principal when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, enabled: 'false' } });
+    await command.action(logger, { options: { debug: false, enabled: false } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -217,7 +217,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, enabled: 'true' } });
+    await command.action(logger, { options: { debug: false, enabled: true } });
     assert(requestPostSpy.notCalled);
   });
 
@@ -238,7 +238,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, enabled: 'true' } });
+    await command.action(logger, { options: { debug: false, enabled: true } });
     assert(loggerLogSpy.calledWith({
       AccountEnabled: true,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
@@ -250,7 +250,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'true', confirm: 'true' } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: true, confirm: true } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -281,18 +281,13 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the enabled option is not a valid boolean value', async () => {
-    const actual = await command.validate({ options: { enabled: '123' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation when the enabled option is true', async () => {
-    const actual = await command.validate({ options: { enabled: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { enabled: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when the enabled option is false', async () => {
-    const actual = await command.validate({ options: { enabled: 'false' } }, commandInfo);
+    const actual = await command.validate({ options: { enabled: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -1,3 +1,5 @@
+import { RoleAssignment } from "../roledefinition/RoleDefinition";
+
 export interface WebProperties {
   AllowRssFeeds: boolean;
   AlternateCssUrl: string;
@@ -34,6 +36,7 @@ export interface WebProperties {
   UIVersionConfigurationEnabled: boolean;
   Url: string;
   WebTemplate: string;
+  RoleAssignments?: RoleAssignment[];
 }
 
 export interface CurrentChangeToken {
