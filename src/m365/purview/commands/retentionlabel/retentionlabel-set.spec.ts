@@ -1,0 +1,116 @@
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
+import auth from '../../../../Auth';
+import { Cli } from '../../../../cli/Cli';
+import { CommandInfo } from '../../../../cli/CommandInfo';
+import { Logger } from '../../../../cli/Logger';
+import Command, { CommandError } from '../../../../Command';
+import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
+import { sinonUtil } from '../../../../utils/sinonUtil';
+import commands from '../../commands';
+const command: Command = require('./retentionlabel-set');
+
+describe(commands.RETENTIONLABEL_SET, () => {
+  const validId = 'e554d69c-0992-4f9b-8a66-fca3c4d9c531';
+
+  let log: string[];
+  let logger: Logger;
+  let commandInfo: CommandInfo;
+
+  before(() => {
+    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
+  });
+
+  beforeEach(() => {
+    log = [];
+    logger = {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
+      }
+    };
+  });
+
+  afterEach(() => {
+    sinonUtil.restore([
+      request.patch
+    ]);
+  });
+
+  after(() => {
+    sinonUtil.restore([
+      auth.restoreAuth,
+      appInsights.trackEvent,
+      pid.getProcessName
+    ]);
+    auth.service.connected = false;
+  });
+
+  it('has correct name', () => {
+    assert.strictEqual(command.name.startsWith(commands.RETENTIONLABEL_SET), true);
+  });
+
+  it('has a description', () => {
+    assert.notStrictEqual(command.description, null);
+  });
+
+  it('fails validation if id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation with valid id but no other option specified', async () => {
+    const actual = await command.validate({ options: { id: validId } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation with valid id and a single option specified', async () => {
+    const actual = await command.validate({ options: { id: validId, retentionDuration: 180 } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation with valid id and multipe options specified', async () => {
+    const actual = await command.validate({ options: { id: validId, retentionDuration: 180, actionAfterRetentionPeriod: 'none' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('correctly sets field retentionDays and actionAfterRetentionPeriod of a specific retention label by id', async () => {
+    let data: any;
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${validId}`) {
+        data = opts.data;
+        return;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await command.action(logger, { options: { id: validId, retentionDuration: 180, actionAfterRetentionPeriod: 'none', verbose: true } });
+    assert.strictEqual(data['retentionDuration']['@odata.type'], 'microsoft.graph.security.retentionDurationInDays');
+    assert.strictEqual(data['retentionDuration']['days'], 180);
+    assert.strictEqual(data['actionAfterRetentionPeriod'], 'none');
+  });
+
+  it('fails to set field retentionDays of a specific retention label by id', async () => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${validId}`) {
+        throw 'Error occured when updating the retention label';
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { id: validId, retentionDays: 180, actionAfterRetentionPeriod: 'none' } }), new CommandError('Error occured when updating the retention label'));
+  });
+});
