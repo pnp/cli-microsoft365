@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
@@ -27,7 +27,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     (command as any).archive = admZipMock;
     commandInfo = Cli.getCommandInfo(command);
@@ -61,7 +61,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   after(() => {
     (command as any).archive = undefined;
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
