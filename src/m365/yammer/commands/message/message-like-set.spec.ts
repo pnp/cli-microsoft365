@@ -105,7 +105,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('prompts when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, messageId: 1231231, enable: false } });
+    await command.action(logger, { options: { messageId: 1231231, enable: false } });
 
     let promptIssued = false;
 

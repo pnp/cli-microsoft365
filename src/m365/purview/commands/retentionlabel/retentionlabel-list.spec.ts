@@ -117,7 +117,7 @@ describe(commands.RETENTIONLABEL_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith(mockResponseArray));
   });
 
@@ -130,6 +130,6 @@ describe(commands.RETENTIONLABEL_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError('An error has occurred'));
   });
 });

@@ -217,7 +217,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, all: true } });
+    await command.action(logger, { options: { all: true } });
     assert(loggerLogSpy.calledWith([{
       ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       ConsentType: "AllPrincipals",
@@ -308,7 +308,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, resource: "Microsoft Graph" } });
+    await command.action(logger, { options: { resource: "Microsoft Graph" } });
     assert(loggerLogSpy.calledWith([{
       ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       ConsentType: "AllPrincipals",

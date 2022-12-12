@@ -250,7 +250,7 @@ describe(commands.CHATBOT_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment, name: validName } } as any),
+    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, name: validName } } as any),
       new CommandError(`bot With Id = ${validId} Does Not Exist`));
   });
 });

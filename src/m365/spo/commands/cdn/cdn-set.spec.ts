@@ -87,7 +87,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables public CDN when Public type specified and enabled set to true', async () => {
-    await command.action(logger, { options: { enabled: 'true', type: 'Public' } });
+    await command.action(logger, { options: { enabled: true, type: 'Public' } });
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -129,7 +129,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables public CDN when no type specified and enabled set to true', async () => {
-    await assert.rejects(command.action(logger, { options: { enabled: true } }));
+    await assert.doesNotReject(command.action(logger, { options: { enabled: true } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -440,6 +440,17 @@ describe(commands.CDN_SET, () => {
 
     await assert.rejects(command.action(logger, { options: { enabled: true } } as any),
       new CommandError('An error has occurred'));
+  });
+
+  it('supports debug mode', () => {
+    const options = command.options;
+    let containsdebugOption = false;
+    options.forEach(o => {
+      if (o.option === '--debug') {
+        containsdebugOption = true;
+      }
+    });
+    assert(containsdebugOption);
   });
 
   it('requires tenant enabled state', () => {
