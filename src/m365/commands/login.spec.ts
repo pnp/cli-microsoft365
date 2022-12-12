@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import Axios from 'axios';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import appInsights from '../../appInsights';
+import { telemetry } from '../../telemetry';
 import auth, { AuthType } from '../../Auth';
 import { Cli } from '../../cli/Cli';
 import { CommandInfo } from '../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -58,7 +58,7 @@ describe(commands.LOGIN, () => {
       auth.clearConnectionInfo,
       auth.storeConnectionInfo,
       Axios.post,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });

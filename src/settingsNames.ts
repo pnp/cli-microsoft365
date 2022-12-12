@@ -6,6 +6,7 @@ const settingsNames = {
   csvQuote: 'csvQuote',
   csvQuoted: 'csvQuoted',
   csvQuotedEmpty: 'csvQuotedEmpty',
+  disableTelemetry: 'disableTelemetry',
   errorOutput: 'errorOutput',
   helpMode: 'helpMode',
   output: 'output',

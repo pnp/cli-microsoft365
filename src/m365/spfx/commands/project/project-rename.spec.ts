@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import { pid } from '../../../../utils/pid';
@@ -15,13 +15,13 @@ describe(commands.PROJECT_RENAME, () => {
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let trackEvent: any;
-  let telemetry: any;
+  let telemetryCommandName: any;
   let writeFileSyncSpy: sinon.SinonStub;
   const projectPath: string = 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react';
 
   before(() => {
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
+    trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
+      telemetryCommandName = commandName;
     });
   });
 
@@ -38,7 +38,7 @@ describe(commands.PROJECT_RENAME, () => {
         log.push(msg);
       }
     };
-    telemetry = null;
+    telemetryCommandName = null;
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     writeFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
   });
@@ -56,7 +56,7 @@ describe(commands.PROJECT_RENAME, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
@@ -80,7 +80,7 @@ describe(commands.PROJECT_RENAME, () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
     await command.action(logger, { options: { newName: 'spfx-react' } });
-    assert.strictEqual(telemetry.name, commands.PROJECT_RENAME);
+    assert.strictEqual(telemetryCommandName, commands.PROJECT_RENAME);
   });
 
   it('shows error if the project path couldn\'t be determined', async () => {

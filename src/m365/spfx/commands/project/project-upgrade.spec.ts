@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
@@ -21,7 +21,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let trackEvent: any;
-  let telemetry: any;
+  let telemetryCommandName: any;
   let packagesDevExact: string[];
   let packagesDepExact: string[];
   let packagesDepUn: string[];
@@ -30,8 +30,8 @@ describe(commands.PROJECT_UPGRADE, () => {
   const projectPath: string = './src/m365/spfx/commands/project/test-projects/spfx-141-webpart-nolib';
 
   before(() => {
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
+    trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
+      telemetryCommandName = commandName;
     });
     project141webPartNoLib = (command as any).getProject(projectPath);
     commandInfo = Cli.getCommandInfo(command);
@@ -50,7 +50,7 @@ describe(commands.PROJECT_UPGRADE, () => {
         log.push(msg);
       }
     };
-    telemetry = null;
+    telemetryCommandName = null;
     (command as any).allFindings = [];
     (command as any).packageManager = 'npm';
     (command as any).shell = 'bash';
@@ -75,7 +75,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
@@ -95,7 +95,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('logs correct telemetry event', async () => {
     await assert.rejects(command.action(logger, { options: {} }));
-    assert.strictEqual(telemetry.name, commands.PROJECT_UPGRADE);
+    assert.strictEqual(telemetryCommandName, commands.PROJECT_UPGRADE);
   });
 
   it('shows error if the project path couldn\'t be determined', async () => {

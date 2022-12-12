@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import { PassThrough } from 'stream';
-import appInsights from '../../appInsights';
+import { telemetry } from '../../telemetry';
 import auth from '../../Auth';
 import { Cli } from '../../cli/Cli';
 import { CommandInfo } from '../../cli/CommandInfo';
@@ -28,7 +28,7 @@ describe(commands.REQUEST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
@@ -63,7 +63,7 @@ describe(commands.REQUEST, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       auth.ensureAccessToken,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.accessTokens = {};

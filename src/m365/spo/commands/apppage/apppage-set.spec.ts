@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import * as sinon from "sinon";
-import appInsights from "../../../../appInsights";
+import { telemetry } from "../../../../telemetry";
 import auth from "../../../../Auth";
 import { Cli } from "../../../../cli/Cli";
 import { CommandInfo } from "../../../../cli/CommandInfo";
@@ -18,7 +18,7 @@ describe(commands.APPPAGE_SET, () => {
 
   before(() => {
     sinon.stub(auth, "restoreAuth").callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, "trackEvent").callsFake(() => { });
+    sinon.stub(telemetry, "trackEvent").callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -43,7 +43,7 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([appInsights.trackEvent, auth.restoreAuth]);
+    sinonUtil.restore([telemetry.trackEvent, auth.restoreAuth]);
     auth.service.connected = false;
   });
 

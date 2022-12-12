@@ -3,8 +3,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type * as UpdateNotifier from 'update-notifier';
-import appInsights from './appInsights';
 import { Cli } from './cli/Cli';
+import { telemetry } from './telemetry';
 
 const packageJSON = require('../package.json');
 
@@ -27,10 +27,7 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string)
     cli.execute(path.join(resolvedPath, 'm365'), process.argv.slice(2));
   }
   catch (e: any) {
-    appInsights.trackException({
-      exception: e
-    });
-    appInsights.flush();
+    telemetry.trackException(e);
     process.exit(1);
   }
 });

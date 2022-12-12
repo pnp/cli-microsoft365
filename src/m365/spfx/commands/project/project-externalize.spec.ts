@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { AxiosRequestConfig } from 'axios';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
@@ -19,13 +19,13 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   let log: any[];
   let logger: Logger;
   let trackEvent: any;
-  let telemetry: any;
+  let telemetryCommandName: any;
   const logEntryToCheck = 1; //necessary as long as we display the beta message
   const projectPath: string = './src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react';
 
   before(() => {
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
+    trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
+      telemetryCommandName = commandName;
     });
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
   });
@@ -43,7 +43,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
         log.push(msg);
       }
     };
-    telemetry = null;
+    telemetryCommandName = null;
     (command as any).allFindings = [];
   });
 
@@ -61,7 +61,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
@@ -81,7 +81,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('logs correct telemetry event', async () => {
     await assert.rejects(command.action(logger, { options: {} }));
-    assert.strictEqual(telemetry.name, commands.PROJECT_EXTERNALIZE);
+    assert.strictEqual(telemetryCommandName, commands.PROJECT_EXTERNALIZE);
   });
 
   it('shows error if the project path couldn\'t be determined', async () => {

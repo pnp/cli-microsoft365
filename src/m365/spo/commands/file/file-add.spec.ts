@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -181,7 +181,7 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
     ensureFolderStub = sinon.stub(spo, 'ensureFolder').resolves();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(Buffer, 'alloc').returns(Buffer.from('abc'));
     auth.service.connected = true;
@@ -227,7 +227,7 @@ describe(commands.FILE_ADD, () => {
       fs.readFileSync,
       fs.existsSync,
       spo.ensureFolder,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       Buffer.alloc
     ]);
