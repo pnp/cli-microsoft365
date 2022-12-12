@@ -402,17 +402,6 @@ describe(commands.MAIL_SEND, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('sends email using a specified group mailbox', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({

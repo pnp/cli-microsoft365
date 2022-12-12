@@ -442,17 +442,6 @@ describe(commands.CDN_SET, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
-  });
-
   it('requires tenant enabled state', () => {
     const options = command.options;
     let requiresOption = false;
