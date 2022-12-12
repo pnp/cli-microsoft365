@@ -159,4 +159,18 @@ describe(commands.REMOVE, () => {
     command.action(logger, { options: { debug: true, confirm: true } });
   });
 
+  it(`doesn't remove context info from the .m365rc.json file when there was no context`, async () => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+      apps: [{
+        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+        name: 'My AAD app'
+      }]
+    }));
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'unlinkSync');
+
+    await command.action(logger, { options: { debug: true, confirm: true } });
+    assert(fsWriteFileSyncSpy.notCalled);
+  });
+
 });

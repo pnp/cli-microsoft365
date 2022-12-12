@@ -64,7 +64,7 @@ class ContextRemoveCommand extends AnonymousCommand {
     );
   }
 
-  public removeContext(logger: Logger): void {
+  private removeContext(logger: Logger): void {
     const filePath: string = '.m365rc.json';
 
     let m365rc: M365RcJson = {};
@@ -81,24 +81,26 @@ class ContextRemoveCommand extends AnonymousCommand {
       }
     }
 
-    if (m365rc.context) {
-      const keys = Object.keys(m365rc);
-      if (keys.length === 1 && keys.indexOf('context') > -1) {
-        try {
-          fs.unlinkSync(filePath);
-        }
-        catch (e) {
-          logger.logToStderr(`Error removing ${filePath}: ${e}. Please remove ${filePath} manually.`);
-        }
+    if (!m365rc.context) {
+      return;
+    }
+
+    const keys = Object.keys(m365rc);
+    if (keys.length === 1 && keys.indexOf('context') > -1) {
+      try {
+        fs.unlinkSync(filePath);
       }
-      else {
-        try {
-          delete m365rc.context;
-          fs.writeFileSync(filePath, JSON.stringify(m365rc, null, 2));
-        }
-        catch (e) {
-          logger.logToStderr(`Error writing ${filePath}: ${e}. Please remove context info from ${filePath} manually.`);
-        }
+      catch (e) {
+        logger.logToStderr(`Error removing ${filePath}: ${e}. Please remove ${filePath} manually.`);
+      }
+    }
+    else {
+      try {
+        delete m365rc.context;
+        fs.writeFileSync(filePath, JSON.stringify(m365rc, null, 2));
+      }
+      catch (e) {
+        logger.logToStderr(`Error writing ${filePath}: ${e}. Please remove context info from ${filePath} manually.`);
       }
     }
   }
