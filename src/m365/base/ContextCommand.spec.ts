@@ -1,12 +1,12 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../appInsights';
 import { Logger } from '../../cli/Logger';
 import { CommandError } from '../../Command';
 import ContextCommand from './ContextCommand';
 import { sinonUtil } from '../../utils/sinonUtil';
 import * as fs from 'fs';
 import { Hash } from '../../utils/types';
+import { telemetry } from '../../telemetry';
 
 class MockCommand extends ContextCommand {
   public get name(): string {
@@ -37,7 +37,7 @@ describe('ContextCommand', () => {
 
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
   });
 
   beforeEach(() => {
@@ -59,7 +59,7 @@ describe('ContextCommand', () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync
