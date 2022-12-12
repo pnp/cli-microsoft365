@@ -3,10 +3,10 @@ import * as sinon from 'sinon';
 import commands from '../commands';
 import { Logger } from '../../../cli/Logger';
 import { sinonUtil } from '../../../utils/sinonUtil';
-import appInsights from '../../../appInsights';
 import Command from '../../../Command';
 import * as fs from 'fs';
 import { Cli } from '../../../cli/Cli';
+import { telemetry } from '../../../telemetry';
 const command: Command = require('./context-remove');
 
 describe(commands.REMOVE, () => {
@@ -15,7 +15,7 @@ describe(commands.REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
   });
 
   beforeEach(() => {
@@ -40,7 +40,7 @@ describe(commands.REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync,
@@ -51,7 +51,7 @@ describe(commands.REMOVE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent
+      telemetry.trackEvent
     ]);
   });
 
