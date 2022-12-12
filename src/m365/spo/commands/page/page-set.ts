@@ -185,32 +185,22 @@ class SpoPageSetCommand extends SpoCommand {
       }
 
       if (args.options.layoutType) {
-        const requestOptions: AxiosRequestConfig = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'content-type': 'application/json;odata=nometadata',
-            'X-HTTP-Method': 'MERGE',
-            'IF-MATCH': '*',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: {
-            PageLayoutType: args.options.layoutType
-          },
-          responseType: 'json'
+        const itemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl);
+        const listItemSetOptions: spoListItemSetOptions = {
+          webUrl: args.options.webUrl,
+          listUrl: listServerRelativeUrl,
+          id: itemId,
+          systemUpdate: true,
+          PageLayoutType: args.options.layoutType,
+          verbose: this.verbose,
+          debug: this.debug
         };
-
         if (args.options.layoutType === 'Article') {
-          requestOptions.data.PromotedState = 0;
-          requestOptions.data.BannerImageUrl = {
-            Description: '/_layouts/15/images/sitepagethumbnail.png',
-            Url: `${resource}/_layouts/15/images/sitepagethumbnail.png`
-          };
+          listItemSetOptions.PromotedState = 0;
+          listItemSetOptions.BannerImageUrl = `${resource}/_layouts/15/images/sitepagethumbnail.png, /_layouts/15/images/sitepagethumbnail.png`;
         }
-
-        await request.post(requestOptions);
+        await Cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
       }
-
       if (args.options.promoteAs) {
         const requestOptions: AxiosRequestConfig = {
           responseType: 'json'
@@ -241,19 +231,19 @@ class SpoPageSetCommand extends SpoCommand {
               PromotedState: 2,
               FirstPublishedDate: new Date().toISOString(),
               verbose: this.verbose,
-              debug: true
+              debug: this.debug
             };
             await Cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
             break;
           case 'Template':
-            const templateItemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl)
+            const templateItemId = await this.getFileListItemId(args.options.webUrl, serverRelativeFileUrl);
             requestOptions.headers = {
               'X-RequestDigest': requestDigest,
               'content-type': 'application/json;odata=nometadata',
               'X-HTTP-Method': 'POST',
               'IF-MATCH': '*',
               accept: 'application/json;odata=nometadata'
-            }
+            };
             requestOptions.url = `${args.options.webUrl}/_api/SitePages/Pages(${templateItemId})/SavePageAsTemplate`;
             const res = await request.post<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }>(requestOptions);
             if (fileNameWithoutExtension) {

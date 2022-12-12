@@ -11,6 +11,8 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
+import * as spoFileGetCommand from '../file/file-get';
+import * as spoListItemSetCommand from '../listitem/listitem-set';
 const command: Command = require('./page-add');
 
 describe(commands.PAGE_ADD, () => {
@@ -50,7 +52,9 @@ describe(commands.PAGE_ADD, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      Cli.executeCommand,
+      Cli.executeCommandWithOutput
     ]);
   });
 
@@ -73,13 +77,13 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('creates new modern page', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -101,7 +105,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -116,14 +120,27 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
+      if (command === spoListItemSetCommand) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoFileGetCommand) {
+        return { 'stdout': '{\"FileSystemObjectType\":0,\"Id\":6,\"ServerRedirectedEmbedUri\":null,\"ServerRedirectedEmbedUrl\":\"\",\"ContentTypeId\":\"0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD\",\"ComplianceAssetId\":null,\"WikiField\":null,\"Title\":\"zzzz\",\"CanvasContent1\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.0\\\" data-sp-controldata=\\\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\\\"><\/div><\/div>\",\"BannerImageUrl\":{\"Description\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\",\"Url\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\"},\"Description\":null,\"PromotedState\":0,\"FirstPublishedDate\":\"2022-11-11T15:48:15\",\"LayoutWebpartsContent\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.4\\\" data-sp-controldata=\\\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;Mathijs Verbeeck&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\\\"><\/div><\/div>\",\"OData__AuthorBylineId\":[9],\"_AuthorBylineStringId\":[\"9\"],\"OData__TopicHeader\":null,\"OData__SPSitePageFlags\":null,\"OData__SPCallToAction\":null,\"OData__OriginalSourceUrl\":null,\"OData__OriginalSourceSiteId\":null,\"OData__OriginalSourceWebId\":null,\"OData__OriginalSourceListId\":null,\"OData__OriginalSourceItemId\":null,\"ID\":6,\"Created\":\"2022-11-11T15:48:00\",\"AuthorId\":9,\"Modified\":\"2022-11-12T02:03:12\",\"EditorId\":9,\"OData__CopySource\":null,\"CheckoutUserId\":9,\"OData__UIVersionString\":\"2.19\",\"GUID\":\"9a94cb88-019b-4a66-abd6-be7f5337f659\"}' };
+      }
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }));
@@ -200,7 +217,18 @@ describe(commands.PAGE_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-
+    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
+      if (command === spoListItemSetCommand) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoFileGetCommand) {
+        return { 'stdout': '{\"FileSystemObjectType\":0,\"Id\":6,\"ServerRedirectedEmbedUri\":null,\"ServerRedirectedEmbedUrl\":\"\",\"ContentTypeId\":\"0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD\",\"ComplianceAssetId\":null,\"WikiField\":null,\"Title\":\"zzzz\",\"CanvasContent1\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.0\\\" data-sp-controldata=\\\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\\\"><\/div><\/div>\",\"BannerImageUrl\":{\"Description\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\",\"Url\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\"},\"Description\":null,\"PromotedState\":0,\"FirstPublishedDate\":\"2022-11-11T15:48:15\",\"LayoutWebpartsContent\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.4\\\" data-sp-controldata=\\\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;Mathijs Verbeeck&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\\\"><\/div><\/div>\",\"OData__AuthorBylineId\":[9],\"_AuthorBylineStringId\":[\"9\"],\"OData__TopicHeader\":null,\"OData__SPSitePageFlags\":null,\"OData__SPCallToAction\":null,\"OData__OriginalSourceUrl\":null,\"OData__OriginalSourceSiteId\":null,\"OData__OriginalSourceWebId\":null,\"OData__OriginalSourceListId\":null,\"OData__OriginalSourceItemId\":null,\"ID\":6,\"Created\":\"2022-11-11T15:48:00\",\"AuthorId\":9,\"Modified\":\"2022-11-12T02:03:12\",\"EditorId\":9,\"OData__CopySource\":null,\"CheckoutUserId\":9,\"OData__UIVersionString\":\"2.19\",\"GUID\":\"9a94cb88-019b-4a66-abd6-be7f5337f659\"}' };
+      }
+      throw 'Invalid request';
+    });
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
   });
 
@@ -274,7 +302,18 @@ describe(commands.PAGE_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-
+    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
+      if (command === spoListItemSetCommand) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoFileGetCommand) {
+        return { 'stdout': '{\"FileSystemObjectType\":0,\"Id\":6,\"ServerRedirectedEmbedUri\":null,\"ServerRedirectedEmbedUrl\":\"\",\"ContentTypeId\":\"0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD\",\"ComplianceAssetId\":null,\"WikiField\":null,\"Title\":\"zzzz\",\"CanvasContent1\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.0\\\" data-sp-controldata=\\\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\\\"><\/div><\/div>\",\"BannerImageUrl\":{\"Description\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\",\"Url\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\"},\"Description\":null,\"PromotedState\":0,\"FirstPublishedDate\":\"2022-11-11T15:48:15\",\"LayoutWebpartsContent\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.4\\\" data-sp-controldata=\\\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;Mathijs Verbeeck&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\\\"><\/div><\/div>\",\"OData__AuthorBylineId\":[9],\"_AuthorBylineStringId\":[\"9\"],\"OData__TopicHeader\":null,\"OData__SPSitePageFlags\":null,\"OData__SPCallToAction\":null,\"OData__OriginalSourceUrl\":null,\"OData__OriginalSourceSiteId\":null,\"OData__OriginalSourceWebId\":null,\"OData__OriginalSourceListId\":null,\"OData__OriginalSourceItemId\":null,\"ID\":6,\"Created\":\"2022-11-11T15:48:00\",\"AuthorId\":9,\"Modified\":\"2022-11-12T02:03:12\",\"EditorId\":9,\"OData__CopySource\":null,\"CheckoutUserId\":9,\"OData__UIVersionString\":\"2.19\",\"GUID\":\"9a94cb88-019b-4a66-abd6-be7f5337f659\"}' };
+      }
+      throw 'Invalid request';
+    });
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } });
   });
 
@@ -459,8 +498,19 @@ describe(commands.PAGE_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home' } });
+    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
+      if (command === spoListItemSetCommand) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoFileGetCommand) {
+        return { 'stdout': '{\"FileSystemObjectType\":0,\"Id\":6,\"ServerRedirectedEmbedUri\":null,\"ServerRedirectedEmbedUrl\":\"\",\"ContentTypeId\":\"0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD\",\"ComplianceAssetId\":null,\"WikiField\":null,\"Title\":\"zzzz\",\"CanvasContent1\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.0\\\" data-sp-controldata=\\\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\\\"><\/div><\/div>\",\"BannerImageUrl\":{\"Description\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\",\"Url\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\"},\"Description\":null,\"PromotedState\":0,\"FirstPublishedDate\":\"2022-11-11T15:48:15\",\"LayoutWebpartsContent\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.4\\\" data-sp-controldata=\\\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;Mathijs Verbeeck&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\\\"><\/div><\/div>\",\"OData__AuthorBylineId\":[9],\"_AuthorBylineStringId\":[\"9\"],\"OData__TopicHeader\":null,\"OData__SPSitePageFlags\":null,\"OData__SPCallToAction\":null,\"OData__OriginalSourceUrl\":null,\"OData__OriginalSourceSiteId\":null,\"OData__OriginalSourceWebId\":null,\"OData__OriginalSourceListId\":null,\"OData__OriginalSourceItemId\":null,\"ID\":6,\"Created\":\"2022-11-11T15:48:00\",\"AuthorId\":9,\"Modified\":\"2022-11-12T02:03:12\",\"EditorId\":9,\"OData__CopySource\":null,\"CheckoutUserId\":9,\"OData__UIVersionString\":\"2.19\",\"GUID\":\"9a94cb88-019b-4a66-abd6-be7f5337f659\"}' };
+      }
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -540,8 +590,19 @@ describe(commands.PAGE_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'NewsPage' } });
+    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
+      if (command === spoListItemSetCommand) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoFileGetCommand) {
+        return { 'stdout': '{\"FileSystemObjectType\":0,\"Id\":6,\"ServerRedirectedEmbedUri\":null,\"ServerRedirectedEmbedUrl\":\"\",\"ContentTypeId\":\"0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD\",\"ComplianceAssetId\":null,\"WikiField\":null,\"Title\":\"zzzz\",\"CanvasContent1\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.0\\\" data-sp-controldata=\\\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\\\"><\/div><\/div>\",\"BannerImageUrl\":{\"Description\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\",\"Url\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\"},\"Description\":null,\"PromotedState\":0,\"FirstPublishedDate\":\"2022-11-11T15:48:15\",\"LayoutWebpartsContent\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.4\\\" data-sp-controldata=\\\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;Mathijs Verbeeck&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\\\"><\/div><\/div>\",\"OData__AuthorBylineId\":[9],\"_AuthorBylineStringId\":[\"9\"],\"OData__TopicHeader\":null,\"OData__SPSitePageFlags\":null,\"OData__SPCallToAction\":null,\"OData__OriginalSourceUrl\":null,\"OData__OriginalSourceSiteId\":null,\"OData__OriginalSourceWebId\":null,\"OData__OriginalSourceListId\":null,\"OData__OriginalSourceItemId\":null,\"ID\":6,\"Created\":\"2022-11-11T15:48:00\",\"AuthorId\":9,\"Modified\":\"2022-11-12T02:03:12\",\"EditorId\":9,\"OData__CopySource\":null,\"CheckoutUserId\":9,\"OData__UIVersionString\":\"2.19\",\"GUID\":\"9a94cb88-019b-4a66-abd6-be7f5337f659\"}' };
+      }
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'NewsPage' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -560,7 +621,7 @@ describe(commands.PAGE_ADD, () => {
         });
       }
 
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsTemplate`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(6)/SavePageAsTemplate`) > -1) {
         return Promise.resolve({ Id: 1, BannerImageUrl: 'url', CanvasContent1: 'content1', LayoutWebpartsContent: 'content', UniqueId: 'a4eb92e3-4eae-427f-8f6d-4e2ed907c2c4' });
       }
 
@@ -628,8 +689,19 @@ describe(commands.PAGE_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'Template' } } as any);
+    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
+      if (command === spoListItemSetCommand) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoFileGetCommand) {
+        return { 'stdout': '{\"FileSystemObjectType\":0,\"Id\":6,\"ServerRedirectedEmbedUri\":null,\"ServerRedirectedEmbedUrl\":\"\",\"ContentTypeId\":\"0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD\",\"ComplianceAssetId\":null,\"WikiField\":null,\"Title\":\"zzzz\",\"CanvasContent1\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.0\\\" data-sp-controldata=\\\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\\\"><\/div><\/div>\",\"BannerImageUrl\":{\"Description\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\",\"Url\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\"},\"Description\":null,\"PromotedState\":0,\"FirstPublishedDate\":\"2022-11-11T15:48:15\",\"LayoutWebpartsContent\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.4\\\" data-sp-controldata=\\\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;Mathijs Verbeeck&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\\\"><\/div><\/div>\",\"OData__AuthorBylineId\":[9],\"_AuthorBylineStringId\":[\"9\"],\"OData__TopicHeader\":null,\"OData__SPSitePageFlags\":null,\"OData__SPCallToAction\":null,\"OData__OriginalSourceUrl\":null,\"OData__OriginalSourceSiteId\":null,\"OData__OriginalSourceWebId\":null,\"OData__OriginalSourceListId\":null,\"OData__OriginalSourceItemId\":null,\"ID\":6,\"Created\":\"2022-11-11T15:48:00\",\"AuthorId\":9,\"Modified\":\"2022-11-12T02:03:12\",\"EditorId\":9,\"OData__CopySource\":null,\"CheckoutUserId\":9,\"OData__UIVersionString\":\"2.19\",\"GUID\":\"9a94cb88-019b-4a66-abd6-be7f5337f659\"}' };
+      }
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'Template', layoutType: 'Article' } } as any);
     assert(loggerLogSpy.notCalled);
   });
 
@@ -703,7 +775,18 @@ describe(commands.PAGE_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-
+    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
+      if (command === spoListItemSetCommand) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoFileGetCommand) {
+        return { 'stdout': '{\"FileSystemObjectType\":0,\"Id\":6,\"ServerRedirectedEmbedUri\":null,\"ServerRedirectedEmbedUrl\":\"\",\"ContentTypeId\":\"0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD\",\"ComplianceAssetId\":null,\"WikiField\":null,\"Title\":\"zzzz\",\"CanvasContent1\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.0\\\" data-sp-controldata=\\\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\\\"><\/div><\/div>\",\"BannerImageUrl\":{\"Description\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\",\"Url\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\"},\"Description\":null,\"PromotedState\":0,\"FirstPublishedDate\":\"2022-11-11T15:48:15\",\"LayoutWebpartsContent\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.4\\\" data-sp-controldata=\\\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;Mathijs Verbeeck&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\\\"><\/div><\/div>\",\"OData__AuthorBylineId\":[9],\"_AuthorBylineStringId\":[\"9\"],\"OData__TopicHeader\":null,\"OData__SPSitePageFlags\":null,\"OData__SPCallToAction\":null,\"OData__OriginalSourceUrl\":null,\"OData__OriginalSourceSiteId\":null,\"OData__OriginalSourceWebId\":null,\"OData__OriginalSourceListId\":null,\"OData__OriginalSourceItemId\":null,\"ID\":6,\"Created\":\"2022-11-11T15:48:00\",\"AuthorId\":9,\"Modified\":\"2022-11-12T02:03:12\",\"EditorId\":9,\"OData__CopySource\":null,\"CheckoutUserId\":9,\"OData__UIVersionString\":\"2.19\",\"GUID\":\"9a94cb88-019b-4a66-abd6-be7f5337f659\"}' };
+      }
+      throw 'Invalid request';
+    });
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home', promoteAs: 'HomePage' } });
   });
 
@@ -842,8 +925,19 @@ describe(commands.PAGE_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: false } });
+    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
+      if (command === spoListItemSetCommand) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoFileGetCommand) {
+        return { 'stdout': '{\"FileSystemObjectType\":0,\"Id\":6,\"ServerRedirectedEmbedUri\":null,\"ServerRedirectedEmbedUrl\":\"\",\"ContentTypeId\":\"0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD\",\"ComplianceAssetId\":null,\"WikiField\":null,\"Title\":\"zzzz\",\"CanvasContent1\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.0\\\" data-sp-controldata=\\\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\\\"><\/div><\/div>\",\"BannerImageUrl\":{\"Description\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\",\"Url\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\"},\"Description\":null,\"PromotedState\":0,\"FirstPublishedDate\":\"2022-11-11T15:48:15\",\"LayoutWebpartsContent\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.4\\\" data-sp-controldata=\\\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;Mathijs Verbeeck&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\\\"><\/div><\/div>\",\"OData__AuthorBylineId\":[9],\"_AuthorBylineStringId\":[\"9\"],\"OData__TopicHeader\":null,\"OData__SPSitePageFlags\":null,\"OData__SPCallToAction\":null,\"OData__OriginalSourceUrl\":null,\"OData__OriginalSourceSiteId\":null,\"OData__OriginalSourceWebId\":null,\"OData__OriginalSourceListId\":null,\"OData__OriginalSourceItemId\":null,\"ID\":6,\"Created\":\"2022-11-11T15:48:00\",\"AuthorId\":9,\"Modified\":\"2022-11-12T02:03:12\",\"EditorId\":9,\"OData__CopySource\":null,\"CheckoutUserId\":9,\"OData__UIVersionString\":\"2.19\",\"GUID\":\"9a94cb88-019b-4a66-abd6-be7f5337f659\"}' };
+      }
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: false } });
     assert.deepStrictEqual(savedAsDraft, true);
   });
 
@@ -921,8 +1015,19 @@ describe(commands.PAGE_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-
-    await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true } });
+    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
+      if (command === spoListItemSetCommand) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoFileGetCommand) {
+        return { 'stdout': '{\"FileSystemObjectType\":0,\"Id\":6,\"ServerRedirectedEmbedUri\":null,\"ServerRedirectedEmbedUrl\":\"\",\"ContentTypeId\":\"0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD\",\"ComplianceAssetId\":null,\"WikiField\":null,\"Title\":\"zzzz\",\"CanvasContent1\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.0\\\" data-sp-controldata=\\\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\\\"><\/div><\/div>\",\"BannerImageUrl\":{\"Description\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\",\"Url\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\"},\"Description\":null,\"PromotedState\":0,\"FirstPublishedDate\":\"2022-11-11T15:48:15\",\"LayoutWebpartsContent\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.4\\\" data-sp-controldata=\\\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;Mathijs Verbeeck&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\\\"><\/div><\/div>\",\"OData__AuthorBylineId\":[9],\"_AuthorBylineStringId\":[\"9\"],\"OData__TopicHeader\":null,\"OData__SPSitePageFlags\":null,\"OData__SPCallToAction\":null,\"OData__OriginalSourceUrl\":null,\"OData__OriginalSourceSiteId\":null,\"OData__OriginalSourceWebId\":null,\"OData__OriginalSourceListId\":null,\"OData__OriginalSourceItemId\":null,\"ID\":6,\"Created\":\"2022-11-11T15:48:00\",\"AuthorId\":9,\"Modified\":\"2022-11-12T02:03:12\",\"EditorId\":9,\"OData__CopySource\":null,\"CheckoutUserId\":9,\"OData__UIVersionString\":\"2.19\",\"GUID\":\"9a94cb88-019b-4a66-abd6-be7f5337f659\"}' };
+      }
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -1000,7 +1105,18 @@ describe(commands.PAGE_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-
+    sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
+      if (command === spoListItemSetCommand) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoFileGetCommand) {
+        return { 'stdout': '{\"FileSystemObjectType\":0,\"Id\":6,\"ServerRedirectedEmbedUri\":null,\"ServerRedirectedEmbedUrl\":\"\",\"ContentTypeId\":\"0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD\",\"ComplianceAssetId\":null,\"WikiField\":null,\"Title\":\"zzzz\",\"CanvasContent1\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.0\\\" data-sp-controldata=\\\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\\\"><\/div><\/div>\",\"BannerImageUrl\":{\"Description\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\",\"Url\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\"},\"Description\":null,\"PromotedState\":0,\"FirstPublishedDate\":\"2022-11-11T15:48:15\",\"LayoutWebpartsContent\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.4\\\" data-sp-controldata=\\\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;Mathijs Verbeeck&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\\\"><\/div><\/div>\",\"OData__AuthorBylineId\":[9],\"_AuthorBylineStringId\":[\"9\"],\"OData__TopicHeader\":null,\"OData__SPSitePageFlags\":null,\"OData__SPCallToAction\":null,\"OData__OriginalSourceUrl\":null,\"OData__OriginalSourceSiteId\":null,\"OData__OriginalSourceWebId\":null,\"OData__OriginalSourceListId\":null,\"OData__OriginalSourceItemId\":null,\"ID\":6,\"Created\":\"2022-11-11T15:48:00\",\"AuthorId\":9,\"Modified\":\"2022-11-12T02:03:12\",\"EditorId\":9,\"OData__CopySource\":null,\"CheckoutUserId\":9,\"OData__UIVersionString\":\"2.19\",\"GUID\":\"9a94cb88-019b-4a66-abd6-be7f5337f659\"}' };
+      }
+      throw 'Invalid request';
+    });
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Initial version' } });
   });
 
@@ -1071,7 +1187,7 @@ describe(commands.PAGE_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
+    await assert.rejects(command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
       new CommandError('An error has occurred'));
   });
 
