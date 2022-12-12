@@ -1,7 +1,7 @@
 import { Cli } from '../../../../cli/Cli';
 import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command, { CommandErrorWithOutput } from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
@@ -181,7 +181,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
     const userInfo: string = args.options.userName ? args.options.userName : args.options.email ? args.options.email : args.options.userId!.toString();
 
     return Promise
-      .all(userInfo.split(',').map(singleUserName => {
+      .all(userInfo.split(',').map(async singleUserName => {
         const options: AadUserGetCommandOptions | SpoUserGetCommandOptions = {
           output: 'json',
           debug: args.options.debug,
@@ -200,37 +200,46 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         }
 
         if (options.id) {
-          return Cli
-            .executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...options, _: [] } })
-            .then((getUserGetOutput: CommandOutput): void => {
-              if (this.debug) {
-                logger.logToStderr(getUserGetOutput.stderr);
-              }
+          try {
+            const spoUserGetOutput: CommandOutput = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...options, _: [] } });
+            if (this.debug) {
+              logger.logToStderr(spoUserGetOutput.stderr);
+            }
 
-              validUserNames.push(JSON.parse(getUserGetOutput.stdout).UserPrincipalName);
-            }, (err: CommandErrorWithOutput) => {
-              if (this.debug) {
-                logger.logToStderr(err.stderr);
-              }
+            validUserNames.push(JSON.parse(spoUserGetOutput.stdout).UserPrincipalName);
+
+            return spoUserGetOutput;
+          }
+          catch (err: any) {
+            if (this.debug) {
               logger.logToStderr(err.stderr);
-              invalidUserNames.push(singleUserName);
-            });
+            }
+            logger.logToStderr(err.stderr);
+            invalidUserNames.push(singleUserName);
+
+            return err;
+          }
         }
         else {
-          return Cli
-            .executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } })
-            .then((getUserGetOutput: CommandOutput): void => {
-              if (this.debug) {
-                logger.logToStderr(getUserGetOutput.stderr);
-              }
+          try {
+            const aadUserGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } });
 
-              validUserNames.push(JSON.parse(getUserGetOutput.stdout).userPrincipalName);
-            }, (err: CommandErrorWithOutput) => {
-              if (this.debug) {
-                logger.logToStderr(err.stderr);
-              }
-              invalidUserNames.push(singleUserName);
-            });
+            if (this.debug) {
+              logger.logToStderr(aadUserGetOutput.stderr);
+            }
+
+            validUserNames.push(JSON.parse(aadUserGetOutput.stdout).userPrincipalName);
+
+            return aadUserGetOutput;
+          }
+          catch (err: any) {
+            if (this.debug) {
+              logger.logToStderr(err.stderr);
+            }
+            invalidUserNames.push(singleUserName);
+
+            return err;
+          }
         }
       }))
       .then((): Promise<string[]> => {

@@ -80,7 +80,7 @@ m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --
           0
         ],
         "CurrentRole": 0,
-        "DisplayName": "test user1",
+        "DisplayName": "John Doe",
         "Email": "john.doe@contoso.onmicrosoft.com",
         "InvitationLink": null,
         "IsUserKnown": true,

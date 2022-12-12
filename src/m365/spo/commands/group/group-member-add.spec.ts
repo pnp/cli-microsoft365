@@ -514,15 +514,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       stderr: `User cannot be found`
     }));
 
-    // sinon.stub(request, 'post').callsFake(opts => {
-    //   if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-    //     opts.data) {
-    //     return Promise.resolve(jsonGenericError);
-    //   }
-
-    //   return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
-    // });
-
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
