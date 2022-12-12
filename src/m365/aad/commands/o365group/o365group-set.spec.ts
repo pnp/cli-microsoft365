@@ -25,7 +25,6 @@ describe(commands.O365GROUP_SET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -53,6 +52,7 @@ describe(commands.O365GROUP_SET, () => {
       request.put,
       request.patch,
       request.get,
+      fs.readFileSync,
       global.setTimeout
     ]);
   });
@@ -60,7 +60,6 @@ describe(commands.O365GROUP_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      fs.readFileSync,
       appInsights.trackEvent,
       pid.getProcessName
     ]);
@@ -122,7 +121,7 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'false' } });
+    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: false } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -139,11 +138,12 @@ describe(commands.O365GROUP_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'true' } });
+    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: true } });
     assert(loggerLogSpy.notCalled);
   });
 
   it('updates Microsoft 365 Group logo with a png image', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848/photo/$value' &&
         opts.headers &&
@@ -159,6 +159,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('updates Microsoft 365 Group logo with a jpg image (debug)', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
         opts.headers &&
@@ -174,6 +175,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('updates Microsoft 365 Group logo with a gif image', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value' &&
         opts.headers &&
@@ -189,6 +191,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('handles failure when updating Microsoft 365 Group logo', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value') {
         return Promise.reject('An error has occurred');
@@ -201,11 +204,12 @@ describe(commands.O365GROUP_SET, () => {
       return {} as any;
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } } as any), 
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'f3db5c2b-068f-480d-985b-ec78b9fa0e76', logoPath: 'logo.png' } } as any),
       new CommandError('An error has occurred'));
   });
 
   it('handles failure when updating Microsoft 365 Group logo (debug)', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/photo/$value') {
         return Promise.reject('An error has occurred');
@@ -421,18 +425,13 @@ describe(commands.O365GROUP_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if isPrivate is invalid boolean', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if isPrivate is true', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if isPrivate is false', async () => {
-    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'false' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
