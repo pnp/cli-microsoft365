@@ -148,13 +148,13 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('creates new modern page (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -176,11 +176,11 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "page",
           Id: 1,
           BannerImageUrl: {
@@ -189,11 +189,11 @@ describe(commands.PAGE_ADD, () => {
           },
           CanvasContent1: "{}",
           layoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -208,14 +208,14 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
       if (command === spoListItemSetCommand) {
@@ -233,9 +233,9 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('creates new modern page on root of tenant (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "page",
           Id: 1,
           BannerImageUrl: {
@@ -244,11 +244,11 @@ describe(commands.PAGE_ADD, () => {
           },
           CanvasContent1: "{}",
           layoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sitepages')/files/AddTemplateFile`) > -1 &&
@@ -256,7 +256,7 @@ describe(commands.PAGE_ADD, () => {
           urlOfFile: '/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -278,7 +278,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -293,14 +293,14 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
       if (command === spoListItemSetCommand) {
@@ -318,13 +318,13 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('automatically appends the .aspx extension', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -346,7 +346,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -361,14 +361,14 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { name: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }));
@@ -376,13 +376,13 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('sets page title when specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -404,7 +404,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -419,14 +419,14 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { name: 'page.aspx', title: 'My page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }));
@@ -434,9 +434,9 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('creates new modern page using the Home layout', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "page",
           Id: 1,
           BannerImageUrl: {
@@ -445,11 +445,11 @@ describe(commands.PAGE_ADD, () => {
           },
           CanvasContent1: "{}",
           layoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
@@ -457,7 +457,7 @@ describe(commands.PAGE_ADD, () => {
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -479,7 +479,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -489,14 +489,14 @@ describe(commands.PAGE_ADD, () => {
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
           PageLayoutType: 'Home'
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
       if (command === spoListItemSetCommand) {
@@ -515,9 +515,9 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('creates new modern page and promotes it as NewsPage', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "page",
           Id: 1,
           BannerImageUrl: {
@@ -526,11 +526,11 @@ describe(commands.PAGE_ADD, () => {
           },
           CanvasContent1: "{}",
           layoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
@@ -538,7 +538,7 @@ describe(commands.PAGE_ADD, () => {
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -560,7 +560,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -575,20 +575,20 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
         opts.data.PromotedState === 2 &&
         opts.data.FirstPublishedDate) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
       if (command === spoListItemSetCommand) {
@@ -607,9 +607,9 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('creates new modern page and promotes it as Template', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "page",
           Id: 1,
           BannerImageUrl: {
@@ -618,15 +618,15 @@ describe(commands.PAGE_ADD, () => {
           },
           CanvasContent1: "{}",
           layoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(6)/SavePageAsTemplate`) > -1) {
-        return Promise.resolve({ Id: 1, BannerImageUrl: 'url', CanvasContent1: 'content1', LayoutWebpartsContent: 'content', UniqueId: 'a4eb92e3-4eae-427f-8f6d-4e2ed907c2c4' });
+        return { Id: 1, BannerImageUrl: 'url', CanvasContent1: 'content1', LayoutWebpartsContent: 'content', UniqueId: 'a4eb92e3-4eae-427f-8f6d-4e2ed907c2c4' };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
@@ -634,7 +634,7 @@ describe(commands.PAGE_ADD, () => {
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -656,7 +656,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -671,23 +671,23 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
         !opts.data) {
-        return Promise.resolve({ Id: '1' });
+        return { Id: '1' };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('a4eb92e3-4eae-427f-8f6d-4e2ed907c2c4')/ListItemAllFields/SetCommentsDisabled`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(2)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
       if (command === spoListItemSetCommand) {
@@ -706,9 +706,9 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('creates new modern page using the Home layout and promotes it as HomePage (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "page",
           Id: 1,
           BannerImageUrl: {
@@ -717,11 +717,11 @@ describe(commands.PAGE_ADD, () => {
           },
           CanvasContent1: "{}",
           layoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
@@ -729,7 +729,7 @@ describe(commands.PAGE_ADD, () => {
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -751,7 +751,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -761,19 +761,19 @@ describe(commands.PAGE_ADD, () => {
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
           PageLayoutType: 'Home'
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/rootfolder') > -1 &&
         opts.data.WelcomePage === 'SitePages/page.aspx') {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
       if (command === spoListItemSetCommand) {
@@ -791,13 +791,13 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('creates new modern page with comments enabled', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -819,7 +819,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -834,14 +834,14 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(false)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', commentsEnabled: true } }));
@@ -851,13 +851,13 @@ describe(commands.PAGE_ADD, () => {
   it('creates new modern page and check if saved as draft', async () => {
     let savedAsDraft = false;
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -879,7 +879,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -894,15 +894,15 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "page",
           Id: 1,
           BannerImageUrl: {
@@ -911,19 +911,19 @@ describe(commands.PAGE_ADD, () => {
           },
           CanvasContent1: "{}",
           layoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf('_api/SitePages/Pages(1)/SavePageAsDraft') > -1) {
         savedAsDraft = true;
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
       if (command === spoListItemSetCommand) {
@@ -942,13 +942,13 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('creates new modern page and publishes it', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -970,7 +970,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -985,15 +985,15 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "page",
           Id: 1,
           BannerImageUrl: {
@@ -1002,18 +1002,18 @@ describe(commands.PAGE_ADD, () => {
           },
           CanvasContent1: "{}",
           layoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/CheckIn(comment=@a1,checkintype=@a2)?@a1=\'\'&@a2=1') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
       if (command === spoListItemSetCommand) {
@@ -1032,9 +1032,9 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('creates new modern page and publishes it with a message (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "page",
           Id: 1,
           BannerImageUrl: {
@@ -1043,15 +1043,15 @@ describe(commands.PAGE_ADD, () => {
           },
           CanvasContent1: "{}",
           layoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Initial%20version'&@a2=1`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
@@ -1059,7 +1059,7 @@ describe(commands.PAGE_ADD, () => {
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -1081,7 +1081,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -1096,14 +1096,14 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
     sinon.stub(Cli, 'executeCommand').callsFake(async (command): Promise<any> => {
       if (command === spoListItemSetCommand) {
@@ -1121,13 +1121,13 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('escapes special characters in user input', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
-        return Promise.resolve({
+        return {
           "CheckInComment": "",
           "CheckOutType": 2,
           "ContentTag": "{64201083-46BA-4966-8BC5-B0CB31E3456C},1,0",
@@ -1149,7 +1149,7 @@ describe(commands.PAGE_ADD, () => {
           "UIVersion": 1,
           "UIVersionLabel": "0.1",
           "UniqueId": "64201083-46ba-4966-8bc5-b0cb31e3456c"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
@@ -1164,18 +1164,18 @@ describe(commands.PAGE_ADD, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/Publish(\'Don%39t%20tell\')') > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Don\'t tell' } }));
@@ -1183,8 +1183,8 @@ describe(commands.PAGE_ADD, () => {
   });
 
   it('correctly handles OData error when creating modern page', async () => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),

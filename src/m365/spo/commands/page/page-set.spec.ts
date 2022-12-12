@@ -51,7 +51,7 @@ describe(commands.PAGE_SET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/article.aspx')/ListItemAllFields`) > -1 ||
         (opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/article.aspx')/ListItemAllFields`) > -1) &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -62,11 +62,11 @@ describe(commands.PAGE_SET, () => {
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           }
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/article.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -78,18 +78,18 @@ describe(commands.PAGE_SET, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
   });
 
@@ -189,9 +189,9 @@ describe(commands.PAGE_SET, () => {
   it('updates page layout to Home', async () => {
     sinonUtil.restore([request.post]);
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage") {
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -203,14 +203,14 @@ describe(commands.PAGE_SET, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home' } }));
@@ -309,21 +309,21 @@ describe(commands.PAGE_SET, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           PageLayoutType: 'Home'
         })) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf('_api/web/rootfolder') > -1 &&
         opts.data.WelcomePage === 'SitePages/page.aspx') {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -335,18 +335,18 @@ describe(commands.PAGE_SET, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home', promoteAs: 'HomePage', description: "Page Description" } });
@@ -355,13 +355,13 @@ describe(commands.PAGE_SET, () => {
   it('enables comments on the page', async () => {
     sinonUtil.restore([request.post]);
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -373,18 +373,18 @@ describe(commands.PAGE_SET, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', commentsEnabled: true } });
@@ -393,9 +393,9 @@ describe(commands.PAGE_SET, () => {
   it('disables comments on the page (debug)', async () => {
     sinonUtil.restore([request.post]);
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage") {
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -407,16 +407,16 @@ describe(commands.PAGE_SET, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields" ||
         opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(true)" ||
         opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(1)/SavePageAsDraft") {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', commentsEnabled: false } });
@@ -452,13 +452,13 @@ describe(commands.PAGE_SET, () => {
 
     const newPageTitle = "updated title";
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -470,18 +470,18 @@ describe(commands.PAGE_SET, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: newPageTitle } });
@@ -490,13 +490,13 @@ describe(commands.PAGE_SET, () => {
   it('publishes page', async () => {
     sinonUtil.restore([request.post]);
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -508,18 +508,18 @@ describe(commands.PAGE_SET, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1=\'\'&@a2=1`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true } });
@@ -529,9 +529,9 @@ describe(commands.PAGE_SET, () => {
   it('publishes page with a message (debug)', async () => {
     sinonUtil.restore([request.post]);
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -543,18 +543,18 @@ describe(commands.PAGE_SET, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Initial%20version'&@a2=1`) > -1) {
-        return Promise.resolve();
+        return;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: 'Initial version' } });
@@ -563,13 +563,13 @@ describe(commands.PAGE_SET, () => {
   it('escapes special characters in user input', async () => {
     sinonUtil.restore([request.post]);
     const comment = `Don't tell`;
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${formatting.encodeQueryParameter(comment)}'&@a2=1`) {
-        return Promise.resolve();
+        return;
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({
+        return {
           Title: "article",
           Id: 1,
           TopicHeader: "TopicHeader",
@@ -581,10 +581,10 @@ describe(commands.PAGE_SET, () => {
           },
           CanvasContent1: "{}",
           LayoutWebpartsContent: "{}"
-        });
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', publish: true, publishMessage: comment } });
@@ -594,8 +594,8 @@ describe(commands.PAGE_SET, () => {
   it('correctly handles OData error when creating modern page', async () => {
     sinonUtil.restore([request.post]);
 
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw { error: { 'odata.error': { message: { value: 'An error has occurred' } } } };
     });
 
     await assert.rejects(command.action(logger, { options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Article' } } as any),
