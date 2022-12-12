@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../appInsights';
+import { telemetry } from '../../telemetry';
 import auth from '../../Auth';
 import { Logger } from '../../cli/Logger';
 import { CommandError } from '../../Command';
@@ -30,7 +30,7 @@ class MockCommand extends YammerCommand {
 
 describe('YammerCommand', () => {
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
   });
 
@@ -40,7 +40,7 @@ describe('YammerCommand', () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });

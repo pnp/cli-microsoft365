@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { formatting } from '../../../../utils/formatting';
@@ -26,7 +26,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -63,7 +63,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       pid.getProcessName,
-      appInsights.trackEvent
+      telemetry.trackEvent
     ]);
     auth.service.connected = false;
   });

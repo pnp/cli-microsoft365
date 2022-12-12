@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
@@ -18,11 +18,11 @@ describe(commands.SOLUTION_INIT, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let trackEvent: any;
-  let telemetry: any;
+  let telemetryCommandName: any;
 
   before(() => {
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
+    trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
+      telemetryCommandName = commandName;
     });
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -40,7 +40,7 @@ describe(commands.SOLUTION_INIT, () => {
         log.push(msg);
       }
     };
-    telemetry = null;
+    telemetryCommandName = null;
   });
 
   afterEach(() => {
@@ -54,7 +54,7 @@ describe(commands.SOLUTION_INIT, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
@@ -74,7 +74,7 @@ describe(commands.SOLUTION_INIT, () => {
 
   it('logs correct telemetry event', async () => {
     await assert.rejects(command.action(logger, { options: {} }));
-    assert.strictEqual(telemetry.name, commands.SOLUTION_INIT);
+    assert.strictEqual(telemetryCommandName, commands.SOLUTION_INIT);
   });
 
   it('supports specifying publisher name', () => {
@@ -217,7 +217,7 @@ describe(commands.SOLUTION_INIT, () => {
   it('TemplateInstantiator.instantiate is called exactly twice when the CDS Assets Directory \'Other\' already exists in the current directory, but doesn\'t contain a Solution.xml file', async () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((pathToCheck) => {
-      if(path.basename(pathToCheck.toString()).toLowerCase() === 'other') {
+      if (path.basename(pathToCheck.toString()).toLowerCase() === 'other') {
         return true;
       }
       else if (path.basename(pathToCheck.toString()).toLowerCase() === 'solution.xml') {
@@ -225,7 +225,7 @@ describe(commands.SOLUTION_INIT, () => {
       }
       else {
         return originalExistsSync(pathToCheck);
-      }    
+      }
     });
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
@@ -237,7 +237,7 @@ describe(commands.SOLUTION_INIT, () => {
   it('TemplateInstantiator.instantiate is called exactly once when the CDS Assets Directory \'Other\' already exists in the current directory and contains a Solution.xml file', async () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((pathToCheck) => {
-      if(path.basename(pathToCheck.toString()).toLowerCase() === 'other') {
+      if (path.basename(pathToCheck.toString()).toLowerCase() === 'other') {
         return true;
       }
       else if (path.basename(pathToCheck.toString()).toLowerCase() === 'solution.xml') {
