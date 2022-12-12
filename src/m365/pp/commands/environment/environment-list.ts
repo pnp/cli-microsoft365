@@ -27,11 +27,11 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -39,11 +39,11 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-a, --asAdmin'
+        option: '--asAdmin'
       }
     );
   }

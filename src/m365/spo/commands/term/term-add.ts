@@ -159,13 +159,13 @@ class SpoTermAddCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['termGroupId', 'termGroupName']);
+    this.optionSets.push({ options: ['termGroupId', 'termGroupName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let term: Term;
     let formDigest: string;
-    
+
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
       const res: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
@@ -208,7 +208,7 @@ class SpoTermAddCommand extends SpoCommand {
         if (this.verbose) {
           logger.logToStderr(`Setting term properties...`);
         }
-  
+
         const properties: string[] = [];
         let i: number = 127;
         if (args.options.description) {
@@ -229,18 +229,18 @@ class SpoTermAddCommand extends SpoCommand {
           });
           term.LocalCustomProperties = localCustomProperties;
         }
-  
+
         let termStoreObjectIdentity: string = '';
         // get term store object identity
         for (let i: number = 0; i < json.length; i++) {
           if (json[i] !== 8) {
             continue;
           }
-  
+
           termStoreObjectIdentity = json[i + 1]._ObjectIdentity_;
           break;
         }
-  
+
         const requestOptions: any = {
           url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
@@ -248,7 +248,7 @@ class SpoTermAddCommand extends SpoCommand {
           },
           data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${properties.join('')}<Method Name="CommitAll" Id="131" ObjectPathId="109" /></Actions><ObjectPaths><Identity Id="117" Name="${term._ObjectIdentity_}" /><Identity Id="109" Name="${termStoreObjectIdentity}" /></ObjectPaths></Request>`
         };
-  
+
         terms = await request.post(requestOptions);
       }
 
@@ -266,8 +266,8 @@ class SpoTermAddCommand extends SpoCommand {
       term.Id = term.Id.replace('/Guid(', '').replace(')/', '');
       term.LastModifiedDate = new Date(Number(term.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
       logger.log(term);
-      
-    } 
+
+    }
     catch (err: any) {
       this.handleRejectedPromise(err);
     }

@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import commands from '../../commands';
@@ -95,17 +95,9 @@ class SpoAppListCommand extends SpoAppBaseCommand {
         logger.logToStderr(`Retrieving apps...`);
       }
 
-      const requestOptions: any = {
-        url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const apps = await request.get<{ value: any[] }>(requestOptions);
-      if (apps.value && apps.value.length > 0) {
-        logger.log(apps.value);
+      const apps = await odata.getAllItems<any>(`${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps`);
+      if (apps && apps.length > 0) {
+        logger.log(apps);
       }
       else {
         if (this.verbose) {

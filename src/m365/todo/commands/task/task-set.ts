@@ -130,7 +130,7 @@ class TodoTaskSetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listName']);
+    this.optionSets.push({ options: ['listId', 'listName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

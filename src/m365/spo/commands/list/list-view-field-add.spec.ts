@@ -158,9 +158,9 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['listId', 'listTitle', 'listUrl'],
-      ['viewId', 'viewTitle'],
-      ['id', 'title']
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['viewId', 'viewTitle'] },
+      { options: ['id', 'title'] }
     ]);
   });
 

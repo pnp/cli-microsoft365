@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
   previewImageAltText?: string;
   thumbnailUrl?: string;
   version?: number | string;
-  isDefault?: string;
+  isDefault?: boolean;
 }
 
 class SpoSiteDesignSetCommand extends SpoCommand {
@@ -37,6 +37,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -51,7 +52,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
         previewImageAltText: typeof args.options.previewImageAltText !== 'undefined',
         thumbnailUrl: typeof args.options.thumbnailUrl !== 'undefined',
         version: typeof args.options.version !== 'undefined',
-        isDefault: typeof args.options.isDefault !== 'undefined'
+        isDefault: typeof args.options.isDefault
       });
     });
   }
@@ -87,9 +88,14 @@ class SpoSiteDesignSetCommand extends SpoCommand {
         option: '-v, --version [version]'
       },
       {
-        option: '--isDefault [isDefault]'
+        option: '--isDefault [isDefault]',
+        autocomplete: ['true', 'false']
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('isDefault');
   }
 
   #initValidators(): void {
@@ -118,12 +124,6 @@ class SpoSiteDesignSetCommand extends SpoCommand {
         if (args.options.version &&
           typeof args.options.version !== 'number') {
           return `${args.options.version} is not a number`;
-        }
-
-        if (typeof args.options.isDefault !== 'undefined' &&
-          args.options.isDefault !== 'true' &&
-          args.options.isDefault !== 'false') {
-          return `${args.options.isDefault} is not a valid boolean value`;
         }
 
         return true;
@@ -163,7 +163,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
         updateInfo.Version = args.options.version;
       }
       if (typeof args.options.isDefault !== 'undefined') {
-        updateInfo.IsDefault = args.options.isDefault === 'true';
+        updateInfo.IsDefault = args.options.isDefault;
       }
 
       const requestOptions: any = {
@@ -179,7 +179,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
 
       const res: any = await request.post(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

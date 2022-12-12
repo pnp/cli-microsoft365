@@ -58,7 +58,7 @@ class OutlookMessageListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['folderId', 'folderName']);
+    this.optionSets.push({ options: ['folderId', 'folderName'] });
   }
 
   public defaultProperties(): string[] | undefined {

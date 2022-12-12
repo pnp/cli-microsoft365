@@ -29,6 +29,28 @@ Get the output configured for CLI for Microsoft 365
 m365 cli config get --key output
 ```
 
+## Response
+
+When retrieving the `output` key, responses will look like this:
+
+=== "JSON"
+
+    ```json
+    "json"
+    ```
+
+=== "Text"
+
+    ```text
+    json
+    ```
+
+=== "CSV"
+
+    ```csv
+    json
+    ```
+
 ## More information
 
 - [Configuring the CLI for Microsoft 365](../../../user-guide/configuring-cli.md)

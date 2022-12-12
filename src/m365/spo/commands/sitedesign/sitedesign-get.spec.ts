@@ -78,7 +78,7 @@ describe(commands.SITEDESIGN_GET, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['id', 'title']
+      { options: ['id', 'title'] }
     ]);
   });
 

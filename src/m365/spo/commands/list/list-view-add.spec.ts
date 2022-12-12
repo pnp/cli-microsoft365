@@ -95,7 +95,7 @@ describe(commands.LIST_VIEW_ADD, () => {
   });
 
   it('has correct option sets', () => {
-    assert.deepStrictEqual(command.optionSets, [['listId', 'listTitle', 'listUrl']]);
+    assert.deepStrictEqual(command.optionSets, [{ options: ['listId', 'listTitle', 'listUrl'] }]);
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {

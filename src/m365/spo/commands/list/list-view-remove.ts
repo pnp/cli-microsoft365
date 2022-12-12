@@ -106,8 +106,8 @@ class SpoListViewRemoveCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['listId', 'listTitle', 'listUrl'],
-      ['id', 'title']
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['id', 'title'] }
     );
   }
 

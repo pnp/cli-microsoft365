@@ -20,7 +20,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -62,6 +62,11 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [{ options: ['location', 'parentNodeId'] }]);
   });
 
   it('excludes options from URL processing', () => {

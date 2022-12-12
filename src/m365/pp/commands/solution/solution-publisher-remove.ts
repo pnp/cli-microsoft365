@@ -65,7 +65,7 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
         option: '-n, --name [name]'
       },
       {
-        option: '-a, --asAdmin'
+        option: '--asAdmin'
       },
       {
         option: '--confirm'
@@ -75,7 +75,7 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'name']
+      { options: ['id', 'name'] }
     );
   }
 
@@ -91,7 +91,7 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Removes a publisher '${args.options.id || args.options.name}'...`);
     }

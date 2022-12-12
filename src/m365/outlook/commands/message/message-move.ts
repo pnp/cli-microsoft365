@@ -73,8 +73,8 @@ class OutlookMessageMoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['sourceFolderId', 'sourceFolderName'],
-      ['targetFolderId', 'targetFolderName']
+      { options: ['sourceFolderId', 'sourceFolderName'] },
+      { options: ['targetFolderId', 'targetFolderName'] }
     );
   }
 

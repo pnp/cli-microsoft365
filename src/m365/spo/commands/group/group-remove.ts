@@ -69,18 +69,18 @@ class SpoGroupRemoveCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (args.options.id && typeof args.options.id !== 'number') {
           return `${args.options.id} is not a number`;
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

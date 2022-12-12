@@ -71,26 +71,26 @@ class AadO365GroupUserSetCommand extends GraphCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {    
+      async (args: CommandArgs) => {
         if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
           return `${args.options.teamId} is not a valid GUID`;
         }
-    
+
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
           return `${args.options.groupId} is not a valid GUID`;
         }
-    
+
         if (['Owner', 'Member'].indexOf(args.options.role) === -1) {
           return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['groupId', 'teamId']);
+    this.optionSets.push({ options: ['groupId', 'teamId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

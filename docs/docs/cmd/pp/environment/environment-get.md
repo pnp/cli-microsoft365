@@ -13,7 +13,7 @@ m365 pp environment get [options]
 `-n, --name <name>`
 : The name of the environment to get information about
 
-`-a, --asAdmin`
+`--asAdmin`
 : Run the command as admin and retrieve details of environments you do not have explicitly assigned permissions to
 
 ## Remarks
