@@ -1,8 +1,9 @@
+import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
+import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -13,16 +14,15 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   confirm?: boolean;
-  skipRecycleBin: boolean;
 }
 
-class AadO365GroupRemoveCommand extends GraphCommand {
+class PurviewRetentionLabelRemoveCommand extends GraphCommand {
   public get name(): string {
-    return commands.O365GROUP_REMOVE;
+    return commands.RETENTIONLABEL_REMOVE;
   }
 
   public get description(): string {
-    return 'Removes an Microsoft 365 Group';
+    return 'Delete a retention label';
   }
 
   constructor() {
@@ -36,8 +36,7 @@ class AadO365GroupRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString(),
-        skipRecycleBin: args.options.skipRecycleBin
+        confirm: !!args.options.confirm
       });
     });
   }
@@ -49,9 +48,6 @@ class AadO365GroupRemoveCommand extends GraphCommand {
       },
       {
         option: '--confirm'
-      },
-      {
-        option: '--skipRecycleBin'
       }
     );
   }
@@ -60,7 +56,7 @@ class AadO365GroupRemoveCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+          return `'${args.options.id}' is not a valid GUID.`;
         }
 
         return true;
@@ -69,30 +65,17 @@ class AadO365GroupRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeGroup: () => Promise<void> = async (): Promise<void> => {
-      if (this.verbose) {
-        logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id}...`);
-      }
-
+    const removeRetentionLabel: () => Promise<void> = async (): Promise<void> => {
       try {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/groups/${args.options.id}`,
+        const requestOptions: AxiosRequestConfig = {
+          url: `${this.resource}/beta/security/labels/retentionLabels/${args.options.id}`,
           headers: {
-            'accept': 'application/json;odata.metadata=none'
-          }
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
         };
 
         await request.delete(requestOptions);
-
-        if (args.options.skipRecycleBin) {
-          const requestOptions2: any = {
-            url: `${this.resource}/v1.0/directory/deletedItems/${args.options.id}`,
-            headers: {
-              'accept': 'application/json;odata.metadata=none'
-            }
-          };
-          await request.delete(requestOptions2);
-        }
       }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
@@ -100,21 +83,21 @@ class AadO365GroupRemoveCommand extends GraphCommand {
     };
 
     if (args.options.confirm) {
-      await removeGroup();
+      await removeRetentionLabel();
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the group ${args.options.id}?`
+        message: `Are you sure you want to remove the retention label ${args.options.id}?`
       });
 
       if (result.continue) {
-        await removeGroup();
+        await removeRetentionLabel();
       }
     }
   }
 }
 
-module.exports = new AadO365GroupRemoveCommand();
+module.exports = new PurviewRetentionLabelRemoveCommand();

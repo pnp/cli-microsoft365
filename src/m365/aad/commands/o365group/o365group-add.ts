@@ -42,6 +42,7 @@ class AadO365GroupAddCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -52,10 +53,10 @@ class AadO365GroupAddCommand extends GraphCommand {
         members: typeof args.options.members !== 'undefined',
         logoPath: typeof args.options.logoPath !== 'undefined',
         isPrivate: typeof args.options.isPrivate !== 'undefined',
-        allowMembersToPost: (!(!args.options.allowMembersToPost)).toString(),
-        hideGroupInOutlook: (!(!args.options.hideGroupInOutlook)).toString(),
-        subscribeNewGroupMembers: (!(!args.options.subscribeNewGroupMembers)).toString(),
-        welcomeEmailDisabled: (!(!args.options.welcomeEmailDisabled)).toString()
+        allowMembersToPost: args.options.allowMembersToPost,
+        hideGroupInOutlook: args.options.hideGroupInOutlook,
+        subscribeNewGroupMembers: args.options.subscribeNewGroupMembers,
+        welcomeEmailDisabled: args.options.welcomeEmailDisabled
       });
     });
   }
@@ -81,21 +82,29 @@ class AadO365GroupAddCommand extends GraphCommand {
         option: '--isPrivate'
       },
       {
-        option: '--allowMembersToPost [allowMembersToPost]'
+        option: '--allowMembersToPost [allowMembersToPost]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--hideGroupInOutlook [hideGroupInOutlook]'
+        option: '--hideGroupInOutlook [hideGroupInOutlook]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--subscribeNewGroupMembers [subscribeNewGroupMembers]'
+        option: '--subscribeNewGroupMembers [subscribeNewGroupMembers]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--welcomeEmailDisabled [welcomeEmailDisabled]'
+        option: '--welcomeEmailDisabled [welcomeEmailDisabled]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '-l, --logoPath [logoPath]'
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('allowMembersToPost', 'hideGroupInOutlook', 'subscribeNewGroupMembers', 'welcomeEmailDisabled');
   }
 
   #initValidators(): void {
@@ -109,7 +118,7 @@ class AadO365GroupAddCommand extends GraphCommand {
             }
           }
         }
-    
+
         if (args.options.members) {
           const members: string[] = args.options.members.split(',').map(m => m.trim());
           for (let i = 0; i < members.length; i++) {
@@ -118,19 +127,19 @@ class AadO365GroupAddCommand extends GraphCommand {
             }
           }
         }
-    
+
         if (args.options.logoPath) {
           const fullPath: string = path.resolve(args.options.logoPath);
-    
+
           if (!fs.existsSync(fullPath)) {
             return `File '${fullPath}' not found`;
           }
-    
+
           if (fs.lstatSync(fullPath).isDirectory()) {
             return `Path '${fullPath}' points to a directory`;
           }
         }
-    
+
         return true;
       }
     );
@@ -197,7 +206,7 @@ class AadO365GroupAddCommand extends GraphCommand {
         if (this.verbose) {
           logger.logToStderr(`Setting group logo ${fullPath}...`);
         }
-  
+
         const requestOptionsPhoto: any = {
           url: `${this.resource}/v1.0/groups/${group.id}/photo/$value`,
           headers: {
@@ -205,7 +214,7 @@ class AadO365GroupAddCommand extends GraphCommand {
           },
           data: fs.readFileSync(fullPath)
         };
-  
+
         await new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
           this.setGroupLogo(requestOptionsPhoto, AadO365GroupAddCommand.numRepeat, resolve, reject, logger);
         });
@@ -223,7 +232,7 @@ class AadO365GroupAddCommand extends GraphCommand {
           }
         })));
       }
-      
+
       if (memberIds.length !== 0) {
         await Promise.all(memberIds.map(memberId => request.post<void>({
           url: `${this.resource}/v1.0/groups/${group.id}/members/$ref`,
@@ -238,7 +247,7 @@ class AadO365GroupAddCommand extends GraphCommand {
       }
 
       logger.log(group);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  hideDefaultThemes: string;
+  hideDefaultThemes: boolean;
 }
 
 class SpoHideDefaultThemesSetCommand extends SpoCommand {
@@ -27,7 +27,7 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
-    this.#initValidators();
+    this.#initTypes();
   }
 
   #initTelemetry(): void {
@@ -41,22 +41,14 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--hideDefaultThemes <hideDefaultThemes>'
+        option: '--hideDefaultThemes <hideDefaultThemes>',
+        autocomplete: ['true', 'false']
       }
     );
   }
 
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (args.options.hideDefaultThemes !== 'false' &&
-          args.options.hideDefaultThemes !== 'true') {
-          return `${args.options.hideDefaultThemes} is not a valid boolean`;
-        }
-
-        return true;
-      }
-    );
+  #initTypes(): void {
+    this.types.boolean.push('hideDefaultThemes');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

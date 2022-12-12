@@ -11,7 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   messageId: number;
-  enable?: string;
+  enable?: boolean;
   confirm?: boolean;
 }
 
@@ -29,13 +29,14 @@ class YammerMessageLikeSetCommand extends YammerCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        enable: args.options.enable !== undefined,
+        enable: args.options.enable,
         confirm: (!(!args.options.confirm)).toString()
       });
     });
@@ -47,7 +48,8 @@ class YammerMessageLikeSetCommand extends YammerCommand {
         option: '--messageId <messageId>'
       },
       {
-        option: '--enable [enable]'
+        option: '--enable [enable]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--confirm'
@@ -55,17 +57,15 @@ class YammerMessageLikeSetCommand extends YammerCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.boolean.push('enable');
+  }
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.messageId && typeof args.options.messageId !== 'number') {
           return `${args.options.messageId} is not a number`;
-        }
-
-        if (args.options.enable &&
-          args.options.enable !== 'true' &&
-          args.options.enable !== 'false') {
-          return `${args.options.enable} is not a valid value for the enable option. Allowed values are true|false`;
         }
 
         return true;
@@ -89,19 +89,19 @@ class YammerMessageLikeSetCommand extends YammerCommand {
       };
 
       try {
-        if (args.options.enable !== 'false') {
+        if (args.options.enable !== false) {
           await request.post(requestOptions);
         }
         else {
           await request.delete(requestOptions);
-        }        
-      } 
+        }
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
     };
 
-    if (args.options.enable === 'false') {
+    if (args.options.enable === false) {
       if (args.options.confirm) {
         await executeLikeAction();
       }
@@ -114,7 +114,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
           default: false,
           message: messagePrompt
         });
-        
+
         if (result.continue) {
           await executeLikeAction();
         }
