@@ -95,7 +95,7 @@ class SpoListGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'title', 'url']);
+    this.optionSets.push({ options: ['id', 'title', 'url'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

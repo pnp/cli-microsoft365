@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -112,25 +112,10 @@ class SpoCustomActionListCommand extends SpoCommand {
     }
   }
 
-  private getCustomActions(options: Options): Promise<CustomAction[]> {
-    const requestOptions: any = {
-      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
+  private async getCustomActions(options: Options): Promise<CustomAction[]> {
+    const response: CustomAction[] = await odata.getAllItems<CustomAction>(`${options.webUrl}/_api/${options.scope}/UserCustomActions`);
 
-    return new Promise<CustomAction[]>((resolve: (list: CustomAction[]) => void, reject: (error: any) => void): void => {
-      request
-        .get<{ value: CustomAction[]; }>(requestOptions)
-        .then((response: { value: CustomAction[] }) => {
-          resolve(response.value);
-        })
-        .catch((error: any) => {
-          reject(error);
-        });
-    });
+    return response;
   }
 
   /**

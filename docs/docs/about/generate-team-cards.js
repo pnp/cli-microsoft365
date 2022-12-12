@@ -643,6 +643,12 @@ const contributors = [{
     twitter: 'stijnbrouwers85'
   },
   {
+    name: 'Stijn Haerkens',
+    company: 'VanRoey.be',
+    github: 'stijnhaerkenss',
+    twitter: ''
+  },
+  {
     name: 'Sudharsan Kesavanarayanan',
     company: 'NTT Ltd',
     github: 'sudharsank',

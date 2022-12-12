@@ -836,7 +836,7 @@ describe(commands.SEND, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['title', 'card']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['title', 'card'] }]);
   });
 
   it('supports specifying unknown options', () => {

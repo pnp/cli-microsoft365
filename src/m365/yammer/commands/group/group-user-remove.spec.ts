@@ -87,7 +87,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('id must be a number', async () => {
+  it('groupId must be a number', async () => {
     const actual = await command.validate({ options: { groupId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -159,7 +159,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
     const promptStub: sinon.SinonStub = sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    
+
     await command.action(logger, { options: { debug: false, groupId: 1231231, id: 989998789 } });
 
     assert(promptStub.called);
@@ -168,7 +168,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
   it('aborts execution when prompt not confirmed', async () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
-    ));  
+    ));
 
     await command.action(logger, { options: { debug: false, groupId: 1231231, id: 989998789 } });
 

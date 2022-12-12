@@ -117,7 +117,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'title']
+      { options: ['id', 'title'] }
     );
   }
 

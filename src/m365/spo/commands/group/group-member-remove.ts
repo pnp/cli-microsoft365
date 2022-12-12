@@ -80,7 +80,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['groupName', 'groupId']);
+    this.optionSets.push({ options: ['groupName', 'groupId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

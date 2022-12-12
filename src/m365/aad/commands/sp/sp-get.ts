@@ -75,7 +75,7 @@ class AadSpGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appDisplayName', 'appObjectId']);
+    this.optionSets.push({ options: ['appId', 'appDisplayName', 'appObjectId'] });
   }
 
   private getSpId(args: CommandArgs): Promise<string> {

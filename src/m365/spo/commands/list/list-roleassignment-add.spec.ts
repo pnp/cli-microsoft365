@@ -121,9 +121,9 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['listId', 'listTitle', 'listUrl'],
-      ['principalId', 'upn', 'groupName'],
-      ['roleDefinitionId', 'roleDefinitionName']
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['principalId', 'upn', 'groupName'] },
+      { options: ['roleDefinitionId', 'roleDefinitionName'] }
     ]);
   });
 

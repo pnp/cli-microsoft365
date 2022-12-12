@@ -24,6 +24,10 @@ Update list of commands for Zsh, Bash and Fish command completion
 m365 cli completion sh update
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - Command completion: [https://pnp.github.io/cli-microsoft365/user-guide/completion/](https://pnp.github.io/cli-microsoft365/user-guide/completion/)

@@ -80,7 +80,10 @@ describe(commands.LIST_VIEW_REMOVE, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['listId', 'listTitle', 'listUrl'], ['id', 'title']]);
+    assert.deepStrictEqual(optionSets, [
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['id', 'title'] }
+    ]);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
