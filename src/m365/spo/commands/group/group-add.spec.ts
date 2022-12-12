@@ -84,11 +84,6 @@ describe(commands.GROUP_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when invalid boolean is passed as option', async () => {
-    const actual = await command.validate({ options: { webUrl: validSharePointUrl, name: validName, allowRequestToJoinLeave: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if the url is valid and name is passed', async () => {
     const actual = await command.validate({ options: { webUrl: validSharePointUrl, name: validName } }, commandInfo);
     assert.strictEqual(actual, true);

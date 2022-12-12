@@ -296,14 +296,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('validation false if boolean option has non boolean value', async () => {
-    const options: any = {
-      ShowAllUsersClaim: 'abc'
-    };
-    const actual = await command.validate({ options: options }, commandInfo);
-    assert.strictEqual(actual, 'ShowAllUsersClaim option has invalid value of abc. Allowed values are ["true","false"]');
-  });
-
   it('validation fails if no options specified', async () => {
     const options: any = {
       debug: true,

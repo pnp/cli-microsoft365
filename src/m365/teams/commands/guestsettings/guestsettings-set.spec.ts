@@ -67,7 +67,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        allowCreateUpdateChannels: 'true'
+        allowCreateUpdateChannels: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -88,7 +88,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'true' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: true }
     } as any);
   });
 
@@ -108,7 +108,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: 'true', allowDeleteChannels: 'true' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: true, allowDeleteChannels: true }
     } as any);
   });
 
@@ -117,7 +117,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'true' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the teamId is not a valid GUID', async () => {
@@ -130,31 +130,11 @@ describe(commands.GUESTSETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if allowDeleteChannels is not a valid boolean', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowDeleteChannels: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if allowCreateUpdateChannels is not a valid boolean', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateChannels: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if allowDeleteChannels is false', async () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowDeleteChannels: 'false'
+        allowDeleteChannels: false
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -164,7 +144,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowDeleteChannels: 'true'
+        allowDeleteChannels: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -174,7 +154,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateChannels: 'false'
+        allowCreateUpdateChannels: false
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -184,7 +164,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateChannels: 'true'
+        allowCreateUpdateChannels: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);

@@ -265,11 +265,14 @@ nav:
         - card list: cmd/pp/card/card-list.md
         - card remove: cmd/pp/card/card-remove.md
       - chatbot:
+        - chatbot get: cmd/pp/chatbot/chatbot-get.md
         - chatbot list: cmd/pp/chatbot/chatbot-list.md
+        - chatbot remove: cmd/pp/chatbot/chatbot-remove.md
       - dataverse:
         - dataverse table get: cmd/pp/dataverse/dataverse-table-get.md
         - dataverse table list: cmd/pp/dataverse/dataverse-table-list.md
         - dataverse table remove: cmd/pp/dataverse/dataverse-table-remove.md
+        - dataverse table row list: cmd/pp/dataverse/dataverse-table-row-list.md
       - environment:
         - environment get: cmd/pp/environment/environment-get.md
         - environment list: cmd/pp/environment/environment-list.md
@@ -283,11 +286,16 @@ nav:
         - solution get: cmd/pp/solution/solution-get.md
         - solution list: cmd/pp/solution/solution-list.md
         - solution remove: cmd/pp/solution/solution-remove.md
+        - solution publisher add: cmd/pp/solution/solution-publisher-add.md
         - solution publisher get: cmd/pp/solution/solution-publisher-get.md
         - solution publisher list: cmd/pp/solution/solution-publisher-list.md
         - solution publisher remove: cmd/pp/solution/solution-publisher-remove.md
       - tenant:
         - tenant settings list: cmd/pp/tenant/tenant-settings-list.md
+    - Purview (purview):
+      - retentionlabel:
+        - retentionlabel list: cmd/purview/retentionlabel/retentionlabel-list.md
+        - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
     - Search (search):
       - externalconnection:
         - externalconnection add: cmd/search/externalconnection/externalconnection-add.md

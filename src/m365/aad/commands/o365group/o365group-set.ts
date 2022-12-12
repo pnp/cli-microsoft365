@@ -18,7 +18,7 @@ export interface Options extends GlobalOptions {
   description?: string;
   owners?: string;
   members?: string;
-  isPrivate?: string;
+  isPrivate?: boolean;
   logoPath?: string;
 }
 
@@ -38,6 +38,7 @@ class AadO365GroupSetCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -48,7 +49,7 @@ class AadO365GroupSetCommand extends GraphCommand {
         description: typeof args.options.description !== 'undefined',
         owners: typeof args.options.owners !== 'undefined',
         members: typeof args.options.members !== 'undefined',
-        isPrivate: typeof args.options.isPrivate !== 'undefined',
+        isPrivate: args.options.isPrivate,
         logoPath: typeof args.options.logoPath !== 'undefined'
       });
     });
@@ -72,12 +73,17 @@ class AadO365GroupSetCommand extends GraphCommand {
         option: '--members [members]'
       },
       {
-        option: '--isPrivate [isPrivate]'
+        option: '--isPrivate [isPrivate]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '-l, --logoPath [logoPath]'
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('isPrivate');
   }
 
   #initValidators(): void {
@@ -91,11 +97,11 @@ class AadO365GroupSetCommand extends GraphCommand {
           !args.options.logoPath) {
           return 'Specify at least one property to update';
         }
-    
+
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         if (args.options.owners) {
           const owners: string[] = args.options.owners.split(',').map(o => o.trim());
           for (let i = 0; i < owners.length; i++) {
@@ -104,7 +110,7 @@ class AadO365GroupSetCommand extends GraphCommand {
             }
           }
         }
-    
+
         if (args.options.members) {
           const members: string[] = args.options.members.split(',').map(m => m.trim());
           for (let i = 0; i < members.length; i++) {
@@ -113,25 +119,19 @@ class AadO365GroupSetCommand extends GraphCommand {
             }
           }
         }
-    
-        if (typeof args.options.isPrivate !== 'undefined' &&
-          args.options.isPrivate !== 'true' &&
-          args.options.isPrivate !== 'false') {
-          return `${args.options.isPrivate} is not a valid boolean value`;
-        }
-    
+
         if (args.options.logoPath) {
           const fullPath: string = path.resolve(args.options.logoPath);
-    
+
           if (!fs.existsSync(fullPath)) {
             return `File '${fullPath}' not found`;
           }
-    
+
           if (fs.lstatSync(fullPath).isDirectory()) {
             return `Path '${fullPath}' points to a directory`;
           }
         }
-    
+
         return true;
       }
     );
@@ -143,7 +143,7 @@ class AadO365GroupSetCommand extends GraphCommand {
         if (this.verbose) {
           logger.logToStderr(`Updating Microsoft 365 Group ${args.options.id}...`);
         }
-  
+
         const update: Group = {};
         if (args.options.displayName) {
           update.displayName = args.options.displayName;
@@ -152,9 +152,9 @@ class AadO365GroupSetCommand extends GraphCommand {
           update.description = args.options.description;
         }
         if (typeof args.options.isPrivate !== 'undefined') {
-          update.visibility = args.options.isPrivate === 'true' ? 'Private' : 'Public';
+          update.visibility = args.options.isPrivate ? 'Private' : 'Public';
         }
-  
+
         const requestOptions: any = {
           url: `${this.resource}/v1.0/groups/${args.options.id}`,
           headers: {
@@ -163,8 +163,8 @@ class AadO365GroupSetCommand extends GraphCommand {
           responseType: 'json',
           data: update
         };
-  
-        await request.patch(requestOptions);          
+
+        await request.patch(requestOptions);
       }
 
       if (args.options.logoPath) {

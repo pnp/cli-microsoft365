@@ -91,7 +91,7 @@ class PpCardRemoveCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+  public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Removing card '${args.options.id || args.options.name}'...`);
     }

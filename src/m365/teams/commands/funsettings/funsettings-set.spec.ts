@@ -79,7 +79,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: 'false' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: false }
     } as any);
   });
 
@@ -98,7 +98,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: 'true' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: true }
     } as any);
   });
 
@@ -155,7 +155,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: 'true' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: true }
     } as any);
   });
 
@@ -174,7 +174,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: 'false' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: false }
     } as any);
   });
 
@@ -194,7 +194,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: 'true' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: true }
     } as any);
   });
 
@@ -213,7 +213,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: true, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: 'false' }
+      options: { debug: true, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: false }
     } as any);
   });
 
@@ -232,7 +232,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: true, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: 'false' }
+      options: { debug: true, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: false }
     } as any);
   });
 
@@ -265,26 +265,6 @@ describe(commands.FUNSETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when allowGiphy is a valid boolean', async () => {
-    const actualTrue = await command.validate({
-      options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowGiphy: 'true' }
-    }, commandInfo);
-
-    const actualFalse = await command.validate({
-      options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowGiphy: 'false' }
-    }, commandInfo);
-
-    const actual = actualTrue && actualFalse;
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation when allowGiphy is not a valid boolean', async () => {
-    const actual = await command.validate({
-      options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowGiphy: 'trueish' }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation when giphyContentRating is moderate or strict', async () => {
     const actualModerate = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', giphyContentRating: 'moderate' }
@@ -307,41 +287,14 @@ describe(commands.FUNSETTINGS_SET, () => {
 
   it('passes validation when allowStickersAndMemes is a valid boolean', async () => {
     const actualTrue = await command.validate({
-      options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowStickersAndMemes: 'true' }
+      options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowStickersAndMemes: true }
     }, commandInfo);
 
     const actualFalse = await command.validate({
-      options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowStickersAndMemes: 'false' }
+      options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowStickersAndMemes: false }
     }, commandInfo);
 
     const actual = actualTrue && actualFalse;
     assert.strictEqual(actual, true);
-  });
-
-  it('fails validation when allowStickersAndMemes is not a valid boolean', async () => {
-    const actual = await command.validate({
-      options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowStickersAndMemes: 'somethingelse' }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when allowCustomMemes is a valid boolean', async () => {
-    const actualTrue = await command.validate({
-      options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowCustomMemes: 'true' }
-    }, commandInfo);
-
-    const actualFalse = await command.validate({
-      options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowCustomMemes: 'false' }
-    }, commandInfo);
-
-    const actual = actualTrue && actualFalse;
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation when allowCustomMemes is not a valid boolean', async () => {
-    const actual = await command.validate({
-      options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowCustomMemes: 'somethingelse' }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 });

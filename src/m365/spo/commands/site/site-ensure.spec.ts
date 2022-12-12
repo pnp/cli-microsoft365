@@ -606,8 +606,8 @@ describe(commands.SITE_ENSURE, () => {
       if (command === spoSiteSetCommand) {
         if (JSON.stringify(args) === JSON.stringify({
           options: {
-            isPublic: 'true',
-            shareByEmailEnabled: 'true',
+            isPublic: true,
+            shareByEmailEnabled: true,
             title: 'Team 1',
             url: 'https://contoso.sharepoint.com/sites/team1',
             verbose: false,

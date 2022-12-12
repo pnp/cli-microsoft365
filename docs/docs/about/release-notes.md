@@ -1,12 +1,24 @@
 # Release notes
 
-## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
+## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0) (beta)
 
 ### New commands
 
 **Planner:**
 
 - [planner plan set](../cmd/planner/plan/plan-set.md) - updates a Microsoft Planner plan [#3346](https://github.com/pnp/cli-microsoft365/issues/3346)
+
+**Power Platform:**
+
+- [pp chatbot get](../cmd/pp/chatbot/chatbot-get.md) - get information about the specified chatbot [#4107](https://github.com/pnp/cli-microsoft365/issues/4107)
+- [pp chatbot remove](../cmd/pp/chatbot/chatbot-remove.md) - removes the specified chatbot [#4106](https://github.com/pnp/cli-microsoft365/issues/4106)
+- [pp dataverse table row list](../cmd/pp/dataverse/dataverse-table-row-list.md) - lists table rows for the given Dataverse table [#3791](https://github.com/pnp/cli-microsoft365/issues/3791)
+- [pp solution publisher add](../cmd/pp/solution/solution-publisher-add.md) - adds a specified publisher in a given environment [#3977](https://github.com/pnp/cli-microsoft365/issues/3977)
+
+**Purview:**
+
+- [purview retentionlabel list](../cmd/purview/retentionlabel/retentionlabel-list.md) - get a list of retention labels [#4144](https://github.com/pnp/cli-microsoft365/issues/4144)
+- [purview retentionlabel remove](../cmd/purview/retentionlabel/retentionlabel-remove.md) - deletes a retention label [#4149](https://github.com/pnp/cli-microsoft365/issues/4149)
 
 **Teams:**
 
@@ -28,6 +40,11 @@
 - fixed next publish build version stamping [#4194](https://github.com/pnp/cli-microsoft365/issues/4194)
 - added 'teams user app list' with teamsApp output [#4128](https://github.com/pnp/cli-microsoft365/issues/4128)
 - fixed 'spo listitem list' filter option [#4090](https://github.com/pnp/cli-microsoft365/issues/4090)
+- introduced markdown output for documentation purposes [#2908](https://github.com/pnp/cli-microsoft365/issues/2908)
+- fixed exposing internal API error [#3527](https://github.com/pnp/cli-microsoft365/issues/3527)
+- extended 'spo serviceprincipal permissionrequest approve' with --all flags [#4074](https://github.com/pnp/cli-microsoft365/issues/4074)
+- fixed the sample script 'resubmit all failed flow runs'
+- updated command options with the new boolean handlings [#3986](https://github.com/pnp/cli-microsoft365/issues/3986)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 

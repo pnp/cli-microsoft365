@@ -1,6 +1,8 @@
 export enum Output {
   text,
-  json
+  json,
+  csv,
+  md
 }
 
 export default interface GlobalOptions {
