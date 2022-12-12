@@ -34,6 +34,10 @@ Configure the default CLI output to JSON
 m365 cli config set --key output --value json
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - [Configuring the CLI for Microsoft 365](../../../user-guide/configuring-cli.md)

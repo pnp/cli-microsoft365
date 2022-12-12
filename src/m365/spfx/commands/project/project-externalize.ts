@@ -115,6 +115,12 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     }
   }
 
+  public getMdOutput(logStatement: any): string {
+    // overwrite markdown output to return the output as-is
+    // because the command already implements its own logic to format the output
+    return logStatement;
+  }
+
   private writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], logger: Logger, options: GlobalOptions): void {
     let report;
 

@@ -540,6 +540,19 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     assert(log[logEntryToCheck].indexOf('## Findings') > -1);
   });
 
+  it('overrides base md formatting', async () => {
+    const expected = [
+      {
+        'prop1': 'value1'
+      },
+      {
+        'prop2': 'value2'
+      }
+    ];
+    const actual = command.getMdOutput(expected, command, { options: { output: 'md' } } as any);
+    assert.deepStrictEqual(actual, expected);
+  });
+
   it('returns text report with output format default', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
     const originalReadFileSync = fs.readFileSync;

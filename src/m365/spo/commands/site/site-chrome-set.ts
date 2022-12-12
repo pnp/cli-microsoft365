@@ -41,9 +41,9 @@ interface Options extends GlobalOptions {
   logoAlignment?: Alignment;
   footerLayout?: FooterLayout;
   footerEmphasis?: Emphasis;
-  disableMegaMenu?: string;
-  hideTitleInHeader?: string;
-  disableFooter?: string;
+  disableMegaMenu?: boolean;
+  hideTitleInHeader?: boolean;
+  disableFooter?: boolean;
 }
 
 class SpoSiteChromeSetCommand extends SpoCommand {
@@ -60,6 +60,7 @@ class SpoSiteChromeSetCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -104,15 +105,22 @@ class SpoSiteChromeSetCommand extends SpoCommand {
         autocomplete: ['Lightest', 'Light', 'Dark', 'Darkest']
       },
       {
-        option: '--disableMegaMenu [disableMegaMenu]'
+        option: '--disableMegaMenu [disableMegaMenu]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--hideTitleInHeader [hideTitleInHeader]'
+        option: '--hideTitleInHeader [hideTitleInHeader]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--disableFooter [disableFooter]'
+        option: '--disableFooter [disableFooter]',
+        autocomplete: ['true', 'false']
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('disableMegaMenu', 'hideTitleInHeader', 'disableFooter');
   }
 
   #initValidators(): void {
@@ -154,9 +162,9 @@ class SpoSiteChromeSetCommand extends SpoCommand {
     const logoAlignment = args.options.logoAlignment ? Alignment[args.options.logoAlignment] : null;
     const footerLayout = args.options.footerLayout ? FooterLayout[args.options.footerLayout] : null;
     const footerEmphasis = args.options.footerEmphasis ? Emphasis[args.options.footerEmphasis] : null;
-    const hideTitleInHeader = typeof args.options.hideTitleInHeader !== "undefined" ? args.options.hideTitleInHeader.toLowerCase() === "true" : null;
-    const disableMegaMenu = typeof args.options.disableMegaMenu !== 'undefined' ? args.options.disableMegaMenu.toLowerCase() === "true" : null;
-    const disableFooter = typeof args.options.disableFooter !== 'undefined' ? args.options.disableFooter.toLowerCase() === "true" : null;
+    const hideTitleInHeader = typeof args.options.hideTitleInHeader !== "undefined" ? args.options.hideTitleInHeader : null;
+    const disableMegaMenu = typeof args.options.disableMegaMenu !== 'undefined' ? args.options.disableMegaMenu : null;
+    const disableFooter = typeof args.options.disableFooter !== 'undefined' ? args.options.disableFooter : null;
 
     const body: any = {};
     if (headerLayout !== null) {
@@ -195,7 +203,7 @@ class SpoSiteChromeSetCommand extends SpoCommand {
 
     try {
       await request.post(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

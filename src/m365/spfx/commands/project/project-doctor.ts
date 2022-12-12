@@ -64,7 +64,8 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     '1.14.0',
     '1.15.0',
     '1.15.2',
-    '1.16.0'
+    '1.16.0',
+    '1.16.1'
   ];
 
   protected get allowedOutputs(): string[] {
@@ -239,6 +240,12 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
       default:
         logger.log(findingsToReport);
     }
+  }
+
+  public getMdOutput(logStatement: any): string {
+    // overwrite markdown output to return the output as-is
+    // because the command already implements its own logic to format the output
+    return logStatement;
   }
 
   private writeReportTourFolder(findingsToReport: any): void {

@@ -7,6 +7,8 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import request from '../../../../request';
+import config from '../../../../config';
+import { ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -19,6 +21,7 @@ interface Options extends GlobalOptions {
   listTitle?: string;
   listId: string;
   listUrl: string;
+  updateChildren: boolean;
 }
 
 class SpoContentTypeSetCommand extends SpoCommand {
@@ -27,7 +30,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Updates existing content type';
+    return 'Update an existing content type';
   }
 
   constructor() {
@@ -47,7 +50,8 @@ class SpoContentTypeSetCommand extends SpoCommand {
         name: typeof args.options.name !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined'
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        updateChildren: args.options.updateChildren
       });
     });
   }
@@ -72,6 +76,9 @@ class SpoContentTypeSetCommand extends SpoCommand {
       {
         option: '--listUrl [listUrl]'
       },
+      {
+        option: '--updateChildren'
+      }
     );
   }
 
@@ -111,40 +118,24 @@ class SpoContentTypeSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const requestOptions: AxiosRequestConfig = {
-      url: `${args.options.webUrl}/_api/Web`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json',
-      data: this.getRequestPayload(args.options)
-    };
-
-    if (args.options.listId) {
-      requestOptions.url += `/Lists/GetById('${formatting.encodeQueryParameter(args.options.listId)}')`;
-    }
-    else if (args.options.listTitle) {
-      requestOptions.url += `/Lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
-    }
-    else if (args.options.listUrl) {
-      requestOptions.url += `/GetList('${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl))}')`;
-    }
-    requestOptions.url += '/ContentTypes';
-
     try {
-      const contentTypeId = await this.getContentTypeId(args.options);
-      requestOptions.url += `/GetById('${formatting.encodeQueryParameter(contentTypeId)}')`;
-
-      await request.patch(requestOptions);
+      const contentTypeId = await this.getContentTypeId(logger, args.options);
+      const siteId = await this.getSiteId(logger, args.options.webUrl);
+      const webId = await this.getWebId(logger, args.options.webUrl);
+      await this.updateContentType(logger, siteId, webId, contentTypeId, args.options);
     }
     catch (err: any) {
-      this.handleRejectedPromise(err);
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getContentTypeId(options: Options): Promise<string> {
+  private async getContentTypeId(logger: Logger, options: Options): Promise<string> {
     if (options.id) {
       return options.id;
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving content type to update...`);
     }
 
     const requestOptions: AxiosRequestConfig = {
@@ -175,7 +166,30 @@ class SpoContentTypeSetCommand extends SpoCommand {
     return res.value[0].Id.StringValue;
   }
 
-  private getRequestPayload(options: Options): any {
+  private async updateContentType(logger: Logger, siteId: string, webId: string, contentTypeId: string, options: Options): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Updating content type...`);
+    }
+
+    const payload = this.getRequestPayload(options);
+
+    const requestOptions: AxiosRequestConfig = {
+      url: `${options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'Content-Type': 'text/xml'
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${payload}</Actions><ObjectPaths><Identity Id="9" Name="fc4179a0-e0d7-5000-c38b-bc3506fbab6f|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:contenttype:${formatting.escapeXml(contentTypeId)}" /></ObjectPaths></Request>`
+    };
+
+    const res = await request.post<string>(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage;
+    }
+  }
+
+  private getRequestPayload(options: Options): string {
     const excludeOptions: string[] = [
       'webUrl',
       'id',
@@ -186,17 +200,56 @@ class SpoContentTypeSetCommand extends SpoCommand {
       'query',
       'debug',
       'verbose',
-      'output'
+      'output',
+      'updateChildren'
     ];
 
-    const payload = Object.keys(options)
+    let i: number = 12;
+    const payload: string[] = Object.keys(options)
       .filter(key => excludeOptions.indexOf(key) === -1)
-      .reduce((object: any, key: string) => {
-        object[key] = options[key];
-        return object;
-      }, {});
+      .map(key => {
+        return `<SetProperty Id="${i++}" ObjectPathId="9" Name="${key}"><Parameter Type="String">${formatting.escapeXml(options[key])}</Parameter></SetProperty>`;
+      });
 
-    return payload;
+    if (options.updateChildren) {
+      payload.push(`<Method Name="Update" Id="${i++}" ObjectPathId="9"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method>`);
+    }
+
+    return payload.join('');
+  }
+
+  private async getSiteId(logger: Logger, webUrl: string): Promise<string> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving site collection id...`);
+    }
+
+    const requestOptions: AxiosRequestConfig = {
+      url: `${webUrl}/_api/site?$select=Id`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const site = await request.get<{ Id: string }>(requestOptions);
+    return site.Id;
+  }
+
+  private async getWebId(logger: Logger, webUrl: string): Promise<string> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving web id...`);
+    }
+
+    const requestOptions: AxiosRequestConfig = {
+      url: `${webUrl}/_api/web?$select=Id`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const web = await request.get<{ Id: string }>(requestOptions);
+    return web.Id;
   }
 }
 

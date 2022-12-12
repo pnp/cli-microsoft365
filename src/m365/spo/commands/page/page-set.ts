@@ -26,7 +26,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   layoutType?: string;
   promoteAs?: string;
-  commentsEnabled?: string;
+  commentsEnabled?: boolean;
   publish: boolean;
   publishMessage?: string;
   description?: string;
@@ -48,6 +48,7 @@ class SpoPageSetCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -105,6 +106,10 @@ class SpoPageSetCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.boolean.push('commentsEnabled');
+  }
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -134,12 +139,6 @@ class SpoPageSetCommand extends SpoCommand {
 
         if (args.options.promoteAs === 'NewsPage' && args.options.layoutType && args.options.layoutType !== 'Article') {
           return 'You can only promote article pages as news article';
-        }
-
-        if (typeof args.options.commentsEnabled !== 'undefined' &&
-          args.options.commentsEnabled !== 'true' &&
-          args.options.commentsEnabled !== 'false') {
-          return `${args.options.commentsEnabled} is not a valid value for commentsEnabled. Allowed values true|false`;
         }
 
         return true;
@@ -349,7 +348,7 @@ class SpoPageSetCommand extends SpoCommand {
 
       if (typeof args.options.commentsEnabled !== 'undefined') {
         const requestOptions: AxiosRequestConfig = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields/SetCommentsDisabled(${args.options.commentsEnabled === 'false'})`,
+          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields/SetCommentsDisabled(${args.options.commentsEnabled === false})`,
           headers: {
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',

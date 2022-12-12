@@ -38,3 +38,7 @@ Removes external connection with name _Test_. Will NOT prompt for confirmation b
 ```sh
 m365 search externalconnection remove --name "Test" --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

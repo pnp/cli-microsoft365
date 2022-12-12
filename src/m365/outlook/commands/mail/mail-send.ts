@@ -7,7 +7,6 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { validation } from '../../../../utils/validation';
 import { formatting } from '../../../../utils/formatting';
 
 interface CommandArgs {
@@ -42,6 +41,7 @@ class OutlookMailSendCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -95,9 +95,14 @@ class OutlookMailSendCommand extends GraphCommand {
         option: '--attachment [attachment]'
       },
       {
-        option: '--saveToSentItems [saveToSentItems]'
+        option: '--saveToSentItems [saveToSentItems]',
+        autocomplete: ['true', 'false']
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('saveToSentItems');
   }
 
   #initValidators(): void {
@@ -107,10 +112,6 @@ class OutlookMailSendCommand extends GraphCommand {
           args.options.bodyContentType !== 'Text' &&
           args.options.bodyContentType !== 'HTML') {
           return `${args.options.bodyContentType} is not a valid value for the bodyContentType option. Allowed values are Text|HTML`;
-        }
-
-        if (args.options.saveToSentItems && !validation.isValidBoolean(args.options.saveToSentItems as any)) {
-          return `${args.options.saveToSentItems} is not a valid value for the saveToSentItems option. Allowed values are true|false`;
         }
 
         if (args.options.importance && ['low', 'normal', 'high'].indexOf(args.options.importance) === -1) {

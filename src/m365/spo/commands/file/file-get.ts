@@ -6,10 +6,7 @@ import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
-import { BasePermissions } from '../../base-permissions';
 import commands from '../../commands';
-import { RoleAssignment, RoleDefinition } from '../roledefinition/RoleDefinition';
-import { RoleType } from '../roledefinition/RoleType';
 import { FileProperties } from './FileProperties';
 
 interface CommandArgs {
@@ -208,10 +205,12 @@ class SpoFileGetCommand extends SpoCommand {
           if (args.options.withPermissions) {
             requestOptions.url = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${file.ServerRelativeUrl}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
             const response = await request.get<{ value: any[] }>(requestOptions);
-            const roleAssignments = this.setFriendlyPermissions(response.value);
-            fileProperties.RoleAssignments = roleAssignments;
+            response.value.forEach((r: any) => {
+              r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
+            });
+            fileProperties.RoleAssignments = response.value;
             if (args.options.asListItem) {
-              fileProperties.ListItemAllFields.RoleAssignments = roleAssignments;
+              fileProperties.ListItemAllFields.RoleAssignments = response.value;
             }
           }
           logger.log(args.options.asListItem ? fileProperties.ListItemAllFields : fileProperties);
@@ -221,20 +220,6 @@ class SpoFileGetCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private setFriendlyPermissions(response: any[]): RoleAssignment[] {
-    response.forEach((r: any) => {
-      r.RoleDefinitionBindings.forEach((r: RoleDefinition) => {
-        const permissions: BasePermissions = new BasePermissions();
-        permissions.high = r.BasePermissions.High as number;
-        permissions.low = r.BasePermissions.Low as number;
-        r.BasePermissionsValue = permissions.parse();
-        r.RoleTypeKindValue = RoleType[r.RoleTypeKind];
-      });
-    });
-
-    return response;
   }
 }
 
