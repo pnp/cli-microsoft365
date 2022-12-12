@@ -1,4 +1,4 @@
-# solution remove
+# pp solution publisher remove
 
 Removes the specified publisher in the specified Power Platform environment
 

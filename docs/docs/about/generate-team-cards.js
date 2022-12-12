@@ -175,6 +175,12 @@ const contributors = [{
     twitter: 'casvaniersel'
   },
   {
+    name: 'Chinu Anand',
+    company: '',
+    github: 'chinu-anand',
+    twitter: 'anand_chinu'
+  },
+  {
     name: 'Christian Bewernitz',
     company: '',
     github: 'karfau',
@@ -653,6 +659,12 @@ const contributors = [{
     company: 'NTT Ltd',
     github: 'sudharsank',
     twitter: 'sudharsank'
+  },
+  {
+    name: 'Taaqif Peck',
+    company: '',
+    github: 'Taaqif',
+    twitter: ''
   },
   {
     name: 'Tanmay Rathi',

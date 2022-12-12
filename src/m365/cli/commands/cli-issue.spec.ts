@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../appInsights';
+import { telemetry } from '../../../telemetry';
 import { Cli } from '../../../cli/Cli';
 import { CommandInfo } from '../../../cli/CommandInfo';
 import { Logger } from '../../../cli/Logger';
@@ -19,7 +19,7 @@ describe(commands.ISSUE, () => {
   let openBrowserSpy: Sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     (command as any).open = () => { };
     openBrowserSpy = sinon.spy(command as any, 'openBrowser');
@@ -47,7 +47,7 @@ describe(commands.ISSUE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
