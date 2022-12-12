@@ -1,5 +1,5 @@
 import sinon = require("sinon");
-import appInsights from "../../../appInsights";
+import { telemetry } from "../../../telemetry";
 import auth from "../../../Auth";
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from "../../../Command";
@@ -50,7 +50,7 @@ describe(commands.LIST, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.ensureFormDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
