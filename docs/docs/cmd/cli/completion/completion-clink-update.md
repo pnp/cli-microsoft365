@@ -24,8 +24,12 @@ This commands updates the list of commands and their options used by command com
 Write the list of commands for Clink (cmder) command completion to a file named `m365.lua` in the current directory
 
 ```powershell
-cli completion clink update > m365.lua
+m365 cli completion clink update > m365.lua
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

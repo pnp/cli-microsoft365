@@ -88,4 +88,45 @@ describe('utils/md', () => {
     assert(!plannerPlanAddHelpPlain.includes(`=== "JSON"`), 'Includes the original tab definition');
     assert(!plannerPlanAddHelpPlain.includes(`\` json`), 'Includes language escape code');
   });
+
+  it('escapes underscores in an md string', () => {
+    const src = 'This is _italic_';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is \\_italic\\_');
+  });
+
+  it('escapes asterisks in an md string', () => {
+    const src = 'This is **bold**';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is \\*\\*bold\\*\\*');
+  });
+
+  it('escapes backticks in an md string', () => {
+    const src = 'This is `code`';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is \\`code\\`');
+  });
+
+  it('escapes tilde in an md string', () => {
+    const src = 'This is ~strikethrough~';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is \\~strikethrough\\~');
+  });
+
+  it('escapes pipe in an md string', () => {
+    const src = 'This is | pipe';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is \\| pipe');
+  });
+
+  it('escapes new line in an md string', () => {
+    const src = 'This is\nnew\nline';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is<br>new<br>line');
+  });
+
+  it(`doesn't fail escaping special md characters if the specified arg is undefined`, () => {
+    const actual = md.escapeMd(undefined);
+    assert.strictEqual(actual, undefined);
+  });
 });

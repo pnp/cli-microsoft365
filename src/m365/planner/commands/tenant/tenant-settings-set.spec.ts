@@ -82,14 +82,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when invalid boolean is passed as option', async () => {
-    const actual = await command.validate({
-      options: {
-        isPlannerAllowed: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
 
   it('passes validation when valid options specified', async () => {
     const actual = await command.validate({

@@ -1,4 +1,7 @@
 import * as stripJsonComments from 'strip-json-comments';
+import { BasePermissions } from '../m365/spo/base-permissions';
+import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition';
+import { RoleType } from '../m365/spo/commands/roledefinition/RoleType';
 
 export const formatting = {
   escapeXml(s: any | undefined): any | undefined {
@@ -40,6 +43,18 @@ export const formatting = {
         filtered[key] = obj[key];
         return filtered;
       }, {});
+  },
+
+  setFriendlyPermissions(response: RoleDefinition[]): RoleDefinition[] {
+    response.forEach((r: RoleDefinition) => {
+      const permissions: BasePermissions = new BasePermissions();
+      permissions.high = r.BasePermissions.High as number;
+      permissions.low = r.BasePermissions.Low as number;
+      r.BasePermissionsValue = permissions.parse();
+      r.RoleTypeKindValue = RoleType[r.RoleTypeKind];
+    });
+
+    return response;
   },
 
   parseCsvToJson(s: string, quoteChar: string = '"', delimiter: string = ','): any {
@@ -85,5 +100,31 @@ export const formatting = {
       .replace(/:/g, '%3A')
       .replace(/@/g, '%40')
       .replace(/#/g, '%23');
+  },
+
+  /**
+   * Rewrites boolean values according to the definition:
+   * Booleans are case-insensitive, and are represented by the following values.
+   *   True: 1, yes, true, on
+   *   False: 0, no, false, off
+   * @value Stringified Boolean value to rewrite
+   * @returns A stringified boolean with the value 'true' or 'false'. Returns the original value if it does not comply with the definition. 
+   */
+  rewriteBooleanValue(value: string): string {
+    const argValue = value.toLowerCase();
+    switch (argValue) {
+      case '1':
+      case 'true':
+      case 'yes':
+      case 'on':
+        return 'true';
+      case '0':
+      case 'false':
+      case 'no':
+      case 'off':
+        return 'false';
+      default:
+        return value;
+    }
   }
 };
