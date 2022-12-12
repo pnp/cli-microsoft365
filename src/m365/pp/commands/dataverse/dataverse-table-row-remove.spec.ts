@@ -18,8 +18,12 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
   //#region Mocked Responses
   const validEnvironment = '4be50206-9576-4237-8b17-38d8aadfaa36';
   const validId = '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893';
-  const validTablename = 'DataverseLogicalname';
+  const validTableName = 'DataverseTable';
+  const validEntitySetName = 'cr6c3_dataversetables';
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
+  const tableResponse = {
+    EntitySetName: 'cr6c3_dataversetables'
+  };
   //#endregion
 
   let log: string[];
@@ -58,6 +62,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
+      request.get,
       request.delete,
       powerPlatform.getDynamicsInstanceApiUrl,
       Cli.prompt,
@@ -87,14 +92,19 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
       options: {
         environment: validEnvironment,
         id: 'Invalid GUID',
-        tablename: validTablename
+        tableName: validTableName
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if required options specified', async () => {
-    const actual = await command.validate({ options: { environment: validEnvironment, tablename: validTablename, id: validId } }, commandInfo);
+  it('passes validation if required options specified (tableName)', async () => {
+    const actual = await command.validate({ options: { environment: validEnvironment, tableName: validTableName, id: validId } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if required options specified (entitySetName)', async () => {
+    const actual = await command.validate({ options: { environment: validEnvironment, entitySetName: validEntitySetName, id: validId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -131,11 +141,11 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
-  it('removes the specified row from a dataverse table owned by the currently signed-in user when prompt confirmed', async () => {
+  it('removes the specified row according to the entitySetName parameter from a dataverse table owned by the currently signed-in user when prompt confirmed', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/${validTablename}(${validId})`) {
+      if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/${validEntitySetName}(${validId})`) {
         return;
       }
 
@@ -151,17 +161,27 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
         debug: true,
         environment: validEnvironment,
         id: validId,
-        tablename: validTablename
+        entitySetName: validEntitySetName
       }
     });
     assert(loggerLogToStderrSpy.called);
   });
 
-  it('removes the specified row from a dataverse table without confirmation prompt', async () => {
+  it('removes the specified row according to the tableName parameter from a dataverse table with the entitySetName parameter without confirmation prompt', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/EntityDefinitions(LogicalName='${validTableName}')?$select=EntitySetName`)) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return tableResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/${validTablename}(${validId})`) {
+      if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/${validEntitySetName}(${validId})`) {
         return;
       }
 
@@ -173,7 +193,7 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
         debug: true,
         environment: validEnvironment,
         id: validId,
-        tablename: validTablename,
+        tableName: validTableName,
         confirm: true
       }
     });
@@ -192,8 +212,33 @@ describe(commands.DATAVERSE_TABLE_ROW_REMOVE, () => {
         debug: true,
         environment: validEnvironment,
         id: validId,
-        confirm: true
+        confirm: true,
+        entitySetName: validEntitySetName
       }
     }), new CommandError(errorMessage));
+  });
+
+  it('removes dataverse table row with the entitySetName parameter and without confirmation', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/${validEntitySetName}(${validId})`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        environment: validEnvironment,
+        id: validId,
+        entitySetName: validEntitySetName,
+        confirm: true
+      }
+    });
+
+    assert(loggerLogToStderrSpy.called);
   });
 });

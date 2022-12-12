@@ -16,8 +16,11 @@ pp dataverse table row remove [options]
 `-i, --id <id>`
 : The id of the row to remove.
 
-`-t, --tablename <tablename>`
-: The name of the dataverse table.
+`--entitySetName [entitySetName]`
+: The entity set name of the table. Specify either `entitySetName` or `tableName` but not both
+
+`--tableName [tableName]`
+: The name of the table. Specify either `entitySetName` or `tableName` but not both
 
 `--confirm`
 : Don't prompt for confirmation
@@ -32,19 +35,25 @@ pp dataverse table row remove [options]
 Removes a row from a dataverse table in a given environment
 
 ```sh
-m365 pp dataverse table row remove --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tablename "aadusers" --id "21d01cf4-356c-ed11-9561-000d3a4bbea4"
+m365 pp dataverse table row remove --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tableName "aadusers" --id "21d01cf4-356c-ed11-9561-000d3a4bbea4"
 ```
 
 Removes a row from a dataverse table in a given environment as Admin
 
 ```sh
-m365 pp dataverse table row remove --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tablename "aadusers" --id "21d01cf4-356c-ed11-9561-000d3a4bbea4" --asAdmin
+m365 pp dataverse table row remove --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tableName "aadusers" --id "21d01cf4-356c-ed11-9561-000d3a4bbea4" --asAdmin
 ```
 
 Removes a row from a dataverse table in a given environment without prompting for confirmation
 
 ```sh
-m365 pp dataverse table row remove --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tablename "aadusers" --id "21d01cf4-356c-ed11-9561-000d3a4bbea4" --confirm
+m365 pp dataverse table row remove --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --tableName "aadusers" --id "21d01cf4-356c-ed11-9561-000d3a4bbea4" --confirm
+```
+
+Removes a row from a dataverse table in a given environment based on the entity set name without prompting for confirmation
+
+```sh
+m365 pp dataverse table row remove --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --entitySetName "cr6c3_accounts" --id "21d01cf4-356c-ed11-9561-000d3a4bbea4" --confirm
 ```
 
 ## Response
