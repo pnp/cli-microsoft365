@@ -8,6 +8,8 @@ import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
+import * as SpoUserGetCommand from '../user/user-get';
+import { Options as SpoUserGetCommandOptions } from '../user/user-get';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { SharingResult } from './SharingResult';
@@ -22,6 +24,7 @@ interface Options extends GlobalOptions {
   groupName?: string;
   userName?: string;
   email?: string;
+  userId?: string;
 }
 
 class SpoGroupMemberAddCommand extends SpoCommand {
@@ -52,7 +55,8 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         groupId: typeof args.options.groupId !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
-        email: typeof args.options.email !== 'undefined'
+        email: typeof args.options.email !== 'undefined',
+        userId: typeof args.options.userId !== 'undefined'
       });
     });
   }
@@ -73,6 +77,9 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       },
       {
         option: '--email [email]'
+      },
+      {
+        option: '--userId [userId]'
       }
     );
   }
@@ -97,7 +104,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupId', 'groupName'] },
-      { options: ['userName', 'email'] }
+      { options: ['userName', 'email', 'userId'] }
     );
   }
 
@@ -171,11 +178,11 @@ class SpoGroupMemberAddCommand extends SpoCommand {
 
     const validUserNames: string[] = [];
     const invalidUserNames: string[] = [];
-    const userInfo: string = args.options.userName ? args.options.userName : args.options.email!;
+    const userInfo: string = args.options.userName ? args.options.userName : args.options.email ? args.options.email : args.options.userId!.toString();
 
     return Promise
       .all(userInfo.split(',').map(singleUserName => {
-        const options: AadUserGetCommandOptions = {
+        const options: AadUserGetCommandOptions | SpoUserGetCommandOptions = {
           output: 'json',
           debug: args.options.debug,
           verbose: args.options.verbose
@@ -184,24 +191,47 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         if (args.options.userName) {
           options.userName = singleUserName.trim();
         }
-        else {
+        else if (args.options.email) {
           options.email = singleUserName.trim();
         }
+        else {
+          options.id = singleUserName.trim();
+          options.webUrl = args.options.webUrl;
+        }
 
-        return Cli
-          .executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } })
-          .then((getUserGetOutput: CommandOutput): void => {
-            if (this.debug) {
-              logger.logToStderr(getUserGetOutput.stderr);
-            }
+        if (options.id) {
+          return Cli
+            .executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...options, _: [] } })
+            .then((getUserGetOutput: CommandOutput): void => {
+              if (this.debug) {
+                logger.logToStderr(getUserGetOutput.stderr);
+              }
 
-            validUserNames.push(JSON.parse(getUserGetOutput.stdout).userPrincipalName);
-          }, (err: CommandErrorWithOutput) => {
-            if (this.debug) {
+              validUserNames.push(JSON.parse(getUserGetOutput.stdout).UserPrincipalName);
+            }, (err: CommandErrorWithOutput) => {
+              if (this.debug) {
+                logger.logToStderr(err.stderr);
+              }
               logger.logToStderr(err.stderr);
-            }
-            invalidUserNames.push(singleUserName);
-          });
+              invalidUserNames.push(singleUserName);
+            });
+        }
+        else {
+          return Cli
+            .executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } })
+            .then((getUserGetOutput: CommandOutput): void => {
+              if (this.debug) {
+                logger.logToStderr(getUserGetOutput.stderr);
+              }
+
+              validUserNames.push(JSON.parse(getUserGetOutput.stdout).userPrincipalName);
+            }, (err: CommandErrorWithOutput) => {
+              if (this.debug) {
+                logger.logToStderr(err.stderr);
+              }
+              invalidUserNames.push(singleUserName);
+            });
+        }
       }))
       .then((): Promise<string[]> => {
         if (invalidUserNames.length > 0) {
