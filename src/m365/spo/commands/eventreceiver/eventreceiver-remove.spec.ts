@@ -1,12 +1,13 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { pid } from '../../../../utils/pid';
 import { formatting } from '../../../../utils/formatting';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -33,7 +34,8 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -71,8 +73,9 @@ describe(commands.EVENTRECEIVER_REMOVE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
-      auth.restoreAuth
+      telemetry.trackEvent,
+      auth.restoreAuth,
+      pid.getProcessName
     ]);
     auth.service.connected = false;
   });

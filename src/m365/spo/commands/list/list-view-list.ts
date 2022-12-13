@@ -1,8 +1,8 @@
-import { AxiosRequestConfig } from 'axios';
+
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -88,7 +88,7 @@ class SpoListViewListCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -105,17 +105,9 @@ class SpoListViewListCommand extends SpoCommand {
       requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/views`;
     }
 
-    const requestOptions: AxiosRequestConfig = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const res = await request.get<any>(requestOptions);
-      logger.log(res.value);
+      const res = await odata.getAllItems<any>(requestUrl);
+      logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

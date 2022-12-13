@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.CUSTOMACTION_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -53,7 +53,7 @@ describe(commands.CUSTOMACTION_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -69,7 +69,7 @@ describe(commands.CUSTOMACTION_GET, () => {
 
   it('defines correct option sets', () => {
     assert.deepStrictEqual(command.optionSets, [
-      ['id', 'title']
+      { options: ['id', 'title'] }
     ]);
   });
 
@@ -566,10 +566,10 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: 'foo'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: 'foo'
+      }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -577,10 +577,10 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('fails validation if the id option is not a valid guid', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "foo",
-          webUrl: 'https://contoso.sharepoint.com'
-        }
+      {
+        id: "foo",
+        webUrl: 'https://contoso.sharepoint.com'
+      }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -588,10 +588,10 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('passes validation when the id and url options specified', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com"
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com"
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -599,11 +599,11 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('passes validation when the id, url and scope options specified', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com",
-          scope: "Site"
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com",
+        scope: "Site"
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -611,10 +611,10 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('passes validation when the id and url option specified', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com"
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com"
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -637,11 +637,11 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('accepts scope to be All', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'All'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'All'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -649,11 +649,11 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('accepts scope to be Site', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'Site'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'Site'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -661,11 +661,11 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('accepts scope to be Web', async () => {
     const actual = await command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'Web'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'Web'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -698,10 +698,10 @@ describe(commands.CUSTOMACTION_GET, () => {
     const actual = await command.validate(
       {
         options:
-          {
-            id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-            webUrl: "https://contoso.sharepoint.com"
-          }
+        {
+          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+          webUrl: "https://contoso.sharepoint.com"
+        }
       }, commandInfo);
     assert.strictEqual(actual, true);
   });

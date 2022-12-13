@@ -1,3 +1,5 @@
+import { RoleAssignment } from "../roledefinition/RoleDefinition";
+
 export interface FileProperties {
   ListItemAllFields: any;
   CheckInComment: string;
@@ -21,4 +23,5 @@ export interface FileProperties {
   UIVersion: number;
   UIVersionLabel: string;
   UniqueId: string;
+  RoleAssignments?: RoleAssignment[];
 }

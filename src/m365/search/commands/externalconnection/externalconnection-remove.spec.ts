@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
@@ -18,7 +18,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
@@ -55,7 +55,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -71,7 +71,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'name']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
   });
 
   it('prompts before removing the specified external connection by id when confirm option not passed', async () => {
@@ -126,7 +126,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    
+
 
     await command.action(logger, { options: { debug: true, id: "contosohr" } });
     assert(externalConnectionRemoveCallIssued);
@@ -191,10 +191,13 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject('The specified connection does not exist in Microsoft Search');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      name: "Fabrikam HR", 
-      confirm: true } } as any), new CommandError("The specified connection does not exist in Microsoft Search"));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: "Fabrikam HR",
+        confirm: true
+      }
+    } as any), new CommandError("The specified connection does not exist in Microsoft Search"));
   });
 
   it('fails when multiple external connections with same name exists', async () => {
@@ -216,10 +219,13 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject("Invalid request");
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: "My HR",
-      confirm: true } } as any), new CommandError("Multiple external connections with name My HR found. Please disambiguate (IDs): fabrikamhr, contosohr"));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: false,
+        name: "My HR",
+        confirm: true
+      }
+    } as any), new CommandError("Multiple external connections with name My HR found. Please disambiguate (IDs): fabrikamhr, contosohr"));
   });
 
   it('supports debug mode', () => {

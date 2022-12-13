@@ -59,3 +59,7 @@ Send an e-mail to _user@contoso.com_ with additional headers
 ```sh
 m365 spo mail send --webUrl https://contoso.sharepoint.com/sites/project-x --to "user@contoso.com" --subject "Email sent via CLI for Microsoft 365" --body "<h1>CLI for Microsoft 365</h1>Email sent via <b>command</b>." --additionalHeaders "'{\"X-MC-Tags\":\"CLI for Microsoft 365\"}'"
 ```
+
+## Response
+
+The command won't return a response on success.

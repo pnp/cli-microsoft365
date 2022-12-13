@@ -15,7 +15,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
@@ -117,7 +117,7 @@ class SpoListItemSetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -227,17 +227,18 @@ class SpoListItemSetCommand extends SpoCommand {
       }
 
       const additionalContentType: string = (args.options.systemUpdate && args.options.contentType && contentTypeName !== '') ? `
+          <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">
             <Parameters>
               <Parameter Type="String">ContentType</Parameter>
               <Parameter Type="String">${contentTypeName}</Parameter>
-            </Parameters>`
+            </Parameters>
+          </Method>`
         : ``;
 
       const requestBody: any = args.options.systemUpdate ?
         `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">
           <Actions>
-            <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">${this.mapRequestBody(args.options).join()}${additionalContentType}
-            </Method>
+            ${this.mapRequestBody(args.options).join('')}${additionalContentType}
             <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />
           </Actions>
           <ObjectPaths>
@@ -342,10 +343,12 @@ class SpoListItemSetCommand extends SpoCommand {
       if (excludeOptions.indexOf(key) === -1) {
         if (options.systemUpdate) {
           requestBody.push(`
+          <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">
             <Parameters>
               <Parameter Type="String">${key}</Parameter>
               <Parameter Type="String">${(<any>options)[key].toString()}</Parameter>
-            </Parameters>`);
+            </Parameters>
+          </Method>`);
         }
         else {
           requestBody.push({ FieldName: key, FieldValue: (<any>options)[key].toString() });

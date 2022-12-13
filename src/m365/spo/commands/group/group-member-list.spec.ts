@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,8 +19,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
   let commandInfo: CommandInfo;
 
   const JSONSPGroupMembersList =
-  {
-    "value": [
+    [
       {
         "Id": 6,
         "IsHiddenInUI": false,
@@ -55,12 +54,15 @@ describe(commands.GROUP_MEMBER_LIST, () => {
         },
         "UserPrincipalName": "AdeleV@contoso.com"
       }
-    ]
+    ];
+
+  const groupMembersList = {
+    value: JSONSPGroupMembersList
   };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -92,7 +94,7 @@ describe(commands.GROUP_MEMBER_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -111,12 +113,12 @@ describe(commands.GROUP_MEMBER_LIST, () => {
   });
 
   it('Getting the members of a SharePoint Group using groupId', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.resolve(JSONSPGroupMembersList);
+        return groupMembersList;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
       options: {
@@ -125,16 +127,16 @@ describe(commands.GROUP_MEMBER_LIST, () => {
         groupId: 3
       }
     });
-    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList.value));
+    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList));
   });
 
   it('Getting the members of a SharePoint Group using groupId (DEBUG)', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.resolve(JSONSPGroupMembersList);
+        return groupMembersList;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
       options: {
@@ -143,16 +145,16 @@ describe(commands.GROUP_MEMBER_LIST, () => {
         groupId: 3
       }
     });
-    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList.value));
+    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList));
   });
 
   it('Getting the members of a SharePoint Group using groupName (DEBUG)', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetByName') > -1) {
-        return Promise.resolve(JSONSPGroupMembersList);
+        return groupMembersList;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw `Invalid request ${JSON.stringify(opts)}`;
     });
     await command.action(logger, {
       options: {
@@ -161,16 +163,16 @@ describe(commands.GROUP_MEMBER_LIST, () => {
         groupName: "Contoso Site Owners"
       }
     });
-    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList.value));
+    assert(loggerLogSpy.calledWith(JSONSPGroupMembersList));
   });
 
   it('Correctly Handles Error when listing members of the group', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.reject('Invalid request');
+        throw 'Invalid request';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, {

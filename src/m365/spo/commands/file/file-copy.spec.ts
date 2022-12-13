@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -9,69 +9,26 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
-import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
 const command: Command = require('./file-copy');
 
 describe(commands.FILE_COPY, () => {
+  const webUrl = 'https://contoso.sharepoint.com/sites/project';
+  const documentName = 'Document.pdf';
+  const relSourceUrl = '/sites/project/Documents/' + documentName;
+  const absoluteSourceUrl = 'https://contoso.sharepoint.com/sites/project/Documents/' + documentName;
+  const relTargetUrl = '/sites/IT/Documents';
+  const absoluteTargetUrl = 'https://contoso.sharepoint.com/sites/IT/Documents';
+
   let log: any[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
+  let requestPostStub: sinon.SinonStub;
   let commandInfo: CommandInfo;
-
-  const stubAllPostRequests: any = (
-    createCopyJobs: any = null,
-    waitForJobResult: any = null
-  ) => {
-    return sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/site/CreateCopyJobs') > -1) {
-        if (createCopyJobs) {
-          return createCopyJobs;
-        }
-        return Promise.resolve({ value: [{ "EncryptionKey": "6G35dpTMegtzqT3rsZ/av6agpsqx/SUyaAHBs9fJE6A=", "JobId": "cee65dc5-8d05-41cc-8657-92a12d213f76", "JobQueueUri": "https://spobn1sn1m001pr.queue.core.windows.net:443/1246pq20180429-5305d83990eb483bb93e7356252715b4?sv=2014-02-14&sig=JUwFF1B0KVC2h0o5qieHPUG%2BQE%2BEhJHNpbzFf8QmCGc%3D&st=2018-04-28T07%3A00%3A00Z&se=2018-05-20T07%3A00%3A00Z&sp=rap" }] });
-      }
-
-      if ((opts.url as string).indexOf('/_api/site/GetCopyJobProgress') > -1) {
-        if (waitForJobResult) {
-          return waitForJobResult;
-        }
-        return Promise.resolve({
-          JobState: 0,
-          Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Copy\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-  };
-
-  const stubAllGetRequests: any = (fileExists: any = null) => {
-    return sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('GetFileByServerRelativeUrl') > -1) {
-        if (fileExists) {
-          return fileExists;
-        }
-        return Promise.resolve({});
-      }
-
-      return Promise.reject('Invalid request');
-    });
-  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
-      FormDigestValue: 'abc',
-      FormDigestTimeoutSeconds: 1800,
-      FormDigestExpiresAt: new Date(),
-      WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
-    sinon.stub(global, 'setTimeout').callsFake((fn) => {
-      fn();
-      return {} as any;
-    });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -89,24 +46,27 @@ describe(commands.FILE_COPY, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
+
+    requestPostStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/SP.MoveCopyUtil.CopyFileByPath`) {
+        return;
+      }
+
+      throw 'Invalid request URL: ' + opts.url;
+    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post,
-      request.get,
-      Cli.executeCommand
+      request.post
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
+      telemetry.trackEvent,
       auth.restoreAuth,
-      spo.getRequestDigest,
-      appInsights.trackEvent,
-      pid.getProcessName,
-      global.setTimeout
+      pid.getProcessName
     ]);
     auth.service.connected = false;
   });
@@ -119,247 +79,185 @@ describe(commands.FILE_COPY, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('excludes options from URL processing', () => {
-    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['targetUrl']);
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', sourceUrl: absoluteSourceUrl, targetUrl: absoluteTargetUrl } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
-  it('should command complete successfully', async () => {
-    stubAllPostRequests();
-    stubAllGetRequests();
+  it('fails validation if nameConflictBehavior has an invalid value', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, sourceUrl: absoluteSourceUrl, targetUrl: absoluteTargetUrl, nameConflictBehavior: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
 
+  it('passes validation if all required properties are provided', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, sourceUrl: absoluteSourceUrl, targetUrl: absoluteTargetUrl } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('copies file successfully when absolute URLs are provided', async () => {
     await command.action(logger, {
       options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc'
+        verbose: true,
+        webUrl: webUrl,
+        sourceUrl: absoluteSourceUrl,
+        targetUrl: absoluteTargetUrl
       }
     });
-  });
 
-  it('should complete successfully in 4 tries', async () => {
-    let counter = 4;
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/recycle()') > -1) {
-        return Promise.resolve();
-      }
-
-      if ((opts.url as string).indexOf('/_api/site/CreateCopyJobs') > -1) {
-        return Promise.resolve({ value: [{ "EncryptionKey": "6G35dpTMegtzqT3rsZ/av6agpsqx/SUyaAHBs9fJE6A=", "JobId": "cee65dc5-8d05-41cc-8657-92a12d213f76", "JobQueueUri": "https://spobn1sn1m001pr.queue.core.windows.net:443/1246pq20180429-5305d83990eb483bb93e7356252715b4?sv=2014-02-14&sig=JUwFF1B0KVC2h0o5qieHPUG%2BQE%2BEhJHNpbzFf8QmCGc%3D&st=2018-04-28T07%3A00%3A00Z&se=2018-05-20T07%3A00%3A00Z&sp=rap" }] });
-      }
-
-      if ((opts.url as string).indexOf('/_api/site/GetCopyJobProgress') > -1) {
-        // substract jobstate untill we hit jobstate = 0 (success)
-        counter = (counter - 1);
-
-        return Promise.resolve({
-          JobState: counter,
-          Logs: ["{\r\n  \"Event\": \"JobEnd\",\r\n  \"JobId\": \"cee65dc5-8d05-41cc-8657-92a12d213f76\",\r\n  \"Time\": \"04/29/2018 22:00:08.370\",\r\n  \"FilesCreated\": \"1\",\r\n  \"BytesProcessed\": \"4860914\",\r\n  \"ObjectsProcessed\": \"2\",\r\n  \"TotalExpectedSPObjects\": \"2\",\r\n  \"TotalErrors\": \"0\",\r\n  \"TotalWarnings\": \"0\",\r\n  \"TotalRetryCount\": \"0\",\r\n  \"MigrationType\": \"Move\",\r\n  \"MigrationDirection\": \"Import\",\r\n  \"CreatedOrUpdatedFileStatsBySize\": \"{\\\"1-10M\\\":{\\\"Count\\\":1,\\\"TotalSize\\\":4860914,\\\"TotalDownloadTime\\\":24,\\\"TotalCreationTime\\\":2824}}\",\r\n  \"ObjectsStatsByType\": \"{\\\"SPUser\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":0,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPFile\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":3184,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0},\\\"SPListItem\\\":{\\\"Count\\\":1,\\\"TotalTime\\\":360,\\\"AccumulatedVersions\\\":0,\\\"ObjectsWithVersions\\\":0}}\",\r\n  \"TotalExpectedBytes\": \"4860914\",\r\n  \"CorrelationId\": \"8559629e-0036-5000-c38d-80b698e0cd79\"\r\n}"]
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    stubAllGetRequests();
-
-    await command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc'
-      }
-    });
-  });
-
-  it('should fail if source file not found', async () => {
-    stubAllPostRequests();
-    const rejectFileExists = new Promise<any>((resolve, reject) => {
-      return reject('File not found.');
-    });
-    stubAllGetRequests(rejectFileExists);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc'
-      }
-    } as any), new CommandError('File not found.'));
-  });
-
-  it('should succeed when run with option --deleteIfAlreadyExists', async () => {
-    stubAllPostRequests();
-    stubAllGetRequests();
-    sinon.stub(Cli, 'executeCommand');
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc',
-        deleteIfAlreadyExists: true
-      }
-    });
-    assert(loggerLogToStderrSpy.called);
-  });
-
-  it('should succeed when run with option --deleteIfAlreadyExists and response 404', async () => {
-    stubAllPostRequests();
-    stubAllGetRequests();
-
-    const fileDeleteError: any = {
-      error: {
-        message: 'does not exist'
+    const response = {
+      srcPath: {
+        DecodedUrl: absoluteSourceUrl
       },
-      stderr: ''
+      destPath: {
+        DecodedUrl: absoluteTargetUrl + `/${documentName}`
+      },
+      overwrite: false,
+      options: {
+        KeepBoth: false,
+        ShouldBypassSharedLocks: false
+      }
     };
 
-    sinon.stub(Cli, 'executeCommand').returns(Promise.reject(fileDeleteError));
+    assert.deepStrictEqual(requestPostStub.lastCall.args[0].data, response);
+  });
 
+  it('copies file successfully when server relative URLs are provided', async () => {
     await command.action(logger, {
       options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc',
-        deleteIfAlreadyExists: true
+        verbose: true,
+        webUrl: webUrl,
+        sourceUrl: relSourceUrl,
+        targetUrl: relTargetUrl
       }
     });
-    assert(loggerLogToStderrSpy.called);
-  });
 
-  it('should show error when recycleFile rejects with error', async () => {
-    
-    stubAllPostRequests();
-    stubAllGetRequests();
-    sinon.stub(Cli, 'executeCommand').returns(Promise.reject('abc'));
-    await assert.rejects(command.action(logger, {
+    const response = {
+      srcPath: {
+        DecodedUrl: absoluteSourceUrl
+      },
+      destPath: {
+        DecodedUrl: absoluteTargetUrl + `/${documentName}`
+      },
+      overwrite: false,
       options: {
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc',
-        deleteIfAlreadyExists: true
+        KeepBoth: false,
+        ShouldBypassSharedLocks: false
       }
-    } as any), new CommandError('abc'));
+    };
+
+    assert.deepStrictEqual(requestPostStub.lastCall.args[0].data, response);
   });
 
-  it('should recycleFile format target url', async () => {
-    stubAllPostRequests();
-    stubAllGetRequests();
-
-    sinon.stub(Cli, 'executeCommand').returns(Promise.reject('abc'));
-
-    await assert.rejects(command.action(logger, {
+  it('copies file successfully with a new name', async () => {
+    await command.action(logger, {
       options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: '/abc/',
-        deleteIfAlreadyExists: true
+        verbose: true,
+        webUrl: webUrl,
+        sourceUrl: relSourceUrl,
+        targetUrl: relTargetUrl,
+        newName: 'Document-renamed.pdf'
       }
-    } as any), new CommandError('abc'));
+    });
+
+    const response = {
+      srcPath: {
+        DecodedUrl: absoluteSourceUrl
+      },
+      destPath: {
+        DecodedUrl: absoluteTargetUrl + '/Document-renamed.pdf'
+      },
+      overwrite: false,
+      options: {
+        KeepBoth: false,
+        ShouldBypassSharedLocks: false
+      }
+    };
+
+    assert.deepStrictEqual(requestPostStub.lastCall.args[0].data, response);
   });
 
-  it('should show error when getRequestDigest rejects with error', async () => {
-    stubAllPostRequests();
-    stubAllGetRequests();
-    sinonUtil.restore(spo.getRequestDigest);
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('error'));
+  it('copies file successfully with nameConflictBehavior fail', async () => {
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        webUrl: webUrl,
+        sourceUrl: relSourceUrl,
+        targetUrl: relTargetUrl,
+        nameConflictBehavior: 'fail'
+      }
+    });
 
-    try {
-      await assert.rejects(command.action(logger, {
-        options: {
-          debug: true,
-          webUrl: 'https://contoso.sharepoint.com',
-          sourceUrl: 'abc/abc.pdf',
-          targetUrl: 'abc',
-          deleteIfAlreadyExists: true
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.overwrite, false, 'Overwite option is not false');
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.options.KeepBoth, false, 'KeepBoth option is not false');
+  });
+
+  it('copies file successfully with nameConflictBehavior replace', async () => {
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        webUrl: webUrl,
+        sourceUrl: relSourceUrl,
+        targetUrl: relTargetUrl,
+        nameConflictBehavior: 'replace'
+      }
+    });
+
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.overwrite, true, 'Overwite option is not true');
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.options.KeepBoth, false, 'KeepBoth option is not false');
+  });
+
+  it('copies file successfully with nameConflictBehavior rename', async () => {
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        webUrl: webUrl,
+        sourceUrl: relSourceUrl,
+        targetUrl: relTargetUrl,
+        nameConflictBehavior: 'rename'
+      }
+    });
+
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.overwrite, false, 'Overwite option is not false');
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.options.KeepBoth, true, 'KeepBoth option is not true');
+  });
+
+  it('copies file successfully with with bypassSharedLock option', async () => {
+    await command.action(logger, {
+      options: {
+        verbose: true,
+        webUrl: webUrl,
+        sourceUrl: relSourceUrl,
+        targetUrl: relTargetUrl,
+        bypassSharedLock: true
+      }
+    });
+
+    assert.strictEqual(requestPostStub.lastCall.args[0].data.options.ShouldBypassSharedLocks, true);
+  });
+
+  it('handles file not found error correctly', async () => {
+    const errorMessage = 'File Not Found.';
+    requestPostStub.restore();
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw {
+        error: {
+          'odata.error': {
+            message: {
+              lang: 'en-US',
+              value: errorMessage
+            }
+          }
         }
-      } as any), new CommandError('error'));
-    }
-    finally {
-      sinonUtil.restore(spo.getRequestDigest);
-      sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
-        FormDigestValue: 'abc',
-        FormDigestTimeoutSeconds: 1800,
-        FormDigestExpiresAt: new Date(),
-        WebFullUrl: 'https://contoso.sharepoint.com'
-      }));
-    }
-  });
-
-  it('should show error when waitForJobResult rejects with JobError', async () => {
-    const waitForJobResult = new Promise<any>((resolve) => {
-      const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
-      return resolve({ Logs: [log] });
+      };
     });
-    stubAllPostRequests(null, waitForJobResult);
-    stubAllGetRequests();
-
-    sinon.stub(Cli, 'executeCommand');
 
     await assert.rejects(command.action(logger, {
       options: {
         verbose: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc',
-        deleteIfAlreadyExists: true
+        webUrl: webUrl,
+        sourceUrl: relSourceUrl,
+        targetUrl: relTargetUrl
       }
-    } as any), new CommandError('error1'));
-  });
-
-  it('should show error when waitForJobResult rejects with JobFatalError', async () => {
-    const waitForJobResult = new Promise<any>((resolve) => {
-      const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
-      return resolve({ JobState: 0, Logs: [log] });
-    });
-    stubAllPostRequests(null, waitForJobResult);
-    stubAllGetRequests();
-    sinon.stub(Cli, 'executeCommand');
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc',
-        deleteIfAlreadyExists: true
-      }
-    } as any), new CommandError('error2'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
-  });
-
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', sourceUrl: 'abc', targetUrl: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', sourceUrl: 'abc', targetUrl: 'abc' } }, commandInfo);
-    assert.strictEqual(actual, true);
+    }), new CommandError(errorMessage));
   });
 });

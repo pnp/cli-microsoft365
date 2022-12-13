@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -80,7 +80,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -113,7 +113,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -171,9 +171,9 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['listId', 'listTitle', 'listUrl'],
-      ['viewId', 'viewTitle'],
-      ['id', 'title']
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['viewId', 'viewTitle'] },
+      { options: ['id', 'title'] }
     ]);
   });
 

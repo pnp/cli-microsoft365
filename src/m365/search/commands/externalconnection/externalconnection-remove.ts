@@ -52,7 +52,7 @@ class SearchExternalConnectionRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   private getExternalConnectionId(args: CommandArgs): Promise<string> {

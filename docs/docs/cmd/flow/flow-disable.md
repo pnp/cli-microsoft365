@@ -11,13 +11,13 @@ m365 flow disable [options]
 ## Options
 
 `-n, --name <name>`
-: The name of the Power Automate flow to disable
+: The name of the Power Automate flow to disable.
 
 `-e, --environmentName <environmentName>`
-: The name of the environment for which to disable Power Automate flow
+: The name of the environment for which to disable Power Automate flow.
 
 `--asAdmin`
-: Set, to disable the flow as admin
+: Set, to disable the flow as admin.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -45,3 +45,7 @@ Disables Power Automate flow owned by another user
 ```sh
 m365 flow disable --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin
 ```
+
+## Response
+
+The command won't return a response on success.

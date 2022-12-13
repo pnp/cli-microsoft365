@@ -39,6 +39,10 @@ Unregister the site collection with URL _https://contoso.sharepoint.com/sites/sa
 m365 spo hubsite unregister --url https://contoso.sharepoint.com/sites/sales --confirm
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - SharePoint hub sites new in Microsoft 365: [https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547](https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547)

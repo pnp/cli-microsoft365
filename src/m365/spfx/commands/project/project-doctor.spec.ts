@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
@@ -19,13 +19,13 @@ describe(commands.PROJECT_DOCTOR, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let trackEvent: any;
-  let telemetry: any;
+  let telemetryCommandName: any;
   const validProjectPath = 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-react';
   const invalidProjectPath = 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-react-invalidconfig';
 
   before(() => {
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
+    trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
+      telemetryCommandName = commandName;
     });
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -43,7 +43,7 @@ describe(commands.PROJECT_DOCTOR, () => {
         log.push(msg);
       }
     };
-    telemetry = null;
+    telemetryCommandName = null;
     (command as any).allFindings = [];
     (command as any).packageManager = 'npm';
   });
@@ -63,7 +63,7 @@ describe(commands.PROJECT_DOCTOR, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
@@ -87,7 +87,7 @@ describe(commands.PROJECT_DOCTOR, () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
 
     await command.action(logger, { options: {} });
-    assert.strictEqual(telemetry.name, commands.PROJECT_DOCTOR);
+    assert.strictEqual(telemetryCommandName, commands.PROJECT_DOCTOR);
   });
 
   it('shows error if the project path couldn\'t be determined', async () => {
@@ -126,9 +126,28 @@ describe(commands.PROJECT_DOCTOR, () => {
 
   it('returns markdown report with output format md', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(Cli, 'log').callsFake(msg => log.push(msg));
 
-    await command.action(logger, { options: { output: 'md' } } as any);
-    assert(log[0].indexOf('## Findings') > -1);
+    try {
+      await Cli.executeCommand(command, { options: { output: 'md' } } as any);
+      assert(log[0].indexOf('## Findings') > -1);
+    }
+    finally {
+      sinonUtil.restore(Cli.log);
+    }
+  });
+
+  it('overrides base md formatting', async () => {
+    const expected = [
+      {
+        'prop1': 'value1'
+      },
+      {
+        'prop2': 'value2'
+      }
+    ];
+    const actual = command.getMdOutput(expected, command, { options: { output: 'md' } } as any);
+    assert.deepStrictEqual(actual, expected);
   });
 
   it('returns text report with output format text', async () => {
@@ -469,6 +488,14 @@ describe(commands.PROJECT_DOCTOR, () => {
 
   it('e2e: shows correct number of findings for a valid 1.16.0 project', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1160-webpart-react'));
+
+    await command.action(logger, { options: {} } as any);
+    const findings: FindingToReport[] = log[0];
+    assert.strictEqual(findings.length, 0);
+  });
+
+  it('e2e: shows correct number of findings for a valid 1.16.1 project', async () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1161-webpart-react'));
 
     await command.action(logger, { options: {} } as any);
     const findings: FindingToReport[] = log[0];

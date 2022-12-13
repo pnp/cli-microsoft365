@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,7 +19,7 @@ describe(commands.TEAM_CLONE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -50,7 +50,7 @@ describe(commands.TEAM_CLONE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -165,7 +165,7 @@ describe(commands.TEAM_CLONE, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'name']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
   });
 
   it('creates a clone of a Microsoft Teams team with mandatory parameters', async () => {
@@ -223,14 +223,17 @@ describe(commands.TEAM_CLONE, () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-      name: 'Library Assist',
-      partsToClone: 'apps,tabs,settings,channels,members',
-      description: 'abc',
-      visibility: 'public',
-      classification: 'label' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: 'Library Assist',
+        partsToClone: 'apps,tabs,settings,channels,members',
+        description: 'abc',
+        visibility: 'public',
+        classification: 'label'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,7 +19,7 @@ describe(commands.SITE_CHROME_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -49,7 +49,7 @@ describe(commands.SITE_CHROME_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -101,7 +101,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: "true" } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: true } });
     assert.strictEqual(data.megaMenuEnabled, false);
   });
 
@@ -116,7 +116,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', disableFooter: "true" } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', disableFooter: true } });
     assert.strictEqual(data.footerEnabled, false);
   });
 
@@ -131,7 +131,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: "true" } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: true } });
     assert.strictEqual(data.hideTitleInHeader, true);
   });
 

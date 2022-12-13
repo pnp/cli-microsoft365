@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import { AxiosRequestConfig } from 'axios';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -48,7 +48,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -93,7 +93,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       spo.getSpoAdminUrl,
       request.patch
@@ -136,7 +136,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title', 'url']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title', 'url'] }]);
   });
 
   it('prompts before disconnecting the hub site when confirmation argument not passed', async () => {
@@ -167,7 +167,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await command.action(logger, { 
+    await command.action(logger, {
       options: {
         id: id,
         verbose: true,
@@ -191,7 +191,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await command.action(logger, { 
+    await command.action(logger, {
       options: {
         title: title,
         verbose: true,
@@ -215,7 +215,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await command.action(logger, { 
+    await command.action(logger, {
       options: {
         url: url,
         verbose: true,
@@ -244,7 +244,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { 
+    await command.action(logger, {
       options: {
         title: title
       }
@@ -275,7 +275,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { 
+    await assert.rejects(command.action(logger, {
       options: {
         title: title,
         confirm: true
@@ -297,7 +297,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { 
+    await assert.rejects(command.action(logger, {
       options: {
         title: title,
         confirm: true
@@ -319,7 +319,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await assert.rejects(command.action(logger, { 
+    await assert.rejects(command.action(logger, {
       options: {
         url: url,
         confirm: true
@@ -338,10 +338,10 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
     const errorMessage = 'Something went wrong';
     patchStub.restore();
-    sinon.stub(request, 'patch').callsFake(async () => { throw { error: { 'odata.error': { message: { value: errorMessage }}}};});
+    sinon.stub(request, 'patch').callsFake(async () => { throw { error: { 'odata.error': { message: { value: errorMessage } } } }; });
 
-    await assert.rejects(command.action(logger, { 
-      options: { 
+    await assert.rejects(command.action(logger, {
+      options: {
         id: id,
         confirm: true
       }

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
@@ -56,7 +56,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -166,18 +166,13 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if hideDefaultThemes is not a valid boolean', async () => {
-    const actual = await command.validate({ options: { hideDefaultThemes: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation when hideDefaultThemes is true', async () => {
-    const actual = await command.validate({ options: { hideDefaultThemes: `true` } }, commandInfo);
+    const actual = await command.validate({ options: { hideDefaultThemes: true } }, commandInfo);
     assert(actual);
   });
 
   it('passes validation when hideDefaultThemes is false', async () => {
-    const actual = await command.validate({ options: { hideDefaultThemes: `false` } }, commandInfo);
+    const actual = await command.validate({ options: { hideDefaultThemes: false } }, commandInfo);
     assert(actual);
   });
 });

@@ -110,9 +110,9 @@ class TeamsTabGetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['teamId', 'teamName'],
-      ['channelId', 'channelName'],
-      ['id', 'name']
+      { options: ['teamId', 'teamName'] },
+      { options: ['channelId', 'channelName'] },
+      { options: ['id', 'name'] }
     );
   }
 

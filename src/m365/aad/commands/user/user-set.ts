@@ -34,6 +34,7 @@ class AadUserSetCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
     this.#initOptionSets();
   }
@@ -43,7 +44,7 @@ class AadUserSetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         objectId: typeof args.options.objectId !== 'undefined',
         userPrincipalName: typeof args.options.userPrincipalName !== 'undefined',
-        accountEnabled: (!!args.options.accountEnabled).toString()
+        accountEnabled: args.options.accountEnabled
       });
     });
   }
@@ -57,9 +58,14 @@ class AadUserSetCommand extends GraphCommand {
         option: '-n, --userPrincipalName [userPrincipalName]'
       },
       {
-        option: '--accountEnabled [accountEnabled]'
+        option: '--accountEnabled [accountEnabled]',
+        autocomplete: ['true', 'false']
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('accountEnabled');
   }
 
   #initValidators(): void {
@@ -76,7 +82,7 @@ class AadUserSetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['objectId', 'userPrincipalName']);
+    this.optionSets.push({ options: ['objectId', 'userPrincipalName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -113,8 +119,8 @@ class AadUserSetCommand extends GraphCommand {
       'accountEnabled'
     ];
 
-    if (options.accountEnabled) {
-      requestBody['AccountEnabled'] = String(options.accountEnabled) === "true";
+    if (options.accountEnabled !== undefined) {
+      requestBody['AccountEnabled'] = options.accountEnabled;
     }
 
     Object.keys(options).forEach(key => {

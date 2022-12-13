@@ -42,7 +42,7 @@ interface Options extends GlobalOptions {
   removeDeletedSite: boolean;
   wait: boolean;
   // set
-  disableFlows?: string;
+  disableFlows?: boolean;
   sharingCapability?: string;
 }
 
@@ -59,6 +59,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
     super();
 
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -124,7 +125,8 @@ class SpoSiteEnsureCommand extends SpoCommand {
         option: '--removeDeletedSite'
       },
       {
-        option: '--disableFlows [disableFlows]'
+        option: '--disableFlows [disableFlows]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--sharingCapability [sharingCapability]',
@@ -134,6 +136,10 @@ class SpoSiteEnsureCommand extends SpoCommand {
         option: '--wait'
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('disableFlows');
   }
 
   #initValidators(): void {
@@ -289,9 +295,9 @@ class SpoSiteEnsureCommand extends SpoCommand {
     const options: SpoSiteSetCommandOptions = {
       classification: args.options.classification,
       disableFlows: args.options.disableFlows,
-      isPublic: typeof args.options.isPublic !== 'undefined' ? args.options.isPublic.toString() : undefined,
+      isPublic: args.options.isPublic,
       owners: args.options.owners,
-      shareByEmailEnabled: typeof args.options.shareByEmailEnabled !== 'undefined' ? args.options.shareByEmailEnabled.toString() : undefined,
+      shareByEmailEnabled: args.options.shareByEmailEnabled,
       siteDesignId: args.options.siteDesignId,
       title: args.options.title,
       url: args.options.url,

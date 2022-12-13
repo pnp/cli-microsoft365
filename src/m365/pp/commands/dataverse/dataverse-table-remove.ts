@@ -52,7 +52,7 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '-a, --asAdmin'
+        option: '--asAdmin'
       },
       {
         option: '--confirm'
@@ -60,7 +60,7 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Removing a table for which the user is an admin...`);
     }

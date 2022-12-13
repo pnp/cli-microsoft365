@@ -1,10 +1,11 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { WebPropertiesCollection } from "./WebPropertiesCollection";
+import { WebProperties } from './WebProperties';
 
 interface CommandArgs {
   options: Options;
@@ -13,6 +14,7 @@ interface CommandArgs {
 export interface Options extends GlobalOptions {
   url: string;
   withGroups?: boolean;
+  withPermissions?: boolean;
 }
 
 class SpoWebGetCommand extends SpoCommand {
@@ -35,7 +37,8 @@ class SpoWebGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        withGroups: typeof args.options.withGroups !== 'undefined'
+        withGroups: !!args.options.withGroups,
+        withPermissions: !!args.options.withPermissions
       });
     });
   }
@@ -47,6 +50,9 @@ class SpoWebGetCommand extends SpoCommand {
       },
       {
         option: '--withGroups'
+      },
+      {
+        option: '--withPermissions'
       }
     );
   }
@@ -71,9 +77,17 @@ class SpoWebGetCommand extends SpoCommand {
     };
 
     try {
-      const webProperties: WebPropertiesCollection = await request.get<WebPropertiesCollection>(requestOptions);
+      const webProperties: WebProperties = await request.get<WebProperties>(requestOptions);
+      if (args.options.withPermissions) {
+        requestOptions.url = `${args.options.url}/_api/web/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
+        const response = await request.get<{ value: any[] }>(requestOptions);
+        response.value.forEach((r: any) => {
+          r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
+        });
+        webProperties.RoleAssignments = response.value;
+      }
       logger.log(webProperties);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

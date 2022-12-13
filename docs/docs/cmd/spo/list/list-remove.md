@@ -37,3 +37,7 @@ Remove the list with title _List 1_ located in site _https://contoso.sharepoint.
 ```sh
 m365 spo list remove --webUrl https://contoso.sharepoint.com/sites/project-x --title 'List 1'
 ```
+
+## Response
+
+The command won't return a response on success.

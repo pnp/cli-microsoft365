@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -12,6 +12,8 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
+import * as spoFileGetCommand from '../file/file-get';
+import * as spoListItemSetCommand from '../listitem/listitem-set';
 const command: Command = require('./page-set');
 
 describe(commands.PAGE_SET, () => {
@@ -22,7 +24,7 @@ describe(commands.PAGE_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -94,7 +96,9 @@ describe(commands.PAGE_SET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post
+      request.post,
+      Cli.executeCommand,
+      Cli.executeCommandWithOutput
     ]);
   });
 
@@ -102,7 +106,7 @@ describe(commands.PAGE_SET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -295,7 +299,7 @@ describe(commands.PAGE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', commentsEnabled: 'true' } });
+    await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', commentsEnabled: true } });
   });
 
   it('disables comments on the page (debug)', async () => {
@@ -327,8 +331,32 @@ describe(commands.PAGE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', commentsEnabled: 'false' } });
+    await command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', commentsEnabled: false } });
     assert(loggerLogSpy.notCalled);
+  });
+
+  it('demotes news page to a regular page', async () => {
+    sinonUtil.restore([request.post]);
+
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === spoFileGetCommand) {
+        return { 'stdout': '{\"FileSystemObjectType\":0,\"Id\":6,\"ServerRedirectedEmbedUri\":null,\"ServerRedirectedEmbedUrl\":\"\",\"ContentTypeId\":\"0x0101009D1CB255DA76424F860D91F20E6C411800E2DAFA6353688E488147257C551A63BD\",\"ComplianceAssetId\":null,\"WikiField\":null,\"Title\":\"zzzz\",\"CanvasContent1\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.0\\\" data-sp-controldata=\\\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true,&quot;isSpellCheckEnabled&quot;&#58;true,&quot;globalRichTextStylingVersion&quot;&#58;0&#125;&#125;\\\"><\/div><\/div>\",\"BannerImageUrl\":{\"Description\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\",\"Url\":\"https:\/\/mathijsdev2.sharepoint.com\/_layouts\/15\/images\/sitepagethumbnail.png\"},\"Description\":null,\"PromotedState\":0,\"FirstPublishedDate\":\"2022-11-11T15:48:15\",\"LayoutWebpartsContent\":\"<div><div data-sp-canvascontrol=\\\"\\\" data-sp-canvasdataversion=\\\"1.4\\\" data-sp-controldata=\\\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title area&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;audiences&quot;&#58;[],&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&#125;,&quot;links&quot;&#58;&#123;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;zzzz&quot;,&quot;imageSourceType&quot;&#58;4,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;false,&quot;showPublishDate&quot;&#58;false,&quot;topicHeader&quot;&#58;&quot;&quot;,&quot;enableGradientEffect&quot;&#58;true,&quot;authors&quot;&#58;[&#123;&quot;id&quot;&#58;&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;upn&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;email&quot;&#58;&quot;mathijs@mathijsdev2.onmicrosoft.com&quot;,&quot;name&quot;&#58;&quot;Mathijs Verbeeck&quot;,&quot;role&quot;&#58;&quot;&quot;&#125;],&quot;authorByline&quot;&#58;[&quot;i&#58;0#.f|membership|mathijs@mathijsdev2.onmicrosoft.com&quot;]&#125;,&quot;reservedHeight&quot;&#58;228&#125;\\\"><\/div><\/div>\",\"OData__AuthorBylineId\":[9],\"_AuthorBylineStringId\":[\"9\"],\"OData__TopicHeader\":null,\"OData__SPSitePageFlags\":null,\"OData__SPCallToAction\":null,\"OData__OriginalSourceUrl\":null,\"OData__OriginalSourceSiteId\":null,\"OData__OriginalSourceWebId\":null,\"OData__OriginalSourceListId\":null,\"OData__OriginalSourceItemId\":null,\"ID\":6,\"Created\":\"2022-11-11T15:48:00\",\"AuthorId\":9,\"Modified\":\"2022-11-12T02:03:12\",\"EditorId\":9,\"OData__CopySource\":null,\"CheckoutUserId\":9,\"OData__UIVersionString\":\"2.19\",\"GUID\":\"9a94cb88-019b-4a66-abd6-be7f5337f659\"}' };
+      }
+      if (command === spoListItemSetCommand) {
+        return;
+      }
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) {
+        return {};
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', demoteFrom: 'NewsPage' } });
   });
 
   it('updates page title', async () => {
@@ -634,6 +662,11 @@ describe(commands.PAGE_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('fails validation if demote type is invalid', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', demoteFrom: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if promote type is invalid', async () => {
     const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -664,18 +697,13 @@ describe(commands.PAGE_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if commentsEnabled is invalid', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if commentsEnabled is true', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if commentsEnabled is false', async () => {
-    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: 'false' } }, commandInfo);
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -110,8 +110,8 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['fileUrl', 'fileId'],
-      ['upn', 'groupName', 'principalId']
+      { options: ['fileUrl', 'fileId'] },
+      { options: ['upn', 'groupName', 'principalId'] }
     );
   }
 

@@ -72,14 +72,14 @@ class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'displayName', 'mailNickname']);
+    this.optionSets.push({ options: ['id', 'displayName', 'mailNickname'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

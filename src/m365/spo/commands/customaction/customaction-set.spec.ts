@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -35,7 +35,7 @@ describe(commands.CUSTOMACTION_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -74,7 +74,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -638,11 +638,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     defaultCommandOptions.webUrl = 'foo';
     const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('getRegistrationType returns 1 if registrationType value is List', () => {
-    const registrationType: number = (command as any)['getRegistrationType']('List');
-    assert(registrationType === 1);
   });
 
   it('should map independently location', () => {

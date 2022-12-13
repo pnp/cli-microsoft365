@@ -175,6 +175,12 @@ const contributors = [{
     twitter: 'casvaniersel'
   },
   {
+    name: 'Chinu Anand',
+    company: '',
+    github: 'chinu-anand',
+    twitter: 'anand_chinu'
+  },
+  {
     name: 'Christian Bewernitz',
     company: '',
     github: 'karfau',
@@ -643,10 +649,22 @@ const contributors = [{
     twitter: 'stijnbrouwers85'
   },
   {
+    name: 'Stijn Haerkens',
+    company: 'VanRoey.be',
+    github: 'stijnhaerkenss',
+    twitter: ''
+  },
+  {
     name: 'Sudharsan Kesavanarayanan',
     company: 'NTT Ltd',
     github: 'sudharsank',
     twitter: 'sudharsank'
+  },
+  {
+    name: 'Taaqif Peck',
+    company: '',
+    github: 'Taaqif',
+    twitter: ''
   },
   {
     name: 'Tanmay Rathi',

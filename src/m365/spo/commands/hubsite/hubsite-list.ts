@@ -1,6 +1,8 @@
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -58,17 +60,9 @@ class SpoHubSiteListCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-      
-      let requestOptions: any = {
-        url: `${spoAdminUrl}/_api/hubsites`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
 
-      const hubSitesResult = await request.get<{ value: HubSite[] }>(requestOptions);
-      const hubSites = hubSitesResult.value;
+      const hubSitesResult = await odata.getAllItems<HubSite>(`${spoAdminUrl}/_api/hubsites`);
+      const hubSites = hubSitesResult;
 
       if (!(args.options.includeAssociatedSites !== true || args.options.output && args.options.output !== 'json')) {
         if (this.debug) {
@@ -76,7 +70,7 @@ class SpoHubSiteListCommand extends SpoCommand {
           logger.logToStderr('');
         }
 
-        requestOptions = {
+        const requestOptions: AxiosRequestConfig = {
           url: `${spoAdminUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`,
           headers: {
             accept: 'application/json;odata=nometadata'
@@ -89,13 +83,13 @@ class SpoHubSiteListCommand extends SpoCommand {
             }
           }
         };
-  
+
         if (this.debug) {
           logger.logToStderr(`Will retrieve associated sites (including the hub sites) in batches of ${this.batchSize}`);
         }
-  
-        const res = await this.getSites(requestOptions, requestOptions.url, logger);
-  
+
+        const res = await this.getSites(requestOptions, requestOptions.url as string, logger);
+
         if (res) {
           hubSites.forEach(h => {
             const filteredSites = res.filter(f => {

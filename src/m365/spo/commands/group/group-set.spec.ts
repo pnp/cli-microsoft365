@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -33,7 +33,7 @@ describe(commands.GROUP_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -66,7 +66,7 @@ describe(commands.GROUP_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -82,7 +82,7 @@ describe(commands.GROUP_SET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'name']]);
+    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
   });
 
   it('fails validation when group id is not a number', async () => {
@@ -107,17 +107,6 @@ describe(commands.GROUP_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when invalid boolean is passed as option', async () => {
-    const actual = await command.validate({
-      options: {
-        webUrl: validWebUrl,
-        id: validId,
-        autoAcceptRequestToJoinLeave: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation when invalid web URL is passed', async () => {
     const actual = await command.validate({
       options: {
@@ -133,7 +122,7 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         id: validId,
-        allowRequestToJoinLeave: 'true'
+        allowRequestToJoinLeave: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -152,7 +141,7 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         id: validId,
-        allowRequestToJoinLeave: 'true'
+        allowRequestToJoinLeave: true
       }
     });
   });
@@ -170,12 +159,12 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         name: validName,
-        allowRequestToJoinLeave: 'true'
+        allowRequestToJoinLeave: true
       }
     });
   });
 
-  it('successfully updates group owner by ownerEmail', async () => {
+  it('successfully updates group owner by ownerEmail, retrieves group by id', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInfoResponse),
       stderr: ''
@@ -208,7 +197,7 @@ describe(commands.GROUP_SET, () => {
     });
   });
 
-  it('successfully updates group owner by ownerEmail', async () => {
+  it('successfully updates group owner by ownerUserName, retrieves group by name', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInfoResponse),
       stderr: ''
@@ -254,7 +243,7 @@ describe(commands.GROUP_SET, () => {
       options: {
         webUrl: validWebUrl,
         name: validName,
-        autoAcceptRequestToJoinLeave: 'true'
+        autoAcceptRequestToJoinLeave: true
       }
     }), new CommandError('An error has occurred'));
   });

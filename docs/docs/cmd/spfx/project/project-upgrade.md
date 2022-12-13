@@ -32,7 +32,7 @@ m365 spfx project upgrade [options]
 
 ## Remarks
 
-The `spfx project upgrade` command helps you upgrade your SharePoint Framework project to the specified version. If no version is specified, the command will upgrade to the latest version of the SharePoint Framework it supports (v1.16.0).
+The `spfx project upgrade` command helps you upgrade your SharePoint Framework project to the specified version. If no version is specified, the command will upgrade to the latest version of the SharePoint Framework it supports (v1.16.1).
 
 This command doesn't change your project files. Instead, it gives you a report with all steps necessary to upgrade your project to the specified version of the SharePoint Framework. Changing project files is error-prone, especially when it comes to updating your solution's code. This is why at this moment, this command produces a report that you can use yourself to perform the necessary updates and verify that everything is working as expected.
 
@@ -85,3 +85,103 @@ Get instructions to upgrade the current SharePoint Framework project to the late
 ```sh
 m365 spfx project upgrade --output tour
 ```
+
+## Response
+
+When upgrading an SPFx project built using version 1.15.0 to SPFx version 1.15.2, you'll get output similar to following (output is truncated):
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "description": "Upgrade SharePoint Framework dependency package @microsoft/sp-core-library",
+        "id": "FN001001",
+        "file": "./package.json",
+        "position": {
+          "line": 15,
+          "character": 5
+        },
+        "resolution": "npm i -SE @microsoft/sp-core-library@1.15.2",
+        "resolutionType": "cmd",
+        "severity": "Required",
+        "title": "@microsoft/sp-core-library"
+      },
+      {
+        "description": "Update version in .yo-rc.json",
+        "id": "FN010001",
+        "file": "./.yo-rc.json",
+        "position": {
+          "line": 5,
+          "character": 5
+        },
+        "resolution": "{\\\n  \"@microsoft/generator-sharepoint\": {\\\n    \"version\": \"1.15.2\"\\\n  }\\\n}",
+        "resolutionType": "json",
+        "severity": "Recommended",
+        "title": ".yo-rc.json version"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Execute in bash
+    -----------------------
+    npm i -SE @microsoft/sp-core-library@1.15.2
+
+    ./.yo-rc.json
+    -------------
+    Update version in .yo-rc.json:
+    {
+      "@microsoft/generator-sharepoint": {
+        "version": "1.15.2"
+      }
+    }
+    ```
+
+=== "Markdown"
+
+    ````md
+    # Upgrade project HelloWorld to v1.15.2
+
+    Date: 20/11/2022
+
+    ## Findings
+
+    Following is the list of steps required to upgrade your project to SharePoint Framework version 1.15.2. [Summary](#Summary) of the modifications is included at the end of the report.
+
+    ### FN001001 @microsoft/sp-core-library | Required
+
+    Upgrade SharePoint Framework dependency package @microsoft/sp-core-library
+
+    Execute the following command:
+
+    ```sh
+    npm i -SE @microsoft/sp-core-library@1.15.2
+    ```
+
+    File: [./package.json:17:5](./package.json)
+
+    ## Summary
+
+    ### Execute script
+
+    ```sh
+    npm i -SE @microsoft/sp-core-library@1.15.2
+    ```
+
+    ### Modify files
+
+    #### [./.yo-rc.json](./.yo-rc.json)
+
+    Update version in .yo-rc.json:
+
+    ```json
+    {
+      "@microsoft/generator-sharepoint": {
+        "version": "1.15.2"
+      }
+    }
+    ```
+    ````

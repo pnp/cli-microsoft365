@@ -106,7 +106,7 @@ class SpoTermSetAddCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['termGroupId', 'termGroupName']);
+    this.optionSets.push({ options: ['termGroupId', 'termGroupName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -153,15 +153,15 @@ class SpoTermSetAddCommand extends SpoCommand {
           if (json[i] !== 39) {
             continue;
           }
-  
+
           termStoreObjectIdentity = json[i + 1]._ObjectIdentity_;
           break;
         }
-  
+
         if (this.verbose) {
           logger.logToStderr(`Setting term set properties...`);
         }
-  
+
         const properties: string[] = [];
         let i: number = 127;
         if (args.options.description) {
@@ -175,7 +175,7 @@ class SpoTermSetAddCommand extends SpoCommand {
           });
           termSet.CustomProperties = customProperties;
         }
-  
+
         const requestOptions: any = {
           url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
@@ -183,7 +183,7 @@ class SpoTermSetAddCommand extends SpoCommand {
           },
           data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${properties.join('')}<Method Name="CommitAll" Id="131" ObjectPathId="109" /></Actions><ObjectPaths><Identity Id="117" Name="${termSet._ObjectIdentity_}" /><Identity Id="109" Name="${termStoreObjectIdentity}" /></ObjectPaths></Request>`
         };
-  
+
         terms = await request.post(requestOptions);
       }
 
@@ -201,8 +201,8 @@ class SpoTermSetAddCommand extends SpoCommand {
       termSet.Id = termSet.Id.replace('/Guid(', '').replace(')/', '');
       termSet.LastModifiedDate = new Date(Number(termSet.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
       logger.log(termSet);
-      
-    } 
+
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

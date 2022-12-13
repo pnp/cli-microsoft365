@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -26,7 +26,7 @@ describe(commands.CHANNEL_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -63,7 +63,7 @@ describe(commands.CHANNEL_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -100,8 +100,8 @@ describe(commands.CHANNEL_REMOVE, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [
-      ['id', 'name'],
-      ['teamId', 'teamName']
+      { options: ['id', 'name'] },
+      { options: ['teamId', 'teamName'] }
     ]);
   });
 
@@ -239,7 +239,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
   });
 
-  it('removes the specified channel by name when prompt confirmed (debug)', async () => {
+  it('removes the specified channel by name and teamName when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(teamName)}'`) {
         return {
@@ -278,7 +278,7 @@ describe(commands.CHANNEL_REMOVE, () => {
   });
 
 
-  it('removes the specified channel by name when prompt confirmed (debug)', async () => {
+  it('removes the specified channel by name and teamId when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(name)}'`) {
         return {

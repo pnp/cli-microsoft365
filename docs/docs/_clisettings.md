@@ -11,7 +11,9 @@ Setting name|Definition|Default value
 `csvQuote`|The quote characters surrounding a field. An empty quote value will preserve the original field, whether it contains quotation marks or not.|` `
 `csvQuoted`|Quote all the non-empty fields even if not required|`false`
 `csvQuotedEmpty`|Quote empty strings and overrides quoted_string on empty strings when defined|`false`
+`disableTelemetry`|Disables sending of telemetry data|`false`
 `errorOutput`|Defines if errors should be written to `stdout` or `stderr`|`stderr`
+`helpMode`|Defines what part of command's help to display. Allowed values are `options`, `examples`, `remarks`, `response`, `full`|`full`
 `output`|Defines the default output when issuing a command|`json`
 `printErrorsAsPlainText`|When output mode is set to `json`, print error messages as plain-text rather than JSON|`true`
 `prompt`|Prompts for missing values in required options|`false`

@@ -77,8 +77,8 @@ class SpoHubSiteConnectCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'title', 'url'],
-      ['parentId', 'parentTitle', 'parentUrl']
+      { options: ['id', 'title', 'url'] },
+      { options: ['parentId', 'parentTitle', 'parentUrl'] }
     );
   }
 
