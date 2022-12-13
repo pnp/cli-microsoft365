@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -17,9 +18,31 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
 
+  const webUrl = 'https://contoso.sharepoint.com/sites/SiteA';
+  const groupId = 4;
+  const groupName = 'Site A Visitors';
+  const userName = 'Alex.Wilber@contoso.com';
+  const email = 'Alex.Wilber@contoso.com';
+  const userId = 14;
+
   const UserRemovalJSONResponse =
   {
     "odata.null": true
+  };
+
+  const userInformation: any =
+  {
+    businessPhones: [],
+    displayName: "Alex Wilber",
+    givenName: "Alex Wilber",
+    id: "59b75414-4511-4c65-86a3-b6f5cd806748",
+    jobTitle: "",
+    mail: email,
+    mobilePhone: null,
+    officeLocation: null,
+    preferredLanguage: null,
+    surname: "User",
+    userPrincipalName: email
   };
 
   before(() => {
@@ -48,7 +71,8 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.prompt
+      Cli.prompt,
+      Cli.executeCommandWithOutput
     ]);
   });
 
@@ -69,91 +93,225 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('Removes user from SharePoint group using Group ID - Without Confirmation Prompt', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(opts => {
-      if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.resolve(UserRemovalJSONResponse);
-      }
-
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
-    });
-    await command.action(logger, {
+  it('fails validation if webURL is Invalid', async () => {
+    const actual = await command.validate({
       options: {
-        debug: false,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 4,
-        userName: "Alex.Wilber@contoso.com",
-        confirm: true
+        webUrl: "InvalidWEBURL",
+        groupId: groupId,
+        userName: userName
       }
-    });
-    assert(postStub.called);
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
-  it('Removes user from SharePoint group using Group ID - Without Confirmation Prompt (Debug)', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(opts => {
-      if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.resolve(UserRemovalJSONResponse);
+  it('fails validation if groupid and groupName is entered', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: webUrl,
+        groupId: groupId,
+        groupName: groupName,
+        userName: userName
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if neither groupId nor groupName is entered', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: webUrl,
+        userName: userName
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both userId and email options are passed', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: webUrl,
+        groupId: groupId,
+        userId: userId,
+        email: email
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both userName and email options are passed', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: webUrl,
+        groupId: groupId,
+        email: email,
+        userName: userName
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both userName and userId options are passed', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: webUrl,
+        groupId: groupId,
+        userId: userId,
+        userName: userName
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both email and userId options are passed', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: webUrl,
+        groupId: groupId,
+        email: email,
+        userId: userId
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if userName, email, and userId options are not passed', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: webUrl,
+        groupId: groupId
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if groupId is Invalid', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: webUrl,
+        groupId: "INVALIDGROUP",
+        userName: userName
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if all the required options are specified', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: webUrl,
+        groupId: groupId,
+        userName: userName
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('removes user from SharePoint group by groupId and userName with confirm option (debug)', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      const loginName: string = `i:0#.f|membership|${userName}`;
+      if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
+        return UserRemovalJSONResponse;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      return `Invalid request ${JSON.stringify(opts)}`;
     });
+
     await command.action(logger, {
       options: {
         debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 4,
-        userName: "Alex.Wilber@contoso.com",
+        verbose: true,
+        webUrl: webUrl,
+        groupId: groupId,
+        userName: userName,
         confirm: true
       }
     });
+
     assert(postStub.called);
   });
 
-  it('Removes user from SharePoint group using Group Name - Without Confirmation Prompt (Debug)', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake(opts => {
-      if ((opts.url as string).indexOf('/_api/web/sitegroups/GetByName') > -1) {
-        return Promise.resolve(UserRemovalJSONResponse);
-      }
-
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
-    });
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupName: "Site A Visitors",
-        userName: "Alex.Wilber@contoso.com",
-        confirm: true
-      }
-    });
-    assert(postStub.called);
-  });
-
-  it('Removes user from SharePoint group using Group ID - With Confirmation Prompt', async () => {
+  it('removes user from SharePoint group by groupId and userName when confirm option not passed', async () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    const postStub = sinon.stub(request, 'post').callsFake(opts => {
-      if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
-        return Promise.resolve(UserRemovalJSONResponse);
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      const loginName: string = `i:0#.f|membership|${userName}`;
+      if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
+        return UserRemovalJSONResponse;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      return `Invalid request ${JSON.stringify(opts)}`;
     });
+
     await command.action(logger, {
       options: {
         debug: false,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 4,
-        userName: "Alex.Wilber@contoso.com",
+        verbose: true,
+        webUrl: webUrl,
+        groupId: groupId,
+        userName: userName,
         confirm: false
       }
     });
+
     assert(postStub.called);
   });
 
-  it('Aborts Removal of user from SharePoint group using Group Id - With Confirmation Prompt', async () => {
+  it('removes user from SharePoint group by groupName and userId with confirm option', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(groupName)}')/users/removeById(${userId})`) {
+        return UserRemovalJSONResponse;
+      }
+
+      return `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: false,
+        verbose: true,
+        webUrl: webUrl,
+        groupName: groupName,
+        userId: userId,
+        confirm: true
+      }
+    });
+
+    assert(postStub.called);
+  });
+
+  it('removes user from SharePoint group by groupName and email with confirm option', async () => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
+      stdout: JSON.stringify(userInformation),
+      stderr: ''
+    }));
+
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
+      const loginName: string = `i:0#.f|membership|${userName}`;
+      if (opts.url === `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(groupName)}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
+        return UserRemovalJSONResponse;
+      }
+
+      return `Invalid request ${JSON.stringify(opts)}`;
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: false,
+        verbose: true,
+        webUrl: webUrl,
+        groupName: groupName,
+        email: email,
+        confirm: true
+      }
+    });
+
+    assert(postStub.called);
+  });
+
+  it('aborts removing user from SharePoint group when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
@@ -163,18 +321,20 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: false,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 4,
-        userName: "Alex.Wilber@contoso.com",
+        verbose: true,
+        webUrl: webUrl,
+        groupId: groupId,
+        userName: userName,
         confirm: false
       }
     });
     assert(postSpy.notCalled);
   });
 
-  it('Correctly Handles Error when removing user from the group using Group Id', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
+  it('correctly handles error when removing user from the group using groupId and userName', async () => {
+    const loginName: string = `i:0#.f|membership|${userName}`;
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
         return Promise.reject('The user does not exist or is not unique.');
       }
 
@@ -184,38 +344,15 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: false,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 4,
-        userName: "Alex.Wilber@invalidcontoso.com",
+        verbose: true,
+        webUrl: webUrl,
+        groupId: groupId,
+        userName: userName,
         confirm: true
       }
     }), new CommandError('The user does not exist or is not unique.'));
   });
 
-  it('fails validation if webURL is Invalid', async () => {
-    const actual = await command.validate({ options: { webUrl: "InvalidWEBURL", groupId: 4, userName: "Alex.Wilber@contoso.com" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if groupid and groupName is entered', async () => {
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "4", groupName: "Site A Visitors", userName: "Alex.Wilber@contoso.com" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither groupId nor groupName is entered', async () => {
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", userName: "Alex.Wilber@contoso.com" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if groupId is Invalid', async () => {
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "INVALIDGROUP", userName: "Alex.Wilber@contoso.com" } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if all the required options are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 3, userName: "Alex.Wilber@contoso.com" } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
 
   it('supports debug mode', () => {
     const options = command.options;
@@ -227,5 +364,4 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
     assert(containsOption);
   });
-
 });
