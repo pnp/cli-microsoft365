@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
@@ -18,11 +18,11 @@ describe(commands.PCF_INIT, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let trackEvent: any;
-  let telemetry: any;
+  let telemetryCommandName: any;
 
   before(() => {
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
+    trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
+      telemetryCommandName = commandName;
     });
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -40,7 +40,7 @@ describe(commands.PCF_INIT, () => {
         log.push(msg);
       }
     };
-    telemetry = null;
+    telemetryCommandName = null;
   });
 
   afterEach(() => {
@@ -54,7 +54,7 @@ describe(commands.PCF_INIT, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
@@ -74,7 +74,7 @@ describe(commands.PCF_INIT, () => {
 
   it('logs correct telemetry event', async () => {
     await assert.rejects(command.action(logger, { options: {} }));
-    assert.strictEqual(telemetry.name, commands.PCF_INIT);
+    assert.strictEqual(telemetryCommandName, commands.PCF_INIT);
   });
 
   it('supports specifying namespace', () => {

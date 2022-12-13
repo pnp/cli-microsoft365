@@ -5,7 +5,7 @@ import * as inquirer from 'inquirer';
 import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import appInsights from '../appInsights';
+import { telemetry } from '../telemetry';
 import Command, { CommandError } from '../Command';
 import AnonymousCommand from '../m365/base/AnonymousCommand';
 import * as cliCompletionUpdateCommand from '../m365/cli/commands/completion/completion-clink-update';
@@ -215,7 +215,7 @@ describe('Cli', () => {
   let mockCommandWithBooleanRewrite: Command;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
 
     cliLogStub = sinon.stub((Cli as any), 'log').callsFake(message => {
@@ -285,7 +285,7 @@ describe('Cli', () => {
       (Cli as any).formatOutput,
       process.exit,
       md.md2plain,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       cli.getSettingWithDefaultValue,
       mockCommand.action

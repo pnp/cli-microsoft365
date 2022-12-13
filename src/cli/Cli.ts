@@ -7,7 +7,6 @@ import * as minimist from 'minimist';
 import * as os from 'os';
 import * as path from 'path';
 import { Logger } from './Logger';
-import appInsights from '../appInsights';
 import Command, { CommandArgs, CommandError, CommandTypes } from '../Command';
 import config from '../config';
 import GlobalOptions from '../GlobalOptions';
@@ -19,6 +18,7 @@ import { md } from '../utils/md';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
 import { validation } from '../utils/validation';
+import { telemetry } from '../telemetry';
 const packageJSON = require('../../package.json');
 
 export interface CommandOutput {
@@ -604,11 +604,7 @@ export class Cli {
       this.printAvailableCommands();
     }
 
-    appInsights.trackEvent({
-      name: 'help',
-      properties
-    });
-    appInsights.flush();
+    telemetry.trackEvent('help', properties);
 
     process.exit(exitCode);
   }

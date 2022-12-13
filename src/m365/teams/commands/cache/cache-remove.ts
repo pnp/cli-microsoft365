@@ -4,6 +4,7 @@ import * as util from 'util';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import { formatting } from '../../../../utils/formatting';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import commands from '../../commands';
 
@@ -13,6 +14,10 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   confirm?: boolean;
+}
+
+interface Win32Process {
+  ProcessId: number;
 }
 
 class TeamsCacheRemoveCommand extends AnonymousCommand {
@@ -35,7 +40,7 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        confirm: (!(!args.options.confirm)).toString()
+        confirm: !!args.options.confirm
       });
     });
   }
@@ -87,27 +92,23 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
       }
     }
     catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+      this.handleError(err);
     }
   }
 
   private async clearTeamsCache(logger: Logger): Promise<void> {
-    try {
-      const filePath = this.getTeamsCacheFolderPath(logger);
-      const folderExists = await this.checkIfCacheFolderExists(filePath, logger);
+    const filePath = this.getTeamsCacheFolderPath(logger);
+    const folderExists = this.checkIfCacheFolderExists(filePath, logger);
 
-      if (folderExists) {
-        await this.killRunningProcess(logger);
-        await this.removeCacheFiles(filePath, logger);
-        logger.logToStderr('Teams cache cleared!');
-      }
-      else {
-        logger.logToStderr('Cache folder does not exist. Nothing to remove.');
-      }
+    if (folderExists) {
+      await this.killRunningProcess(logger);
+      await this.removeCacheFiles(filePath, logger);
+      logger.logToStderr('Teams cache cleared!');
     }
-    catch (e: any) {
-      throw e.message as string;
+    else {
+      logger.logToStderr('Cache folder does not exist. Nothing to remove.');
     }
+
   }
 
   private getTeamsCacheFolderPath(logger: Logger): string {
@@ -148,7 +149,7 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
 
     switch (platform) {
       case 'win32':
-        cmd = 'taskkill /IM "Teams.exe" /F';
+        cmd = 'wmic process where caption="Teams.exe" get ProcessId';
         break;
       case 'darwin':
         cmd = `ps ax | grep MacOS/Teams -m 1 | grep -v grep | awk '{ print $1 }'`;
@@ -159,28 +160,19 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
       logger.logToStderr(cmd);
     }
 
-    try {
-      const cmdOutput = await this.exec(cmd);
+    const cmdOutput = await this.exec(cmd);
 
-      if (cmdOutput.stdout !== '' && platform === 'darwin') {
-        process.kill(cmdOutput.stdout);
-      }
-
-      if (this.verbose) {
-        logger.logToStderr('Teams client closed');
-      }
+    if (platform === 'darwin') {
+      process.kill(cmdOutput.stdout);
     }
-    catch (e: any) {
-      const errorMessage = e.message as string;
-
-      if (errorMessage.includes('ERROR: The process "Teams.exe" not found.')) {
-        if (this.verbose) {
-          logger.logToStderr('Teams client isn\'t running');
-        }
-      }
-      else {
-        throw new Error(errorMessage);
-      }
+    else if (platform === 'win32') {
+      const processJson: Win32Process[] = formatting.parseCsvToJson(cmdOutput.stdout);
+      processJson.filter(proc => proc.ProcessId).map((proc: Win32Process) => {
+        process.kill(proc.ProcessId);
+      });
+    }
+    if (this.verbose) {
+      logger.logToStderr('Teams client closed');
     }
   }
 
@@ -205,12 +197,7 @@ class TeamsCacheRemoveCommand extends AnonymousCommand {
       logger.logToStderr(cmd);
     }
 
-    try {
-      await this.exec(cmd);
-    }
-    catch (e: any) {
-      throw new Error(e.message as string);
-    }
+    await this.exec(cmd);
   }
 
   private exec = util.promisify(require('child_process').exec);
