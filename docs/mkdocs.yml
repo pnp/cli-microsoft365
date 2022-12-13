@@ -208,6 +208,7 @@ nav:
         - plan get: cmd/planner/plan/plan-get.md
         - plan list: cmd/planner/plan/plan-list.md
         - plan remove: cmd/planner/plan/plan-remove.md
+        - plan set: cmd/planner/plan/plan-set.md
       - task:
         - task add: cmd/planner/task/task-add.md
         - task get: cmd/planner/task/task-get.md
@@ -264,11 +265,14 @@ nav:
         - card list: cmd/pp/card/card-list.md
         - card remove: cmd/pp/card/card-remove.md
       - chatbot:
+        - chatbot get: cmd/pp/chatbot/chatbot-get.md
         - chatbot list: cmd/pp/chatbot/chatbot-list.md
+        - chatbot remove: cmd/pp/chatbot/chatbot-remove.md
       - dataverse:
         - dataverse table get: cmd/pp/dataverse/dataverse-table-get.md
         - dataverse table list: cmd/pp/dataverse/dataverse-table-list.md
         - dataverse table remove: cmd/pp/dataverse/dataverse-table-remove.md
+        - dataverse table row list: cmd/pp/dataverse/dataverse-table-row-list.md
       - environment:
         - environment get: cmd/pp/environment/environment-get.md
         - environment list: cmd/pp/environment/environment-list.md
@@ -282,11 +286,16 @@ nav:
         - solution get: cmd/pp/solution/solution-get.md
         - solution list: cmd/pp/solution/solution-list.md
         - solution remove: cmd/pp/solution/solution-remove.md
+        - solution publisher add: cmd/pp/solution/solution-publisher-add.md
         - solution publisher get: cmd/pp/solution/solution-publisher-get.md
         - solution publisher list: cmd/pp/solution/solution-publisher-list.md
         - solution publisher remove: cmd/pp/solution/solution-publisher-remove.md
       - tenant:
         - tenant settings list: cmd/pp/tenant/tenant-settings-list.md
+    - Purview (purview):
+      - retentionlabel:
+        - retentionlabel list: cmd/purview/retentionlabel/retentionlabel-list.md
+        - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
     - Search (search):
       - externalconnection:
         - externalconnection add: cmd/search/externalconnection/externalconnection-add.md
@@ -665,6 +674,7 @@ nav:
       - meeting:
         - meeting get: 'cmd/teams/meeting/meeting-get.md'
         - meeting list: cmd/teams/meeting/meeting-list.md
+        - meeting attendancereport list: cmd/teams/meeting/meeting-attendancereport-list.md
       - membersettings:
         - membersettings list: cmd/teams/membersettings/membersettings-list.md
         - membersettings set: cmd/teams/membersettings/membersettings-set.md
@@ -854,6 +864,7 @@ nav:
       - sample-scripts/tenant/tenant-monitor-notify-healthstatus/index.md
   - About:
     - about/why-cli.md
+    - about/telemetry.md
     - about/comparison-powershell.md
     - about/release-notes.md
     - about/team.md
@@ -883,6 +894,7 @@ extra_css:
     - css/styles2.css
 markdown_extensions:
     - admonition
+    - footnotes
     - meta
     - toc:
           permalink: true

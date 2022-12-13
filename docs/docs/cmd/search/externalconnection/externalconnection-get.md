@@ -31,3 +31,41 @@ Get the External Connection by its name
 ```sh
 m365 search externalconnection get --name "Test"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "id": "CLITest",
+      "name": "CLI-Test",
+      "description": "CLI Test",
+      "state": "draft",
+      "configuration": {
+        "authorizedApps": [
+          "31359c7f-bd7e-475c-86db-fdb8c937548e"
+        ],
+        "authorizedAppIds": [
+          "31359c7f-bd7e-475c-86db-fdb8c937548e"
+        ]
+      }
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    configuration: {"authorizedApps":["31359c7f-bd7e-475c-86db-fdb8c937548e"],"authorizedAppIds":["31359c7f-bd7e-475c-86db-fdb8c937548e"]}
+    description  : CLI Test
+    id           : CLITest
+    name         : CLI-Test
+    state        : draft
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,name,description,state,configuration
+    CLITest,CLI-Test,CLI Test,draft,"{""authorizedApps"":[""31359c7f-bd7e-475c-86db-fdb8c937548e""],""authorizedAppIds"":[""31359c7f-bd7e-475c-86db-fdb8c937548e""]}"
+    ```

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.SITE_ENSURE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.SITE_ENSURE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -606,8 +606,8 @@ describe(commands.SITE_ENSURE, () => {
       if (command === spoSiteSetCommand) {
         if (JSON.stringify(args) === JSON.stringify({
           options: {
-            isPublic: 'true',
-            shareByEmailEnabled: 'true',
+            isPublic: true,
+            shareByEmailEnabled: true,
             title: 'Team 1',
             url: 'https://contoso.sharepoint.com/sites/team1',
             verbose: false,
@@ -623,7 +623,7 @@ describe(commands.SITE_ENSURE, () => {
 
       return Promise.reject(new CommandError('Unknown case'));
     });
-    
+
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1', isPublic: true, shareByEmailEnabled: true } } as any);
   });
 

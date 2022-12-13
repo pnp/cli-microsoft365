@@ -86,7 +86,7 @@ class PpSolutionPublisherGetCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving a specific publisher '${args.options.id || args.options.name}'...`);
     }

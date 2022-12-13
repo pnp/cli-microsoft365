@@ -11,7 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   siteUrl: string;
-  enabled: string;
+  enabled: boolean;
 }
 
 class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
@@ -28,6 +28,7 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -45,28 +46,27 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '--enabled <enabled>'
+        option: '--enabled <enabled>',
+        autocomplete: ['true', 'false']
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('enabled');
   }
 
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidBoolean(args.options.enabled)) {
-          return 'Invalid "enabled" option value. Specify "true" or "false"';
-        }
-
         return validation.isValidSharePointUrl(args.options.siteUrl);
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const enabled: boolean = args.options.enabled.toLocaleLowerCase() === 'true';
-
     const requestOptions: any = {
-      url: `${args.options.siteUrl}/_api/site/features/${enabled ? 'add' : 'remove'}`,
+      url: `${args.options.siteUrl}/_api/site/features/${args.options.enabled ? 'add' : 'remove'}`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -78,12 +78,12 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
     };
 
     if (this.verbose) {
-      logger.logToStderr(`${enabled ? 'Activating' : 'Deactivating'} in-place records management for site ${args.options.siteUrl}`);
+      logger.logToStderr(`${args.options.enabled ? 'Activating' : 'Deactivating'} in-place records management for site ${args.options.siteUrl}`);
     }
 
     try {
       await request.post(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

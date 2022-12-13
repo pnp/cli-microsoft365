@@ -90,7 +90,7 @@ class PpCardCloneCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Cloning a card from '${args.options.id || args.options.name}'...`);
     }

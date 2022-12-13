@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -30,7 +30,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -62,7 +62,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
@@ -82,14 +82,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when invalid boolean is passed as option', async () => {
-    const actual = await command.validate({
-      options: {
-        isPlannerAllowed: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
 
   it('passes validation when valid options specified', async () => {
     const actual = await command.validate({

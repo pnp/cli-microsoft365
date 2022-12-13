@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -58,7 +58,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -95,18 +95,13 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('passes validation if enabled set to "true"', async () => {
-    const actual = await command.validate({ options: { messageId: 10123123, enable: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { messageId: 10123123, enable: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if enabled set to "false"', async () => {
-    const actual = await command.validate({ options: { messageId: 10123123, enable: 'false' } }, commandInfo);
+    const actual = await command.validate({ options: { messageId: 10123123, enable: false } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('does not pass validation if enable not set to either "true" or "false"', async () => {
-    const actual = await command.validate({ options: { messageId: 10123123, enable: 'fals' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -121,7 +116,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('prompts when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, messageId: 1231231, enable: 'false' } });
+    await command.action(logger, { options: { debug: false, messageId: 1231231, enable: false } });
 
     let promptIssued = false;
 
@@ -152,7 +147,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231, confirm: 'true' } });
+    await command.action(logger, { options: { debug: true, messageId: 1231231, confirm: true } });
     assert(requestPostedStub.called);
   });
 
@@ -164,7 +159,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231, enable: 'true' } });
+    await command.action(logger, { options: { debug: true, messageId: 1231231, enable: true } });
     assert(requestPostedStub.called);
   });
 
@@ -176,12 +171,12 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231, enable: 'false', confirm: true } });
+    await command.action(logger, { options: { debug: true, messageId: 1231231, enable: false, confirm: true } });
     assert(requestPostedStub.called);
   });
 
   it('prompts when disliking and confirmation parameter is denied', async () => {
-    await command.action(logger, { options: { debug: false, messageId: 1231231, enable: 'false', confirm: false } });
+    await command.action(logger, { options: { debug: false, messageId: 1231231, enable: false, confirm: false } });
 
     let promptIssued = false;
 
@@ -205,7 +200,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { debug: true, messageId: 1231231, enable: 'false' } });
+    await command.action(logger, { options: { debug: true, messageId: 1231231, enable: false } });
     assert(requestDeleteStub.called);
   });
 
@@ -215,7 +210,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       { continue: false }
     ));
 
-    await command.action(logger, { options: { debug: false, messageId: 1231231, enable: 'false' } });
+    await command.action(logger, { options: { debug: false, messageId: 1231231, enable: false } });
     assert(requests.length === 0);
   });
 }); 

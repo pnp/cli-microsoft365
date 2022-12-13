@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,9 +21,8 @@ describe(commands.O365GROUP_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -49,6 +48,7 @@ describe(commands.O365GROUP_ADD, () => {
       request.post,
       request.put,
       request.get,
+      fs.readFileSync,
       global.setTimeout
     ]);
   });
@@ -56,8 +56,7 @@ describe(commands.O365GROUP_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      fs.readFileSync,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -344,6 +343,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Microsoft 365 Group with a png logo', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -421,6 +421,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Microsoft 365 Group with a jpg logo (debug)', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -498,6 +499,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('creates Microsoft 365 Group with a gif logo', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -575,6 +577,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('handles failure when creating Microsoft 365 Group with a logo', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -633,6 +636,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('handles failure when creating Microsoft 365 Group with a logo (debug)', async () => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({

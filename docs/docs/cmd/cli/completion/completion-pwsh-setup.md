@@ -26,8 +26,12 @@ If the specified profile path doesn't exist, the CLI will try to create it.
 Set up command completion for PowerShell using the profile from the profile variable
 
 ```powershell
-cli completion pwsh setup --profile $profile
+m365 cli completion pwsh setup --profile $profile
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

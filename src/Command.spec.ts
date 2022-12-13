@@ -1,13 +1,13 @@
 import * as assert from 'assert';
 import * as chalk from 'chalk';
 import * as sinon from 'sinon';
-import appInsights from './appInsights';
 import auth from './Auth';
 import { Cli } from './cli/Cli';
 import { Logger } from './cli/Logger';
 import Command, {
   CommandError
 } from './Command';
+import { telemetry } from './telemetry';
 import { pid } from './utils/pid';
 import { sinonUtil } from './utils/sinonUtil';
 
@@ -125,15 +125,15 @@ class MockCommand4 extends Command {
 }
 
 describe('Command', () => {
-  let telemetry: any;
+  let telemetryCommandName: any;
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let cli: Cli;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
+    sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
+      telemetryCommandName = commandName;
     });
     logger = {
       log: () => { },
@@ -145,7 +145,7 @@ describe('Command', () => {
   });
 
   beforeEach(() => {
-    telemetry = null;
+    telemetryCommandName = null;
     auth.service.connected = true;
     cli.currentCommandName = undefined;
   });
@@ -159,9 +159,9 @@ describe('Command', () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
       pid.getProcessName,
-      auth.restoreAuth
+      auth.restoreAuth,
+      telemetry.trackEvent
     ]);
   });
 
@@ -254,7 +254,7 @@ describe('Command', () => {
     const mock = new MockCommand1();
     await mock.action(logger, { options: {} });
 
-    assert.strictEqual(telemetry.name, 'mock-command');
+    assert.strictEqual(telemetryCommandName, 'mock-command');
   });
 
   it('logs command alias in the telemetry when command alias used', async () => {
@@ -262,7 +262,7 @@ describe('Command', () => {
     const mock = new MockCommand1();
     await mock.action(logger, { options: {} });
 
-    assert.strictEqual(telemetry.name, 'mc1');
+    assert.strictEqual(telemetryCommandName, 'mc1');
   });
 
   it('logs empty command name in telemetry when command called using something else than name or alias', async () => {
@@ -270,7 +270,7 @@ describe('Command', () => {
     const mock = new MockCommand1();
     await mock.action(logger, { options: {} });
 
-    assert.strictEqual(telemetry.name, '');
+    assert.strictEqual(telemetryCommandName, '');
   });
 
   it('correctly handles error when instance of error returned from the promise', () => {
@@ -324,6 +324,203 @@ describe('Command', () => {
   it('catches exception thrown by commandAction', async () => {
     const command = new MockCommand4();
     await assert.rejects(command.action(logger, { options: {} }), new CommandError('Exception'));
+  });
+
+  it('prints command name as the h1 heading in md output', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{}];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`# mock-command`) > -1);
+  });
+
+  it('uses the title property as the preferred item heading', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ title: 'title', Title: 'Title', displayName: 'displayName', DisplayName: 'DisplayName', name: 'name', Name: 'Name' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## title`) > -1);
+  });
+
+  it('uses the Title property as the item heading when title not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ Title: 'Title', displayName: 'displayName', DisplayName: 'DisplayName', name: 'name', Name: 'Name' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## Title`) > -1);
+  });
+
+  it('uses the displayName property as the item heading when title and Title not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ displayName: 'displayName', DisplayName: 'DisplayName', name: 'name', Name: 'Name' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## displayName`) > -1);
+  });
+
+  it('uses the DisplayName property as the item heading when title, Title, and displayName not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ DisplayName: 'DisplayName', name: 'name', Name: 'Name' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## DisplayName`) > -1);
+  });
+
+  it('uses the name property as the item heading when title, Title, displayName, and DisplayName not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ name: 'name', Name: 'Name' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## name`) > -1);
+  });
+
+  it('uses the Name property as the item heading when title, Title, displayName, DisplayName, and name not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ Name: 'Name' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## Name`) > -1);
+  });
+
+  it('uses undefined as the item heading when no known properties set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{}];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined`) > -1);
+  });
+
+  it('uses the id property as the preferred item ID', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ id: 'id', Id: 'Id', ID: 'ID', uniqueId: 'uniqueId', UniqueId: 'UniqueId', objectId: 'objectId', ObjectId: 'ObjectId', url: 'url', Url: 'Url', URL: 'URL' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined (id)`) > -1);
+  });
+
+  it('uses the Id property as the item ID when id not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ Id: 'Id', ID: 'ID', uniqueId: 'uniqueId', UniqueId: 'UniqueId', objectId: 'objectId', ObjectId: 'ObjectId', url: 'url', Url: 'Url', URL: 'URL' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined (Id)`) > -1);
+  });
+
+  it('uses the ID property as the item ID when id, and Id not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ ID: 'ID', uniqueId: 'uniqueId', UniqueId: 'UniqueId', objectId: 'objectId', ObjectId: 'ObjectId', url: 'url', Url: 'Url', URL: 'URL' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined (ID)`) > -1);
+  });
+
+  it('uses the uniqueId property as the item ID when id, Id, and ID not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ uniqueId: 'uniqueId', UniqueId: 'UniqueId', objectId: 'objectId', ObjectId: 'ObjectId', url: 'url', Url: 'Url', URL: 'URL' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined (uniqueId)`) > -1);
+  });
+
+  it('uses the UniqueId property as the item ID when id, Id, ID, and uniqueId not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ UniqueId: 'UniqueId', objectId: 'objectId', ObjectId: 'ObjectId', url: 'url', Url: 'Url', URL: 'URL' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined (UniqueId)`) > -1);
+  });
+
+  it('uses the objectId property as the item ID when id, Id, ID, uniqueId, and UniqueId not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ objectId: 'objectId', ObjectId: 'ObjectId', url: 'url', Url: 'Url', URL: 'URL' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined (objectId)`) > -1);
+  });
+
+  it('uses the ObjectId property as the item ID when id, Id, ID, uniqueId, UniqueId, and objectId not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ ObjectId: 'ObjectId', url: 'url', Url: 'Url', URL: 'URL' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined (ObjectId)`) > -1);
+  });
+
+  it('uses the url property as the item ID when id, Id, ID, uniqueId, UniqueId, objectId, and ObjectId not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ url: 'url', Url: 'Url', URL: 'URL' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined (url)`) > -1);
+  });
+
+  it('uses the Url property as the item ID when id, Id, ID, uniqueId, UniqueId, objectId, ObjectId, and url not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ Url: 'Url', URL: 'URL' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined (Url)`) > -1);
+  });
+
+  it('uses the URL property as the item ID when id, Id, ID, uniqueId, UniqueId, objectId, ObjectId, url, and URL not set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{ URL: 'URL' }];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined (URL)`) > -1);
+  });
+
+  it('uses undefined as the item ID when no matching id properties set', () => {
+    const command = new MockCommand1();
+    const commandOutput = [{}];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`## undefined (undefined)`) > -1);
+  });
+
+  it('properly handles logging no output', () => {
+    const command = new MockCommand1();
+    const actual = command.getMdOutput(undefined as any, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`# mock-command`) > -1);
+  });
+
+  it('properly handles logging empty output', () => {
+    const command = new MockCommand1();
+    const commandOutput: any[] = [];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(`# mock-command`) > -1);
+  });
+
+  it('properly handles logging mixed output with an empty item in between', () => {
+    const command = new MockCommand1();
+    const commandOutput = [
+      {
+        id: 'id1'
+      },
+      undefined,
+      {
+        id: 'id2'
+      }
+    ];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    const match = actual.match(/## undefined/g);
+    assert.strictEqual(match?.length, 2);
+  });
+
+  it('escapes reserved md characters in property names', () => {
+    const command = new MockCommand1();
+    const commandOutput = [
+      {
+        '_*~`|': 'value'
+      }
+    ];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf('\\_\\*\\~\\`\\|') > -1);
+  });
+
+  it('escapes reserved md characters in property values', () => {
+    const command = new MockCommand1();
+    const commandOutput = [
+      {
+        'property': '_*~`|'
+      }
+    ];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf('\\_\\*\\~\\`\\|') > -1);
+  });
+
+  it('serializes objects that are values to JSON', () => {
+    const command = new MockCommand1();
+    const commandOutput = [
+      {
+        'property': {
+          'property': 'value'
+        }
+      }
+    ];
+    const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
+    assert(actual.indexOf(JSON.stringify(commandOutput[0].property)) > -1);
   });
 
   it('passes validation when csv output specified', async () => {

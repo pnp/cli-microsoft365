@@ -51,6 +51,12 @@ m365 teams user app list --userName admin@contoso.com
           "lastModifiedDateTime": null,
           "createdBy": null
         },
+        "teamsApp": {
+            "id": "14d6962d-6eeb-4f48-8890-de55454bb136",
+            "externalId": null,
+            "displayName": "Activity",
+            "distributionMethod": "store"
+        },
         "appId": "14d6962d-6eeb-4f48-8890-de55454bb136"
       }
     ]

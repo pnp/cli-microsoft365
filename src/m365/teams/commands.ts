@@ -26,6 +26,7 @@ export default {
   FUNSETTINGS_SET: `${prefix} funsettings set`,
   GUESTSETTINGS_LIST: `${prefix} guestsettings list`,
   GUESTSETTINGS_SET: `${prefix} guestsettings set`,
+  MEETING_ATTENDANCEREPORT_LIST: `${prefix} meeting attendancereport list`,
   MEETING_GET: `${prefix} meeting get`,
   MEETING_LIST: `${prefix} meeting list`,
   MEMBERSETTINGS_LIST: `${prefix} membersettings list`,

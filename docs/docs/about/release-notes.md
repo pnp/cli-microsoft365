@@ -1,5 +1,53 @@
 # Release notes
 
+## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0) (beta)
+
+### New commands
+
+**Planner:**
+
+- [planner plan set](../cmd/planner/plan/plan-set.md) - updates a Microsoft Planner plan [#3346](https://github.com/pnp/cli-microsoft365/issues/3346)
+
+**Power Platform:**
+
+- [pp chatbot get](../cmd/pp/chatbot/chatbot-get.md) - get information about the specified chatbot [#4107](https://github.com/pnp/cli-microsoft365/issues/4107)
+- [pp chatbot remove](../cmd/pp/chatbot/chatbot-remove.md) - removes the specified chatbot [#4106](https://github.com/pnp/cli-microsoft365/issues/4106)
+- [pp dataverse table row list](../cmd/pp/dataverse/dataverse-table-row-list.md) - lists table rows for the given Dataverse table [#3791](https://github.com/pnp/cli-microsoft365/issues/3791)
+- [pp solution publisher add](../cmd/pp/solution/solution-publisher-add.md) - adds a specified publisher in a given environment [#3977](https://github.com/pnp/cli-microsoft365/issues/3977)
+
+**Purview:**
+
+- [purview retentionlabel list](../cmd/purview/retentionlabel/retentionlabel-list.md) - get a list of retention labels [#4144](https://github.com/pnp/cli-microsoft365/issues/4144)
+- [purview retentionlabel remove](../cmd/purview/retentionlabel/retentionlabel-remove.md) - deletes a retention label [#4149](https://github.com/pnp/cli-microsoft365/issues/4149)
+
+**Teams:**
+
+- [teams meeting attendancereport list](../cmd/teams/meeting/meeting-attendancereport-list.md) - lists all attendance reports for a given meeting [#3907](https://github.com/pnp/cli-microsoft365/issues/3907)
+
+### Changes
+
+- updated 'spo roledefinition list' command [#4075](https://github.com/pnp/cli-microsoft365/issues/4075)
+- updated 'spo contenttype set' command with a flag to push updates to child content types [#3792](https://github.com/pnp/cli-microsoft365/issues/3792)
+- enhanced cli-output-mode doc [#4117](https://github.com/pnp/cli-microsoft365/issues/4117)
+- fixed 'spo navigation node add' command [#4093](https://github.com/pnp/cli-microsoft365/issues/4093)
+- enhanced spo lisitem set command [#4167](https://github.com/pnp/cli-microsoft365/issues/4167)
+- added support for upgrading SPFx projects to v1.16.1 [#4181](https://github.com/pnp/cli-microsoft365/issues/4181)
+- extended 'spfx doctor' with support for v1.16.1 projects [#4182](https://github.com/pnp/cli-microsoft365/issues/4182)
+- extended 'spfx project doctor' with support for v1.16.1 projects [#4183](https://github.com/pnp/cli-microsoft365/issues/4183)
+- enhanced parsing of boolean arguments [#3914](https://github.com/pnp/cli-microsoft365/issues/3914)
+- updated logic for upgrading SPFx projects to v1.14 [#4060](https://github.com/pnp/cli-microsoft365/issues/4060)
+- added docs response for cli and search commands [#3921](https://github.com/pnp/cli-microsoft365/issues/3921)
+- fixed next publish build version stamping [#4194](https://github.com/pnp/cli-microsoft365/issues/4194)
+- added 'teams user app list' with teamsApp output [#4128](https://github.com/pnp/cli-microsoft365/issues/4128)
+- fixed 'spo listitem list' filter option [#4090](https://github.com/pnp/cli-microsoft365/issues/4090)
+- introduced markdown output for documentation purposes [#2908](https://github.com/pnp/cli-microsoft365/issues/2908)
+- fixed exposing internal API error [#3527](https://github.com/pnp/cli-microsoft365/issues/3527)
+- extended 'spo serviceprincipal permissionrequest approve' with --all flags [#4204](https://github.com/pnp/cli-microsoft365/issues/4204)
+- fixed the sample script 'resubmit all failed flow runs' [#2799](https://github.com/pnp/cli-microsoft365/pull/2799)
+- updated command options with the new boolean handlings [#3986](https://github.com/pnp/cli-microsoft365/issues/3986)
+- extended 'teams cache remove' to check on Teams PID [#3448](https://github.com/pnp/cli-microsoft365/issues/3448)
+- added 'disableTelemetry' config value [#4109](https://github.com/pnp/cli-microsoft365/issues/4109)
+
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
 ### New commands

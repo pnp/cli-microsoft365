@@ -5,7 +5,7 @@ import * as inquirer from 'inquirer';
 import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import appInsights from '../appInsights';
+import { telemetry } from '../telemetry';
 import Command, { CommandError } from '../Command';
 import AnonymousCommand from '../m365/base/AnonymousCommand';
 import * as cliCompletionUpdateCommand from '../m365/cli/commands/completion/completion-clink-update';
@@ -36,8 +36,7 @@ class MockCommand extends AnonymousCommand {
         option: '-y, --parameterY [parameterY]'
       }
     );
-    this.types.string.push('x');
-    this.types.boolean.push('y');
+    this.types.string.push('x', 'y');
   }
   public async commandAction(logger: Logger, args: any): Promise<void> {
     logger.log(args.options.parameterX);
@@ -127,6 +126,33 @@ class MockCommandWithValidation extends AnonymousCommand {
   }
 }
 
+class MockCommandWithBooleanRewrite extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock boolean rewrite';
+  }
+  public get description(): string {
+    return 'Mock command with boolean rewrite';
+  }
+  constructor() {
+    super();
+
+    this.options.push(
+      {
+        option: '-x, --booleanParameterX [booleanParameterX]'
+      },
+      {
+        option: '-y, --booleanParameterY [booleanParameterY]'
+      }
+    );
+
+    this.types.boolean.push('x', 'booleanParameterX', 'y', 'booleanParameterY');
+  }
+  public async commandAction(logger: Logger, args: any): Promise<void> {
+    logger.log(`booleanParameterX: ${args.options.booleanParameterX}`);
+    logger.log(`booleanParameterY: ${args.options.booleanParameterY}`);
+  }
+}
+
 class MockCommandWithPrompt extends AnonymousCommand {
   public get name(): string {
     return 'cli mock prompt';
@@ -186,9 +212,10 @@ describe('Cli', () => {
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
   let log: string[] = [];
+  let mockCommandWithBooleanRewrite: Command;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
 
     cliLogStub = sinon.stub((Cli as any), 'log').callsFake(message => {
@@ -201,6 +228,7 @@ describe('Cli', () => {
 
     mockCommand = new MockCommand();
     mockCommandWithAlias = new MockCommandWithAlias();
+    mockCommandWithBooleanRewrite = new MockCommandWithBooleanRewrite();
     mockCommandWithValidation = new MockCommandWithValidation();
     mockCommandWithOptionSets = new MockCommandWithOptionSets();
     mockCommandActionSpy = sinon.spy(mockCommand, 'action');
@@ -221,6 +249,7 @@ describe('Cli', () => {
     (cli as any).loadCommand(mockCommandWithAlias);
     (cli as any).loadCommand(mockCommandWithValidation);
     (cli as any).loadCommand(cliCompletionUpdateCommand);
+    (cli as any).loadCommand(mockCommandWithBooleanRewrite);
   });
 
   afterEach(() => {
@@ -235,13 +264,14 @@ describe('Cli', () => {
       Cli.executeCommand,
       fs.existsSync,
       fs.readFileSync,
-      mockCommandWithValidation.validate,
-      mockCommandWithValidation.action,
       inquirer.prompt,
       // eslint-disable-next-line no-console
       console.log,
       // eslint-disable-next-line no-console
       console.error,
+      mockCommand.validate,
+      mockCommandWithValidation.action,
+      mockCommandWithValidation.validate,
       mockCommand.commandAction,
       mockCommand.processOptions,
       Cli.prompt
@@ -255,9 +285,10 @@ describe('Cli', () => {
       (Cli as any).formatOutput,
       process.exit,
       md.md2plain,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
-      cli.getSettingWithDefaultValue
+      cli.getSettingWithDefaultValue,
+      mockCommand.action
     ]);
   });
 
@@ -515,6 +546,105 @@ describe('Cli', () => {
           done(e);
         }
       }, e => done(e));
+  });
+
+  it(`succeeds running with truthy/falsy values 'true' and 'false'`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'true', '--booleanParameterY', 'false', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`rewrites a truthy/falsy values '1' and '0' to 'true' and 'false' respectively`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', '1', '--booleanParameterY', '0', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`rewrites a truthy/falsy values 'on' and 'off' to 'true' and 'false' respectively`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'on', '--booleanParameterY', 'off', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'yes', '--booleanParameterY', 'no', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`rewrites a truthy/falsy values 'True' and 'False' to 'true' and 'false' respectively`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'True', '--booleanParameterY', 'False', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`rewrites a truthy/falsy values 'yes' and 'no' to 'true' and 'false' respectively (using shorts)`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '-x', 'yes', '-y', 'no', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith(`booleanParameterX: true`));
+          assert(cliLogStub.calledWith(`booleanParameterY: false`));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`shows error when a boolean option does not contain a correct truthy/falsy value`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'boolean', 'rewrite', '--booleanParameterX', 'folse'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        assert(cliErrorStub.calledWith(chalk.red(`Error: The value 'folse' for option '--booleanParameterX' is not a valid boolean`)));
+        done();
+      });
   });
 
   it(`fails options validation if the command doesn't allow unknown options and specified options match command options`, (done) => {
@@ -1026,7 +1156,7 @@ describe('Cli', () => {
       .then(_ => {
         try {
           // 12 commands from the folder + 4 mocks + cli completion clink update
-          assert.strictEqual(cli.commands.length, 12 + 4 + 1);
+          assert.strictEqual(cli.commands.length, 12 + 5 + 1);
           done();
         }
         catch (e) {
@@ -1116,24 +1246,24 @@ describe('Cli', () => {
   });
 
   it('doesn\'t fail when undefined object is passed to the log', () => {
-    const actual = (Cli as any).formatOutput(undefined, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, undefined, { output: 'text' });
     assert.strictEqual(actual, undefined);
   });
 
   it('returns the same object if non-array is passed to the log', () => {
     const s = 'foo';
-    const actual = (Cli as any).formatOutput(s, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, s, { output: 'text' });
     assert.strictEqual(actual, s);
   });
 
   it('doesn\'t fail when an array with undefined object is passed to the log', () => {
-    const actual = (Cli as any).formatOutput([undefined], { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, [undefined], { output: 'text' });
     assert.strictEqual(actual, '');
   });
 
   it('formats output as pretty JSON when JSON output requested', (done) => {
     const o = { lorem: 'ipsum', dolor: 'sit' };
-    const actual = (Cli as any).formatOutput(o, { output: 'json' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'json' });
     try {
       assert.strictEqual(actual, JSON.stringify(o, null, 2));
       done();
@@ -1152,7 +1282,7 @@ describe('Cli', () => {
       '  "_ObjectIdentity_": "b61700a0-9062-3000-659e-7f5738e3385a|908bed80-a04a-4433-b4a0-883d9847d110:1b11f502-9eb0-401a-b164-68933e6e9443\\\\\\nSiteProperties\\\\\\nhttps%3a%2f%2fm365x954810.sharepoint.com%2fsites%2fsite1617"',
       '}'
     ].join('\n');
-    const actual = (Cli as any).formatOutput(input, { output: 'json' });
+    const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'json' });
     try {
       assert.strictEqual(actual, expected);
       done();
@@ -1174,7 +1304,7 @@ describe('Cli', () => {
       }
       ];
     const expected = "header1,header2\nvalue1item1,value2item1\nvalue1item2,value2item2\n";
-    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'csv' });
     try {
       assert.strictEqual(actual, expected);
       done();
@@ -1191,7 +1321,7 @@ describe('Cli', () => {
       "header2": "value2item1"
     };
     const expected = "header1,header2\nvalue1item1,value2item1\n";
-    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'csv' });
     try {
       assert.strictEqual(actual, expected);
       done();
@@ -1215,7 +1345,7 @@ describe('Cli', () => {
     });
 
     const expected = "value1item1,value2item1\n";
-    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'csv' });
     try {
       assert.strictEqual(actual, expected);
       done();
@@ -1239,7 +1369,7 @@ describe('Cli', () => {
     });
 
     const expected = "\"header1\",\"header2\"\n\"value1item1\",\"value2item1\"\n";
-    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'csv' });
     try {
       assert.strictEqual(actual, expected);
       done();
@@ -1263,7 +1393,7 @@ describe('Cli', () => {
     });
 
     const expected = "header1,header2\nvalue1item1,\"\"\n";
-    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'csv' });
     try {
       assert.strictEqual(actual, expected);
       done();
@@ -1293,7 +1423,7 @@ describe('Cli', () => {
     });
 
     const expected = "_header1_,_header2_\n_value1item1_,_value2item1_\n";
-    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'csv' });
     try {
       assert.strictEqual(actual, expected);
       done();
@@ -1305,7 +1435,7 @@ describe('Cli', () => {
 
   it('formats simple output as text', (done) => {
     const o = false;
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'text' });
     try {
       assert.strictEqual(actual, `${o}`);
       done();
@@ -1317,13 +1447,13 @@ describe('Cli', () => {
 
   it('formats date output as text', () => {
     const d = new Date();
-    const actual = (Cli as any).formatOutput(d, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, d, { output: 'text' });
     assert.strictEqual(actual, d.toString());
   });
 
   it('formats object output as transposed table when passing seqential props', (done) => {
     const o = { prop1: 'value1', prop2: 'value2' };
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'text' });
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop2', 'value2');
@@ -1342,7 +1472,7 @@ describe('Cli', () => {
 
   it('formats object output as transposed table', (done) => {
     const o = { prop1: 'value1 ', prop12: 'value12' };
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'text' });
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop12', 'value12');
@@ -1361,7 +1491,7 @@ describe('Cli', () => {
 
   it('formats array values as JSON', (done) => {
     const o = { prop1: ['value1', 'value2'] };
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'text' });
     const expected = 'prop1: ["value1","value2"]' + '\n';
     try {
       assert.strictEqual(actual, expected);
@@ -1377,7 +1507,7 @@ describe('Cli', () => {
       ['value1', 'value2'],
       ['value3', 'value4']
     ];
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'text' });
     const expected = [o[0].join(','), o[1].join(',')].join(os.EOL);
     try {
       assert.strictEqual(actual, expected);
@@ -1393,7 +1523,7 @@ describe('Cli', () => {
       { prop1: 'value1', prop2: 'value2' },
       { prop1: 'value3', prop2: 'value4' }
     ];
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'text' });
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop2', 'value2');
@@ -1413,7 +1543,7 @@ describe('Cli', () => {
 
   it('formats command error as error message', (done) => {
     const o = new CommandError('An error has occurred');
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'text' });
     const expected = chalk.red('Error: An error has occurred');
     try {
       assert.strictEqual(actual, expected);
@@ -1426,7 +1556,7 @@ describe('Cli', () => {
 
   it('sets array type to the first non-undefined value', (done) => {
     const o = [undefined, 'lorem', 'ipsum'];
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'text' });
     const expected = `${os.EOL}lorem${os.EOL}ipsum`;
     try {
       assert.strictEqual(actual, expected);
@@ -1443,7 +1573,7 @@ describe('Cli', () => {
       'lorem',
       { prop1: 'value3', prop2: 'value4' }
     ];
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'text' });
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop2', 'value2');
@@ -1461,12 +1591,51 @@ describe('Cli', () => {
     }
   });
 
+  it('formats object with array as md', (done) => {
+    const input =
+      [{
+        "header1": "value1item1",
+        "header2": "value2item1"
+      },
+      {
+        "header1": "value1item2",
+        "header2": "value2item2"
+      }
+      ];
+    const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'md' });
+    const match = actual.match(/^## /gm);
+    try {
+      assert.strictEqual(match?.length, 2);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('formats a simple object as md', (done) => {
+    const input =
+    {
+      "header1": "value1item1",
+      "header2": "value2item1"
+    };
+    const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'md' });
+    const match = actual.match(/^## /gm);
+    try {
+      assert.strictEqual(match?.length, 1);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
   it('applies JMESPath query to a single object', (done) => {
     const o = {
       "first": "Joe",
       "last": "Doe"
     };
-    const actual = (Cli as any).formatOutput(o, { query: 'first', output: 'json' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { query: 'first', output: 'json' });
     try {
       assert.strictEqual(actual, JSON.stringify("Joe"));
       done();
@@ -1487,7 +1656,7 @@ describe('Cli', () => {
     (cli as any).commandToExecute = {
       defaultProperties: ['name']
     };
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'text' });
     const t = new Table();
     t.cell('name', 'Seattle');
     t.newRow();
@@ -1523,7 +1692,7 @@ describe('Cli', () => {
     (cli as any).commandToExecute = {
       defaultProperties: ['name']
     };
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const actual = (Cli as any).formatOutput(mockCommand, o, { output: 'text' });
     const t = new Table();
     t.cell('name', 'Seattle');
     t.newRow();
@@ -1555,7 +1724,7 @@ describe('Cli', () => {
         { "name": "Olympia", "state": "WA" }
       ]
     };
-    const actual = (Cli as any).formatOutput(o, {
+    const actual = (Cli as any).formatOutput(mockCommand, o, {
       query: `locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}`,
       output: 'json'
     });
@@ -1579,7 +1748,7 @@ describe('Cli', () => {
         { "name": "Olympia", "state": "WA" }
       ]
     };
-    const actual = (Cli as any).formatOutput(o, {
+    const actual = (Cli as any).formatOutput(mockCommand, o, {
       query: `locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}`,
       output: 'json',
       help: true
@@ -1603,7 +1772,7 @@ describe('Cli', () => {
       ]
     };
     assert.throws(() => {
-      (Cli as any).formatOutput(o, {
+      (Cli as any).formatOutput(mockCommand, o, {
         query: `contains(abc)`,
         output: 'json'
       });
@@ -1619,7 +1788,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  6 commands'));
+      assert(cliLogStub.calledWith('  cli *  7 commands'));
       done();
     }
     catch (e) {
@@ -1639,7 +1808,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli mock *        3 commands'));
+      assert(cliLogStub.calledWith('  cli mock *        4 commands'));
       done();
     }
     catch (e) {
@@ -1659,7 +1828,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  6 commands'));
+      assert(cliLogStub.calledWith('  cli *  7 commands'));
       done();
     }
     catch (e) {

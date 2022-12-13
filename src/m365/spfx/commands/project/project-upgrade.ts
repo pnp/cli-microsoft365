@@ -69,7 +69,8 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.14.0',
     '1.15.0',
     '1.15.2',
-    '1.16.0'
+    '1.16.0',
+    '1.16.1'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -358,6 +359,12 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
       default:
         logger.log(findingsToReport);
     }
+  }
+
+  public getMdOutput(logStatement: any): string {
+    // overwrite markdown output to return the output as-is
+    // because the command already implements its own logic to format the output
+    return logStatement;
   }
 
   private writeReportTourFolder(findingsToReport: any): void {
