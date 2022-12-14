@@ -1,6 +1,6 @@
 # spo file retentionlabel remove
 
-Clears the retention label from a list item
+Clears the retention label from a file
 
 ## Usage
 
@@ -20,7 +20,7 @@ m365 spo file retentionlabel remove [options]
 : The UniqueId (GUID) of the file of which the label should be removed. Specify either `fileUrl` or `fileId` but not both.
 
 `--confirm`
-: Don't prompt for confirming removing the list item
+: Don't prompt for confirming removing the retention label from a file
 
 --8<-- "docs/cmd/_global.md"
 

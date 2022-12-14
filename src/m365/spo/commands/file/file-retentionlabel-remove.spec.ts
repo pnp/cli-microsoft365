@@ -78,7 +78,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing retentionlabel when confirmation argument not passed', async () => {
+  it('prompts before removing retentionlabel from a file when confirmation argument not passed', async () => {
     await command.action(logger, { options: { debug: false, webUrl: webUrl, fileUrl: fileUrl } });
     let promptIssued = false;
 
@@ -89,7 +89,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing list item when prompt not confirmed', async () => {
+  it('aborts removing file retention label when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
@@ -105,7 +105,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
-  it('removes the retentionlabel based on fileUrl when prompt confirmed', async () => {
+  it('removes the retentionlabel from a file based on fileUrl when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')?$expand=ListItemAllFields`) {
         return { ListItemAllFields: { Id: listId }, ServerRelativeUrl: fileUrl };
@@ -139,7 +139,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     assert(postSpy.called);
   });
 
-  it('removes the retentionlabel based on fileId when prompt confirmed', async () => {
+  it('removes the retentionlabel from a file based on fileId when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileById('${fileId}')?$expand=ListItemAllFields`) {
         return { ListItemAllFields: { Id: listId }, ServerRelativeUrl: fileUrl };
@@ -174,7 +174,7 @@ describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
     assert(postSpy.called);
   });
 
-  it('removes the retentionlabel based on fileId', async () => {
+  it('removes the retentionlabel from a file based on fileId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileById('${fileId}')?$expand=ListItemAllFields`) {
         return { ListItemAllFields: { Id: listId }, ServerRelativeUrl: fileUrl };
