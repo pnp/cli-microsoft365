@@ -35,19 +35,19 @@ m365 spo listitem remove [options]
 
 ## Examples
 
-Remove the list item located in given site based on the list id
+Remove the list item located in a given site based on the list id
 
 ```sh
 m365 spo listitem remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
 ```
 
-Remove the list item located in given site based on the list title
+Remove the list item located in a given site based on the list title
 
 ```sh
 m365 spo listitem remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --id 1
 ```
 
-Remove the list item located in given site based on the server relative list url
+Remove the list item located in a given site based on the server relative list url
 
 ```sh
 m365 spo listitem remove --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/lists/TestList --id 1
