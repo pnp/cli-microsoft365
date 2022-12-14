@@ -12,7 +12,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
@@ -158,7 +158,7 @@ class SpoListItemRetentionLabelRemoveCommand extends SpoCommand {
     try {
       const serverRelativeUrl = await this.getListServerRelativeUrl(args);
 
-      const url = `${args.options.webUrl}/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${serverRelativeUrl}'&@a2='${args.options.listItemId}'`;
+      const url = `${args.options.webUrl}/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(serverRelativeUrl)}'&@a2='${args.options.listItemId}'`;
       const requestBody = {
         "complianceTag": "",
         "isTagPolicyHold": false,

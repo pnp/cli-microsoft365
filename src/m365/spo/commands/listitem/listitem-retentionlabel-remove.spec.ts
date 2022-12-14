@@ -119,7 +119,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
     ));
 
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${listUrl}'&@a2='1'`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
         return;
       }
 
@@ -152,7 +152,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
     ));
 
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${listUrl}'&@a2='1'`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
         return;
       }
 
@@ -172,7 +172,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel based on listUrl', async () => {
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${listUrl}'&@a2='1'`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
         return;
       }
 
@@ -198,7 +198,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
     ));
 
     const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${listUrl}'&@a2='1'`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
         return;
       }
 
