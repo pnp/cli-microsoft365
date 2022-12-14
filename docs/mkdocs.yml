@@ -476,6 +476,7 @@ nav:
         - listitem list: cmd/spo/listitem/listitem-list.md
         - listitem set: cmd/spo/listitem/listitem-set.md
         - listitem remove: cmd/spo/listitem/listitem-remove.md
+        - listitem retentionlabel remove: cmd/spo/listitem/listitem-retentionlabel-remove.md
         - listitem attachment list: cmd/spo/listitem/listitem-attachment-list.md
         - listitem batch add: cmd/spo/listitem/listitem-batch-add.md
         - listitem roleassignment add: cmd/spo/listitem/listitem-roleassignment-add.md
