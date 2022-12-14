@@ -402,6 +402,7 @@ nav:
         - file move: cmd/spo/file/file-move.md
         - file remove: cmd/spo/file/file-remove.md
         - file rename: cmd/spo/file/file-rename.md
+        - file retentionlabel remove: cmd/spo/file/file-retentionlabel-remove.md
         - file roleassignment add: cmd/spo/file/file-roleassignment-add.md
         - file roleassignment remove: cmd/spo/file/file-roleassignment-remove.md
         - file roleinheritance break: cmd/spo/file/file-roleinheritance-break.md

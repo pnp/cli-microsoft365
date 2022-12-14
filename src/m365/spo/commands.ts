@@ -56,6 +56,7 @@ export default {
   FILE_MOVE: `${prefix} file move`,
   FILE_REMOVE: `${prefix} file remove`,
   FILE_RENAME: `${prefix} file rename`,
+  FILE_RETENTIONLABEL_REMOVE: `${prefix} file retentionlabel remove`,
   FILE_ROLEASSIGNMENT_ADD: `${prefix} file roleassignment add`,
   FILE_ROLEASSIGNMENT_REMOVE: `${prefix} file roleassignment remove`,
   FILE_ROLEINHERITANCE_BREAK: `${prefix} file roleinheritance break`,
