@@ -26,7 +26,7 @@ m365 spo listitem retentionlabel remove [options]
 : Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`
 
 `--confirm`
-: Don't prompt for confirming removing the list item
+: Don't prompt for confirming removing the retention label from a list item
 
 --8<-- "docs/cmd/_global.md"
 
