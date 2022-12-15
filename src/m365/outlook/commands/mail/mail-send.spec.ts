@@ -98,7 +98,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -153,7 +153,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -186,7 +186,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', cc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', cc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -219,7 +219,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bcc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bcc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -246,7 +246,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: false } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: false } });
     assert.strictEqual(actual, expected);
   });
 
@@ -310,7 +310,7 @@ describe(commands.MAIL_SEND, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),
+    await assert.rejects(command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),
       new CommandError(`An error has occurred`));
   });
 
@@ -402,17 +402,6 @@ describe(commands.MAIL_SEND, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('sends email using a specified group mailbox', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
@@ -436,7 +425,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', mailbox: 'sales@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', mailbox: 'sales@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -462,7 +451,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', sender: 'some-user@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', sender: 'some-user@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -472,7 +461,6 @@ describe(commands.MAIL_SEND, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         subject: 'Lorem ipsum',
         to: 'mail@domain.com',
         bodyContents: 'Lorem ipsum'

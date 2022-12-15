@@ -73,7 +73,7 @@ describe(commands.REPORT_USERACTIVITYUSERDETAIL, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, date: '2019-07-13' } });
+    await command.action(logger, { options: { date: '2019-07-13' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(date=2019-07-13)");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });

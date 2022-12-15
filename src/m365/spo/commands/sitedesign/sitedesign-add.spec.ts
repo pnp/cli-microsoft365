@@ -21,7 +21,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -100,7 +100,7 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
@@ -180,7 +180,7 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25" } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25" } });
     assert(loggerLogSpy.calledOnce);
   });
 
@@ -210,7 +210,7 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'CommunicationSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'CommunicationSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
@@ -251,7 +251,7 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site' } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site' } });
     assert(loggerLogSpy.calledWith({
       "Description": "Contoso team site",
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
@@ -292,7 +292,7 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageUrl: 'https://contoso.com/assets/team-site-preview.png' } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageUrl: 'https://contoso.com/assets/team-site-preview.png' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
@@ -333,7 +333,7 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageAltText: 'Contoso team site preview' } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageAltText: 'Contoso team site preview' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
@@ -374,7 +374,7 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", isDefault: true } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", isDefault: true } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
@@ -418,7 +418,7 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', previewImageAltText: 'Contoso team site preview', isDefault: true } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', previewImageAltText: 'Contoso team site preview', isDefault: true } });
     assert(loggerLogSpy.calledWith({
       "Description": 'Contoso team site',
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
@@ -437,22 +437,13 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      title: 'Contoso', 
-      webTemplate: 'TeamSite', 
-      siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        title: 'Contoso',
+        webTemplate: 'TeamSite',
+        siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24'
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying title', () => {

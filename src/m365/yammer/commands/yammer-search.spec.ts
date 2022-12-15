@@ -247,7 +247,7 @@ describe(commands.SEARCH, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('correctly handles error', async() => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -256,7 +256,7 @@ describe(commands.SEARCH, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('does not pass validation without parameters', async () => {
@@ -307,17 +307,6 @@ describe(commands.SEARCH, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('returns all items', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
@@ -327,7 +316,7 @@ describe(commands.SEARCH, () => {
     });
 
     await command.action(logger, { options: { queryText: "contents" } } as any);
-    
+
     const result = loggerLogSpy.lastCall.args[0];
     assert.strictEqual(result.length, 15);
     assert.strictEqual(result[0].id, 11111);

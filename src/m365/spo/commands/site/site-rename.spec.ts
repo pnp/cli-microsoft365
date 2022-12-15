@@ -469,17 +469,6 @@ describe(commands.SITE_RENAME, () => {
     } as any), new CommandError("An error has occurred"));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
-  });
-
   it('accepts newUrl parameter', async () => {
     const actual = await command.validate({ options: { url: "https://contoso.sharepoint.com/", newUrl: "https://contoso.sharepoint.com/sites/new" } }, commandInfo);
     assert.strictEqual(actual, true);

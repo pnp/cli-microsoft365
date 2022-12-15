@@ -114,7 +114,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'invalid' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { id: 'invalid' } } as any), new CommandError('An error has occurred'));
   });
 
   it('gets the specified service health issue for tenant', async () => {
@@ -132,16 +132,5 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_GET, () => {
       }
     });
     assert(loggerLogSpy.calledWith(jsonOutput));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

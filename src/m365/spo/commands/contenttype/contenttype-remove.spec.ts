@@ -219,7 +219,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', confirm: false } });
+    await command.action(logger, { options: { verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', confirm: false } });
     assert(postCallbackStub.notCalled);
   });
 
@@ -283,7 +283,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'NonExistentContentType', confirm: true } } as any),
       new CommandError('Content type not found'));
-    
+
     assert(getRequestStub.called);
     assert(deleteRequestStub.notCalled);
   });
@@ -305,17 +305,6 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     ['i', 'id'].forEach(o => {
       assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports verbose mode', () => {

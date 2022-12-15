@@ -234,16 +234,4 @@ describe(commands.EVENTRECEIVER_LIST, () => {
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', listId: 'b17bd74f-d1b1-42bf-a21d-f865a903acc3' } });
     assert(loggerLogSpy.calledWith(eventReceiverResponseJson));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
 });

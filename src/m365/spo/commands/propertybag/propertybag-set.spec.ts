@@ -489,17 +489,6 @@ describe(commands.PROPERTYBAG_SET, () => {
       new CommandError('ClientSvc unknown error'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsVerboseOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsVerboseOption = true;
-      }
-    });
-    assert(containsVerboseOption);
-  });
-
   it('supports specifying folder', () => {
     const options = command.options;
     let containsScopeOption = false;

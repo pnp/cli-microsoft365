@@ -115,7 +115,7 @@ describe(commands.FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -205,7 +205,7 @@ describe(commands.FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listId: '03cef05c-ba50-4dcf-a876-304f0626085c', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My column' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', listId: '03cef05c-ba50-4dcf-a876-304f0626085c', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My column' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -455,7 +455,7 @@ describe(commands.FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn>', Description: 'My column' } }));
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn>', Description: 'My column' } }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -493,7 +493,7 @@ describe(commands.FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column>' } }));
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column>' } }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -555,7 +555,7 @@ describe(commands.FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' } } as any),
       new CommandError(`Column 'MyColumn' does not exist. It may have been deleted by another user.`));
   });
 
@@ -586,7 +586,7 @@ describe(commands.FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listId: '03cef05c-ba50-4dcf-a876-304f0626085c', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My column' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', listId: '03cef05c-ba50-4dcf-a876-304f0626085c', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My column' } } as any),
       new CommandError(`List does not exist.\n\nThe page you selected contains a list that does not exist.  It may have been deleted by another user.`));
   });
 
@@ -662,24 +662,13 @@ describe(commands.FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column' } } as any),
       new CommandError(`An error has occurred`));
   });
 
   it('allows unknown options', () => {
     const allowUnknownOptions = command.allowUnknownOptions();
     assert.strictEqual(allowUnknownOptions, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {

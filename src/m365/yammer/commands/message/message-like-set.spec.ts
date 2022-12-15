@@ -81,7 +81,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation with parameters', async () => {
@@ -104,19 +104,8 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('prompts when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, messageId: 1231231, enable: false } });
+    await command.action(logger, { options: { messageId: 1231231, enable: false } });
 
     let promptIssued = false;
 
@@ -176,7 +165,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('prompts when disliking and confirmation parameter is denied', async () => {
-    await command.action(logger, { options: { debug: false, messageId: 1231231, enable: false, confirm: false } });
+    await command.action(logger, { options: { messageId: 1231231, enable: false, confirm: false } });
 
     let promptIssued = false;
 
@@ -210,7 +199,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       { continue: false }
     ));
 
-    await command.action(logger, { options: { debug: false, messageId: 1231231, enable: false } });
+    await command.action(logger, { options: { messageId: 1231231, enable: false } });
     assert(requests.length === 0);
   });
 }); 

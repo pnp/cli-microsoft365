@@ -494,17 +494,6 @@ describe(commands.PLAN_SET, () => {
       return Promise.reject('An error has occurred.');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError('An error has occurred.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError('An error has occurred.'));
   });
 });

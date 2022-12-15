@@ -88,7 +88,7 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowUserEditMessages: true }
+      options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowUserEditMessages: true }
     } as any);
   });
 
@@ -109,7 +109,7 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowOwnerDeleteMessages: true, allowTeamMentions: true, allowChannelMentions: true }
+      options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowOwnerDeleteMessages: true, allowTeamMentions: true, allowChannelMentions: true }
     } as any);
   });
 
@@ -133,7 +133,6 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
         allowOwnerDeleteMessages: true,
         allowTeamMentions: true,
@@ -170,16 +169,5 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });
