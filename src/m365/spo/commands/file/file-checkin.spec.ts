@@ -163,7 +163,6 @@ describe(commands.FILE_CHECKIN, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
@@ -176,7 +175,6 @@ describe(commands.FILE_CHECKIN, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         url: '/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com'
       }
@@ -189,7 +187,6 @@ describe(commands.FILE_CHECKIN, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         type: 'minor'
@@ -203,7 +200,6 @@ describe(commands.FILE_CHECKIN, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         type: 'overwrite'
@@ -217,7 +213,6 @@ describe(commands.FILE_CHECKIN, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         comment: 'abc1'
@@ -231,7 +226,6 @@ describe(commands.FILE_CHECKIN, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         type: 'minor'
@@ -245,7 +239,6 @@ describe(commands.FILE_CHECKIN, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         type: 'overwrite'
@@ -259,24 +252,12 @@ describe(commands.FILE_CHECKIN, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         comment: 'abc1'
       }
     });
     assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='abc1',checkintype=1)");
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {

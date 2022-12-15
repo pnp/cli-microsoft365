@@ -98,7 +98,6 @@ describe(commands.PAGE_REMOVE, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           name: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           confirm: true
@@ -152,7 +151,6 @@ describe(commands.PAGE_REMOVE, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           name: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a'
         }
@@ -223,7 +221,6 @@ describe(commands.PAGE_REMOVE, () => {
     await command.action(logger,
       {
         options: {
-          debug: false,
           name: 'page',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           confirm: true
@@ -244,23 +241,11 @@ describe(commands.PAGE_REMOVE, () => {
     await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           name: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           confirm: true
         }
       }), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying name', () => {

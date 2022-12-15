@@ -23,7 +23,7 @@ describe(commands.FOLDER_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
 
     stubPostResponses = (removeResp: any = null) => {
@@ -36,7 +36,7 @@ describe(commands.FOLDER_REMOVE, () => {
             return Promise.resolve();
           }
         }
-  
+
         return Promise.reject('Invalid request');
       });
     };
@@ -89,7 +89,7 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('prompts before removing folder when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
     let promptIssued = false;
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;
@@ -103,7 +103,7 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } });
     assert(requests.length === 0);
   });
 
@@ -114,23 +114,28 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: 
-      { debug: false, 
-        webUrl: 'https://contoso.sharepoint.com', 
-        url: '/Shared Documents/Folder1' 
-      } });
+    await command.action(logger, {
+      options:
+      {
+        webUrl: 'https://contoso.sharepoint.com',
+        url: '/Shared Documents/Folder1'
+      }
+    });
     assert(loggerLogSpy.notCalled === true);
   });
 
   it('should send params for remove request', async () => {
     const request: sinon.SinonStub = stubPostResponses();
 
-    await command.action(logger, { options: 
-      { verbose: true, 
-        webUrl: 'https://contoso.sharepoint.com', 
+    await command.action(logger, {
+      options:
+      {
+        verbose: true,
+        webUrl: 'https://contoso.sharepoint.com',
         url: '/Shared Documents/Folder1',
         confirm: true
-      } });
+      }
+    });
     const lastCall: any = request.lastCall.args[0];
     assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolder1\')');
     assert.strictEqual(lastCall.method, 'POST');
@@ -144,11 +149,14 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: 
-      { verbose: true, 
-        webUrl: 'https://contoso.sharepoint.com/sites/test1', 
-        url: '/Shared Documents/Folder1' 
-      } });
+    await command.action(logger, {
+      options:
+      {
+        verbose: true,
+        webUrl: 'https://contoso.sharepoint.com/sites/test1',
+        url: '/Shared Documents/Folder1'
+      }
+    });
     const lastCall: any = request.lastCall.args[0];
     assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2Ftest1%2FShared%20Documents%2FFolder1\')');
     assert.strictEqual(lastCall.method, 'POST');
@@ -162,13 +170,15 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: 
-      { 
+    await command.action(logger, {
+      options:
+      {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com', 
-        url: '/Shared Documents/Folder1', 
-        recycle: true 
-      } });
+        webUrl: 'https://contoso.sharepoint.com',
+        url: '/Shared Documents/Folder1',
+        recycle: true
+      }
+    });
     const lastCall: any = request.lastCall.args[0];
     assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents%2FFolder1\')/recycle()');
     assert.strictEqual(lastCall.method, 'POST');
@@ -182,24 +192,15 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await assert.rejects(command.action(logger, { options: 
-      { 
+    await assert.rejects(command.action(logger, {
+      options:
+      {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com', 
-        url: '/Shared Documents/Folder1', 
-        recycle: true 
-      } } as any), new CommandError('error1'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
+        webUrl: 'https://contoso.sharepoint.com',
+        url: '/Shared Documents/Folder1',
+        recycle: true
       }
-    });
-    assert(containsDebugOption);
+    } as any), new CommandError('error1'));
   });
 
   it('supports specifying URL', () => {

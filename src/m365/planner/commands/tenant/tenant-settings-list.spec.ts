@@ -99,15 +99,4 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

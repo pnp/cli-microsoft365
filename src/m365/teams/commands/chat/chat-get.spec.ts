@@ -123,7 +123,6 @@ describe(commands.CHAT_GET, () => {
   it('fails validation if id and name and participants are not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -249,17 +248,6 @@ describe(commands.CHAT_GET, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('gets chat conversation using id', async () => {

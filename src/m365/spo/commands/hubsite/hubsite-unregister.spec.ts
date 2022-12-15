@@ -23,7 +23,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -95,12 +95,12 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
   it('prompts before unregistering the hub site when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -115,7 +115,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales' } });
     assert(requests.length === 0);
   });
 
@@ -159,7 +159,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any),
       new CommandError("hubSiteId"));
   });
 
@@ -171,16 +171,5 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   it('passes validation when the url is a valid SharePoint URL', async () => {
     const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

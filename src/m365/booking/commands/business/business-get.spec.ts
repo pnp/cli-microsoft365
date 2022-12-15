@@ -96,7 +96,7 @@ describe(commands.BUSINESS_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: validId } });
+    await command.action(logger, { options: { id: validId } });
     assert(loggerLogSpy.calledWith(businessResponse));
   });
 
@@ -113,7 +113,7 @@ describe(commands.BUSINESS_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: validName } });
+    await command.action(logger, { options: { name: validName } });
     assert(loggerLogSpy.calledWith(businessResponse));
   });
 
@@ -126,7 +126,7 @@ describe(commands.BUSINESS_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: validName } } as any), new CommandError(`Multiple businesses with name ${validName} found. Please disambiguate: ${validId}, ${validId}`));
+    await assert.rejects(command.action(logger, { options: { name: validName } } as any), new CommandError(`Multiple businesses with name ${validName} found. Please disambiguate: ${validId}, ${validId}`));
   });
 
   it('fails when no business found with name', async () => {
@@ -138,7 +138,7 @@ describe(commands.BUSINESS_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: validName } } as any), new CommandError(`The specified business with name ${validName} does not exist.`));
+    await assert.rejects(command.action(logger, { options: { name: validName } } as any), new CommandError(`The specified business with name ${validName} does not exist.`));
   });
 
   it('fails when no business found with name because of an empty displayName', async () => {
@@ -150,24 +150,13 @@ describe(commands.BUSINESS_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: validName } } as any), new CommandError(`The specified business with name ${validName} does not exist.`));
+    await assert.rejects(command.action(logger, { options: { name: validName } } as any), new CommandError(`The specified business with name ${validName} does not exist.`));
   });
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

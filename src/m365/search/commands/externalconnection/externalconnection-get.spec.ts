@@ -90,7 +90,6 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false
       }
     }), new CommandError('An error has occurred'));
   });
@@ -160,16 +159,5 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
         name: 'Contoso HR'
       }
     }), new CommandError(`External connection with name 'Contoso HR' not found`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

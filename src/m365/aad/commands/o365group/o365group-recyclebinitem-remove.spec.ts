@@ -291,15 +291,4 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
       }
     }), new CommandError("An error has occurred"));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 }); 

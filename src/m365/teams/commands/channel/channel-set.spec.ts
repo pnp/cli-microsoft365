@@ -178,7 +178,6 @@ describe(commands.CHANNEL_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: teamId,
         name: name,
         newName: newName,
@@ -216,7 +215,6 @@ describe(commands.CHANNEL_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamName: teamName,
         id: id,
         newName: newName,
@@ -253,16 +251,5 @@ describe(commands.CHANNEL_SET, () => {
         confirm: true
       }
     }), new CommandError(errorMessage));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

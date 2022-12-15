@@ -1006,8 +1006,7 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
-        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
-        debug: false
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'
       }
     });
   });
@@ -1035,16 +1034,5 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [{ options: ['listId', 'listTitle', 'listUrl'] }]);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

@@ -62,12 +62,12 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   });
 
   it('generates file with commands info', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(generateShCompletionStub.called);
   });
 
   it('sets up command completion in the shell', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(setupShCompletionStub.called);
   });
 

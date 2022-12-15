@@ -148,18 +148,7 @@ describe(commands.SOLUTION_PUBLISHER_LIST, () => {
 
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment } } as any),
+    await assert.rejects(command.action(logger, { options: { environment: validEnvironment } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

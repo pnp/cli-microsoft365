@@ -136,7 +136,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 1 } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 1 } });
     assert(loggerLogSpy.calledWith(
       {
         "order": 1,
@@ -213,7 +213,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 1 } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 1 } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -284,7 +284,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 5 } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 5 } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -315,7 +315,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home', section: 1, column: 1 } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home', section: 1, column: 1 } });
     assert(loggerLogSpy.calledWith(
       {
         "order": 1,
@@ -334,7 +334,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'json', section: 1, column: 1 } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'json', section: 1, column: 1 } });
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
       "factor": 6,
       "order": 1,
@@ -407,7 +407,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 1 } } as any), new CommandError('Page home.aspx is not a modern page.'));
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 1 } } as any), new CommandError('Page home.aspx is not a modern page.'));
   });
 
   it('correctly handles page not found', async () => {
@@ -425,7 +425,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 1 } } as any), new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 1 } } as any), new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
   });
 
   it('correctly handles OData error when retrieving pages', async () => {
@@ -433,18 +433,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 1 } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', section: 1, column: 1 } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

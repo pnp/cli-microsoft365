@@ -435,7 +435,6 @@ describe(commands.WEB_GET, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         url: 'https://contoso.sharepoint.com'
       }
     });
@@ -483,22 +482,10 @@ describe(commands.WEB_GET, () => {
     await command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         url: 'https://contoso.sharepoint.com'
       }
     });
     assert('Correct Url');
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {

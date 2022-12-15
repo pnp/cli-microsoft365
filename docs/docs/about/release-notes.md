@@ -47,6 +47,7 @@
 - updated command options with the new boolean handlings [#3986](https://github.com/pnp/cli-microsoft365/issues/3986)
 - extended 'teams cache remove' to check on Teams PID [#3448](https://github.com/pnp/cli-microsoft365/issues/3448)
 - added 'disableTelemetry' config value [#4109](https://github.com/pnp/cli-microsoft365/issues/4109)
+- enhanced test files [#4155](https://github.com/pnp/cli-microsoft365/issues/4155)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
