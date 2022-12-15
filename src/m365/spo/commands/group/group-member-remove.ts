@@ -10,6 +10,8 @@ import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { Options as SpoGroupMemberListCommandOptions } from './group-member-list';
+import * as SpoGroupMemberListCommand from './group-member-list';
 
 interface CommandArgs {
   options: Options;
@@ -23,6 +25,8 @@ interface Options extends GlobalOptions {
   email?: string;
   userId?: number;
   confirm?: boolean;
+  aadGroupId?: string;
+  aadGroupName?: string;
 }
 
 class SpoGroupMemberRemoveCommand extends SpoCommand {
@@ -77,6 +81,12 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         option: '--userId [userId]'
       },
       {
+        option: '--aadGroupId [aadGroupId]'
+      },
+      {
+        option: '--aadGroupName [aadGroupName]'
+      },
+      {
         option: '--confirm'
       }
     );
@@ -101,6 +111,10 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
           return `${args.options.email} is not a valid email`;
         }
 
+        if (args.options.aadGroupId && !validation.isValidGuid(args.options.aadGroupId as string)) {
+          return `${args.options.aadGroupId} is not a valid GUID`;
+        }
+
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
@@ -109,7 +123,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupName', 'groupId'] },
-      { options: ['userName', 'email', 'userId'] }
+      { options: ['userName', 'email', 'userId', 'aadGroupId', 'aadGroupName'] }
     );
   }
 
@@ -135,58 +149,95 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeUserfromSPGroup: () => Promise<void> = async (): Promise<void> => {
-      if (this.verbose) {
-        logger.logToStderr(`Removing User ${args.options.userName || args.options.email || args.options.userId} from Group: ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
-      }
-
-      let requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/${args.options.groupId
-        ? `GetById('${args.options.groupId}')`
-        : `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')`}`;
-
-      if (args.options.userId) {
-        requestUrl += `/users/removeById(${args.options.userId})`;
-      }
-      else {
-        const userName: string = await this.getUserName(logger, args);
-        const loginName: string = `i:0#.f|membership|${userName}`;
-        requestUrl += `/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`;
-      }
-
-      const requestOptions: any = {
-        url: requestUrl,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      try {
-        await request.post(requestOptions);
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    };
-
     if (args.options.confirm) {
       if (this.debug) {
         logger.logToStderr('Confirmation bypassed by entering confirm option. Removing the user from SharePoint Group...');
       }
-      await removeUserfromSPGroup();
+      await this.removeUserfromSPGroup(logger, args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email} from the SharePoint group?`
+        message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email || args.options.aadGroupId || args.options.aadGroupName} from the SharePoint group?`
       });
 
       if (result.continue) {
-        await removeUserfromSPGroup();
+        await this.removeUserfromSPGroup(logger, args);
       }
     }
+  }
+
+  private async removeUserfromSPGroup(logger: Logger, args: CommandArgs): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Removing User ${args.options.userName || args.options.email || args.options.userId || args.options.aadGroupId || args.options.aadGroupName} from Group: ${args.options.groupId || args.options.groupName}`);
+    }
+
+    let requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/${args.options.groupId
+      ? `GetById('${args.options.groupId}')`
+      : `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')`}`;
+
+    if (args.options.userId) {
+      requestUrl += `/users/removeById(${args.options.userId})`;
+    }
+    else if (args.options.userName || args.options.email) {
+      const userName: string = await this.getUserName(logger, args);
+      const loginName: string = `i:0#.f|membership|${userName}`;
+      requestUrl += `/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`;
+    }
+    else {
+      const aadGroupId = await this.getGroupId(args);
+      requestUrl += `/users/RemoveById(${aadGroupId})`;
+    }
+    const requestOptions: any = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    try {
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private async getGroupId(args: CommandArgs): Promise<string> {
+    const options: SpoGroupMemberListCommandOptions = {
+      webUrl: args.options.webUrl,
+      output: 'json',
+      debug: this.debug,
+      verbose: this.verbose
+    };
+
+    if (args.options.groupId) {
+      options.groupId = args.options.groupId;
+    }
+    else {
+      options.groupName = args.options.groupName;
+    }
+
+    const output = await Cli.executeCommandWithOutput(SpoGroupMemberListCommand as Command, { options: { ...options, _: [] } });
+    const getGroupMemberListOutput = JSON.parse(output.stdout);
+
+    let foundgroups: any;
+
+    if (args.options.aadGroupId) {
+      foundgroups = getGroupMemberListOutput.filter((x: any) => { return x.LoginName.indexOf(args.options.aadGroupId) > -1 && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
+    }
+    else {
+      foundgroups = getGroupMemberListOutput.filter((x: any) => { return x.Title === args.options.aadGroupName && (x.LoginName.indexOf("c:0o.c|federateddirectoryclaimprovider|") === 0 || x.LoginName.indexOf("c:0t.c|tenant|") === 0); });
+    }
+
+    if (foundgroups.length === 0) {
+      throw `The Azure AD group ${args.options.aadGroupId || args.options.aadGroupName} is not found in SharePoint group ${args.options.groupId || args.options.groupName}`;
+    }
+
+    return foundgroups[0].Id;
   }
 }
 
