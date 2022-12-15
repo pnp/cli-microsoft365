@@ -79,7 +79,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
   it('prompts before removing content type from list when confirmation argument not passed (listId)', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         listId: listId,
         webUrl: webUrl,
         id: contentTypeId
@@ -97,7 +96,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
   it('prompts before removing content type from list when confirmation argument not passed (listTitle)', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: listTitle,
         webUrl: webUrl,
         id: contentTypeId
@@ -119,7 +117,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         listId: listId,
         webUrl: webUrl,
         contentTypeId: contentTypeId
@@ -266,7 +263,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: listId,
         webUrl: webUrl,
         id: contentTypeId
@@ -296,7 +292,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: listTitle,
         webUrl: webUrl,
         id: contentTypeId
@@ -338,7 +333,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: listTitle,
         webUrl: webUrl,
         id: contentTypeId,
@@ -360,7 +354,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: listId,
         webUrl: webUrl,
         id: contentTypeId,
@@ -419,17 +412,6 @@ describe(commands.LIST_CONTENTTYPE_REMOVE, () => {
   it('fails validation if the contentTypeId option is not passed', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('configures command types', () => {

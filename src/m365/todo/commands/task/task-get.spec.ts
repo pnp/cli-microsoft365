@@ -118,7 +118,7 @@ describe(commands.TASK_GET, () => {
       throw 'The specified task list does not exist';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, listName: 'Tasks List' } } as any), new CommandError('The specified task list does not exist'));
+    await assert.rejects(command.action(logger, { options: { listName: 'Tasks List' } } as any), new CommandError('The specified task list does not exist'));
   });
 
   it('passes validation if only listId is passed', async () => {
@@ -152,7 +152,6 @@ describe(commands.TASK_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
         listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA='
       }
@@ -171,7 +170,6 @@ describe(commands.TASK_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
         listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=',
         output: 'json'
@@ -205,7 +203,6 @@ describe(commands.TASK_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
         listName: 'Tasks List',
         output: 'json'
@@ -213,16 +210,5 @@ describe(commands.TASK_GET, () => {
     });
 
     assert(loggerLogSpy.calledWith(taskResponse));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

@@ -158,7 +158,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'file.pdf'
         }
@@ -296,7 +295,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/Shared%20Documents/Demo%20Files/file.docx',
           targetFile: 'file.pdf'
         }
@@ -365,7 +363,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/DemoDocs/file.docx',
           targetFile: 'file.pdf'
         }
@@ -426,7 +423,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/subsite/Shared%20Documents/file.docx',
           targetFile: 'file.pdf'
         }
@@ -487,7 +483,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/subsite/Shared%20Documents/Folder/file.docx',
           targetFile: 'file.pdf'
         }
@@ -548,7 +543,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/subsite/DocLib/file.docx',
           targetFile: 'file.pdf'
         }
@@ -605,7 +599,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso-my.sharepoint.com/personal/steve_contoso_com/Documents/file.docx',
           targetFile: 'file.pdf'
         }
@@ -662,7 +655,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso-my.sharepoint.com/personal/steve_contoso_com/Documents/Folder/file.docx',
           targetFile: 'file.pdf'
         }
@@ -719,7 +711,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/sites/Contoso/Shared%20Documents/file.docx',
           targetFile: 'file.pdf'
         }
@@ -776,7 +767,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/sites/Contoso/Shared%20Documents/Folder/file.docx',
           targetFile: 'file.pdf'
         }
@@ -837,7 +827,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/sites/Contoso/site/Shared%20Documents/file.docx',
           targetFile: 'file.pdf'
         }
@@ -1308,7 +1297,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await assert.rejects(command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
         }
@@ -1382,7 +1370,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await assert.rejects(command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
         }
@@ -1481,7 +1468,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await assert.rejects(command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
         }
@@ -1759,7 +1745,6 @@ describe(commands.CONVERT_PDF, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         sourceFile: 'file.docx',
         targetFile: 'file.pdf'
       }
@@ -1788,16 +1773,5 @@ describe(commands.CONVERT_PDF, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = await command.validate({ options: { sourceFile: 'file.docx', targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

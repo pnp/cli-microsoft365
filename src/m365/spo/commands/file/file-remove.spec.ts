@@ -77,7 +77,7 @@ describe(commands.FILE_REMOVE, () => {
   });
 
   it('prompts before removing file when confirmation argument not passed (id)', async () => {
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -88,7 +88,7 @@ describe(commands.FILE_REMOVE, () => {
   });
 
   it('prompts before removing file when confirmation argument not passed (title)', async () => {
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -103,7 +103,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
     assert(requests.length === 0);
   });
 
@@ -126,7 +126,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/GetFileById(guid'`) > -1 &&
@@ -160,7 +160,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/' + fileUrl)}')`) > -1 &&
@@ -194,7 +194,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/' + fileUrl)}')`) > -1 &&
@@ -228,7 +228,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
@@ -262,7 +262,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
@@ -296,7 +296,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
@@ -330,7 +330,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
@@ -364,7 +364,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
@@ -398,7 +398,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`) > -1 &&
@@ -432,7 +432,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
@@ -466,7 +466,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    await command.action(logger, { options: { webUrl: siteUrl, url: fileUrl } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`GetFileByServerRelativeUrl('${formatting.encodeQueryParameter('/sites/subsite/' + fileUrl)}')`) > -1 &&
@@ -497,7 +497,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf', recycle: true } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf', recycle: true } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/recycle()`) > -1 &&
@@ -528,7 +528,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/GetFileByServerRelativeUrl('`) > -1 &&
@@ -559,7 +559,7 @@ describe(commands.FILE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf', recycle: true } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf', recycle: true } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/recycle()`) > -1 &&
@@ -606,7 +606,6 @@ describe(commands.FILE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
@@ -627,7 +626,6 @@ describe(commands.FILE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         url: actionUrl,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
@@ -648,24 +646,12 @@ describe(commands.FILE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: actionId,
         recycle: true,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
       }
     });
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {

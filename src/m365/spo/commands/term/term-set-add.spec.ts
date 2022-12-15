@@ -22,7 +22,7 @@ describe(commands.TERM_SET_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -115,7 +115,7 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } });
+    await command.action(logger, { options: { name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } });
     assert(loggerLogSpy.calledWith({
       CreatedDate: '2018-10-01T18:31:32.608Z',
       Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
@@ -173,7 +173,7 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } });
+    await command.action(logger, { options: { name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } });
     assert(loggerLogSpy.calledWith({
       CreatedDate: '2018-10-01T18:31:32.608Z',
       Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
@@ -231,7 +231,7 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301' } });
+    await command.action(logger, { options: { name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301' } });
     assert(loggerLogSpy.calledWith({
       CreatedDate: '2018-10-01T18:31:32.608Z',
       Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
@@ -363,7 +363,7 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', customProperties: JSON.stringify({ Prop1: 'Value 1', Prop2: 'Value 2' }) } });
+    await command.action(logger, { options: { name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', customProperties: JSON.stringify({ Prop1: 'Value 1', Prop2: 'Value 2' }) } });
     assert(loggerLogSpy.calledWith({
       CreatedDate: '2018-10-01T18:31:32.608Z',
       Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
@@ -401,7 +401,7 @@ describe(commands.TERM_SET_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly handles error when the term group specified by id doesn\'t exist', async () => {
@@ -420,10 +420,12 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      name: 'PnP-Organizations', 
-      termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'PnP-Organizations',
+        termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when the term group specified by name doesn\'t exist', async () => {
@@ -443,7 +445,7 @@ describe(commands.TERM_SET_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, { options: { name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when the specified name already exists', async () => {
@@ -462,7 +464,7 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } } as any), new CommandError('A term set already exists with the name specified.'));
+    await assert.rejects(command.action(logger, { options: { name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } } as any), new CommandError('A term set already exists with the name specified.'));
   });
 
   it('correctly handles error when the specified id already exists', async () => {
@@ -482,7 +484,7 @@ describe(commands.TERM_SET_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'PnP-Organizations', id: 'aca21974-139c-44fd-813c-6bbe6f25e658', termGroupName: 'PnPTermSets' } } as any), new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.'));
+    await assert.rejects(command.action(logger, { options: { name: 'PnP-Organizations', id: 'aca21974-139c-44fd-813c-6bbe6f25e658', termGroupName: 'PnPTermSets' } } as any), new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.'));
   });
 
   it('correctly handles error when setting the description', async () => {
@@ -536,7 +538,7 @@ describe(commands.TERM_SET_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', description: 'List of organizations' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', description: 'List of organizations' } } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly handles error when setting custom properties', async () => {
@@ -590,11 +592,13 @@ describe(commands.TERM_SET_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      name: 'PnP-Organizations', 
-      termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', 
-      customProperties: JSON.stringify({ Prop1: 'Value 1', Prop2: 'Value 2' }) } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'PnP-Organizations',
+        termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb',
+        customProperties: JSON.stringify({ Prop1: 'Value 1', Prop2: 'Value 2' })
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly escapes XML in term group name', async () => {
@@ -637,7 +641,7 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets>' } });
+    await command.action(logger, { options: { name: 'PnP-Organizations', termGroupName: 'PnPTermSets>' } });
     assert(loggerLogSpy.calledWith({
       CreatedDate: '2018-10-01T18:31:32.608Z',
       Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
@@ -695,7 +699,7 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnP-Organizations>', termGroupName: 'PnPTermSets' } });
+    await command.action(logger, { options: { name: 'PnP-Organizations>', termGroupName: 'PnPTermSets' } });
     assert(loggerLogSpy.calledWith({
       CreatedDate: '2018-10-01T18:31:32.608Z',
       Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
@@ -761,7 +765,7 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', description: 'List of organizations>' } });
+    await command.action(logger, { options: { name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', description: 'List of organizations>' } });
     assert(loggerLogSpy.calledWith({
       CreatedDate: '2018-10-01T18:31:32.608Z',
       Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
@@ -827,7 +831,7 @@ describe(commands.TERM_SET_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', customProperties: JSON.stringify({ Prop1: '<Value 1', Prop2: 'Value 2>' }) } });
+    await command.action(logger, { options: { name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', customProperties: JSON.stringify({ Prop1: '<Value 1', Prop2: 'Value 2>' }) } });
     assert(loggerLogSpy.calledWith({
       CreatedDate: '2018-10-01T18:31:32.608Z',
       Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
@@ -896,16 +900,5 @@ describe(commands.TERM_SET_ADD, () => {
   it('passes validation when custom properties is a valid JSON string', async () => {
     const actual = await command.validate({ options: { name: 'PnP-Organizations', termGroupName: 'PnPTermSets', customProperties: '{}' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

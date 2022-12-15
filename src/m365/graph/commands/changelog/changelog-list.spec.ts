@@ -247,7 +247,7 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: { }
+      options: {}
     });
     assert(loggerLogSpy.calledWith(validChangelog));
   });
@@ -262,7 +262,7 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: {output: 'text' }
+      options: { output: 'text' }
     });
     assert(loggerLogSpy.calledWith(validChangelogText));
   });
@@ -277,7 +277,7 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: { 
+      options: {
         changeType: validChangeType
       }
     });
@@ -294,7 +294,7 @@ describe(commands.CHANGELOG_LIST, () => {
     });
 
     await command.action(logger, {
-      options: { 
+      options: {
         versions: validVersions,
         services: validServices,
         startDate: validStartDate,
@@ -304,21 +304,10 @@ describe(commands.CHANGELOG_LIST, () => {
     assert(loggerLogSpy.calledWith(validChangelog));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

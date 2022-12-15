@@ -24,7 +24,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -100,7 +100,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -125,7 +125,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   });
 
   it('prompts before revoking the rights when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -141,7 +141,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
     assert(postSpy.notCalled);
   });
 
@@ -157,7 +157,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
     assert(postStub.called);
   });
 
@@ -177,7 +177,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales>', principals: 'admin>', confirm: true } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales>', principals: 'admin>', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -197,7 +197,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user', confirm: true } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -217,7 +217,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', confirm: true } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -237,7 +237,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user', confirm: true } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -256,7 +256,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } } as any),
       new CommandError('An error has occurred.'));
   });
 
@@ -265,19 +265,8 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying hub site URL', () => {

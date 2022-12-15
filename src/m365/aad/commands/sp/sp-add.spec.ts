@@ -159,7 +159,7 @@ describe(commands.SP_ADD, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -321,16 +321,5 @@ describe(commands.SP_ADD, () => {
       "appId": "65415bb1-9267-4313-bbf5-ae259732ee12",
       "displayName": "foo"
     }));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

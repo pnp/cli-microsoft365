@@ -150,17 +150,6 @@ describe(commands.LISTITEM_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('supports specifying URL', () => {
     const options = command.options;
     let containsTypeOption = false;
@@ -251,7 +240,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -281,7 +269,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -303,7 +290,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -320,7 +306,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       webUrl: webUrl,
       id: expectedId,
@@ -353,7 +338,6 @@ describe(commands.LISTITEM_GET, () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     const options: any = {
-      debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       webUrl: webUrl,
       id: expectedId,

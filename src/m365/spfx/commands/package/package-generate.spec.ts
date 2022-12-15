@@ -103,8 +103,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        enableForTeams: 'all',
-        debug: false
+        enableForTeams: 'all'
       }
     });
     assert(archiveWriteZipSpy.called);
@@ -137,8 +136,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        enableForTeams: 'tab',
-        debug: false
+        enableForTeams: 'tab'
       }
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsTab']).replace(/"/g, '&quot;')));
@@ -155,8 +153,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        enableForTeams: 'personalApp',
-        debug: false
+        enableForTeams: 'personalApp'
       }
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsPersonalApp']).replace(/"/g, '&quot;')));
@@ -173,8 +170,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        enableForTeams: 'all',
-        debug: false
+        enableForTeams: 'all'
       }
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsTab', 'TeamsPersonalApp']).replace(/"/g, '&quot;')));
@@ -191,8 +187,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        enableForTeams: 'all',
-        debug: false
+        enableForTeams: 'all'
       }
     }), (err) => err === 'An error has occurred');
     assert(archiveWriteZipSpy.notCalled);
@@ -207,8 +202,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        enableForTeams: 'all',
-        debug: false
+        enableForTeams: 'all'
       }
     }), (err) => err === 'An error has occurred');
   });
@@ -223,8 +217,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        enableForTeams: 'all',
-        debug: false
+        enableForTeams: 'all'
       }
     });
     assert(fsrmdirSyncSpy.called);
@@ -241,8 +234,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        enableForTeams: 'all',
-        debug: false
+        enableForTeams: 'all'
       }
     }));
     assert(fsrmdirSyncSpy.called);
@@ -258,8 +250,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        enableForTeams: 'all',
-        debug: false
+        enableForTeams: 'all'
       }
     }), (err) => err === 'An error has occurred while removing the temp folder at /tmp/abc. Please remove it manually.');
   });
@@ -275,8 +266,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        enableForTeams: 'tab',
-        debug: false
+        enableForTeams: 'tab'
       }
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', '$token$'));
@@ -293,8 +283,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        exposePageContextGlobally: true,
-        debug: false
+        exposePageContextGlobally: true
       }
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', '!0'));
@@ -311,8 +300,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
-        exposeTeamsContextGlobally: true,
-        debug: false
+        exposeTeamsContextGlobally: true
       }
     });
     assert(fsWriteFileSyncSpy.calledWith('file.json', '!0'));
@@ -364,16 +352,5 @@ describe(commands.PACKAGE_GENERATE, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });
