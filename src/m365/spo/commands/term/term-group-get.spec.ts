@@ -22,7 +22,7 @@ describe(commands.TERM_GROUP_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -133,7 +133,7 @@ describe(commands.TERM_GROUP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } });
+    await command.action(logger, { options: { id: '36a62501-17ea-455a-bed4-eff862242def' } });
     assert(loggerLogSpy.calledWith({
       "CreatedDate": "2018-06-20T07:23:21.033Z",
       "Id": "36a62501-17ea-455a-bed4-eff862242def",
@@ -233,9 +233,11 @@ describe(commands.TERM_GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      id: '36a62501-17ea-455a-bed4-eff862242def' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        id: '36a62501-17ea-455a-bed4-eff862242def'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles term group not found via name', async () => {
@@ -256,7 +258,7 @@ describe(commands.TERM_GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'People' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, { options: { name: 'People' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when retrieving taxonomy term groups', async () => {
@@ -269,8 +271,8 @@ describe(commands.TERM_GROUP_GET, () => {
         }
       ]));
     });
-    
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('File Not Found.'));
+
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('File Not Found.'));
   });
 
   it('fails validation if neither id nor name specified', async () => {
@@ -298,21 +300,10 @@ describe(commands.TERM_GROUP_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('handles promise rejection', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } } as any), new CommandError('getRequestDigest error'));
+    await assert.rejects(command.action(logger, { options: { id: '36a62501-17ea-455a-bed4-eff862242def' } } as any), new CommandError('getRequestDigest error'));
   });
 });

@@ -79,7 +79,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: false }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: false }
     } as any);
   });
 
@@ -98,7 +98,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: true }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: true }
     } as any);
   });
 
@@ -117,7 +117,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'moderate' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'moderate' }
     } as any);
   });
 
@@ -136,7 +136,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'strict' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'strict' }
     } as any);
   });
 
@@ -155,7 +155,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: true }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: true }
     } as any);
   });
 
@@ -174,7 +174,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: false }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: false }
     } as any);
   });
 
@@ -194,7 +194,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: true }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: true }
     } as any);
   });
 
@@ -296,16 +296,5 @@ describe(commands.FUNSETTINGS_SET, () => {
 
     const actual = actualTrue && actualFalse;
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

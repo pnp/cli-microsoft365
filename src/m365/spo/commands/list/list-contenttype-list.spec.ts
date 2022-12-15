@@ -162,7 +162,6 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
@@ -208,7 +207,6 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         listUrl: 'sites/documents'
       }
@@ -254,7 +252,6 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
@@ -278,7 +275,6 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         output: 'json'
@@ -334,16 +330,5 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
   it('fails validation if both listId and listTitle options are passed', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

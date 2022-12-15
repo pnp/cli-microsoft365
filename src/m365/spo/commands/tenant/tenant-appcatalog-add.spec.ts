@@ -941,17 +941,6 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('fails validation if the specified url is not a valid SharePoint URL', async () => {
     const options: any = { url: '/foo', owner: 'user@contoso.com', timeZone: 4 };
     const actual = await command.validate({ options: options }, commandInfo);

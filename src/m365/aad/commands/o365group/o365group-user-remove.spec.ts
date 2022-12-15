@@ -21,7 +21,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -133,7 +133,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('prompts before removing the specified user from the specified Microsoft 365 Group when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -160,7 +160,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
     assert(postSpy.notCalled);
   });
 
@@ -185,13 +185,13 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return Promise.resolve({ 
-          response: { 
+        return Promise.resolve({
+          response: {
             status: 200,
             data: {
               value: "00000000-0000-0000-0000-000000000000"
             }
-          } 
+          }
         });
       }
 
@@ -221,7 +221,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
     assert(memberDeleteCallIssued);
   });
 
@@ -236,13 +236,13 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return Promise.resolve({ 
-          response: { 
+        return Promise.resolve({
+          response: {
             status: 200,
             data: {
               value: "00000000-0000-0000-0000-000000000000"
             }
-          } 
+          }
         });
       }
 
@@ -269,7 +269,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -284,13 +284,13 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return Promise.resolve({ 
-          response: { 
+        return Promise.resolve({
+          response: {
             status: 200,
             data: {
               value: "00000000-0000-0000-0000-000000000000"
             }
-          } 
+          }
         });
       }
 
@@ -305,7 +305,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         return Promise.reject({
           "response": {
             "status": 404
-          } 
+          }
         });
       }
 
@@ -319,7 +319,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -334,13 +334,13 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return Promise.resolve({ 
-          response: { 
+        return Promise.resolve({
+          response: {
             status: 200,
             data: {
               value: "00000000-0000-0000-0000-000000000000"
             }
-          } 
+          }
         });
       }
 
@@ -361,7 +361,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         return Promise.reject({
           "response": {
             "status": 404
-          } 
+          }
         });
       }
 
@@ -369,7 +369,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -384,13 +384,13 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return Promise.resolve({ 
-          response: { 
+        return Promise.resolve({
+          response: {
             status: 200,
             data: {
               value: "00000000-0000-0000-0000-000000000000"
             }
-          } 
+          }
         });
       }
 
@@ -405,7 +405,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         return Promise.resolve({
           "response": {
             "status": 404
-          } 
+          }
         });
       }
 
@@ -413,16 +413,16 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         return Promise.reject({
           "response": {
             "status": 404
-          } 
+          }
         });
       }
 
       return Promise.reject('Invalid request');
 
     });
-    
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -437,13 +437,13 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return Promise.resolve({ 
-          response: { 
+        return Promise.resolve({
+          response: {
             status: 200,
             data: {
               value: "00000000-0000-0000-0000-000000000000"
             }
-          } 
+          }
         });
       }
 
@@ -459,7 +459,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         return Promise.resolve({
           "response": {
             "status": 400
-          } 
+          }
         });
       }
 
@@ -467,7 +467,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         return Promise.reject({
           "response": {
             "status": 404
-          } 
+          }
         });
       }
 
@@ -475,7 +475,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
+    await command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } });
     assert(memberDeleteCallIssued);
   });
 
@@ -498,7 +498,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
       new CommandError('Invalid object identifier'));
   });
 
@@ -511,13 +511,13 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return Promise.resolve({ 
-          response: { 
+        return Promise.resolve({
+          response: {
             status: 200,
             data: {
               value: "00000000-0000-0000-0000-000000000000"
             }
-          } 
+          }
         });
       }
 
@@ -526,12 +526,13 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
-        return Promise.reject({ 
-          response: { 
+        return Promise.reject({
+          response: {
             status: 400,
             data: {
-              error: { 'odata.error': { message: { value: 'Invalid object identifier' } } } }
-          } 
+              error: { 'odata.error': { message: { value: 'Invalid object identifier' } } }
+            }
+          }
         });
       }
 
@@ -542,7 +543,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
       new CommandError('Invalid object identifier'));
   });
 
@@ -555,13 +556,13 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
-        return Promise.resolve({ 
-          response: { 
+        return Promise.resolve({
+          response: {
             status: 200,
             data: {
               value: "00000000-0000-0000-0000-000000000000"
             }
-          } 
+          }
         });
       }
 
@@ -574,18 +575,19 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
           "err": {
             "response": {
               "status": 404
-            } 
+            }
           }
         });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
-        return Promise.reject({ 
-          response: { 
+        return Promise.reject({
+          response: {
             status: 400,
             data: {
-              error: { 'odata.error': { message: { value: 'Invalid object identifier' } } } }
-          } 
+              error: { 'odata.error': { message: { value: 'Invalid object identifier' } } }
+            }
+          }
         });
       }
 
@@ -596,7 +598,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
+    await assert.rejects(command.action(logger, { options: { groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
       new CommandError('Invalid object identifier'));
   });
 
@@ -619,16 +621,5 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     ));
 
     await assert.rejects(command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any), new CommandError("Invalid request"));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

@@ -67,7 +67,7 @@ describe(commands.FOLDER_COPY, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
@@ -169,17 +169,6 @@ describe(commands.FOLDER_COPY, () => {
         targetUrl: 'abc'
       }
     } as any), new CommandError('error2'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {

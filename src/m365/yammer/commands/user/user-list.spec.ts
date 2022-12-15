@@ -229,7 +229,7 @@ describe(commands.USER_LIST, () => {
         });
       }
     });
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('sorts users in reverse order', async () => {
@@ -305,7 +305,7 @@ describe(commands.USER_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation without parameters', async () => {
@@ -346,16 +346,5 @@ describe(commands.USER_LIST, () => {
   it('does not pass validation if letter is set to a multiple characters', async () => {
     const actual = await command.validate({ options: { letter: "ab" } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

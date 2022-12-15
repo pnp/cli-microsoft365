@@ -80,7 +80,6 @@ describe(commands.LIST_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "FooList"
       }
     } as any);
@@ -100,17 +99,6 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: "FooList" } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { name: "FooList" } } as any), new CommandError('An error has occurred'));
   });
 });

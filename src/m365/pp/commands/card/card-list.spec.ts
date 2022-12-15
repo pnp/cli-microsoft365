@@ -187,17 +187,6 @@ describe(commands.CARD_LIST, () => {
       throw `Resource '' does not exist or one of its queried reference-property objects are not present`;
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } }), new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present"));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } }), new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present"));
   });
 });

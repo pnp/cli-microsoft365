@@ -69,17 +69,6 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('supports specifying URL', () => {
     const options = command.options;
     let containsTypeOption = false;
@@ -129,10 +118,13 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      confirm: true } } as any), new CommandError(err));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        confirm: true
+      }
+    } as any), new CommandError(err));
   });
 
   it('aborts resetting role inheritance when prompt not confirmed', async () => {
@@ -143,7 +135,7 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
 
   it('prompts before resetting role inheritance when confirmation argument not passed', async () => {
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com' } });
-  	let promptIssued = false;
+    let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;
