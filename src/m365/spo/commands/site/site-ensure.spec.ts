@@ -856,17 +856,6 @@ describe(commands.SITE_ENSURE, () => {
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1' } } as any));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('fails validation if the specified url is a single word', async () => {
     const options: any = { url: 'site', title: 'Site' };
     const actual = await command.validate({ options: options }, commandInfo);

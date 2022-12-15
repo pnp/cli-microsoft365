@@ -200,7 +200,6 @@ describe(commands.FOLDER_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: webUrl,
         parentFolderUrl: parentFolderUrl
       }
@@ -228,17 +227,6 @@ describe(commands.FOLDER_LIST, () => {
     });
 
     assert(loggerLogSpy.lastCall.calledWith(folderListOutput.value));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {

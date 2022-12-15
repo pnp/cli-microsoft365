@@ -258,9 +258,9 @@ function reindex(collection?: { order: number, columns?: { order: number }[], co
   for (let i = 0; i < collection.length; i++) {
     collection[i].order = i + 1;
     if (hOP(collection[i], "columns")) {
-        reindex(collection[i].columns);
+      reindex(collection[i].columns);
     } else if (hOP(collection[i], "controls")) {
-        reindex(collection[i].controls);
+      reindex(collection[i].controls);
     }
   }
 }
@@ -303,13 +303,13 @@ export class ClientSidePage {
 
     const unespace = (escaped: string): string => {
       const mapDict = [
-          [/\\/g, "\\\\"], [/&quot;/g, "\""], [/&#58;/g, ":"], [/&#123;/g, "{"], [/&#125;/g, "}"],
-          [/\\\\/g, "\\"], [/\\\?/g, "?"], [/\\\./g, "."], [/\\\[/g, "["], [/\\\]/g, "]"],
-          [/\\\(/g, "("], [/\\\)/g, ")"], [/\\\|/g, "|"], [/\\\+/g, "+"], [/\\\*/g, "*"],
-          [/\\\$/g, "$"],
+        [/\\/g, "\\\\"], [/&quot;/g, "\""], [/&#58;/g, ":"], [/&#123;/g, "{"], [/&#125;/g, "}"],
+        [/\\\\/g, "\\"], [/\\\?/g, "?"], [/\\\./g, "."], [/\\\[/g, "["], [/\\\]/g, "]"],
+        [/\\\(/g, "("], [/\\\)/g, ")"], [/\\\|/g, "|"], [/\\\+/g, "+"], [/\\\*/g, "*"],
+        [/\\\$/g, "$"],
       ];
       return mapDict.reduce((r, m) => r.replace(m[0], m[1] as string), escaped);
-  };
+    };
 
     return JSON.parse(unespace(escapedString));
   }
@@ -480,32 +480,32 @@ export class ClientSidePage {
     if (control.controlData) {
       // handle case where we don't have position data
       if (hOP(control.controlData, "position")) {
-          if (hOP(control.controlData.position, "zoneIndex")) {
-              zoneIndex = control.controlData.position.zoneIndex;
-          }
-          if (hOP(control.controlData.position, "sectionIndex")) {
-              sectionIndex = control.controlData.position.sectionIndex;
-          }
-          if (hOP(control.controlData.position, "sectionFactor")) {
-              sectionFactor = control.controlData.position.sectionFactor;
-          }
+        if (hOP(control.controlData.position, "zoneIndex")) {
+          zoneIndex = control.controlData.position.zoneIndex;
+        }
+        if (hOP(control.controlData.position, "sectionIndex")) {
+          sectionIndex = control.controlData.position.sectionIndex;
+        }
+        if (hOP(control.controlData.position, "sectionFactor")) {
+          sectionFactor = control.controlData.position.sectionFactor;
+        }
       }
     }
 
     const sections = this.sections.filter(s => s.order === zoneIndex);
     if (sections.length < 1) {
-        section = new CanvasSection(this, zoneIndex);
-        this.sections.push(section);
+      section = new CanvasSection(this, zoneIndex);
+      this.sections.push(section);
     } else {
-        section = sections[0];
+      section = sections[0];
     }
 
     const columns = section.columns.filter(c => c.order === sectionIndex);
     if (columns.length < 1) {
-        column = new CanvasColumn(section, sectionIndex, sectionFactor);
-        section.columns.push(column);
+      column = new CanvasColumn(section, sectionIndex, sectionFactor);
+      section.columns.push(column);
     } else {
-        column = columns[0];
+      column = columns[0];
     }
 
     control.column = column;
@@ -525,10 +525,10 @@ export class ClientSidePage {
     const sections = this.sections.filter(s => s.order === order);
 
     if (sections.length < 1) {
-        section = new CanvasSection(this, order);
-        this.sections.push(section);
+      section = new CanvasSection(this, order);
+      this.sections.push(section);
     } else {
-        section = sections[0];
+      section = sections[0];
     }
 
     column.section = section;
@@ -655,11 +655,11 @@ export class CanvasColumn extends CanvasControl {
     }
     else {
       control.column = this;
-			control.order = index;
-			this.controls.splice(index, 0, control);
+      control.order = index;
+      this.controls.splice(index, 0, control);
     }
 
-		return this;
+    return this;
   }
 
   public getControl<T extends ClientSidePart>(index: number): T {
@@ -688,12 +688,12 @@ export class CanvasColumn extends CanvasControl {
 
     this.controlData = ClientSidePage.escapedStringToJson<ClientSideControlData>(getAttrValueFromString(html, "data-sp-controldata"));
     if (hOP(this.controlData, "position")) {
-        if (hOP(this.controlData.position, "sectionFactor")) {
-            this.factor = this.controlData.position.sectionFactor;
-        }
-        if (hOP(this.controlData.position, "sectionIndex")) {
-            this.order = this.controlData.position.sectionIndex;
-        }
+      if (hOP(this.controlData.position, "sectionFactor")) {
+        this.factor = this.controlData.position.sectionFactor;
+      }
+      if (hOP(this.controlData.position, "sectionIndex")) {
+        this.order = this.controlData.position.sectionIndex;
+      }
     }
   }
 
@@ -703,7 +703,7 @@ export class CanvasColumn extends CanvasControl {
       position: {
         sectionFactor: this.factor,
         sectionIndex: this.order,
-        zoneIndex: this.section ? this.section.order : 0,
+        zoneIndex: this.section ? this.section.order : 0
       },
     };
   }
@@ -773,7 +773,7 @@ export class ClientSideText extends ClientSidePart {
         controlIndex: this.order,
         sectionFactor: this.column ? this.column.factor : 0,
         sectionIndex: this.column ? this.column.order : 0,
-        zoneIndex: this.column && this.column.section ? this.column.section.order : 0,
+        zoneIndex: this.column && this.column.section ? this.column.section.order : 0
       },
     };
   }
@@ -802,10 +802,10 @@ export class ClientSideText extends ClientSidePart {
 
     getBoundedDivMarkup(html, /<div[^>]*data-sp-rte[^>]*>/i, (s: string) => {
 
-        // now we need to grab the inner text between the divs
-        const match = /<div[^>]*data-sp-rte[^>]*>(.*?)<\/div>$/i.exec(s);
+      // now we need to grab the inner text between the divs
+      const match = /<div[^>]*data-sp-rte[^>]*>(.*?)<\/div>$/i.exec(s);
 
-        this.text = match && match.length > 1 ? match[1] : "";
+      this.text = match && match.length > 1 ? match[1] : "";
     });
   }
 }
@@ -893,7 +893,7 @@ export class ClientSideWebpart extends ClientSidePart {
   }
 
   public fromHtml(html: string): void {
-    
+
     super.fromHtml(html);
 
     const webPartData = ClientSidePage.escapedStringToJson<ClientSideWebpartData>(getAttrValueFromString(html, "data-sp-webpartdata"));
@@ -912,7 +912,7 @@ export class ClientSideWebpart extends ClientSidePart {
     if (typeof webPartData.dynamicDataPaths !== "undefined") {
       this.dynamicDataPaths = webPartData.dynamicDataPaths;
     }
-    
+
     if (typeof webPartData.dynamicDataValues !== "undefined") {
       this.dynamicDataValues = webPartData.dynamicDataValues;
     }
@@ -934,7 +934,7 @@ export class ClientSideWebpart extends ClientSidePart {
         controlIndex: this.order,
         sectionFactor: this.column ? this.column.factor : 0,
         sectionIndex: this.column ? this.column.order : 0,
-        zoneIndex: this.column && this.column.section ? this.column.section.order : 0,
+        zoneIndex: this.column && this.column.section ? this.column.section.order : 0
       },
       webPartId: this.webPartId,
     };

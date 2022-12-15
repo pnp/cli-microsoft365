@@ -298,9 +298,12 @@ describe(commands.APP_INSTALL, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-      id: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        id: '4440558e-8c73-4597-abc7-3644a64c4bce'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user name)`, async () => {
@@ -340,10 +343,13 @@ describe(commands.APP_INSTALL, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'post').callsFake(() => Promise.reject('Invalid request'));
-    
-    await assert.rejects(command.action(logger, { options: { 
-      userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-      id: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        id: '4440558e-8c73-4597-abc7-3644a64c4bce'
+      }
+    } as any), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
   });
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID; debug)`, async () => {
@@ -365,21 +371,13 @@ describe(commands.APP_INSTALL, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'post').callsFake(() => Promise.reject('Invalid request'));
-    
-    await assert.rejects(command.action(logger, { options: { 
-      userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-      id: '4440558e-8c73-4597-abc7-3644a64c4bce',
-      debug: true } } as any), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
-  });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        id: '4440558e-8c73-4597-abc7-3644a64c4bce',
+        debug: true
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
   });
 });

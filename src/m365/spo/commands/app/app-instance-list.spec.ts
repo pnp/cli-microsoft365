@@ -135,7 +135,7 @@ describe(commands.APP_INSTANCE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite', debug: false } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite' } });
     assert.strictEqual(log.length, 0);
   });
 
@@ -167,16 +167,5 @@ describe(commands.APP_INSTANCE_LIST, () => {
         siteUrl: 'https://contoso.sharepoint.com/sites/testsite'
       }
     } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 });

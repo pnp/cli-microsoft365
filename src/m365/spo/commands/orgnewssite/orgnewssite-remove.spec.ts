@@ -94,7 +94,6 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         confirm: true,
         url: "http://contoso.sharepoint.com/sites/site1"
@@ -121,7 +120,6 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         confirm: false,
         url: "http://contoso.sharepoint.com/sites/site1"
@@ -206,16 +204,5 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
       }
     });
     assert(containsConfirmOption);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

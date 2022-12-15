@@ -167,9 +167,12 @@ describe(commands.WEB_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      url: 'https://contoso.sharepoint.com' } } as any), new CommandError(err));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        url: 'https://contoso.sharepoint.com'
+      }
+    } as any), new CommandError(err));
   });
 
   it('uses correct API url when output json option is passed', async () => {
@@ -186,22 +189,10 @@ describe(commands.WEB_LIST, () => {
     await command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         url: 'https://contoso.sharepoint.com'
       }
     });
     assert('Correct Url');
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {

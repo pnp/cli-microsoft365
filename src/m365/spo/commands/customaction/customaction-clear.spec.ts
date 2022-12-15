@@ -36,7 +36,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -89,16 +89,18 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should user custom actions cleared successfully without prompting with confirmation argument', async () => {
     defaultPostCallsStub();
 
-    await command.action(logger, { options: {
-      verbose: false,
-      webUrl: 'https://contoso.sharepoint.com',
-      confirm: true
-    } });
+    await command.action(logger, {
+      options: {
+        verbose: false,
+        webUrl: 'https://contoso.sharepoint.com',
+        confirm: true
+      }
+    });
     assert(loggerLogSpy.notCalled);
   });
 
   it('should prompt before clearing custom actions when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com'} });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -110,12 +112,12 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
   it('should abort custom actions clear when prompt not confirmed', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
-    
+
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com'}} as any);
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } } as any);
     assert(postCallsSpy.notCalled);
   });
 
@@ -127,12 +129,12 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    
+
     try {
-      await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' }} as any);
+      await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } } as any);
       assert(postCallsSpy.calledTwice);
       assert(clearScopedCustomActionsSpy.calledWith(sinon.match(
-        { 
+        {
           webUrl: 'https://contoso.sharepoint.com'
         })) === true);
     }
@@ -146,7 +148,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
     const options = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web',
       confirm: true
@@ -156,7 +157,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       await command.action(logger, { options: options } as any);
       assert(postCallsSpy.calledOnce);
       assert(clearScopedCustomActionsSpy.calledWith({
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web',
         confirm: true
@@ -223,7 +223,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     };
 
-    
+
     try {
       await command.action(logger, { options: options } as any);
       assert(clearScopedCustomActionsSpy.calledTwice, 'clearScopedCustomActionsSpy.calledTwice');
@@ -296,17 +296,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     }), new CommandError(err));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsVerboseOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsVerboseOption = true;
-      }
-    });
-    assert(containsVerboseOption);
-  });
-
   it('supports specifying scope', () => {
     const options = command.options;
     let containsScopeOption = false;
@@ -326,9 +315,9 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should fail validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: 'foo'
-        }
+      {
+        webUrl: 'foo'
+      }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -336,9 +325,9 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should pass validation when the url options specified', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com"
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com"
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -346,10 +335,10 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should pass validation when the url and scope options specified', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com",
-          scope: "Site"
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com",
+        scope: "Site"
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -357,10 +346,10 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should accept scope to be All', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'All'
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'All'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -368,10 +357,10 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should accept scope to be Site', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'Site'
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'Site'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -379,10 +368,10 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should accept scope to be Web', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'Web'
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'Web'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });

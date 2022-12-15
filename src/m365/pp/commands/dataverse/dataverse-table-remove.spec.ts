@@ -172,18 +172,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment, name: validName, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, name: validName, confirm: true } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });
