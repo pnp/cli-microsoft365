@@ -96,8 +96,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  // it('fails validation if webURL is Invalid', async () => {
-  //   const actual = await command.validate({
   it('Removes Azure AD group from SharePoint group using Azure AD Group Name', async () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (

@@ -33,6 +33,12 @@ m365 spo group member remove [options]
 `--aadGroupName [aadGroupName]`
 : The name of the Azure AD group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId` or `aadGroupName`.
 
+`--aadGroupId [aadGroupId]`
+: The object Id of the Azure AD group to remove as a member. Specify either `aadGroupId` or `aadGroupName`.
+
+`--aadGroupName [aadGroupName]`
+: The name of the Azure AD group to remove as a member. Specify either `aadGroupId` or `aadGroupName`.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples

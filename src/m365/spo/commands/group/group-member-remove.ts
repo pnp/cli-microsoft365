@@ -24,9 +24,9 @@ interface Options extends GlobalOptions {
   userName?: string;
   email?: string;
   userId?: number;
-  confirm?: boolean;
   aadGroupId?: string;
   aadGroupName?: string;
+  confirm?: boolean;
 }
 
 class SpoGroupMemberRemoveCommand extends SpoCommand {
