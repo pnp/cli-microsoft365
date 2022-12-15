@@ -116,11 +116,6 @@ describe(commands.USER_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if resetPassword and password is set and newPassword is also set', async () => {
-    const actual = await command.validate({ options: { objectId: objectId, resetPassword: true, password: newPassword, newPassword: newPassword } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if the objectId is a valid GUID', async () => {
     const actual = await command.validate({ options: { objectId: objectId } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -133,13 +128,13 @@ describe(commands.USER_SET, () => {
 
   it('throws error when objectId is not equal to current signed in objectId in Cli when passing both the options currentPassword and newPassword', async () => {
     sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return '7c47b08e-e7b3-427a-9eba-b679815148e9'; });
-    await assert.rejects(command.action(logger, { options: { verbose: true, debug: false, objectId: objectId, newPassword: newPassword, currentPassword: currentPassword } } as any),
+    await assert.rejects(command.action(logger, { options: { verbose: true, objectId: objectId, newPassword: newPassword, currentPassword: currentPassword } } as any),
       new CommandError(`You can only change your own password. Please use --objectId @meId to reference to your own userId`));
   });
 
   it('throws error when userPrincipalName is not equal to current signed in userPrincipalName in Cli when passing both the options currentPassword and newPassword', async () => {
     sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return 'john@contoso.com'; });
-    await assert.rejects(command.action(logger, { options: { verbose: true, debug: false, userPrincipalName: userPrincipalName, newPassword: newPassword, currentPassword: currentPassword } } as any),
+    await assert.rejects(command.action(logger, { options: { verbose: true, userPrincipalName: userPrincipalName, newPassword: newPassword, currentPassword: currentPassword } } as any),
       new CommandError(`You can only change your own password. Please use --userPrincipalName @meUserName to reference to your own userPrincipalName`));
   });
 
@@ -172,7 +167,6 @@ describe(commands.USER_SET, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        debug: false,
         objectId: objectId,
         Department: 'Sales & Marketing',
         CompanyName: 'Contoso'
@@ -197,7 +191,7 @@ describe(commands.USER_SET, () => {
         verbose: true,
         objectId: objectId,
         resetPassword: true,
-        password: newPassword,
+        newPassword: newPassword,
         forceChangePasswordNextSignIn: true
       }
     } as any);
@@ -220,7 +214,7 @@ describe(commands.USER_SET, () => {
         verbose: true,
         userPrincipalName: userPrincipalName,
         resetPassword: true,
-        password: newPassword
+        newPassword: newPassword
       }
     } as any);
     assert(loggerLogSpy.notCalled);
@@ -283,7 +277,6 @@ describe(commands.USER_SET, () => {
     await command.action(logger, {
       options: {
         verbose: true,
-        debug: false,
         userPrincipalName: userPrincipalName,
         accountEnabled: true
       }
