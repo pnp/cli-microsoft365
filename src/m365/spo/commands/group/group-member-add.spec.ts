@@ -247,6 +247,11 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if userId is Invalid', async () => {
+    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, userId: "9,invalidUserId" } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if all the required options are specified', async () => {
     const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, userName: "Alex.Wilber@contoso.com" } }, commandInfo);
     assert.strictEqual(actual, true);

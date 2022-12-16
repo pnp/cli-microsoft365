@@ -96,6 +96,11 @@ class SpoGroupMemberAddCommand extends SpoCommand {
           return `Specified groupId ${args.options.groupId} is not a number`;
         }
 
+        const userIdReg = new RegExp(/^[0-9,.]*$/);
+        if (args.options.userId && !userIdReg.test(args.options.userId!)) {
+          return `${args.options.userId} is not a number or a comma seperated value`;
+        }
+
         return true;
       }
     );
@@ -178,68 +183,26 @@ class SpoGroupMemberAddCommand extends SpoCommand {
 
     const validUserNames: string[] = [];
     const invalidUserNames: string[] = [];
-    const userInfo: string = args.options.userName ? args.options.userName : args.options.email ? args.options.email : args.options.userId!.toString();
+    const userInfo: string = args.options.userName || args.options.email || args.options.userId!.toString();
 
     return Promise
       .all(userInfo.split(',').map(async singleUserName => {
-        const options: AadUserGetCommandOptions | SpoUserGetCommandOptions = {
-          output: 'json',
-          debug: args.options.debug,
-          verbose: args.options.verbose
-        };
-
-        if (args.options.userName) {
-          options.userName = singleUserName.trim();
-        }
-        else if (args.options.email) {
-          options.email = singleUserName.trim();
-        }
-        else {
-          options.id = singleUserName.trim();
-          options.webUrl = args.options.webUrl;
-        }
-
-        if (options.id) {
-          try {
-            const spoUserGetOutput: CommandOutput = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...options, _: [] } });
-            if (this.debug) {
-              logger.logToStderr(spoUserGetOutput.stderr);
-            }
-
-            validUserNames.push(JSON.parse(spoUserGetOutput.stdout).UserPrincipalName);
-
-            return spoUserGetOutput;
+        try {
+          if (args.options.userId) {
+            return await this.spoUserGet(args.options, singleUserName.trim(), logger, validUserNames);
           }
-          catch (err: any) {
-            if (this.debug) {
-              logger.logToStderr(err.stderr);
-            }
+          else {
+            return await this.aadUserGet(args.options, singleUserName.trim(), logger, validUserNames);
+          }
+        }
+        catch (err: any) {
+          if (this.debug) {
             logger.logToStderr(err.stderr);
-            invalidUserNames.push(singleUserName);
-
-            return err;
           }
-        }
-        else {
-          try {
-            const aadUserGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } });
+          logger.logToStderr(err.stderr);
+          invalidUserNames.push(singleUserName);
 
-            if (this.debug) {
-              logger.logToStderr(aadUserGetOutput.stderr);
-            }
-
-            validUserNames.push(JSON.parse(aadUserGetOutput.stdout).userPrincipalName);
-
-            return aadUserGetOutput;
-          }
-          catch (err: any) {
-            if (this.debug) {
-              logger.logToStderr(err.stderr);
-            }
-            invalidUserNames.push(singleUserName);
-
-            return err;
-          }
+          return err;
         }
       }))
       .then((): Promise<string[]> => {
@@ -249,6 +212,46 @@ class SpoGroupMemberAddCommand extends SpoCommand {
 
         return Promise.resolve(validUserNames);
       });
+  }
+
+  private async aadUserGet(options: Options, userName: string, logger: Logger, validUserNames: string[]): Promise<CommandOutput> {
+    const aadUserGetCommandoptions: AadUserGetCommandOptions = {
+      ...(options.userName && { userName: userName }),
+      ...(options.email && { email: userName }),
+      output: 'json',
+      debug: options.debug,
+      verbose: options.verbose
+    };
+    const aadUserGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...aadUserGetCommandoptions, _: [] } });
+
+    if (this.debug) {
+      logger.logToStderr(aadUserGetOutput.stderr);
+    }
+
+    validUserNames.push(JSON.parse(aadUserGetOutput.stdout).userPrincipalName);
+
+    return aadUserGetOutput;
+  }
+
+  private async spoUserGet(options: Options, userName: string, logger: Logger, validUserNames: string[]): Promise<CommandOutput> {
+    const spoUserGetCommandoptions: SpoUserGetCommandOptions = {
+      id: userName,
+      webUrl: options.webUrl,
+      output: 'json',
+      debug: options.debug,
+      verbose: options.verbose
+    };
+
+    logger.log(spoUserGetCommandoptions);
+
+    const spoUserGetOutput: CommandOutput = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...spoUserGetCommandoptions, _: [] } });
+    if (this.debug) {
+      logger.logToStderr(spoUserGetOutput.stderr);
+    }
+
+    validUserNames.push(JSON.parse(spoUserGetOutput.stdout).UserPrincipalName);
+
+    return spoUserGetOutput;
   }
 
   private getFormattedUserList(activeUserList: string[]): any {
