@@ -101,6 +101,14 @@ class SpoGroupMemberAddCommand extends SpoCommand {
           return `${args.options.userId} is not a number or a comma seperated value`;
         }
 
+        if (args.options.userName && args.options.userName.split(',').some(e => !validation.isValidUserPrincipalName(e))) {
+          return `${args.options.userName} contains one or more invalid usernames`;
+        }
+
+        if (args.options.email && args.options.email.split(',').some(e => !validation.isValidUserPrincipalName(e))) {
+          return `${args.options.email} contains one or more invalid email addresses`;
+        }
+
         return true;
       }
     );
