@@ -1,6 +1,6 @@
 # pp dataverse table row remove
 
-Removes a row from a dataverse table in a given environment
+Removes a row from a dataverse table in a given environment.
 
 ## Usage
 
