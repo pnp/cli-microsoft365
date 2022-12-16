@@ -98,7 +98,7 @@ describe(commands.APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, distributionMethod: 'organization' } });
+    await command.action(logger, { options: { distributionMethod: 'organization' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "7131a36d-bb5f-46b8-bb40-0b199a3fad74",
@@ -167,17 +167,6 @@ describe(commands.APP_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { output: 'json', debug: false } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { output: 'json' } } as any), new CommandError('An error has occurred'));
   });
 });

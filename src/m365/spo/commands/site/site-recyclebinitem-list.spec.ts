@@ -66,17 +66,6 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Title', 'DirName']);
   });
@@ -111,9 +100,12 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      siteUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError(err));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        siteUrl: 'https://contoso.sharepoint.com'
+      }
+    } as any), new CommandError(err));
   });
 
   it('retrieves all items from recycle bin', async () => {

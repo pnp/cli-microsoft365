@@ -101,7 +101,6 @@ describe(commands.LIST_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "FooList"
       }
     } as any);
@@ -138,7 +137,6 @@ describe(commands.LIST_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "FooList",
         confirm: true
       }
@@ -176,7 +174,6 @@ describe(commands.LIST_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA="
       }
     } as any);
@@ -197,7 +194,7 @@ describe(commands.LIST_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.resolve();
     });
-    await assert.rejects(command.action(logger, { options: { debug: false, name: "FooList" } } as any), new CommandError('The list FooList cannot be found'));
+    await assert.rejects(command.action(logger, { options: { name: "FooList" } } as any), new CommandError('The list FooList cannot be found'));
   });
 
   it('handles error correctly', async () => {
@@ -224,7 +221,7 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: "FooList" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { name: "FooList" } } as any), new CommandError('An error has occurred'));
   });
 
   it('prompts before removing the list when confirm option not passed', async () => {
@@ -262,7 +259,6 @@ describe(commands.LIST_REMOVE, () => {
 
     command.action(logger, {
       options: {
-        debug: false,
         name: "FooList"
       }
     } as any);
@@ -277,7 +273,6 @@ describe(commands.LIST_REMOVE, () => {
   it('fails validation if both name and id are not set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         name: null,
         id: null
       }
@@ -288,7 +283,6 @@ describe(commands.LIST_REMOVE, () => {
   it('passes validation when all parameters are valid', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         name: 'Foo'
       }
     }, commandInfo);
@@ -299,23 +293,10 @@ describe(commands.LIST_REMOVE, () => {
   it('fails validation if both name and id are set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         name: 'foo',
         id: 'bar'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

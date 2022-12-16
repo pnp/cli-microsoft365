@@ -145,7 +145,6 @@ describe(commands.GROUPSETTING_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: 'c391b57d-5783-4c53-9236-cefb5c6ef323',
         UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance',
         ClassificationList: 'HBI, MBI, LBI, GDPR',
@@ -382,7 +381,7 @@ describe(commands.GROUPSETTING_SET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } } as any),
       new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`));
   });
 
@@ -399,16 +398,5 @@ describe(commands.GROUPSETTING_SET, () => {
   it('allows unknown properties', () => {
     const allowUnknownOptions = command.allowUnknownOptions();
     assert.strictEqual(allowUnknownOptions, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

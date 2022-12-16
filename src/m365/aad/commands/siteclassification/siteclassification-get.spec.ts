@@ -73,7 +73,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), 
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('Site classification is not enabled.'));
   });
 
@@ -148,7 +148,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), 
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
   });
 

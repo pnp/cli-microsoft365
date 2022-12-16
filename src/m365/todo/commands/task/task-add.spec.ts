@@ -195,11 +195,14 @@ describe(commands.TASK_ADD, () => {
       }
       return Promise.reject();
     });
-    
-    await assert.rejects(command.action(logger, { options: {
-      title: 'New task',
-      listName: 'Tasks List',
-      debug: true } } as any), new CommandError('The specified task list does not exist'));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        title: 'New task',
+        listName: 'Tasks List',
+        debug: true
+      }
+    } as any), new CommandError('The specified task list does not exist'));
   });
 
   it('handles error correctly', async () => {
@@ -263,16 +266,5 @@ describe(commands.TASK_ADD, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

@@ -365,17 +365,6 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('adds conversation members using teamName, channelId, and userId', async () => {
     await command.action(logger, {
       options: {
@@ -594,7 +583,6 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
         userDisplayName: "Admin"

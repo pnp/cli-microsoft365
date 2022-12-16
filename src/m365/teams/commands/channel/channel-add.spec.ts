@@ -154,7 +154,7 @@ describe(commands.CHANNEL_ADD, () => {
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  
+
   it('validates for a correct general channel input.', async () => {
     const actual = await command.validate({
       options: {
@@ -201,11 +201,14 @@ describe(commands.CHANNEL_ADD, () => {
       throw 'The specified team does not exist in the Microsoft Teams';
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      teamName: 'Team Name',
-      name: 'Architecture Discussion',
-      description: 'Architecture' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        teamName: 'Team Name',
+        name: 'Architecture Discussion',
+        description: 'Architecture'
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('fails when multiple teams with same name exists', async () => {
@@ -258,11 +261,14 @@ describe(commands.CHANNEL_ADD, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      teamName: 'Team Name',
-      name: 'Architecture Discussion',
-      description: 'Architecture'} } as any), new CommandError('Multiple Microsoft Teams teams with name Team Name found: 00000000-0000-0000-0000-000000000000, 00000000-0000-0000-0000-000000000000'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        teamName: 'Team Name',
+        name: 'Architecture Discussion',
+        description: 'Architecture'
+      }
+    } as any), new CommandError('Multiple Microsoft Teams teams with name Team Name found: 00000000-0000-0000-0000-000000000000, 00000000-0000-0000-0000-000000000000'));
   });
 
   it('creates channel within the Microsoft Teams team in the tenant with description by team id', async () => {
@@ -285,7 +291,7 @@ describe(commands.CHANNEL_ADD, () => {
         description: 'Architecture'
       }
     });
-    
+
     assert(loggerLogSpy.calledWith({
       "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
       "displayName": "Architecture Discussion",
@@ -308,7 +314,6 @@ describe(commands.CHANNEL_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion'
       }
@@ -324,7 +329,7 @@ describe(commands.CHANNEL_ADD, () => {
   it('creates private channel within the Microsoft Teams team by team id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
-        return{
+        return {
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
           "membershipType": "private"
@@ -336,7 +341,6 @@ describe(commands.CHANNEL_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion',
         type: 'private',
@@ -366,14 +370,13 @@ describe(commands.CHANNEL_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion',
         type: 'shared',
         owner: 'john.doe@contoso.com'
       }
     });
-    
+
     assert(loggerLogSpy.calledWith({
       "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
       "displayName": "Architecture Discussion",
@@ -443,20 +446,11 @@ describe(commands.CHANNEL_ADD, () => {
       throw 'An error has occurred';
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-      name: 'Architecture Discussion' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture Discussion'
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 });

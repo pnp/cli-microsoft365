@@ -136,17 +136,6 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('supports specifying URL', () => {
     const options = command.options;
     let containsTypeOption = false;
@@ -285,7 +274,6 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       output: "json",
@@ -303,7 +291,6 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       fields: "Title,ID"
@@ -352,7 +339,6 @@ describe(commands.LISTITEM_LIST, () => {
     });
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       fields: "Title,Modified,Company/Title"
@@ -378,7 +364,6 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       output: "text"
@@ -409,7 +394,6 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
@@ -424,7 +408,6 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
     const options: any = {
-      debug: false,
       listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
