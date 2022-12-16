@@ -81,7 +81,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: userId } });
+    await command.action(logger, { options: { id: userId } });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -103,7 +103,7 @@ describe(commands.USER_GET, () => {
       };
     }
 
-    await command.action(logger, { options: { debug: false, id: '@meid' } });
+    await command.action(logger, { options: { id: '@meid' } });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -129,7 +129,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, userName: userName } });
+    await command.action(logger, { options: { userName: userName } });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -151,7 +151,7 @@ describe(commands.USER_GET, () => {
       };
     }
 
-    await command.action(logger, { options: { debug: false, userName: '@meusername' } });
+    await command.action(logger, { options: { userName: '@meusername' } });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -164,7 +164,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, email: userName } });
+    await command.action(logger, { options: { email: userName } });
     assert(loggerLogSpy.calledWith(resultValue));
   });
 
@@ -177,7 +177,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, userName: userName, properties: 'id,mail' } });
+    await command.action(logger, { options: { userName: userName, properties: 'id,mail' } });
     assert(loggerLogSpy.calledWith({ "id": "userId", "mail": null }));
   });
 
@@ -195,7 +195,7 @@ describe(commands.USER_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: '68be84bf-a585-4776-80b3-30aa5207aa22' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: '68be84bf-a585-4776-80b3-30aa5207aa22' } } as any),
       new CommandError(`Resource '68be84bf-a585-4776-80b3-30aa5207aa22' does not exist or one of its queried reference-property objects are not present.`));
   });
 
@@ -208,7 +208,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject(`The specified user with id ${userId} does not exist`);
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: userId } }),
+    await assert.rejects(command.action(logger, { options: { id: userId } }),
       new CommandError(`The specified user with id ${userId} does not exist`));
   });
 
@@ -221,7 +221,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject(`The specified user with user name ${userName} does not exist`);
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, userName: userName } }),
+    await assert.rejects(command.action(logger, { options: { userName: userName } }),
       new CommandError(`The specified user with user name ${userName} does not exist`));
   });
 
@@ -234,7 +234,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject(`The specified user with email ${userName} does not exist`);
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, email: userName } }),
+    await assert.rejects(command.action(logger, { options: { email: userName } }),
       new CommandError(`The specified user with email ${userName} does not exist`));
   });
 
@@ -254,7 +254,6 @@ describe(commands.USER_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         email: userName
       }
     }), new CommandError(`Multiple users with email ${userName} found. Please disambiguate (user names): ${userName}, DebraB@contoso.onmicrosoft.com or (ids): ${userId}, 9b1b1e42-794b-4c71-93ac-5ed92488b67f`));
@@ -303,16 +302,5 @@ describe(commands.USER_GET, () => {
   it('passes validation if the email is specified', async () => {
     const actual = await command.validate({ options: { email: 'john.doe@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

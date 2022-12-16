@@ -458,7 +458,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       return Promise.resolve(JSON.stringify({ scriptType: 'script' }));
     });
 
-    await command.action(logger, { options: { output: 'json', debug: false } } as any);
+    await command.action(logger, { options: { output: 'json' } } as any);
     const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[0];
     assert.notStrictEqual(findings.edits.length, 0);
   });
@@ -613,16 +613,5 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   it('fails validation when csv output specified', async () => {
     assert.notStrictEqual(await command.validate({ options: { output: 'csv' } }, Cli.getCommandInfo(command)), true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

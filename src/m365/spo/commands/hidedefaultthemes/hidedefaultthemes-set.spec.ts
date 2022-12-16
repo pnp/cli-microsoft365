@@ -83,7 +83,6 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         hideDefaultThemes: true
       }
     });
@@ -148,17 +147,6 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
         hideDefaultThemes: true
       }
     } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('fails validation if hideDefaultThemes is not set', async () => {

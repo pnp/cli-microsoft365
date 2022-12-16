@@ -103,7 +103,6 @@ describe(commands.LIST_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
     const actual = JSON.stringify(log[log.length - 1]);
@@ -141,17 +140,6 @@ describe(commands.LIST_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

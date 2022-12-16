@@ -17,7 +17,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -74,7 +74,6 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
   });
@@ -120,16 +119,5 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
 
     await assert.rejects(command.action(logger, { options: { debug: true, verbose: true } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

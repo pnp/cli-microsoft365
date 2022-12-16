@@ -271,22 +271,11 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: false, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+      await command.action(logger, { options: { environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
       assert.fail('No error message thrown.');
     }
     catch (ex) {
       assert(ex, (new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present")).message);
     }
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

@@ -22,7 +22,7 @@ describe(commands.TERM_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -144,7 +144,7 @@ describe(commands.TERM_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } });
+    await command.action(logger, { options: { termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } });
     assert(loggerLogSpy.calledWith([{
       "_ObjectType_": "SP.Taxonomy.Term",
       "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==",
@@ -424,7 +424,7 @@ describe(commands.TERM_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupName: 'PnPTermSets' } });
+    await command.action(logger, { options: { termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupName: 'PnPTermSets' } });
     assert(loggerLogSpy.calledWith([{
       "_ObjectType_": "SP.Taxonomy.Term",
       "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==",
@@ -564,7 +564,7 @@ describe(commands.TERM_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets' } });
+    await command.action(logger, { options: { termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets' } });
     assert(loggerLogSpy.calledWith([{
       "_ObjectType_": "SP.Taxonomy.Term",
       "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==",
@@ -650,7 +650,7 @@ describe(commands.TERM_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets', output: 'json' } });
+    await command.action(logger, { options: { termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets', output: 'json' } });
     assert(loggerLogSpy.calledWith([{ "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "10ca969e-3062-0000-2cdb-e38e5b6fba03|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==", "CreatedDate": "2018-09-13T11:52:55.320Z", "Id": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b", "LastModifiedDate": "2018-09-13T11:52:55.337Z", "Name": "HR", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "HR", "TermsCount": 0 }, { "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "10ca969e-3062-0000-2cdb-e38e5b6fba03|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7tkN1JPJFMkK56GbFv1PDHg==", "CreatedDate": "2018-09-13T11:52:55.477Z", "Id": "247543b6-45f2-4232-b9e8-66c5bf53c31e", "LastModifiedDate": "2018-09-13T11:52:55.490Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }, { "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "10ca969e-3062-0000-2cdb-e38e5b6fba03|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7j2DD/1ASKE2ziDgfrY1GAg==", "CreatedDate": "2018-09-13T11:52:55.600Z", "Id": "ffc3608f-1250-4d28-b388-381fad8d4602", "LastModifiedDate": "2018-09-13T11:52:55.617Z", "Name": "Leadership", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Leadership", "TermsCount": 2 }]));
   });
 
@@ -719,7 +719,7 @@ describe(commands.TERM_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets>' } });
+    await command.action(logger, { options: { termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets>' } });
     assert(loggerLogSpy.calledWith([{
       "_ObjectType_": "SP.Taxonomy.Term",
       "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==",
@@ -859,7 +859,7 @@ describe(commands.TERM_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, termSetName: 'PnP-Organizations>', termGroupName: 'PnPTermSets' } });
+    await command.action(logger, { options: { termSetName: 'PnP-Organizations>', termGroupName: 'PnPTermSets' } });
     assert(loggerLogSpy.calledWith([{
       "_ObjectType_": "SP.Taxonomy.Term",
       "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==",
@@ -944,11 +944,13 @@ describe(commands.TERM_LIST, () => {
         }
       ]));
     });
-    
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', 
-      termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed',
+        termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles term group not found via name', async () => {
@@ -962,10 +964,12 @@ describe(commands.TERM_LIST, () => {
       ]));
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      termSetName: 'PnP-CollabFooter-SharedLinks', 
-      termGroupName: 'PnPTermSets' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        termSetName: 'PnP-CollabFooter-SharedLinks',
+        termGroupName: 'PnPTermSets'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles term set not found via id', async () => {
@@ -978,10 +982,12 @@ describe(commands.TERM_LIST, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', 
-      termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed',
+        termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles term set not found via name', async () => {
@@ -995,10 +1001,12 @@ describe(commands.TERM_LIST, () => {
       ]));
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      termSetName: 'PnP-CollabFooter-SharedLinks', 
-      termGroupName: 'PnPTermSets' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        termSetName: 'PnP-CollabFooter-SharedLinks',
+        termGroupName: 'PnPTermSets'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when retrieving taxonomy terms', async () => {
@@ -1011,11 +1019,13 @@ describe(commands.TERM_LIST, () => {
         }
       ]));
     });
-    
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      termSetName: 'PnP-Organizations', 
-      termGroupName: 'PnPTermSets' } } as any), new CommandError('File Not Found.'));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        termSetName: 'PnP-Organizations',
+        termGroupName: 'PnPTermSets'
+      }
+    } as any), new CommandError('File Not Found.'));
   });
 
   it('correctly handles no terms found', async () => {
@@ -1029,7 +1039,7 @@ describe(commands.TERM_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets', output: 'json' } });
+    await command.action(logger, { options: { termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets', output: 'json' } });
   });
 
   it('fails validation if neither termSetId nor termSetName specified', async () => {
@@ -1082,25 +1092,16 @@ describe(commands.TERM_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('handles promise rejection', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      termSetName: 'PnP-Organizations', 
-      termGroupName: 'PnPTermSets', 
-      output: 'json' } } as any), new CommandError('getRequestDigest error'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        termSetName: 'PnP-Organizations',
+        termGroupName: 'PnPTermSets',
+        output: 'json'
+      }
+    } as any), new CommandError('getRequestDigest error'));
   });
 });

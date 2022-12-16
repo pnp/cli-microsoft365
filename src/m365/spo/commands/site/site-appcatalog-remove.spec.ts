@@ -105,7 +105,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site' } });
   });
 
   it('removes site collection app catalog (debug=true)', async () => {
@@ -169,17 +169,6 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying site url', () => {

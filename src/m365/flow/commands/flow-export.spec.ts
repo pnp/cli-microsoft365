@@ -202,7 +202,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'json' } });
+    await command.action(logger, { options: { id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'json' } });
     assert(loggerLogSpy.calledWith(`./${flowDisplayName}.json`));
   });
 
@@ -224,7 +224,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'json' } });
+    await command.action(logger, { options: { id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'json' } });
     assert(loggerLogSpy.calledWith('./_Flow __name_ _ with_ Illegal _ characters__.json'));
   });
 
@@ -242,7 +242,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'zip' } });
+    await command.action(logger, { options: { id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'zip' } });
     assert(loggerLogSpy.calledWith(`./${actualFilename}`));
   });
 
@@ -251,7 +251,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'zip' } });
+    await command.action(logger, { options: { id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'zip' } });
     assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
   });
 
@@ -260,7 +260,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } });
+    await command.action(logger, { options: { id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -269,7 +269,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } });
+    await command.action(logger, { options: { id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } });
     assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
   });
 
@@ -279,7 +279,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } });
+    await command.action(logger, { options: { id: `${foundFlowId}`, environmentName: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } });
     assert.strictEqual(postRequestsStub.lastCall.args[0].data.resources["L1BST1ZJREVSUy9NSUNST1NPRlQuRkxPVy9GTE9XUy9GMkVCOEIzNy1GNjI0LTRCMjItOTk1NC1CNUQwQ0JCMjhGOEI="].suggestedCreationType, 'Update');
     resourceIds.forEach((id) => {
       assert.strictEqual(postRequestsStub.lastCall.args[0].data.resources[id].suggestedCreationType, 'Existing');
@@ -290,7 +290,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environmentName: `Default-${notFoundEnvironmentId}`, id: `${foundFlowId}` } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: `Default-${notFoundEnvironmentId}`, id: `${foundFlowId}` } } as any),
       new CommandError(`Access to the environment 'Default-${notFoundEnvironmentId}' is denied.`));
   });
 
@@ -298,7 +298,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environmentName: `Default-${foundEnvironmentId}`, id: notFoundFlowId } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: `Default-${foundEnvironmentId}`, id: notFoundFlowId } } as any),
       new CommandError(`The caller with object id '${foundEnvironmentId}' does not have permission for connection '${notFoundFlowId}' under Api 'shared_logicflows'.`));
   });
 
@@ -347,17 +347,6 @@ describe(commands.EXPORT, () => {
   it('passes validation when the id and environment specified and format set to JSON', async () => {
     const actual = await command.validate({ options: { environmentName: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying id', () => {

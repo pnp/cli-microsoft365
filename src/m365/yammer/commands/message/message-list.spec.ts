@@ -99,7 +99,7 @@ describe(commands.MESSAGE_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation without parameters', async () => {
@@ -150,17 +150,6 @@ describe(commands.MESSAGE_LIST, () => {
   it('you are not allowed to use groupId and threadId and feedType at the same time', async () => {
     const actual = await command.validate({ options: { feedType: 'Private', groupId: 123, threadId: 123 } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('returns messages without more results', async () => {
@@ -318,7 +307,7 @@ describe(commands.MESSAGE_LIST, () => {
         });
       }
     });
-    
+
     await assert.rejects(command.action(logger, { options: { output: 'json' } } as any), new CommandError('An error has occurred.'));
   });
 

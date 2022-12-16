@@ -532,7 +532,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     try {
       await assert.rejects(command.action(logger, {
         options: {
-          debug: false,
           id: actionId,
           webUrl: 'https://contoso.sharepoint.com',
           scope: 'All'
@@ -562,7 +561,6 @@ describe(commands.CUSTOMACTION_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
@@ -784,16 +782,5 @@ describe(commands.CUSTOMACTION_SET, () => {
       }
     });
     assert(containsScopeOption);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });
