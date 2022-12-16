@@ -292,8 +292,11 @@ describe(commands.REQUEST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      url: 'https://contoso.sharepoint.com/_api/web' } } as any), new CommandError('Invalid request'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        url: 'https://contoso.sharepoint.com/_api/web'
+      }
+    } as any), new CommandError('Invalid request'));
   });
 
 
@@ -360,7 +363,6 @@ describe(commands.REQUEST, () => {
     });
 
     const options = {
-      debug: false,
       url: "https://contoso.sharepoint.com/_api/web/GetFileById('b2307a39-e878-458b-bc90-03bc578531d6')/$value",
       body: '{ "key": "value" }',
       'content-type': 'application/json',
@@ -373,16 +375,5 @@ describe(commands.REQUEST, () => {
     sinonUtil.restore([
       fs.createWriteStream
     ]);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

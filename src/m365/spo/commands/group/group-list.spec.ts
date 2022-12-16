@@ -147,7 +147,6 @@ describe(commands.GROUP_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
@@ -164,7 +163,6 @@ describe(commands.GROUP_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         associatedGroupsOnly: true
       }
@@ -182,7 +180,6 @@ describe(commands.GROUP_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         associatedGroupsOnly: true,
         output: 'json'
@@ -201,7 +198,6 @@ describe(commands.GROUP_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         associatedGroupsOnly: true,
         output: 'text'

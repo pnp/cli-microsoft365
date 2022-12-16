@@ -21,7 +21,7 @@ describe(commands.WEB_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -71,17 +71,6 @@ describe(commands.WEB_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('should fail validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({
       options:
@@ -109,7 +98,7 @@ describe(commands.WEB_REMOVE, () => {
       }
       return Promise.reject('Invalid request');
     });
-    
+
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/subsite' } });
     let promptIssued = false;
 
@@ -161,7 +150,7 @@ describe(commands.WEB_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    
+
     await command.action(logger, {
       options: {
         url: "https://contoso.sharepoint.com/subsite"
@@ -244,8 +233,11 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      url: "https://contoso.sharepoint.com/subsite",
-      confirm: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        url: "https://contoso.sharepoint.com/subsite",
+        confirm: true
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 });

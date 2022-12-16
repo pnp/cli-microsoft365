@@ -58,7 +58,7 @@ describe(commands.COMPLETION_PWSH_UPDATE, () => {
   });
 
   it('builds command completion', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(generateShCompletionStub.called);
   });
 

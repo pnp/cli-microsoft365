@@ -197,8 +197,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('abc1'); }));
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options = {
-      webUrl: 'https://contoso.sharepoint.com',
-      debug: false
+      webUrl: 'https://contoso.sharepoint.com'
     };
 
     await assert.rejects(command.action(logger, { options: options } as any),
@@ -298,17 +297,6 @@ describe(commands.PROPERTYBAG_LIST, () => {
     assert.strictEqual((out[6].value as Date).getSeconds(), expectedDate.getSeconds(), 'getSeconds');
     assert.strictEqual(out[8].key, 'vti_isscriptable');
     assert.strictEqual(out[8].value, false);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsVerboseOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsVerboseOption = true;
-      }
-    });
-    assert(containsVerboseOption);
   });
 
   it('supports specifying folder', () => {

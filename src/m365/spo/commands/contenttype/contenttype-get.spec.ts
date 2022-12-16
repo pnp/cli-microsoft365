@@ -75,7 +75,7 @@ describe(commands.CONTENTTYPE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } });
     assert(loggerLogSpy.calledWith(contentTypeByIdResponse));
   });
 
@@ -88,7 +88,7 @@ describe(commands.CONTENTTYPE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Alert' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'PnP Alert' } });
     assert(loggerLogSpy.calledWith(contentTypeByNameResponse.value[0]));
   });
 
@@ -255,17 +255,6 @@ describe(commands.CONTENTTYPE_GET, () => {
     ['i', 'id'].forEach(o => {
       assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {

@@ -73,7 +73,7 @@ describe(commands.GROUP_USER_ADD, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation with parameters', async () => {
@@ -89,17 +89,6 @@ describe(commands.GROUP_USER_ADD, () => {
   it('id must be a number', async () => {
     const actual = await command.validate({ options: { groupId: 10, id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('calls the service if the current user is added to the group', async () => {

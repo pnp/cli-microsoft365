@@ -158,7 +158,6 @@ describe(commands.FILE_VERSION_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: validWebUrl,
         label: validLabel,
         fileUrl: `Shared Documents/Fo'lde'r`
@@ -184,16 +183,5 @@ describe(commands.FILE_VERSION_GET, () => {
         label: validLabel
       }
     }), new CommandError(err));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

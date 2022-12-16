@@ -88,7 +88,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
       if (opts.url === 'https://contoso.sharepoint.com/subsite/_api/web/breakroleinheritance(true)') {
         return;
       }
-      
+
       throw 'Invalid request URL: ' + opts.url;
     });
 
@@ -106,7 +106,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
       if (opts.url === 'https://contoso.sharepoint.com/subsite/_api/web/breakroleinheritance(true)') {
         return;
       }
-      
+
       throw 'Invalid request URL: ' + opts.url;
     });
 
@@ -127,7 +127,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
       if (opts.url === 'https://contoso.sharepoint.com/subsite/_api/web/breakroleinheritance(true)') {
         return;
       }
-      
+
       throw 'Invalid request URL: ' + opts.url;
     });
 
@@ -169,16 +169,5 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
         confirm: true
       }
     }), new CommandError(errorMessage));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

@@ -19,7 +19,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -63,21 +63,9 @@ describe(commands.SITECLASSIFICATION_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('fails validation if none of the options are specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -86,7 +74,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
   it('passes validation if at least one option is specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false, classifications: "Confidential"
+        classifications: "Confidential"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -95,7 +83,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
   it('passes validation if all options are passed', async () => {
     const actual = await command.validate({
       options: {
-        debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "https://aka.ms/pnp", guestUsageGuidelinesUrl: "https://aka.ms/pnp"
+        classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "https://aka.ms/pnp", guestUsageGuidelinesUrl: "https://aka.ms/pnp"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -288,7 +276,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    await command.action(logger, { options: { usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
     assert(updateRequestIssued);
   });
 
@@ -464,7 +452,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
+    await command.action(logger, { options: { guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any);
     assert(updateRequestIssued);
   });
 
