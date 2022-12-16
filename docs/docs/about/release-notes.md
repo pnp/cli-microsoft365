@@ -14,6 +14,7 @@
 - [pp chatbot remove](../cmd/pp/chatbot/chatbot-remove.md) - removes the specified chatbot [#4106](https://github.com/pnp/cli-microsoft365/issues/4106)
 - [pp dataverse table row list](../cmd/pp/dataverse/dataverse-table-row-list.md) - lists table rows for the given Dataverse table [#3791](https://github.com/pnp/cli-microsoft365/issues/3791)
 - [pp solution publisher add](../cmd/pp/solution/solution-publisher-add.md) - adds a specified publisher in a given environment [#3977](https://github.com/pnp/cli-microsoft365/issues/3977)
+- [pp dataverse table row remove](../cmd/pp/dataverse/dataverse-table-row-remove.md) - removes a row from a dataverse table in a given environment [#4030](https://github.com/pnp/cli-microsoft365/issues/4030)
 
 **Purview:**
 
@@ -48,6 +49,7 @@
 - extended 'teams cache remove' to check on Teams PID [#3448](https://github.com/pnp/cli-microsoft365/issues/3448)
 - added 'disableTelemetry' config value [#4109](https://github.com/pnp/cli-microsoft365/issues/4109)
 - enhanced test files [#4155](https://github.com/pnp/cli-microsoft365/issues/4155)
+- enhanced Cli test file [#4185](https://github.com/pnp/cli-microsoft365/issues/4185)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
