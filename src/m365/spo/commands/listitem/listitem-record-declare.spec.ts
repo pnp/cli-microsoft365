@@ -278,17 +278,6 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     assert.notStrictEqual(declareItemAsRecordFakeCalled, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('supports specifying URL', () => {
     const options = command.options;
     let containsTypeOption = false;

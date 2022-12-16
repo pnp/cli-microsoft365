@@ -113,7 +113,7 @@ describe(commands.TEAM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([
       {
         "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -145,7 +145,7 @@ describe(commands.TEAM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([
       {
         "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -174,7 +174,7 @@ describe(commands.TEAM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Invalid request'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Invalid request'));
   });
 
   it('lists Microsoft Teams in the tenant (debug)', async () => {
@@ -326,7 +326,7 @@ describe(commands.TEAM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { joined: true, debug: false } });
+    await command.action(logger, { options: { joined: true } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -418,7 +418,7 @@ describe(commands.TEAM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { output: 'json', debug: false } });
+    await command.action(logger, { options: { output: 'json' } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -433,16 +433,5 @@ describe(commands.TEAM_LIST, () => {
         "isArchived": false
       }
     ]));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

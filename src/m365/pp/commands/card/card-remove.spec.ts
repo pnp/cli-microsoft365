@@ -209,15 +209,4 @@ describe(commands.CARD_REMOVE, () => {
       }
     }), new CommandError(errorMessage));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

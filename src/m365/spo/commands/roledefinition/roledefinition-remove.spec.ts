@@ -71,17 +71,6 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', id: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -123,7 +112,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
   });
 
   it('prompts before removing role definition when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -138,7 +127,7 @@ describe(commands.ROLEDEFINITION_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } });
     assert(requests.length === 0);
   });
 

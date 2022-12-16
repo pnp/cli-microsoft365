@@ -56,7 +56,7 @@ describe(commands.COMPLETION_CLINK_UPDATE, () => {
   });
 
   it('builds command completion', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(generateClinkCompletionStub.called);
   });
 });

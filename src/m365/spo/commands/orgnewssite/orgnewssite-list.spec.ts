@@ -82,7 +82,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, verbose: true } });
+    await command.action(logger, { options: { verbose: true } });
     assert.strictEqual(svcListRequest.callCount, 1);
     assert(loggerLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1']));
   });
@@ -98,7 +98,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, verbose: false } });
+    await command.action(logger, { options: { verbose: false } });
     assert.strictEqual(svcListRequest.callCount, 1);
     assert(loggerLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1', 'http://contoso.sharepoint.com/sites/site2']));
   });
@@ -133,16 +133,5 @@ describe(commands.ORGNEWSSITE_LIST, () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

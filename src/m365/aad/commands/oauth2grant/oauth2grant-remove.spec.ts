@@ -104,7 +104,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
+    await command.action(logger, { options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
     assert(loggerLogSpy.notCalled);
     assert(deleteRequestStub.called);
   });
@@ -118,13 +118,13 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', confirm: true } });
+    await command.action(logger, { options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', confirm: true } });
     assert(loggerLogSpy.notCalled);
     assert(deleteRequestStub.called);
   });
 
   it('prompts before removing OAuth2 permission grant when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
+    await command.action(logger, { options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -153,7 +153,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
       { continue: false }
     ));
 
-    await command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
+    await command.action(logger, { options: { grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
     assert(deleteSpy.notCalled);
   });
 
@@ -183,19 +183,8 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } } as any),
+    await assert.rejects(command.action(logger, { options: { confirm: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying grantId', () => {

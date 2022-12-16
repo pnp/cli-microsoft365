@@ -59,7 +59,7 @@ describe(commands.OPEN, () => {
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => false));
   });
 
-  afterEach(() => {    
+  afterEach(() => {
     openStub.restore();
     getSettingWithDefaultValueStub.restore();
   });
@@ -93,22 +93,10 @@ describe(commands.OPEN, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('shows message with url when the app specified with the appId is found', async () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId
       }
     });
@@ -119,19 +107,17 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         appId: appId
       }
     });
     assert(loggerLogSpy.calledWith(`Use a web browser to open the page https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
-  
+
   it('shows message with preview-url when the app specified with the appId is found', async () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId,
         preview: true
       }
@@ -146,7 +132,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId
       }
     });
@@ -160,7 +145,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId,
         preview: true
       }
@@ -177,7 +161,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: appId,
         preview: true
       }

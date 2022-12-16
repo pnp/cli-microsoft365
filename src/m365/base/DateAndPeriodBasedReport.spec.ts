@@ -34,7 +34,7 @@ describe('PeriodBasedReport', () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
@@ -55,7 +55,7 @@ describe('PeriodBasedReport', () => {
       logToStderr: (msg: string) => {
         log.push(msg);
       }
-    };    
+    };
     (mockCommand as any).items = [];
   });
 
@@ -151,10 +151,10 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    await mockCommand.action(logger, { options: { debug: false, period: 'D7' } });
+    await mockCommand.action(logger, { options: { period: 'D7' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-  }); 
+  });
 
   it('fails validation if the date option is not a valid date string', async () => {
     const actual = await mockCommand.validate({
@@ -179,7 +179,7 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    await mockCommand.action(logger, { options: { debug: false, date: '2019-07-13' } });
+    await mockCommand.action(logger, { options: { date: '2019-07-13' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(date=2019-07-13)");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -187,18 +187,7 @@ describe('PeriodBasedReport', () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(mockCommand.action(logger, { options: { debug: false, period: 'D7' } } as any),
+    await assert.rejects(mockCommand.action(logger, { options: { period: 'D7' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = mockCommand.options;
-    let containsOption = false;
-    options.forEach((o: any) => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

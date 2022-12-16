@@ -20,7 +20,7 @@ describe(commands.CONTENTTYPE_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -68,19 +68,8 @@ describe(commands.CONTENTTYPE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['StringId', 'Name', 'Hidden', 'ReadOnly', 'Sealed']);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo'} }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -312,7 +301,6 @@ describe(commands.CONTENTTYPE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/test'
       }
     });
@@ -573,7 +561,6 @@ describe(commands.CONTENTTYPE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         category: 'List Content Types',
         webUrl: 'https://contoso.sharepoint.com/sites/test'
       }
