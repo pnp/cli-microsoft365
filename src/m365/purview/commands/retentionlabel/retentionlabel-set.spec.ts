@@ -75,6 +75,26 @@ describe(commands.RETENTIONLABEL_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation when specifying an invalid value for behaviorDuringRetentionPeriod', async () => {
+    const actual = await command.validate({ options: { id: validId, behaviorDuringRetentionPeriod: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when specifying an invalid value for actionAfterRetentionPeriod', async () => {
+    const actual = await command.validate({ options: { id: validId, actionAfterRetentionPeriod: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when specifying an invalid value for retentionTrigger', async () => {
+    const actual = await command.validate({ options: { id: validId, retentionTrigger: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when specifying an invalid value for defaultRecordBehavior', async () => {
+    const actual = await command.validate({ options: { id: validId, defaultRecordBehavior: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation with valid id and a single option specified', async () => {
     const actual = await command.validate({ options: { id: validId, retentionDuration: 180 } }, commandInfo);
     assert.strictEqual(actual, true);
@@ -100,6 +120,40 @@ describe(commands.RETENTIONLABEL_SET, () => {
     assert.strictEqual(data['retentionDuration']['@odata.type'], 'microsoft.graph.security.retentionDurationInDays');
     assert.strictEqual(data['retentionDuration']['days'], 180);
     assert.strictEqual(data['actionAfterRetentionPeriod'], 'none');
+  });
+
+  it('correctly sets field retentionTrigger, defaultRecordBehavior and behaviorDuringRetentionPeriod of a specific retention label by id', async () => {
+    let data: any;
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${validId}`) {
+        data = opts.data;
+        return;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await command.action(logger, { options: { id: validId, retentionTrigger: 'dateLabeled', defaultRecordBehavior: 'startLocked', behaviorDuringRetentionPeriod: 'retainAsRecord', verbose: true } });
+    assert.strictEqual(data['defaultRecordBehavior'], 'startLocked');
+    assert.strictEqual(data['retentionTrigger'], 'dateLabeled');
+    assert.strictEqual(data['behaviorDuringRetentionPeriod'], 'retainAsRecord');
+  });
+
+  it('correctly sets field descriptionForUsers, descriptionForAdmins and labelToBeApplied of a specific retention label by id', async () => {
+    let data: any;
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${validId}`) {
+        data = opts.data;
+        return;
+      }
+
+      throw 'Invalid Request';
+    });
+
+    await command.action(logger, { options: { id: validId, descriptionForUsers: 'description for users', descriptionForAdmins: 'description for admins', labelToBeApplied: 'label to be applied', verbose: true } });
+    assert.strictEqual(data['descriptionForUsers'], 'description for users');
+    assert.strictEqual(data['descriptionForAdmins'], 'description for admins');
+    assert.strictEqual(data['labelToBeApplied'], 'label to be applied');
   });
 
   it('fails to set field retentionDays of a specific retention label by id', async () => {

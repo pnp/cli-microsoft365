@@ -23,6 +23,11 @@ interface Options extends GlobalOptions {
 }
 
 class PurviewRetentionLabelSetCommand extends GraphCommand {
+  public allowedBehaviorDuringRetentionPeriodValues = ['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord'];
+  public allowedActionAfterRetentionPeriodValues = ['none', 'delete', 'startDispositionReview'];
+  public allowedRetentionTriggerValues = ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent'];
+  public allowedDefaultRecordBehaviorValues = ['startLocked', 'startUnlocked'];
+
   public get name(): string {
     return commands.RETENTIONLABEL_SET;
   }
@@ -42,14 +47,14 @@ class PurviewRetentionLabelSetCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        behaviorDuringRetentionPeriod: !!args.options.behaviorDuringRetentionPeriod,
-        actionAfterRetentionPeriod: !!args.options.actionAfterRetentionPeriod,
-        retentionDuration: !!args.options.retentionDuration,
-        retentionTrigger: !!args.options.retentionTrigger,
-        defaultRecordBehavior: !!args.options.defaultRecordBehavior,
-        descriptionForUsers: !!args.options.descriptionForUsers,
-        descriptionForAdmins: !!args.options.descriptionForAdmins,
-        labelToBeApplied: !!args.options.labelToBeApplied
+        behaviorDuringRetentionPeriod: typeof args.options.behaviorDuringRetentionPeriod !== 'undefined',
+        actionAfterRetentionPeriod: typeof args.options.actionAfterRetentionPeriod !== 'undefined',
+        retentionDuration: typeof args.options.retentionDuration !== 'undefined',
+        retentionTrigger: typeof args.options.retentionTrigger !== 'undefined',
+        defaultRecordBehavior: typeof args.options.defaultRecordBehavior !== 'undefined',
+        descriptionForUsers: typeof args.options.descriptionForUsers !== 'undefined',
+        descriptionForAdmins: typeof args.options.descriptionForAdmins !== 'undefined',
+        labelToBeApplied: typeof args.options.labelToBeApplied !== 'undefined'
       });
     });
   }
@@ -61,22 +66,22 @@ class PurviewRetentionLabelSetCommand extends GraphCommand {
       },
       {
         option: '--behaviorDuringRetentionPeriod [behaviorDuringRetentionPeriod]',
-        autocomplete: ['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord']
+        autocomplete: this.allowedBehaviorDuringRetentionPeriodValues
       },
       {
         option: '--actionAfterRetentionPeriod [actionAfterRetentionPeriod]',
-        autocomplete: ['none', 'delete', 'startDispositionReview']
+        autocomplete: this.allowedActionAfterRetentionPeriodValues
       },
       {
         option: '--retentionDuration [retentionDuration]'
       },
       {
         option: '-t, --retentionTrigger [retentionTrigger]',
-        autocomplete: ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent']
+        autocomplete: this.allowedRetentionTriggerValues
       },
       {
         option: '--defaultRecordBehavior [defaultRecordBehavior]',
-        autocomplete: ['startLocked', 'startUnlocked']
+        autocomplete: this.allowedDefaultRecordBehaviorValues
       },
       {
         option: '--descriptionForUsers [descriptionForUsers]'
@@ -97,9 +102,25 @@ class PurviewRetentionLabelSetCommand extends GraphCommand {
           return `'${args.options.id}' is not a valid GUID.`;
         }
 
-        const { actionAfterRetionPeriod, behaviorDuringRetentionPeriod, defaultRecordBehavior, descriptionForAdmins, descriptionForUsers, labelToBeApplied, retentionDuration, retentionTrigger } = args.options;
-        if ([actionAfterRetionPeriod, behaviorDuringRetentionPeriod, defaultRecordBehavior, descriptionForAdmins, descriptionForUsers, labelToBeApplied, retentionDuration, retentionTrigger].every(i => typeof i === 'undefined')) {
-          return `Specify atleast one property to update.`;
+        const { actionAfterRetentionPeriod, behaviorDuringRetentionPeriod, defaultRecordBehavior, descriptionForAdmins, descriptionForUsers, labelToBeApplied, retentionDuration, retentionTrigger } = args.options;
+        if ([actionAfterRetentionPeriod, behaviorDuringRetentionPeriod, defaultRecordBehavior, descriptionForAdmins, descriptionForUsers, labelToBeApplied, retentionDuration, retentionTrigger].every(i => typeof i === 'undefined')) {
+          return `Specify at least one property to update.`;
+        }
+
+        if (behaviorDuringRetentionPeriod && this.allowedBehaviorDuringRetentionPeriodValues.indexOf(behaviorDuringRetentionPeriod) === -1) {
+          return `'${behaviorDuringRetentionPeriod}' is not a valid value for the behaviorDuringRetentionPeriod option. Allowed values are ${this.allowedBehaviorDuringRetentionPeriodValues.join('|')}`;
+        }
+
+        if (actionAfterRetentionPeriod && this.allowedActionAfterRetentionPeriodValues.indexOf(actionAfterRetentionPeriod) === -1) {
+          return `'${actionAfterRetentionPeriod}' is not a valid value for the actionAfterRetentionPeriod option. Allowed values are ${this.allowedActionAfterRetentionPeriodValues.join('|')}`;
+        }
+
+        if (retentionTrigger && this.allowedRetentionTriggerValues.indexOf(retentionTrigger) === -1) {
+          return `'${retentionTrigger}' is not a valid value for the retentionTrigger option. Allowed values are ${this.allowedRetentionTriggerValues.join('|')}`;
+        }
+
+        if (defaultRecordBehavior && this.allowedDefaultRecordBehaviorValues.indexOf(defaultRecordBehavior) === -1) {
+          return `'${defaultRecordBehavior}' is not a valid value for the defaultRecordBehavior option. Allowed values are ${this.allowedDefaultRecordBehaviorValues.join('|')}`;
         }
 
         return true;

@@ -37,15 +37,6 @@ m365 purview retentionlabel set [options]
 `--labelToBeApplied [labelToBeApplied]`
 : Specifies the replacement label to be applied automatically after the retention period of the current label ends.
 
-`--behaviorDuringRetentionPeriod [behaviorDuringRetentionPeriod]`
-: 
-
-`--behaviorDuringRetentionPeriod [behaviorDuringRetentionPeriod]`
-: 
-
-`--behaviorDuringRetentionPeriod [behaviorDuringRetentionPeriod]`
-: 
-
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
