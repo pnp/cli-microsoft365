@@ -35,6 +35,38 @@ Commands in the CLI for Microsoft 365 often contain options that determine what 
 
 Some options are required and necessary for the particular command to execute, while other are optional. When listing available options for the particular command, CLI for Microsoft 365 follows the naming convention where required options are wrapped in angle brackets (`< >`) while optional options are wrapped in square brackets (`[ ]`). For example, in the `spo cdn origin add` command, the origin you want to add is required (`-r, --origin <origin>`), while the type of CDN for which this origin should be added is optional (`-t, --type [type]`) and its value defaults to `Public`.
 
+## Boolean options (true/false)
+
+Some options in the CLI expect boolean values like `true` or `false`. The CLI for Microsoft 365 has the following definition on booleans:
+
+!!! info "Definition of Booleans" 
+    Booleans are case-insensitive, and are represented by the following values.  
+    True: 1, yes, true, on  
+    False: 0, no, false, off
+
+This means that whenever you need to pass a boolean value to a command, you can use any of the values listed above. For example, to configure if planner is allowed in your organisation you can execute the following:
+
+```sh
+m365 planner tenant settings set --isPlannerAllowed true
+m365 planner tenant settings set --isPlannerAllowed 1
+m365 planner tenant settings set --isPlannerAllowed yes
+m365 planner tenant settings set --isPlannerAllowed on
+m365 planner tenant settings set --isPlannerAllowed TRUE
+
+m365 planner tenant settings set --isPlannerAllowed false
+m365 planner tenant settings set --isPlannerAllowed 0
+m365 planner tenant settings set --isPlannerAllowed no
+m365 planner tenant settings set --isPlannerAllowed off
+m365 planner tenant settings set --isPlannerAllowed FALSE
+```
+
+Additionally, in PowerShell you can use boolean values `$true` and `$false` as well:
+
+```PowerShell
+m365 planner tenant settings set --isPlannerAllowed $true
+m365 planner tenant settings set --isPlannerAllowed $false
+```
+
 ## Values with quotes
 
 In cases, when the option's value contains spaces, it should be wrapped in quotes. For example, to create a modern team site for the _CLI for Microsoft 365_ team, you would execute in the shell:
