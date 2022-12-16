@@ -199,20 +199,9 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         groupId: "00000000-0000-0000-0000-000000000000",
         threadId: "AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E="
       }
     } as any), new CommandError('An error has occurred'));
-  });
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

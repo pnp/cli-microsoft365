@@ -127,10 +127,12 @@ describe(commands.TAB_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelId: '19:00000000000000000000000000000000@thread.skype' } } as any), new CommandError('Channel id is not in a valid format: 29:d09d9792d59544af846fa19c98b6acc6@thread.skype'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype'
+      }
+    } as any), new CommandError('Channel id is not in a valid format: 29:d09d9792d59544af846fa19c98b6acc6@thread.skype'));
   });
 
   it('correctly lists all tabs in a Microsoft Teams channel', async () => {
@@ -174,7 +176,6 @@ describe(commands.TAB_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype'
       }
@@ -344,16 +345,5 @@ describe(commands.TAB_LIST, () => {
       },
       "teamsAppTabId": "com.microsoft.teamspace.tab.wiki"
     }]));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

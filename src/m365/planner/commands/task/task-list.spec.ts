@@ -519,7 +519,6 @@ describe(commands.TASK_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
       }
@@ -573,7 +572,6 @@ describe(commands.TASK_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         bucketName: 'foo',
         planTitle: 'My Planner Plan',
         ownerGroupName: 'My Planner Group'
@@ -582,13 +580,12 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('lists planner tasks of the current logged in user', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.called);
   });
 
   it('correctly lists planner tasks with planTitle and ownerGroupId', async () => {
     const options: any = {
-      debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
@@ -599,7 +596,6 @@ describe(commands.TASK_LIST, () => {
 
   it('correctly lists planner tasks with planTitle and ownerGroupName', async () => {
     const options: any = {
-      debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
     };
@@ -610,7 +606,6 @@ describe(commands.TASK_LIST, () => {
 
   it('correctly lists planner tasks with bucketId', async () => {
     const options: any = {
-      debug: false,
       bucketId: 'FtzysDykv0-9s9toWiZhdskAD67z'
     };
 
@@ -621,7 +616,6 @@ describe(commands.TASK_LIST, () => {
   it('correctly lists planner tasks with bucketName and planId', async () => {
 
     const options: any = {
-      debug: false,
       bucketName: 'Planner Bucket A',
       planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
     };
@@ -632,7 +626,6 @@ describe(commands.TASK_LIST, () => {
 
   it('correctly lists planner tasks with bucketName, planTitle, and ownerGroupId', async () => {
     const options: any = {
-      debug: false,
       bucketName: 'Planner Bucket A',
       planTitle: 'My Planner Plan',
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
@@ -644,7 +637,6 @@ describe(commands.TASK_LIST, () => {
 
   it('correctly lists planner tasks with bucketName, planTitle, and ownerGroupName', async () => {
     const options: any = {
-      debug: false,
       bucketName: 'Planner Bucket A',
       planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
@@ -658,17 +650,6 @@ describe(commands.TASK_LIST, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

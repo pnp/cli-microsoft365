@@ -181,7 +181,6 @@ describe(commands.TEAM_CLONE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
@@ -234,16 +233,5 @@ describe(commands.TEAM_CLONE, () => {
         classification: 'label'
       }
     } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

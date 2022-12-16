@@ -2843,17 +2843,6 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert(mkDirSyncStub.notCalled, '.tours folder created');
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('passes validation when package manager not specified', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);

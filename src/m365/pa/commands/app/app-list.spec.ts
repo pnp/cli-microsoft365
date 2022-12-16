@@ -1506,7 +1506,7 @@ describe(commands.APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([
       {
         "name": "4d4bb961-eef9-4258-8516-aa8d64e6b477",
@@ -2460,7 +2460,7 @@ describe(commands.APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { asAdmin: true, environment: '4ce50206-9576-4237-8b17-38d8aadfaa35', debug: false } });
+    await command.action(logger, { options: { asAdmin: true, environment: '4ce50206-9576-4237-8b17-38d8aadfaa35' } });
     assert(loggerLogSpy.calledWith([
       {
         "name": "4d4bb961-eef9-4258-8516-aa8d64e6b477",
@@ -2944,7 +2944,7 @@ describe(commands.APP_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } } as any),
+    await assert.rejects(command.action(logger, { options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } } as any),
       new CommandError(`Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied.`));
   });
 
@@ -3429,7 +3429,7 @@ describe(commands.APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, output: 'json' } });
+    await command.action(logger, { options: { output: 'json' } });
     assert(loggerLogSpy.calledWith(apps));
   });
 
@@ -3438,7 +3438,7 @@ describe(commands.APP_LIST, () => {
       return Promise.resolve({ value: [] });
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -3465,19 +3465,8 @@ describe(commands.APP_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('fails validation if asAdmin specified without environment', async () => {

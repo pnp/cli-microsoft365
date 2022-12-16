@@ -172,14 +172,18 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     }));
     const admZipMockWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
 
-    await assert.rejects(command.action(logger, { options: { portalUrl: 'https://contoso.sharepoint.com',
-      name: 'Contoso',
-      description: 'Contoso',
-      longDescription: `Stay on top of what's happening at Contoso`,
-      companyName: 'Contoso',
-      companyWebsiteUrl: 'https://contoso.com',
-      coloredIconPath: 'icon-color.png',
-      outlineIconPath: 'icon-outline.png' } } as any), new CommandError('404 - FILE NOT FOUND'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        portalUrl: 'https://contoso.sharepoint.com',
+        name: 'Contoso',
+        description: 'Contoso',
+        longDescription: `Stay on top of what's happening at Contoso`,
+        companyName: 'Contoso',
+        companyWebsiteUrl: 'https://contoso.com',
+        coloredIconPath: 'icon-color.png',
+        outlineIconPath: 'icon-outline.png'
+      }
+    } as any), new CommandError('404 - FILE NOT FOUND'));
     assert(admZipMockWriteZipSpy.notCalled);
   });
 
@@ -189,16 +193,19 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
       stderr: '404 - FILE NOT FOUND stderr'
     }));
 
-    await assert.rejects(command.action(logger, { options: { 
-      portalUrl: 'https://contoso.sharepoint.com',
-      name: 'Contoso',
-      description: 'Contoso',
-      longDescription: `Stay on top of what's happening at Contoso`,
-      companyName: 'Contoso',
-      companyWebsiteUrl: 'https://contoso.com',
-      coloredIconPath: 'icon-color.png',
-      outlineIconPath: 'icon-outline.png',
-      debug: true } } as any), new CommandError('404 - FILE NOT FOUND'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        portalUrl: 'https://contoso.sharepoint.com',
+        name: 'Contoso',
+        description: 'Contoso',
+        longDescription: `Stay on top of what's happening at Contoso`,
+        companyName: 'Contoso',
+        companyWebsiteUrl: 'https://contoso.com',
+        coloredIconPath: 'icon-color.png',
+        outlineIconPath: 'icon-outline.png',
+        debug: true
+      }
+    } as any), new CommandError('404 - FILE NOT FOUND'));
   });
 
   it('fails with an error if the specified site is not a communication site', async () => {
@@ -210,16 +217,19 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
       stderr: ''
     }));
 
-    await assert.rejects(command.action(logger, { options: { 
-      portalUrl: 'https://contoso.sharepoint.com/sites/contoso',
-      name: 'Contoso',
-      description: 'Contoso',
-      longDescription: `Stay on top of what's happening at Contoso`,
-      companyName: 'Contoso',
-      companyWebsiteUrl: 'https://contoso.com',
-      coloredIconPath: 'icon-color.png',
-      outlineIconPath: 'icon-outline.png',
-      debug: true } } as any), new CommandError('Site https://contoso.sharepoint.com/sites/contoso is not a Communication Site. Please specify a different site and try again.'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        portalUrl: 'https://contoso.sharepoint.com/sites/contoso',
+        name: 'Contoso',
+        description: 'Contoso',
+        longDescription: `Stay on top of what's happening at Contoso`,
+        companyName: 'Contoso',
+        companyWebsiteUrl: 'https://contoso.com',
+        coloredIconPath: 'icon-color.png',
+        outlineIconPath: 'icon-outline.png',
+        debug: true
+      }
+    } as any), new CommandError('Site https://contoso.sharepoint.com/sites/contoso is not a Communication Site. Please specify a different site and try again.'));
   });
 
   it(`fails with an error if creating the zip file failed`, async () => {
@@ -234,15 +244,18 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
       throw new Error('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      portalUrl: 'https://contoso.sharepoint.com',
-      name: 'Contoso',
-      description: 'Contoso',
-      longDescription: `Stay on top of what's happening at Contoso`,
-      companyName: 'Contoso',
-      companyWebsiteUrl: 'https://contoso.com',
-      coloredIconPath: 'icon-color.png',
-      outlineIconPath: 'icon-outline.png' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        portalUrl: 'https://contoso.sharepoint.com',
+        name: 'Contoso',
+        description: 'Contoso',
+        longDescription: `Stay on top of what's happening at Contoso`,
+        companyName: 'Contoso',
+        companyWebsiteUrl: 'https://contoso.com',
+        coloredIconPath: 'icon-color.png',
+        outlineIconPath: 'icon-outline.png'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it(`fails validation if the specified app name is longer than 30 chars`, async () => {
@@ -408,16 +421,5 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

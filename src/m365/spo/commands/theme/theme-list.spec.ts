@@ -80,7 +80,6 @@ describe(commands.THEME_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/GetTenantThemingOptions');
@@ -165,17 +164,6 @@ describe(commands.THEME_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, verbose: true } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
+    await assert.rejects(command.action(logger, { options: { verbose: true } } as any), new CommandError('An error has occurred'));
   });
 });

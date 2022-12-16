@@ -158,7 +158,6 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         title: 'YourAppCustomizer',
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
@@ -180,7 +179,6 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         title: 'YourAppCustomizer',
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
@@ -306,7 +304,6 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
     const options = {
-      debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web',
@@ -317,7 +314,6 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       await command.action(logger, { options: options } as any);
       assert(postCallsSpy.calledOnce);
       assert(removeScopedCustomActionSpy.calledWith({
-        debug: false,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web',
@@ -548,16 +544,6 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     }), new CommandError(err));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsVerboseOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsVerboseOption = true;
-      }
-    });
-    assert(containsVerboseOption);
-  });
 
   it('supports specifying scope', () => {
     const options = command.options;
