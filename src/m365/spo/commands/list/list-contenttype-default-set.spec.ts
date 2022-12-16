@@ -631,17 +631,6 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('configures command types', () => {
     assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');

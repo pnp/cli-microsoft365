@@ -240,7 +240,7 @@ describe(commands.SOLUTION_LIST, () => {
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }),
+    await assert.rejects(command.action(logger, { options: {} }),
       new CommandError(`The environment 'undefined' could not be retrieved. See the inner exception for more details: undefined`));
   });
 
@@ -272,18 +272,7 @@ describe(commands.SOLUTION_LIST, () => {
 
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } } as any),
+    await assert.rejects(command.action(logger, { options: { environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

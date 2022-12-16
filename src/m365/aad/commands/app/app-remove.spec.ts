@@ -264,15 +264,4 @@ describe(commands.APP_REMOVE, () => {
       }
     }), new CommandError("Multiple Azure AD application registration with name myapp found. Please choose one of the object IDs: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952"));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

@@ -79,7 +79,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       { continue: true }
     ));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation with parameters', async () => {
@@ -95,17 +95,6 @@ describe(commands.GROUP_USER_REMOVE, () => {
   it('id must be a number', async () => {
     const actual = await command.validate({ options: { groupId: 10, id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('calls the service if the current user is removed from the group', async () => {
@@ -160,7 +149,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       { continue: false }
     ));
 
-    await command.action(logger, { options: { debug: false, groupId: 1231231, id: 989998789 } });
+    await command.action(logger, { options: { groupId: 1231231, id: 989998789 } });
 
     assert(promptStub.called);
   });
@@ -170,7 +159,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
       { continue: false }
     ));
 
-    await command.action(logger, { options: { debug: false, groupId: 1231231, id: 989998789 } });
+    await command.action(logger, { options: { groupId: 1231231, id: 989998789 } });
 
     assert(requests.length === 0);
   });

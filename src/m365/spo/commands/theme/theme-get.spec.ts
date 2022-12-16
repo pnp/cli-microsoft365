@@ -19,7 +19,7 @@ describe(commands.THEME_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -83,7 +83,6 @@ describe(commands.THEME_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'Contoso'
       }
     });
@@ -126,9 +125,12 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Contoso' } } as any), new CommandError('Unknown Error'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Contoso'
+      }
+    } as any), new CommandError('Unknown Error'));
   });
 
   it('handles empty error correctly', async () => {
@@ -140,9 +142,12 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Contoso' } } as any), new CommandError('ClientSvc unknown error'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Contoso'
+      }
+    } as any), new CommandError('ClientSvc unknown error'));
   });
 
   it('handles request error correctly', async () => {
@@ -153,19 +158,11 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Contoso' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Contoso'
       }
-    });
-    assert(containsDebugOption);
+    } as any), new CommandError('An error has occurred'));
   });
 });

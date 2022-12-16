@@ -20,7 +20,7 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -94,7 +94,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -190,7 +189,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -203,7 +201,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('fails validation if the owner is not a valid GUID', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'invalid',
@@ -217,7 +214,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('fails validation if properties is not valid JSON string', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -231,7 +227,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('fails validation if properties have no valid type', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -245,7 +240,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('fails validation if a specified property has missing type', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -259,7 +253,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('fails validation if a specified property has missing name', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -273,7 +266,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('fails validation if properties JSON string is not an array', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -287,7 +279,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('passes validation if the owner is a valid GUID', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: 'Test Description',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -301,7 +292,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('passes validation if the optional description is missing', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: null,
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -315,7 +305,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('passes validation if the property type is Binary', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: null,
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -329,7 +318,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('passes validation if the property type is Boolean', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: null,
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -343,7 +331,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('passes validation if the property type is DateTime', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: null,
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -357,7 +344,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('passes validation if the property type is Integer', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: null,
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -371,7 +357,6 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   it('passes validation if the property type is String', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'TestSchemaExtension',
         description: null,
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
@@ -380,16 +365,5 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

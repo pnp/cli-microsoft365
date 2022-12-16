@@ -65,7 +65,7 @@ describe(commands.RECONSENT, () => {
   });
 
   it('shows message with url (not using autoOpenLinksInBrowser)', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith(`To re-consent the PnP Microsoft 365 Management Shell Azure AD application navigate in your web browser to https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
   });
 
@@ -75,7 +75,6 @@ describe(commands.RECONSENT, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
     assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
@@ -89,7 +88,6 @@ describe(commands.RECONSENT, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false
       }
     }), new CommandError("An error occurred"));
     assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));

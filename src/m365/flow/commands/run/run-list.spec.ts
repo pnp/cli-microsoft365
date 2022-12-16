@@ -18,7 +18,7 @@ describe(commands.RUN_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -359,7 +359,7 @@ describe(commands.RUN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', flowName: "396d5ec9-ae2d-4a84-967d-cd7f56cd8f30" } });
+    await command.action(logger, { options: { environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', flowName: "396d5ec9-ae2d-4a84-967d-cd7f56cd8f30" } });
     assert(loggerLogSpy.calledWith([
       {
         "name": "08586653536760200319026785874CU62",
@@ -462,7 +462,7 @@ describe(commands.RUN_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6', flowName: "396d5ec9-ae2d-4a84-967d-cd7f56cd8f30" } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6', flowName: "396d5ec9-ae2d-4a84-967d-cd7f56cd8f30" } } as any),
       new CommandError(`Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied.`));
   });
 
@@ -471,7 +471,7 @@ describe(commands.RUN_LIST, () => {
       return Promise.resolve({ value: [] });
     });
 
-    await command.action(logger, { options: { debug: false, environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', flowName: '16c90c26-25e0-4800-8af9-da594e02d427' } });
+    await command.action(logger, { options: { environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', flowName: '16c90c26-25e0-4800-8af9-da594e02d427' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -498,19 +498,8 @@ describe(commands.RUN_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying environmentName parameter', () => {

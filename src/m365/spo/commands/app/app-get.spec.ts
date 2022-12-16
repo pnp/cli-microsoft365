@@ -149,7 +149,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert(loggerLogSpy.calledWith({
       ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
       Title: 'online-client-side-solution',
@@ -179,7 +179,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
     assert(loggerLogSpy.calledWith({
       ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
       Title: 'online-client-side-solution',
@@ -215,7 +215,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } });
+    await command.action(logger, { options: { name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } });
     assert(loggerLogSpy.calledWith({
       ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
       Title: 'online-client-side-solution',
@@ -252,7 +252,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'solution.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com/sites/site1' } });
+    await command.action(logger, { options: { name: 'solution.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com/sites/site1' } });
     assert(loggerLogSpy.calledWith({
       ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
       Title: 'online-client-side-solution',
@@ -318,7 +318,7 @@ describe(commands.APP_GET, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { appCatalogUrl: '' }
     ));
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'solution.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+    await assert.rejects(command.action(logger, { options: { name: 'solution.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -353,7 +353,7 @@ describe(commands.APP_GET, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' }
     ));
-    await command.action(logger, { options: { debug: false, name: 'solution.sppkg' } });
+    await command.action(logger, { options: { name: 'solution.sppkg' } });
     assert(loggerLogSpy.calledWith({
       ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
       Title: 'online-client-side-solution',
@@ -389,7 +389,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
       new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
@@ -419,7 +419,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } } as any),
       new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
@@ -439,7 +439,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -469,7 +469,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -541,16 +541,5 @@ describe(commands.APP_GET, () => {
   it('passes validation when the scope is specified with \'sitecollection\'', async () => {
     const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'https://contoso.sharepoint.com', appCatalogScope: 'sitecollection' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });
