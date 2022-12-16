@@ -114,7 +114,6 @@ class PpDataverseTableRowRemoveCommand extends PowerPlatformCommand {
     }
   }
 
-
   private async deleteTableRow(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
