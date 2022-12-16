@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,7 +19,7 @@ describe(commands.WEB_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -49,7 +49,7 @@ describe(commands.WEB_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -74,7 +74,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title' } });
   });
 
   it('updates site logo URL', async () => {
@@ -88,7 +88,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', siteLogoUrl: 'image.png' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', siteLogoUrl: 'image.png' } });
   });
 
   it('unsets the site logo', async () => {
@@ -102,7 +102,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', siteLogoUrl: '' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', siteLogoUrl: '' } });
   });
 
   it('disables quick launch', async () => {
@@ -116,7 +116,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: false } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: false } });
   });
 
   it('enables quick launch', async () => {
@@ -130,7 +130,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: true } });
   });
 
   it('sets site header to compact', async () => {
@@ -144,7 +144,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'compact' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'compact' } });
   });
 
   it('sets site header to standard', async () => {
@@ -158,7 +158,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'standard' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'standard' } });
   });
 
   it('sets site header emphasis to 0', async () => {
@@ -172,7 +172,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 0 } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 0 } });
   });
 
   it('sets site header emphasis to 1', async () => {
@@ -186,7 +186,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 1 } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 1 } });
   });
 
   it('sets site header emphasis to 2', async () => {
@@ -200,7 +200,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 2 } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 2 } });
   });
 
   it('sets site header emphasis to 3', async () => {
@@ -214,7 +214,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 3 } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 3 } });
   });
 
   it('sets site menu mode to megamenu', async () => {
@@ -228,7 +228,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: true } });
   });
 
   it('sets site menu mode to cascading', async () => {
@@ -242,7 +242,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: false } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: false } });
   });
 
   it('updates all properties', async () => {
@@ -254,7 +254,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: true, headerLayout: 'compact', headerEmphasis: 1, megaMenuEnabled: true, footerEnabled: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: true, headerLayout: 'compact', headerEmphasis: 1, megaMenuEnabled: true, footerEnabled: true } });
   });
 
   it('Update Welcome page', async () => {
@@ -265,7 +265,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, welcomePage: 'SitePages/Home.aspx', url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: { welcomePage: 'SitePages/Home.aspx', url: 'https://contoso.sharepoint.com/sites/team-a' } });
   });
 
   it('Update Welcome page (debug)', async () => {
@@ -294,7 +294,7 @@ describe(commands.WEB_SET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
   it('correctly handles error while updating Welcome page', async () => {
@@ -314,7 +314,6 @@ describe(commands.WEB_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         welcomePage: 'https://contoso.sharepoint.com/sites/team-a/SitePages/Home.aspx',
         url: 'https://contoso.sharepoint.com/sites/team-a'
       }
@@ -324,17 +323,6 @@ describe(commands.WEB_SET, () => {
   it('allows unknown properties', () => {
     const allowUnknownOptions = command.allowUnknownOptions();
     assert.strictEqual(allowUnknownOptions, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying url', () => {
@@ -439,7 +427,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: true } });
   });
 
   it('disables footer', async () => {
@@ -453,7 +441,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: false } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: false } });
   });
 
   it('fails validation if search scope is not valid', async () => {
@@ -502,7 +490,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' } });
   });
 
   it('sets search scope to tenant', async () => {
@@ -516,7 +504,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' } });
   });
 
   it('sets search scope to hub', async () => {
@@ -530,7 +518,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' } });
   });
 
   it('sets search scope to site', async () => {
@@ -544,7 +532,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' } });
   });
 
   it('sets search scope even if parameter is not all lower case', async () => {
@@ -558,6 +546,6 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Site' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Site' } });
   });
 });

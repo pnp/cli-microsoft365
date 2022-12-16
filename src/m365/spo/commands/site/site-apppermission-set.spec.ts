@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
@@ -54,7 +54,7 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -143,10 +143,13 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
       return Promise.reject(siteError);
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing',
-      permission: "write",
-      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e" } } as any), new CommandError('Requested site could not be found'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing',
+        permission: "write",
+        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+      }
+    } as any), new CommandError('Requested site could not be found'));
   });
 
   it('fails to get Azure AD app when Azure AD app does not exists', async () => {
@@ -174,11 +177,14 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
         return Promise.reject('The specified app permission does not exist');
       });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-      permission: "write",
-      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e" } } as any), new CommandError('The specified app permission does not exist'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+        permission: "write",
+        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+      }
+    } as any), new CommandError('The specified app permission does not exist'));
   });
 
   it('fails when multiple Azure AD apps with same name exists', async () => {
@@ -231,10 +237,13 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
         return Promise.reject('Multiple app permissions with displayName Foo found: 89ea5c94-7736-4e25-95ad-3fa95f62b66e,cca00169-d38b-462f-a3b4-f3566b162f2d7');
       });
 
-    await assert.rejects(command.action(logger, { options: {
-      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-      permission: "write",
-      appDisplayName: "Foo" } } as any), new CommandError('Multiple app permissions with displayName Foo found: 89ea5c94-7736-4e25-95ad-3fa95f62b66e,cca00169-d38b-462f-a3b4-f3566b162f2d7'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+        permission: "write",
+        appDisplayName: "Foo"
+      }
+    } as any), new CommandError('Multiple app permissions with displayName Foo found: 89ea5c94-7736-4e25-95ad-3fa95f62b66e,cca00169-d38b-462f-a3b4-f3566b162f2d7'));
   });
 
   it('Updates an application permission to the site by appId', async () => {
@@ -480,16 +489,5 @@ describe(commands.SITE_APPPERMISSION_SET, () => {
         }
       ]
     }));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -57,7 +57,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -139,7 +139,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         claim: 'Product.Read',
         confirm: true
@@ -215,7 +214,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'ProductRead',
         confirm: true
@@ -291,7 +289,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         confirm: true
@@ -384,7 +381,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         claim: 'Product.Read',
         confirm: true
@@ -477,7 +473,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         name: 'ProductRead',
         confirm: true
@@ -568,7 +563,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         confirm: true
@@ -745,7 +739,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
   });
 
-  it('deletes an app role when the role is in enabled state and valid appId, role id and --confirm option specified (debug)', async ()=> {
+  it('deletes an app role when the role is in enabled state and valid appId, role id and --confirm option specified (debug)', async () => {
 
     const getRequestStub = sinon.stub(request, 'get');
 
@@ -907,7 +901,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         confirm: true
@@ -986,7 +979,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         claim: 'Product.Read',
         confirm: true
@@ -1065,7 +1057,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         name: 'ProductRead',
         confirm: true
@@ -1333,7 +1324,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         claim: 'Product.Read',
         confirm: true
@@ -1409,7 +1399,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         name: 'ProductRead',
         confirm: true
@@ -1448,7 +1437,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         name: 'ProductRead',
         confirm: true
@@ -1487,7 +1475,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         claim: 'Product.Read',
         confirm: true
@@ -1526,7 +1513,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'App-Name',
         id: 'c4352a0a-494f-46f9-b843-479855c173a7',
         confirm: true
@@ -1535,7 +1521,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
   });
 
   it('prompts before removing the specified app role when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, appName: 'App-Name', claim: 'Product.Read' } });
+    await command.action(logger, { options: { appName: 'App-Name', claim: 'Product.Read' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -1728,7 +1714,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         appId: '53788d97-dc06-460c-8bd6-5cfbc7e3b0f7',
         name: 'ProductRead',
         confirm: false
@@ -1839,7 +1824,7 @@ describe(commands.APP_ROLE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, appName: 'App-Name', claim: 'Product.Read' } });
+    await command.action(logger, { options: { appName: 'App-Name', claim: 'Product.Read' } });
     assert(patchStub.notCalled);
   });
 
@@ -1875,7 +1860,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         name: 'App-Role',
         confirm: true
@@ -1894,7 +1878,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
         name: 'App-Role',
         confirm: true
@@ -1913,7 +1896,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'My app',
         name: 'App-Role',
         confirm: true
@@ -2010,25 +1992,4 @@ describe(commands.APP_ROLE_REMOVE, () => {
     const actual = await command.validate({ options: { appName: 'My App', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-
-
-
-
-
-
-
-
-
 });

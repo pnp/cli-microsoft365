@@ -42,9 +42,12 @@
 - fixed 'spo listitem list' filter option [#4090](https://github.com/pnp/cli-microsoft365/issues/4090)
 - introduced markdown output for documentation purposes [#2908](https://github.com/pnp/cli-microsoft365/issues/2908)
 - fixed exposing internal API error [#3527](https://github.com/pnp/cli-microsoft365/issues/3527)
-- extended 'spo serviceprincipal permissionrequest approve' with --all flags [#4074](https://github.com/pnp/cli-microsoft365/issues/4074)
-- fixed the sample script 'resubmit all failed flow runs'
+- extended 'spo serviceprincipal permissionrequest approve' with --all flags [#4204](https://github.com/pnp/cli-microsoft365/issues/4204)
+- fixed the sample script 'resubmit all failed flow runs' [#2799](https://github.com/pnp/cli-microsoft365/pull/2799)
 - updated command options with the new boolean handlings [#3986](https://github.com/pnp/cli-microsoft365/issues/3986)
+- extended 'teams cache remove' to check on Teams PID [#3448](https://github.com/pnp/cli-microsoft365/issues/3448)
+- added 'disableTelemetry' config value [#4109](https://github.com/pnp/cli-microsoft365/issues/4109)
+- enhanced test files [#4155](https://github.com/pnp/cli-microsoft365/issues/4155)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 

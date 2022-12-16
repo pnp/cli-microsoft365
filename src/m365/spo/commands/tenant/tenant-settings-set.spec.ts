@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as chalk from 'chalk';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -37,7 +37,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -77,7 +77,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -98,17 +98,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('handles client.svc promise error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -117,7 +106,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('sets the tenant settings successfully', async () => {
@@ -240,7 +229,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Timed out'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Timed out'));
   });
 
   it('should turn enums to int in the request successfully', async () => {

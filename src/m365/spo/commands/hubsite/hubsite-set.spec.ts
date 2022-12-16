@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.HUBSITE_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -60,7 +60,7 @@ describe(commands.HUBSITE_SET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -95,7 +95,7 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    await command.action(logger, { options: { title: 'Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
     assert(loggerLogSpy.calledWith({
       Description: "Description",
       ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -126,7 +126,7 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, description: 'All things sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    await command.action(logger, { options: { description: 'All things sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
     assert(loggerLogSpy.calledWith({
       Description: "All things sales",
       ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -157,7 +157,7 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    await command.action(logger, { options: { logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
     assert(loggerLogSpy.calledWith({
       Description: "All things sales",
       ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -250,7 +250,7 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    await command.action(logger, { options: { title: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
     assert(loggerLogSpy.calledWith({
       Description: "Description",
       ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -281,7 +281,7 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, description: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    await command.action(logger, { options: { description: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
     assert(loggerLogSpy.calledWith({
       Description: "",
       ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -312,7 +312,7 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, logoUrl: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    await command.action(logger, { options: { logoUrl: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
     assert(loggerLogSpy.calledWith({
       Description: "All things sales",
       ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -338,7 +338,7 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any),
+    await assert.rejects(command.action(logger, { options: { logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any),
       new CommandError('Invalid URL: Logo.'));
   });
 
@@ -347,7 +347,7 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any),
+    await assert.rejects(command.action(logger, { options: { logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -361,17 +361,6 @@ describe(commands.HUBSITE_SET, () => {
     ['t', 'title', 'd', 'description', 'l', 'logoUrl'].forEach(o => {
       assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying hub site ID', () => {

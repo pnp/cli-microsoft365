@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -65,7 +65,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -94,12 +94,12 @@ describe(commands.SITEDESIGN_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(logger, { options: { confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
     assert(loggerLogSpy.notCalled);
   });
 
   it('prompts before removing the specified site design when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -112,7 +112,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
   it('aborts removing site design when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert(postSpy.notCalled);
   });
 
@@ -123,8 +123,8 @@ describe(commands.SITEDESIGN_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
     assert(postStub.called);
   });
 
@@ -133,18 +133,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports specifying id', () => {

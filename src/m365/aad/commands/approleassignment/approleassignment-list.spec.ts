@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -436,7 +436,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -467,7 +467,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -545,7 +545,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, appObjectId: '021d971f-779d-439b-8006-9f084423f344' } } as any), new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
+    await assert.rejects(command.action(logger, { options: { appObjectId: '021d971f-779d-439b-8006-9f084423f344' } } as any), new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
   it('fails validation if neither appId nor appDisplayName are not specified', async () => {
@@ -576,17 +576,6 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('passes validation when the appId option specified', async () => {
     const actual = await command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying appId', () => {

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.TEAM_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -58,7 +58,7 @@ describe(commands.TEAM_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -115,7 +115,6 @@ describe(commands.TEAM_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'Finance',
         confirm: true
       }
@@ -123,7 +122,7 @@ describe(commands.TEAM_REMOVE, () => {
   });
 
   it('prompts before removing the specified team by id when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, id: "00000000-0000-0000-0000-000000000000" } });
+    await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000" } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -144,7 +143,7 @@ describe(commands.TEAM_REMOVE, () => {
 
   it('aborts removing the specified team when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    await command.action(logger, { options: { debug: false, id: "00000000-0000-0000-0000-000000000000" } });
+    await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000" } });
     assert(postSpy.notCalled);
   });
 
@@ -183,7 +182,7 @@ describe(commands.TEAM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: "00000000-0000-0000-0000-000000000000", confirm: true } });
+    await command.action(logger, { options: { id: "00000000-0000-0000-0000-000000000000", confirm: true } });
   });
 
   it('removes the specified team by name without prompting when confirmed specified', async () => {
@@ -209,7 +208,7 @@ describe(commands.TEAM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: "Finance", confirm: true } });
+    await command.action(logger, { options: { name: "Finance", confirm: true } });
   });
 
   it('should handle Microsoft graph error response', async () => {
@@ -236,16 +235,5 @@ describe(commands.TEAM_REMOVE, () => {
     ));
 
     await assert.rejects(command.action(logger, { options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

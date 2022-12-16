@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,7 +19,7 @@ describe(commands.TEAM_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -50,7 +50,7 @@ describe(commands.TEAM_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -86,7 +86,7 @@ describe(commands.TEAM_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' }
+      options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' }
     } as any);
   });
 
@@ -103,7 +103,7 @@ describe(commands.TEAM_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', mailNickName: 'NewNickName' }
+      options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', mailNickName: 'NewNickName' }
     } as any);
   });
 
@@ -159,7 +159,6 @@ describe(commands.TEAM_SET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
         name: 'NewName'
       }
@@ -184,16 +183,5 @@ describe(commands.TEAM_SET, () => {
       }
     }, commandInfo);
     assert.notStrictEqual(actual, false);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

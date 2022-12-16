@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -27,7 +27,7 @@ describe(commands.CHANNEL_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -58,7 +58,7 @@ describe(commands.CHANNEL_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -178,7 +178,6 @@ describe(commands.CHANNEL_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: teamId,
         name: name,
         newName: newName,
@@ -216,7 +215,6 @@ describe(commands.CHANNEL_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamName: teamName,
         id: id,
         newName: newName,
@@ -253,16 +251,5 @@ describe(commands.CHANNEL_SET, () => {
         confirm: true
       }
     }), new CommandError(errorMessage));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

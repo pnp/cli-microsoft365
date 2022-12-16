@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import appInsights from '../../../appInsights';
+import { telemetry } from '../../../telemetry';
 import auth from '../../../Auth';
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
@@ -19,7 +19,7 @@ describe(commands.GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
@@ -59,7 +59,7 @@ describe(commands.GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       fs.existsSync,
       fs.readFileSync
@@ -86,7 +86,6 @@ describe(commands.GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
     }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
@@ -97,7 +96,6 @@ describe(commands.GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
     }), new CommandError(`An error has occurred`));
@@ -180,16 +178,5 @@ describe(commands.GET, () => {
     });
     const call: sinon.SinonSpyCall = loggerLogToStderrSpy.firstCall;
     assert(call.args[0].includes('Executing command aad app get with options'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

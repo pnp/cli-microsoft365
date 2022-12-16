@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -29,7 +29,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -60,7 +60,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -180,7 +180,7 @@ describe(commands.SOLUTION_PUBLISHER_ADD, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment, name: validName, displayName: validDisplayName, prefix: validPrefix, choiceValuePrefix: validChoiceValuePrefix } } as any),
+    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, name: validName, displayName: validDisplayName, prefix: validPrefix, choiceValuePrefix: validChoiceValuePrefix } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 });

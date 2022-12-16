@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.SITESCRIPT_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -59,7 +59,7 @@ describe(commands.SITESCRIPT_SET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -95,7 +95,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } });
+    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } });
     assert(loggerLogSpy.calledWith({
       "Content": JSON.stringify({}),
       "Description": "My contoso script",
@@ -157,7 +157,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', description: 'My contoso script' } });
+    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', description: 'My contoso script' } });
     assert(loggerLogSpy.calledWith({
       "Content": JSON.stringify({}),
       "Description": "My contoso script",
@@ -188,7 +188,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', version: '1' } });
+    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', version: '1' } });
     assert(loggerLogSpy.calledWith({
       "Content": JSON.stringify({}),
       "Description": "My contoso script",
@@ -219,7 +219,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', content: JSON.stringify({}) } });
+    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', content: JSON.stringify({}) } });
     assert(loggerLogSpy.calledWith({
       "Content": JSON.stringify({}),
       "Description": "My contoso script",
@@ -253,7 +253,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso', description: 'My contoso script', version: '1', content: JSON.stringify({}) } });
+    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso', description: 'My contoso script', version: '1', content: JSON.stringify({}) } });
     assert(loggerLogSpy.calledWith({
       "Content": JSON.stringify({}),
       "Description": "My contoso script",
@@ -268,18 +268,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', title: 'Contoso' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', title: 'Contoso' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying id', () => {

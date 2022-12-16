@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
@@ -18,7 +18,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
@@ -55,7 +55,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -141,7 +141,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: "contosohr", confirm: true } });
+    await command.action(logger, { options: { id: "contosohr", confirm: true } });
   });
 
   it('removes external connection with specified ID', async () => {
@@ -152,7 +152,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, id: "contosohr", confirm: true } });
+    await command.action(logger, { options: { id: "contosohr", confirm: true } });
   });
 
   it('removes external connection with specified name', async () => {
@@ -178,7 +178,7 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, name: "Contoso HR", confirm: true } });
+    await command.action(logger, { options: { name: "Contoso HR", confirm: true } });
   });
 
   it('fails to get external connection by name when it does not exists', async () => {
@@ -193,7 +193,6 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: "Fabrikam HR",
         confirm: true
       }
@@ -221,21 +220,9 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: "My HR",
         confirm: true
       }
     } as any), new CommandError("Multiple external connections with name My HR found. Please disambiguate (IDs): fabrikamhr, contosohr"));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

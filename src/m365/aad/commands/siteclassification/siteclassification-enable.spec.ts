@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -16,7 +16,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -45,7 +45,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -57,17 +57,6 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('handles Microsoft 365 Tenant siteclassification missing DirectorySettingTemplate', async () => {
@@ -317,7 +306,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
     assert(enableRequestIssued);
   });
 
@@ -405,7 +394,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
     assert(enableRequestIssued);
   });
 
@@ -493,7 +482,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
     assert(enableRequestIssued);
   });
 
@@ -581,7 +570,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any);
+    await command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any);
     assert(enableRequestIssued);
   });
 
@@ -676,7 +665,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any),
+    await assert.rejects(command.action(logger, { options: { classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any),
       new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`));
   });
 });

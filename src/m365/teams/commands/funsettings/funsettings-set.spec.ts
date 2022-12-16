@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,7 +19,7 @@ describe(commands.FUNSETTINGS_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -49,7 +49,7 @@ describe(commands.FUNSETTINGS_SET, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       auth.restoreAuth
     ]);
@@ -79,7 +79,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: false }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: false }
     } as any);
   });
 
@@ -98,7 +98,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: true }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: true }
     } as any);
   });
 
@@ -117,7 +117,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'moderate' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'moderate' }
     } as any);
   });
 
@@ -136,7 +136,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'strict' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'strict' }
     } as any);
   });
 
@@ -155,7 +155,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: true }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: true }
     } as any);
   });
 
@@ -174,7 +174,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: false }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: false }
     } as any);
   });
 
@@ -194,7 +194,7 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: true }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: true }
     } as any);
   });
 
@@ -296,16 +296,5 @@ describe(commands.FUNSETTINGS_SET, () => {
 
     const actual = actualTrue && actualFalse;
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -17,12 +17,12 @@ describe(commands.MESSAGE_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  const firstMessage: any = {"sender_id":1496550646, "replied_to_id":1496550647,"id":10123190123123,"thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1"};
-  const secondMessage: any = {"sender_id":1496550640, "replied_to_id":"","id":10123190123124,"thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2"};
+  const firstMessage: any = { "sender_id": 1496550646, "replied_to_id": 1496550647, "id": 10123190123123, "thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1" };
+  const secondMessage: any = { "sender_id": 1496550640, "replied_to_id": "", "id": 10123190123124, "thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2" };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -54,7 +54,7 @@ describe(commands.MESSAGE_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -78,7 +78,7 @@ describe(commands.MESSAGE_GET, () => {
   });
 
   it('id is required', async () => {
-    const actual = await command.validate({ options: { } }, commandInfo);
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -90,7 +90,7 @@ describe(commands.MESSAGE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { id:10123190123123, debug: true } } as any );
+    await command.action(logger, { options: { id: 10123190123123, debug: true } } as any);
 
     assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123123);
   });
@@ -104,7 +104,7 @@ describe(commands.MESSAGE_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('calls the messaging endpoint with id and json and json', async () => {
@@ -115,24 +115,13 @@ describe(commands.MESSAGE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, id:10123190123124, output: "json" } } as any);
-    
+    await command.action(logger, { options: { debug: true, id: 10123190123124, output: "json" } } as any);
+
     assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123124);
   });
 
   it('passes validation with parameters', async () => {
-    const actual = await command.validate({ options: { id: 10123123 }}, commandInfo);
+    const actual = await command.validate({ options: { id: 10123123 } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

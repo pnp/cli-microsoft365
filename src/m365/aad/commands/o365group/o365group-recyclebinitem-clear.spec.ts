@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
@@ -19,7 +19,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     auth.service.connected = true;
@@ -57,7 +57,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       fs.readFileSync,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -135,7 +135,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true } });
+    await command.action(logger, { options: { confirm: true } });
     assert(deleteStub.calledTwice);
   });
 
@@ -237,7 +237,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true } });
+    await command.action(logger, { options: { confirm: true } });
     assert(deleteStub.calledThrice);
   });
 
@@ -255,12 +255,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true } });
+    await command.action(logger, { options: { confirm: true } });
     assert(deleteStub.notCalled);
   });
 
   it('prompts before clearing the O365 Group recycle bin items when --confirm option is not passed', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -276,7 +276,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(deleteSpy.notCalled);
   });
 
@@ -358,7 +358,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(deleteStub.calledTwice);
   });
 
@@ -465,17 +465,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
 
     await assert.rejects(command.action(logger, { options: { confirm: true } }), new CommandError(errorMessage));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying confirmation flag', () => {

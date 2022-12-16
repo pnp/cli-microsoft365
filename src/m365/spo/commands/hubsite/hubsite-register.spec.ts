@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.HUBSITE_REGISTER, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -58,7 +58,7 @@ describe(commands.HUBSITE_REGISTER, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -90,7 +90,7 @@ describe(commands.HUBSITE_REGISTER, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/sales' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "ID": "255a50b2-527f-4413-8485-57f4c17a24d1",
@@ -149,19 +149,8 @@ describe(commands.HUBSITE_REGISTER, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/sales' } } as any),
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales' } } as any),
       new CommandError('This site is already a HubSite.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying site collection URL', () => {

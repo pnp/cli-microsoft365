@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -23,7 +23,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -56,7 +56,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -79,7 +79,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'af92a21f-a0ec-4668-ba2c-951a2b5d6f94' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'af92a21f-a0ec-4668-ba2c-951a2b5d6f94' } });
     assert(loggerLogSpy.calledWith(mockControlGetDataOutput));
   });
 
@@ -105,7 +105,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home', id: 'af92a21f-a0ec-4668-ba2c-951a2b5d6f94' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home', id: 'af92a21f-a0ec-4668-ba2c-951a2b5d6f94' } });
     assert(loggerLogSpy.calledWith(mockControlGetDataOutput));
   });
 
@@ -118,7 +118,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } });
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(mockControlGetDataEmptyColumnOutput));
   });
 
@@ -131,7 +131,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: '1212fc8d-dd6b-408a-8d5d-9f1cc787efbb' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: '1212fc8d-dd6b-408a-8d5d-9f1cc787efbb' } });
     assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(mockControlGetDataWithTextOutput));
   });
 
@@ -144,7 +144,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'af92a21f-a0ec-4668-ba2c-951a2b5d6f94' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'af92a21f-a0ec-4668-ba2c-951a2b5d6f94' } });
     assert(loggerLogSpy.calledWith(mockControlGetDataWithUnknownTypeOutput));
   });
 
@@ -158,7 +158,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -216,7 +216,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
       new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
   });
 
@@ -225,19 +225,8 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('fails validation if the specified id is not a valid GUID', async () => {

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -18,7 +18,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -56,7 +56,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -75,17 +75,6 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['DaysRemaining', 'DeletionTime', 'Url']);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('handles client.svc promise error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -94,7 +83,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error while getting tenant recycle bin', async () => {
@@ -111,7 +100,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
   it('includes all properties for json output', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -138,7 +127,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, output: 'json' } });
+    await command.action(logger, { options: { output: 'json' } });
     assert(loggerLogSpy.calledWith([
       {
         "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "85bb2b9f-5099-2000-af64-2c100126d549|908bed80-a04a-4433-b4a0-883d9847d110:c7d25483-6785-4e76-8b22-9c57c0b70134\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fClassicThrowaway", "DaysRemaining": 92, "DeletionTime": "\/Date(2020,0,15,11,4,3,893)\/", "SiteId": "\/Guid(7db536da-792b-4be7-b9b6-194778905606)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fClassicThrowaway", "UserCodeMaximumLevel": 0
@@ -198,6 +187,6 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Timed out'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Timed out'));
   });
 });

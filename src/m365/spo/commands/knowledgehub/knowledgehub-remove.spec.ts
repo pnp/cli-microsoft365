@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
@@ -21,7 +21,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -78,7 +78,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       request.post,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       spo.getRequestDigest
     ]);
@@ -96,7 +96,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('removes Knowledge Hub settings from tenant without prompting with confirmation argument', async () => {
-    await command.action(logger, { options: { debug: false, confirm: true } });
+    await command.action(logger, { options: { confirm: true } });
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -190,18 +190,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
+    await assert.rejects(command.action(logger, { options: { confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports suppressing confirmation prompt', () => {

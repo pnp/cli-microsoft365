@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.TAB_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.TAB_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -127,10 +127,12 @@ describe(commands.TAB_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelId: '19:00000000000000000000000000000000@thread.skype' } } as any), new CommandError('Channel id is not in a valid format: 29:d09d9792d59544af846fa19c98b6acc6@thread.skype'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype'
+      }
+    } as any), new CommandError('Channel id is not in a valid format: 29:d09d9792d59544af846fa19c98b6acc6@thread.skype'));
   });
 
   it('correctly lists all tabs in a Microsoft Teams channel', async () => {
@@ -174,7 +176,6 @@ describe(commands.TAB_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype'
       }
@@ -344,16 +345,5 @@ describe(commands.TAB_LIST, () => {
       },
       "teamsAppTabId": "com.microsoft.teamspace.tab.wiki"
     }]));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

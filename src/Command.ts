@@ -1,7 +1,6 @@
 import type * as Chalk from 'chalk';
 import type { Inquirer } from 'inquirer';
 import * as os from 'os';
-import appInsights from './appInsights';
 import auth from './Auth';
 import { Cli } from './cli/Cli';
 import { CommandInfo } from './cli/CommandInfo';
@@ -10,6 +9,7 @@ import { Logger } from './cli/Logger';
 import GlobalOptions from './GlobalOptions';
 import request from './request';
 import { settingsNames } from './settingsNames';
+import { telemetry } from './telemetry';
 import { accessToken } from './utils/accessToken';
 import { md } from './utils/md';
 import { GraphResponseError } from './utils/odata';
@@ -414,11 +414,7 @@ export default abstract class Command {
     request.debug = this.debug;
     request.logger = logger;
 
-    appInsights.trackEvent({
-      name: this.getUsedCommandName(),
-      properties: this.getTelemetryProperties(args)
-    });
-    appInsights.flush();
+    telemetry.trackEvent(this.getUsedCommandName(), this.getTelemetryProperties(args));
   }
 
   protected getUnknownOptions(options: any): any {

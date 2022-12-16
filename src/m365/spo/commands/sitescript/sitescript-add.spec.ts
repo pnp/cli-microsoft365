@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.SITESCRIPT_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -59,7 +59,7 @@ describe(commands.SITESCRIPT_ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -93,7 +93,7 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } });
+    await command.action(logger, { options: { title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } });
     assert(loggerLogSpy.calledWith({
       "Content": null,
       "Description": "My contoso script",
@@ -149,7 +149,7 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', description: '', content: JSON.stringify({ "abc": "def" }) } });
+    await command.action(logger, { options: { title: 'Contoso', description: '', content: JSON.stringify({ "abc": "def" }) } });
     assert(loggerLogSpy.calledWith({
       "Content": null,
       "Description": "",
@@ -192,18 +192,7 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, title: 'Contoso', content: JSON.stringify({}) } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { title: 'Contoso', content: JSON.stringify({}) } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying title', () => {

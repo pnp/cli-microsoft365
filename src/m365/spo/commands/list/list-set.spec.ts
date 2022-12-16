@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,7 +19,7 @@ describe(commands.LIST_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -49,7 +49,7 @@ describe(commands.LIST_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -123,7 +123,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', description: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', description: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -139,7 +139,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -155,7 +155,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', schemaXml: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', schemaXml: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -171,7 +171,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -187,7 +187,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -203,7 +203,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -219,7 +219,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -235,7 +235,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -251,7 +251,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -267,7 +267,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -283,7 +283,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -300,7 +300,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -316,7 +316,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -332,7 +332,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -348,7 +348,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -364,7 +364,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -380,7 +380,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -396,7 +396,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -412,7 +412,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -428,7 +428,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -444,7 +444,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -460,7 +460,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -476,7 +476,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -492,7 +492,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -508,7 +508,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -524,7 +524,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -540,7 +540,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -556,7 +556,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -572,7 +572,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -588,7 +588,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -604,7 +604,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -620,7 +620,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -636,7 +636,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -652,7 +652,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -668,7 +668,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -684,7 +684,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -700,7 +700,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -716,7 +716,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -732,7 +732,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -748,7 +748,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -764,7 +764,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -780,7 +780,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -796,7 +796,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -812,7 +812,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -828,7 +828,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -844,7 +844,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -860,7 +860,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -876,7 +876,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -892,7 +892,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -908,7 +908,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -924,7 +924,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -940,7 +940,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -956,7 +956,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -972,7 +972,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -988,7 +988,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1004,7 +1004,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1020,7 +1020,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1036,7 +1036,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1052,7 +1052,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1068,7 +1068,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1077,18 +1077,7 @@ describe(commands.LIST_SET, () => {
       throw 'An error has occurred';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
+    await assert.rejects(command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying URL', () => {

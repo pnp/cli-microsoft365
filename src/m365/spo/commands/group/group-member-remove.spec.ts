@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -24,7 +24,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -55,7 +55,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -79,7 +79,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         userName: "Alex.Wilber@contoso.com",
@@ -143,7 +142,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         userName: "Alex.Wilber@contoso.com",
@@ -162,7 +160,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         userName: "Alex.Wilber@contoso.com",
@@ -183,7 +180,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         userName: "Alex.Wilber@invalidcontoso.com",
@@ -216,16 +212,4 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 3, userName: "Alex.Wilber@contoso.com" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
 });

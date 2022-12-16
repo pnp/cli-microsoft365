@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -91,7 +91,7 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc',
@@ -133,7 +133,7 @@ describe(commands.PROPERTYBAG_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       spo.getRequestDigest
     ]);
@@ -259,8 +259,7 @@ describe(commands.PROPERTYBAG_GET, () => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('abc1'); }));
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options = {
-      webUrl: 'https://contoso.sharepoint.com',
-      debug: false
+      webUrl: 'https://contoso.sharepoint.com'
     };
 
     await assert.rejects(command.action(logger, { options: options } as any),
@@ -606,17 +605,6 @@ describe(commands.PROPERTYBAG_GET, () => {
     assert(lastCall.calledWith(sinon.match({
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/sites/test/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
     })));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsVerboseOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsVerboseOption = true;
-      }
-    });
-    assert(containsVerboseOption);
   });
 
   it('supports specifying folder', () => {

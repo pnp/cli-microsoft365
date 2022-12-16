@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -176,7 +176,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
@@ -207,7 +207,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -233,7 +233,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('gets the service update messages available in Microsoft 365', async () => {
@@ -246,7 +246,6 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
     assert(loggerLogSpy.calledWith(jsonOutput.value));
@@ -278,8 +277,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        service: 'Microsoft Teams',
-        debug: false
+        service: 'Microsoft Teams'
       }
     } as any);
     assert(loggerLogSpy.calledWith(jsonOutputMicrosoftTeams.value));
@@ -296,21 +294,9 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
     await command.action(logger, {
       options: {
         service: 'Microsoft Teams',
-        output: 'text',
-        debug: false
+        output: 'text'
       }
     });
     assert(loggerLogSpy.calledWith(jsonOutputMicrosoftTeams.value));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

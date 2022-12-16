@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -36,7 +36,7 @@ describe(commands.SP_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -67,7 +67,7 @@ describe(commands.SP_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -111,7 +111,7 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, appId: '65415bb1-9267-4313-bbf5-ae259732ee12' } });
+    await command.action(logger, { options: { appId: '65415bb1-9267-4313-bbf5-ae259732ee12' } });
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
@@ -128,7 +128,7 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, appObjectId: '59e617e5-e447-4adc-8b88-00af644d7c92' } });
+    await command.action(logger, { options: { appObjectId: '59e617e5-e447-4adc-8b88-00af644d7c92' } });
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
@@ -146,11 +146,11 @@ describe(commands.SP_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
       new CommandError('An error has occurred'));
   });
 
-  
+
   it('fails when Azure AD app with same name exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
@@ -252,17 +252,6 @@ describe(commands.SP_GET, () => {
   it('fails validation if appObjectId and appDisplayName are specified', async () => {
     const actual = await command.validate({ options: { appDisplayName: 'abc', appObjectId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying appId', () => {

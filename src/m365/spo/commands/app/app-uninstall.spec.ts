@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.APP_UNINSTALL, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
@@ -57,7 +57,7 @@ describe(commands.APP_UNINSTALL, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       request.post,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -104,7 +104,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('uninstalls app from the specified site without prompting with confirmation argument', async () => {
-    sinonUtil.restore([ request.post ]);
+    sinonUtil.restore([request.post]);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -123,7 +123,7 @@ describe(commands.APP_UNINSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/uninstall`) > -1 &&
@@ -136,7 +136,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('uninstalls app from the specified site installed from the site collection app catalog', async () => {
-    sinonUtil.restore([ request.post ]);
+    sinonUtil.restore([request.post]);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -155,7 +155,7 @@ describe(commands.APP_UNINSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true, appCatalogScope: 'sitecollection' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true, appCatalogScope: 'sitecollection' } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/uninstall`) > -1 &&
@@ -168,7 +168,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('prompts before uninstalling an app when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -182,12 +182,12 @@ describe(commands.APP_UNINSTALL, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } });
     assert(requests.length === 0);
   });
 
   it('uninstalls an app when prompt confirmed', async () => {
-    sinonUtil.restore([ request.post ]);
+    sinonUtil.restore([request.post]);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -210,7 +210,7 @@ describe(commands.APP_UNINSTALL, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com' } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/uninstall`) > -1 &&
@@ -223,7 +223,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('correctly handles failure when app not found in app catalog', async () => {
-    sinonUtil.restore([ request.post ]);
+    sinonUtil.restore([request.post]);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -252,12 +252,12 @@ describe(commands.APP_UNINSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
       new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
   it('correctly handles failure when app is already being uninstalled', async () => {
-    sinonUtil.restore([ request.post ]);
+    sinonUtil.restore([request.post]);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -285,12 +285,12 @@ describe(commands.APP_UNINSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
       new CommandError('Another job exists for this app instance. Please retry after that job is done.'));
   });
 
   it('correctly handles random API error', async () => {
-    sinonUtil.restore([ request.post ]);
+    sinonUtil.restore([request.post]);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
@@ -307,12 +307,12 @@ describe(commands.APP_UNINSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
       new CommandError('An error has occurred'));
   });
 
   it('correctly handles random API error (error message is not ODataError)', async () => {
-    sinonUtil.restore([ request.post ]);
+    sinonUtil.restore([request.post]);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
@@ -329,12 +329,12 @@ describe(commands.APP_UNINSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
       new CommandError('{"message":"An error has occurred"}'));
   });
 
   it('correctly handles API OData error', async () => {
-    sinonUtil.restore([ request.post ]);
+    sinonUtil.restore([request.post]);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
@@ -360,7 +360,7 @@ describe(commands.APP_UNINSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', confirm: true } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -387,16 +387,5 @@ describe(commands.APP_UNINSTALL, () => {
   it('passes validation when the scope is \'sitecollection\'', async () => {
     const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', appCatalogScope: 'sitecollection' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 });

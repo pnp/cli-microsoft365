@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.RUN_CANCEL, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -58,7 +58,7 @@ describe(commands.RUN_CANCEL, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -97,7 +97,6 @@ describe(commands.RUN_CANCEL, () => {
   it('prompts before cancelling the specified Microsoft FlowName when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
@@ -121,7 +120,6 @@ describe(commands.RUN_CANCEL, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
@@ -161,7 +159,7 @@ describe(commands.RUN_CANCEL, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async() => (
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
     await command.action(logger, {
@@ -188,7 +186,6 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161',
@@ -215,7 +212,6 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
@@ -242,7 +238,6 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161'
@@ -263,7 +258,6 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161',
@@ -290,7 +284,6 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762688CP233'
@@ -311,24 +304,12 @@ describe(commands.RUN_CANCEL, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762688CP233',
         confirm: true
       }
     } as any), new CommandError(`Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying name', () => {

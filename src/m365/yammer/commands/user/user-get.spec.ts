@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.USER_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.USER_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -118,7 +118,7 @@ describe(commands.USER_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred.'));
   });
 
   it('correctly handles 404 error', async () => {
@@ -128,7 +128,7 @@ describe(commands.USER_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Not found (404)'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Not found (404)'));
   });
 
   it('passes validation without parameters', async () => {
@@ -149,16 +149,5 @@ describe(commands.USER_GET, () => {
   it('does not pass with id and e-mail', async () => {
     const actual = await command.validate({ options: { id: 1496550646, email: "pl@nubo.eu" } }, commandInfo);
     assert.strictEqual(actual, "You are only allowed to search by ID or e-mail but not both");
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -359,7 +359,7 @@ describe(commands.FOLDER_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
 
     stubGetResponses = (getResp: any = null) => {
@@ -404,7 +404,7 @@ describe(commands.FOLDER_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -489,7 +489,6 @@ describe(commands.FOLDER_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com',
         id: 'b2307a39-e878-458b-bc90-03bc578531d6'
@@ -504,7 +503,6 @@ describe(commands.FOLDER_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com',
         url: '/Shared Documents'
@@ -519,7 +517,6 @@ describe(commands.FOLDER_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
         url: 'Shared Documents/'
@@ -536,7 +533,6 @@ describe(commands.FOLDER_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
         url: 'Shared Documents/FolderPermission',
         withPermissions: true
@@ -562,15 +558,5 @@ describe(commands.FOLDER_GET, () => {
         withPermissions: true
       }
     } as any), new CommandError(error));
-  });
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -59,7 +59,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -87,7 +87,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com' } } as any);
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any);
   });
 
   it('enables communication site features on the specified site (debug)', async () => {
@@ -145,17 +145,6 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
     await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('requires site URL', () => {

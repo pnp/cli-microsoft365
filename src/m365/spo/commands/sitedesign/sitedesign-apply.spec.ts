@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.SITEDESIGN_APPLY, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -51,7 +51,7 @@ describe(commands.SITEDESIGN_APPLY, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -83,7 +83,6 @@ describe(commands.SITEDESIGN_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
         webUrl: 'https://contoso.sharepoint.com'
       }
@@ -131,7 +130,6 @@ describe(commands.SITEDESIGN_APPLY, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
         webUrl: 'https://contoso.sharepoint.com',
         asTask: true
@@ -145,21 +143,12 @@ describe(commands.SITEDESIGN_APPLY, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
-      webUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98',
+        webUrl: 'https://contoso.sharepoint.com'
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying id', () => {
@@ -193,7 +182,7 @@ describe(commands.SITEDESIGN_APPLY, () => {
     const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-  
+
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
     const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webUrl: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);

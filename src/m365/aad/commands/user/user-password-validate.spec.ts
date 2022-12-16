@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -17,7 +17,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
@@ -48,7 +48,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -83,7 +83,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    await command.action(logger, { options: { debug: false, password: 'cli365' } });
+    await command.action(logger, { options: { password: 'cli365' } });
     assert(loggerLogSpy.calledWith({
       "isValid": false,
       "validationResults": [
@@ -118,7 +118,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    await command.action(logger, { options: { debug: false, password: 'cli365password' } });
+    await command.action(logger, { options: { password: 'cli365password' } });
     assert(loggerLogSpy.calledWith({
       "isValid": false,
       "validationResults": [
@@ -153,7 +153,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    await command.action(logger, { options: { debug: false, password: 'MyP@ssW0rd' } });
+    await command.action(logger, { options: { password: 'MyP@ssW0rd' } });
     assert(loggerLogSpy.calledWith({
       "isValid": false,
       "validationResults": [
@@ -188,7 +188,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    await command.action(logger, { options: { debug: false, password: 'cli365P@ssW0rd' } });
+    await command.action(logger, { options: { password: 'cli365P@ssW0rd' } });
     assert(loggerLogSpy.calledWith({
       "isValid": true,
       "validationResults": [
@@ -215,18 +215,7 @@ describe(commands.USER_PASSWORD_VALIDATE, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, password: 'cli365P@ssW0rd079654' } } as any), 
+    await assert.rejects(command.action(logger, { options: { password: 'cli365P@ssW0rd079654' } } as any),
       new CommandError(`An error has occurred`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

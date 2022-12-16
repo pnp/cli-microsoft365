@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -16,10 +16,10 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -56,7 +56,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -130,7 +130,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([{
       Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
       Resource: 'Microsoft Graph',
@@ -149,29 +149,18 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('File Not Found.'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('An error has occurred'));
   });
 
   it('defines alias', () => {
     const alias = command.alias();
     assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

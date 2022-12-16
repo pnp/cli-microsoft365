@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,10 +19,10 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -53,7 +53,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -72,7 +72,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   });
 
   it('lists controls on the modern page', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {      
+    sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve(mockControlListData);
       }
@@ -80,7 +80,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } });
     assert(loggerLogSpy.calledWith(mockControlListDataOutput));
   });
 
@@ -106,7 +106,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home' } });
     assert(loggerLogSpy.calledWith(mockControlListDataOutput));
   });
 
@@ -132,7 +132,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any);
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any);
     assert(loggerLogSpy.calledWith(mockControlListDataWithTextOutput));
   });
 
@@ -141,24 +141,26 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.resolve({ CanvasContent1: null });
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any);
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any);
     assert([]);
   });
 
   it('correctly handles page not found', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({ error: {
-        "odata.error": {
-          "code": "-2130575338, Microsoft.SharePoint.SPException",
-          "message": {
-            "lang": "en-US",
-            "value": "The file /sites/team-a/SitePages/home1.aspx does not exist."
+      return Promise.reject({
+        error: {
+          "odata.error": {
+            "code": "-2130575338, Microsoft.SharePoint.SPException",
+            "message": {
+              "lang": "en-US",
+              "value": "The file /sites/team-a/SitePages/home1.aspx does not exist."
+            }
           }
         }
-      } });
+      });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
       new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
   });
 
@@ -167,19 +169,8 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

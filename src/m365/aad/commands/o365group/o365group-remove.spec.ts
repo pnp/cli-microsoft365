@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.O365GROUP_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -59,7 +59,7 @@ describe(commands.O365GROUP_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -82,7 +82,7 @@ describe(commands.O365GROUP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: false } });
+    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: false } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -100,7 +100,7 @@ describe(commands.O365GROUP_REMOVE, () => {
   });
 
   it('prompts before removing the specified group when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -127,7 +127,7 @@ describe(commands.O365GROUP_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postSpy.notCalled);
   });
 
@@ -147,7 +147,7 @@ describe(commands.O365GROUP_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    await command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postStub.called);
   });
 
@@ -207,19 +207,8 @@ describe(commands.O365GROUP_REMOVE, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
+    await assert.rejects(command.action(logger, { options: { confirm: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
       new CommandError('File Not Found.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying id', () => {

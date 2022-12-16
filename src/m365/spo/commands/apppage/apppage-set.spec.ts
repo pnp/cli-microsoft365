@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import * as sinon from "sinon";
-import appInsights from "../../../../appInsights";
+import { telemetry } from "../../../../telemetry";
 import auth from "../../../../Auth";
 import { Cli } from "../../../../cli/Cli";
 import { CommandInfo } from "../../../../cli/CommandInfo";
@@ -18,7 +18,7 @@ describe(commands.APPPAGE_SET, () => {
 
   before(() => {
     sinon.stub(auth, "restoreAuth").callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, "trackEvent").callsFake(() => { });
+    sinon.stub(telemetry, "trackEvent").callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -43,7 +43,7 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   after(() => {
-    sinonUtil.restore([appInsights.trackEvent, auth.restoreAuth]);
+    sinonUtil.restore([telemetry.trackEvent, auth.restoreAuth]);
     auth.service.connected = false;
   });
 
@@ -65,10 +65,9 @@ describe(commands.APPPAGE_SET, () => {
       }
       return Promise.reject("Invalid request");
     });
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           name: "failme",
           webUrl: "https://contoso.sharepoint.com/",
           webPartData: JSON.stringify({})
@@ -79,32 +78,20 @@ describe(commands.APPPAGE_SET, () => {
   it("Update the single-part app pag", async () => {
     sinon.stub(request, "post").callsFake(opts => {
       if (
-        (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1 
+        (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1
       ) {
         return Promise.resolve();
       }
       return Promise.reject("Invalid request");
     });
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: "demo",
           webUrl: "https://contoso.sharepoint.com/",
           webPartData: JSON.stringify({})
         }
       });
-  });
-
-  it("supports debug mode", () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === "--debug") {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it("supports specifying name", () => {

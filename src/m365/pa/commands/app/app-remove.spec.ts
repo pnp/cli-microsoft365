@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.APP_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -58,7 +58,7 @@ describe(commands.APP_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -93,7 +93,6 @@ describe(commands.APP_REMOVE, () => {
   it('prompts before removing the specified Microsoft Power App when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     });
@@ -102,7 +101,7 @@ describe(commands.APP_REMOVE, () => {
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;
     }
-    
+
     assert(promptIssued);
   });
 
@@ -114,7 +113,6 @@ describe(commands.APP_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     });
@@ -216,7 +214,6 @@ describe(commands.APP_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     } as any), new CommandError(`App 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`));
@@ -230,7 +227,6 @@ describe(commands.APP_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
@@ -250,7 +246,6 @@ describe(commands.APP_REMOVE, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     } as any);
@@ -264,22 +259,10 @@ describe(commands.APP_REMOVE, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
     } as any);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying name', () => {
@@ -317,7 +300,6 @@ describe(commands.APP_REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     } as any), new CommandError("Something went wrong"));

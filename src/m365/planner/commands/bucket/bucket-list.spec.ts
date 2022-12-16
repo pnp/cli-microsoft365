@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -132,7 +132,7 @@ describe(commands.BUCKET_LIST, () => {
   before(() => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -181,7 +181,7 @@ describe(commands.BUCKET_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -280,7 +280,6 @@ describe(commands.BUCKET_LIST, () => {
 
   it('correctly lists planner buckets with planId', async () => {
     const options: any = {
-      debug: false,
       planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
     };
 
@@ -290,7 +289,6 @@ describe(commands.BUCKET_LIST, () => {
 
   it('correctly lists planner buckets with planTitle and ownerGroupName', async () => {
     const options: any = {
-      debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
     };
@@ -301,7 +299,6 @@ describe(commands.BUCKET_LIST, () => {
 
   it('correctly lists planner buckets with planTitle and ownerGroupId', async () => {
     const options: any = {
-      debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
@@ -321,7 +318,6 @@ describe(commands.BUCKET_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
       }
@@ -345,17 +341,6 @@ describe(commands.BUCKET_LIST, () => {
       return Promise.reject("An error has occurred.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError("An error has occurred."));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
   });
 });

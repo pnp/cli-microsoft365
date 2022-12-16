@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -17,7 +17,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
@@ -47,7 +47,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -73,7 +73,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), 
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError('Site classification is not enabled.'));
   });
 
@@ -148,7 +148,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), 
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
   });
 

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -70,7 +70,7 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       request.post,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       spo.getRequestDigest
     ]);
@@ -87,7 +87,7 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
   });
 
   it('sets the Knowledgehub Site', async () => {
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/knowledgesite' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/knowledgesite' } });
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -145,7 +145,7 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/knowledgesite' } } as any),
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/knowledgesite' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -157,16 +157,5 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
   it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
     const actual = await command.validate({ options: { siteUrl: 'site.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 });

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -82,7 +82,7 @@ describe(commands.PLAN_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -122,7 +122,7 @@ describe(commands.PLAN_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -249,7 +249,6 @@ describe(commands.PLAN_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         title: validTitle,
         ownerGroupId: validOwnerGroupId
       }
@@ -276,7 +275,6 @@ describe(commands.PLAN_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         title: validTitle,
         ownerGroupName: validOwnerGroupName
       }
@@ -310,9 +308,8 @@ describe(commands.PLAN_ADD, () => {
       return Promise.reject(`Invalid request ${opts.url}`);
     });
 
-    await command.action(logger, { 
+    await command.action(logger, {
       options: {
-        debug: false,
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         shareWithUserIds: validShareWithUserIds
@@ -356,7 +353,6 @@ describe(commands.PLAN_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         shareWithUserNames: validShareWithUserNames
@@ -400,7 +396,6 @@ describe(commands.PLAN_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         shareWithUserNames: validShareWithUserNames
@@ -413,17 +408,6 @@ describe(commands.PLAN_ADD, () => {
       return Promise.reject("An error has occurred.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError("An error has occurred."));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError("An error has occurred."));
   });
 });

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,7 +19,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -49,7 +49,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -88,7 +88,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: true }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: true }
     } as any);
   });
 
@@ -108,7 +108,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: true, allowDeleteChannels: true }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: true, allowDeleteChannels: true }
     } as any);
   });
 
@@ -117,7 +117,7 @@ describe(commands.GUESTSETTINGS_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the teamId is not a valid GUID', async () => {
@@ -168,16 +168,5 @@ describe(commands.GUESTSETTINGS_SET, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

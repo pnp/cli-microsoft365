@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../appInsights';
+import { telemetry } from '../../telemetry';
 import auth from '../../Auth';
 import { Logger } from '../../cli/Logger';
 import Command, { CommandError } from '../../Command';
@@ -17,7 +17,7 @@ describe(commands.LOGOUT, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     authClearConnectionInfoStub = sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
   });
 
@@ -39,7 +39,7 @@ describe(commands.LOGOUT, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
@@ -75,9 +75,9 @@ describe(commands.LOGOUT, () => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
-    
+
     try {
-      await command.action(logger, { options: { debug: false } });
+      await command.action(logger, { options: {} });
       assert(logoutSpy.called);
     }
     finally {
@@ -92,7 +92,7 @@ describe(commands.LOGOUT, () => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
-    
+
     try {
       await command.action(logger, { options: { debug: true } });
       assert(logoutSpy.called);
@@ -108,7 +108,7 @@ describe(commands.LOGOUT, () => {
   it('correctly handles error when restoring auth information', async () => {
     sinonUtil.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
-    
+
     try {
       await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
     }

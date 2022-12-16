@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.CHANNEL_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.CHANNEL_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -215,10 +215,13 @@ describe(commands.CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
-      id: '19:493665404ebd4a18adb8a980a31b4986@thread.skype' } } as any), new CommandError('Failed to execute Skype backend request GetThreadS2SRequest.'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
+        id: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
+      }
+    } as any), new CommandError('Failed to execute Skype backend request GetThreadS2SRequest.'));
   });
 
   it('fails when team name does not exist', async () => {
@@ -254,11 +257,14 @@ describe(commands.CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      teamName: 'Team Name',
-      name: 'Channel Name',
-      tabName: 'Tab Name' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        teamName: 'Team Name',
+        name: 'Channel Name',
+        tabName: 'Tab Name'
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('fails to get channel when channel does not exist', async () => {
@@ -269,11 +275,14 @@ describe(commands.CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      teamId: '00000000-0000-0000-0000-000000000000',
-      name: 'Channel Name',
-      tabName: 'Tab Name' } } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        teamId: '00000000-0000-0000-0000-000000000000',
+        name: 'Channel Name',
+        tabName: 'Tab Name'
+      }
+    } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
   it('should get channel information for the Microsoft Teams team by id', async () => {
@@ -493,16 +502,5 @@ describe(commands.CHANNEL_GET, () => {
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.getCall(loggerLogSpy.callCount - 2);
     assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

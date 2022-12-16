@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.APP_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -52,7 +52,7 @@ describe(commands.APP_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -93,7 +93,7 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true } });
+    await command.action(logger, { options: { id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true } });
     assert(removeTeamsAppCalled);
   });
 
@@ -120,7 +120,7 @@ describe(commands.APP_REMOVE, () => {
         return Promise.resolve();
       }
 
-      return Promise.reject('Invalid request');      
+      return Promise.reject('Invalid request');
     });
 
     sinon.stub(Cli, 'prompt').callsFake(async () => (
@@ -136,7 +136,7 @@ describe(commands.APP_REMOVE, () => {
       { continue: false }
     ));
 
-    command.action(logger, { options: { debug: false, id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
+    command.action(logger, { options: { id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22` } });
     assert(requests.length === 0);
   });
 
@@ -145,20 +145,11 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      filePath: 'teamsapp.zip', 
-      id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        filePath: 'teamsapp.zip',
+        id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 });

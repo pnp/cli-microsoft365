@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -61,7 +61,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -92,7 +92,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -191,7 +191,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'Group Not Found.' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
       new CommandError('Group Not Found.'));
   });
 
@@ -210,17 +210,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
         confirm: true
       }
     }), new CommandError(`The specified group '${validGroupMailNickname}' does not exist.`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('throws error message when multiple groups were found', async () => {

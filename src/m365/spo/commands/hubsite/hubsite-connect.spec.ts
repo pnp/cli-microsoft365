@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import { AxiosRequestConfig } from 'axios';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -40,7 +40,7 @@ describe(commands.HUBSITE_CONNECT, () => {
       }
     ]
   };
-  
+
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -48,7 +48,7 @@ describe(commands.HUBSITE_CONNECT, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -87,7 +87,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       spo.getSpoAdminUrl,
       request.patch
@@ -150,8 +150,8 @@ describe(commands.HUBSITE_CONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await command.action(logger, { 
-      options: { 
+    await command.action(logger, {
+      options: {
         verbose: true,
         id: id,
         parentId: parentId
@@ -173,8 +173,8 @@ describe(commands.HUBSITE_CONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await command.action(logger, { 
-      options: { 
+    await command.action(logger, {
+      options: {
         verbose: true,
         title: title,
         parentTitle: parentTitle
@@ -196,8 +196,8 @@ describe(commands.HUBSITE_CONNECT, () => {
       throw 'Invalid request URL: ' + opts.url;
     });
 
-    await command.action(logger, { 
-      options: { 
+    await command.action(logger, {
+      options: {
         verbose: true,
         url: url,
         parentUrl: parentUrl
@@ -210,8 +210,8 @@ describe(commands.HUBSITE_CONNECT, () => {
   it('throws error when hub site with ID was not found', async () => {
     sinon.stub(request, 'get').callsFake(async () => ({ value: [] }));
 
-    await assert.rejects(command.action(logger, { 
-      options: { 
+    await assert.rejects(command.action(logger, {
+      options: {
         id: id,
         parentId: parentId
       }
@@ -221,8 +221,8 @@ describe(commands.HUBSITE_CONNECT, () => {
   it('throws error when hub site with title was not found', async () => {
     sinon.stub(request, 'get').callsFake(async () => ({ value: [] }));
 
-    await assert.rejects(command.action(logger, { 
-      options: { 
+    await assert.rejects(command.action(logger, {
+      options: {
         title: title,
         parentTitle: parentTitle
       }
@@ -232,8 +232,8 @@ describe(commands.HUBSITE_CONNECT, () => {
   it('throws error when hub site with url was not found', async () => {
     sinon.stub(request, 'get').callsFake(async () => ({ value: [] }));
 
-    await assert.rejects(command.action(logger, { 
-      options: { 
+    await assert.rejects(command.action(logger, {
+      options: {
         url: url,
         parentUrl: parentUrl
       }
@@ -241,20 +241,21 @@ describe(commands.HUBSITE_CONNECT, () => {
   });
 
   it('throws error when multiple hub sites with the same name were found', async () => {
-    sinon.stub(request, 'get').callsFake(async () => ({ value: [
-      {
-        Title: title,
-        ID: id
-      },
-      {
-        Title: title,
-        ID: parentId
-      }
-    ]
+    sinon.stub(request, 'get').callsFake(async () => ({
+      value: [
+        {
+          Title: title,
+          ID: id
+        },
+        {
+          Title: title,
+          ID: parentId
+        }
+      ]
     }));
 
-    await assert.rejects(command.action(logger, { 
-      options: { 
+    await assert.rejects(command.action(logger, {
+      options: {
         title: title,
         parentUrl: parentUrl
       }
@@ -274,22 +275,11 @@ describe(commands.HUBSITE_CONNECT, () => {
       };
     });
 
-    await assert.rejects(command.action(logger, { 
-      options: { 
+    await assert.rejects(command.action(logger, {
+      options: {
         title: title,
         parentUrl: parentUrl
       }
     }), new CommandError('Something went wrong'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

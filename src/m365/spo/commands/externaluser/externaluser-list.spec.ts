@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -60,7 +60,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -136,7 +136,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -352,7 +352,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com' } });
     assert(loggerLogSpy.calledWith([{
       DisplayName: 'Dear Vesa',
       InvitedAs: 'me@dearvesa.fi',
@@ -559,7 +559,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
         }
       ]));
     });
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -581,17 +581,6 @@ describe(commands.EXTERNALUSER_LIST, () => {
       return Promise.reject('An error has occurred');
     });
     await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying page size', () => {

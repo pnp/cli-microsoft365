@@ -866,6 +866,7 @@ nav:
       - sample-scripts/tenant/tenant-monitor-notify-healthstatus.md
   - About:
     - about/why-cli.md
+    - about/telemetry.md
     - about/comparison-powershell.md
     - about/release-notes.md
     - about/team.md
@@ -895,6 +896,7 @@ extra_css:
     - css/styles2.css
 markdown_extensions:
     - admonition
+    - footnotes
     - meta
     - toc:
           permalink: true

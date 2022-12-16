@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.USER_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -58,7 +58,7 @@ describe(commands.USER_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -70,17 +70,6 @@ describe(commands.USER_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('fails validation if id or loginName options are not passed', async () => {
@@ -144,7 +133,7 @@ describe(commands.USER_REMOVE, () => {
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;
     }
-    
+
     assert(promptIssued);
   });
 
@@ -192,7 +181,7 @@ describe(commands.USER_REMOVE, () => {
     });
     let correctRequestIssued = false;
     requests.forEach(r => {
-      if (r.url.indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')`) > -1 && 
+      if (r.url.indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')`) > -1 &&
         r.headers['accept'] === 'application/json;odata=nometadata') {
         correctRequestIssued = true;
       }
@@ -321,9 +310,12 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      webUrl: "https://contoso.sharepoint.com/subsite",
-      id: 10,
-      confirm: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: "https://contoso.sharepoint.com/subsite",
+        id: 10,
+        confirm: true
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 });

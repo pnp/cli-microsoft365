@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
@@ -16,7 +16,7 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
   let generateShCompletionStub: sinon.SinonStub;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     generateShCompletionStub = sinon.stub(autocomplete, 'generateShCompletion').callsFake(() => { });
   });
@@ -43,7 +43,7 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       autocomplete.generateShCompletion
     ]);
@@ -58,7 +58,7 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
   });
 
   it('builds command completion', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(generateShCompletionStub.called);
   });
 

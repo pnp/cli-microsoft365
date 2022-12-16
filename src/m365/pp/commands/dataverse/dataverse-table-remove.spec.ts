@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
@@ -26,7 +26,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
@@ -63,7 +63,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -172,18 +172,7 @@ describe(commands.DATAVERSE_TABLE_REMOVE, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment, name: validName, confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, name: validName, confirm: true } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

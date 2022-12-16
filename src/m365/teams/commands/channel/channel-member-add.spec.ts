@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as os from 'os';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -185,7 +185,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -243,7 +243,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -363,17 +363,6 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('adds conversation members using teamName, channelId, and userId', async () => {
@@ -594,7 +583,6 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
         userDisplayName: "Admin"

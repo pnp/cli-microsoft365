@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -51,7 +51,7 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -72,7 +72,6 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
   it('fails validation if teamId, channelId and messageId are not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -81,7 +80,6 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
   it('fails validation if channelId and messageId are not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
       }
     }, commandInfo);
@@ -97,18 +95,6 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('validates for a correct input', async () => {
@@ -368,7 +354,6 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
         channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
         messageId: "1501527481624"
@@ -512,7 +497,6 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
         channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
@@ -592,10 +576,12 @@ describe(commands.MESSAGE_REPLY_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
-      channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
-      messageId: "1501527481624" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
+        messageId: "1501527481624"
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 });

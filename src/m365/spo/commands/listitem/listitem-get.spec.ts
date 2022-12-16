@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -105,7 +105,7 @@ describe(commands.LISTITEM_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -136,7 +136,7 @@ describe(commands.LISTITEM_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -148,17 +148,6 @@ describe(commands.LISTITEM_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {
@@ -251,7 +240,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -281,7 +269,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -303,7 +290,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -320,7 +306,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       webUrl: webUrl,
       id: expectedId,
@@ -353,7 +338,6 @@ describe(commands.LISTITEM_GET, () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     const options: any = {
-      debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       webUrl: webUrl,
       id: expectedId,

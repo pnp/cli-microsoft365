@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -99,9 +99,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       return Promise.reject('Invalid request');
     });
     await command.action(logger, {
-      options: {
-        debug: false
-      }
+      options: {}
     });
     try {
       assert(loggerLogSpy.calledWith([{
@@ -181,9 +179,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       return Promise.reject('Invalid request');
     });
     await command.action(logger, {
-      options: {
-        debug: false
-      }
+      options: {}
     });
     try {
       assert(loggerLogSpy.lastCall.args[0][1].id === 'adatumisv_exo3');
@@ -231,7 +227,6 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         owner: '07d21ad2-c8f9-4316-a14a-347db702bd3c'
       }
     });
@@ -307,7 +302,6 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         pageNumber: 1
       }
     });
@@ -383,7 +377,6 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         pageNumber: 1,
         pageSize: 1
       }
@@ -486,7 +479,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     const errorMessage = 'Something went wrong';
     sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
 
-    await assert.rejects(command.action(logger, { options: { } }), new CommandError(errorMessage));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError(errorMessage));
   });
 
   it('passes validation if the owner is a valid GUID', async () => {
@@ -520,16 +513,5 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   it('passes validation if the pageSize is a positive number', async () => {
     const actual = await command.validate({ options: { pageSize: '2' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

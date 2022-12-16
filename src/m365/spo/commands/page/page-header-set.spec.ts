@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.PAGE_HEADER_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -77,7 +77,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -142,7 +142,7 @@ describe(commands.PAGE_HEADER_SET, () => {
           Title: 'Page'
         });
       }
-      
+
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$expand=ListItemAllFields`) > -1) {
         return Promise.resolve({ CanvasContent1: mockCanvasContent });
       }
@@ -188,7 +188,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default' } });
+    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default' } });
     assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
@@ -198,7 +198,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } });
+    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } });
     assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
@@ -244,7 +244,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } });
+    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } });
     assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
@@ -289,7 +289,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } });
+    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } });
     assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
@@ -344,7 +344,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom' } });
+    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom' } });
     assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
@@ -389,7 +389,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg' } });
+    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg' } });
     assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
@@ -399,7 +399,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', textAlignment: 'Center' } });
+    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', textAlignment: 'Center' } });
     assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
@@ -410,7 +410,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showTopicHeader: true, topicHeader: 'Team Awesome' } });
+    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showTopicHeader: true, topicHeader: 'Team Awesome' } });
     assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
@@ -420,7 +420,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showPublishDate: true } });
+    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showPublishDate: true } });
     assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
@@ -431,12 +431,12 @@ describe(commands.PAGE_HEADER_SET, () => {
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', authors: 'Joe Doe, Jane Doe' } });
+    await command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', authors: 'Joe Doe, Jane Doe' } });
     assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
   it('automatically appends the .aspx extension', async () => {
-    await command.action(logger, { options: { debug: false, pageName: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any);
+    await command.action(logger, { options: { pageName: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any);
   });
 
   it('correctly handles OData error when retrieving modern page', async () => {
@@ -445,7 +445,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
+    await assert.rejects(command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -482,18 +482,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if webUrl is not an absolute URL', async () => {

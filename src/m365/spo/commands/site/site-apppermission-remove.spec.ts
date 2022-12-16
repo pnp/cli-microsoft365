@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -58,7 +58,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -105,7 +105,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -272,7 +272,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
 
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
-    ));    
+    ));
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
@@ -306,7 +306,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
 
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
-    ));    
+    ));
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
@@ -340,20 +340,12 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-      appDisplayName: 'Foo',
-      confirm: true } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+        appDisplayName: 'Foo',
+        confirm: true
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 });

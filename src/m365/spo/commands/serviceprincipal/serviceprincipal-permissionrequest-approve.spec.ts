@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -24,7 +24,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -63,7 +63,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -139,7 +139,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, id: validId } });
+    await command.action(logger, { options: { id: validId } });
     assert(loggerLogSpy.calledWith({
       ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       ConsentType: "AllPrincipals",
@@ -217,7 +217,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, all: true } });
+    await command.action(logger, { options: { all: true } });
     assert(loggerLogSpy.calledWith([{
       ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       ConsentType: "AllPrincipals",
@@ -308,7 +308,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, resource: "Microsoft Graph" } });
+    await command.action(logger, { options: { resource: "Microsoft Graph" } });
     assert(loggerLogSpy.calledWith([{
       ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       ConsentType: "AllPrincipals",
@@ -336,13 +336,13 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { debug: false, id: validId } } as any),
+    await assert.rejects(command.action(logger, { options: { id: validId } } as any),
       new CommandError('Permission entry already exists.'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { debug: false, id: validId } } as any),
+    await assert.rejects(command.action(logger, { options: { id: validId } } as any),
       new CommandError('An error has occurred'));
   });
 
