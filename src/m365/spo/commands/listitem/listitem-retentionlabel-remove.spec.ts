@@ -21,6 +21,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
   let log: any[];
   let logger: Logger;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
@@ -45,6 +46,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
         log.push(msg);
       }
     };
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
       return { continue: false };
@@ -53,7 +55,6 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
       request.post,
       Cli.prompt
     ]);
@@ -88,7 +89,6 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('aborts removing list item when prompt not confirmed', async () => {
-    const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
@@ -101,25 +101,17 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
         listItemId: 1
       }
     });
-    assert(postSpy.notCalled);
+    assert(loggerLogToStderrSpy.notCalled);
   });
 
   it('removes the retentionlabel based on listId when prompt confirmed', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/RootFolder`) {
-        return { ServerRelativeUrl: listUrl };
-      }
-
-      throw 'Invalid request';
-    });
-
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
 
-    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(1)/SetComplianceTag()`) {
         return;
       }
 
@@ -128,31 +120,23 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
+        debug: true,
         listId: listId,
         webUrl: webUrl,
         listItemId: 1
       }
     });
-    assert(postSpy.called);
+    assert(loggerLogToStderrSpy.calledWith());
   });
 
   it('removes the retentionlabel based on listTitle when prompt confirmed', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/RootFolder`) {
-        return { ServerRelativeUrl: listUrl };
-      }
-
-      throw 'Invalid request';
-    });
-
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
 
-    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(1)/SetComplianceTag()`) {
         return;
       }
 
@@ -161,18 +145,18 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
+        debug: true,
         listTitle: listTitle,
         webUrl: webUrl,
         listItemId: 1
       }
     });
-    assert(postSpy.called);
+    assert(loggerLogToStderrSpy.calledWith());
   });
 
   it('removes the retentionlabel based on listUrl', async () => {
-    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='%2F${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
         return;
       }
 
@@ -181,14 +165,14 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
+        debug: true,
         confirm: true,
         listUrl: listUrl,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1
       }
     });
-    assert(postSpy.called);
+    assert(loggerLogToStderrSpy.calledWith());
   });
 
   it('removes the retentionlabel based on listUrl when prompt confirmed (debug)', async () => {
@@ -197,8 +181,8 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
       { continue: true }
     ));
 
-    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='%2F${formatting.encodeQueryParameter(listUrl)}'&@a2='1'`) {
         return;
       }
 
@@ -213,7 +197,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
         listItemId: 1
       }
     });
-    assert(postSpy.called);
+    assert(loggerLogToStderrSpy.calledWith());
   });
 
   it('correctly handles API OData error', async () => {
