@@ -109,7 +109,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeListItem: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Removing list item ${args.options.id} from list ${args.options.listId || args.options.listTitle || args.options.listUrl} site at ${args.options.webUrl}...`);
+        logger.logToStderr(`Removing list item ${args.options.id} from list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
       }
 
       let requestUrl = `${args.options.webUrl}/_api/web`;
