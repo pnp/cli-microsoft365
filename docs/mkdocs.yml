@@ -42,6 +42,7 @@ nav:
         - approleassignment list: cmd/aad/approleassignment/approleassignment-list.md
         - approleassignment remove: cmd/aad/approleassignment/approleassignment-remove.md
       - group:
+        - group get: cmd/aad/group/group-get.md
         - group list: cmd/aad/group/group-list.md
       - groupsetting:
         - groupsetting add: cmd/aad/groupsetting/groupsetting-add.md
