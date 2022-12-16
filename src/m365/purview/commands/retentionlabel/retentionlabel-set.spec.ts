@@ -17,6 +17,7 @@ describe(commands.RETENTIONLABEL_SET, () => {
 
   let log: string[];
   let logger: Logger;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -40,6 +41,7 @@ describe(commands.RETENTIONLABEL_SET, () => {
         log.push(msg);
       }
     };
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -106,10 +108,8 @@ describe(commands.RETENTIONLABEL_SET, () => {
   });
 
   it('correctly sets field retentionDays and actionAfterRetentionPeriod of a specific retention label by id', async () => {
-    let data: any;
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${validId}`) {
-        data = opts.data;
         return;
       }
 
@@ -117,16 +117,12 @@ describe(commands.RETENTIONLABEL_SET, () => {
     });
 
     await command.action(logger, { options: { id: validId, retentionDuration: 180, actionAfterRetentionPeriod: 'none', verbose: true } });
-    assert.strictEqual(data['retentionDuration']['@odata.type'], 'microsoft.graph.security.retentionDurationInDays');
-    assert.strictEqual(data['retentionDuration']['days'], 180);
-    assert.strictEqual(data['actionAfterRetentionPeriod'], 'none');
+    assert(loggerLogToStderrSpy.notCalled);
   });
 
   it('correctly sets field retentionTrigger, defaultRecordBehavior and behaviorDuringRetentionPeriod of a specific retention label by id', async () => {
-    let data: any;
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${validId}`) {
-        data = opts.data;
         return;
       }
 
@@ -134,16 +130,12 @@ describe(commands.RETENTIONLABEL_SET, () => {
     });
 
     await command.action(logger, { options: { id: validId, retentionTrigger: 'dateLabeled', defaultRecordBehavior: 'startLocked', behaviorDuringRetentionPeriod: 'retainAsRecord', verbose: true } });
-    assert.strictEqual(data['defaultRecordBehavior'], 'startLocked');
-    assert.strictEqual(data['retentionTrigger'], 'dateLabeled');
-    assert.strictEqual(data['behaviorDuringRetentionPeriod'], 'retainAsRecord');
+    assert(loggerLogToStderrSpy.notCalled);
   });
 
   it('correctly sets field descriptionForUsers, descriptionForAdmins and labelToBeApplied of a specific retention label by id', async () => {
-    let data: any;
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels/${validId}`) {
-        data = opts.data;
         return;
       }
 
@@ -151,9 +143,7 @@ describe(commands.RETENTIONLABEL_SET, () => {
     });
 
     await command.action(logger, { options: { id: validId, descriptionForUsers: 'description for users', descriptionForAdmins: 'description for admins', labelToBeApplied: 'label to be applied', verbose: true } });
-    assert.strictEqual(data['descriptionForUsers'], 'description for users');
-    assert.strictEqual(data['descriptionForAdmins'], 'description for admins');
-    assert.strictEqual(data['labelToBeApplied'], 'label to be applied');
+    assert(loggerLogToStderrSpy.notCalled);
   });
 
   it('fails to set field retentionDays of a specific retention label by id', async () => {
