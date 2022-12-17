@@ -326,6 +326,11 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
       { continue: true }
     ));
 
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
+      stdout: JSON.stringify(userInformation),
+      stderr: ''
+    }));
+
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       const loginName: string = `i:0#.f|membership|${userName}`;
       if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
