@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Context:**
+
+- [context init](../cmd/context/context-init.md) - initiates CLI for Microsoft 365 context in the current working folder [#4042](https://github.com/pnp/cli-microsoft365/issues/4042)
+
 **Planner:**
 
 - [planner plan set](../cmd/planner/plan/plan-set.md) - updates a Microsoft Planner plan [#3346](https://github.com/pnp/cli-microsoft365/issues/3346)
@@ -56,7 +60,8 @@
 - enhanced Cli test file [#4185](https://github.com/pnp/cli-microsoft365/issues/4185)
 - enhanced new command template [#4135](https://github.com/pnp/cli-microsoft365/issues/4135)
 - included response output for 'spo orgassetslibrary' until 'spo serviceprincipal' commands [#3932](https://github.com/pnp/cli-microsoft365/issues/3932)
-- renamed 'spo list label <verb>' commands [#4156](https://github.com/pnp/cli-microsoft365/issues/4156)
+- renamed 'spo list label [verb]' commands [#4156](https://github.com/pnp/cli-microsoft365/issues/4156)
+- extended 'aad user set' with changing and resetting a password [#2852](https://github.com/pnp/cli-microsoft365/issues/2852)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
