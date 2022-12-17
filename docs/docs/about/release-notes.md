@@ -27,7 +27,7 @@
 
 **SharePoint:**
 
-- [spo web retentionlabel list](../cmd/spo/web/web-retentionlabel-lis.md) - gets a list of retention labels that are available on a site [#4152](https://github.com/pnp/cli-microsoft365/issues/4152)
+- [spo web retentionlabel list](../cmd/spo/web/web-retentionlabel-list.md) - gets a list of retention labels that are available on a site [#4152](https://github.com/pnp/cli-microsoft365/issues/4152)
 
 **Teams:**
 
