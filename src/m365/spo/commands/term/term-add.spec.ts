@@ -22,7 +22,7 @@ describe(commands.TERM_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -85,7 +85,7 @@ describe(commands.TERM_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, name: 'IT', termSetName: 'Department', termGroupName: 'People' } });
+    await command.action(logger, { options: { name: 'IT', termSetName: 'Department', termGroupName: 'People' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -100,7 +100,7 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', id: '47fdacfe-ff64-4a05-b611-e84e767f04de', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } });
+    await command.action(logger, { options: { name: 'IT', id: '47fdacfe-ff64-4a05-b611-e84e767f04de', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -115,7 +115,7 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', id: '47fdacfe-ff64-4a05-b611-e84e767f04de', parentTermId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' }});
+    await command.action(logger, { options: { name: 'IT', id: '47fdacfe-ff64-4a05-b611-e84e767f04de', parentTermId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -161,7 +161,7 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: 'Department', termGroupName: 'People' } });
+    await command.action(logger, { options: { name: 'IT', customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: 'Department', termGroupName: 'People' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": { "Prop1": "Value1" }, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": { "LocalProp1": "LocalValue1" }, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -182,7 +182,7 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'IT', termSetName: 'Department', termGroupName: 'People' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { name: 'IT', termSetName: 'Department', termGroupName: 'People' } } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly handles error when the term group specified by id doesn\'t exist', async () => {
@@ -202,12 +202,14 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      name: 'IT', 
-      id: '47fdacfe-ff64-4a05-b611-e84e767f04de', 
-      termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', 
-      termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'IT',
+        id: '47fdacfe-ff64-4a05-b611-e84e767f04de',
+        termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f',
+        termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when the term group specified by name doesn\'t exist', async () => {
@@ -227,7 +229,7 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'IT', termSetName: 'Department', termGroupName: 'People' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, { options: { name: 'IT', termSetName: 'Department', termGroupName: 'People' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
 
   });
 
@@ -248,11 +250,13 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      name: 'IT', 
-      termSetName: 'Department', 
-      termGroupName: 'People' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'IT',
+        termSetName: 'Department',
+        termGroupName: 'People'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when the term set specified by id doesn\'t exist', async () => {
@@ -272,12 +276,14 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      name: 'IT', 
-      id: '47fdacfe-ff64-4a05-b611-e84e767f04de', 
-      termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', 
-      termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'IT',
+        id: '47fdacfe-ff64-4a05-b611-e84e767f04de',
+        termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f',
+        termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef'
+      }
+    } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
   it('correctly handles error when the specified name already exists', async () => {
@@ -291,11 +297,13 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      name: 'IT', 
-      termSetName: 'Department', 
-      termGroupName: 'People'  } } as any), new CommandError('There is already a term with the same default label and parent term.'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'IT',
+        termSetName: 'Department',
+        termGroupName: 'People'
+      }
+    } as any), new CommandError('There is already a term with the same default label and parent term.'));
   });
 
   it('correctly handles error when the specified id already exists', async () => {
@@ -309,12 +317,14 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      name: 'IT', 
-      id: '47fdacfe-ff64-4a05-b611-e84e767f04de', 
-      termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', 
-      termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } } as any), new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'IT',
+        id: '47fdacfe-ff64-4a05-b611-e84e767f04de',
+        termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f',
+        termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef'
+      }
+    } as any), new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.'));
   });
 
   it('correctly handles error when setting the description', async () => {
@@ -338,12 +348,14 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      name: 'IT', 
-      description: 'IT term', 
-      termSetName: 'Department', 
-      termGroupName: 'People'  } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'IT',
+        description: 'IT term',
+        termSetName: 'Department',
+        termGroupName: 'People'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly handles error when setting custom properties', async () => {
@@ -367,13 +379,15 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      name: 'IT', 
-      customProperties: '{"Prop1": "Value1"}', 
-      localCustomProperties: '{"LocalProp1": "LocalValue1"}', 
-      termSetName: 'Department', 
-      termGroupName: 'People' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'IT',
+        customProperties: '{"Prop1": "Value1"}',
+        localCustomProperties: '{"LocalProp1": "LocalValue1"}',
+        termSetName: 'Department',
+        termGroupName: 'People'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly handles error when setting local custom properties', async () => {
@@ -397,13 +411,15 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      name: 'IT', 
-      customProperties: '{"Prop1": "Value1"}', 
-      localCustomProperties: '{"LocalProp1": "LocalValue1"}', 
-      termSetName: 'Department', 
-      termGroupName: 'People' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'IT',
+        customProperties: '{"Prop1": "Value1"}',
+        localCustomProperties: '{"LocalProp1": "LocalValue1"}',
+        termSetName: 'Department',
+        termGroupName: 'People'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly escapes XML in term group name', async () => {
@@ -417,7 +433,7 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', termSetName: 'Department', termGroupName: 'People>' }});
+    await command.action(logger, { options: { name: 'IT', termSetName: 'Department', termGroupName: 'People>' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -432,7 +448,7 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', termSetName: 'Department>', termGroupName: 'People' } });
+    await command.action(logger, { options: { name: 'IT', termSetName: 'Department>', termGroupName: 'People' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -447,7 +463,7 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT>', termSetName: 'Department', termGroupName: 'People' } });
+    await command.action(logger, { options: { name: 'IT>', termSetName: 'Department', termGroupName: 'People' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT>", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -470,7 +486,7 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', description: 'IT term>', termSetName: 'Department', termGroupName: 'People' } });
+    await command.action(logger, { options: { name: 'IT', description: 'IT term>', termSetName: 'Department', termGroupName: 'People' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "IT term>", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -493,7 +509,7 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', customProperties: '{"Prop1>": "Value1>"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: 'Department', termGroupName: 'People' } });
+    await command.action(logger, { options: { name: 'IT', customProperties: '{"Prop1>": "Value1>"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: 'Department', termGroupName: 'People' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": { "Prop1>": "Value1>" }, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": { "LocalProp1": "LocalValue1" }, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -516,7 +532,7 @@ describe(commands.TERM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'IT', customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1>": "LocalValue1>"}', termSetName: 'Department', termGroupName: 'People' } });
+    await command.action(logger, { options: { name: 'IT', customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1>": "LocalValue1>"}', termSetName: 'Department', termGroupName: 'People' } });
     assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-10-22T19:11:43.669Z", "Id": "47fdacfe-ff64-4a05-b611-e84e767f04de", "LastModifiedDate": "2018-10-22T19:11:43.669Z", "Name": "IT", "CustomProperties": { "Prop1": "Value1" }, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": { "LocalProp1>": "LocalValue1>" }, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
   });
 
@@ -603,16 +619,5 @@ describe(commands.TERM_ADD, () => {
   it('passes validation when local custom properties is a valid JSON string', async () => {
     const actual = await command.validate({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', localCustomProperties: '{}' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

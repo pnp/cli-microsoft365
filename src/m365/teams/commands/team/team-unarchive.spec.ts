@@ -201,15 +201,4 @@ describe(commands.TEAM_UNARCHIVE, () => {
 
     await assert.rejects(command.action(logger, { options: { id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6' } } as any), new CommandError('No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6'));
   });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
 });

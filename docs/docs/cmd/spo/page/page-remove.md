@@ -11,13 +11,13 @@ m365 spo page remove [options]
 ## Options
 
 `-n, --name <name>`
-: Name of the page to remove
+: Name of the page to remove.
 
 `-u, --webUrl <webUrl>`
-: URL of the site from which the page should be removed
+: URL of the site from which the page should be removed.
 
 `--confirm`
-: Do not prompt for confirmation before removing the page
+: Do not prompt for confirmation before removing the page.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -29,14 +29,18 @@ If you set the `--confirm` flag, you will not be prompted for confirmation befor
 
 ## Examples
 
-Remove a modern page.
+Remove a modern page
 
 ```sh
 m365 spo page remove --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
 ```
 
-Remove a modern page without a confirmation prompt.
+Remove a modern page without a confirmation prompt
 
 ```sh
 m365 spo page remove --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

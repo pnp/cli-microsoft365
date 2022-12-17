@@ -98,7 +98,6 @@ describe(commands.REMOVE, () => {
   it('prompts before removing the specified Microsoft Flow owned by the currently signed-in user when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
@@ -120,7 +119,6 @@ describe(commands.REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
@@ -154,7 +152,6 @@ describe(commands.REMOVE, () => {
   it('prompts before removing the specified Microsoft Flow owned by another user when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         asAdmin: true
@@ -177,7 +174,6 @@ describe(commands.REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         asAdmin: true
@@ -264,7 +260,6 @@ describe(commands.REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         confirm: true
@@ -290,7 +285,6 @@ describe(commands.REMOVE, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
@@ -310,7 +304,6 @@ describe(commands.REMOVE, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
@@ -326,24 +319,12 @@ describe(commands.REMOVE, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         confirm: true
       }
     } as any);
     assert(loggerLogSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying name', () => {

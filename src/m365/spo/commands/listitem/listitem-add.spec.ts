@@ -143,17 +143,6 @@ describe(commands.LISTITEM_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('supports specifying URL', () => {
     const options = command.options;
     let containsTypeOption = false;
@@ -207,7 +196,6 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       Title: "fail adding me"
@@ -285,7 +273,6 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       contentType: "Unexpected content type",
@@ -301,7 +288,6 @@ describe(commands.LISTITEM_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: 'Demo List',
         webUrl: webUrl,
         Title: expectedTitle,

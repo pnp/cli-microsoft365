@@ -17,7 +17,7 @@ describe(commands.RUN_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -221,7 +221,7 @@ describe(commands.RUN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, flowName: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } });
+    await command.action(logger, { options: { flowName: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } });
     assert(loggerLogSpy.calledWith({
       "name": "08586653536760200319026785874CU62",
       "id": "/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/396d5ec9-ae2d-4a84-967d-cd7f56cd8f30/runs/08586653536760200319026785874CU62",
@@ -319,7 +319,7 @@ describe(commands.RUN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, flowName: 'edf73e7e-9928-4cb9-8eb2-fc263f375ada', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586652586741142222645090602CU35' } });
+    await command.action(logger, { options: { flowName: 'edf73e7e-9928-4cb9-8eb2-fc263f375ada', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586652586741142222645090602CU35' } });
     assert(loggerLogSpy.calledWith({
       "name": "08586652586741142222645090602CU35",
       "id": "/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/edf73e7e-9928-4cb9-8eb2-fc263f375ada/runs/08586652586741142222645090602CU35",
@@ -377,7 +377,7 @@ describe(commands.RUN_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, flowName: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbbx', name: '08586653536760200319026785874CU62' } } as any),
+    await assert.rejects(command.action(logger, { options: { flowName: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbbx', name: '08586653536760200319026785874CU62' } } as any),
       new CommandError(`Access to the environment 'Default-48595cc3-adce-4267-8e99-0c838923dbbx' is denied.`));
   });
 
@@ -391,7 +391,7 @@ describe(commands.RUN_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, flowName: '1c6ee23a-a835-44bc-a4f5-462b658efc12', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } } as any),
+    await assert.rejects(command.action(logger, { options: { flowName: '1c6ee23a-a835-44bc-a4f5-462b658efc12', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } } as any),
       new CommandError(`The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '1c6ee23a-a835-44bc-a4f5-462b658efc12' under Api 'shared_logicflows'.`));
   });
 
@@ -405,7 +405,7 @@ describe(commands.RUN_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, flowName: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: 'ABC' } } as any),
+    await assert.rejects(command.action(logger, { options: { flowName: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: 'ABC' } } as any),
       new CommandError(`The provided workflow run name is not valid.`));
   });
 
@@ -423,19 +423,8 @@ describe(commands.RUN_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying environment', () => {

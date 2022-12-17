@@ -14,11 +14,16 @@
 - [pp chatbot remove](../cmd/pp/chatbot/chatbot-remove.md) - removes the specified chatbot [#4106](https://github.com/pnp/cli-microsoft365/issues/4106)
 - [pp dataverse table row list](../cmd/pp/dataverse/dataverse-table-row-list.md) - lists table rows for the given Dataverse table [#3791](https://github.com/pnp/cli-microsoft365/issues/3791)
 - [pp solution publisher add](../cmd/pp/solution/solution-publisher-add.md) - adds a specified publisher in a given environment [#3977](https://github.com/pnp/cli-microsoft365/issues/3977)
+- [pp dataverse table row remove](../cmd/pp/dataverse/dataverse-table-row-remove.md) - removes a row from a dataverse table in a given environment [#4030](https://github.com/pnp/cli-microsoft365/issues/4030)
 
 **Purview:**
 
 - [purview retentionlabel list](../cmd/purview/retentionlabel/retentionlabel-list.md) - get a list of retention labels [#4144](https://github.com/pnp/cli-microsoft365/issues/4144)
 - [purview retentionlabel remove](../cmd/purview/retentionlabel/retentionlabel-remove.md) - deletes a retention label [#4149](https://github.com/pnp/cli-microsoft365/issues/4149)
+
+**SharePoint:**
+
+- [spo web retentionlabel list](../cmd/spo/web/web-retentionlabel-lis.md) - gets a list of retention labels that are available on a site [#4152](https://github.com/pnp/cli-microsoft365/issues/4152)
 
 **Teams:**
 
@@ -47,6 +52,11 @@
 - updated command options with the new boolean handlings [#3986](https://github.com/pnp/cli-microsoft365/issues/3986)
 - extended 'teams cache remove' to check on Teams PID [#3448](https://github.com/pnp/cli-microsoft365/issues/3448)
 - added 'disableTelemetry' config value [#4109](https://github.com/pnp/cli-microsoft365/issues/4109)
+- enhanced test files [#4155](https://github.com/pnp/cli-microsoft365/issues/4155)
+- enhanced Cli test file [#4185](https://github.com/pnp/cli-microsoft365/issues/4185)
+- enhanced new command template [#4135](https://github.com/pnp/cli-microsoft365/issues/4135)
+- included response output for 'spo orgassetslibrary' until 'spo serviceprincipal' commands [#3932](https://github.com/pnp/cli-microsoft365/issues/3932)
+- renamed 'spo list label <verb>' commands [#4156](https://github.com/pnp/cli-microsoft365/issues/4156)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
@@ -2121,8 +2131,8 @@
 
 **SharePoint Online:**
 
-- [spo list label get](../cmd/spo/list/list-label-get.md) - gets label set on the specified list [#773](https://github.com/pnp/cli-microsoft365/issues/773)
-- [spo list label set](../cmd/spo/list/list-label-set.md) - sets classification label on the specified list [#772](https://github.com/pnp/cli-microsoft365/issues/772)
+- [spo list label get](../cmd/spo/list/list-retentionlabel-get.md) - gets label set on the specified list [#773](https://github.com/pnp/cli-microsoft365/issues/773)
+- [spo list label set](../cmd/spo/list/list-retentionlabel-set.md) - sets classification label on the specified list [#772](https://github.com/pnp/cli-microsoft365/issues/772)
 - [spo list view field add](../cmd/spo/list/list-view-field-add.md) - adds the specified field to list view [#735](https://github.com/pnp/cli-microsoft365/issues/735)
 - [spo list view field remove](../cmd/spo/list/list-view-field-remove.md) - removes the specified field from list view [#736](https://github.com/pnp/cli-microsoft365/issues/736)
 - [spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md) - activates or deactivates in-place records management for a site collection [#774](https://github.com/pnp/cli-microsoft365/issues/774)

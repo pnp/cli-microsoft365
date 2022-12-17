@@ -20,7 +20,7 @@ describe(commands.GUESTSETTINGS_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -79,7 +79,7 @@ describe(commands.GUESTSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } });
+    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900" } });
     assert(loggerLogSpy.calledWith({
       "allowCreateUpdateChannels": false,
       "allowDeleteChannels": false
@@ -112,13 +112,12 @@ describe(commands.GUESTSETTINGS_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900" } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if teamId is not a valid GUID', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         teamId: 'invalid'
       }
     }, commandInfo);
@@ -128,7 +127,6 @@ describe(commands.GUESTSETTINGS_LIST, () => {
   it('passes validation when teamId is valid', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         teamId: '2609af39-7775-4f94-a3dc-0dd67657e900'
       }
     }, commandInfo);
@@ -149,21 +147,10 @@ describe(commands.GUESTSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", output: 'json', debug: false } });
+    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", output: 'json' } });
     assert(loggerLogSpy.calledWith({
       "allowCreateUpdateChannels": false,
       "allowDeleteChannels": false
     }));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

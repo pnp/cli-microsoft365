@@ -130,20 +130,12 @@ describe(commands.USERPROFILE_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      userName: 'john.doe@mytenant.onmicrosoft.com',
-      propertyName: 'SPS-JobTitle',
-      propertyValue: 'Senior Developer' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        userName: 'john.doe@mytenant.onmicrosoft.com',
+        propertyName: 'SPS-JobTitle',
+        propertyValue: 'Senior Developer'
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 });

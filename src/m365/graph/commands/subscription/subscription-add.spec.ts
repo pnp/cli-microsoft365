@@ -89,7 +89,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         resource: "me/mailFolders('Inbox')/messages",
         changeType: 'updated',
         clientState: 'secretClientValue',
@@ -164,7 +163,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         resource: "groups",
         changeType: 'updated',
@@ -230,7 +228,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         resource: "groups",
         changeType: 'updated',
         clientState: 'secretClientValue',
@@ -314,7 +311,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         resource: "me/mailFolders('Inbox')/messages",
         changeType: 'updated',
         clientState: 'secretClientValue',
@@ -327,7 +323,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   it('fails validation if expirationDateTime is not valid', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         resource: "me/mailFolders('Inbox')/messages",
         changeType: 'updated',
         clientState: 'secretClientValue',
@@ -341,7 +336,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   it('fails validation if notificationUrl is not valid', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         resource: "me/mailFolders('Inbox')/messages",
         changeType: 'updated',
         clientState: 'secretClientValue',
@@ -355,7 +349,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   it('fails validation if changeType is not valid', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         resource: "me/mailFolders('Inbox')/messages",
         changeType: 'foo',
         clientState: 'secretClientValue',
@@ -369,7 +362,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   it('fails validation if the clientState exceeds maximum allowed length', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         resource: "me/mailFolders('Inbox')/messages",
         changeType: 'updated',
         clientState: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -383,7 +375,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   it('passes validation if the expirationDateTime is not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         resource: "me/mailFolders('Inbox')/messages",
         changeType: 'updated',
         clientState: 'secretClientValue',
@@ -392,16 +383,5 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

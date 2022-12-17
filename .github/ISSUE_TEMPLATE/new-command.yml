@@ -74,6 +74,17 @@ body:
     validations:
       required: true
   - type: textarea
+    id: defaultProperties
+    attributes:
+      label: Default properties
+      description: |
+        Provide the default properties that should be returned when using text or csv `--output` mode.
+      value: |
+        - Default property 1
+        - Default property 2
+    validations:
+      required: false
+  - type: textarea
     id: info
     attributes:
       label: Additional Info

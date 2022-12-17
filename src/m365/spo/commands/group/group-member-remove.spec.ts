@@ -353,7 +353,6 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     }), new CommandError('The user does not exist or is not unique.'));
   });
 
-
   it('supports debug mode', () => {
     const options = command.options;
     let containsOption = false;

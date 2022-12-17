@@ -122,7 +122,6 @@ describe(commands.GROUP_MEMBER_LIST, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 3
       }
@@ -207,16 +206,5 @@ describe(commands.GROUP_MEMBER_LIST, () => {
   it('passes validation if all the required options are specified', async () => {
     const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 3 } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

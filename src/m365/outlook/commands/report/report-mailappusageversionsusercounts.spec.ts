@@ -70,7 +70,7 @@ describe(commands.REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, period: 'D7' } });
+    await command.action(logger, { options: { period: 'D7' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getEmailAppUsageVersionsUserCounts(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
