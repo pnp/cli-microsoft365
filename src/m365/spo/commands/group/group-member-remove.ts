@@ -89,6 +89,18 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
           return `Specified "groupId" ${args.options.groupId} is not valid`;
         }
 
+        if (args.options.userId && isNaN(args.options.userId)) {
+          return `Specified "userId" ${args.options.userId} is not valid`;
+        }
+
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid userName`;
+        }
+
+        if (args.options.email && !validation.isValidUserPrincipalName(args.options.email)) {
+          return `${args.options.email} is not a valid email`;
+        }
+
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
@@ -105,18 +117,17 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
     if (args.options.userName) {
       return args.options.userName;
     }
-    else {
-      const options: AadUserGetCommandOptions = {
-        email: args.options.email,
-        output: 'json',
-        debug: args.options.debug,
-        verbose: args.options.verbose
-      };
 
-      const userGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } });
-      const userOutput = JSON.parse(userGetOutput.stdout);
-      return userOutput.userPrincipalName;
-    }
+    const options: AadUserGetCommandOptions = {
+      email: args.options.email,
+      output: 'json',
+      debug: args.options.debug,
+      verbose: args.options.verbose
+    };
+
+    const userGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } });
+    const userOutput = JSON.parse(userGetOutput.stdout);
+    return userOutput.userPrincipalName;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -165,7 +176,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove user User ${args.options.userName} from SharePoint group?`
+        message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email} from SharePoint group?`
       });
 
       if (result.continue) {

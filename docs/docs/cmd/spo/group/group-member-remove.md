@@ -32,19 +32,19 @@ m365 spo group member remove [options]
 
 ## Examples
 
-Remove a user by id from SharePoint group on the web
+Remove a user from a SharePoint group by userName.
 
 ```sh
 m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userName "Alex.Wilber@contoso.com"
 ```
 
-Remove a user by email from SharePoint group on the web
+Remove a user from a SharePoint group by email.
 
 ```sh
 m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Site A Visitors" --email "Alex.Wilber@contoso.com"
 ```
 
-Remove a user by id from SharePoint group on the web
+Remove a user from a SharePoint group by id.
 
 ```sh
 m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Site A Visitors" --userId 14
