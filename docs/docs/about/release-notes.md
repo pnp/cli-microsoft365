@@ -21,6 +21,10 @@
 - [purview retentionlabel list](../cmd/purview/retentionlabel/retentionlabel-list.md) - get a list of retention labels [#4144](https://github.com/pnp/cli-microsoft365/issues/4144)
 - [purview retentionlabel remove](../cmd/purview/retentionlabel/retentionlabel-remove.md) - deletes a retention label [#4149](https://github.com/pnp/cli-microsoft365/issues/4149)
 
+**SharePoint:**
+
+- [spo web retentionlabel list](../cmd/spo/web/web-retentionlabel-lis.md) - gets a list of retention labels that are available on a site [#4152](https://github.com/pnp/cli-microsoft365/issues/4152)
+
 **Teams:**
 
 - [teams meeting attendancereport list](../cmd/teams/meeting/meeting-attendancereport-list.md) - lists all attendance reports for a given meeting [#3907](https://github.com/pnp/cli-microsoft365/issues/3907)
@@ -50,6 +54,9 @@
 - added 'disableTelemetry' config value [#4109](https://github.com/pnp/cli-microsoft365/issues/4109)
 - enhanced test files [#4155](https://github.com/pnp/cli-microsoft365/issues/4155)
 - enhanced Cli test file [#4185](https://github.com/pnp/cli-microsoft365/issues/4185)
+- enhanced new command template [#4135](https://github.com/pnp/cli-microsoft365/issues/4135)
+- included response output for 'spo orgassetslibrary' until 'spo serviceprincipal' commands [#3932](https://github.com/pnp/cli-microsoft365/issues/3932)
+- renamed 'spo list label <verb>' commands [#4156](https://github.com/pnp/cli-microsoft365/issues/4156)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
