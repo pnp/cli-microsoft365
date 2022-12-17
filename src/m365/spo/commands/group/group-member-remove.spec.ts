@@ -299,7 +299,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
     ));
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(groupName)}')/users/removeById(${userId})`) {
+      if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeById(${userId})`) {
         return UserRemovalJSONResponse;
       }
 
@@ -328,7 +328,7 @@ describe(commands.GROUP_MEMBER_REMOVE, () => {
 
     const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       const loginName: string = `i:0#.f|membership|${userName}`;
-      if (opts.url === `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(groupName)}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
+      if (opts.url === `${webUrl}/_api/web/sitegroups/GetById('${groupId}')/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`) {
         return UserRemovalJSONResponse;
       }
 
