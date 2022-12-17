@@ -10,9 +10,9 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-const command: Command = require('./list-retentionlabel-set');
+const command: Command = require('./list-retentionlabel-ensure');
 
-describe(commands.LIST_RETENTIONLABEL_SET, () => {
+describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -56,7 +56,7 @@ describe(commands.LIST_RETENTIONLABEL_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_RETENTIONLABEL_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.LIST_RETENTIONLABEL_ENSURE), true);
   });
 
   it('defines correct alias', () => {

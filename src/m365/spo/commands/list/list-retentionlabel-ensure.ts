@@ -23,9 +23,9 @@ interface Options extends GlobalOptions {
   blockEdit?: boolean;
 }
 
-class SpoListRetentionLabelSetCommand extends SpoCommand {
+class SpoListRetentionLabelEnsureCommand extends SpoCommand {
   public get name(): string {
-    return commands.LIST_RETENTIONLABEL_SET;
+    return commands.LIST_RETENTIONLABEL_ENSURE;
   }
 
   public alias(): string[] | undefined {
@@ -104,7 +104,7 @@ class SpoListRetentionLabelSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, commands.LIST_LABEL_SET, commands.LIST_RETENTIONLABEL_SET);
+    this.showDeprecationWarning(logger, commands.LIST_LABEL_SET, commands.LIST_RETENTIONLABEL_ENSURE);
 
     try {
       let listRestUrl: string = '';
@@ -160,4 +160,4 @@ class SpoListRetentionLabelSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListRetentionLabelSetCommand();
+module.exports = new SpoListRetentionLabelEnsureCommand();

@@ -1,11 +1,11 @@
-# spo list retentionlabel set
+# spo list retentionlabel ensure
 
 Sets a default retention label on the specified list or library.
 
 ## Usage
 
 ```sh
-m365 spo list retentionlabel set [options]
+m365 spo list retentionlabel ensure [options]
 ```
 
 ## Alias
@@ -51,13 +51,13 @@ A list retention label is a default label that will be applied to all new items 
 Sets retention label "Some label" on the list _Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo list retentionlabel set --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --label 'Some label'
+m365 spo list retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --label 'Some label'
 ```
 
 Sets retention label "Some label" and disables editing and deleting items on the list and all existing items for list for list _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo list retentionlabel set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --label 'Some label' --blockEdit --blockDelete --syncToItems
+m365 spo list retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --label 'Some label' --blockEdit --blockDelete --syncToItems
 ```
 
 ## Response

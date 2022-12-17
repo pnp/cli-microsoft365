@@ -2139,7 +2139,7 @@
 **SharePoint Online:**
 
 - [spo list label get](../cmd/spo/list/list-retentionlabel-get.md) - gets label set on the specified list [#773](https://github.com/pnp/cli-microsoft365/issues/773)
-- [spo list label set](../cmd/spo/list/list-retentionlabel-set.md) - sets classification label on the specified list [#772](https://github.com/pnp/cli-microsoft365/issues/772)
+- [spo list label set](../cmd/spo/list/list-retentionlabel-ensure.md) - sets classification label on the specified list [#772](https://github.com/pnp/cli-microsoft365/issues/772)
 - [spo list view field add](../cmd/spo/list/list-view-field-add.md) - adds the specified field to list view [#735](https://github.com/pnp/cli-microsoft365/issues/735)
 - [spo list view field remove](../cmd/spo/list/list-view-field-remove.md) - removes the specified field from list view [#736](https://github.com/pnp/cli-microsoft365/issues/736)
 - [spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md) - activates or deactivates in-place records management for a site collection [#774](https://github.com/pnp/cli-microsoft365/issues/774)
