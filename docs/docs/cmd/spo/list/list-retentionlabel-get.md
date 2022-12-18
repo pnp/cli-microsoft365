@@ -1,11 +1,17 @@
-# spo list label get
+# spo list retentionlabel get
 
-Gets label set on the specified list
+Gets the default retention label set on the specified list or library.
 
 ## Usage
 
 ```sh
-m365 spo list label get  [options]
+m365 spo list retentionlabel get [options]
+```
+
+## Alias
+
+```sh
+m365 spo list label get [options]
 ```
 
 ## Options
@@ -26,28 +32,28 @@ m365 spo list label get  [options]
 
 ## Examples
 
-Gets label set on the list with specified title located in the specified site.
+Gets retention label set on the list with specified title located in the specified site.
 
 ```sh
-m365 spo list label get --listTitle ContosoList --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo list retentionlabel get --listTitle ContosoList --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
-Gets label set on the list with specified id located in the specified site.
+Gets retention label set on the list with specified id located in the specified site.
 
 ```sh
-m365 spo list label get --listId cc27a922-8224-4296-90a5-ebbc54da2e85 --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo list retentionlabel get --listId cc27a922-8224-4296-90a5-ebbc54da2e85 --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
-Gets label set on the list with specified server relative url located in the specified site.
+Gets retention label set on the list with specified server relative url located in the specified site.
 
 ```sh
-m365 spo list label get --listUrl 'sites/project-x/Documents' --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo list retentionlabel get --listUrl 'sites/project-x/Documents' --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
-Gets label set on the list with specified site-relative URL located in the specified site.
+Gets retention label set on the list with specified site-relative URL located in the specified site.
 
 ```sh
-m365 spo list label get --listUrl 'Shared Documents' --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo list retentionlabel get --listUrl 'Shared Documents' --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 ## Response

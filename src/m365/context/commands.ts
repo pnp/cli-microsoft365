@@ -1,5 +1,6 @@
 const prefix: string = 'context';
 
 export default {
-  REMOVE: `${prefix} remove`
+  REMOVE: `${prefix} remove`,
+  INIT: `${prefix} init`
 };

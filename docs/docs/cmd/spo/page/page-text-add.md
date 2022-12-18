@@ -11,22 +11,22 @@ m365 spo page text add [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the page to add the text to is located
+: URL of the site where the page to add the text to is located.
 
 `-n, --pageName <pageName>`
-: Name of the page to which add the text
+: Name of the page to which add the text.
 
 `-t, --text <text>`
 : Text to add to the page
 
 `--section [section]`
-: Number of the section to which the text should be added (1 or higher)
+: Number of the section to which the text should be added (1 or higher).
 
 `--column [column]`
-: Number of the column in which the text should be added (1 or higher)
+: Number of the column in which the text should be added (1 or higher).
 
 `--order [order]`
-: Order of the text in the column
+: Order of the text in the column.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -53,3 +53,7 @@ Add text at the beginning of the default column on a modern page
 ```sh
 m365 spo page text add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world' --order 1
 ```
+
+## Response
+
+The command won't return a response on success.

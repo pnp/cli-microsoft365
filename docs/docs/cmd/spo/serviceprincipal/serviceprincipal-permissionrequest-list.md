@@ -30,3 +30,33 @@ List all pending permission requests
 ```sh
 m365 spo serviceprincipal permissionrequest list
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Id": "6eceed61-77e4-424d-ae1d-696a0de4d768",
+        "Resource": "Microsoft Graph",
+        "ResourceId": "Microsoft Graph",
+        "Scope": "Reports.Read.All"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Id                                    Resource         ResourceId       Scope
+    ------------------------------------  ---------------  ---------------  -----------------------
+    6eceed61-77e4-424d-ae1d-696a0de4d768  Microsoft Graph  Microsoft Graph  Reports.Read.All
+    ```
+
+=== "CSV"
+
+    ```csv
+    Id,Resource,ResourceId,Scope
+    6eceed61-77e4-424d-ae1d-696a0de4d768,Microsoft Graph,Microsoft Graph,Reports.Read.All
+    ```

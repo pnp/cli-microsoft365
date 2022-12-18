@@ -1,4 +1,4 @@
-import { Hash } from "../../utils/types";
+import { Hash } from '../../utils/types';
 
 export interface M365RcJson {
   apps?: M365RcJsonApp[];

@@ -12,6 +12,7 @@ export default {
   DATAVERSE_TABLE_GET: `${prefix} dataverse table get`,
   DATAVERSE_TABLE_REMOVE: `${prefix} dataverse table remove`,
   DATAVERSE_TABLE_ROW_LIST: `${prefix} dataverse table row list`,
+  DATAVERSE_TABLE_ROW_REMOVE: `${prefix} dataverse table row remove`,
   ENVIRONMENT_GET: `${prefix} environment get`,
   ENVIRONMENT_LIST: `${prefix} environment list`,
   GATEWAY_GET: `${prefix} gateway get`,
