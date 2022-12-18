@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import commands from '../commands';
 import { Logger } from '../../../cli/Logger';
 import { sinonUtil } from '../../../utils/sinonUtil';
-import Command from '../../../Command';
+import Command, { CommandError } from '../../../Command';
 import * as fs from 'fs';
 import { Cli } from '../../../cli/Cli';
 import { telemetry } from '../../../telemetry';
@@ -40,7 +40,6 @@ describe(commands.REMOVE, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      telemetry.trackEvent,
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync,
@@ -126,16 +125,14 @@ describe(commands.REMOVE, () => {
     }, null, 2));
   });
 
-  it(`doesn't save context info in the .m365rc.json file when there was an error reading file contents`, async () => {
+  it(`handles an error when reading file contents failes`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
-    const fsWriteFileSyncSpy = sinon.spy(fs, 'unlinkSync');
 
-    await command.action(logger, { options: { debug: true, confirm: true } });
-    assert(fsWriteFileSyncSpy.notCalled);
+    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } }), new CommandError(`Error reading .m365rc.json: Error: An error has occurred. Please remove context info from .m365rc.json manually.`));
   });
 
-  it(`doesn't save context info in the .m365rc.json file when there was error writing file contents`, async () => {
+  it(`handles an error when writing file contents failes`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
       "apps": [
@@ -147,19 +144,19 @@ describe(commands.REMOVE, () => {
       "context": {}
     }));
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
-    command.action(logger, { options: { debug: true, confirm: true } });
+    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } }), new CommandError(`Error writing .m365rc.json: Error: An error has occurred. Please remove context info from .m365rc.json manually.`));
   });
 
-  it(`doesn't remove the .m365rc.json file when there was error removing the file`, async () => {
+  it(`handles an error when removing the file failes`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
       "context": {}
     }));
     sinon.stub(fs, 'unlinkSync').callsFake(_ => { throw new Error('An error has occurred'); });
-    command.action(logger, { options: { debug: true, confirm: true } });
+    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } }), new CommandError(`Error removing .m365rc.json: Error: An error has occurred. Please remove .m365rc.json manually.`));
   });
 
-  it(`doesn't remove context info from the .m365rc.json file when there was no context`, async () => {
+  it(`doesn't update the context file, if it doesn't contain context information`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
       apps: [{
@@ -167,7 +164,7 @@ describe(commands.REMOVE, () => {
         name: 'My AAD app'
       }]
     }));
-    const fsWriteFileSyncSpy = sinon.spy(fs, 'unlinkSync');
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     await command.action(logger, { options: { debug: true, confirm: true } });
     assert(fsWriteFileSyncSpy.notCalled);

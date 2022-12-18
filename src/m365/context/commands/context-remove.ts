@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
+import { CommandError } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import { M365RcJson } from '../../base/M365RcJson';
@@ -25,7 +26,7 @@ class ContextRemoveCommand extends AnonymousCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
-      await this.removeContext(logger);
+      await this.removeContext();
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -36,7 +37,7 @@ class ContextRemoveCommand extends AnonymousCommand {
       });
 
       if (result.continue) {
-        await this.removeContext(logger);
+        await this.removeContext();
       }
     }
   }
@@ -64,7 +65,7 @@ class ContextRemoveCommand extends AnonymousCommand {
     );
   }
 
-  private removeContext(logger: Logger): void {
+  private removeContext(): void {
     const filePath: string = '.m365rc.json';
 
     let m365rc: M365RcJson = {};
@@ -76,8 +77,7 @@ class ContextRemoveCommand extends AnonymousCommand {
         }
       }
       catch (e) {
-        logger.logToStderr(`Error reading ${filePath}: ${e}. Please remove context info from ${filePath} manually.`);
-        return;
+        throw new CommandError(`Error reading ${filePath}: ${e}. Please remove context info from ${filePath} manually.`);
       }
     }
 
@@ -91,7 +91,7 @@ class ContextRemoveCommand extends AnonymousCommand {
         fs.unlinkSync(filePath);
       }
       catch (e) {
-        logger.logToStderr(`Error removing ${filePath}: ${e}. Please remove ${filePath} manually.`);
+        throw new CommandError(`Error removing ${filePath}: ${e}. Please remove ${filePath} manually.`);
       }
     }
     else {
@@ -100,7 +100,7 @@ class ContextRemoveCommand extends AnonymousCommand {
         fs.writeFileSync(filePath, JSON.stringify(m365rc, null, 2));
       }
       catch (e) {
-        logger.logToStderr(`Error writing ${filePath}: ${e}. Please remove context info from ${filePath} manually.`);
+        throw new CommandError(`Error writing ${filePath}: ${e}. Please remove context info from ${filePath} manually.`);
       }
     }
   }
