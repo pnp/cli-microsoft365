@@ -47,6 +47,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         groupId: typeof args.options.groupId !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
         aadGroupId: typeof args.options.aadGroupId !== 'undefined',
         aadGroupName: typeof args.options.aadGroupName !== 'undefined',
         confirm: !!args.options.confirm
@@ -127,19 +128,17 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       logger.logToStderr(`Removing User with Username ${args.options.userName} from Group: ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
     }
 
-    let requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/`;
+    let requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/${args.options.groupId
+      ? `GetById('${args.options.groupId}')`
+      : `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')`}`;
 
     if (args.options.userName) {
       const loginName: string = `i:0#.f|membership|${args.options.userName}`;
-      requestUrl += `${args.options.groupId
-        ? `GetById('${args.options.groupId}')`
-        : `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')`}/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`;
+      requestUrl += `/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`;
     }
     else {
       const aadGroupId = await this.getGroupId(args);
-      requestUrl += `${args.options.groupId
-        ? `GetById('${args.options.groupId}')`
-        : `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')`}/users/RemoveById(${aadGroupId})`;
+      requestUrl += `/users/RemoveById(${aadGroupId})`;
       logger.log(aadGroupId);
     }
     const requestOptions: any = {

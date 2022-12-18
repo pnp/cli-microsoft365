@@ -19,14 +19,14 @@ m365 spo group member remove [options]
 `--groupName  [groupName]`
 : Name of the SharePoint group from which user has to be removed. Specify either `groupName` or `groupId`, but not both
 
-`--userName <userName>`
-: The UPN of the user that needs to be removed (user principal name, eg. megan.bowen@contoso.com)
+`--userName [userName]`
+: The UPN of the user that needs to be removed (user principal name, eg. megan.bowen@contoso.com). Specify either `aadGroupId`, `aadGroupName` or `userName`
 
 `--aadGroupId [aadGroupId]`
-: The object Id of the Azure AD group to remove as a member. Specify either `aadGroupId` or `aadGroupName`.
+: The object Id of the Azure AD group to remove as a member. Specify either `aadGroupId`, `aadGroupName` or `userName`
 
 `--aadGroupName [aadGroupName]`
-: The name of the Azure AD group to remove as a member. Specify either `aadGroupId` or `aadGroupName`.
+: The name of the Azure AD group to remove as a member. Specify either `aadGroupId`, `aadGroupName` or `userName`
 
 --8<-- "docs/cmd/_global.md"
 
