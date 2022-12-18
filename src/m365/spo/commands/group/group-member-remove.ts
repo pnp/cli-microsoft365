@@ -190,6 +190,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       const aadGroupId = await this.getGroupId(args);
       requestUrl += `/users/RemoveById(${aadGroupId})`;
     }
+
     const requestOptions: any = {
       url: requestUrl,
       headers: {
