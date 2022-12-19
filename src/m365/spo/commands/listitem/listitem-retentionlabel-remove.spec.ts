@@ -118,15 +118,14 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
+    await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
         listId: listId,
         webUrl: webUrl,
         listItemId: 1
       }
-    });
-    assert(loggerLogToStderrSpy.calledWith());
+    }));
   });
 
   it('removes the retentionlabel based on listTitle when prompt confirmed', async () => {
@@ -143,15 +142,14 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
+    await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
         listTitle: listTitle,
         webUrl: webUrl,
         listItemId: 1
       }
-    });
-    assert(loggerLogToStderrSpy.calledWith());
+    }));
   });
 
   it('removes the retentionlabel based on listUrl', async () => {
@@ -163,7 +161,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
+    await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
         confirm: true,
@@ -171,8 +169,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1
       }
-    });
-    assert(loggerLogToStderrSpy.calledWith());
+    }));
   });
 
   it('removes the retentionlabel based on listUrl when prompt confirmed (debug)', async () => {
@@ -189,15 +186,14 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
+    await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
         listUrl: listUrl,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1
       }
-    });
-    assert(loggerLogToStderrSpy.calledWith());
+    }));
   });
 
   it('correctly handles API OData error', async () => {
