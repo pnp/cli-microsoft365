@@ -37,7 +37,7 @@ Some options are required and necessary for the particular command to execute, w
 
 ## Boolean options (true/false)
 
-Some options in the CLI expect boolean values like `true` or `false`. The CLI for Microsoft 365 has the following definition on booleans:
+Some options in the CLI expect boolean values like `true` or `false`. The CLI for Microsoft 365 has the following definition for booleans:
 
 !!! info "Definition of Booleans" 
     Booleans are case-insensitive and are represented by the following values.  
