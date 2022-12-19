@@ -20,7 +20,7 @@ interface SearchExternalItem {
 }
 
 interface Property {
-  aliasses?: string[];
+  aliases?: string[];
   isQueryable?: boolean;
   isRefinable?: boolean;
   isRetrievable?: boolean;
@@ -36,7 +36,7 @@ class SearchExternalConnectionSchemaAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'This command will allow the administrator to add a schema to a specific external connection for use in Microsoft Search.';
+    return 'This command allows the administrator to add a schema to a specific external connection for use in Microsoft Search.';
   }
 
   constructor() {
@@ -79,6 +79,7 @@ class SearchExternalConnectionSchemaAddCommand extends GraphCommand {
         if (schemaObject.baseType === undefined || schemaObject.baseType !== 'microsoft.graph.externalItem') {
           return `The schema needs a required property 'baseType' with value 'microsoft.graph.externalItem'`;
         }
+
         if (!schemaObject.properties || schemaObject.properties.length > 128) {
           return `We need atleast one property and a maximum of 128 properties in the schema object`;
         }

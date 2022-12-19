@@ -1,6 +1,6 @@
 # search externalconnection schema add
 
-This command will allow the administrator to add a schema to a specific external connection for use in Microsoft Search.
+This command allows the administrator to add a schema to a specific external connection for use in Microsoft Search.
 
 ## Usage
 
@@ -10,7 +10,7 @@ m365 search externalconnection schema add [options]
 
 ## Options
 
-`-i, --externalConnectionId  [externalConnectionId]`
+`-i, --externalConnectionId  <externalConnectionId>`
 : ID of the External Connection.
 
 `-s, --schema [schema]`
