@@ -106,6 +106,14 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.showDeprecationWarning(logger, commands.LIST_LABEL_SET, commands.LIST_RETENTIONLABEL_ENSURE);
 
+    if (args.options.blockDelete) {
+      this.warn(logger, `Option 'blockDelete' is deprecated.`);
+    }
+
+    if (args.options.blockEdit) {
+      this.warn(logger, `Option 'blockEdit' is deprecated.`);
+    }
+
     try {
       let listRestUrl: string = '';
       let listServerRelativeUrl: string = '';
