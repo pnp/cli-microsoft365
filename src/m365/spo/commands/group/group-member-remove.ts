@@ -113,7 +113,11 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
     );
   }
 
-  private async getUserName(args: CommandArgs): Promise<string> {
+  private async getUserName(logger: Logger, args: CommandArgs): Promise<string> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving information about the user ${args.options.userName || args.options.email}`);
+    }
+
     if (args.options.userName) {
       return args.options.userName;
     }
@@ -144,7 +148,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         requestUrl += `/users/removeById(${args.options.userId})`;
       }
       else {
-        const userName: string = await this.getUserName(args);
+        const userName: string = await this.getUserName(logger, args);
         const loginName: string = `i:0#.f|membership|${userName}`;
         requestUrl += `/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`;
       }
@@ -176,7 +180,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email} from SharePoint group?`
+        message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email} from the SharePoint group?`
       });
 
       if (result.continue) {
