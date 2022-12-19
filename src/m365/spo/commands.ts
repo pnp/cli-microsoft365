@@ -281,6 +281,7 @@ export default {
   USERPROFILE_GET: `${prefix} userprofile get`,
   USERPROFILE_SET: `${prefix} userprofile set`,
   WEB_ADD: `${prefix} web add`,
+  WEB_APPLICATIONCUSTOMIZER_ENSURE: `${prefix} web applicationcustomizer ensure`,
   WEB_CLIENTSIDEWEBPART_LIST: `${prefix} web clientsidewebpart list`,
   WEB_GET: `${prefix} web get`,
   WEB_INSTALLEDLANGUAGE_LIST: `${prefix} web installedlanguage list`,
