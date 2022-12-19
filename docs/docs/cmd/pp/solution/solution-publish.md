@@ -1,6 +1,6 @@
 # pp solution publish
 
-Publishes the components of a specified solution in the specified Power Platform environment
+Publishes the components of a solution in a given Power Platform environment
 
 ## Usage
 
@@ -22,8 +22,8 @@ m365 pp solution publish [options]
 `--asAdmin`
 : Run the command as admin for environments you do not have explicitly assigned permissions to.
 
-`--confirm`
-: Don't prompt for confirmation
+`--wait`
+: Wait for the job to complete
 
 --8<-- "docs/cmd/_global.md"
 

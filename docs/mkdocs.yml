@@ -286,8 +286,8 @@ nav:
         - solution get: cmd/pp/solution/solution-get.md
         - solution list: cmd/pp/solution/solution-list.md
         - solution remove: cmd/pp/solution/solution-remove.md
-        - solution publisher add: cmd/pp/solution/solution-publisher-add.md
         - solution publish: 'cmd/pp/solution/solution-publish.md'
+        - solution publisher add: cmd/pp/solution/solution-publisher-add.md
         - solution publisher get: cmd/pp/solution/solution-publisher-get.md
         - solution publisher list: cmd/pp/solution/solution-publisher-list.md
         - solution publisher remove: cmd/pp/solution/solution-publisher-remove.md

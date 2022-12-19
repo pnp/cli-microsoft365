@@ -10,6 +10,7 @@ import commands from '../../commands';
 import { Options as PpSolutionGetCommandOptions } from './solution-get';
 import * as PpSolutionGetCommand from './solution-get';
 import Command from '../../../../Command';
+import { formatting } from '../../../../utils/formatting';
 
 interface CommandArgs {
   options: Options;
@@ -23,7 +24,7 @@ export interface Options extends GlobalOptions {
   wait?: boolean;
 }
 
-export interface SolutionComponent {
+interface SolutionComponent {
   msdyn_componentlogicalname: string;
   msdyn_name: string;
 }
@@ -34,7 +35,7 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
   }
 
   public get description(): string {
-    return 'Publishes a specific solution in a given environment.';
+    return 'Publishes the specified solution';
   }
 
   constructor() {
@@ -97,13 +98,16 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Publishes a specific solution '${args.options.id || args.options.name}'...`);
+      logger.logToStderr(`Publishing the solution '${args.options.id || args.options.name}'...`);
     }
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
-      const parameterXml = await this.getSolutionComponents(args, dynamicsApiUrl);
+      const solutionId = await this.getSolutionId(args, logger);
+
+      const solutionComponents: SolutionComponent[] = await this.getSolutionComponents(dynamicsApiUrl, solutionId, logger);
+      const parameterXml = this.buildXmlRequestObject(solutionComponents, logger);
 
       const requestOptions: AxiosRequestConfig = {
         url: `${dynamicsApiUrl}/api/data/v9.0/PublishXml`,
@@ -122,15 +126,14 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
       else {
         request.post(requestOptions);
       }
-
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getSolutionComponents(args: CommandArgs, dynamicsApiUrl: string): Promise<string> {
-    const solutionId = await this.getSolutionId(args);
+  private async getSolutionComponents(dynamicsApiUrl: string, solutionId: string, logger: Logger): Promise<SolutionComponent[]> {
+
     const requestOptions: AxiosRequestConfig = {
       url: `${dynamicsApiUrl}/api/data/v9.0/msdyn_solutioncomponentsummaries?$filter=(msdyn_solutionid eq ${solutionId})&$select=msdyn_componentlogicalname,msdyn_name&$orderby=msdyn_componentlogicalname asc&api-version=9.1`,
       headers: {
@@ -139,14 +142,22 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
       responseType: 'json'
     };
 
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving solution components`);
+    }
+
     const response = await request.get<{ value: SolutionComponent[] }>(requestOptions);
 
-    return this.formatAsXml(response.value);
+    return response.value;
   }
 
-  private async getSolutionId(args: CommandArgs): Promise<string> {
+  private async getSolutionId(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.id) {
       return args.options.id;
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving solutionId`);
     }
 
     const options: PpSolutionGetCommandOptions = {
@@ -162,7 +173,10 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
     return getSolutionOutput.solutionid;
   }
 
-  private formatAsXml(solutionComponents: SolutionComponent[]): string {
+  private buildXmlRequestObject(solutionComponents: SolutionComponent[], logger: Logger): string {
+    if (this.verbose) {
+      logger.logToStderr(`Building the XML request object...`);
+    }
     const result = solutionComponents.reduce(function (r, a) {
       const key = a.msdyn_componentlogicalname.slice(-1) === 'y' ?
         a.msdyn_componentlogicalname.substring(0, a.msdyn_componentlogicalname.length - 1) + 'ies' :
@@ -173,27 +187,8 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
       return r;
     }, Object.create(null));
 
-    return `<importexportxml>${this.objectToXml(result)}</importexportxml>`;
+    return `<importexportxml>${formatting.objectToXml(result)}</importexportxml>`;
   }
-
-  private objectToXml(obj: any): string {
-    let xml = '';
-    for (const prop in obj) {
-      xml += "<" + prop + ">";
-      if (obj[prop] instanceof Array) {
-        for (const array in obj[prop]) {
-          xml += this.objectToXml(new Object(obj[prop][array]));
-        }
-      }
-      else {
-        xml += obj[prop];
-      }
-      xml += "</" + prop + ">";
-    }
-    xml = xml.replace(/<\/?[0-9]{1,}>/g, '');
-    return xml;
-  }
-
 }
 
 module.exports = new PpSolutionPublishCommand();

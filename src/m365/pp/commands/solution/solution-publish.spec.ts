@@ -161,14 +161,13 @@ describe(commands.SOLUTION_PUBLISH, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, {
+    await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
         environment: validEnvironment,
         name: validName
       }
-    });
-    assert(loggerLogToStderrSpy.called);
+    }));
   });
 
   it('publishes the components of a specified solution owned by the currently signed-in user and waits for completion', async () => {
@@ -239,16 +238,5 @@ describe(commands.SOLUTION_PUBLISH, () => {
         id: validId
       }
     }), new CommandError(errorMessage));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });
