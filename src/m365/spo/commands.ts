@@ -12,6 +12,7 @@ export default {
   APP_TEAMSPACKAGE_DOWNLOAD: `${prefix} app teamspackage download`,
   APP_UNINSTALL: `${prefix} app uninstall`,
   APP_UPGRADE: `${prefix} app upgrade`,
+  APPLICATIONCUSTOMIZER_ADD: `${prefix} applicationcustomizer add`,
   APPPAGE_ADD: `${prefix} apppage add`,
   APPPAGE_SET: `${prefix} apppage set`,
   CDN_GET: `${prefix} cdn get`,

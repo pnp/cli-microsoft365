@@ -359,6 +359,8 @@ nav:
         - app upgrade: cmd/spo/app/app-upgrade.md
         - app instance list: cmd/spo/app/app-instance-list.md
         - app teamspackage download: cmd/spo/app/app-teamspackage-download.md
+      - applicationcustomizer:
+        - applicationcustomizer add: cmd/spo/applicationcustomizer/applicationcustomizer-add.md
       - apppage:
         - apppage add: cmd/spo/apppage/apppage-add.md
         - apppage set: cmd/spo/apppage/apppage-set.md
