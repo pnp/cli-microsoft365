@@ -78,7 +78,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('prompts before removing retentionlabel when confirmation argument not passed (id)', async () => {
-    await command.action(logger, { options: { debug: false, listItemId: 1, webUrl: webUrl, listTitle: listTitle } });
+    await command.action(logger, { options: { listItemId: 1, webUrl: webUrl, listTitle: listTitle } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -95,7 +95,6 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: listTitle,
         webUrl: webUrl,
         listItemId: 1
@@ -203,7 +202,6 @@ describe(commands.LISTITEM_RETENTIONLABEL_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         confirm: true,
         listUrl: listUrl,
         webUrl: 'https://contoso.sharepoint.com',
