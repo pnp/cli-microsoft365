@@ -44,7 +44,7 @@ Some options in the CLI expect boolean values like `true` or `false`. The CLI fo
     True: 1, yes, true, on  
     False: 0, no, false, off
 
-This means that whenever you need to pass a boolean value to a command, you can use any of the values listed above. For example, to configure if planner is allowed in your organisation you can execute the following:
+This means that whenever you need to pass a boolean value to a command, you can use any of the values listed above. For example, to configure if Planner is allowed in your organization you can execute the following:
 
 ```sh
 m365 planner tenant settings set --isPlannerAllowed true
