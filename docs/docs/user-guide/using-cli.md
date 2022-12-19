@@ -40,7 +40,7 @@ Some options are required and necessary for the particular command to execute, w
 Some options in the CLI expect boolean values like `true` or `false`. The CLI for Microsoft 365 has the following definition on booleans:
 
 !!! info "Definition of Booleans" 
-    Booleans are case-insensitive, and are represented by the following values.  
+    Booleans are case-insensitive and are represented by the following values.  
     True: 1, yes, true, on  
     False: 0, no, false, off
 
