@@ -20,13 +20,13 @@ m365 aad group get [options]
 
 ## Examples
 
-Get information about a Azure AD Group by id
+Get information about an Azure AD Group by id
 
 ```sh
 m365 aad group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
 ```
 
-Get information about a Azure AD Group by title
+Get information about an Azure AD Group by title
 
 ```sh
 m365 aad group get --title "Finance"
