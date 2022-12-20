@@ -114,12 +114,12 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
   }
 
   private async getUserName(logger: Logger, args: CommandArgs): Promise<string> {
-    if (this.verbose) {
-      logger.logToStderr(`Retrieving information about the user ${args.options.userName || args.options.email}`);
-    }
-
     if (args.options.userName) {
       return args.options.userName;
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving information about the user ${args.options.email}`);
     }
 
     const options: AadUserGetCommandOptions = {
