@@ -2,7 +2,7 @@
   {
     "name": "pnp-hide-list-from-site-contents",
     "source": "pnp",
-    "title": "Hide SharePoint list from Site Contents",
+    "title": "CLI - Hide SharePoint list from Site Contents",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/hide-list-from-site-contents",
     "creationDateTime": "2020-03-28",
     "updateDateTime": "2020-03-28",

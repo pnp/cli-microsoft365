@@ -2,7 +2,7 @@
   {
     "name": "pnp-remove-site-scripts",
     "source": "pnp",
-    "title": "Delete custom SharePoint site scripts",
+    "title": "CLI - Delete custom SharePoint site scripts",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/remove-site-scripts",
     "creationDateTime": "2020-03-15",
     "updateDateTime": "2020-03-15",

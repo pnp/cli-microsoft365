@@ -2,7 +2,7 @@
   {
     "name": "pnp-replace-owner-with-a-different-one",
     "source": "pnp",
-    "title": "Replace an owner in a Microsoft 365 Group or Microsoft Team",
+    "title": "CLI - Replace an owner in a Microsoft 365 Group or Microsoft Team",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/replace-owner-with-a-different-one",
     "creationDateTime": "2021-04-28",
     "updateDateTime": "2021-04-28",

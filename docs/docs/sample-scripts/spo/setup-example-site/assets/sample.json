@@ -2,7 +2,7 @@
   {
     "name": "pnp-setup-example-site",
     "source": "pnp",
-    "title": "Replace site collection admin with another user",
+    "title": "CLI - Setup example site",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/setup-example-site",
     "creationDateTime": "2021-04-10",
     "updateDateTime": "2021-04-10",

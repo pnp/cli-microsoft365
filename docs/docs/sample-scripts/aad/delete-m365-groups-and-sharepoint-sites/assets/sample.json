@@ -2,7 +2,7 @@
   {
     "name": "pnp-delete-m365-groups-and-sharepoint-sites",
     "source": "pnp",
-    "title": "Delete all Microsoft 365 groups and SharePoint sites",
+    "title": "CLI - Delete all Microsoft 365 groups and SharePoint sites",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/delete-m365-groups-and-sharepoint-sites",
     "creationDateTime": "2021-03-15",
     "updateDateTime": "2021-03-15",

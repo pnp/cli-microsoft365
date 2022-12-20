@@ -2,7 +2,7 @@
   {
     "name": "pnp-empty-tenant-recyclebin",
     "source": "pnp",
-    "title": "Empty the tenant recycle bin",
+    "title": "CLI - Empty the tenant recycle bin",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/empty-tenant-recyclebin",
     "creationDateTime": "2021-06-13",
     "updateDateTime": "2021-06-13",

@@ -2,7 +2,7 @@
   {
     "name": "pnp-flow-runs-day-summary",
     "source": "pnp",
-    "title": "Flow runs day summary report",
+    "title": "CLI - Flow runs day summary report",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/flow-runs-day-summary",
     "creationDateTime": "2021-10-16",
     "updateDateTime": "2021-10-16",

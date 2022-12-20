@@ -2,7 +2,7 @@
   {
     "name": "pnp-remove-site-designs",
     "source": "pnp",
-    "title": "Delete custom SharePoint site designs",
+    "title": "CLI - Delete custom SharePoint site designs",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/remove-site-designs",
     "creationDateTime": "2019-10-20",
     "updateDateTime": "2019-10-20",

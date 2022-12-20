@@ -2,7 +2,7 @@
   {
     "name": "pnp-list-site-externalusers",
     "source": "pnp",
-    "title": "List all external users in all site collections",
+    "title": "CLI - List all external users in all site collections",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-site-externalusers",
     "creationDateTime": "2021-03-15",
     "updateDateTime": "2021-03-15",

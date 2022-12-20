@@ -2,7 +2,7 @@
   {
     "name": "pnp-list-tenant-wide-extensions",
     "source": "pnp",
-    "title": "List all tenant-wide extensions",
+    "title": "CLI - List all tenant-wide extensions",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-tenant-wide-extensions",
     "creationDateTime": "2020-04-12",
     "updateDateTime": "2020-04-12",

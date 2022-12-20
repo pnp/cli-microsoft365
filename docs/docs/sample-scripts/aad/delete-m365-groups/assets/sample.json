@@ -2,7 +2,7 @@
   {
     "name": "pnp-delete-m365-groups",
     "source": "pnp",
-    "title": "Delete all Microsoft 365 groups",
+    "title": "CLI - Delete all Microsoft 365 groups",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/delete-m365-groups",
     "creationDateTime": "2020-03-15",
     "updateDateTime": "2020-03-15",
