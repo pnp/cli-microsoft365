@@ -251,8 +251,6 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       logger.logToStderr(spoUserGetOutput.stderr);
     }
 
-    Cli.log(spoUserGetOutput.stderr);
-
     validUserNames.push(JSON.parse(spoUserGetOutput.stdout).UserPrincipalName);
   }
 
