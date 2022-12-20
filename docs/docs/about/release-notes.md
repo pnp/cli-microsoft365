@@ -62,6 +62,8 @@
 - included response output for 'spo orgassetslibrary' until 'spo serviceprincipal' commands [#3932](https://github.com/pnp/cli-microsoft365/issues/3932)
 - renamed 'spo list label [verb]' commands [#4156](https://github.com/pnp/cli-microsoft365/issues/4156)
 - extended 'aad user set' with changing and resetting a password [#2852](https://github.com/pnp/cli-microsoft365/issues/2852)
+- refactored script samples to expose them in Microsoft solution gallery [#4168](https://github.com/pnp/cli-microsoft365/issues/4168)
+
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
