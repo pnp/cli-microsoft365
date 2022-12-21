@@ -301,6 +301,7 @@ nav:
         - tenant settings list: cmd/pp/tenant/tenant-settings-list.md
     - Purview (purview):
       - retentionlabel:
+        - retentionlabel add: cmd/purview/retentionlabel/retentionlabel-add.md
         - retentionlabel get: cmd/purview/retentionlabel/retentionlabel-get.md
         - retentionlabel list: cmd/purview/retentionlabel/retentionlabel-list.md
         - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
