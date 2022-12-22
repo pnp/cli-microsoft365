@@ -122,6 +122,7 @@ nav:
         - config set: cmd/cli/config/config-set.md
     - Context (context):
       - init: cmd/context/context-init.md
+      - remove: cmd/context/context-remove.md
     - File (file):
       - add: cmd/file/file-add.md
       - convert:
