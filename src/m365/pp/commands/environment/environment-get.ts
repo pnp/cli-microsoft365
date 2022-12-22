@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  name?: string;
   asAdmin?: boolean;
 }
 
@@ -38,6 +38,7 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        name: typeof args.options.name !== 'undefined',
         asAdmin: !!args.options.asAdmin
       });
     });
@@ -46,7 +47,7 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-n, --name <name>'
+        option: '-n, --name [name]'
       },
       {
         option: '--asAdmin'
@@ -70,7 +71,7 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
 
     const res: { value: Environment[] } = await request.get<{ value: Environment[] }>(requestOptions);
     const environmentItem: Environment | undefined = res.value.filter((env: Environment) => {
-      return env.name === args.options.name;
+      return args.options.name ? env.name === args.options.name : env.properties.isDefault === true;
     })[0];
 
     if (!environmentItem) {

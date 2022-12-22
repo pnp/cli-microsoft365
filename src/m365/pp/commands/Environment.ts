@@ -3,4 +3,8 @@ export interface Environment {
   type: string;
   location: string;
   name: string;
+  properties: {
+    displayName: string;
+    isDefault: boolean;
+  }
 }

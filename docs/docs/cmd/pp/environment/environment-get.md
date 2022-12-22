@@ -10,11 +10,11 @@ m365 pp environment get [options]
 
 ## Options
 
-`-n, --name <name>`
-: The name of the environment to get information about
+`-n, --name [name]`
+: The name of the environment. When not specified, the default environment is retrieved.
 
 `--asAdmin`
-: Run the command as admin and retrieve details of environments you do not have explicitly assigned permissions to
+: Run the command as admin and retrieve details of environments you do not have explicitly assigned permissions to.
 
 --8<-- "docs/cmd/_global.md"
 
