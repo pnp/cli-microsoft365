@@ -76,7 +76,8 @@ class Request {
     this.req = Axios.create({
       headers: {
         'user-agent': `NONISV|SharePointPnP|CLIMicrosoft365/${packageJSON.version}`,
-        'accept-encoding': 'gzip, deflate'
+        'accept-encoding': 'gzip, deflate',
+        'X-ClientService-ClientTag': `M365CLI:${packageJSON.version}`
       },
       decompress: true,
       responseType: 'text',
