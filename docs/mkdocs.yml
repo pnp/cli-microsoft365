@@ -399,6 +399,7 @@ nav:
         - file roleinheritance break: cmd/spo/file/file-roleinheritance-break.md
         - file roleinheritance reset: cmd/spo/file/file-roleinheritance-reset.md
         - file sharinginfo get: cmd/spo/file/file-sharinginfo-get.md
+        - file sharinglink list: cmd/spo/file/file-sharinglink-list.md
         - file version clear: cmd/spo/file/file-version-clear.md
         - file version get: cmd/spo/file/file-version-get.md
         - file version list: cmd/spo/file/file-version-list.md
