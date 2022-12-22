@@ -22,6 +22,9 @@ m365 spo list label set [options]
 `--label <label>`
 : The label to set on the list.
 
+`--name <name>`
+: The label to set on the list
+
 `-t, --listTitle [listTitle]`
 : The title of the list on which to set the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
@@ -48,16 +51,16 @@ A list retention label is a default label that will be applied to all new items 
 
 ## Examples
 
-Sets retention label on the list with specified site-relative URL located in the specified site.
+Sets a retention label on a given list
 
 ```sh
-m365 spo list retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --label 'Some label'
+m365 spo list retentionlabel set --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --name 'Some label'
 ```
 
-Sets retention label and disables editing and deleting items on the list and all existing items for the list with specified title located in the specified site.
+Sets a retention label and disables editing and deleting items on the list and all existing items for a given list
 
 ```sh
-m365 spo list retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --label 'Some label' --blockEdit --blockDelete --syncToItems
+m365 spo list retentionlabel set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --name 'Some label' --blockEdit --blockDelete --syncToItems
 ```
 
 ## Response
