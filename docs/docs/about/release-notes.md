@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Azure AD:**
+
+- [aad group get](../cmd/aad/group/group-get.md) - get information about a specified Azure AD Group [#3786](https://github.com/pnp/cli-microsoft365/issues/3786) 
+
 **Context:**
 
 - [context init](../cmd/context/context-init.md) - initiates CLI for Microsoft 365 context in the current working folder [#4042](https://github.com/pnp/cli-microsoft365/issues/4042)
@@ -25,9 +29,11 @@
 
 - [purview retentionlabel list](../cmd/purview/retentionlabel/retentionlabel-list.md) - get a list of retention labels [#4144](https://github.com/pnp/cli-microsoft365/issues/4144)
 - [purview retentionlabel remove](../cmd/purview/retentionlabel/retentionlabel-remove.md) - deletes a retention label [#4149](https://github.com/pnp/cli-microsoft365/issues/4149)
+- [purview retentionlabel set](../cmd/purview/retentionlabel/retentionlabel-set.md) - updates a retention label [#4148](https://github.com/pnp/cli-microsoft365/issues/4148)
 
 **SharePoint:**
 
+- [spo listitem retentionlabel remove](../cmd/spo/listitem/listitem-retentionlabel-remove.md) - clears the retention label from a list item'. [#4162](https://github.com/pnp/cli-microsoft365/issues/4162)
 - [spo web retentionlabel list](../cmd/spo/web/web-retentionlabel-list.md) - gets a list of retention labels that are available on a site [#4152](https://github.com/pnp/cli-microsoft365/issues/4152)
 
 **Teams:**
@@ -67,6 +73,9 @@
 - added the ClientTag request header [#4261](https://github.com/pnp/cli-microsoft365/pull/4261)
 - renamed verb to `ensure` for 'spo list retentionlabel set' [#4246](https://github.com/pnp/cli-microsoft365/issues/4246)
 - added documentation about option values starting with a dash [#4257](https://github.com/pnp/cli-microsoft365/issues/4257)
+- added deprecation label to some options of 'spo list retentionlabel set' [#4221](https://github.com/pnp/cli-microsoft365/issues/4221)
+- extends 'spo group member remove' command with support for email and userId options [#4099](https://github.com/pnp/cli-microsoft365/issues/4099)
+- adds userId option to 'spo group member add' [#4097](https://github.com/pnp/cli-microsoft365/issues/4097)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
