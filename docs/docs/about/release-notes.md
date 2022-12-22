@@ -7,6 +7,7 @@
 **Context:**
 
 - [context init](../cmd/context/context-init.md) - initiates CLI for Microsoft 365 context in the current working folder [#4042](https://github.com/pnp/cli-microsoft365/issues/4042)
+- [context remove](../cmd/context/context-remove.md) - removes the CLI for Microsoft 365 context in the current working folder [#4043](https://github.com/pnp/cli-microsoft365/issues/4043)
 
 **Planner:**
 
@@ -63,7 +64,9 @@
 - renamed 'spo list label [verb]' commands [#4156](https://github.com/pnp/cli-microsoft365/issues/4156)
 - extended 'aad user set' with changing and resetting a password [#2852](https://github.com/pnp/cli-microsoft365/issues/2852)
 - refactored script samples to expose them in Microsoft solution gallery [#4168](https://github.com/pnp/cli-microsoft365/issues/4168)
-
+- added the ClientTag request header [#4261](https://github.com/pnp/cli-microsoft365/pull/4261)
+- renamed verb to `ensure` for 'spo list retentionlabel set' [#4246](https://github.com/pnp/cli-microsoft365/issues/4246)
+- added documentation about option values starting with a dash [#4257](https://github.com/pnp/cli-microsoft365/issues/4257)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
