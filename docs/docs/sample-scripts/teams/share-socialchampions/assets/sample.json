@@ -1,0 +1,52 @@
+[
+  {
+    "name": "pnp-share-socialchampions",
+    "source": "pnp",
+    "title": "Share social champions to Teams",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/share-socialchampions",
+    "creationDateTime": "2021-08-12",
+    "updateDateTime": "2021-08-12",
+    "shortDescription": "Retrieves activities for SharePoint Online, Teams and Yammer and shares the top 3 contributors for each category as an adaptive card to the specified webhook url.",
+    "longDescription": [
+      "Retrieves activities for SharePoint Online, Teams and Yammer and shares the top 3 contributors for each category as an adaptive card to the specified webhook url."
+    ],
+    "products": [
+      "SharePoint Online",
+      "Teams",
+      "Yammer"
+    ],
+    "categories": [],
+    "tags": [
+      "users",
+      "adoption"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/share-socialchampions/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "appieschot",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/15227781?v=4",
+        "name": "Albert-Jan Schot"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

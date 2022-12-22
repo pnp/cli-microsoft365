@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-create-team-from-group",
+    "source": "pnp",
+    "title": "Create a Microsoft Team with channels from a Microsoft 365 Group",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/create-team-from-group",
+    "creationDateTime": "2021-03-10",
+    "updateDateTime": "2021-03-10",
+    "shortDescription": "Creates a Microsoft 365 Group, associates a logo to it and some members.",
+    "longDescription": [
+      "A sample script which creates a Microsoft 365 Group, associates a logo to it and some members. Afterward, it teamyfies the Group and creates two public channels."
+    ],
+    "products": [
+      "Teams"
+    ],
+    "categories": [],
+    "tags": [
+      "groups",
+      "provisioning",
+      "teams"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/create-team-from-group/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "plamber",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/18241305?v=4",
+        "name": "Patrick Lamber"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

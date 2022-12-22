@@ -49,6 +49,14 @@ When the value, that you want to provide contains quotes, it needs to be wrapped
 m365 spo sitescript add --title "Contoso" --description "Contoso theme script" --content '{"abc": "def"}'
 ```
 
+## Values starting with a dash (-)
+
+In cases, when the option's value starts with a dash (-), specify the option's value using the `=` operator. For example, to get a planner task with ID _-9rMKQooUjZdxgv1qQVZYABEuw_, execute in the shell:
+
+```sh
+m365 planner task get --id=-9rMKQooUjZdxgv1qQVZYABEuw
+```
+
 ## Working with SharePoint URLs in `spo` commands
 
 CLI for Microsoft 365 contains a number of commands for managing SharePoint Online. Each of these commands requires you to specify the site or web on which you want to execute the command. For example, to get information about a site collection located at `https://contoso.sharepoint.com/sites/contoso`, you'd execute:

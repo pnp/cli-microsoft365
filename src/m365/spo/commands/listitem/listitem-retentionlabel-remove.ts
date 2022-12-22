@@ -4,6 +4,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -45,7 +46,6 @@ class SpoListItemRetentionLabelRemoveCommand extends SpoCommand {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
-        recycle: !!args.options.recycle,
         confirm: !!args.options.confirm
       });
     });
@@ -67,9 +67,6 @@ class SpoListItemRetentionLabelRemoveCommand extends SpoCommand {
       },
       {
         option: '--listUrl [listUrl]'
-      },
-      {
-        option: '--recycle'
       },
       {
         option: '--confirm'
@@ -122,43 +119,23 @@ class SpoListItemRetentionLabelRemoveCommand extends SpoCommand {
     }
   }
 
-  protected async getListServerRelativeUrl(args: CommandArgs): Promise<string> {
-    if (args.options.listUrl) {
-      return args.options.listUrl;
-    }
-
-    let requestUrl = `${args.options.webUrl}/_api/web`;
-
-    if (args.options.listId) {
-      requestUrl += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
-    }
-    else if (args.options.listTitle) {
-      requestUrl += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')`;
-    }
-
-    requestUrl += `/RootFolder`;
-
-    const requestOptions: AxiosRequestConfig = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const response = await request.get<{ ServerRelativeUrl: string }>(requestOptions);
-
-    return response.ServerRelativeUrl;
-  }
-
-  protected async removeListItemRetentionLabel(logger: Logger, args: CommandArgs): Promise<void> {
+  private async removeListItemRetentionLabel(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Removing retention label from list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
     }
     try {
-      const serverRelativeUrl = await this.getListServerRelativeUrl(args);
+      let url = `${args.options.webUrl}/_api/web`;
+      if (args.options.listId) {
+        url += `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/items(${args.options.listItemId})/SetComplianceTag()`;
+      }
+      else if (args.options.listTitle) {
+        url += `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/items(${args.options.listItemId})/SetComplianceTag()`;
+      }
+      else {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl!);
+        url += `/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listServerRelativeUrl)}'&@a2='${args.options.listItemId}'`;
+      }
 
-      const url = `${args.options.webUrl}/_api/web/GetList(@a1)/items(@a2)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(serverRelativeUrl)}'&@a2='${args.options.listItemId}'`;
       const requestBody = {
         "complianceTag": "",
         "isTagPolicyHold": false,

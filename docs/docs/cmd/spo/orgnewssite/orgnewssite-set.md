@@ -11,7 +11,7 @@ m365 spo orgnewssite set [options]
 ## Options
 
 `-u, --url <url>`
-: The URL of the site to mark as an organizational news site
+: The URL of the site to mark as an organizational news site.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -29,3 +29,7 @@ Set a site as an organizational news site
 ```sh
 m365 spo orgnewssite set --url https://contoso.sharepoint.com/sites/site1
 ```
+
+## Response
+
+The command won't return a response on success.

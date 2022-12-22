@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-list-all-checked-out-files",
+    "source": "pnp",
+    "title": "List all checked out files in SharePoint",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-checked-out-files",
+    "creationDateTime": "2022-02-19",
+    "updateDateTime": "2022-02-19",
+    "shortDescription": "This script will retrieve all the checked out files in a particular site.",
+    "longDescription": [
+      "This script will retrieve all the checked out files in a particular site."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "files",
+      "reports"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/list-all-checked-out-files/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "veronicageek",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/25181757?v=4",
+        "name": "Veronique Lengelle"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

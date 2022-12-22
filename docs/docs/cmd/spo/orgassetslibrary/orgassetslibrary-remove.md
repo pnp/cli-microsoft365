@@ -11,10 +11,10 @@ m365 spo orgassetslibrary remove [options]
 ## Options
 
 `--libraryUrl <libraryUrl>`
-: The server relative URL of the library to be removed as a central location for organization assets
+: The server relative URL of the library to be removed as a central location for organization assets.
 
 `--confirm`
-: Don't prompt for confirming removing the organization asset library
+: Don't prompt for confirming removing the organization asset library.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -23,8 +23,30 @@ m365 spo orgassetslibrary remove [options]
 
 ## Examples
 
-Removes organization assets library without confirmation
+Removes organization assets library without prompting for confirmation
 
 ```sh
 m365 spo orgassetslibrary remove --libraryUrl "/sites/branding/assets" --confirm
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "IsNull": false
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    IsNull: false
+    ```
+
+=== "CSV"
+
+    ```csv
+    IsNull
+    ```

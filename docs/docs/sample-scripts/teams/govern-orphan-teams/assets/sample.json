@@ -1,0 +1,52 @@
+[
+  {
+    "name": "pnp-govern-orphan-teams",
+    "source": "pnp",
+    "title": "Govern orphaned Microsoft Teams",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/govern-orphan-teams",
+    "creationDateTime": "2020-05-02",
+    "updateDateTime": "2020-05-02",
+    "shortDescription": "This script finds teams that no longer have an owner.",
+    "longDescription": [
+      "Every team needs an owner, at least one. Common best practice is that you should have at least two users in owner role. Teams is not allowing the last owner to leave the team, but there might occasions when last owner is removed, example when people are leaving the organization and account gets deleted. This script finds those teams that no longer have an owner."
+    ],
+    "products": [
+      "Teams"
+    ],
+    "categories": [],
+    "tags": [
+      "reports",
+      "security",
+      "teams",
+      "users"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/govern-orphan-teams/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "garrytrinder",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/11563347?v=4",
+        "name": "Garry Trinder"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

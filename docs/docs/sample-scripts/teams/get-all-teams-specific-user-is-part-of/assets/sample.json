@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-get-all-teams-specific-user-is-part-of",
+    "source": "pnp",
+    "title": "Get all the Teams a specific user is part of",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/get-all-teams-specific-user-is-part-of",
+    "creationDateTime": "2021-09-14",
+    "updateDateTime": "2021-09-14",
+    "shortDescription": "Gets all the Teams a specific user is part of.",
+    "longDescription": [
+      "Gets all the Teams a specific user is part of."
+    ],
+    "products": [
+      "Teams"
+    ],
+    "categories": [],
+    "tags": [
+      "teams",
+      "reports",
+      "users"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/get-all-teams-specific-user-is-part-of/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "veronicageek",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/25181757?v=4",
+        "name": "Veronique Lengelle"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

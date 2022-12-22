@@ -1,0 +1,49 @@
+[
+  {
+    "name": "pnp-detecting-pii-exists-in-sharepointlist-column",
+    "source": "pnp",
+    "title": "Detecting PII exists in SharePoint List using AWS Comprehend",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/detecting-pii-exists-in-sharepointlist-column",
+    "creationDateTime": "2022-02-12",
+    "updateDateTime": "2022-02-12",
+    "shortDescription": "The script uses Amazon Comprehend to detect PII entities from a specific SharePoint List column record the results in another list and CSV report.",
+    "longDescription": [
+      "In this post, I showcased using Amazon Comprehend to detect PII entities from a specific SharePoint List column and record the results in another list and CSV report via the AWS CLI and CLI for Microsoft 365."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "compliance"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/detecting-pii-exists-in-sharepointlist-column/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "sprider",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/21008316?v=4",
+        "name": "Joseph Velliah"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

@@ -380,7 +380,7 @@ Get-PnPInPlaceRecordsManagement|PnP.PowerShell|
 Get-PnPIsSiteAliasAvailable|PnP.PowerShell|
 Get-PnPJavaScriptLink|PnP.PowerShell|
 Get-PnPKnowledgeHubSite|PnP.PowerShell|
-Get-PnPLabel|PnP.PowerShell|[spo list label get](../cmd/spo/list/list-label-get.md)
+Get-PnPLabel|PnP.PowerShell|[spo list retentionlabel get](../cmd/spo/list/list-retentionlabel-get.md)
 Get-PnPList|PnP.PowerShell|[spo list get](../cmd/spo/list/list-get.md), [spo list list](../cmd/spo/list/list-list.md)
 Get-PnPListDesign|PnP.PowerShell|
 Get-PnPListInformationRightsManagement|PnP.PowerShell|
@@ -728,7 +728,7 @@ Set-PnPHubSite|PnP.PowerShell|[spo hubsite set](../cmd/spo/hubsite/hubsite-set.m
 Set-PnPIndexedProperties|PnP.PowerShell|
 Set-PnPInPlaceRecordsManagement|PnP.PowerShell|[spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md)
 Set-PnPKnowledgeHubSite|PnP.PowerShell|[spo knowledgehub set](../cmd/spo/knowledgehub/knowledgehub-set.md)
-Set-PnPLabel|PnP.PowerShell|[spo list label set](../cmd/spo/list/list-label-set.md)
+Set-PnPLabel|PnP.PowerShell|[spo list retentionlabel ensure](../cmd/spo/list/list-retentionlabel-ensure.md)
 Set-PnPList|PnP.PowerShell|[spo list set](../cmd/spo/list/list-set.md)
 Set-PnPListInformationRightsManagement|PnP.PowerShell|
 Set-PnPListItem|PnP.PowerShell|[spo listitem set](../cmd/spo/listitem/listitem-set.md)
