@@ -117,7 +117,7 @@ describe(commands.LIST_RETENTIONLABEL_SET, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
-        label: 'abc'
+        name: 'abc'
       }
     } as any), new CommandError('404 - "404 FILE NOT FOUND"'));
   });
@@ -145,7 +145,7 @@ describe(commands.LIST_RETENTIONLABEL_SET, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
-        label: 'abc'
+        name: 'abc'
       }
     });
     const lastCall = postStub.lastCall.args[0];
@@ -178,7 +178,7 @@ describe(commands.LIST_RETENTIONLABEL_SET, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: '4d535433-2a7b-40b0-9dad-8f0f8f3b3841',
-        label: 'abc'
+        name: 'abc'
       }
     });
     const lastCall = postStub.lastCall.args[0];
@@ -202,7 +202,7 @@ describe(commands.LIST_RETENTIONLABEL_SET, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listUrl: 'MyLibrary',
-        label: 'abc',
+        name: 'abc',
         blockDelete: true,
         blockEdit: true,
         syncToItems: true
@@ -222,33 +222,22 @@ describe(commands.LIST_RETENTIONLABEL_SET, () => {
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if the listid option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc', listId: 'XXXXX' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc', listId: 'XXXXX' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listid option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if listId, listUrl and listTitle options are not passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });
