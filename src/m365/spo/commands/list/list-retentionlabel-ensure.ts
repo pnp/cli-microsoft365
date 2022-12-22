@@ -14,7 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  label: string;
+  name: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
@@ -64,7 +64,7 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--label <label>'
+        option: '--name <name>'
       },
       {
         option: '-t, --listTitle [listTitle]'
@@ -144,7 +144,7 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
         },
         data: {
           listUrl: listAbsoluteUrl,
-          complianceTagValue: args.options.label,
+          complianceTagValue: args.options.name,
           blockDelete: args.options.blockDelete || false,
           blockEdit: args.options.blockEdit || false,
           syncToItems: args.options.syncToItems || false
