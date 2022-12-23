@@ -259,6 +259,7 @@ export default {
   STORAGEENTITY_REMOVE: `${prefix} storageentity remove`,
   TENANT_APPCATALOG_ADD: `${prefix} tenant appcatalog add`,
   TENANT_APPCATALOGURL_GET: `${prefix} tenant appcatalogurl get`,
+  TENANT_APPLICATIONCUSTOMIZER_ADD: `${prefix} tenant applicationcustomizer add`,
   TENANT_RECYCLEBINITEM_LIST: `${prefix} tenant recyclebinitem list`,
   TENANT_RECYCLEBINITEM_REMOVE: `${prefix} tenant recyclebinitem remove`,
   TENANT_RECYCLEBINITEM_RESTORE: `${prefix} tenant recyclebinitem restore`,
