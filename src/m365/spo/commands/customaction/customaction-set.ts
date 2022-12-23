@@ -12,7 +12,7 @@ interface CommandArgs {
   options: Options;
 }
 
-export interface Options extends GlobalOptions {
+interface Options extends GlobalOptions {
   webUrl: string;
   id: string;
   name?: string;
