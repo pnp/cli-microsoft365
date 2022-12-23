@@ -28,7 +28,7 @@ interface Options extends GlobalOptions {
   webTemplate?: string;
 }
 
-class SpoTenantApplicationCustomizerAdd extends SpoCommand {
+class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
   public get name(): string {
     return commands.TENANT_APPLICATIONCUSTOMIZER_ADD;
   }
@@ -186,4 +186,4 @@ class SpoTenantApplicationCustomizerAdd extends SpoCommand {
   }
 }
 
-module.exports = new SpoTenantApplicationCustomizerAdd();
+module.exports = new SpoTenantApplicationCustomizerAddCommand();
