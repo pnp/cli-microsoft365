@@ -1,11 +1,16 @@
-import * as os from 'os';
+import { spawnSync } from 'child_process';
 import * as fs from 'fs';
-import { execSync } from 'child_process';
+import * as os from 'os';
 import { cache } from './cache';
 
 function getProcessNameOnMacOs(pid: number): string | undefined {
-  const stdout = execSync(`ps -o comm= ${pid}`, { encoding: 'utf8' });
-  return stdout.trim();
+  const res = spawnSync('ps', ['-o', 'comm=', pid.toString()], { encoding: 'utf8' });
+  if (res.error || res.stderr) {
+    return undefined;
+  }
+  else {
+    return res.stdout.trim();
+  }
 }
 
 function getProcessNameOnLinux(pid: number): string | undefined {
@@ -20,8 +25,24 @@ function getProcessNameOnLinux(pid: number): string | undefined {
 }
 
 function getProcessNameOnWindows(pid: number): string | undefined {
-  const stdout = execSync(`wmic PROCESS where ProcessId=${pid} get Caption | find /V "Caption"`, { encoding: 'utf8' });
-  return stdout.trim();
+  const findProcess = spawnSync('wmic', ['PROCESS', 'where', `ProcessId=${pid}`, 'get', 'Caption'], { encoding: 'utf8' });
+  if (findProcess.error || findProcess.stderr) {
+    return undefined;
+  }
+  else {
+    const getPid = spawnSync('find', ['/V', '"Caption"'], {
+      encoding: 'utf8',
+      input: findProcess.stdout,
+      // must include or passing quoted "Caption" will fail
+      windowsVerbatimArguments: true
+    });
+    if (getPid.error || getPid.stderr) {
+      return undefined;
+    }
+    else {
+      return getPid.stdout.trim();
+    }
+  }
 }
 
 export const pid = {
@@ -45,16 +66,11 @@ export const pid = {
     }
 
     if (getPidName) {
-      try {
-        processName = getPidName(pid);
-        if (processName) {
-          cache.setValue(pid.toString(), processName);
-        }
-        return processName;
+      processName = getPidName(pid);
+      if (processName) {
+        cache.setValue(pid.toString(), processName);
       }
-      catch {
-        return undefined;
-      }
+      return processName;
     }
 
     return undefined;
