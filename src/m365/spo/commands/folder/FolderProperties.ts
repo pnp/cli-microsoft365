@@ -15,6 +15,7 @@ export interface FolderProperties {
 }
 export interface ListItemAllFields {
   RoleAssignments: RoleAssignment[];
+  Id: string;
 }
 export interface RoleAssignment {
   Member: Member;

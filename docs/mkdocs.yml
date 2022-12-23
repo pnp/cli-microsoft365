@@ -410,6 +410,7 @@ nav:
         - folder move: cmd/spo/folder/folder-move.md
         - folder remove: cmd/spo/folder/folder-remove.md
         - folder rename: cmd/spo/folder/folder-rename.md
+        - folder retentionlabel remove: cmd/spo/folder/folder-retentionlabel-remove.md
         - folder roleassignment add: cmd/spo/folder/folder-roleassignment-add.md
         - folder roleassignment remove: cmd/spo/folder/folder-roleassignment-remove.md
         - folder roleinheritance break: cmd/spo/folder/folder-roleinheritance-break.md
