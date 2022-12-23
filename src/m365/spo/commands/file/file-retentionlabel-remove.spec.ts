@@ -16,7 +16,7 @@ const command: Command = require('./file-retentionlabel-remove');
 
 describe(commands.FILE_RETENTIONLABEL_REMOVE, () => {
   const webUrl = 'https://contoso.sharepoint.com';
-  const fileUrl = `/Shared Documents/Fo'lde'r`;
+  const fileUrl = `/Shared Documents/Fo'lde'r/Document.docx`;
   const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const listId = 1;
   const SpoListItemRetentionLabelRemoveCommandOutput = `{ "stdout": "", "stderr": "" }`;

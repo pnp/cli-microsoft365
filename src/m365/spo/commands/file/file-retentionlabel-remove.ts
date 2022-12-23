@@ -147,7 +147,6 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
     }
 
     const response = await request.get<FileProperties>(requestOptions);
-    // const fileProperties: FileProperties = JSON.parse(JSON.stringify(response));
     return { id: response.ListItemAllFields.Id, listServerRelativeUrl: this.getListServerRelativeUrl(response.ServerRelativeUrl) };
   }
 
