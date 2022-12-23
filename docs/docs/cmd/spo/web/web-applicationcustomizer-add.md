@@ -53,29 +53,4 @@ m365 spo web applicationcustomizer add --title 'Some customizer' --clientSideCom
 
 ## Response
 
-=== "JSON"
-
-    ```json
-    [ 
-      {
-        "Id": "9cc0f495-db64-4d74-b06b-a3de16231fe1",
-        "Name": "9cc0f495-db64-4d74-b06b-a3de16231fe1",
-        "Title": "Dashboard for Viva Connections"
-      }
-    ]
-    ```
-
-=== "Text"
-
-    ```text
-    Id                                    Name                                  Title
-    ------------------------------------  ------------------------------------  ------------------------------
-    9cc0f495-db64-4d74-b06b-a3de16231fe1  9cc0f495-db64-4d74-b06b-a3de16231fe1  Dashboard for Viva Connections
-    ```
-
-=== "CSV"
-
-    ```csv
-    Id,Name,Title
-    9cc0f495-db64-4d74-b06b-a3de16231fe1,9cc0f495-db64-4d74-b06b-a3de16231fe1,Dashboard for Viva Connections
-    ```
+The command won't return a response on success.
