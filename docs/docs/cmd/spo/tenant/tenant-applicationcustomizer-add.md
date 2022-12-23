@@ -5,7 +5,7 @@ Add an application customizer as a tenant wide extension.
 ## Usage
 
 ```sh
-m365 spo tenant appcatalogurl get [options]
+m365 spo tenant applicationcustomizer add [options]
 ```
 
 ## Options
