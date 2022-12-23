@@ -33,7 +33,8 @@
 
 **SharePoint:**
 
-- [spo listitem retentionlabel remove](../cmd/spo/listitem/listitem-retentionlabel-remove.md) - clears the retention label from a list item'. [#4162](https://github.com/pnp/cli-microsoft365/issues/4162)
+- [spo listitem retentionlabel remove](../cmd/spo/listitem/listitem-retentionlabel-remove.md) - clears the retention label from a list item' [#4162](https://github.com/pnp/cli-microsoft365/issues/4162)
+- [spo site appcatalog list](../cmd/spo/site/site-appcatalog-list.md) - list all site collection app catalogs within the tenant [#4231](https://github.com/pnp/cli-microsoft365/issues/4231)
 - [spo web retentionlabel list](../cmd/spo/web/web-retentionlabel-list.md) - gets a list of retention labels that are available on a site [#4152](https://github.com/pnp/cli-microsoft365/issues/4152)
 
 **Teams:**
@@ -76,6 +77,8 @@
 - added deprecation label to some options of 'spo list retentionlabel set' [#4221](https://github.com/pnp/cli-microsoft365/issues/4221)
 - extends 'spo group member remove' command with support for email and userId options [#4099](https://github.com/pnp/cli-microsoft365/issues/4099)
 - adds userId option to 'spo group member add' [#4097](https://github.com/pnp/cli-microsoft365/issues/4097)
+- fixed page promotion for 'spo page add' and 'spo page set' commands [#4055](https://github.com/pnp/cli-microsoft365/issues/4055)
+- extended 'pp environment get' to retrieve the default environment [#4228](https://github.com/pnp/cli-microsoft365/issues/4228)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
