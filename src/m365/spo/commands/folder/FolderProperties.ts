@@ -13,6 +13,7 @@ export interface FolderProperties {
   WelcomePage: string;
   ListItemAllFields: ListItemAllFields;
 }
+
 export interface ListItemAllFields {
   RoleAssignments: RoleAssignment[];
   ParentList: ParentListFields;
