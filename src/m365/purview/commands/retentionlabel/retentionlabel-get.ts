@@ -33,7 +33,7 @@ class PurviewRetentionLabelGetCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--id <id>'
+        option: '-i, --id <id>'
       }
     );
   }
