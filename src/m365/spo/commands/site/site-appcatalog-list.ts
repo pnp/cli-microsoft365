@@ -19,20 +19,16 @@ class SpoSiteAppCatalogListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     try {
+      if (this.verbose) {
+        logger.logToStderr('Retrieving site collection app catalogs...');
+      }
+
       const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
       const appCatalogs = await odata.getAllItems<any>(`${spoUrl}/_api/Web/TenantAppCatalog/SiteCollectionAppCatalogsSites`);
-
-      if (appCatalogs && appCatalogs.length > 0) {
-        logger.log(appCatalogs);
-      }
-      else {
-        if (this.verbose) {
-          logger.logToStderr('No site collection app catalogs found');
-        }
-      }
+      logger.log(appCatalogs);
     }
     catch (err: any) {
-      this.handleRejectedPromise(err);
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

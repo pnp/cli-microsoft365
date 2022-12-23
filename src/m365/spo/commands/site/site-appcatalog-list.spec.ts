@@ -32,7 +32,6 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -56,7 +55,6 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -87,7 +85,7 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['AbsoluteUrl', 'SiteID']);
   });
 
-  it('retrieves site collection app catalogs within the tenant (debug)', async () => {
+  it('retrieves site collection app catalogs within the tenant', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/Web/TenantAppCatalog/SiteCollectionAppCatalogsSites') {
         return { value: appCatalogResponseValue };
@@ -96,32 +94,19 @@ describe(commands.SITE_APPCATALOG_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith(appCatalogResponseValue));
-  });
-
-  it('correctly handles no site collection app catalogs in the tenant', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/Web/TenantAppCatalog/SiteCollectionAppCatalogsSites') {
-        return { value: [] };
-      }
-
-      throw 'Invalid request';
-    });
-
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogToStderrSpy.calledWith('No site collection app catalogs found'));
+    assert(loggerLogSpy.calledWith(appCatalogResponseValue));
   });
 
   it('correctly handles error when retrieving site collection app catalogs', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/Web/TenantAppCatalog/SiteCollectionAppCatalogsSites') {
-        throw 'Invalid request';
+        throw { error: { error: { message: 'Something went wrong' } } };
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: {} }), new CommandError('Invalid request'));
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError('Something went wrong'));
   });
 });
