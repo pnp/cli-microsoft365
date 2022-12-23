@@ -11,7 +11,7 @@ const command: Command = require('./environment-get');
 
 describe(commands.ENVIRONMENT_GET, () => {
   const name = '5ca1c616-6060-46ba-abc1-18d312f1cb3a';
-  const nameEnvironmentResponse: any = {
+  const environmentResponse: any = {
     "value": [
       {
         "id": `/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/${name}`,
@@ -22,12 +22,7 @@ describe(commands.ENVIRONMENT_GET, () => {
           "displayName": "My Power Platform Environment",
           "isDefault": false
         }
-      }
-    ]
-  };
-
-  const defaultEnvironmentResponse: any = {
-    "value": [
+      },
       {
         "id": `/providers/Microsoft.BusinessAppPlatform/environments/Default-de347bc8-1aeb-4406-8cb3-97db021cadb4`,
         "type": "Microsoft.BusinessAppPlatform/environments",
@@ -137,7 +132,7 @@ describe(commands.ENVIRONMENT_GET, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return nameEnvironmentResponse;
+          return environmentResponse;
         }
       }
 
@@ -150,7 +145,7 @@ describe(commands.ENVIRONMENT_GET, () => {
         name: name
       }
     });
-    assert(loggerLogSpy.calledWith(nameEnvironmentResponse.value[0]));
+    assert(loggerLogSpy.calledWith(environmentResponse.value[0]));
   });
 
   it('retrieves default Microsoft Power Platform environment', async () => {
@@ -159,7 +154,7 @@ describe(commands.ENVIRONMENT_GET, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return defaultEnvironmentResponse;
+          return environmentResponse;
         }
       }
 
@@ -167,7 +162,7 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith(defaultEnvironmentResponse.value[0]));
+    assert(loggerLogSpy.calledWith(environmentResponse.value[1]));
   });
 
   it('retrieves Microsoft Power Platform environment as Admin', async () => {
@@ -176,7 +171,7 @@ describe(commands.ENVIRONMENT_GET, () => {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return nameEnvironmentResponse;
+          return environmentResponse;
         }
       }
 
@@ -191,6 +186,6 @@ describe(commands.ENVIRONMENT_GET, () => {
       }
     });
 
-    assert(loggerLogSpy.calledWith(nameEnvironmentResponse.value[0]));
+    assert(loggerLogSpy.calledWith(environmentResponse.value[0]));
   });
 });

@@ -1,7 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
-import { AxiosRequestConfig } from 'axios';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import { Environment } from '../Environment';
 import commands from '../../commands';
@@ -61,16 +60,8 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
       url = `${this.resource}/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments`;
     }
 
-    const requestOptions: AxiosRequestConfig = {
-      url: `${url}?api-version=2020-10-01`,
-      headers: {
-        accept: 'application/json'
-      },
-      responseType: 'json'
-    };
-
-    const res: { value: Environment[] } = await request.get<{ value: Environment[] }>(requestOptions);
-    const environmentItem: Environment | undefined = res.value.filter((env: Environment) => {
+    const res: any = await odata.getAllItems<Environment[]>(`${url}?api-version=2020-10-01`);
+    const environmentItem: Environment | undefined = res.filter((env: Environment) => {
       return args.options.name ? env.name === args.options.name : env.properties.isDefault === true;
     })[0];
 

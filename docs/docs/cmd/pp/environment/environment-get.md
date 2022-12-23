@@ -39,6 +39,12 @@ Get information as admin about the Power Platform environment by name
 m365 pp environment get --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
 ```
 
+Get information about the default Power Platform environment
+
+```sh
+m365 pp environment get
+```
+
 ## Response
 
 === "JSON"

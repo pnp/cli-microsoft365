@@ -4,7 +4,6 @@ export interface Environment {
   location: string;
   name: string;
   properties: {
-    displayName: string;
     isDefault: boolean;
   }
 }
