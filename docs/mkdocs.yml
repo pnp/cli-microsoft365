@@ -633,6 +633,7 @@ nav:
         - web reindex: cmd/spo/web/web-reindex.md
         - web remove: cmd/spo/web/web-remove.md
         - web set: cmd/spo/web/web-set.md
+        - web applicationcustomizer add: cmd/spo/web/web-applicationcustomizer-add.md
         - web clientsidewebpart list: cmd/spo/web/web-clientsidewebpart-list.md
         - web installedlanguage list: cmd/spo/web/web-installedlanguage-list.md
         - web roleassignment add: cmd/spo/web/web-roleassignment-add.md

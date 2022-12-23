@@ -1,0 +1,81 @@
+# spo web applicationcustomizer add
+
+Add an application customizer to a site.
+
+## Usage
+
+```sh
+m365 spo web applicationcustomizer add [options]
+```
+
+## Options
+
+`-t, --title <title>`
+: The title of the Application Customizer.
+
+`-u, --webUrl <webUrl>`
+: URL of the site for which to retrieve the information.
+
+`-i, --clientSideComponentId <clientSideComponentId>`
+: The Client Side Component Id (GUID) of the application customizer.
+
+`--clientSideComponentProperties <clientSideComponentProperties>`
+: The Client Side Component properties of the application customizer.
+
+--8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treat quotes differently. For example, this is how ApplicationCustomizer user custom action can be created from the Windows cmd.exe:
+
+```sh
+m365 spo web applicationcustomizer add --webUrl https://contoso.sharepoint.com/sites/test --title "YourAppCustomizer" --location "ClientSideExtension.ApplicationCustomizer" --clientSideComponentId b41916e7-e69d-467f-b37f-ff8ecf8f99f2 --clientSideComponentProperties '{\"testMessage\":\"Test message\"}'
+```
+
+Note, how the clientSideComponentProperties option has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash `'{"testMessage":"Test message"}'`.
+
+!!! warning "Escaping JSON in PowerShell"
+    When using the `--clientSideComponentProperties` option it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.md#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.md#passing-complex-content-into-cli-options) instead.
+
+## Examples
+
+Adds an application customizer to the sales site.
+
+```sh
+m365 spo web applicationcustomizer add --title 'Some customizer' --clientSideComponentId  799883f5-7962-4384-a10a-105adaec6ffc --webUrl https://contoso.sharepoint.com/sites/sales
+```
+
+Adds an application customizer to the sales site with some properties.
+
+```sh
+m365 spo web applicationcustomizer add --title 'Some customizer' --clientSideComponentId  799883f5-7962-4384-a10a-105adaec6ffc --clientSideComponentProperties '{ "someProperty": "Some value" }' --webUrl https://contoso.sharepoint.com/sites/sales
+```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [ 
+      {
+        "Id": "9cc0f495-db64-4d74-b06b-a3de16231fe1",
+        "Name": "9cc0f495-db64-4d74-b06b-a3de16231fe1",
+        "Title": "Dashboard for Viva Connections"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Id                                    Name                                  Title
+    ------------------------------------  ------------------------------------  ------------------------------
+    9cc0f495-db64-4d74-b06b-a3de16231fe1  9cc0f495-db64-4d74-b06b-a3de16231fe1  Dashboard for Viva Connections
+    ```
+
+=== "CSV"
+
+    ```csv
+    Id,Name,Title
+    9cc0f495-db64-4d74-b06b-a3de16231fe1,9cc0f495-db64-4d74-b06b-a3de16231fe1,Dashboard for Viva Connections
+    ```
