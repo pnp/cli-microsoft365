@@ -92,7 +92,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_RECORD_LOCK, () => {
 
     await assert.doesNotReject(command.action(logger, {
       options: {
-        debug: true,
+        verbose: true,
         listUrl: listUrl,
         webUrl: webUrl,
         listItemId: 1
@@ -119,7 +119,6 @@ describe(commands.LISTITEM_RETENTIONLABEL_RECORD_LOCK, () => {
 
     await assert.doesNotReject(command.action(logger, {
       options: {
-        debug: true,
         listTitle: listTitle,
         webUrl: webUrl,
         listItemId: 1
@@ -146,7 +145,6 @@ describe(commands.LISTITEM_RETENTIONLABEL_RECORD_LOCK, () => {
 
     await assert.doesNotReject(command.action(logger, {
       options: {
-        debug: true,
         listId: listId,
         webUrl: webUrl,
         listItemId: 1
