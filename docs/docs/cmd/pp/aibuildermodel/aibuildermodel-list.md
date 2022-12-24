@@ -1,6 +1,6 @@
 # pp aibuildermodel list
 
-List available AI builder models in the specified Power Platform environment.
+List available AI builder models in the specified Power Platform environment
 
 ## Usage
 
@@ -11,22 +11,22 @@ pp aibuildermodel list [options]
 ## Options
 
 `-e, --environment <environment>`
-: The name of the environment.
+: The name of the environment
 
 `--asAdmin`
-: Run the command as admin for environments you do not have explicitly assigned permissions to.
+: Run the command as admin for environments you do not have explicitly assigned permissions to
 
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
 
-List AI Builder models in a specific environment.
+List all AI Builder models in a specific environment
 
 ```sh
 m365 pp aibuildermodel list --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5"
 ```
 
-List AI Builder models in a specific environment as admin.
+List all AI Builder models in a specific environment as admin
 
 ```sh
 m365 pp aibuildermodel list --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --asAdmin

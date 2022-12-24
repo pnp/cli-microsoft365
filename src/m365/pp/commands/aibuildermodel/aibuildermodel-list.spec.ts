@@ -16,7 +16,6 @@ describe(commands.AIBUILDERMODEL_LIST, () => {
   const envUrl = "https://contoso-dev.api.crm4.dynamics.com";
   const validEnvironment = "4be50206-9576-4237-8b17-38d8aadfaa36";
   const modelsResponse: any = {
-    "@odata.context": "https://org1547b730.crm4.dynamics.com/api/data/v9.0/$metadata#msdyn_aimodels",
     "value": [
       {
         "@odata.etag": "W/\"1458121\"",
@@ -105,7 +104,7 @@ describe(commands.AIBUILDERMODEL_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.AIBUILDERMODEL_LIST), true);
+    assert.strictEqual(command.name, commands.AIBUILDERMODEL_LIST);
   });
 
   it('has a description', () => {
@@ -131,28 +130,9 @@ describe(commands.AIBUILDERMODEL_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: true, environment: validEnvironment } });
+    await command.action(logger, { options: { verbose: true, environment: validEnvironment } });
     assert(loggerLogSpy.calledWith(modelsResponse.value));
 
-  });
-
-  it('retrieves AI Builder models as admin', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.0/msdyn_aimodels?$filter=iscustomizable/Value eq true`)) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return modelsResponse;
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { debug: true, environment: validEnvironment, asAdmin: true } });
-    assert(loggerLogSpy.calledWith(modelsResponse.value));
   });
 
   it('correctly handles API OData error', async () => {

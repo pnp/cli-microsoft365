@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   asAdmin?: boolean;
 }
 
-class PpAibuildermodelListCommand extends PowerPlatformCommand {
+class PpAiBuilderModelListCommand extends PowerPlatformCommand {
   public get name(): string {
     return commands.AIBUILDERMODEL_LIST;
   }
@@ -55,7 +55,7 @@ class PpAibuildermodelListCommand extends PowerPlatformCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving available AI builder models`);
+      logger.logToStderr(`Retrieving available AI Builder models`);
     }
 
     try {
@@ -70,4 +70,4 @@ class PpAibuildermodelListCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PpAibuildermodelListCommand();
+module.exports = new PpAiBuilderModelListCommand();
