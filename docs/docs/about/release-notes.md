@@ -31,9 +31,13 @@
 - [purview retentionlabel remove](../cmd/purview/retentionlabel/retentionlabel-remove.md) - deletes a retention label [#4149](https://github.com/pnp/cli-microsoft365/issues/4149)
 - [purview retentionlabel set](../cmd/purview/retentionlabel/retentionlabel-set.md) - updates a retention label [#4148](https://github.com/pnp/cli-microsoft365/issues/4148)
 
+**Search:**
+
+- [search externalconnection schema add](../cmd/search/externalconnection/externalconnection-schema-add.md) - adds a schema to a specific external connection [#3171](https://github.com/pnp/cli-microsoft365/issues/3171)
+
 **SharePoint:**
 
-- [spo listitem retentionlabel remove](../cmd/spo/listitem/listitem-retentionlabel-remove.md) - clears the retention label from a list item' [#4162](https://github.com/pnp/cli-microsoft365/issues/4162)
+- [spo listitem retentionlabel remove](../cmd/spo/listitem/listitem-retentionlabel-remove.md) - clears the retention label from a list item [#4162](https://github.com/pnp/cli-microsoft365/issues/4162)
 - [spo site appcatalog list](../cmd/spo/site/site-appcatalog-list.md) - list all site collection app catalogs within the tenant [#4231](https://github.com/pnp/cli-microsoft365/issues/4231)
 - [spo web retentionlabel list](../cmd/spo/web/web-retentionlabel-list.md) - gets a list of retention labels that are available on a site [#4152](https://github.com/pnp/cli-microsoft365/issues/4152)
 
