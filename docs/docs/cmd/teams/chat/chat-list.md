@@ -1,6 +1,6 @@
 # teams chat list
 
-Lists all Microsoft Teams chat conversations for the current user.
+Lists all Microsoft Teams chat conversations for the current or a specific user.
 
 ## Usage
 
@@ -10,8 +10,14 @@ m365 teams chat list [options]
 
 ## Options
 
-`-t, --type [chatType]`
+`-t, --type [type]`
 : The chat type to optionally filter chat conversations by type. The value can be `oneOnOne`, `group` or `meeting`.
+
+`--userId [userId]`
+: ID of the user. Has to be specified when using application permissions. Specify either `userId` or `userName`, but not both.
+
+`--userName [userName]`
+: UPN of the user. Has to be specified when using application permissions. Specify either `userId` or `userName`, but not both.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -23,10 +29,16 @@ List all the Microsoft Teams chat conversations of the current user.
 m365 teams chat list
 ```
 
-List only the one on one Microsoft Teams chat conversations.
+List only the one on one Microsoft Teams chat conversations of a specific user retrieved by id.
 
 ```sh
-m365 teams chat list --type oneOnOne
+m365 teams chat list --userId e6296ed0-4b7d-4ace-aed4-f6b7371ce060 --type oneOnOne
+```
+
+List only the group Microsoft Teams chat conversations of a specific user retrieved by mail
+
+```sh
+m365 teams chat list --userName 'john@contoso.com' --type group 
 ```
 
 ## Response

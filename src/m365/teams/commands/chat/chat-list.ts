@@ -1,8 +1,11 @@
+import auth from '../../../../Auth';
+import { accessToken } from '../../../../utils/accessToken';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { validation } from '../../../../utils/validation';
 
 interface CommandArgs {
   options: Options;
@@ -10,9 +13,12 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   type?: string;
+  userId?: string;
+  userName?: string;
 }
 
 class TeamsChatListCommand extends GraphCommand {
+  public supportedTypes = ['oneOnOne', 'group', 'meeting'];
   public get name(): string {
     return commands.CHAT_LIST;
   }
@@ -27,8 +33,8 @@ class TeamsChatListCommand extends GraphCommand {
 
   constructor() {
     super();
-  
-    
+
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
@@ -41,37 +47,62 @@ class TeamsChatListCommand extends GraphCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
         option: '-t, --type [type]',
-        autocomplete: ['oneOnOne', 'group', 'meeting']
+        autocomplete: this.supportedTypes
+      },
+      {
+        option: '--userId [userId]'
+      },
+      {
+        option: '--userName [userName]'
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const supportedTypes = ['oneOnOne', 'group', 'meeting'];
-        if (args.options.type !== undefined && supportedTypes.indexOf(args.options.type) === -1) {
-          return `${args.options.type} is not a valid chatType. Accepted values are ${supportedTypes.join(', ')}`;
+        if (args.options.type !== undefined && this.supportedTypes.indexOf(args.options.type) === -1) {
+          return `${args.options.type} is not a valid chatType. Accepted values are ${this.supportedTypes.join(', ')}`;
         }
-    
+
+        if (args.options.userId && args.options.userName) {
+          return `You can only specify either 'userId' or 'userName'`;
+        }
+
+        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
+          return `${args.options.userId} is not a valid GUID`;
+        }
+
         return true;
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const filter = args.options.type !== undefined ? `?$filter=chatType eq '${args.options.type}'` : '';
-    const endpoint: string = `${this.resource}/v1.0/chats${filter}`;
+    const isAppOnlyAuth: boolean = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+
+    if (isAppOnlyAuth && !args.options.userId && !args.options.userName) {
+      throw `The option 'userId' or 'userName' is required when obtaining chats using app only permissions`;
+    }
+    else if (!isAppOnlyAuth && (args.options.userId || args.options.userName)) {
+      throw `The options 'userId' or 'userName' cannot be used when obtaining chats using delegated permissions`;
+    }
+
+    let requestUrl = `${this.resource}/v1.0/${!isAppOnlyAuth ? 'me' : `users/${args.options.userId || args.options.userName}`}/chats`;
+
+    if (args.options.type) {
+      requestUrl += `?$filter=chatType eq '${args.options.type}'`;
+    }
 
     try {
-      const items = await odata.getAllItems(endpoint);
+      const items = await odata.getAllItems(requestUrl);
       logger.log(items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
