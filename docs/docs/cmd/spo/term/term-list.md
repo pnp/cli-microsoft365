@@ -52,8 +52,6 @@ m365 spo term list --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termSetI
 
 ## Response
 
-### Standard response
-
 === "JSON"
 
     ```json
@@ -116,12 +114,12 @@ m365 spo term list --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termSetI
     ```text
     Id                                    Name       ParentTermId
     ------------------------------------  ---------  ------------------------------------
-    c387e91c-b553-4b92-886b-9af717cd73b0  Financing  481f2954-498f-47cf-aaa9-5f280e3fa900
+    c387e91c-b553-4b92-886b-9af717cd73b0  Financing  7f91a2b1-78b3-4a2b-a9a6-8e33c0b21166
     ```
 
 === "CSV"
 
     ```csv
     Id,Name,ParentTermId
-    c387e91c-b553-4b92-886b-9af717cd73b0,Financing,481f2954-498f-47cf-aaa9-5f280e3fa900
+    c387e91c-b553-4b92-886b-9af717cd73b0,Financing,7f91a2b1-78b3-4a2b-a9a6-8e33c0b21166
     ```
