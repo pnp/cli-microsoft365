@@ -134,21 +134,31 @@ class SpoTermListCommand extends SpoCommand {
       }
       else {
         // Converted to text friendly output
-        const friendlyOutput: any[] = [];
-        terms.forEach(term => {
-          term.ParentTermId = '';
-          friendlyOutput.push(term);
-          if (term.Children && term.Children.length > 0) {
-            this.getFriendlyChildTerms(term, friendlyOutput);
-          }
-        });
-        logger.log(friendlyOutput.map(i => {
-          return {
-            Id: i.Id,
-            Name: i.Name,
-            ParentTermId: i.ParentTermId
-          };
-        }));
+        if (!args.options.includeChildTerms) {
+          logger.log(terms.map(i => {
+            return {
+              Id: i.Id,
+              Name: i.Name
+            };
+          }));
+        }
+        else {
+          const friendlyOutput: any[] = [];
+          terms.forEach(term => {
+            term.ParentTermId = '';
+            friendlyOutput.push(term);
+            if (term.Children && term.Children.length > 0) {
+              this.getFriendlyChildTerms(term, friendlyOutput);
+            }
+          });
+          logger.log(friendlyOutput.map(i => {
+            return {
+              Id: i.Id,
+              Name: i.Name,
+              ParentTermId: i.ParentTermId
+            };
+          }));
+        }
       }
     }
     catch (err: any) {

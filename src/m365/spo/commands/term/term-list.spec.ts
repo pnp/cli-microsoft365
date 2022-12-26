@@ -345,6 +345,21 @@ describe(commands.TERM_LIST, () => {
     }]
   }];
 
+  const csomDefaultResponseFormattedText = [
+    {
+      "Id": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
+      "Name": "HR"
+    },
+    {
+      "Id": "247543b6-45f2-4232-b9e8-66c5bf53c31e",
+      "Name": "IT"
+    },
+    {
+      "Id": "ffc3608f-1250-4d28-b388-381fad8d4602",
+      "Name": "Leadership"
+    }
+  ];
+
   const csomChildResponseFormattedText = [
     {
       "Id": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
@@ -501,7 +516,7 @@ describe(commands.TERM_LIST, () => {
     assert(loggerLogSpy.calledWith(csomDefaultResponseFormatted));
   });
 
-  it('gets taxonomy term set by name, term group by id (debug)', async () => {
+  it('gets taxonomy term set by name, term group by id in a friendly way', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -512,8 +527,8 @@ describe(commands.TERM_LIST, () => {
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { termSetName: 'PnPTermSets', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } });
-    assert(loggerLogSpy.calledWith(csomDefaultResponseFormatted));
+    await command.action(logger, { options: { termSetName: 'PnPTermSets', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', output: 'text' } });
+    assert(loggerLogSpy.calledWith(csomDefaultResponseFormattedText));
   });
 
   it('gets taxonomy term set by id, term group by name', async () => {
