@@ -13,9 +13,6 @@ m365 teams chat list [options]
 `-t, --type [type]`
 : The chat type to optionally filter chat conversations by type. The value can be `oneOnOne`, `group` or `meeting`.
 
-`--top [top]`
-: Batch size. Has to be a number between 1 and 50.
-
 `--userId [userId]`
 : ID of the user. Has to be specified when using application permissions. Specify either `userId` or `userName`, but not both.
 
@@ -38,10 +35,10 @@ List only the one on one Microsoft Teams chat conversations of a specific user r
 m365 teams chat list --type oneOnOne
 ```
 
-List only the group Microsoft Teams chat conversations of a specific user retrieved by mail in batches of 10.
+List only the group Microsoft Teams chat conversations of a specific user retrieved by mail
 
 ```sh
-m365 teams chat list --type oneOnOne --top 10
+m365 teams chat list --type oneOnOne 
 ```
 
 ## Response

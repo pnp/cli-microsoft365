@@ -13,7 +13,6 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   type?: string;
-  top?: number;
   userId?: string;
   userName?: string;
 }
@@ -56,10 +55,6 @@ class TeamsChatListCommand extends GraphCommand {
         autocomplete: this.supportedTypes
       },
       {
-        option: '--top [top]',
-        autocomplete: this.supportedTypes
-      },
-      {
         option: '--userId [userId]'
       },
       {
@@ -73,10 +68,6 @@ class TeamsChatListCommand extends GraphCommand {
       async (args: CommandArgs) => {
         if (args.options.type !== undefined && this.supportedTypes.indexOf(args.options.type) === -1) {
           return `${args.options.type} is not a valid chatType. Accepted values are ${this.supportedTypes.join(', ')}`;
-        }
-
-        if (args.options.top && (isNaN(args.options.top) || args.options.top > 50 || args.options.top < 1)) {
-          return 'Option top has be a number between 1 and 50.';
         }
 
         if (args.options.userId && args.options.userName) {
@@ -106,10 +97,6 @@ class TeamsChatListCommand extends GraphCommand {
 
     if (args.options.type) {
       requestUrl += `?$filter=chatType eq '${args.options.type}'`;
-    }
-    if (args.options.top) {
-      const character = args.options.type ? '&' : '?';
-      requestUrl += `${character}$top=${args.options.top}`;
     }
 
     try {

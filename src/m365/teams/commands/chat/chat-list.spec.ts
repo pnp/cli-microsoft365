@@ -105,21 +105,6 @@ describe(commands.CHAT_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation for a top value that is not a number', async () => {
-    const actual = await command.validate({ options: { top: 'aaa' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation for a top value that is larger than 0', async () => {
-    const actual = await command.validate({ options: { top: 51 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation for a top value that is smaller than 0', async () => {
-    const actual = await command.validate({ options: { top: -5 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if userId is not a valid GUID', async () => {
     const actual = await command.validate({ options: { userId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -145,8 +130,8 @@ describe(commands.CHAT_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct input for group chat conversations and a top value of 25', async () => {
-    const actual = await command.validate({ options: { type: "group", top: 25 } }, commandInfo);
+  it('validates for a correct input for group chat conversation', async () => {
+    const actual = await command.validate({ options: { type: "group" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -155,24 +140,24 @@ describe(commands.CHAT_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('lists all chat conversations for the currently signed in user using batches of 10', async () => {
+  it('lists all chat conversations for the currently signed in user', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/chats?$top=10`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/chats`) {
         return { 'value': chatsResponse };
       }
 
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { top: 10 } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith(chatsResponse));
   });
 
-  it('lists oneOnOne chat conversations for the currently signed in user using batches of 10', async () => {
+  it('lists oneOnOne chat conversations for the currently signed in user', async () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/chats?$filter=chatType eq 'oneOnOne'&$top=10`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/chats?$filter=chatType eq 'oneOnOne'`) {
         return { 'value': chatsResponse.filter(y => y.chatType === 'oneOnOne') };
       }
 
@@ -180,7 +165,7 @@ describe(commands.CHAT_LIST, () => {
     });
 
     await command.action(logger, {
-      options: { type: 'oneOnOne', top: 10 }
+      options: { type: 'oneOnOne' }
     });
     assert(loggerLogSpy.calledWith(chatsResponse.filter(y => y.chatType === 'oneOnOne')));
   });
