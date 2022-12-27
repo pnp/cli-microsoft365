@@ -97,6 +97,25 @@ m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Gro
     xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
     ```
 
+=== "Markdown"
+
+    ```md
+    # planner plan add --title "My Planner Plan" --ownerGroupId "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4"
+
+    Date: 30/03/2015
+
+    ## My Planner Plan (xqQg5FS2LkCp935s-FIFm2QAFkHM)
+
+    Property | Value
+    ---------|-------
+    createdDateTime | 2015-03-30T18:36:49.2407981Z
+    owner | ebf3b108-5234-4e22-b93d-656d7dae5874
+    title | My Planner Plan
+    id | xqQg5FS2LkCp935s-FIFm2QAFkHM
+    createdBy | {"user":{"displayName":null,"id":"95e27074-6c4a-447a-aa24-9d718a0b86fa"},"application":{"displayName":null,"id":"ebf3b108-5234-4e22-b93d-656d7dae5874"}}
+    container | {"containerId":"ebf3b108-5234-4e22-b93d-656d7dae5874","type":"group","url":"https://graph.microsoft.com/v1.0/groups/ebf3b108-5234-4e22-b93d-656d7dae5874"}
+    ```
+
 ### `shareWithUserIds`, `shareWithUserNames` response
 
 When we make use of the option `shareWithUserIds` or `shareWithUserNames` the response will differ. 
@@ -172,4 +191,25 @@ When we make use of the option `shareWithUserIds` or `shareWithUserNames` the re
     ```csv
     id,title,createdDateTime,owner
     xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
+    ```
+
+=== "Markdown"
+
+    ```md
+    # planner plan add --title "My Planner Plan" --ownerGroupId "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4" --shareWithUserNames "Allan.Carroll@contoso.com,Ida.Stevens@contoso.com"
+
+    Date: 30/03/2015
+
+    ## My Planner Plan (xqQg5FS2LkCp935s-FIFm2QAFkHM)
+
+    Property | Value
+    ---------|-------
+    createdDateTime | 2015-03-30T18:36:49.2407981Z
+    owner | ebf3b108-5234-4e22-b93d-656d7dae5874
+    title | My Planner Plan
+    id | xqQg5FS2LkCp935s-FIFm2QAFkHM
+    createdBy | {"user":{"displayName":null,"id":"dd8b99a7-77c6-4238-a609-396d27844921"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}
+    container | {"containerId":"ebf3b108-5234-4e22-b93d-656d7dae5874","type":"group","url":"https://graph.microsoft.com/v1.0/groups/ebf3b108-5234-4e22-b93d-656d7dae5874"}
+    sharedWith | {"ebf3b108-5234-4e22-b93d-656d7dae5874":true,"6463a5ce-2119-4198-9f2a-628761df4a62":true}
+    categoryDescriptions | {"category1":null,"category2":null,"category3":null,"category4":null,"category5":null,"category6":null,"category7":null,"category8":null,"category9":null,"category10":null,"category11":null,"category12":null,"category13":null,"category14":null,"category15":null,"category16":null,"category17":null,"category18":null,"category19":null,"category20":null,"category21":null,"category22":null,"category23":null,"category24":null,"category25":null}
     ```
