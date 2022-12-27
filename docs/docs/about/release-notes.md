@@ -83,6 +83,7 @@
 - adds userId option to 'spo group member add' [#4097](https://github.com/pnp/cli-microsoft365/issues/4097)
 - fixed page promotion for 'spo page add' and 'spo page set' commands [#4055](https://github.com/pnp/cli-microsoft365/issues/4055)
 - extended 'pp environment get' to retrieve the default environment [#4228](https://github.com/pnp/cli-microsoft365/issues/4228)
+- fixed retrieving process name on Azure Functions [#4229](https://github.com/pnp/cli-microsoft365/issues/4229)
 
 ## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
 
