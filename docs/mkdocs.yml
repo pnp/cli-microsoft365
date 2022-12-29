@@ -485,14 +485,15 @@ nav:
         - listitem remove: cmd/spo/listitem/listitem-remove.md
         - listitem attachment list: cmd/spo/listitem/listitem-attachment-list.md
         - listitem batch add: cmd/spo/listitem/listitem-batch-add.md
-        - listitem record lock: cmd/spo/listitem/listitem-record-lock.md
         - listitem retentionlabel remove: cmd/spo/listitem/listitem-retentionlabel-remove.md
         - listitem roleassignment add: cmd/spo/listitem/listitem-roleassignment-add.md
         - listitem roleassignment remove: cmd/spo/listitem/listitem-roleassignment-remove.md
         - listitem roleinheritance break: cmd/spo/listitem/listitem-roleinheritance-break.md
         - listitem roleinheritance reset: cmd/spo/listitem/listitem-roleinheritance-reset.md
         - listitem record declare: cmd/spo/listitem/listitem-record-declare.md
+        - listitem record lock: cmd/spo/listitem/listitem-record-lock.md
         - listitem record undeclare: cmd/spo/listitem/listitem-record-undeclare.md
+        - listitem record unlock: cmd/spo/listitem/listitem-record-unlock.md
       - mail:
         - mail send: cmd/spo/mail/mail-send.md
       - navigation:
