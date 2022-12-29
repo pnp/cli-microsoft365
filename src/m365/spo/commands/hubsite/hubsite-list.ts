@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { odata } from '../../../../utils/odata';
 import { spo } from '../../../../utils/spo';
 import SpoCommand from '../../../base/SpoCommand';
@@ -70,7 +69,7 @@ class SpoHubSiteListCommand extends SpoCommand {
           logger.logToStderr('');
         }
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${spoAdminUrl}/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`,
           headers: {
             accept: 'application/json;odata=nometadata'

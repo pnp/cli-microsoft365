@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -189,7 +188,7 @@ class SpoListItemListCommand extends SpoCommand {
         const filter: string = args.options.filter ? `$filter=${encodeURIComponent(args.options.filter)}` : ``;
         const fieldSelect: string = `?$select=Id&${rowLimit}&${filter}`;
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${requestUrl}/items${fieldSelect}`,
           headers: {
             'accept': 'application/json;odata=nometadata',
@@ -217,7 +216,7 @@ class SpoListItemListCommand extends SpoCommand {
         }
         : ``;
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${requestUrl}/${args.options.camlQuery ? `GetItems` : `items${fieldSelect}`}`,
         headers: {
           'accept': 'application/json;odata=nometadata',

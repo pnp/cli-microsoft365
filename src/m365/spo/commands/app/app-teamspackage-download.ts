@@ -1,9 +1,8 @@
-import { AxiosRequestConfig } from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -129,7 +128,7 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
 
       await this.loadAppCatalogUrl(logger, args);
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.appCatalogUrl}/_api/web/tenantappcatalog/downloadteamssolution(${appInfo.id})/$value`,
         headers: {
           accept: 'application/json;odata=nometadata'
@@ -188,7 +187,7 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
           url += `getfolderbyserverrelativeurl('${appCatalogListName}')/files('${formatting.encodeQueryParameter(args.options.appName)}')/ListItemAllFields?$select=Id`;
         }
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url,
           headers: {
             accept: 'application/json;odata=nometadata'

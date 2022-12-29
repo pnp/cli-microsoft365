@@ -1,11 +1,10 @@
 import * as assert from 'assert';
-import { AxiosRequestConfig } from 'axios';
 import { ClientRequest } from 'http';
 import * as https from 'https';
 import * as sinon from 'sinon';
 import auth from './Auth';
 import { Logger } from './cli/Logger';
-import _request from './request';
+import _request, { CliRequestOptions } from './request';
 import { sinonUtil } from './utils/sinonUtil';
 
 describe('Request', () => {
@@ -15,7 +14,7 @@ describe('Request', () => {
     logToStderr: () => { }
   };
 
-  let _options: AxiosRequestConfig;
+  let _options: CliRequestOptions;
 
   beforeEach(() => {
     _request.logger = logger;
@@ -175,7 +174,7 @@ describe('Request', () => {
       });
   });
 
-  
+
   it(`removes the resource header on distinguished resource requests`, (done) => {
     sinon.stub(https, 'request').callsFake((options: any) => {
       _options = options;

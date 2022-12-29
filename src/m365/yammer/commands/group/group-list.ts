@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
 
@@ -85,7 +84,7 @@ class YammerGroupListCommand extends YammerCommand {
     }
     endpoint += `?page=${page}`;
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: endpoint,
       headers: {
         accept: 'application/json;odata.metadata=none',

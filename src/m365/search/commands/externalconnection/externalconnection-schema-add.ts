@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -94,7 +93,7 @@ class SearchExternalConnectionSchemaAddCommand extends GraphCommand {
       logger.logToStderr(`Adding schema to external connection with id ${args.options.externalConnectionId}`);
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/external/connections/${args.options.externalConnectionId}/schema`,
       headers: {
         accept: 'application/json;odata.metadata=none'

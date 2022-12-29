@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -106,7 +105,7 @@ class SpoFileCopyCommand extends SpoCommand {
         destinationPath += sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
       }
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/SP.MoveCopyUtil.CopyFileByPath`,
         headers: {
           accept: 'application/json;odata=nometadata'

@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -122,7 +121,7 @@ class SpoContentTypeGetCommand extends SpoCommand {
       requestUrl += `?$filter=Name eq '${formatting.encodeQueryParameter(args.options.name)}'`;
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         accept: 'application/json;odata=nometadata'

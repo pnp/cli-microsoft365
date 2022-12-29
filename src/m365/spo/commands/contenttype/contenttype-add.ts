@@ -1,10 +1,9 @@
-import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -127,7 +126,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
         `<Property Name="Group" Type="String">${formatting.escapeXml(args.options.group)}</Property>` :
         '<Property Name="Group" Type="Null" />';
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'X-RequestDigest': reqDigest.FormDigestValue
@@ -182,7 +181,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
       logger.logToStderr(`Retrieving site collection id...`);
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/site?$select=Id`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -199,7 +198,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
       logger.logToStderr(`Retrieving web id...`);
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/web?$select=Id`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -220,7 +219,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
       return options.listId;
     }
     else if (options.listTitle) {
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')?$select=Id`,
         headers: {
           accept: 'application/json;odata=nometadata'
@@ -232,7 +231,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
     }
     else if (options.listUrl) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${options.webUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')?$select=Id`,
         headers: {
           accept: 'application/json;odata=nometadata'

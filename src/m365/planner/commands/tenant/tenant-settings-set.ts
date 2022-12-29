@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import PlannerCommand from '../../../base/PlannerCommand';
 import commands from '../../commands';
 
@@ -107,7 +106,7 @@ class PlannerTenantSettingsSetCommand extends PlannerCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/taskAPI/tenantAdminSettings/Settings`,
       headers: {
         accept: 'application/json;odata.metadata=none',
