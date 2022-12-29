@@ -485,6 +485,7 @@ nav:
         - listitem remove: cmd/spo/listitem/listitem-remove.md
         - listitem attachment list: cmd/spo/listitem/listitem-attachment-list.md
         - listitem batch add: cmd/spo/listitem/listitem-batch-add.md
+        - listitem retentionlabel record unlock: cmd/spo/listitem/listitem-retentionlabel-record-unlock.md
         - listitem retentionlabel remove: cmd/spo/listitem/listitem-retentionlabel-remove.md
         - listitem roleassignment add: cmd/spo/listitem/listitem-roleassignment-add.md
         - listitem roleassignment remove: cmd/spo/listitem/listitem-roleassignment-remove.md

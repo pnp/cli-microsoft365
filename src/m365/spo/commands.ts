@@ -144,6 +144,7 @@ export default {
   LISTITEM_RECORD_DECLARE: `${prefix} listitem record declare`,
   LISTITEM_RECORD_UNDECLARE: `${prefix} listitem record undeclare`,
   LISTITEM_REMOVE: `${prefix} listitem remove`,
+  LISTITEM_RETENTIONLABEL_RECORD_UNLOCK: `${prefix} listitem retentionlabel record unlock`,
   LISTITEM_RETENTIONLABEL_REMOVE: `${prefix} listitem retentionlabel remove`,
   LISTITEM_ROLEASSIGNMENT_ADD: `${prefix} listitem roleassignment add`,
   LISTITEM_ROLEASSIGNMENT_REMOVE: `${prefix} listitem roleassignment remove`,
