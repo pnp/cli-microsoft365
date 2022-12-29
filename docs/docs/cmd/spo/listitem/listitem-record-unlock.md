@@ -1,11 +1,11 @@
-# spo listitem retentionlabel record unlock
+# spo listitem record unlock
 
 Unlocks the list item record
 
 ## Usage
 
 ```sh
-m365 spo listitem retentionlabel record unlock [options]
+m365 spo listitem record unlock [options]
 ```
 
 ## Options
@@ -32,19 +32,19 @@ m365 spo listitem retentionlabel record unlock [options]
 Unlocks the list item record in a given site based on the list id
 
 ```sh
-m365 spo listitem retentionlabel record unlock --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --listItemId 1
+m365 spo listitem record unlock --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --listItemId 1
 ```
 
 Unlocks the list item record in a given site based on the list title
 
 ```sh
-m365 spo listitem retentionlabel record unlock --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --listItemId 1
+m365 spo listitem record unlock --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --listItemId 1
 ```
 
 Unlocks the list item record in a given site based on the server relative list url
 
 ```sh
-m365 spo listitem retentionlabel record unlock --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/lists/TestList --listItemId 1
+m365 spo listitem record unlock --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/lists/TestList --listItemId 1
 ```
 
 ## Response

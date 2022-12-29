@@ -10,9 +10,9 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-const command: Command = require('./listitem-retentionlabel-record-unlock');
+const command: Command = require('./listitem-record-unlock');
 
-describe(commands.LISTITEM_RETENTIONLABEL_RECORD_UNLOCK, () => {
+describe(commands.LISTITEM_RECORD_UNLOCK, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -74,7 +74,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_RECORD_UNLOCK, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.LISTITEM_RETENTIONLABEL_RECORD_UNLOCK);
+    assert.strictEqual(command.name, commands.LISTITEM_RECORD_UNLOCK);
   });
 
   it('has a description', () => {
