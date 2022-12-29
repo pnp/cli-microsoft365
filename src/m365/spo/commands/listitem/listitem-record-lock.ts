@@ -21,9 +21,9 @@ export interface Options extends GlobalOptions {
   listItemId: string;
 }
 
-class SpoListItemRetentionLabelRecordLockCommand extends SpoCommand {
+class SpoListItemRecordLockCommand extends SpoCommand {
   public get name(): string {
-    return commands.LISTITEM_RETENTIONLABEL_RECORD_LOCK;
+    return commands.LISTITEM_RECORD_LOCK;
   }
 
   public get description(): string {
@@ -151,4 +151,4 @@ class SpoListItemRetentionLabelRecordLockCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListItemRetentionLabelRecordLockCommand();
+module.exports = new SpoListItemRecordLockCommand();
