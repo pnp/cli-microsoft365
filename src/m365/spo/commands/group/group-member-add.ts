@@ -8,6 +8,8 @@ import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
+import * as AadGroupGetCommand from '../../../aad/commands/group/group-get';
+import { Options as AadGroupGetCommandOptions } from '../../../aad/commands/group/group-get';
 import * as SpoUserGetCommand from '../user/user-get';
 import { Options as SpoUserGetCommandOptions } from '../user/user-get';
 import SpoCommand from '../../../base/SpoCommand';
@@ -25,6 +27,8 @@ interface Options extends GlobalOptions {
   userName?: string;
   email?: string;
   userId?: string;
+  aadGroupId?: string;
+  aadGroupName?: string;
 }
 
 class SpoGroupMemberAddCommand extends SpoCommand {
@@ -56,7 +60,9 @@ class SpoGroupMemberAddCommand extends SpoCommand {
         groupName: typeof args.options.groupName !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
         email: typeof args.options.email !== 'undefined',
-        userId: typeof args.options.userId !== 'undefined'
+        userId: typeof args.options.userId !== 'undefined',
+        aadGroupId: typeof args.options.aadGroupId !== 'undefined',
+        aadGroupName: typeof args.options.aadGroupName !== 'undefined'
       });
     });
   }
@@ -80,6 +86,12 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       },
       {
         option: '--userId [userId]'
+      },
+      {
+        option: '--aadGroupId [aadGroupId]'
+      },
+      {
+        option: '--aadGroupName [aadGroupName]'
       }
     );
   }
@@ -109,6 +121,10 @@ class SpoGroupMemberAddCommand extends SpoCommand {
           return `${args.options.email} contains one or more invalid email addresses`;
         }
 
+        if (args.options.aadGroupId && args.options.aadGroupId.split(',').some(e => !validation.isValidGuid(e))) {
+          return `${args.options.aadGroupId} contains one or more invalid GUIDs`;
+        }
+
         return true;
       }
     );
@@ -117,7 +133,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       { options: ['groupId', 'groupName'] },
-      { options: ['userName', 'email', 'userId'] }
+      { options: ['userName', 'email', 'userId', 'aadGroupId', 'aadGroupName'] }
     );
   }
 
@@ -127,7 +143,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       const resolvedUsernameList = await this.getValidUsers(args, logger);
 
       if (this.verbose) {
-        logger.logToStderr(`Adding user(s) to SharePoint Group ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
+        logger.logToStderr(`Adding user(s) to SharePoint Group ${args.options.groupId || args.options.groupName}`);
       }
 
       const data: any = {
@@ -195,16 +211,20 @@ class SpoGroupMemberAddCommand extends SpoCommand {
 
     const validUserNames: string[] = [];
     const invalidUserNames: string[] = [];
-    const userIdentifiers: string = args.options.userName || args.options.email || args.options.userId!.toString();
+    const userIdentifiers: string = args.options.userName || args.options.email || args.options.aadGroupId! || args.options.aadGroupName! || args.options.userId!.toString();
 
     return Promise
       .all(userIdentifiers.split(',').map(async userIdentifier => {
+        const user = userIdentifier.trim();
         try {
           if (args.options.userId) {
-            await this.spoUserGet(args.options, userIdentifier.trim(), logger, validUserNames);
+            await this.spoUserGet(args.options, user, logger, validUserNames);
+          }
+          else if (args.options.aadGroupId || args.options.aadGroupName) {
+            await this.aadGroupGet(args.options, user, logger, validUserNames);
           }
           else {
-            await this.aadUserGet(args.options, userIdentifier.trim(), logger, validUserNames);
+            await this.aadUserGet(args.options, user, logger, validUserNames);
           }
         }
         catch (err: any) {
@@ -243,6 +263,28 @@ class SpoGroupMemberAddCommand extends SpoCommand {
     }
 
     validUserNames.push(JSON.parse(aadUserGetOutput.stdout).userPrincipalName);
+  }
+
+  private async aadGroupGet(options: Options, userIdentifier: string, logger: Logger, validUserNames: string[]): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Get UPN from Azure AD for group ${userIdentifier}`);
+    }
+
+    const aadUserGetCommandoptions: AadGroupGetCommandOptions = {
+      ...(options.aadGroupId && { id: userIdentifier }),
+      ...(options.aadGroupName && { title: userIdentifier }),
+      output: 'json',
+      debug: options.debug,
+      verbose: options.verbose
+    };
+
+    const aadGroupGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadGroupGetCommand as Command, { options: { ...aadUserGetCommandoptions, _: [] } });
+
+    if (this.debug) {
+      logger.logToStderr(aadGroupGetOutput.stderr);
+    }
+
+    validUserNames.push(JSON.parse(aadGroupGetOutput.stdout).mail);
   }
 
   private async spoUserGet(options: Options, userIdentifier: string, logger: Logger, validUserNames: string[]): Promise<void> {

@@ -20,19 +20,25 @@ m365 spo group member add [options]
 : Name of the SharePoint Group to which the user needs to be added, specify either `groupId` or `groupName`
 
 `--userName [userName]`
-: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com), specify either `userName`, `email` or `userId`
+: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
 
 `--email [email]`
-: User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com), specify either `userName`, `email` or `userId`
+: User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
 
 `--userId [userId]`
-: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Id's have to be comma separated. Specify either `userName`, `email` or `userId`
+: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Ids have to be comma separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+
+`--aadGroupId [aadGroupId]`
+: The object Id of the Azure AD group to add as a member. If multiple groups need to be added, the Ids have to be comma separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+
+`--aadGroupName [aadGroupName]`
+: The name of the Azure AD group to add as a member. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
 
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-For the `--userName` or `--email` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list invalid values.
+For the `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
 
 ## Examples
 
@@ -70,6 +76,18 @@ Add multiple users with the userId parameter to a SharePoint group with the grou
 
 ```sh
 m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userId "5,12"
+```
+
+Add multiple users with the aadUserId parameter to a SharePoint group with the groupId parameter
+
+```sh
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --aadUserId "56ca9023-3449-4e98-a96a-69e81a6f4983,a96c1755-8aec-4f4d-955f-08504510dc56"
+```
+
+Add multiple users with the aadUserName parameter to a SharePoint group with the groupId parameter
+
+```sh
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --aadUserName "Azure group one, Azure group two"
 ```
 
 ## Response
