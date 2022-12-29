@@ -42,6 +42,7 @@ const dictionary = [
   'management',
   'member',
   'messaging',
+  'model',
   'news',
   'oauth2',
   'office365',
