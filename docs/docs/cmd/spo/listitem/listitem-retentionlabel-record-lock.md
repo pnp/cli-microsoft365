@@ -13,13 +13,13 @@ m365 spo listitem retentionlabel record lock [options]
 `-u, --webUrl <webUrl>`
 : The url of the web
 
-`-i, --listItemId <listItemId>`
+`--listItemId <listItemId>`
 : ID of the list item that should be locked
 
-`-l, --listId [listId]`
+`--listId [listId]`
 : ID of the list. Specify either `listTitle`, `listId` or `listUrl`
 
-`-t, --listTitle [listTitle]`
+`--listTitle [listTitle]`
 : Title of the list. Specify either `listTitle`, `listId` or `listUrl`
 
 `--listUrl [listUrl]`

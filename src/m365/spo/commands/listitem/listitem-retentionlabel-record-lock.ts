@@ -55,13 +55,13 @@ class SpoListItemRetentionLabelRecordLockCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --listItemId <listItemId>'
+        option: '--listItemId <listItemId>'
       },
       {
-        option: '-l, --listId [listId]'
+        option: '--listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]'
+        option: '--listTitle [listTitle]'
       },
       {
         option: '--listUrl [listUrl]'
