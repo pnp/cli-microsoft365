@@ -69,11 +69,6 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
-  });
-
   it('prompts before removing the specified external connection by id when confirm option not passed', async () => {
     await command.action(logger, {
       options: {

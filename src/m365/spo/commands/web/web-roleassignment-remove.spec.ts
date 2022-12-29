@@ -94,13 +94,6 @@ describe(commands.WEB_ROLEASSIGNMENT_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['principalId', 'upn', 'groupName'] }
-    ]);
-  });
-
   it('remove role assignment from web', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_api/web/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {

@@ -106,11 +106,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'displayName', 'mailNickname'] }]);
-  });
-
   it('fails validation if the id is not a valid GUID', async () => {
     const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
