@@ -133,11 +133,6 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title', 'url'] }]);
-  });
-
   it('prompts before disconnecting the hub site when confirmation argument not passed', async () => {
     await command.action(logger, { options: { id: id } });
     let promptIssued = false;

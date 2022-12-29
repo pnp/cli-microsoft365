@@ -97,14 +97,6 @@ describe(commands.CHANNEL_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['id', 'name'] },
-      { options: ['teamId', 'teamName'] }
-    ]);
-  });
-
   it('fails validation if the id is not valid', async () => {
     const actual = await command.validate({
       options: {

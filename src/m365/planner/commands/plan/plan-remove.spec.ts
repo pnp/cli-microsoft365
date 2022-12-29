@@ -112,11 +112,6 @@ describe(commands.PLAN_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title'] }]);
-  });
-
   it('fails validation when id and ownerGroupId is specified', async () => {
     const actual = await command.validate({
       options: {
