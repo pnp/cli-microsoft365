@@ -1,11 +1,10 @@
-import request from "../request";
+import request, { CliRequestOptions } from "../request";
 import { odata } from "./odata";
 import { PlannerPlan } from "@microsoft/microsoft-graph-types";
-import { AxiosRequestConfig } from "axios";
 
 const graphResource = 'https://graph.microsoft.com';
 
-const getRequestOptions = (url: string, metadata: 'none' | 'minimal' | 'full'): AxiosRequestConfig => ({
+const getRequestOptions = (url: string, metadata: 'none' | 'minimal' | 'full'): CliRequestOptions => ({
   url: url,
   headers: {
     accept: `application/json;odata.metadata=${metadata}`
@@ -21,7 +20,7 @@ export const planner = {
    */
   async getPlanById(id: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan> {
     const requestOptions = getRequestOptions(`${graphResource}/v1.0/planner/plans/${id}`, metadata);
-    
+
     try {
       return await request.get<PlannerPlan>(requestOptions);
     }

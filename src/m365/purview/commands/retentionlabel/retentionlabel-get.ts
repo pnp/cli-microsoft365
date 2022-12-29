@@ -2,8 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import GraphCommand from '../../../base/GraphCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
-import request from '../../../../request';
-import { AxiosRequestConfig } from 'axios';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 
 interface CommandArgs {
@@ -56,7 +55,7 @@ class PurviewRetentionLabelGetCommand extends GraphCommand {
         logger.logToStderr(`Retrieving retention label with id ${args.options.id}`);
       }
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/beta/security/labels/retentionLabels/${args.options.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none'

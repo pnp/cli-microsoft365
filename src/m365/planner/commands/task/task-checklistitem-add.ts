@@ -1,10 +1,9 @@
 import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import { v4 } from 'uuid';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
@@ -75,7 +74,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
         }
       };
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(args.options.taskId)}/details`,
         headers: {
           accept: 'application/json;odata.metadata=none',
@@ -102,7 +101,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
   }
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}/details`,
       headers: {
         accept: 'application/json;odata.metadata=minimal'

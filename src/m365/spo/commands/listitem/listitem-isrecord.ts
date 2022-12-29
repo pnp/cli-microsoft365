@@ -1,9 +1,8 @@
-import { AxiosRequestConfig } from 'axios';
 import { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -142,7 +141,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
         if (this.verbose) {
           logger.logToStderr(`Getting list id for list ${args.options.listTitle ? args.options.listTitle : args.options.listUrl}`);
         }
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${requestUrl}?$select=Id`,
           headers: {
             accept: 'application/json;odata=nometadata'
@@ -168,7 +167,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
       }
 
       const requestBody = this.getIsRecordRequestBody(webIdentityResp.objectIdentity, listId, args.options.id);
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'Content-Type': 'text/xml',

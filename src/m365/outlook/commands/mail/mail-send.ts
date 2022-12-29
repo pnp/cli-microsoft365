@@ -1,10 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { AxiosRequestConfig } from 'axios';
 import auth, { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
@@ -150,7 +149,7 @@ class OutlookMailSendCommand extends GraphCommand {
         throw `Specify a upn or user id in the 'sender' option when using app only authentication.`;
       }
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/${args.options.sender ? 'users/' + formatting.encodeQueryParameter(args.options.sender) : 'me'}/sendMail`,
         headers: {
           accept: 'application/json;odata.metadata=none',

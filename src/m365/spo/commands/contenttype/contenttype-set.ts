@@ -1,4 +1,3 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { formatting } from '../../../../utils/formatting';
@@ -6,7 +5,7 @@ import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import config from '../../../../config';
 import { ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils/spo';
 
@@ -138,7 +137,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
       logger.logToStderr(`Retrieving content type to update...`);
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${options.webUrl}/_api/Web`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -173,7 +172,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
 
     const payload = this.getRequestPayload(options);
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'Content-Type': 'text/xml'
@@ -223,7 +222,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
       logger.logToStderr(`Retrieving site collection id...`);
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/site?$select=Id`,
       headers: {
         accept: 'application/json;odata=nometadata'
@@ -240,7 +239,7 @@ class SpoContentTypeSetCommand extends SpoCommand {
       logger.logToStderr(`Retrieving web id...`);
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/web?$select=Id`,
       headers: {
         accept: 'application/json;odata=nometadata'

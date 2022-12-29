@@ -1,8 +1,7 @@
 import auth, { Auth } from '../../../../Auth';
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -88,7 +87,7 @@ class OutlookMessageGetCommand extends GraphCommand {
 
       requestUrl += `/messages/${args.options.id}`;
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/${requestUrl}`,
         headers: {
           accept: 'application/json;odata.metadata=none'

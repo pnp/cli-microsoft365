@@ -8,9 +8,8 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import { Options as SpoEventReceiverGetOptions } from './eventreceiver-get';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { EventReceiver } from './EventReceiver';
-import { AxiosRequestConfig } from 'axios';
 
 const getCommand: Command = require('./eventreceiver-get');
 
@@ -161,7 +160,7 @@ class SpoEventreceiverRemoveCommand extends SpoCommand {
       const rerId = await this.getEventReceiverId(options);
       requestUrl += `/eventreceivers('${rerId}')`;
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: requestUrl,
         headers: {
           'accept': 'application/json;odata=nometadata'
