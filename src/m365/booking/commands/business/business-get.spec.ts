@@ -78,11 +78,6 @@ describe(commands.BUSINESS_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
-  });
-
   it('defines correct properties for the text output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'businessType', 'phone', 'email', 'defaultCurrencyIso']);
   });

@@ -820,11 +820,6 @@ describe(commands.SEND, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['title', 'card'] }]);
-  });
-
   it('supports specifying unknown options', () => {
     assert.strictEqual(command.allowUnknownOptions(), true);
   });

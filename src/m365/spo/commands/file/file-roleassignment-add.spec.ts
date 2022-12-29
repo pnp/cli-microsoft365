@@ -73,15 +73,6 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['fileId', 'fileUrl'] },
-      { options: ['principalId', 'upn', 'groupName'] },
-      { options: ['roleDefinitionId', 'roleDefinitionName'] }
-    ]);
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, groupName: 'Group name A', roleDefinitionName: 'Read' } }, commandInfo);
     assert.notStrictEqual(actual, true);

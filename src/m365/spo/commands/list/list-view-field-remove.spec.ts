@@ -168,15 +168,6 @@ describe(commands.LIST_VIEW_FIELD_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['listId', 'listTitle', 'listUrl'] },
-      { options: ['viewId', 'viewTitle'] },
-      { options: ['id', 'title'] }
-    ]);
-  });
-
   it('prompts before removing field from list view when confirmation argument not passed (list title, view id, field title)', async () => {
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', title: 'Created By' } });
     let promptIssued = false;

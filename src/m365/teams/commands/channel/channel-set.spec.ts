@@ -120,14 +120,6 @@ describe(commands.CHANNEL_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['id', 'name'] },
-      { options: ['teamId', 'teamName'] }
-    ]);
-  });
-
   it('fails to patch channel when channel does not exists', async () => {
     const errorMessage = 'The specified channel does not exist in this Microsoft Teams team';
     sinon.stub(request, 'get').callsFake(async (opts) => {

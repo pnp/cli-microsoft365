@@ -168,15 +168,6 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['listId', 'listTitle', 'listUrl'] },
-      { options: ['viewId', 'viewTitle'] },
-      { options: ['id', 'title'] }
-    ]);
-  });
-
   it('moves the field by title to the position index to viewTitle of listId', async () => {
     stubAllGetRequests();
 

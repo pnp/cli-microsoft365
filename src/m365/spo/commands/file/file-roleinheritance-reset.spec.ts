@@ -73,11 +73,6 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['fileId', 'fileUrl'] }]);
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', fileId: fileId, confirm: true } }, commandInfo);
     assert.notStrictEqual(actual, true);

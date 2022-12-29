@@ -64,11 +64,6 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['location', 'parentNodeId'] }]);
-  });
-
   it('excludes options from URL processing', () => {
     assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
   });
