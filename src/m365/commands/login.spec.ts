@@ -2,11 +2,11 @@ import * as assert from 'assert';
 import Axios from 'axios';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import auth, { AuthType } from '../../Auth';
+import auth, { AuthType, CloudType } from '../../Auth';
 import { Cli } from '../../cli/Cli';
 import { CommandInfo } from '../../cli/CommandInfo';
 import { Logger } from '../../cli/Logger';
-import Command, { CommandError } from '../../Command';
+import Command, { CommandArgs, CommandError } from '../../Command';
 import { telemetry } from '../../telemetry';
 import { pid } from '../../utils/pid';
 import { session } from '../../utils/session';
@@ -72,6 +72,18 @@ describe(commands.LOGIN, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('in telemetry defaults to Public cloud when no cloud has been specified', () => {
+    const args: CommandArgs = { options: {} };
+    command.telemetry.forEach(fn => fn(args));
+    assert.strictEqual((command as any).telemetryProperties.cloud, CloudType.Public);
+  });
+
+  it('in telemetry tracks the specified cloud', () => {
+    const args: CommandArgs = { options: { cloud: 'USGov' } };
+    command.telemetry.forEach(fn => fn(args));
+    assert.strictEqual((command as any).telemetryProperties.cloud, 'USGov');
   });
 
   it('logs in to Microsoft 365', async () => {
@@ -144,6 +156,11 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(auth.service.secret, 'unBrEakaBle@123', 'Incorrect secret set');
   });
 
+  it('logs in to Microsoft 365 using the specified cloud', async () => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
+    await command.action(logger, { options: { cloud: 'USGov' } });
+    assert.strictEqual(auth.service.cloudType, CloudType.USGov);
+  });
 
   it('supports specifying authType', () => {
     const options = command.options;
@@ -214,6 +231,11 @@ describe(commands.LOGIN, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation cloud is set to an invalid value', async () => {
+    const actual = await command.validate({ options: { cloud: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = await command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } }, commandInfo);
@@ -238,6 +260,31 @@ describe(commands.LOGIN, () => {
 
   it('passes validation if authType is not set and userName and password not specified', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when cloud is set to Public', async () => {
+    const actual = await command.validate({ options: { cloud: 'Public' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when cloud is set to USGov', async () => {
+    const actual = await command.validate({ options: { cloud: 'USGov' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when cloud is set to USGovHigh', async () => {
+    const actual = await command.validate({ options: { cloud: 'USGovHigh' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when cloud is set to USGovDoD', async () => {
+    const actual = await command.validate({ options: { cloud: 'USGovDoD' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when cloud is set to China', async () => {
+    const actual = await command.validate({ options: { cloud: 'China' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
