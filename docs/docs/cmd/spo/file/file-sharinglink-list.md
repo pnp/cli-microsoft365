@@ -72,9 +72,9 @@ m365 spo file sharinglink list --webUrl https://contoso.sharepoint.com/sites/dem
           }
         ],
         "link": {
-          "scope": "anonymous",
+          "scope": "organization",
           "type": "view",
-          "webUrl": "https://contoso.sharepoint.com/:b:/s/demo/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A",
+          "webUrl": "https://contoso.sharepoint.com/:w:/s/demo/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A",
           "preventsDownload": false
         }
       }
