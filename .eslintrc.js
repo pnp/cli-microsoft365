@@ -5,11 +5,13 @@ const dictionary = [
   'activation',
   'activations',
   'adaptive',
+  'ai',
   'app',
   'apply',
   'approve',
   'assets',
   'bin',
+  'builder',
   'catalog',
   'checklist',
   'client',
@@ -42,6 +44,7 @@ const dictionary = [
   'management',
   'member',
   'messaging',
+  'model',
   'news',
   'oauth2',
   'office365',
@@ -75,8 +78,7 @@ const dictionary = [
 
 // list of words that should be capitalized in a specific way
 const capitalized = [
-  'OAuth2',
-  'AiBuilderModel'
+  'OAuth2'
 ];
 
 // sort dictionary to put the longest words first

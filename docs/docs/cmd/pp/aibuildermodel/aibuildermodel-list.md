@@ -93,3 +93,48 @@ m365 pp aibuildermodel list --environment "Default-d87a7535-dd31-4437-bfe1-95340
     msdyn_name,msdyn_aimodelid,createdon,modifiedon
     "Document Processing 11/29/2022, 12:58:43 PM",08ffffbe-ec1c-4e64-b64b-dd1db926c613,2022-11-29T11:58:45Z,2022-11-29T11:58:45Z
     ```
+
+=== "Markdown"
+
+    ```md
+    # pp aibuildermodel list --environment "Default-df211959-e0b7-4b7d-8798-490fa1b8e3e7"
+
+    Date: 1/1/2023
+
+    ## undefined (undefined)
+
+    Property | Value
+    ---------|-------
+    statecode | 0
+    \_msdyn\_templateid\_value | 10707e4e-1d56-e911-8194-000d3a6cd5a5
+    msdyn\_modelcreationcontext | {}
+    createdon | 2022-11-29T11:58:45Z
+    \_ownerid\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    modifiedon | 2022-11-29T11:58:45Z
+    msdyn\_sharewithorganizationoncreate | false
+    msdyn\_aimodelidunique | b0328b67-47e2-4202-8189-e617ec9a88bd
+    solutionid | fd140aae-4df4-11dd-bd17-0019b9312238
+    ismanaged | false
+    versionnumber | 1458121
+    msdyn\_name | Document Processing 11/29/2022, 12:58:43 PM
+    introducedversion | 1.0
+    statuscode | 0
+    \_modifiedby\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    overwritetime | 1900-01-01T00:00:00Z
+    componentstate | 0
+    \_createdby\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    \_owningbusinessunit\_value | 6da087c1-1c4d-ed11-bba1-000d3a2caf7f
+    \_owninguser\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    msdyn\_aimodelid | 08ffffbe-ec1c-4e64-b64b-dd1db926c613
+    \_msdyn\_activerunconfigurationid\_value | null
+    overriddencreatedon | null
+    \_msdyn\_retrainworkflowid\_value | null
+    importsequencenumber | null
+    \_msdyn\_scheduleinferenceworkflowid\_value | null
+    \_modifiedonbehalfby\_value | null
+    utcconversiontimezonecode | null
+    \_createdonbehalfby\_value | null
+    \_owningteam\_value | null
+    timezoneruleversionnumber | null
+    iscustomizable | {"Value":true,"CanBeChanged":true,"ManagedPropertyLogicalName":"iscustomizableanddeletable"}
+    ```
