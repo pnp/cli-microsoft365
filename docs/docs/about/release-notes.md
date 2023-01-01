@@ -1,8 +1,12 @@
 # Release notes
 
-## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
+## [v6.2.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
 ### New commands
+
+**Power Platform:**
+
+- [pp aibuildermodel list](../cmd/pp/aibuildermodel/aibuildermodel-list.md) - list available AI builder models in the specified Power Platform environment [#4174](https://github.com/pnp/cli-microsoft365/issues/4174)
 
 **Purview:**
 
@@ -10,6 +14,7 @@
 
 **SharePoint:**
 
+- [spo file sharinglink list](../cmd/spo/file/file-sharinglink-list.md) - lists all the sharing links of a specific file [#4023](https://github.com/pnp/cli-microsoft365/issues/4023)
 - [spo listitem record lock](../cmd/spo/listitem/listitem-record-lock.md) - locks the list item record [#4237](https://github.com/pnp/cli-microsoft365/issues/4237)
 - [spo listitem record unlock](../cmd/spo/listitem/listitem-record-unlock.md) - unlocks the list item record [#4239](https://github.com/pnp/cli-microsoft365/issues/4239)
 
@@ -18,6 +23,7 @@
 - added 'list all files with missing required metadata' sample [#3277](https://github.com/pnp/cli-microsoft365/issues/3277)
 - added own CliRequestOptions [#4277](https://github.com/pnp/cli-microsoft365/issues/4277)
 - deleted 'defines correct option sets' [#4068](https://github.com/pnp/cli-microsoft365/issues/4068)
+- updates the Using Guide with our definition of booleans [#3987](https://github.com/pnp/cli-microsoft365/issues/3987)
 
 ## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
 
