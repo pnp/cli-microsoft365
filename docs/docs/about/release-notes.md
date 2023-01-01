@@ -1,5 +1,18 @@
 # Release notes
 
+## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
+
+### New commands
+
+**Purview:**
+
+- [purview retentionlabel get](../cmd/purview/retentionlabel/retentionlabel-get.md) - get a retention label [#4146](https://github.com/pnp/cli-microsoft365/issues/4146)
+
+**SharePoint:**
+
+- [spo listitem record lock](../cmd/spo/listitem/listitem-record-lock.md) - locks the list item record [#4237](https://github.com/pnp/cli-microsoft365/issues/4237)
+- [spo listitem record unlock](../cmd/spo/listitem/listitem-record-unlock.md) - unlocks the list item record [#4239](https://github.com/pnp/cli-microsoft365/issues/4239)
+
 ## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
 
 ### New commands
