@@ -32,13 +32,13 @@ m365 teams chat list
 List only the one on one Microsoft Teams chat conversations of a specific user retrieved by id.
 
 ```sh
-m365 teams chat list --type oneOnOne
+m365 teams chat list --userId e6296ed0-4b7d-4ace-aed4-f6b7371ce060 --type oneOnOne
 ```
 
 List only the group Microsoft Teams chat conversations of a specific user retrieved by mail
 
 ```sh
-m365 teams chat list --type oneOnOne 
+m365 teams chat list --userName 'john@contoso.com' --type group 
 ```
 
 ## Response
