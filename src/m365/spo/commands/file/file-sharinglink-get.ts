@@ -1,12 +1,12 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { GraphFileDetails } from './GraphFileDetails';
 
 interface CommandArgs {
   options: Options;
@@ -19,13 +19,13 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class SpoFileSharinglinkGetCommand extends SpoCommand {
+class SpoFileSharingLinkGetCommand extends SpoCommand {
   public get name(): string {
     return commands.FILE_SHARINGLINK_GET;
   }
 
   public get description(): string {
-    return 'Gets details about a specific sharing link';
+    return 'Gets details about a specific sharing link of a file';
   }
 
   constructor() {
@@ -40,8 +40,8 @@ class SpoFileSharinglinkGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        fileUrl: (!(!args.options.fileUrl)).toString(),
-        fileId: (!(!args.options.fileId)).toString()
+        fileUrl: typeof args.options.fileUrl !== 'undefined',
+        fileId: typeof args.options.fileId !== 'undefined'
       });
     });
   }
@@ -84,30 +84,6 @@ class SpoFileSharinglinkGetCommand extends SpoCommand {
     this.optionSets.push({ options: ['fileUrl', 'fileId'] });
   }
 
-  private async getNeededFileInformation(args: CommandArgs): Promise<{ SiteId: string; VroomDriveID: string; VroomItemID: string; }> {
-    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
-
-    if (args.options.fileId) {
-      requestUrl += `GetFileById('${args.options.fileId as string}')`;
-    }
-    else {
-      const fileServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl as string);
-      requestUrl += `GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileServerRelativeUrl)}')`;
-    }
-
-    requestUrl += '?$select=SiteId,VroomItemId,VroomDriveId';
-
-    const requestOptions: AxiosRequestConfig = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json'
-      },
-      responseType: 'json'
-    };
-
-    return await request.get<{ SiteId: string; VroomDriveID: string; VroomItemID: string; }>(requestOptions);
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving sharing link for file ${args.options.fileUrl || args.options.fileId} with id ${args.options.id}...`);
@@ -116,11 +92,10 @@ class SpoFileSharinglinkGetCommand extends SpoCommand {
     try {
       const fileDetails = await this.getNeededFileInformation(args);
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions/${args.options.id}`,
         headers: {
-          accept: 'application/json;odata.metadata=none',
-          'content-type': 'application/json;odata.metadata=none'
+          accept: 'application/json;odata.metadata=none'
         },
         responseType: 'json'
       };
@@ -132,6 +107,31 @@ class SpoFileSharinglinkGetCommand extends SpoCommand {
       this.handleRejectedODataJsonPromise(err);
     }
   }
+
+  private async getNeededFileInformation(args: CommandArgs): Promise<GraphFileDetails> {
+    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
+
+    if (args.options.fileUrl) {
+      const fileServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
+      requestUrl += `GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileServerRelativeUrl)}')`;
+    }
+    else {
+      requestUrl += `GetFileById('${args.options.fileId}')`;
+    }
+
+    requestUrl += '?$select=SiteId,VroomItemId,VroomDriveId';
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<GraphFileDetails>(requestOptions);
+    return res;
+  }
 }
 
-module.exports = new SpoFileSharinglinkGetCommand();
+module.exports = new SpoFileSharingLinkGetCommand();
