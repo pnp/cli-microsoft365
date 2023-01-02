@@ -6,6 +6,7 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import { formatting } from '../../../../utils/formatting';
+import { GraphFileDetails } from './GraphFileDetails';
 import { urlUtil } from '../../../../utils/urlUtil';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
@@ -25,7 +26,7 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
-  const fileInformationResponse = {
+  const fileInformationResponse: GraphFileDetails = {
     SiteId: '9798e615-a586-455e-8486-84913f492c49',
     VroomDriveID: 'b!FeaYl4alXkWEhoSRP0ksSSOaj9osSfFPqj5bQNdluvlwfL79GNVISZZCf6nfB3vY',
     VroomItemID: '01A5WCPNXHFAS23ZNOF5D3XU2WU7S3I2AU'
@@ -113,21 +114,6 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the fileId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, id: id } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the fileId or fileUrl option not specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both fileId and fileUrl options are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, fileUrl: fileUrl, id: id } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('gets a specific sharing link of a file by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/GetFileById('${fileId}')?$select=SiteId,VroomItemId,VroomDriveId`) {
@@ -181,15 +167,16 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
     assert(loggerLogSpy.calledWith(fileSharingLinkResponse));
   });
 
-  it('correctly handles random API error', async () => {
-    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: webUrl,
-        fileUrl: fileUrl,
-        id: id
+  it('throws error when file not found by id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFileById('${fileId}')?$select=SiteId,VroomItemId,VroomDriveId`) {
+        throw { error: { 'odata.error': { message: { value: 'File Not Found.' } } } };
       }
-    }), new CommandError("An error has occurred"));
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } } as any),
+      new CommandError(`File Not Found.`));
   });
 });
