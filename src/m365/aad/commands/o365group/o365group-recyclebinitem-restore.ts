@@ -1,8 +1,7 @@
 import { Group } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -83,7 +82,7 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
 
     try {
       const groupId = await this.getGroupId(args.options);
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/directory/deleteditems/${groupId}/restore`,
         headers: {
           accept: 'application/json;odata.metadata=none',
@@ -115,7 +114,7 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
       filterValue = `mailNickname eq '${formatting.encodeQueryParameter(mailNickname)}'`;
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=${filterValue}`,
       headers: {
         accept: 'application/json;odata.metadata=none'

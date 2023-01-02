@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
@@ -86,7 +85,7 @@ class PpDataverseTableRemoveCommand extends PowerPlatformCommand {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(options.environment, options.asAdmin);
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.0/EntityDefinitions(LogicalName='${options.name}')`,
         headers: {
           accept: 'application/json;odata.metadata=none'

@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import { AxiosRequestConfig } from 'axios';
 import * as sinon from 'sinon';
 import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
@@ -7,7 +6,7 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
@@ -44,7 +43,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptOptions: any;
-  let patchStub: sinon.SinonStub<[options: AxiosRequestConfig<any>]>;
+  let patchStub: sinon.SinonStub<[options: CliRequestOptions]>;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -132,11 +131,6 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   it('passes validation if valid url is specified', async () => {
     const actual = await command.validate({ options: { url: url } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title', 'url'] }]);
   });
 
   it('prompts before disconnecting the hub site when confirmation argument not passed', async () => {

@@ -4,8 +4,7 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { HubSite } from './HubSite';
-import { AxiosRequestConfig } from 'axios';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
@@ -126,7 +125,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
       const hubSite = this.getSpecificHubSite(hubSites, args.options.id, args.options.title, args.options.url);
       const parentHubSite = this.getSpecificHubSite(hubSites, args.options.parentId, args.options.parentTitle, args.options.parentUrl);
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${spoAdminUrl}/_api/HubSites/GetById('${hubSite.ID}')`,
         headers: {
           accept: 'application/json;odata=nometadata',
@@ -146,7 +145,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
   }
 
   private async getHubSites(spoAdminUrl: string): Promise<HubSite[]> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${spoAdminUrl}/_api/HubSites?$select=ID,Title,SiteUrl&$top=5000`,
       headers: {
         accept: 'application/json;odata=minimalmetadata'

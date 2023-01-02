@@ -3,9 +3,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { odata } from '../../../../utils/odata';
-import { AxiosRequestConfig } from 'axios';
 
 interface CommandArgs {
   options: Options;
@@ -95,7 +94,7 @@ class PpDataverseTableRowListCommand extends PowerPlatformCommand {
       return args.options.entitySetName;
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${dynamicsApiUrl}/api/data/v9.0/EntityDefinitions(LogicalName='${args.options.tableName}')?$select=EntitySetName`,
       headers: {
         accept: 'application/json;odata.metadata=none'

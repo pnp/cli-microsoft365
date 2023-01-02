@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
@@ -142,7 +141,7 @@ class AadUserSetCommand extends GraphCommand {
         if (this.verbose) {
           logger.logToStderr(`Setting the updated properties for the user ${args.options.userPrincipalName || args.options.objectId}`);
         }
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: requestUrl,
           headers: {
             accept: 'application/json'
@@ -210,7 +209,7 @@ class AadUserSetCommand extends GraphCommand {
       currentPassword: options.currentPassword,
       newPassword: options.newPassword
     };
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${requestUrl}/changePassword`,
       headers: {
         accept: 'application/json;odata.metadata=none'

@@ -102,14 +102,6 @@ describe(commands.LIST_VIEW_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['listId', 'listTitle', 'listUrl'] },
-      { options: ['id', 'title'] }
-    ]);
-  });
-
   it('passes validation when id and listId specified as valid GUIDs', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, id: viewId } }, commandInfo);
     assert.strictEqual(actual, true);

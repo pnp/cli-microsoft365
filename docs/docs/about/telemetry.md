@@ -31,7 +31,7 @@ Executing this command will result in the following telemetry being collected:
 Description | Telemetry data
 ----- | -----
 Command name | spo file add
-Command options[^1] | contentType: true<br />checkOut: false<br />checkInComment: false<br />approve: false<br />approveComment: false<br />publish: true<br />publishComment: true
+Command options[^1] | contentType: true<br />checkOut: false<br />checkInComment: false<br />approve: false<br />approveComment: false<br />publish: true<br />publishComment: true<br />query: false<br />output: json<br />verbose: false<br />debug: false
 CLI for M365 version | 6.0.0
 Node.js version | v16.13.2
 Shell | pwsh.exe

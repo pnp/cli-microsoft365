@@ -1030,9 +1030,4 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
     assert(actual);
   });
-
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['listId', 'listTitle', 'listUrl'] }]);
-  });
 });

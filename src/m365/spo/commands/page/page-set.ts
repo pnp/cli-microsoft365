@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -202,7 +201,7 @@ class SpoPageSetCommand extends SpoCommand {
         await Cli.executeCommand(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
       }
       if (args.options.promoteAs) {
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           responseType: 'json'
         };
 
@@ -291,7 +290,7 @@ class SpoPageSetCommand extends SpoCommand {
       }
 
       if (needsToSavePage) {
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
           headers: {
@@ -308,7 +307,7 @@ class SpoPageSetCommand extends SpoCommand {
       }
 
       if (args.options.promoteAs === 'Template') {
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
           headers: {
@@ -325,7 +324,7 @@ class SpoPageSetCommand extends SpoCommand {
       }
 
       if (typeof args.options.commentsEnabled !== 'undefined') {
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields/SetCommentsDisabled(${args.options.commentsEnabled === false})`,
           headers: {
             'X-RequestDigest': requestDigest,
@@ -352,7 +351,7 @@ class SpoPageSetCommand extends SpoCommand {
         await Cli.executeCommandWithOutput(spoListItemSetCommand as Command, { options: { ...listItemSetOptions, _: [] } });
       }
 
-      let requestOptions: AxiosRequestConfig;
+      let requestOptions: CliRequestOptions;
 
       if (!args.options.publish) {
         if (args.options.promoteAs === 'Template' || !pageId) {

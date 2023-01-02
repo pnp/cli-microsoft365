@@ -3,9 +3,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
-import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Options as PpCardGetCommandOptions } from './card-get';
 import * as PpCardGetCommand from './card-get';
@@ -122,7 +121,7 @@ class PpCardCloneCommand extends PowerPlatformCommand {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
       const cardId = await this.getCardId(args);
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/CardCreateClone`,
         headers: {
           accept: 'application/json;odata.metadata=none'

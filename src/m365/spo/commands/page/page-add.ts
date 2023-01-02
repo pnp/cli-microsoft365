@@ -1,7 +1,7 @@
 import { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -15,7 +15,6 @@ import * as spoFileGetCommand from '../file/file-get';
 import * as spoListItemSetCommand from '../listitem/listitem-set';
 import { Cli, CommandOutput } from '../../../../cli/Cli';
 import Command from '../../../../Command';
-import { AxiosRequestConfig } from 'axios';
 
 interface CommandArgs {
   options: Options;
@@ -152,7 +151,7 @@ class SpoPageAddCommand extends SpoCommand {
       const reqDigest = await spo.getRequestDigest(args.options.webUrl);
       requestDigest = reqDigest.FormDigestValue;
 
-      let requestOptions: AxiosRequestConfig = {
+      let requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/web/getfolderbyserverrelativeurl('${serverRelativeSiteUrl}/sitepages')/files/AddTemplateFile`,
         headers: {
           'X-RequestDigest': requestDigest,
@@ -199,7 +198,7 @@ class SpoPageAddCommand extends SpoCommand {
       }
 
       if (args.options.promoteAs) {
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           responseType: 'json'
         };
 

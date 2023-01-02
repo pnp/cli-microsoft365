@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -133,7 +132,7 @@ class PurviewRetentionLabelSetCommand extends GraphCommand {
       logger.log(`Starting to update retention label with id ${args.options.id}`);
     }
     const requestBody = this.mapRequestBody(args.options);
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/beta/security/labels/retentionLabels/${args.options.id}`,
       headers: {
         accept: 'application/json'

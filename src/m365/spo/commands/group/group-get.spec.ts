@@ -65,11 +65,6 @@ describe(commands.GROUP_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name', 'associatedGroup'] }]);
-  });
-
   it('retrieves group by id with output option json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {

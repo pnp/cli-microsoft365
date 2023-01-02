@@ -2,9 +2,8 @@ import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import Command from '../../../../Command';
 import { Logger } from '../../../../cli/Logger';
-import { AxiosRequestConfig } from 'axios';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from "../../../base/GraphCommand";
 import commands from '../../commands';
 import { Meeting } from '../Meeting';
@@ -130,7 +129,7 @@ class TeamsMeetingGetCommand extends GraphCommand {
 
       requestUrl += `/onlineMeetings?$filter=JoinWebUrl eq '${encodeURIComponent(args.options.joinUrl)}'`;
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: requestUrl,
         headers: {
           accept: 'application/json;odata.metadata=none'

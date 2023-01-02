@@ -46,7 +46,7 @@ interface FileSharingInformation {
   SharedWith: string;
 }
 
-class SpoFileSharinginfoGetCommand extends SpoCommand {
+class SpoFileSharingInfoGetCommand extends SpoCommand {
   public get name(): string {
     return commands.FILE_SHARINGINFO_GET;
   }
@@ -195,4 +195,4 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFileSharinginfoGetCommand();
+module.exports = new SpoFileSharingInfoGetCommand();

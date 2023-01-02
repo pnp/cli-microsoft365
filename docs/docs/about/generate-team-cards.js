@@ -679,6 +679,12 @@ const contributors = [{
     twitter: 'thomyg'
   },
   {
+    name: 'Tim Van de Voorde',
+    company: 'IW',
+    github: 'timdelavoorde',
+    twitter: ''
+  },
+  {
     name: 'Vardhaman Deshpande',
     company: '',
     github: 'vman',

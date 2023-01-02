@@ -97,14 +97,6 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['principalId', 'upn', 'groupName'] },
-      { options: ['roleDefinitionId', 'roleDefinitionName'] }
-    ]);
-  });
-
   it('add role assignment on web by role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {

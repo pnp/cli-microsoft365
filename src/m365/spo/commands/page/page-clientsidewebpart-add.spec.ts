@@ -2830,13 +2830,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['standardWebPart', 'webPartId'] }
-    ]);
-  });
-
   it('fails validation if webPartId value is not valid GUID', async () => {
     const actual = await command.validate({
       options: {

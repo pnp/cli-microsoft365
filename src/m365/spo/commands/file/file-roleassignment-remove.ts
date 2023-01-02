@@ -1,9 +1,8 @@
 import { Cli } from '../../../../cli/Cli';
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
@@ -132,7 +131,7 @@ class SpoFileRoleAssignmentRemoveCommand extends SpoCommand {
         }
 
         const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, fileURL);
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields/roleassignments/removeroleassignment(principalid='${principalId}')`,
           headers: {
             accept: 'application/json;odata=nometadata'

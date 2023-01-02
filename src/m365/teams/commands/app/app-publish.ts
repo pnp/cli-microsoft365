@@ -1,9 +1,8 @@
-import { AxiosRequestConfig } from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -64,7 +63,7 @@ class TeamsAppPublishCommand extends GraphCommand {
         logger.logToStderr(`Adding app '${fullPath}' to app catalog...`);
       }
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/appCatalogs/teamsApps`,
         headers: {
           'content-type': 'application/zip',

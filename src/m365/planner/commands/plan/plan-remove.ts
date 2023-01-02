@@ -1,10 +1,9 @@
 import { PlannerPlan } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
@@ -113,7 +112,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
       try {
         const plan = await this.getPlan(args);
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/plans/${plan.id}`,
           headers: {
             accept: 'application/json;odata.metadata=none',
