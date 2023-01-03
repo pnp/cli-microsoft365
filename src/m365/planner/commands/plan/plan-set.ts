@@ -1,9 +1,8 @@
 import { PlannerPlan, PlannerPlanDetails, User } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
@@ -197,7 +196,7 @@ class PlannerPlanSetCommand extends GraphCommand {
     const userArr: string[] = userNames.split(',').map(o => o.trim());
 
     const promises: Promise<{ value: User[] }>[] = userArr.map(user => {
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
         headers: {
           'content-type': 'application/json'
@@ -234,7 +233,7 @@ class PlannerPlanSetCommand extends GraphCommand {
   }
 
   private async getPlanEtag(planId: string): Promise<string> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/plans/${planId}`,
       headers: {
         accept: 'application/json'
@@ -247,7 +246,7 @@ class PlannerPlanSetCommand extends GraphCommand {
   }
 
   private async getPlanDetailsEtag(planId: string): Promise<string> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/plans/${planId}/details`,
       headers: {
         accept: 'application/json'
@@ -260,7 +259,7 @@ class PlannerPlanSetCommand extends GraphCommand {
   }
 
   private async getPlanDetails(plan: PlannerPlan): Promise<PlannerPlan & PlannerPlanDetails> {
-    const requestOptionsTaskDetails: AxiosRequestConfig = {
+    const requestOptionsTaskDetails: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/plans/${plan.id}/details`,
       headers: {
         'accept': 'application/json;odata.metadata=none',
@@ -303,7 +302,7 @@ class PlannerPlanSetCommand extends GraphCommand {
 
     const etag = await this.getPlanDetailsEtag(planId);
 
-    const requestOptionsPlanDetails: AxiosRequestConfig = {
+    const requestOptionsPlanDetails: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/plans/${planId}/details`,
       headers: {
         'accept': 'application/json;odata.metadata=none',
@@ -330,7 +329,7 @@ class PlannerPlanSetCommand extends GraphCommand {
       if (args.options.newTitle) {
         const etag = await this.getPlanEtag(planId);
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/plans/${planId}`,
           headers: {
             accept: 'application/json;odata.metadata=none',

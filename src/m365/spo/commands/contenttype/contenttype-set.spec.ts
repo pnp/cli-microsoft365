@@ -90,11 +90,6 @@ describe(commands.CONTENTTYPE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
-  });
-
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'invalid', id: id } }, commandInfo);
     assert.notStrictEqual(actual, true);

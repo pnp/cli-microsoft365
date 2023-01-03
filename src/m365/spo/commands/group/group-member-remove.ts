@@ -1,9 +1,13 @@
 import { Cli } from '../../../../cli/Cli';
+import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
+import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
+import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -15,7 +19,9 @@ interface Options extends GlobalOptions {
   webUrl: string;
   groupId?: number;
   groupName?: string;
-  userName: string;
+  userName?: string;
+  email?: string;
+  userId?: number;
   confirm?: boolean;
 }
 
@@ -42,6 +48,9 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         groupId: (!(!args.options.groupId)).toString(),
         groupName: (!(!args.options.groupName)).toString(),
+        userName: (!(!args.options.userName)).toString(),
+        email: (!(!args.options.email)).toString(),
+        userId: (!(!args.options.userId)).toString(),
         confirm: (!(!args.options.confirm)).toString()
       });
     });
@@ -59,7 +68,13 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         option: '--groupName [groupName]'
       },
       {
-        option: '--userName <userName>'
+        option: '--userName [userName]'
+      },
+      {
+        option: '--email [email]'
+      },
+      {
+        option: '--userId [userId]'
       },
       {
         option: '--confirm'
@@ -74,25 +89,69 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
           return `Specified "groupId" ${args.options.groupId} is not valid`;
         }
 
+        if (args.options.userId && isNaN(args.options.userId)) {
+          return `Specified "userId" ${args.options.userId} is not valid`;
+        }
+
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid userName`;
+        }
+
+        if (args.options.email && !validation.isValidUserPrincipalName(args.options.email)) {
+          return `${args.options.email} is not a valid email`;
+        }
+
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['groupName', 'groupId'] });
+    this.optionSets.push(
+      { options: ['groupName', 'groupId'] },
+      { options: ['userName', 'email', 'userId'] }
+    );
+  }
+
+  private async getUserName(logger: Logger, args: CommandArgs): Promise<string> {
+    if (args.options.userName) {
+      return args.options.userName;
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving information about the user ${args.options.email}`);
+    }
+
+    const options: AadUserGetCommandOptions = {
+      email: args.options.email,
+      output: 'json',
+      debug: args.options.debug,
+      verbose: args.options.verbose
+    };
+
+    const userGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } });
+    const userOutput = JSON.parse(userGetOutput.stdout);
+    return userOutput.userPrincipalName;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeUserfromSPGroup: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Removing User with Username ${args.options.userName} from Group: ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
+        logger.logToStderr(`Removing User ${args.options.userName || args.options.email || args.options.userId} from Group: ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
       }
 
-      const loginName: string = `i:0#.f|membership|${args.options.userName}`;
-      const requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/${args.options.groupId
+      let requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/${args.options.groupId
         ? `GetById('${args.options.groupId}')`
-        : `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')`}/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`;
+        : `GetByName('${formatting.encodeQueryParameter(args.options.groupName as string)}')`}`;
+
+      if (args.options.userId) {
+        requestUrl += `/users/removeById(${args.options.userId})`;
+      }
+      else {
+        const userName: string = await this.getUserName(logger, args);
+        const loginName: string = `i:0#.f|membership|${userName}`;
+        requestUrl += `/users/removeByLoginName(@LoginName)?@LoginName='${formatting.encodeQueryParameter(loginName)}'`;
+      }
 
       const requestOptions: any = {
         url: requestUrl,
@@ -121,7 +180,7 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove user User ${args.options.userName} from SharePoint group?`
+        message: `Are you sure you want to remove user ${args.options.userName || args.options.userId || args.options.email} from the SharePoint group?`
       });
 
       if (result.continue) {

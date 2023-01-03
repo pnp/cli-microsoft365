@@ -42,6 +42,7 @@ nav:
         - approleassignment list: cmd/aad/approleassignment/approleassignment-list.md
         - approleassignment remove: cmd/aad/approleassignment/approleassignment-remove.md
       - group:
+        - group get: cmd/aad/group/group-get.md
         - group list: cmd/aad/group/group-list.md
       - groupsetting:
         - groupsetting add: cmd/aad/groupsetting/groupsetting-add.md
@@ -122,6 +123,7 @@ nav:
         - config set: cmd/cli/config/config-set.md
     - Context (context):
       - init: cmd/context/context-init.md
+      - remove: cmd/context/context-remove.md
     - File (file):
       - add: cmd/file/file-add.md
       - convert:
@@ -261,6 +263,8 @@ nav:
         - run list: cmd/flow/run/run-list.md
         - run resubmit: cmd/flow/run/run-resubmit.md
     - Power Platform (pp):
+      - aibuildermodel:
+        - aibuildermodel list: cmd/pp/aibuildermodel/aibuildermodel-list.md
       - card:
         - card clone: cmd/pp/card/card-clone.md
         - card get: cmd/pp/card/card-get.md
@@ -298,14 +302,17 @@ nav:
     - Purview (purview):
       - retentionlabel:
         - retentionlabel add: cmd/purview/retentionlabel/retentionlabel-add.md
+        - retentionlabel get: cmd/purview/retentionlabel/retentionlabel-get.md
         - retentionlabel list: cmd/purview/retentionlabel/retentionlabel-list.md
         - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
+        - retentionlabel set: cmd/purview/retentionlabel/retentionlabel-set.md
     - Search (search):
       - externalconnection:
         - externalconnection add: cmd/search/externalconnection/externalconnection-add.md
         - externalconnection get: cmd/search/externalconnection/externalconnection-get.md
         - externalconnection list: cmd/search/externalconnection/externalconnection-list.md
         - externalconnection remove: cmd/search/externalconnection/externalconnection-remove.md
+        - externalconnection schema add: cmd/search/externalconnection/externalconnection-schema-add.md
     - Skype (skype):
       - report:
         - report activitycounts: cmd/skype/report/report-activitycounts.md
@@ -395,6 +402,7 @@ nav:
         - file roleinheritance break: cmd/spo/file/file-roleinheritance-break.md
         - file roleinheritance reset: cmd/spo/file/file-roleinheritance-reset.md
         - file sharinginfo get: cmd/spo/file/file-sharinginfo-get.md
+        - file sharinglink list: cmd/spo/file/file-sharinglink-list.md
         - file version clear: cmd/spo/file/file-version-clear.md
         - file version get: cmd/spo/file/file-version-get.md
         - file version list: cmd/spo/file/file-version-list.md
@@ -453,8 +461,8 @@ nav:
         - list contenttype list: cmd/spo/list/list-contenttype-list.md
         - list contenttype remove: cmd/spo/list/list-contenttype-remove.md
         - list contenttype default set: cmd/spo/list/list-contenttype-default-set.md        
+        - list retentionlabel ensure: cmd/spo/list/list-retentionlabel-ensure.md
         - list retentionlabel get: cmd/spo/list/list-retentionlabel-get.md
-        - list retentionlabel set: cmd/spo/list/list-retentionlabel-set.md
         - list roleassignment add: cmd/spo/list/list-roleassignment-add.md
         - list roleassignment remove: cmd/spo/list/list-roleassignment-remove.md
         - list roleinheritance break: cmd/spo/list/list-roleinheritance-break.md
@@ -482,12 +490,15 @@ nav:
         - listitem remove: cmd/spo/listitem/listitem-remove.md
         - listitem attachment list: cmd/spo/listitem/listitem-attachment-list.md
         - listitem batch add: cmd/spo/listitem/listitem-batch-add.md
+        - listitem retentionlabel remove: cmd/spo/listitem/listitem-retentionlabel-remove.md
         - listitem roleassignment add: cmd/spo/listitem/listitem-roleassignment-add.md
         - listitem roleassignment remove: cmd/spo/listitem/listitem-roleassignment-remove.md
         - listitem roleinheritance break: cmd/spo/listitem/listitem-roleinheritance-break.md
         - listitem roleinheritance reset: cmd/spo/listitem/listitem-roleinheritance-reset.md
         - listitem record declare: cmd/spo/listitem/listitem-record-declare.md
+        - listitem record lock: cmd/spo/listitem/listitem-record-lock.md
         - listitem record undeclare: cmd/spo/listitem/listitem-record-undeclare.md
+        - listitem record unlock: cmd/spo/listitem/listitem-record-unlock.md
       - mail:
         - mail send: cmd/spo/mail/mail-send.md
       - navigation:
@@ -559,6 +570,7 @@ nav:
         - site rename: cmd/spo/site/site-rename.md
         - site set: cmd/spo/site/site-set.md
         - site appcatalog add: cmd/spo/site/site-appcatalog-add.md
+        - site appcatalog list: cmd/spo/site/site-appcatalog-list.md
         - site appcatalog remove: cmd/spo/site/site-appcatalog-remove.md
         - site apppermission add: cmd/spo/site/site-apppermission-add.md
         - site apppermission get: cmd/spo/site/site-apppermission-get.md

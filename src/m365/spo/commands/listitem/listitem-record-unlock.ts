@@ -1,39 +1,32 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ListInstance } from './ListInstance';
+import { ListInstance } from '../list/ListInstance';
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   webUrl: string;
-  label: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  syncToItems?: boolean;
-  blockDelete?: boolean;
-  blockEdit?: boolean;
+  listItemId: string;
 }
 
-class SpoListRetentionLabelSetCommand extends SpoCommand {
+class SpoListItemRecordUnlockCommand extends SpoCommand {
   public get name(): string {
-    return commands.LIST_RETENTIONLABEL_SET;
-  }
-
-  public alias(): string[] | undefined {
-    return [commands.LIST_LABEL_SET];
+    return commands.LISTITEM_RECORD_UNLOCK;
   }
 
   public get description(): string {
-    return 'Sets a default retention label on the specified list or library.';
+    return 'Unlocks the list item record';
   }
 
   constructor() {
@@ -48,12 +41,9 @@ class SpoListRetentionLabelSetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        listId: (!(!args.options.listId)).toString(),
-        listTitle: (!(!args.options.listTitle)).toString(),
-        listUrl: (!(!args.options.listUrl)).toString(),
-        syncToItems: args.options.syncToItems || false,
-        blockDelete: args.options.blockDelete || false,
-        blockEdit: args.options.blockEdit || false
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined'
       });
     });
   }
@@ -64,25 +54,16 @@ class SpoListRetentionLabelSetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--label <label>'
+        option: '--listItemId <listItemId>'
       },
       {
-        option: '-t, --listTitle [listTitle]'
+        option: '--listId [listId]'
       },
       {
-        option: '-l, --listId [listId]'
+        option: '--listTitle [listTitle]'
       },
       {
         option: '--listUrl [listUrl]'
-      },
-      {
-        option: '--syncToItems'
-      },
-      {
-        option: '--blockDelete'
-      },
-      {
-        option: '--blockEdit'
       }
     );
   }
@@ -90,11 +71,22 @@ class SpoListRetentionLabelSetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+        const id: number = parseInt(args.options.listItemId);
+        if (isNaN(id)) {
+          return `${args.options.listItemId} is not a valid list item ID`;
+        }
+
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.listId &&
+          !validation.isValidGuid(args.options.listId as string)) {
           return `${args.options.listId} is not a valid GUID`;
         }
 
-        return validation.isValidSharePointUrl(args.options.webUrl);
+        return true;
       }
     );
   }
@@ -104,8 +96,9 @@ class SpoListRetentionLabelSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, commands.LIST_LABEL_SET, commands.LIST_RETENTIONLABEL_SET);
-
+    if (this.verbose) {
+      logger.logToStderr(`Unlocking the list item record ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
+    }
     try {
       let listRestUrl: string = '';
       let listServerRelativeUrl: string = '';
@@ -123,7 +116,7 @@ class SpoListRetentionLabelSetCommand extends SpoCommand {
           listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
         }
 
-        const requestOptions: any = {
+        const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder`,
           headers: {
             'accept': 'application/json;odata=nometadata'
@@ -136,18 +129,15 @@ class SpoListRetentionLabelSetCommand extends SpoCommand {
       }
 
       const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
-      const requestUrl: string = `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`;
-      const requestOptions: any = {
+      const requestUrl: string = `${args.options.webUrl}/_api/SP.CompliancePolicy.SPPolicyStoreProxy.UnlockRecordItem()`;
+      const requestOptions: CliRequestOptions = {
         url: requestUrl,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
         data: {
           listUrl: listAbsoluteUrl,
-          complianceTagValue: args.options.label,
-          blockDelete: args.options.blockDelete || false,
-          blockEdit: args.options.blockEdit || false,
-          syncToItems: args.options.syncToItems || false
+          itemId: args.options.listItemId
         },
         responseType: 'json'
       };
@@ -160,4 +150,4 @@ class SpoListRetentionLabelSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListRetentionLabelSetCommand();
+module.exports = new SpoListItemRecordUnlockCommand();

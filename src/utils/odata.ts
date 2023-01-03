@@ -1,5 +1,4 @@
-import { AxiosRequestConfig } from "axios";
-import request from "../request";
+import request, { CliRequestOptions } from "../request";
 
 export interface ODataResponse<T> {
   '@odata.nextLink'?: string;
@@ -22,7 +21,7 @@ export const odata = {
   async getAllItems<T>(url: string, metadata?: 'none' | 'minimal' | 'full'): Promise<T[]> {
     let items: T[] = [];
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: url,
       headers: {
         accept: `application/json;odata.metadata=${metadata ?? 'none'}`,

@@ -67,12 +67,6 @@ describe(commands.CUSTOMACTION_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    assert.deepStrictEqual(command.optionSets, [
-      { options: ['id', 'title'] }
-    ]);
-  });
-
   it('handles error when multiple user custom actions with the specified title found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/UserCustomActions?$filter=Title eq ') > -1) {

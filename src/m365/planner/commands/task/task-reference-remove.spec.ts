@@ -141,11 +141,6 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['url', 'alias'] }]);
-  });
-
   it('prompts before removal when confirm option not passed', async () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {

@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -123,7 +122,7 @@ class SpoFieldAddCommand extends SpoCommand {
       }
 
       const reqDigest = await spo.getRequestDigest(args.options.webUrl);
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${requestUrl}/fields/CreateFieldAsXml`,
         headers: {
           'X-RequestDigest': reqDigest.FormDigestValue,

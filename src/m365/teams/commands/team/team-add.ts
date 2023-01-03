@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -135,7 +134,7 @@ class TeamsTeamAddCommand extends GraphCommand {
       };
     }
 
-    const requestOptionsPost: AxiosRequestConfig = {
+    const requestOptionsPost: CliRequestOptions = {
       url: `${this.resource}/v1.0/teams`,
       headers: {
         'accept': 'application/json;odata.metadata=none'
@@ -170,13 +169,13 @@ class TeamsTeamAddCommand extends GraphCommand {
 
       if (teamsAsyncOperation.status !== TeamsAsyncOperationStatus.Succeeded) {
         output = teamsAsyncOperation;
-      } 
+      }
       else {
         output = await aadGroup.getGroupById(teamsAsyncOperation.targetResourceId);
       }
 
       logger.log(output);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

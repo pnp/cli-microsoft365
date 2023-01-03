@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -144,7 +143,7 @@ class SpoListItemSetCommand extends SpoCommand {
           logger.logToStderr(`Getting list id...`);
         }
 
-        const listRequestOptions: AxiosRequestConfig = {
+        const listRequestOptions: CliRequestOptions = {
           url: `${requestUrl}?$select=Id`,
           headers: {
             'accept': 'application/json;odata=nometadata'
@@ -260,7 +259,7 @@ class SpoListItemSetCommand extends SpoCommand {
         });
       }
 
-      const requestOptions: AxiosRequestConfig = args.options.systemUpdate ?
+      const requestOptions: CliRequestOptions = args.options.systemUpdate ?
         {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
@@ -301,7 +300,7 @@ class SpoListItemSetCommand extends SpoCommand {
         }
       }
 
-      const requestOptionsItems: AxiosRequestConfig = {
+      const requestOptionsItems: CliRequestOptions = {
         url: `${requestUrl}/items(${itemId})`,
         headers: {
           'accept': 'application/json;odata=nometadata'
@@ -371,7 +370,7 @@ class SpoListItemSetCommand extends SpoCommand {
    * @param cmd command cmd
    */
   private async requestObjectIdentity(webUrl: string, logger: Logger, formDigestValue: string): Promise<string> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
         'X-RequestDigest': formDigestValue

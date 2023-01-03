@@ -5,6 +5,9 @@ import { Logger } from './cli/Logger';
 import { formatting } from './utils/formatting';
 const packageJSON = require('../package.json');
 
+export interface CliRequestOptions extends AxiosRequestConfig {
+  fullResponse?: boolean;
+}
 class Request {
   private req: AxiosInstance;
   private _logger?: Logger;
@@ -21,7 +24,7 @@ class Request {
     this._debug = debug;
 
     if (this._debug) {
-      this.req.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConfig => {
+      this.req.interceptors.request.use((config: CliRequestOptions): CliRequestOptions => {
         if (this._logger) {
           this._logger.logToStderr('Request:');
           const properties: string[] = ['url', 'method', 'headers', 'responseType', 'decompress'];
@@ -76,7 +79,8 @@ class Request {
     this.req = Axios.create({
       headers: {
         'user-agent': `NONISV|SharePointPnP|CLIMicrosoft365/${packageJSON.version}`,
-        'accept-encoding': 'gzip, deflate'
+        'accept-encoding': 'gzip, deflate',
+        'X-ClientService-ClientTag': `M365CLI:${packageJSON.version}`
       },
       decompress: true,
       responseType: 'text',
@@ -88,7 +92,7 @@ class Request {
     // since we're stubbing requests, request interceptor is never called in
     // tests, so let's exclude it from coverage
     /* c8 ignore next 7 */
-    this.req.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConfig => {
+    this.req.interceptors.request.use((config: CliRequestOptions): CliRequestOptions => {
       if (config.responseType === 'json') {
         config.transformResponse = Axios.defaults.transformResponse;
       }
@@ -115,37 +119,37 @@ class Request {
     );
   }
 
-  public post<TResponse>(options: AxiosRequestConfig): Promise<TResponse> {
+  public post<TResponse>(options: CliRequestOptions): Promise<TResponse> {
     options.method = 'POST';
     return this.execute(options);
   }
 
-  public get<TResponse>(options: AxiosRequestConfig): Promise<TResponse> {
+  public get<TResponse>(options: CliRequestOptions): Promise<TResponse> {
     options.method = 'GET';
     return this.execute(options);
   }
 
-  public patch<TResponse>(options: AxiosRequestConfig): Promise<TResponse> {
+  public patch<TResponse>(options: CliRequestOptions): Promise<TResponse> {
     options.method = 'PATCH';
     return this.execute(options);
   }
 
-  public put<TResponse>(options: AxiosRequestConfig): Promise<TResponse> {
+  public put<TResponse>(options: CliRequestOptions): Promise<TResponse> {
     options.method = 'PUT';
     return this.execute(options);
   }
 
-  public delete<TResponse>(options: AxiosRequestConfig): Promise<TResponse> {
+  public delete<TResponse>(options: CliRequestOptions): Promise<TResponse> {
     options.method = 'DELETE';
     return this.execute(options);
   }
 
-  public head<TResponse>(options: AxiosRequestConfig): Promise<TResponse> {
+  public head<TResponse>(options: CliRequestOptions): Promise<TResponse> {
     options.method = 'HEAD';
     return this.execute(options);
   }
 
-  public execute<TResponse>(options: AxiosRequestConfig, resolve?: (res: TResponse) => void, reject?: (error: any) => void): Promise<TResponse> {
+  public execute<TResponse>(options: CliRequestOptions, resolve?: (res: TResponse) => void, reject?: (error: any) => void): Promise<TResponse> {
     if (!this._logger) {
       return Promise.reject('Logger not set on the request object');
     }
@@ -177,10 +181,10 @@ class Request {
         })
         .then((res: any): void => {
           if (resolve) {
-            resolve(options.responseType === 'stream' ? res : res.data);
+            resolve((options.responseType === 'stream' || options.fullResponse) ? res : res.data);
           }
           else {
-            _resolve(options.responseType === 'stream' ? res : res.data);
+            _resolve((options.responseType === 'stream' || options.fullResponse) ? res : res.data);
           }
         }, (error: AxiosError): void => {
           if (error && error.response &&

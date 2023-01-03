@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import * as fs from 'fs';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { v4 } from 'uuid';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -155,7 +154,7 @@ class SpoListItemBatchAddCommand extends SpoCommand {
   private async postBatchData(itemsToAdd: FormValues[][], webUrl: string, requestUrl: string): Promise<void> {
     const batchId = v4();
     const requestBody = this.parseBatchRequestBody(itemsToAdd, batchId, requestUrl);
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/$batch`,
       headers: {
         'Content-Type': `multipart/mixed; boundary=batch_${batchId}`,

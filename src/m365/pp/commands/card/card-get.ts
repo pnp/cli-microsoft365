@@ -3,9 +3,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
-import { AxiosRequestConfig } from 'axios';
 
 interface CommandArgs {
   options: Options;
@@ -103,7 +102,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
   }
 
   private async getCard(dynamicsApiUrl: string, options: Options): Promise<any> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

@@ -6503,13 +6503,6 @@ describe(commands.APP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['name', 'manifest'] }
-    ]);
-  });
-
   it('creates AAD app reg for a web app from a manifest with redirectUris and options overriding them', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {

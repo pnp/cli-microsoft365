@@ -1,7 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
-import { AxiosRequestConfig } from 'axios';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import { Environment } from '../Environment';
 import commands from '../../commands';
@@ -11,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  name?: string;
   asAdmin?: boolean;
 }
 
@@ -38,6 +37,7 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        name: typeof args.options.name !== 'undefined',
         asAdmin: !!args.options.asAdmin
       });
     });
@@ -46,7 +46,7 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-n, --name <name>'
+        option: '-n, --name [name]'
       },
       {
         option: '--asAdmin'
@@ -60,18 +60,10 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
       url = `${this.resource}/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments`;
     }
 
-    const requestOptions: AxiosRequestConfig = {
-      url: `${url}?api-version=2020-10-01`,
-      headers: {
-        accept: 'application/json'
-      },
-      responseType: 'json'
-    };
-
-    const res: { value: Environment[] } = await request.get<{ value: Environment[] }>(requestOptions);
-    const environmentItem: Environment | undefined = res.value.filter((env: Environment) => {
-      return env.name === args.options.name;
-    })[0];
+    const res = await odata.getAllItems<Environment>(`${url}?api-version=2020-10-01`);
+    const environmentItem: Environment | undefined = res.filter((env: Environment) =>
+      args.options.name ? env.name === args.options.name : env.properties.isDefault === true
+    )[0];
 
     if (!environmentItem) {
       throw `The specified Power Platform environment does not exist`;

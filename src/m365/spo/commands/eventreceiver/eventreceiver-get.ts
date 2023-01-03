@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -127,7 +126,7 @@ class SpoEventreceiverGetCommand extends SpoCommand {
   }
 
   private async getEventReceiver(args: CommandArgs): Promise<EventReceiver> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api`,
       headers: {
         'accept': 'application/json;odata=nometadata'

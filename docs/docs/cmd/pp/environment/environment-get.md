@@ -10,11 +10,11 @@ m365 pp environment get [options]
 
 ## Options
 
-`-n, --name <name>`
-: The name of the environment to get information about
+`-n, --name [name]`
+: The name of the environment. When not specified, the default environment is retrieved.
 
 `--asAdmin`
-: Run the command as admin and retrieve details of environments you do not have explicitly assigned permissions to
+: Run the command as admin and retrieve details of environments you do not have explicitly assigned permissions to.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -37,6 +37,12 @@ Get information as admin about the Power Platform environment by name
 
 ```sh
 m365 pp environment get --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
+```
+
+Get information about the default Power Platform environment
+
+```sh
+m365 pp environment get
 ```
 
 ## Response

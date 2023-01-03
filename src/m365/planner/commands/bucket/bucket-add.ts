@@ -1,8 +1,7 @@
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { AxiosRequestConfig } from 'axios';
+import request, { CliRequestOptions } from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
@@ -113,7 +112,7 @@ class PlannerBucketAddCommand extends GraphCommand {
     try {
       const planId = await this.getPlanId(args);
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/buckets`,
         headers: {
           'accept': 'application/json;odata.metadata=none'

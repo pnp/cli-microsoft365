@@ -84,3 +84,20 @@ m365 planner bucket get --name "Planner Bucket A" --planTitle "My Plan" --ownerG
     id,name,planId,orderHint
     ttEB_Uj690STdR3GC1MIDZgANq1U,My Planner Bucket,xqQg5FS2LkCp935s-FIFm2QAFkHM,8585363889524958496
     ```
+
+=== "Markdown"
+
+    ```md
+    # planner bucket get --id "ttEB_Uj690STdR3GC1MIDZgANq1U"
+
+    Date: 27/12/2022
+
+    ## My Planner Bucket (ttEB_Uj690STdR3GC1MIDZgANq1U)
+
+    Property | Value
+    ---------|-------
+    name | My Planner Bucket
+    planId | xqQg5FS2LkCp935s-FIFm2QAFkHM
+    orderHint | 8585363889524958496
+    id | ttEB_Uj690STdR3GC1MIDZgANq1U
+    ```

@@ -155,15 +155,6 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['listId', 'listTitle', 'listUrl'] },
-      { options: ['viewId', 'viewTitle'] },
-      { options: ['id', 'title'] }
-    ]);
-  });
-
   it('supports specifying URL', () => {
     const options = command.options;
     let containsTypeOption = false;

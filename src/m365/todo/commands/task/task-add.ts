@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -118,7 +117,7 @@ class TodoTaskAddCommand extends GraphCommand {
     try {
       const listId: string = await this.getTodoListId(args);
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${endpoint}/me/todo/lists/${listId}/tasks`,
         headers: {
           accept: 'application/json;odata.metadata=none',
