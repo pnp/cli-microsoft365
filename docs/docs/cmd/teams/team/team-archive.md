@@ -32,13 +32,13 @@ When a team is archived, users can no longer send or like messages on any channe
 
 ## Examples
 
-Archive the specified Microsoft Teams team with id _6f6fd3f7-9ba5-4488-bbe6-a789004d0d55_
+Archive the specified Microsoft Teams team by id.
 
 ```sh
 m365 teams team archive --id 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
 ```
 
-Archive the specified Microsoft Teams team with name _Team Name_
+Archive the specified Microsoft Teams team by name.
 
 ```sh
 m365 teams team archive --name "Team Name"
