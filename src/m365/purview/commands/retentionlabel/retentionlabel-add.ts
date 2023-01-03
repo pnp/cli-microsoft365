@@ -93,21 +93,21 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
           return `Specified retentionDuration ${args.options.retentionDuration} is not a number`;
         }
 
-        if (['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord'].indexOf(args.options.behaviorDuringRetentionPeriod.toLowerCase()) === -1) {
+        if (['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord'].indexOf(args.options.behaviorDuringRetentionPeriod) === -1) {
           return `${args.options.behaviorDuringRetentionPeriod} is not a valid behavior of a document with the label. Allowed values are doNotRetain|retain|retainAsRecord|retainAsRegulatoryRecord`;
         }
 
-        if (['none', 'delete', 'startDispositionReview'].indexOf(args.options.actionAfterRetentionPeriod.toLowerCase()) === -1) {
+        if (['none', 'delete', 'startDispositionReview'].indexOf(args.options.actionAfterRetentionPeriod) === -1) {
           return `${args.options.actionAfterRetentionPeriod} is not a valid action to take on a document with the label. Allowed values are none|delete|startDispositionReview`;
         }
 
         if (args.options.retentionTrigger &&
-          ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent'].indexOf(args.options.retentionTrigger.toLowerCase()) === -1) {
+          ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent'].indexOf(args.options.retentionTrigger) === -1) {
           return `${args.options.retentionTrigger} is not a valid action retention duration calculation. Allowed values are dateLabeled|dateCreated|dateModified|dateOfEvent`;
         }
 
         if (args.options.defaultRecordBehavior &&
-          ['startLocked', 'startUnlocked'].indexOf(args.options.defaultRecordBehavior.toLowerCase()) === -1) {
+          ['startLocked', 'startUnlocked'].indexOf(args.options.defaultRecordBehavior) === -1) {
           return `${args.options.defaultRecordBehavior} is not a valid state of a record label. Allowed values are startLocked|startUnlocked`;
         }
 
