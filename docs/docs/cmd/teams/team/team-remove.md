@@ -29,19 +29,19 @@ If the command finds multiple Microsoft Teams teams with the specified name, it 
 
 ## Examples
 
-Removes the specified Microsoft Teams team with id _00000000-0000-0000-0000-000000000000_
+Removes the specified Microsoft Teams team by id.
 
 ```sh
 m365 teams team remove --id 00000000-0000-0000-0000-000000000000
 ```
 
-Removes the specified Microsoft Teams team with name _Team Name_
+Removes the specified Microsoft Teams team by name.
 
 ```sh
 m365 teams team remove --name "Team Name"
 ```
 
-Removes the specified team without confirmation
+Removes the specified team without confirmation.
 
 ```sh
 m365 teams team remove --id 00000000-0000-0000-0000-000000000000 --confirm
