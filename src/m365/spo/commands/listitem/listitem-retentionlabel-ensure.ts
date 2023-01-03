@@ -12,6 +12,7 @@ import * as SpoWebRetentionLabelListCommand from '../web/web-retentionlabel-list
 import { Options as SpoWebRetentionLabelListCommandOptions } from '../web/web-retentionlabel-list';
 import Command from '../../../../Command';
 import { Cli } from '../../../../cli/Cli';
+import { ListItemRetentionLabel } from './ListItemRetentionLabel';
 
 interface CommandArgs {
   options: Options;
@@ -33,7 +34,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Clear the retention label from a list item';
+    return 'Apply a retention label to a list item';
   }
 
   constructor() {
@@ -126,7 +127,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
     }
   }
 
-  private async getLabelInformation(options: Options, logger: Logger): Promise<any> {
+  private async getLabelInformation(options: Options, logger: Logger): Promise<ListItemRetentionLabel> {
     const cmdOptions: SpoWebRetentionLabelListCommandOptions = {
       webUrl: options.webUrl,
       output: 'json',
@@ -151,19 +152,17 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
       throw new Error(`The specified retention label does not exist`);
     }
 
-    const requestBody = {
-      "complianceTag": label.TagName,
-      "isTagPolicyHold": label.BlockDelete,
-      "isTagPolicyRecord": label.BlockEdit,
-      "isEventBasedTag": label.IsEventTag,
-      "isTagSuperLock": label.SuperLock,
-      "isUnlockedAsDefault": label.UnlockedAsDefault
-    };
-
-    return requestBody;
+    return {
+      complianceTag: label.TagName,
+      isTagPolicyHold: label.BlockDelete,
+      isTagPolicyRecord: label.BlockEdit,
+      isEventBasedTag: label.IsEventTag,
+      isTagSuperLock: label.SuperLock,
+      isUnlockedAsDefault: label.UnlockedAsDefault
+    } as ListItemRetentionLabel;
   }
 
-  private async applyLabel(options: Options, labelInformation: any, logger: Logger): Promise<void> {
+  private async applyLabel(options: Options, labelInformation: ListItemRetentionLabel, logger: Logger): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Applying retention label to item in list '${options.listId || options.listTitle || options.listUrl}' in site at ${options.webUrl}...`);
     }
@@ -183,7 +182,6 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
 
     const requestOptions: AxiosRequestConfig = {
       url: requestUrl,
-      method: 'POST',
       headers: {
         'accept': 'application/json;odata=nometadata'
       },

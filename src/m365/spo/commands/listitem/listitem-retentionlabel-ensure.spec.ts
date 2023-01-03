@@ -120,7 +120,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', listItemId: 1, listTitle: listTitle, name: labelName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -130,7 +130,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both listId and title options are passed', async () => {
+  it('fails validation if both listId and listTitle options are passed', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, listId: listId, listTitle: listTitle, listItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
