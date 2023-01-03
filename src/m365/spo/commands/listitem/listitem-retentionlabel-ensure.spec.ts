@@ -236,7 +236,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
   it('applies a retentionlabel based on listUrl and id (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@a1)/items(1)/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listUrl)}'`
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@listUrl)/items(1)/SetComplianceTag()?@listUrl='${formatting.encodeQueryParameter(listUrl)}'`
         && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":false,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
         return;
       }

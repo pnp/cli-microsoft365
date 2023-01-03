@@ -177,7 +177,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
     }
     else if (options.listUrl) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
-      requestUrl += `/GetList(@a1)/items(${options.listItemId})/SetComplianceTag()?@a1='${formatting.encodeQueryParameter(listServerRelativeUrl)}'`;
+      requestUrl += `/GetList(@listUrl)/items(${options.listItemId})/SetComplianceTag()?@listUrl='${formatting.encodeQueryParameter(listServerRelativeUrl)}'`;
     }
 
     const requestOptions: AxiosRequestConfig = {
