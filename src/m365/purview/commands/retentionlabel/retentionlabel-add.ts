@@ -93,30 +93,21 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
           return `Specified retentionDuration ${args.options.retentionDuration} is not a number`;
         }
 
-        if (args.options.behaviorDuringRetentionPeriod !== 'doNotRetain' &&
-          args.options.behaviorDuringRetentionPeriod !== 'retain' &&
-          args.options.behaviorDuringRetentionPeriod !== 'retainAsRecord' &&
-          args.options.behaviorDuringRetentionPeriod !== 'retainAsRegulatoryRecord') {
+        if (['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord'].indexOf(args.options.behaviorDuringRetentionPeriod.toLowerCase()) === -1) {
           return `${args.options.behaviorDuringRetentionPeriod} is not a valid behavior of a document with the label. Allowed values are doNotRetain|retain|retainAsRecord|retainAsRegulatoryRecord`;
         }
 
-        if (args.options.actionAfterRetentionPeriod !== 'none' &&
-          args.options.actionAfterRetentionPeriod !== 'delete' &&
-          args.options.actionAfterRetentionPeriod !== 'startDispositionReview') {
+        if (['none', 'delete', 'startDispositionReview'].indexOf(args.options.actionAfterRetentionPeriod.toLowerCase()) === -1) {
           return `${args.options.actionAfterRetentionPeriod} is not a valid action to take on a document with the label. Allowed values are none|delete|startDispositionReview`;
         }
 
         if (args.options.retentionTrigger &&
-          args.options.retentionTrigger !== 'dateLabeled' &&
-          args.options.retentionTrigger !== 'dateCreated' &&
-          args.options.retentionTrigger !== 'dateModified' &&
-          args.options.retentionTrigger !== 'dateOfEvent') {
+          ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent'].indexOf(args.options.retentionTrigger.toLowerCase()) === -1) {
           return `${args.options.retentionTrigger} is not a valid action retention duration calculation. Allowed values are dateLabeled|dateCreated|dateModified|dateOfEvent`;
         }
 
         if (args.options.defaultRecordBehavior &&
-          args.options.defaultRecordBehavior !== 'startLocked' &&
-          args.options.defaultRecordBehavior !== 'startUnlocked') {
+          ['startLocked', 'startUnlocked'].indexOf(args.options.defaultRecordBehavior.toLowerCase()) === -1) {
           return `${args.options.defaultRecordBehavior} is not a valid state of a record label. Allowed values are startLocked|startUnlocked`;
         }
 
@@ -143,7 +134,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
 
     if (args.options.descriptionForAdmins) {
       if (this.verbose) {
-        logger.logToStderr(`Using '${args.options.descriptionForAdmins}' as descriptionForAdmins...`);
+        logger.logToStderr(`Using '${args.options.descriptionForAdmins}' as descriptionForAdmins`);
       }
 
       requestBody.descriptionForAdmins = args.options.descriptionForAdmins;
@@ -151,7 +142,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
 
     if (args.options.descriptionForUsers) {
       if (this.verbose) {
-        logger.logToStderr(`Using '${args.options.descriptionForUsers}' as descriptionForUsers...`);
+        logger.logToStderr(`Using '${args.options.descriptionForUsers}' as descriptionForUsers`);
       }
 
       requestBody.descriptionForUsers = args.options.descriptionForUsers;

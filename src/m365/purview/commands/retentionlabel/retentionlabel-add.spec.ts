@@ -187,7 +187,7 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     assert.strictEqual(actual, `${invalid} is not a valid state of a record label. Allowed values are startLocked|startUnlocked`);
   });
 
-  it('Adds retention label by id when prompt confirmed', async () => {
+  it('adds retention label by id when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels`) {
         return requestResponse;

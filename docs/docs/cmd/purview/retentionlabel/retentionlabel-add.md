@@ -123,6 +123,6 @@ m365 purview retentionlabel add --displayName 'some label' --behaviorDuringReten
 === "CSV"
 
     ```csv
-displayName,descriptionForAdmins,descriptionForUsers,isInUse,retentionTrigger,behaviorDuringRetentionPeriod,actionAfterRetentionPeriod,createdDateTime,lastModifiedDateTime,labelToBeApplied,defaultRecordBehavior,id,retentionDuration,createdBy,lastModifiedBy,dispositionReviewStages
+    displayName,descriptionForAdmins,descriptionForUsers,isInUse,retentionTrigger,behaviorDuringRetentionPeriod,actionAfterRetentionPeriod,createdDateTime,lastModifiedDateTime,labelToBeApplied,defaultRecordBehavior,id,retentionDuration,createdBy,lastModifiedBy,dispositionReviewStages
     some label,Description for admins,Description for users,,dateLabeled,retain,delete,2022-12-21T09:33:32Z,2022-12-21T09:33:32Z,another label,startLocked,cfc8b132-7aef-45f4-9fcf-3c199090ba2a,"{""days"":365}","{""user"":{""id"":null,""displayName"":""John Doe""}}","{""user"":{""id"":null,""displayName"":""John Doe""}}",[]
     ```
