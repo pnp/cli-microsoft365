@@ -3,9 +3,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
-import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Options as PpSolutionPublisherGetCommandOptions } from './solution-publisher-get';
 import * as PpSolutionPublisherGetCommand from './solution-publisher-get';
@@ -136,7 +135,7 @@ class PpSolutionPublisherRemoveCommand extends PowerPlatformCommand {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
       const publisherId = await this.getPublisherId(args);
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/publishers(${publisherId})`,
         headers: {
           accept: 'application/json;odata.metadata=none'

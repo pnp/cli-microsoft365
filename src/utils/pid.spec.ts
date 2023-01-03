@@ -18,7 +18,7 @@ describe('utils/pid', () => {
   afterEach(() => {
     sinonUtil.restore([
       os.platform,
-      child_process.execSync,
+      child_process.spawnSync,
       fs.existsSync,
       fs.readFileSync
     ]);
@@ -33,16 +33,35 @@ describe('utils/pid', () => {
 
   it('retrieves process name on Windows', () => {
     sinon.stub(os, 'platform').callsFake(() => 'win32');
-    sinon.stub(child_process, 'execSync').callsFake(() => 'pwsh');
+    sinon.stub(child_process, 'spawnSync').callsFake(() => {
+      return {
+        stdout: 'pwsh'
+      } as any;
+    });
 
     assert.strictEqual(pid.getProcessName(123), 'pwsh');
   });
 
   it('retrieves process name on macOS', () => {
     sinon.stub(os, 'platform').callsFake(() => 'darwin');
-    sinon.stub(child_process, 'execSync').callsFake(() => '/bin/bash');
+    sinon.stub(child_process, 'spawnSync').callsFake(() => {
+      return {
+        stdout: '/bin/bash'
+      } as any;
+    });
 
     assert.strictEqual(pid.getProcessName(123), '/bin/bash');
+  });
+
+  it('retrieves undefined on macOS when retrieving the process name failed', () => {
+    sinon.stub(os, 'platform').callsFake(() => 'darwin');
+    sinon.stub(child_process, 'spawnSync').callsFake(() => {
+      return {
+        error: 'An error has occurred'
+      } as any;
+    });
+
+    assert.strictEqual(pid.getProcessName(123), undefined);
   });
 
   it('retrieves process name on Linux', () => {
@@ -66,16 +85,43 @@ describe('utils/pid', () => {
     assert.strictEqual(pid.getProcessName(123), undefined);
   });
 
-  it('returns undefined when retrieving process name fails', () => {
+  it('returns undefined when retrieving process name on Windows fails', () => {
     sinon.stub(os, 'platform').callsFake(() => 'win32');
-    sinon.stub(child_process, 'execSync').throws();
+    sinon.stub(child_process, 'spawnSync').callsFake(() => {
+      return {
+        error: 'An error has occurred'
+      } as any;
+    });
+
+    assert.strictEqual(pid.getProcessName(123), undefined);
+  });
+
+  it('returns undefined when extracting process name on Windows', () => {
+    sinon.stub(os, 'platform').callsFake(() => 'win32');
+    sinon.stub(child_process, 'spawnSync').callsFake(command => {
+      if (command === 'wmic') {
+        return {
+          stdout: 'Caption\
+pwsh.exe\
+'
+        };
+      }
+
+      return {
+        error: 'An error has occurred'
+      } as any;
+    });
 
     assert.strictEqual(pid.getProcessName(123), undefined);
   });
 
   it('stores retrieved process name in cache', () => {
     sinon.stub(os, 'platform').callsFake(() => 'win32');
-    sinon.stub(child_process, 'execSync').callsFake(() => 'pwsh');
+    sinon.stub(child_process, 'spawnSync').callsFake(() => {
+      return {
+        stdout: 'pwsh'
+      } as any;
+    });
 
     pid.getProcessName(123);
 

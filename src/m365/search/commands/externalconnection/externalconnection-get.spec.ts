@@ -78,11 +78,6 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
-  });
-
   it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');

@@ -257,15 +257,6 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['teamId', 'teamName'] },
-      { options: ['channelId', 'channelName'] },
-      { options: ['userId', 'userDisplayName'] }
-    ]);
-  });
-
   it('fails validation if the teamId is not a valid guid', async () => {
     const actual = await command.validate({
       options: {

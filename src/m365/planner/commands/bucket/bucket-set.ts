@@ -1,9 +1,8 @@
 import { PlannerBucket } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
@@ -151,7 +150,7 @@ class PlannerBucketSetCommand extends GraphCommand {
     try {
       const bucket = await this.getBucket(args);
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/buckets/${bucket.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none',
@@ -178,7 +177,7 @@ class PlannerBucketSetCommand extends GraphCommand {
 
   private getBucket(args: CommandArgs): Promise<PlannerBucket> {
     if (args.options.id) {
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/buckets/${args.options.id}`,
         headers: {
           accept: 'application/json'
@@ -192,7 +191,7 @@ class PlannerBucketSetCommand extends GraphCommand {
     return this
       .getPlanId(args)
       .then(planId => {
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
           headers: {
             accept: 'application/json'

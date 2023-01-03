@@ -20,10 +20,13 @@ m365 spo group member add [options]
 : Name of the SharePoint Group to which the user needs to be added, specify either `groupId` or `groupName`
 
 `--userName [userName]`
-: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com), specify either `userName` or `email`
+: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com), specify either `userName`, `email` or `userId`
 
 `--email [email]`
-: User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com), specify either `userName` or `email`
+: User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com), specify either `userName`, `email` or `userId`
+
+`--userId [userId]`
+: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Id's have to be comma separated. Specify either `userName`, `email` or `userId`
 
 --8<-- "docs/cmd/_global.md"
 
@@ -33,26 +36,75 @@ For the `--userName` or `--email` options you can specify multiple values by sep
 
 ## Examples
 
-Add a user with name _Alex.Wilber@contoso.com_ to the SharePoint group with id _5_ available on the web _https://contoso.sharepoint.com/sites/SiteA_
+Add a user with the userName parameter to a SharePoint group with the groupId parameter
 
 ```sh
 m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userName "Alex.Wilber@contoso.com"
 ```
 
-Add multiple users by name to the SharePoint group with id _5_ available on the web _https://contoso.sharepoint.com/sites/SiteA_
+Add multiple users with the userName parameter to a SharePoint group with the groupId parameter
 
 ```sh
 m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userName "Alex.Wilber@contoso.com, Adele.Vance@contoso.com"
 ```
 
-Add a user with email _Alex.Wilber@contoso.com_ to the SharePoint group with name _Contoso Site Owners_ available on the web _https://contoso.sharepoint.com/sites/SiteA_
+Add a user with the email parameter to a SharePoint group with the groupName parameter
 
 ```sh
 m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Owners" --email "Alex.Wilber@contoso.com"
 ```
 
-Add multiple users by email to the SharePoint group with name _Contoso Site Owners_ available on the web _https://contoso.sharepoint.com/sites/SiteA_
+Add multiple users with the email parameter to a SharePoint group with the groupName parameter
 
 ```sh
 m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Contoso Site Owners" --email "Alex.Wilber@contoso.com, Adele.Vance@contoso.com"
 ```
+
+Add a user with the userId parameter to a SharePoint group with the groupId parameter
+
+```sh
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userId 5
+```
+
+Add multiple users with the userId parameter to a SharePoint group with the groupId parameter
+
+```sh
+m365 spo group member add --webUrl https://contoso.sharepoint.com/sites/SiteA --groupId 5 --userId "5,12"
+```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "AllowedRoles": [
+          0
+        ],
+        "CurrentRole": 0,
+        "DisplayName": "John Doe",
+        "Email": "john.doe@contoso.onmicrosoft.com",
+        "InvitationLink": null,
+        "IsUserKnown": true,
+        "Message": null,
+        "Status": true,
+        "User": "i:0#.f|membership|john.doe@contoso.onmicrosoft.com"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    DisplayName  Email
+    -----------  ---------------------------------
+    John Doe     john.doe@contoso.onmicrosoft.com
+    ```
+
+=== "CSV"
+
+    ```csv
+    DisplayName,Email
+    John Doe,john.doe@contoso.onmicrosoft.com
+    ```

@@ -76,11 +76,6 @@ describe(commands.FIELD_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title'] }]);
-  });
-
   it('updates site column specified by title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {

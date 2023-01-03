@@ -1,10 +1,9 @@
 import { AadUserConversationMember, Chat, ConversationMember } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import * as os from 'os';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
@@ -109,7 +108,7 @@ class TeamsChatGetCommand extends GraphCommand {
   }
 
   private async getChatDetailsById(id: string): Promise<Chat> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/chats/${formatting.encodeQueryParameter(id)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'

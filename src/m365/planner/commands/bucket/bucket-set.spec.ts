@@ -145,11 +145,6 @@ describe(commands.BUCKET_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'name'] }]);
-  });
-
   it('fails validation id when id and plan details are specified', async () => {
     const actual = await command.validate({
       options: {

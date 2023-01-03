@@ -1,7 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
+
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
@@ -66,7 +66,7 @@ class PpDataverseTableGetCommand extends PowerPlatformCommand {
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.0/EntityDefinitions(LogicalName='${args.options.name}')?$select=MetadataId,IsCustomEntity,IsManaged,SchemaName,IconVectorName,LogicalName,EntitySetName,IsActivity,DataProviderId,IsRenameable,IsCustomizable,CanCreateForms,CanCreateViews,CanCreateCharts,CanCreateAttributes,CanChangeTrackingBeEnabled,CanModifyAdditionalSettings,CanChangeHierarchicalRelationship,CanEnableSyncToExternalSearchIndex&api-version=9.1`,
         headers: {
           accept: 'application/json;odata.metadata=none'

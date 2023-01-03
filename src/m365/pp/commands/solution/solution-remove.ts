@@ -3,9 +3,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
-import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Options as PpSolutionGetCommandOptions } from './solution-get';
 import * as PpSolutionGetCommand from './solution-get';
@@ -136,7 +135,7 @@ class PpSolutionRemoveCommand extends PowerPlatformCommand {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
 
       const solutionId = await this.getSolutionId(args);
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${dynamicsApiUrl}/api/data/v9.1/solutions(${solutionId})`,
         headers: {
           accept: 'application/json;odata.metadata=none'

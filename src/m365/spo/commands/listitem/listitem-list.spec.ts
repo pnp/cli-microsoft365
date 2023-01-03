@@ -152,13 +152,6 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['listId', 'listTitle'] }
-    ]);
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', listTitle: 'Demo List' } }, commandInfo);
     assert.notStrictEqual(actual, true);

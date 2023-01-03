@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -127,7 +126,7 @@ class SpoListRetentionLabelGetCommand extends SpoCommand {
           requestUrl += `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder&$select=RootFolder`;
         }
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: requestUrl,
           headers: {
             'accept': 'application/json;odata=nometadata'
@@ -140,7 +139,7 @@ class SpoListRetentionLabelGetCommand extends SpoCommand {
       }
 
       const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
-      const reqOptions: AxiosRequestConfig = {
+      const reqOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`,
         headers: {
           'accept': 'application/json;odata=nometadata',

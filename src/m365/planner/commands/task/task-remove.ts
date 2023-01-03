@@ -1,10 +1,9 @@
 import { PlannerBucket, PlannerTask } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import * as os from 'os';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { aadGroup } from '../../../../utils/aadGroup';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
@@ -133,7 +132,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
       try {
         const task = await this.getTask(args.options);
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/tasks/${task.id}`,
           headers: {
             accept: 'application/json;odata.metadata=none',
@@ -170,7 +169,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     const { id, title } = options;
 
     if (id) {
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/tasks/${id}`,
         headers: {
           accept: 'application/json'
@@ -212,7 +211,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     return this
       .getPlanId(options)
       .then(planId => {
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/plans/${planId}/buckets?$select=id,name`,
           headers: {
             accept: 'application/json;odata.metadata=none'

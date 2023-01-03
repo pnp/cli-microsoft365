@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -115,7 +114,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
           requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
         }
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${requestUrl}?$select=Id`,
           headers: {
             accept: 'application/json;odata=nometadata'

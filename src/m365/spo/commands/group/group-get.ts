@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -111,7 +110,7 @@ class SpoGroupGetCommand extends SpoCommand {
       }
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       method: 'GET',
       headers: {

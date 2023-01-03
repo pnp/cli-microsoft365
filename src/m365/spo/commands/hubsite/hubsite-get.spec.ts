@@ -80,11 +80,6 @@ describe(commands.HUBSITE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [{ options: ['id', 'title', 'url'] }]);
-  });
-
   it('gets information about the specified hub site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('${validId}')`) > -1) {

@@ -101,6 +101,25 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     userPrincipalName: "Alex.Wilber@contoso.com"
   };
 
+  const spoUserInformation: any =
+  {
+    Id: 9,
+    IsHiddenInUI: false,
+    LoginName: "i:0#.f|membership|Alex.Wilber@contoso.com",
+    Title: "Armand Doe",
+    PrincipalType: 1,
+    Email: "",
+    Expiration: "",
+    IsEmailAuthenticationGuestUser: false,
+    IsShareByEmailGuestUser: false,
+    IsSiteAdmin: false,
+    UserId: {
+      NameId: "10032002529a911c",
+      NameIdIssuer: "urn:federation:microsoftonline"
+    },
+    UserPrincipalName: "Alex.Wilber@contoso.com"
+  };
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
@@ -184,7 +203,31 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both userName and email options are not passed', async () => {
+  it('fails validation if both userName and userId options are passed', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        userId: 5,
+        userName: "Alex.Wilber@contoso.com"
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both userId and email options are passed', async () => {
+    const actual = await command.validate({
+      options: {
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        userId: 5,
+        email: "Alex.Wilber@contoso.com"
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both userName, email or userId options are not passed', async () => {
     const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -201,6 +244,21 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
   it('fails validation if groupID is Invalid', async () => {
     const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "NOGROUP", userName: "Alex.Wilber@contoso.com" } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if userId is Invalid', async () => {
+    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, userId: "9,invalidUserId" } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if userName is Invalid', async () => {
+    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, userName: "Alex.Wilber@contoso.com,9" } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if email is Invalid', async () => {
+    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, email: "Alex.Wilber@contoso.com,9" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -241,6 +299,40 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
         userName: "Alex.Wilber@contoso.com"
+      }
+    });
+    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
+  });
+
+  it('adds user to a SharePoint Group by groupId and userId (Debug)', async () => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
+      stdout: JSON.stringify(spoUserInformation),
+      stderr: ''
+    }));
+
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
+        opts.data) {
+        return Promise.resolve(jsonSingleUser);
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')`) {
+        return Promise.resolve({
+          Id: 32
+        });
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        userId: 9
       }
     });
     assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
@@ -417,5 +509,31 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         userName: "Alex.Wilber@contoso.com"
       }
     }), new CommandError(`The selected permission level is not valid.`));
+  });
+
+  it('Handles generic error when adding user to a SharePoint Group by groupId and userId', async () => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')`) {
+        return Promise.resolve({
+          Id: 32
+        });
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.reject({
+      error: `User cannot be found`,
+      stderr: `User cannot be found`
+    }));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        userId: 19
+      }
+    }), new CommandError(`Users not added to the group because the following users don't exist: 19`));
   });
 });

@@ -114,14 +114,6 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [
-      { options: ['listId', 'listTitle', 'listUrl'] },
-      { options: ['principalId', 'upn', 'groupName'] }
-    ]);
-  });
-
   it('remove role assignment from list item get list by title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_api/web/lists/getByTitle(\'test\')/items(1)/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {

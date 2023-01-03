@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import { AxiosRequestConfig } from 'axios';
 import * as sinon from 'sinon';
 import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
@@ -7,7 +6,7 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -17,7 +16,7 @@ describe(commands.TASK_ADD, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  let postStub: sinon.SinonStub<[options: AxiosRequestConfig<any>]>;
+  let postStub: sinon.SinonStub<[options: CliRequestOptions]>;
 
   const getRequestData = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",

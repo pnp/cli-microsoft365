@@ -1,8 +1,7 @@
 import { Drive, DriveItem, Site } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
-import request from '../../../request';
+import request, { CliRequestOptions } from '../../../request';
 import { formatting } from '../../../utils/formatting';
 import { odata } from '../../../utils/odata';
 import { validation } from '../../../utils/validation';
@@ -103,7 +102,7 @@ class FileListCommand extends GraphCommand {
     }
 
     const url: URL = new URL(webUrl);
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/sites/${formatting.encodeQueryParameter(url.host)}:${url.pathname}?$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -126,7 +125,7 @@ class FileListCommand extends GraphCommand {
       logger.logToStderr(`Getting document library...`);
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/sites/${siteId}/drives?$select=webUrl,id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -165,7 +164,7 @@ class FileListCommand extends GraphCommand {
     }
 
     const documentLibraryRelativeFolderUrl: string = folderUrl.href.replace(new RegExp(documentLibrary.webUrl as string, 'i'), '');
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/drives/${documentLibrary.id}/root${documentLibraryRelativeFolderUrl.length > 0 ? `:${documentLibraryRelativeFolderUrl}` : ''}?$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -188,7 +187,7 @@ class FileListCommand extends GraphCommand {
       return Promise.resolve();
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/drives/${driveId}/items('${folderId}')/children?$filter=folder ne null&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
