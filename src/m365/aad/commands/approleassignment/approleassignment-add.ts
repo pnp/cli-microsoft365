@@ -118,6 +118,11 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
 
     try {
       const servicePrincipalResult = await request.get<{ value: ServicePrincipal[] }>(getServicePrinciplesRequestOptions);
+
+      if (servicePrincipalResult.value.length === 0) {
+        return Promise.reject(`The specified service principal doesn't exist`);
+      }
+
       if (servicePrincipalResult.value.length > 1) {
         throw 'More than one service principal found. Please use the appId or appObjectId option to make sure the right service principal is specified.';
       }

@@ -188,6 +188,24 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       new CommandError(`The scope value 'Sites.Read.All' you have specified does not exist for SharePoint. ${os.EOL}Available scopes (application permissions) are: ${os.EOL}Scope1${os.EOL}Scope2`));
   });
 
+  it('rejects if service principal does not exist', async () => {
+    postRequestStub();
+    sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
+      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
+        // fake first call for getting service principal
+        if (opts.url.indexOf('startswith') === -1) {
+          return Promise.resolve({ "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals", "value": [] });
+        }
+        // second get request for searching for service principals by resource options value specified
+        return Promise.resolve({ "value": [{ objectId: "5edf62fd-ae7a-4a99-af2e-fc5950aaed07", "appRoles": [{ value: 'Scope1', id: '1' }, { value: 'Scope2', id: '2' }] }] });
+      }
+      return Promise.reject();
+    });
+
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } } as any),
+      new CommandError("The specified service principal doesn't exist"));
+  });
+
   it('rejects if more than one service principal found', async () => {
     postRequestStub();
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
