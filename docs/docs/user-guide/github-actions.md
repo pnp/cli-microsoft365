@@ -33,9 +33,24 @@ When connecting to any system or service, we need to make sure that the account 
 
 First you will need to need to navigate, in your browser, to your repository on GitHub.com and go to the `Settings` tab, from here choose the `Secrets` item on the left hand menu.
 
-Using the `Add new secret` link, enter the `ADMIN_USERNAME` into the `Name` field and the username of the account that you are to use to connect to your Microsoft 365 tenant with, e.g. `user@tenant.onmicrosoft.com`. *Note: This account should not be protected with multi factor authentication*
+You may have two options when registering secrets in order to log in to your tenant:
+
+* Using username / password (perfect to test your workflow, in a dev context, for personal usage) ==> **delegated secrets**
+    * *In that case, the CLI commands will run as if it was you (list item updates, site creation...)*
+* Using Azure AD (AAD) application id / certificate (perfect in a production context, without creating any dependencies to an account) ==> **application secrets**
+    * *Here, the CLI commands will run through an app, not a user*
+
+##### Delegated secrets
+
+Using the `Add new secret` link, enter the `ADMIN_USERNAME` into the `Name` field and the username of the account that you are to use to connect to your Microsoft 365 tenant with, e.g. `user@tenant.onmicrosoft.com`. *Note: This account should not be protected with multi-factor authentication*
 
 Repeat the above step to also store the account password which should be named `ADMIN_PASSWORD`.
+
+##### Application secrets
+
+Using the `Add new secret` link, enter the `APP_ID` into the `Name` field and the (client) id of the AAD application to connect to your Microsoft 365 tenant with, e.g. `d355e6f0-0aec-4b1f-b458-7040f91bc297`.
+
+Repeat the above step to also store the application's encoded certificate which should be named `CERTIFICATE_ENCODED`. If your certificate is encrypted with a password, then repeat one last time the previous step with a secret called `CERTIFICATE_PASSWORD`.
 
 #### Setup workflow
 
@@ -73,28 +88,52 @@ The above configuration defines a simple workflow named `CI` that is triggered o
 
 We will update the initial configuration as shown below, replacing the existing steps with the `CLI for Microsoft 365 Login` action instead.
 
+##### Login with delegated secrets
+  
 ```yaml
-name: CI
+  name: CI
 
-on: [push]
+  on: [push]
 
-jobs:
-  build:
+  jobs:
+    build:
 
-    runs-on: ubuntu-latest
+      runs-on: ubuntu-latest
 
-    steps:
+      steps:
 
-    - name: Login to tenant
-      uses: pnp/action-cli-login@v1.0.0
-      with:
-        ADMIN_USERNAME:  ${{ secrets.ADMIN_USERNAME }}
-        ADMIN_PASSWORD:  ${{ secrets.ADMIN_PASSWORD }}
+      - name: Login to tenant
+        uses: pnp/action-cli-login@v2.2.1
+        with:
+          ADMIN_USERNAME:  ${{ secrets.ADMIN_USERNAME }}
+          ADMIN_PASSWORD:  ${{ secrets.ADMIN_PASSWORD }}
+```
+
+##### Login with application secrets
+
+```yaml
+  name: CI
+
+  on: [push]
+
+  jobs:
+    build:
+
+      runs-on: ubuntu-latest
+
+      steps:
+
+      - name: Login to tenant
+        uses: pnp/action-cli-login@v2.2.1
+        with:
+          APP_ID: ${{ secrets.APP_ID }}
+          CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_ENCODED }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
 ```
 
 The `uses` property tells the build agent to use the `CLI for Microsoft 365` GitHub Action for the step, this will automatically become available when the workflow is triggered, no installation is required.
 
-The action accepts an admin username and password, which are used to authenticate with your Microsoft 365 tenant, these credentials are provided by an environment variable called `secrets` which contains properties exposing the secured credentials that we saved earlier.
+The action accepts an admin username and password (or an application id / encoded certificate), which are used to authenticate with your Microsoft 365 tenant, these credentials are provided by an environment variable called `secrets` which contains properties exposing the secured credentials that we saved earlier.
 
 Lastly, we need to commit the `main.yaml` file to the repository, click the `Start Commit` button and click `Commit new file`. You may want enter a custom commit message at this point, however the default will be fine for this tutorial.
 
@@ -109,6 +148,60 @@ You will see that all steps have a green tick, expanding the `Login tenant` step
 Congratulations! You have just setup your first custom workflow in a GitHub repository and successfully logged into Microsoft 365 using the `Microsoft 365 Login` action.
 
 ![CI Successful build](../images/github-actions-tutorial-success.png "CI Successful Build")
+
+#### Specify the version of CLI for Microsoft 365
+
+Sometimes, you would like to use the next (beta) version or a previous one of the CLI (because of a bug that is currently being addressed or to leverage a new feature to come).
+
+The `CLI for Microsoft 365 Login` action provides an optional input to specify a version tag which can be `latest` (default if not specified), `next` or a specific one (`5.9.0`).
+
+```yaml
+  name: CI
+
+  on: [push]
+
+  jobs:
+    build:
+
+      runs-on: ubuntu-latest
+
+      steps:
+
+      - name: Login to tenant
+        uses: pnp/action-cli-login@v2.2.1
+        with:
+          APP_ID: ${{ secrets.APP_ID }}
+          CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_ENCODED }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+          CLI_VERSION: next
+```
+
+#### Specify the tenant to connect to
+
+Depending on the context, you could have to specify the tenant id if you have access to multiple tenants.
+
+The `CLI for Microsoft 365 Login` allows you to indicate the targeting tenant (default `common`). It can be `organization` (if using an Azure AD app which is multitenant) or a tenant id.
+
+```yaml
+  name: CI
+
+  on: [push]
+
+  jobs:
+    build:
+
+      runs-on: ubuntu-latest
+
+      steps:
+
+      - name: Login to tenant
+        uses: pnp/action-cli-login@v2.2.1
+        with:
+          APP_ID: ${{ secrets.APP_ID }}
+          CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_ENCODED }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+          TENANT: 1e0e6964-032a-4e62-a8d7-4c6469d7554b
+```
 
 ## How-To Guides
 
@@ -143,29 +236,30 @@ jobs:
     ##
 
     - name: Login to tenant
-      uses: pnp/action-cli-login@v1.0.0
+      uses: pnp/action-cli-login@v2.2.1
       with:
-        ADMIN_USERNAME:  ${{ secrets.ADMIN_USERNAME }}
-        ADMIN_PASSWORD:  ${{ secrets.ADMIN_PASSWORD }}
+        APP_ID: ${{ secrets.APP_ID }}
+        CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_ENCODED }}
+        CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
 
     - name: Deploy app to tenant app catalog
-      id: o365clideploy
-      uses: pnp/action-cli-deploy@v1.0.0
+      id: M365clideploy
+      uses: pnp/action-cli-deploy@v3.0.1
       with:
         APP_FILE_PATH: sharepoint/solution/spfx-m365-cli-action.sppkg
         SKIP_FEATURE_DEPLOYMENT: true
         OVERWRITE: true
 
     - name: Get the id of the app deployed
-      run: echo "The id of the app deployed is ${{ steps.o365clideploy.outputs.APP_ID }}"
+      run: echo "The id of the app deployed is ${{ steps.M365clideploy.outputs.APP_ID }}"
 ```
 
 Alternatively, you can deploy the app to a site collection based app catalog by using the below step in replacement of the `Deploy app to tenant app catalog` step.
 
 ```yaml
 - name: Deploy app to a site collection app catalog
-  id: o365clideploy
-  uses: pnp/action-cli-deploy@v1.0.0
+  id: M365clideploy
+  uses: pnp/action-cli-deploy@v3.0.1
   with:
     APP_FILE_PATH: sharepoint/solution/spfx-m365-cli-action.sppkg
     SCOPE: sitecollection
@@ -178,9 +272,9 @@ Add this step to a `.yaml` build file contained within the `.github/workflows` f
 
 ```yaml
 - name: Send email
-      uses: pnp/action-cli-runscript@v1.0.0
+      uses: pnp/action-cli-runscript@v2.0.1
       with:
-        O365_CLI_SCRIPT: m365 spo mail send --webUrl https://contoso.sharepoint.com/sites/teamsite --to 'user@contoso.onmicrosoft.com' --subject 'Deployment done' --body '<h2>CLI for Microsoft 365</h2> <p>The deployment is complete.</p> <br/> Email sent via CLI for Microsoft 365 GitHub Action.'
+        M365_CLI_SCRIPT: m365 spo mail send --webUrl https://contoso.sharepoint.com/sites/teamsite --to 'user@contoso.onmicrosoft.com' --subject 'Deployment done' --body '<h2>CLI for Microsoft 365</h2> <p>The deployment is complete.</p> <br/> Email sent via CLI for Microsoft 365 GitHub Action.'
 ```
 
 ### Execute a script file using the CLI for Microsoft 365 Run Script action
@@ -189,9 +283,9 @@ Add the respective script file to your repository and this step to a `.yaml` bui
 
 ```yaml
 - name: Create lists
-      uses: pnp/action-cli-runscript@v1.0.0
+      uses: pnp/action-cli-runscript@v2.0.1
       with:
-        O365_CLI_SCRIPT_PATH: ./script/lists.ps1 
+        M365_CLI_SCRIPT_PATH: ./script/lists.ps1 
 ```
 
 ## Reference
@@ -202,10 +296,15 @@ View on [GitHub Marketplace](https://github.com/marketplace/actions/cli-for-micr
 
 #### Inputs
 
-| Name              | Description                                |          |
-| ------------------|--------------------------------------------| ---------|
-| `ADMIN_USERNAME`  | The username of the account used to login  | Required |
-| `ADMIN_PASSWORD`  | The password of the account used to login  | Required |
+| Name                    | Description                                                               |                                                        |
+| ------------------------|---------------------------------------------------------------------------| -------------------------------------------------------|
+| `ADMIN_USERNAME`        | The username of the account used to login                                 | Optional (but required if `authType` is `password`)    |
+| `ADMIN_PASSWORD`        | The password of the account used to login                                 | Optional (but required if `authType` is `password`)    |
+| `APP_ID`                | App ID of the Azure AD application to use for certificate authentication  | Optional (but required if `authType` is `certificate`) |
+| `CERTIFICATE_ENCODED`   | Base64-encoded string with certificate private key                        | Optional (but required if `authType` is `certificate`) |
+| `CERTIFICATE_PASSWORD`  | Password for the certificate                                              | Optional                                               |
+| `TENANT`                | ID of the tenant from which accounts should be able to authenticate       | Optional                                               |
+| `CLI_VERSION`           | Accepts `latest`, `next` or a specific version tag                        | Optional                                               |
 
 ### Microsoft 365 Deploy App
 
@@ -233,12 +332,12 @@ View on [GitHub Marketplace](https://github.com/marketplace/actions/cli-for-micr
 
 | Name                   | Description                  |          |
 | -----------------------|------------------------------| ---------|
-| `O365_CLI_SCRIPT_PATH` | Relative path to the script  | Required |
-| `O365_CLI_SCRIPT`      | The script to run            | Required |
-| `IS_POWERSHELL`        | Used only with `O365_CLI_SCRIPT`. If `true`, `O365_CLI_SCRIPT` will be passed as a PowerShell script, otherwise the assumption is `bash` script. Default is `false` | Optional |
+| `M365_CLI_SCRIPT_PATH` | Relative path to the script  | Required |
+| `M365_CLI_SCRIPT`      | The script to run            | Required |
+| `IS_POWERSHELL`        | Used only with `M365_CLI_SCRIPT`. If `true`, `M365_CLI_SCRIPT` will be passed as a PowerShell script, otherwise the assumption is `bash` script. Default is `false` | Optional |
 
 !!! attention
-    One of `O365_CLI_SCRIPT_PATH` / `O365_CLI_SCRIPT` is mandatory, in case both are defined `O365_CLI_SCRIPT_PATH` gets preference.
+    One of `M365_CLI_SCRIPT_PATH` / `M365_CLI_SCRIPT` is mandatory, in case both are defined `M365_CLI_SCRIPT_PATH` gets preference.
 
 ## Contributions and Issues
 
