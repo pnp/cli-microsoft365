@@ -97,9 +97,7 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
   }
 
   public async commandAction(logger: Logger, args: any): Promise<void> {
-    if (this.verbose) {
-      logger.logToStderr(`Publishing the solution '${args.options.id || args.options.name}'...`);
-    }
+
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
@@ -119,6 +117,10 @@ class PpSolutionPublishCommand extends PowerPlatformCommand {
           ParameterXml: parameterXml
         }
       };
+
+      if (this.verbose) {
+        logger.logToStderr(`Publishing the solution '${args.options.id || args.options.name}'...`);
+      }
 
       if (args.options.wait) {
         await request.post(requestOptions);
