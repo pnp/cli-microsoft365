@@ -55,6 +55,8 @@ class SpoGroupMemberRemoveCommand extends SpoCommand {
         userName: (!(!args.options.userName)).toString(),
         email: (!(!args.options.email)).toString(),
         userId: (!(!args.options.userId)).toString(),
+        aadGroupId: (!(!args.options.groupId)).toString(),
+        aadGroupName: (!(!args.options.groupName)).toString(),
         confirm: (!(!args.options.confirm)).toString()
       });
     });
