@@ -27,17 +27,12 @@ m365 spo group member remove [options]
 
 `--userId [userId]`
 : The user Id (Id of the site user, eg. 14) of the user to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId` or `aadGroupName`.
+
 `--aadGroupId [aadGroupId]`
 : The object Id of the Azure AD group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId` or `aadGroupName`.
 
 `--aadGroupName [aadGroupName]`
 : The name of the Azure AD group to remove as a member. Specify either `userName`, `email`, `userId`, `aadGroupId` or `aadGroupName`.
-
-`--aadGroupId [aadGroupId]`
-: The object Id of the Azure AD group to remove as a member. Specify either `aadGroupId`, `aadGroupName` or `userName`
-
-`--aadGroupName [aadGroupName]`
-: The name of the Azure AD group to remove as a member. Specify either `aadGroupId`, `aadGroupName` or `userName`
 
 --8<-- "docs/cmd/_global.md"
 
@@ -53,6 +48,12 @@ Remove a user from a SharePoint group based on the username on a given web
 
 ```sh
 m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Site A Visitors" --email "Alex.Wilber@contoso.com"
+```
+
+Remove a user from a SharePoint group by email.
+
+```sh
+m365 spo group member remove --webUrl https://contoso.sharepoint.com/sites/SiteA --groupName "Site A Visitors" --userId 14
 ```
 
 Remove an Azure AD group from a SharePoint group based on the Azure AD group name on a given web
