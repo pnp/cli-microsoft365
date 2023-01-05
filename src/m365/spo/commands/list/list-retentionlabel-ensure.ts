@@ -14,7 +14,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  name: string;
+  name?: string;
+  label?: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
@@ -48,6 +49,8 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        name: (!(!args.options.name)).toString(),
+        label: (!(!args.options.label)).toString(),
         listId: (!(!args.options.listId)).toString(),
         listTitle: (!(!args.options.listTitle)).toString(),
         listUrl: (!(!args.options.listUrl)).toString(),
@@ -64,7 +67,10 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--name <name>'
+        option: '--name [name]'
+      },
+      {
+        option: '--label [label]'
       },
       {
         option: '-t, --listTitle [listTitle]'
@@ -105,6 +111,12 @@ class SpoListRetentionLabelEnsureCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.showDeprecationWarning(logger, commands.LIST_LABEL_SET, commands.LIST_RETENTIONLABEL_ENSURE);
+
+    if (args.options.label) {
+      args.options.name = args.options.label;
+
+      this.warn(logger, `Option 'label' is deprecated. Please use 'name' instead`);
+    }
 
     if (args.options.blockDelete) {
       this.warn(logger, `Option 'blockDelete' is deprecated.`);

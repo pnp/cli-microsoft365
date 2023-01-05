@@ -122,6 +122,40 @@ describe(commands.LIST_RETENTIONLABEL_ENSURE, () => {
     } as any), new CommandError('404 - "404 FILE NOT FOUND"'));
   });
 
+  it('should set label for list with deprecated label', async () => {
+    const postStub = sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/web/lists/getByTitle('MyLibrary')/?$expand=RootFolder&$select=RootFolder`) {
+        return Promise.resolve({ "RootFolder": { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "MyLibrary", "ProgID": null, "ServerRelativeUrl": "/sites/team1/MyLibrary", "TimeCreated": "2019-01-11T10:03:19Z", "TimeLastModified": "2019-01-11T10:03:20Z", "UniqueId": "faaa6af2-0157-4e9a-a352-6165195923c8", "WelcomePage": "" } }
+        );
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com/sites/team1',
+        listTitle: 'MyLibrary',
+        label: 'abc'
+      }
+    });
+    const lastCall = postStub.lastCall.args[0];
+    assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+    assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
+    assert.strictEqual(lastCall.data.blockDelete, false);
+    assert.strictEqual(lastCall.data.blockEdit, false);
+    assert.strictEqual(lastCall.data.syncToItems, false);
+  });
+
   it('should set label for list (debug)', async () => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
