@@ -19,9 +19,6 @@ m365 spo list label set [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the list is located.
 
-`--label <label>`
-: The label to set on the list.
-
 `--name <name>`
 : The label to set on the list
 
