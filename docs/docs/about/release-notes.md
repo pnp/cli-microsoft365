@@ -24,6 +24,8 @@
 - added own CliRequestOptions [#4277](https://github.com/pnp/cli-microsoft365/issues/4277)
 - deleted 'defines correct option sets' [#4068](https://github.com/pnp/cli-microsoft365/issues/4068)
 - updates the Using Guide with our definition of booleans [#3987](https://github.com/pnp/cli-microsoft365/issues/3987)
+- enhanced 'teams chat list' with user filter [#3774](https://github.com/pnp/cli-microsoft365/issues/3774)
+- handled missing app service principals in 'aad approleassignment add' [#4307](https://github.com/pnp/cli-microsoft365/issues/4307)
 
 ## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
 
