@@ -17,6 +17,7 @@
 - [spo file sharinglink list](../cmd/spo/file/file-sharinglink-list.md) - lists all the sharing links of a specific file [#4023](https://github.com/pnp/cli-microsoft365/issues/4023)
 - [spo listitem record lock](../cmd/spo/listitem/listitem-record-lock.md) - locks the list item record [#4237](https://github.com/pnp/cli-microsoft365/issues/4237)
 - [spo listitem record unlock](../cmd/spo/listitem/listitem-record-unlock.md) - unlocks the list item record [#4239](https://github.com/pnp/cli-microsoft365/issues/4239)
+- [spo listitem retentionlabel ensure](../cmd/spo/listitem/listitem-retentionlabel-ensure.md) - adds a retention label to a list item [#4158](https://github.com/pnp/cli-microsoft365/issues/4158)
 
 ### Changes
 
@@ -26,6 +27,8 @@
 - updates the Using Guide with our definition of booleans [#3987](https://github.com/pnp/cli-microsoft365/issues/3987)
 - enhanced 'teams chat list' with user filter [#3774](https://github.com/pnp/cli-microsoft365/issues/3774)
 - handled missing app service principals in 'aad approleassignment add' [#4307](https://github.com/pnp/cli-microsoft365/issues/4307)
+- enhanced spo list retentionlabel set [#4247](https://github.com/pnp/cli-microsoft365/issues/4247)
+- enhanced group member remove [#4098](https://github.com/pnp/cli-microsoft365/issues/4098)
 
 ## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
 
