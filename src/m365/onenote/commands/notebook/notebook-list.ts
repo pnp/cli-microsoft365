@@ -1,12 +1,12 @@
 import { Notebook } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
+import request, { CliRequestOptions } from '../../../../request';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -29,18 +29,27 @@ class OneNoteNotebookListCommand extends GraphCommand {
     return 'Retrieve a list of notebooks';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['createdDateTime', 'displayName', 'id'];
+  }
+
   constructor() {
     super();
 
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        joined: args.options.joined
+        userId: typeof args.options.userId !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
+        groupId: typeof args.options.groupId !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined',
+        webUrl: typeof args.options.webUrl !== 'undefined'
       });
     });
   }
@@ -66,12 +75,8 @@ class OneNoteNotebookListCommand extends GraphCommand {
           return `${args.options.groupId} is not a valid GUID`;
         }
 
-        if (args.options.userId && args.options.userName) {
-          return 'Specify either userId or userName, but not both';
-        }
-
-        if (args.options.groupId && args.options.groupName) {
-          return 'Specify either groupId or groupName, but not both';
+        if (args.options.webUrl) {
+          return validation.isValidSharePointUrl(args.options.webUrl);
         }
 
         return true;
@@ -79,57 +84,60 @@ class OneNoteNotebookListCommand extends GraphCommand {
     );
   }
 
-  private getEndpointUrl(args: CommandArgs): Promise<string> {
-    return new Promise<string>((resolve: (endpoint: string) => void, reject: (error: string) => void): void => {
-      let endpoint: string = `${this.resource}/v1.0/me/onenote/notebooks`;
-
-      if (args.options.userId) {
-        endpoint = `${this.resource}/v1.0/users/${args.options.userId}/onenote/notebooks`;
-        return resolve(endpoint);
-      }
-      else if (args.options.userName) {
-        endpoint = `${this.resource}/v1.0/users/${args.options.userName}/onenote/notebooks`;
-        return resolve(endpoint);
-      }
-      else if (args.options.groupId) {
-        endpoint = `${this.resource}/v1.0/groups/${args.options.groupId}/onenote/notebooks`;
-        return resolve(endpoint);
-      }
-      else if (args.options.groupName) {
-        this
-          .getGroupId(args)
-          .then((retrievedgroupId: string): void => {
-            endpoint = `${this.resource}/v1.0/groups/${retrievedgroupId}/onenote/notebooks`;
-            return resolve(endpoint);
-          })
-          .catch((err: any) => {
-            reject(err);
-          });
-      }
-      else if (args.options.webUrl) {
-        spo.getSpoGraphSiteId(args.options.webUrl)
-          .then((siteId: string): void => {
-            endpoint = `${this.resource}/v1.0/sites/${siteId}/onenote/notebooks`;
-            return resolve(endpoint);
-          })
-          .catch((err: any) => {
-            reject(err);
-          });
-      }
-      else {
-        return resolve(endpoint);
+  #initOptionSets(): void {
+    this.optionSets.push({
+      options: ['userId', 'userName', 'groupId', 'groupName', 'webUrl'],
+      runsWhen: (args) => {
+        const options = [args.options.userId, args.options.userName, args.options.groupId, args.options.groupName, args.options.webUrl];
+        return options.some(item => item !== undefined);
       }
     });
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['createdDateTime', 'displayName', 'id'];
+  private async getEndpointUrl(args: CommandArgs): Promise<string> {
+    let endpoint: string = `${this.resource}/v1.0/`;
+
+    if (args.options.userId) {
+      endpoint += `users/${args.options.userId}`;
+    }
+    else if (args.options.userName) {
+      endpoint += `users/${args.options.userName}`;
+    }
+    else if (args.options.groupId) {
+      endpoint += `groups/${args.options.groupId}`;
+    }
+    else if (args.options.groupName) {
+      const groupId = await this.getGroupId(args.options.groupName);
+      endpoint += `groups/${groupId}`;
+    }
+    else if (args.options.webUrl) {
+      const siteId = await this.getSpoSiteId(args.options.webUrl);
+      endpoint += `sites/${siteId}`;
+    }
+    else {
+      endpoint += 'me';
+    }
+    endpoint += '/onenote/notebooks';
+    return endpoint;
   }
 
-  private getGroupId(args: CommandArgs): Promise<string> {
-    return aadGroup
-      .getGroupByDisplayName(args.options.groupName!)
-      .then(group => group.id!);
+  private async getGroupId(groupName: string): Promise<string> {
+    const group = await aadGroup.getGroupByDisplayName(groupName);
+    return group.id!;
+  }
+
+  private async getSpoSiteId(webUrl: string): Promise<string> {
+    const url = new URL(webUrl);
+    const requestOptions: CliRequestOptions = {
+      url: `${this.resource}/v1.0/sites/${url.hostname}:${url.pathname}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const site = await request.get<{ id: string }>(requestOptions);
+    return site.id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
