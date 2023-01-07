@@ -177,6 +177,8 @@ nav:
     - OneNote (onenote):
       - notebook:
         - notebook list: cmd/onenote/notebook/notebook-list.md
+      - page:
+        - page list: cmd/onenote/page/page-list.md
     - Outlook (outlook):
       - mail:
         - mail send: cmd/outlook/mail/mail-send.md
