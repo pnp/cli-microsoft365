@@ -98,7 +98,7 @@ class OneNotePageListCommand extends GraphCommand {
       endpoint += `users/${args.options.userName}`;
     }
     else if (args.options.groupId) {
-      endpoint = `${this.resource}/v1.0/groups/${args.options.groupId}`;
+      endpoint += `groups/${args.options.groupId}`;
     }
     else if (args.options.groupName) {
       const groupId = await this.getGroupId(args.options.groupName);
