@@ -198,6 +198,7 @@ Add-PnPApplicationCustomizer|PnP.PowerShell|[spo customaction add](../cmd/spo/cu
 Add-PnPAvailableSiteClassification|PnP.PowerShell|
 Add-PnPAzureADGroupMember|PnP.PowerShell|
 Add-PnPAzureADGroupOwner|PnP.PowerShell|
+>>Add-PnPAzureADServicePrincipalAppRole|PnP.PowerShell|
 Add-PnPContentType|PnP.PowerShell|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
 Add-PnPContentTypesFromContentTypeHub|PnP.PowerShell|
 Add-PnPContentTypeToDocumentSet|PnP.PowerShell|
@@ -244,7 +245,6 @@ Add-PnPPublishingImageRendition|PnP.PowerShell|
 Add-PnPPublishingPage|PnP.PowerShell|[spo page add](../cmd/spo/page/page-add.md)
 Add-PnPPublishingPageLayout|PnP.PowerShell|
 Add-PnPRoleDefinition|PnP.PowerShell|
-Add-PnPSiteClassification|PnP.PowerShell|
 Add-PnPSiteCollectionAdmin|PnP.PowerShell|
 Add-PnPSiteCollectionAppCatalog|PnP.PowerShell|[spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.md)
 Add-PnPSiteDesign|PnP.PowerShell|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md)
@@ -291,6 +291,7 @@ ConvertTo-PnPClientSidePage|PnP.PowerShell|
 ConvertTo-PnPPage|PnP.PowerShell|
 Copy-PnPFile|PnP.PowerShell|[spo file copy](../cmd/spo/file/file-copy.md)
 Copy-PnPFolder|PnP.PowerShell|[spo folder copy](../cmd/spo/folder/folder-copy.md)
+>>Copy-PnPItemProxy|PnP.PowerShell|
 Copy-PnPList|PnP.PowerShell|
 Copy-PnPTeamsTeam|PnP.PowerShell|[teams team clone](../cmd/teams/team/team-clone.md)
 Deny-PnPTenantServicePrincipalPermissionRequest|PnP.PowerShell|[spo serviceprincipal permissionrequest deny](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md)
