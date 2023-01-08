@@ -29,6 +29,7 @@
 - handled missing app service principals in 'aad approleassignment add' [#4307](https://github.com/pnp/cli-microsoft365/issues/4307)
 - enhanced spo list retentionlabel set [#4247](https://github.com/pnp/cli-microsoft365/issues/4247)
 - enhanced group member remove [#4098](https://github.com/pnp/cli-microsoft365/issues/4098)
+- updates CI / CD workflow page [#4179](https://github.com/pnp/cli-microsoft365/issues/4179)
 
 ## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
 
