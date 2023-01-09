@@ -69,7 +69,7 @@ class SpoFileSharingLinkAddCommand extends SpoCommand {
         option: '-f, --fileUrl [fileUrl]'
       },
       {
-        option: '--type <type>]',
+        option: '--type <type>',
         autocomplete: SpoFileSharingLinkAddCommand.type
       },
       {
