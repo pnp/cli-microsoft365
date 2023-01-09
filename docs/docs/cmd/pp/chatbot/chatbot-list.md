@@ -80,3 +80,39 @@ m365 pp chatbot list --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5
     displayName,botid,publishedOn,createdOn,botModifiedOn
     CLI Chatbot,23f5f586-97fd-43d5-95eb-451c9797a53d,2022-11-19T19:19:53Z,2022-11-19T10:42:22Z,2022-11-19T20:19:57Z
     ```
+
+=== "Markdown"
+
+    ```md
+    # pp chatbot list --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5"
+
+    Date: 9/1/2023
+
+    ## CLI Chatbot (undefined)
+
+    Property | Value
+    ---------|-------
+    language | 1033
+    botid | 23f5f586-97fd-43d5-95eb-451c9797a53d
+    authenticationTrigger | 0
+    stateCode | 0
+    createdOn | 2022-11-19T10:42:22Z
+    cdsBotId | 23f5f586-97fd-43d5-95eb-451c9797a53d
+    schemaName | new\_bot\_23f5f58697fd43d595eb451c9797a53d
+    ownerId | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    botModifiedOn | 2022-11-19T20:19:57Z
+    solutionId | fd140aae-4df4-11dd-bd17-0019b9312238
+    isManaged | false
+    versionNumber | 1429641
+    timezoneRuleVersionNumber | 0
+    displayName | CLI Chatbot
+    statusCode | 1
+    owner | Doe, John
+    overwriteTime | 1900-01-01T00:00:00Z
+    componentState | 0
+    componentIdUnique | cdcd6496-e25d-4ad1-91cf-3f4d547fdd23
+    authenticationMode | 1
+    botModifiedBy | Doe, John
+    accessControlPolicy | 0
+    publishedOn | 2022-11-19T19:19:53Z
+    ```

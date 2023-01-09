@@ -81,3 +81,24 @@ m365 pp solution publisher get --environment "Default-2ca3eaa5-140f-4175-8261-32
     publisherid,uniquename,friendlyname
     d21aab70-79e7-11dd-8874-00188b01e34f,MicrosoftCorporation,MicrosoftCorporation
     ```
+
+=== "Markdown"
+
+    ```md
+    # pp solution publisher get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "d21aab70-79e7-11dd-8874-00188b01e34f"
+    
+    Date: 9/1/2023
+
+    ## undefined (undefined)
+
+    Property | Value
+    ---------|-------
+    publisherid | d21aab70-79e7-11dd-8874-00188b01e34f
+    uniquename | MicrosoftCorporation
+    friendlyname | MicrosoftCorporation
+    versionnumber | 1226559
+    isreadonly | false
+    description | Uitgever van Microsoft-oplossingen
+    customizationprefix | 
+    customizationoptionvalueprefix | 0
+    ```

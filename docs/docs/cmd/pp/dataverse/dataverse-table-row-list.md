@@ -88,3 +88,35 @@ m365 pp dataverse table row list --environment "Default-2ca3eaa5-140f-4175-8261-
     cr6c3_accountsid,_owningbusinessunit_value,statecode,statuscode,_createdby_value,_ownerid_value,modifiedon,_owninguser_value,_modifiedby_value,versionnumber,createdon,cr6c3_name,overriddencreatedon,importsequencenumber,_modifiedonbehalfby_value,utcconversiontimezonecode,_createdonbehalfby_value,_owningteam_value,timezoneruleversionnumber
     95c80273-3764-ed11-9561-000d3a4bbea4,6da087c1-1c4d-ed11-bba1-000d3a2caf7f,0,1,5fa787c1-1c4d-ed11-bba1-000d3a2caf7f,5fa787c1-1c4d-ed11-bba1-000d3a2caf7f,2022-11-14T16:14:45Z,5fa787c1-1c4d-ed11-bba1-000d3a2caf7f,5fa787c1-1c4d-ed11-bba1-000d3a2caf7f,1413873,2022-11-14T16:14:45Z,Column1 value,,,,,,,
     ```
+
+=== "Markdown"
+
+    ```md
+    # pp dataverse table row list --environment "Default-0cac6cda-2e04-4a3d-9c16-9c91470d7022" --tableName "cr6c3_accounts"
+
+    Date: 9/1/2023
+
+    ## undefined (undefined)
+
+    Property | Value
+    ---------|-------
+    cr6c3\_accountsid | 95c80273-3764-ed11-9561-000d3a4bbea4
+    \_owningbusinessunit\_value | 6da087c1-1c4d-ed11-bba1-000d3a2caf7f
+    statecode | 0
+    statuscode | 1
+    \_createdby\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    \_ownerid\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    modifiedon | 2022-11-14T16:14:45Z
+    \_owninguser\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    \_modifiedby\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    versionnumber | 1413873
+    createdon | 2022-11-14T16:14:45Z
+    cr6c3\_name | Column1 value
+    overriddencreatedon | null
+    importsequencenumber | null
+    \_modifiedonbehalfby\_value | null
+    utcconversiontimezonecode | null
+    \_createdonbehalfby\_value | null
+    \_owningteam\_value | null
+    timezoneruleversionnumber | null
+    ```

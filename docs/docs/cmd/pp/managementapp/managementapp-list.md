@@ -46,3 +46,17 @@ m365 pp managementapp list
     applicationId
     31359c7f-bd7e-475c-86db-fdb8c937548e
     ```
+
+=== "Markdown"
+
+    ```md
+    # pp managementapp list
+
+    Date: 9/1/2023
+
+    ## undefined (undefined)
+
+    Property | Value
+    ---------|-------
+    applicationId | 31359c7f-bd7e-475c-86db-fdb8c937548e
+    ```

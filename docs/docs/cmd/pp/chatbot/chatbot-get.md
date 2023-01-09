@@ -121,3 +121,58 @@ m365 pp chatbot get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5"
     name,botid,publishedon,createdon,modifiedon
     CLI 365 Chatbot,3a081d91-5ea8-40a7-8ac9-abbaa3fcb893,2022-11-19T10:43:24Z,2022-11-19T10:42:22Z,2022-11-19T10:42:24Z
     ```
+    
+=== "Markdown"
+
+    ```md
+    # pp chatbot get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "3a081d91-5ea8-40a7-8ac9-abbaa3fcb893"
+
+    Date: 9/1/2023
+
+    ## CLI 365 Chatbot (undefined)
+
+    Property | Value
+    ---------|-------
+    authenticationtrigger | 0
+    \_owningbusinessunit\_value | 6da087c1-1c4d-ed11-bba1-000d3a2caf7f
+    statuscode | 1
+    createdon | 2022-11-19T10:42:22Z
+    statecode | 0
+    schemaname | new\_bot\_23f5f58697fd43d595eb451c9797a53d
+    \_ownerid\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    overwritetime | 1900-01-01T00:00:00Z
+    name | CLI 365 Chatbot
+    solutionid | fd140aae-4df4-11dd-bd17-0019b9312238
+    ismanaged | false
+    versionnumber | 1445843
+    language | 1033
+    \_modifiedby\_value | 5f91d7a7-5f46-494a-80fa-5c18b0221351
+    \_modifiedonbehalfby\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    modifiedon | 2022-11-19T10:42:24Z
+    componentstate | 0
+    botid | 3a081d91-5ea8-40a7-8ac9-abbaa3fcb893
+    \_createdby\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    componentidunique | cdcd6496-e25d-4ad1-91cf-3f4d547fdd23
+    authenticationmode | 1
+    \_owninguser\_value | 5fa787c1-1c4d-ed11-bba1-000d3a2caf7f
+    accesscontrolpolicy | 0
+    runtimeprovider | 0
+    \_publishedby\_value | null
+    authenticationconfiguration | null
+    authorizedsecuritygroupids | null
+    overriddencreatedon | null
+    applicationmanifestinformation | null
+    importsequencenumber | null
+    synchronizationstatus | null
+    template | null
+    \_providerconnectionreferenceid\_value | null
+    configuration | null
+    utcconversiontimezonecode | null
+    publishedon | null
+    \_createdonbehalfby\_value | null
+    iconbase64 | null
+    supportedlanguages | null
+    \_owningteam\_value | null
+    timezoneruleversionnumber | null
+    iscustomizable | {"Value":true,"CanBeChanged":true,"ManagedPropertyLogicalName":"iscustomizableanddeletable"}
+    ```

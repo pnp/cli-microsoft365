@@ -75,3 +75,17 @@ m365 pp card clone --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" 
     CardIdClone
     80cff342-ddf1-4633-aec1-6d3d131b29e0
     ```
+    
+=== "Markdown"
+
+    ```md
+    # pp card clone --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "408e3f42-4c9e-4c93-8aaf-3cbdea9179aa" --newName "CLI 365 new Card"
+
+    Date: 9/1/2023
+
+    ## undefined (undefined)
+
+    Property | Value
+    ---------|-------
+    CardIdClone | 90460614-6ede-4231-8467-ce99a6359f45
+    ```
