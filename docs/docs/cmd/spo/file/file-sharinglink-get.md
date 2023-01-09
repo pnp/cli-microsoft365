@@ -20,7 +20,7 @@ m365 spo file sharinglink get [options]
 : The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both.
 
 `-i, --id <id>`
-: The ID of the unique share.
+: The ID of the sharing link.
 
 --8<-- "docs/cmd/_global.md"
 
