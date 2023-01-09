@@ -214,7 +214,7 @@ class SpoFileSharingLinkSetCommand extends SpoCommand {
 
   private parseDateExact(date: string): string {
     const d: Date = new Date(Date.parse(date));
-    return d.toISOString().split('.')[0].replaceAll('-', '').replaceAll(':', '') + d.toString().split('GMT')[1].split(' ')[0];
+    return d.toISOString().split('.')[0].replace(/-/g, '').replace(/:/g, '') + d.toString().split('GMT')[1].split(' ')[0];
   }
 }
 
