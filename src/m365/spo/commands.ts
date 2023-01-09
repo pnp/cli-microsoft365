@@ -64,6 +64,7 @@ export default {
   FILE_SHARINGLINK_GET: `${prefix} file sharinglink get`,
   FILE_SHARINGLINK_LIST: `${prefix} file sharinglink list`,
   FILE_SHARINGLINK_REMOVE: `${prefix} file sharinglink remove`,
+  FILE_SHARINGLINK_SET: `${prefix} file sharinglink set`,
   FILE_VERSION_CLEAR: `${prefix} file version clear`,
   FILE_VERSION_GET: `${prefix} file version get`,
   FILE_VERSION_LIST: `${prefix} file version list`,
