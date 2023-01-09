@@ -19,6 +19,15 @@ m365 spo file sharinglink add [options]
 `-i, --fileId [fileId]`
 : The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both.
 
+`--type <type>`
+: The type of sharing link to create. Either `view`, `edit`, or `embed`.
+
+`--expirationDateTime [expirationDateTime]`
+: The date and time to set the expiration. This should be defined as a valid ISO 8601 string
+
+`--scope [scope]`
+: The scope of link to create. Either `anonymous` or `organization`. If not specified, the default of the organization will be used
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
