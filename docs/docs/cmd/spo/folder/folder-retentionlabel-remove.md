@@ -24,6 +24,10 @@ m365 spo folder retentionlabel remove [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+Removing a retentionlabel is only supported on subfolders. Removing a retentionlabel from a rootfolder is currently not supported by by this command:
+
 ## Examples
 
 Removes the retention label from a folder in a given site based on the folder id
