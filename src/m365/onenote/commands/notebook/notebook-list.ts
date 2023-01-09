@@ -39,6 +39,7 @@ class OneNoteNotebookListCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -66,11 +67,6 @@ class OneNoteNotebookListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const options = [args.options.userId, args.options.userName, args.options.groupId, args.options.groupName, args.options.webUrl];
-        if (options.filter(item => item !== undefined).length > 1) {
-          return `Specify either userId, userName, groupId, groupName or webUrl, but not multiple`;
-        }
-
         if (args.options.userId && !validation.isValidGuid(args.options.userId as string)) {
           return `${args.options.userId} is not a valid GUID`;
         }
@@ -86,6 +82,16 @@ class OneNoteNotebookListCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push({
+      options: ['userId', 'userName', 'groupId', 'groupName', 'webUrl'],
+      runsWhen: (args) => {
+        const options = [args.options.userId, args.options.userName, args.options.groupId, args.options.groupName, args.options.webUrl];
+        return options.some(item => item !== undefined);
+      }
+    });
   }
 
   private async getEndpointUrl(args: CommandArgs): Promise<string> {

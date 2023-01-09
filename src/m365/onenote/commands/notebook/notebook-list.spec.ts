@@ -70,20 +70,6 @@ describe(commands.NOTEBOOK_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['createdDateTime', 'displayName', 'id']);
   });
 
-  it('fails validation if multiple options are passed', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        userId: '2609af39-7775-4f94-a3dc-0dd67657e900',
-        userName: 'Documents',
-        webUrl: 'https://contoso.sharepoint.com',
-        groupId: '2609af39-7775-4f94-a3dc-0dd67657e900',
-        groupName: 'My group'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if webUrl is not a valid webUrl', async () => {
     const actual = await command.validate({
       options:
