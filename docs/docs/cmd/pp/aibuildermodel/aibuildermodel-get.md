@@ -97,3 +97,46 @@ m365 pp aibuildermodel get --environment "Default-d87a7535-dd31-4437-bfe1-95340a
     msdyn_name,msdyn_aimodelid,createdon,modifiedon
     "Document Processing 11/29/2022, 12:58:43 PM",08ffffbe-ec1c-4e64-b64b-dd1db926c613,2022-11-29T11:58:45Z,2022-11-29T11:58:45Z
     ```
+
+=== "Markdown"
+
+    ```md
+    # pp aibuildermodel get --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" --id "08ffffbe-ec1c-4e64-b64b-dd1db926c613"
+
+    Date: 6/2/2023
+
+    Property | Value
+    ---------|-------
+    overwritetime | 1900-01-01T00:00:00Z
+    msdyn\_aimodelid | 08ffffbe-ec1c-4e64-b64b-dd1db926c613
+    \_owningbusinessunit\_value | 6da087c1-1c4d-ed11-bba1-000d3a2caf7f
+    solutionid | fd140aae-4df4-11dd-bd17-0019b9312238
+    msdyn\_aimodelidunique | b0802b54-1dbe-4bb0-812a-8579549e9144
+    introducedversion | 1.0
+    \_owninguser\_value | 2311d2bd-1b41-e911-a9aa-000d3a2d57c3
+    msdyn\_name | Document Processing 11/29/2022, 12:58:43 PM
+    statecode | 0
+    statuscode | 0
+    ismanaged | false
+    \_ownerid\_value | 2311d2bd-1b41-e911-a9aa-000d3a2d57c3
+    componentstate | 0
+    modifiedon | 2019-09-20T13:34:04Z
+    \_msdyn\_templateid\_value | 10707e4e-1d56-e911-8194-000d3a6cd5a5
+    \_modifiedby\_value | 2311d2bd-1b41-e911-a9aa-000d3a2d57c3
+    versionnumber | 8076095
+    createdon | 2019-09-20T13:34:04Z
+    \_createdby\_value | 2311d2bd-1b41-e911-a9aa-000d3a2d57c3
+    \_msdyn\_activerunconfigurationid\_value | null
+    overriddencreatedon | null
+    \_msdyn\_retrainworkflowid\_value | null
+    msdyn\_modelcreationcontext | null
+    importsequencenumber | null
+    msdyn\_sharewithorganizationoncreate | null
+    \_msdyn\_scheduleinferenceworkflowid\_value | null
+    \_modifiedonbehalfby\_value | null
+    utcconversiontimezonecode | null
+    \_createdonbehalfby\_value | null
+    \_owningteam\_value | null
+    timezoneruleversionnumber | null
+    iscustomizable | {"Value":true,"CanBeChanged":true,"ManagedPropertyLogicalName":"iscustomizableanddeletable"}
+    ```
