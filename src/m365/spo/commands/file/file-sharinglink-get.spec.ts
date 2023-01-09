@@ -92,7 +92,7 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FILE_SHARINGLINK_GET), true);
+    assert.strictEqual(command.name, commands.FILE_SHARINGLINK_GET);
   });
 
   it('has a description', () => {
@@ -129,7 +129,6 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: true,
         verbose: true,
         webUrl: webUrl,
         fileId: fileId,
@@ -156,7 +155,6 @@ describe(commands.FILE_SHARINGLINK_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: true,
         verbose: true,
         webUrl: webUrl,
         fileUrl: fileUrl,
