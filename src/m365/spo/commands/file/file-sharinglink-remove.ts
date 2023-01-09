@@ -27,7 +27,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Removes a specific sharing link to a file';
+    return 'Removes a specific sharing link of a file';
   }
 
   constructor() {
@@ -94,7 +94,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
     const removeSharingLink: () => Promise<void> = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          logger.logToStderr(`Removing sharing link to file ${args.options.fileUrl || args.options.fileId} with id ${args.options.id}...`);
+          logger.logToStderr(`Removing sharing link of file ${args.options.fileUrl || args.options.fileId} with id ${args.options.id}...`);
         }
 
         const fileDetails = await this.getNeededFileInformation(args);
@@ -122,7 +122,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove role sharing link to file ${args.options.fileUrl || args.options.fileId} from site ${args.options.webUrl}?`
+        message: `Are you sure you want to remove sharing link ${args.options.id} of file ${args.options.fileUrl || args.options.fileId}?`
       });
 
       if (result.continue) {
@@ -147,7 +147,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
-        accept: 'application/json;odata=nometadata'
+        accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };

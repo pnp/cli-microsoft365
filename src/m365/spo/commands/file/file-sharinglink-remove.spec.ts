@@ -29,7 +29,6 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
 
   let log: any[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
@@ -54,7 +53,6 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
       return { continue: false };
@@ -80,7 +78,7 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FILE_SHARINGLINK_REMOVE), true);
+    assert.strictEqual(command.name, commands.FILE_SHARINGLINK_REMOVE);
   });
 
   it('has a description', () => {
@@ -121,7 +119,7 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
   });
 
   it('aborts removing the specified sharing link to a file when confirm option not passed and prompt not confirmed', async () => {
-    const postSpy = sinon.spy(request, 'delete');
+    const deleteSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
@@ -135,12 +133,10 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
       }
     });
 
-    assert(postSpy.notCalled);
+    assert(deleteSpy.notCalled);
   });
 
   it('removes specified sharing link to a file by fileId when prompt confirmed', async () => {
-    let sharingLinkRemoveCallIssued = false;
-
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/GetFileById('${fileId}')?$select=SiteId,VroomItemId,VroomDriveId`) {
         return fileInformationResponse;
@@ -149,10 +145,9 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/${fileInformationResponse.SiteId}/drives/${fileInformationResponse.VroomDriveID}/items/${fileInformationResponse.VroomItemID}/permissions/${id}`) {
-        sharingLinkRemoveCallIssued = true;
-        return { statusCode: 204 };
+        return;
       }
 
       throw 'Invalid request';
@@ -165,14 +160,13 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: true,
         verbose: true,
         webUrl: webUrl,
         fileId: fileId,
         id: id
       }
     });
-    assert(sharingLinkRemoveCallIssued);
+    assert(requestDeleteStub.called);
   });
 
   it('removes specified sharing link to a file by URL', async () => {
@@ -185,9 +179,9 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const requestDeleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/sites/${fileInformationResponse.SiteId}/drives/${fileInformationResponse.VroomDriveID}/items/${fileInformationResponse.VroomItemID}/permissions/${id}`) {
-        return { statusCode: 204 };
+        return;
       }
 
       throw 'Invalid request';
@@ -203,7 +197,7 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
         confirm: true
       }
     });
-    assert(loggerLogToStderrSpy.called);
+    assert(requestDeleteStub.called);
   });
 
   it('throws error when file not found by id', async () => {
