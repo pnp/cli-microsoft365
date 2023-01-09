@@ -26,7 +26,7 @@ m365 spo folder retentionlabel remove [options]
 
 ## Remarks
 
-Removing a retentionlabel is only supported on subfolders. Removing a retentionlabel from a rootfolder is currently not supported by by this command:
+Removing a retentionlabel is only supported on subfolders. Removing a retentionlabel from a rootfolder is currently not supported by by this command.
 
 ## Examples
 
