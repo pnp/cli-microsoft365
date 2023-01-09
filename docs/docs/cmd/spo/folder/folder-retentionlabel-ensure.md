@@ -24,6 +24,10 @@ m365 spo folder retentionlabel ensure [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+Adding a retentionlabel is only supported on subfolders. Adding a retentionlabel to a rootfolder is currently not supported by by this command.
+
 ## Examples
 
 Applies a retention label to a folder based on the label name and the folderUrl
