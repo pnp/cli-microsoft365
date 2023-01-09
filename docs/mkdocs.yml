@@ -427,6 +427,7 @@ nav:
         - file sharinglink get: cmd/spo/file/file-sharinglink-get.md
         - file sharinglink list: cmd/spo/file/file-sharinglink-list.md
         - file sharinglink remove: cmd/spo/file/file-sharinglink-remove.md
+        - file sharinglink set: cmd/spo/file/file-sharinglink-set.md
         - file version clear: cmd/spo/file/file-version-clear.md
         - file version get: cmd/spo/file/file-version-get.md
         - file version list: cmd/spo/file/file-version-list.md
