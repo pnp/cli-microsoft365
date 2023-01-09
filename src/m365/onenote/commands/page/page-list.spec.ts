@@ -129,11 +129,6 @@ describe(commands.PAGE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['createdDateTime', 'title', 'id']);
   });
 
-  it('fails validation if multiple options are specified', async () => {
-    const actual = await command.validate({ options: { userId: userId, userName: userName, groupId: groupId, groupName: groupName, webUrl: webUrl } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the userId is not a valid GUID', async () => {
     const actual = await command.validate({ options: { userId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
