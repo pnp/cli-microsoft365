@@ -5,7 +5,7 @@ import auth from '../Auth';
 import { Logger } from "../cli/Logger";
 import config from "../config";
 import { BasePermissions } from '../m365/spo/base-permissions';
-import request from "../request";
+import request, { CliRequestOptions } from "../request";
 import { formatting } from './formatting';
 
 export interface ContextInfo {
@@ -320,6 +320,31 @@ export const spo = {
         });
     });
   },
+
+  getSpoGraphSiteId(webUrl: string, logger: Logger, debug: boolean): Promise<string> {
+    return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
+      if (debug) {
+        logger.logToStderr(`Retrieving site id from MS Graph...`);
+      }
+      const url = new URL(webUrl);
+
+      const requestOptions: CliRequestOptions = {
+        url: `https://graph.microsoft.com/v1.0/sites/${url.hostname}:${url.pathname}?$select=id`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+
+      request.get<{ id: string }>(requestOptions)
+        .then((res: { id: string }): void => {
+          resolve(res.id);
+        }).catch((err: any): void => {
+          reject(err);
+        });
+    });
+  },
+
 
   /**
    * Ensures the folder path exists

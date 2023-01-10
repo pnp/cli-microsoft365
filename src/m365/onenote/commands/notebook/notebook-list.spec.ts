@@ -342,7 +342,7 @@ describe(commands.NOTEBOOK_LIST, () => {
         return Promise.reject('Invalid request');
       });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite', debug: true } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",

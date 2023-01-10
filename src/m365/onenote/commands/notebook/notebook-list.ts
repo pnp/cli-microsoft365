@@ -1,12 +1,12 @@
 import { Notebook } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -67,19 +67,19 @@ class OneNoteNotebookListCommand extends GraphCommand {
         }
 
         if (args.options.userId && args.options.userName) {
-	        return 'Specify either userId or userName, but not both';
-	      }
+          return 'Specify either userId or userName, but not both';
+        }
 
         if (args.options.groupId && args.options.groupName) {
-	        return 'Specify either groupId or groupName, but not both';
-	      }
+          return 'Specify either groupId or groupName, but not both';
+        }
 
         return true;
       }
     );
   }
 
-  private getEndpointUrl(args: CommandArgs): Promise<string> {
+  private getEndpointUrl(args: CommandArgs, logger: Logger): Promise<string> {
     return new Promise<string>((resolve: (endpoint: string) => void, reject: (error: string) => void): void => {
       let endpoint: string = `${this.resource}/v1.0/me/onenote/notebooks`;
 
@@ -108,7 +108,7 @@ class OneNoteNotebookListCommand extends GraphCommand {
       }
       else if (args.options.webUrl) {
         this
-          .getSpoSiteId(args)
+          .getSpoSiteId(args, logger)
           .then((siteId: string): void => {
             endpoint = `${this.resource}/v1.0/sites/${siteId}/onenote/notebooks`;
             return resolve(endpoint);
@@ -133,27 +133,16 @@ class OneNoteNotebookListCommand extends GraphCommand {
       .then(group => group.id!);
   }
 
-  private getSpoSiteId(args: CommandArgs): Promise<string> {
-    const url = new URL(args.options.webUrl!);
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/sites/${url.hostname}:${url.pathname}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ id: string }>(requestOptions)
-      .then((site: { id: string }) => site.id);
+  private getSpoSiteId(args: CommandArgs, logger: Logger): Promise<string> {
+    return spo.getSpoGraphSiteId(args.options.webUrl!, logger, this.debug);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const endpoint = await this.getEndpointUrl(args);
+      const endpoint = await this.getEndpointUrl(args, logger);
       const items = await odata.getAllItems<Notebook>(endpoint);
       logger.log(items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
