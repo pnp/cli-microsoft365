@@ -189,7 +189,6 @@ describe(commands.FILE_SHARINGLINK_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: true,
         verbose: true,
         webUrl: webUrl,
         fileUrl: fileUrl,

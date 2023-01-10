@@ -102,7 +102,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
         const requestOptions: CliRequestOptions = {
           url: `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions/${args.options.id}`,
           headers: {
-            accept: 'application/json;odata=nometadata'
+            accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
         };
@@ -147,7 +147,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
     const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
-        accept: 'application/json;odata.metadata=none'
+        accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
