@@ -38,7 +38,7 @@ List sharing links of a file by url
 m365 spo file sharinglink list --webUrl https://contoso.sharepoint.com/sites/demo --fileUrl "/sites/demo/shared documents/document.docx"
 ```
 
-List sharing links of a file by url with the scope parameter
+List anonymous sharing links of a file by url
 
 ```sh
 m365 spo file sharinglink list --webUrl https://contoso.sharepoint.com/sites/demo --fileUrl "/sites/demo/shared documents/document.docx" --scope anonymous
@@ -93,14 +93,14 @@ m365 spo file sharinglink list --webUrl https://contoso.sharepoint.com/sites/dem
 === "Text"
 
     ```text
-    id                                    roles  link                                                                                 scope
-    ------------------------------------  -----  -----------------------------------------------------------------------------------  ------------
-    2a021f54-90a2-4016-b3b3-5f34d2e7d932  read   https://contoso.sharepoint.com/:b:/s/demo/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A  anonymous
+    id                                    scope      roles  link                                                            
+    ------------------------------------  ---------  -----  -----------------------------------------------------------------------------------
+    2a021f54-90a2-4016-b3b3-5f34d2e7d932  anonymous  read  https://contoso.sharepoint.com/:b:/s/demo/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A
     ```
 
 === "CSV"
 
     ```csv
-    id,roles,link,scope
-    2a021f54-90a2-4016-b3b3-5f34d2e7d932,read,https://contoso.sharepoint.com/:b:/s/demo/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A,anonymous
+    id,scope,roles,link
+    2a021f54-90a2-4016-b3b3-5f34d2e7d932,anonymous,read,https://contoso.sharepoint.com/:b:/s/demo/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A
     ```
