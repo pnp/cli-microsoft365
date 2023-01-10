@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -48,21 +49,6 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
     );
   }
 
-  private getSpoSiteId(args: CommandArgs): Promise<string> {
-    const url = new URL(args.options.siteUrl);
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/sites/${url.hostname}:${url.pathname}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ id: string }>(requestOptions)
-      .then((site: { id: string }) => site.id);
-  }
-
   private getApplicationPermission(args: CommandArgs, siteId: string): Promise<SitePermission> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/sites/${siteId}/permissions/${args.options.id}`,
@@ -77,7 +63,7 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const siteId: string = await this.getSpoSiteId(args);
+      const siteId: string = await spo.getSpoGraphSiteId(args.options.siteUrl);
       const permissionObject: SitePermission = await this.getApplicationPermission(args, siteId);
       const transposed: { appDisplayName: string; appId: string; permissionId: string, roles: string }[] = [];
 
@@ -93,7 +79,7 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
 
       logger.log(transposed);
 
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

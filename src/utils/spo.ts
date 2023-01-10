@@ -5,7 +5,7 @@ import auth from '../Auth';
 import { Logger } from "../cli/Logger";
 import config from "../config";
 import { BasePermissions } from '../m365/spo/base-permissions';
-import request from "../request";
+import request, { CliRequestOptions } from "../request";
 import { formatting } from './formatting';
 
 export interface ContextInfo {
@@ -319,6 +319,25 @@ export const spo = {
           }
         });
     });
+  },
+
+  /**
+   * Returns the Graph id of a site 
+   * @param webUrl web url e.g. https://contoso.sharepoint.com/sites/site1
+   */
+  async getSpoGraphSiteId(webUrl: string): Promise<string> {
+    const url = new URL(webUrl);
+
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/sites/${url.hostname}:${url.pathname}?$select=id`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const result = await request.get<{ id: string }>(requestOptions);
+    return result.id;
   },
 
   /**
