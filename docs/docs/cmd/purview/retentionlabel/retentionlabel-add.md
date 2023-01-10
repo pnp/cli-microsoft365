@@ -47,10 +47,10 @@ Create a retention label that retains documents and deletes them after one year.
 m365 purview retentionlabel add --displayName 'some label' --behaviorDuringRetentionPeriod retain --actionAfterRetentionPeriod delete --retentionDuration 365
 ```
 
-Create a retention label that retains documents as records and starts a disposition review one year after the last modification date.
+Create a retention label that retains documents as records and does not take any action one year after the last modification date.
 
 ```sh
-m365 purview retentionlabel add --displayName 'some label' --behaviorDuringRetentionPeriod retainAsRecord --actionAfterRetentionPeriod startDispositionReview --retentionDuration 365 --retentionTrigger dateModified
+m365 purview retentionlabel add --displayName 'some label' --behaviorDuringRetentionPeriod retainAsRecord --actionAfterRetentionPeriod none --retentionDuration 365 --retentionTrigger dateModified
 ```
 
 ## Remarks
