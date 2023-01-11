@@ -75,30 +75,34 @@ class SpoWebApplicationCustomizerAddCommand extends SpoCommand {
           return `${args.options.clientSideComponentId} is not a valid GUID`;
         }
 
+        if (args.options.clientSideComponentProperties) {
+          try {
+            JSON.parse(args.options.clientSideComponentProperties);
+          }
+          catch (e) {
+            return `An error has occurred while parsing clientSideComponentProperties: ${e}`;
+          }
+        }
+
         return true;
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    try {
-      if (this.verbose) {
-        logger.logToStderr(`Adding application customizer with title '${args.options.title}' and clientSideComponentId '${args.options.clientSideComponentId}' to the site`);
-      }
+    if (this.verbose) {
+      logger.logToStderr(`Adding application customizer with title '${args.options.title}' and clientSideComponentId '${args.options.clientSideComponentId}' to the site`);
+    }
 
-      const options: spoCustomActionAddCommandOptions = {
-        webUrl: args.options.webUrl,
-        name: args.options.title,
-        title: args.options.title,
-        clientSideComponentId: args.options.clientSideComponentId,
-        clientSideComponentProperties: args.options.clientSideComponentProperties || '',
-        location: 'ClientSideExtension.ApplicationCustomizer'
-      };
-      await Cli.executeCommand(spoCustomActionAddCommand as Command, { options: { ...options, _: [] } });
-    }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
-    }
+    const options: spoCustomActionAddCommandOptions = {
+      webUrl: args.options.webUrl,
+      name: args.options.title,
+      title: args.options.title,
+      clientSideComponentId: args.options.clientSideComponentId,
+      clientSideComponentProperties: args.options.clientSideComponentProperties || '',
+      location: 'ClientSideExtension.ApplicationCustomizer'
+    };
+    await Cli.executeCommand(spoCustomActionAddCommand as Command, { options: { ...options, _: [] } });
   }
 }
 

@@ -17,7 +17,12 @@ describe(commands.WEB_APPLICATIONCUSTOMIZER_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com';
   const title = 'PageFooter';
   const clientSideComponentId = '76d5f8c8-6228-4df8-a2da-b94cbc8115bc';
-  const clientSideComponentProperties = '';
+  const clientSideComponentProperties = '{"testMessage":"Test message"}';
+  const customActionError = {
+    "url": "https://mathijsdev2.sharepoint.com/_api/Web/UserCustomActions",
+    "status": 400,
+    "statusText": "Bad Request"
+  };
 
 
   let log: any[];
@@ -28,6 +33,7 @@ describe(commands.WEB_APPLICATIONCUSTOMIZER_ADD, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -71,42 +77,44 @@ describe(commands.WEB_APPLICATIONCUSTOMIZER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds application customizer to a specific site without specifying clientSideComponentId', async () => {
-    sinon.stub(Cli, 'executeCommand').callsFake(async (command) => {
-      if (command === SpoCustomActionAddCommand) {
+  it('adds application customizer to a specific site without specifying clientSideComponentProperties', async () => {
+    sinon.stub(Cli, 'executeCommand').callsFake(async (command, args) => {
+      if (command === SpoCustomActionAddCommand && args.options["clientSideComponentProperties"] === '') {
         return;
       }
 
-      throw 'Invalid request';
+      throw 'Unknown error occured while executing the command';
     });
 
     await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId } } as any);
     assert(loggerLogToStderrSpy.notCalled);
   });
 
-  it('adds application customizer to a specific site while specifying clientSideComponentId', async () => {
+  it('adds application customizer to a specific site while specifying clientSideComponentProperties', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake(async (command, args) => {
-      if (command === SpoCustomActionAddCommand && args.options["clientSideComponentProperties"] === '') {
+      if (command === SpoCustomActionAddCommand && args.options["clientSideComponentProperties"] === clientSideComponentProperties) {
         return;
       }
 
-      throw 'Invalid request';
+      throw 'Unknown error occured while executing the command';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: clientSideComponentProperties, verbose: true } } as any);
     assert(loggerLogToStderrSpy.called);
   });
 
   it('throws an error when error occurs on adding the application customizer', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake(async (command) => {
       if (command === SpoCustomActionAddCommand) {
-        throw 'Error occured.';
+        throw new CommandError(customActionError as any);
       }
 
-      throw 'Invalid request';
+      throw 'Unknown error occured while executing the command';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, verbose: true } } as any), new CommandError('Error occured.'));
+    await assert.rejects(
+      command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, verbose: true } } as any),
+      new CommandError('Error: Request failed with status code 400'));
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
@@ -116,6 +124,11 @@ describe(commands.WEB_APPLICATIONCUSTOMIZER_ADD, () => {
 
   it('fails validation if the clientSideComponentId option is not a valid GUID', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the clientSideComponentProperties option is not a valid json string', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: 'invalid json string' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

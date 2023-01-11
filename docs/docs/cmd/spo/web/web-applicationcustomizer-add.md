@@ -14,22 +14,22 @@ m365 spo web applicationcustomizer add [options]
 : The title of the Application Customizer.
 
 `-u, --webUrl <webUrl>`
-: URL of the site for which to retrieve the information.
+: URL of the site.
 
 `-i, --clientSideComponentId <clientSideComponentId>`
-: The Client Side Component Id (GUID) of the application customizer.
+: Client-side component ID of the application customizer (GUID).
 
-`--clientSideComponentProperties <clientSideComponentProperties>`
-: The Client Side Component properties of the application customizer.
+`--clientSideComponentProperties [clientSideComponentProperties]`
+: JSON string with application customizer properties
 
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treat quotes differently. For example, this is how ApplicationCustomizer user custom action can be created from the Windows cmd.exe:
+Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treat quotes differently. For example, this is how an application customizer can be created from the Windows cmd.exe:
 
 ```sh
-m365 spo web applicationcustomizer add --webUrl https://contoso.sharepoint.com/sites/test --title "YourAppCustomizer" --location "ClientSideExtension.ApplicationCustomizer" --clientSideComponentId b41916e7-e69d-467f-b37f-ff8ecf8f99f2 --clientSideComponentProperties '{\"testMessage\":\"Test message\"}'
+m365 spo web applicationcustomizer add --webUrl https://contoso.sharepoint.com/sites/test --title "YourAppCustomizer" --clientSideComponentId b41916e7-e69d-467f-b37f-ff8ecf8f99f2 --clientSideComponentProperties '{\"testMessage\":\"Test message\"}'
 ```
 
 Note, how the clientSideComponentProperties option has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash `'{"testMessage":"Test message"}'`.
@@ -42,13 +42,13 @@ Note, how the clientSideComponentProperties option has escaped double quotes `'{
 Adds an application customizer to the sales site.
 
 ```sh
-m365 spo web applicationcustomizer add --title 'Some customizer' --clientSideComponentId  799883f5-7962-4384-a10a-105adaec6ffc --webUrl https://contoso.sharepoint.com/sites/sales
+m365 spo web applicationcustomizer add --title 'Some customizer' --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
 Adds an application customizer to the sales site with some properties.
 
 ```sh
-m365 spo web applicationcustomizer add --title 'Some customizer' --clientSideComponentId  799883f5-7962-4384-a10a-105adaec6ffc --clientSideComponentProperties '{ "someProperty": "Some value" }' --webUrl https://contoso.sharepoint.com/sites/sales
+m365 spo web applicationcustomizer add --title 'Some customizer' --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --clientSideComponentProperties '{ "someProperty": "Some value" }' --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
 ## Response
