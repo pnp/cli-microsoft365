@@ -14,7 +14,7 @@ m365 spo file retentionlabel remove [options]
 : URL of the site where the retentionlabel from a file to remove is located
 
 `--fileUrl [fileUrl]`
-: The server-relative URL of the file of which the label should be removed. Specify either `fileUrl` or `fileId` but not both.
+: The site- or server relative URL of the file of which the label should be removed. Specify either `fileUrl` or `fileId` but not both.
 
 `-i, --fileId [fileId]`
 : The UniqueId (GUID) of the file of which the label should be removed. Specify either `fileUrl` or `fileId` but not both.

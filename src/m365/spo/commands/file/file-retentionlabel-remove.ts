@@ -11,6 +11,7 @@ import { FileProperties } from './FileProperties';
 import { Options as SpoListItemRetentionLabelRemoveCommandOptions } from '../listitem/listitem-retentionlabel-remove';
 import * as SpoListItemRetentionLabelRemoveCommand from '../listitem/listitem-retentionlabel-remove';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 
 interface CommandArgs {
   options: Options;
@@ -116,7 +117,7 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
       const fileProperties = await this.getFileProperties(args);
       const options: SpoListItemRetentionLabelRemoveCommandOptions = {
         webUrl: args.options.webUrl,
-        listUrl: fileProperties.listServerRelativeUrl,
+        listId: fileProperties.listId,
         listItemId: fileProperties.id,
         confirm: true,
         output: 'json',
@@ -124,14 +125,17 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
         verbose: this.verbose
       };
 
-      await Cli.executeCommandWithOutput(SpoListItemRetentionLabelRemoveCommand as Command, { options: { ...options, _: [] } });
+      const spoListItemRetentionLabelRemoveCommandOutput = await Cli.executeCommandWithOutput(SpoListItemRetentionLabelRemoveCommand as Command, { options: { ...options, _: [] } });
+      if (this.verbose) {
+        logger.logToStderr(spoListItemRetentionLabelRemoveCommandOutput.stderr);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getFileProperties(args: CommandArgs): Promise<{ id: string, listServerRelativeUrl: string }> {
+  private async getFileProperties(args: CommandArgs): Promise<{ id: string, listId: string }> {
     const requestOptions: AxiosRequestConfig = {
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -139,19 +143,20 @@ class SpoFileRetentionLabelRemoveCommand extends SpoCommand {
       responseType: 'json'
     };
 
+    let requestUrl = `${args.options.webUrl}/_api/web/`;
+
     if (args.options.fileId) {
-      requestOptions.url = `${args.options.webUrl}/_api/web/GetFileById('${args.options.fileId}')?$expand=ListItemAllFields`;
+      requestUrl += `GetFileById('${args.options.fileId}')`;
     }
     else {
-      requestOptions.url = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl!)}')?$expand=ListItemAllFields`;
+      const serverRelativeUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl!);
+      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
 
-    const response = await request.get<FileProperties>(requestOptions);
-    return { id: response.ListItemAllFields.Id, listServerRelativeUrl: this.getListServerRelativeUrl(response.ServerRelativeUrl) };
-  }
+    requestOptions.url = `${requestUrl}?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ListItemAllFields/ParentList/Id,ListItemAllFields/Id`;
 
-  private getListServerRelativeUrl(fileUrl: string): string {
-    return fileUrl.replace(/\/[^\/]+$/, '');
+    const response = await request.get<FileProperties>(requestOptions);
+    return { id: response.ListItemAllFields.Id, listId: response.ListItemAllFields.ParentList.id };
   }
 }
 
