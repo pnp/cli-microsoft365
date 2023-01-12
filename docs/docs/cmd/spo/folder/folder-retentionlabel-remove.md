@@ -14,7 +14,7 @@ m365 spo folder retentionlabel remove [options]
 : The url of the web.
 
 `--folderUrl [folderUrl]`
-: The server-relative URL of the folder of which the label should be removed. Specify either `folderUrl` or `folderId` but not both.
+: The site- or server relative URL of the folder of which the label should be removed. Specify either `folderUrl` or `folderId` but not both.
 
 `-i, --folderId [folderId]`
 : The UniqueId (GUID) of the folder of which the label should be removed. Specify either `folderUrl` or `folderId` but not both.
@@ -26,7 +26,7 @@ m365 spo folder retentionlabel remove [options]
 
 ## Remarks
 
-Removing a retentionlabel is only supported on subfolders. Removing a retentionlabel from a rootfolder is currently not supported by by this command.
+Removing a retentionlabel with this command is only supported on the folders inside a document library. Removing a retentionlabel on the document library itself is currently not supported by by this command.
 
 ## Examples
 
