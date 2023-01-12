@@ -11,6 +11,7 @@ import { FolderProperties } from './FolderProperties';
 import { Options as SpoListItemRetentionLabelRemoveCommandOptions } from '../listitem/listitem-retentionlabel-remove';
 import * as SpoListItemRetentionLabelRemoveCommand from '../listitem/listitem-retentionlabel-remove';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 
 interface CommandArgs {
   options: Options;
@@ -116,7 +117,7 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
       const folderProperties = await this.getFolderProperties(args);
       const options: SpoListItemRetentionLabelRemoveCommandOptions = {
         webUrl: args.options.webUrl,
-        listUrl: folderProperties.listServerRelativeUrl,
+        listId: folderProperties.listId,
         listItemId: folderProperties.id,
         confirm: true,
         output: 'json',
@@ -124,14 +125,17 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
         verbose: this.verbose
       };
 
-      await Cli.executeCommandWithOutput(SpoListItemRetentionLabelRemoveCommand as Command, { options: { ...options, _: [] } });
+      const spoListItemRetentionLabelRemoveCommandOutput = await Cli.executeCommandWithOutput(SpoListItemRetentionLabelRemoveCommand as Command, { options: { ...options, _: [] } });
+      if (this.verbose) {
+        logger.logToStderr(spoListItemRetentionLabelRemoveCommandOutput.stderr);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getFolderProperties(args: CommandArgs): Promise<{ id: string, listServerRelativeUrl: string }> {
+  private async getFolderProperties(args: CommandArgs): Promise<{ id: string, listId: string }> {
     const requestOptions: AxiosRequestConfig = {
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -139,19 +143,20 @@ class SpoFolderRetentionLabelRemoveCommand extends SpoCommand {
       responseType: 'json'
     };
 
+    let requestUrl = `${args.options.webUrl}/_api/web/`;
+
     if (args.options.folderId) {
-      requestOptions.url = `${args.options.webUrl}/_api/web/GetFolderById('${args.options.folderId}')?$expand=ListItemAllFields`;
+      requestUrl += `GetFolderById('${args.options.folderId}')`;
     }
     else {
-      requestOptions.url = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.folderUrl!)}')?$expand=ListItemAllFields`;
+      const serverRelativeUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl!);
+      requestUrl += `GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
 
+    requestOptions.url = `${requestUrl}?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ListItemAllFields/ParentList/Id,ListItemAllFields/Id`;
     const response = await request.get<FolderProperties>(requestOptions);
-    return { id: response.ListItemAllFields.Id, listServerRelativeUrl: this.getListServerRelativeUrl(response.ServerRelativeUrl) };
-  }
 
-  private getListServerRelativeUrl(folderUrl: string): string {
-    return folderUrl.replace(/\/[^\/]+$/, '');
+    return { id: response.ListItemAllFields.Id, listId: response.ListItemAllFields.ParentList.Id };
   }
 }
 
