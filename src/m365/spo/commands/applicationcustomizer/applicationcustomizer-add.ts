@@ -19,9 +19,9 @@ interface Options extends GlobalOptions {
   clientSideComponentProperties?: string;
 }
 
-class SpoWebApplicationCustomizerAddCommand extends SpoCommand {
+class SpoApplicationCustomizerAddCommand extends SpoCommand {
   public get name(): string {
-    return commands.WEB_APPLICATIONCUSTOMIZER_ADD;
+    return commands.APPLICATIONCUSTOMIZER_ADD;
   }
 
   public get description(): string {
@@ -106,4 +106,4 @@ class SpoWebApplicationCustomizerAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoWebApplicationCustomizerAddCommand();
+module.exports = new SpoApplicationCustomizerAddCommand();

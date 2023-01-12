@@ -332,6 +332,8 @@ nav:
         - app upgrade: cmd/spo/app/app-upgrade.md
         - app instance list: cmd/spo/app/app-instance-list.md
         - app teamspackage download: cmd/spo/app/app-teamspackage-download.md
+      - applicationcustomizer:
+        - applicationcustomizer add: cmd/spo/applicationcustomizer/applicationcustomizer-add.md
       - apppage:
         - apppage add: cmd/spo/apppage/apppage-add.md
         - apppage set: cmd/spo/apppage/apppage-set.md
@@ -633,7 +635,6 @@ nav:
         - web reindex: cmd/spo/web/web-reindex.md
         - web remove: cmd/spo/web/web-remove.md
         - web set: cmd/spo/web/web-set.md
-        - web applicationcustomizer add: cmd/spo/web/web-applicationcustomizer-add.md
         - web clientsidewebpart list: cmd/spo/web/web-clientsidewebpart-list.md
         - web installedlanguage list: cmd/spo/web/web-installedlanguage-list.md
         - web roleassignment add: cmd/spo/web/web-roleassignment-add.md

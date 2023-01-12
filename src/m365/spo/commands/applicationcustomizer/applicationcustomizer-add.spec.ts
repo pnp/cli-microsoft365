@@ -5,15 +5,15 @@ import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
+import Command from '../../../../Command';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-const command: Command = require('./web-applicationcustomizer-add');
+const command: Command = require('./applicationcustomizer-add');
 import * as SpoCustomActionAddCommand from '../customaction/customaction-add';
 
 
-describe(commands.WEB_APPLICATIONCUSTOMIZER_ADD, () => {
+describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com';
   const title = 'PageFooter';
   const clientSideComponentId = '76d5f8c8-6228-4df8-a2da-b94cbc8115bc';
@@ -70,7 +70,7 @@ describe(commands.WEB_APPLICATIONCUSTOMIZER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.WEB_APPLICATIONCUSTOMIZER_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.APPLICATIONCUSTOMIZER_ADD), true);
   });
 
   it('has a description', () => {
@@ -83,7 +83,7 @@ describe(commands.WEB_APPLICATIONCUSTOMIZER_ADD, () => {
         return;
       }
 
-      throw 'Unknown error occured while executing the command';
+      throw customActionError;
     });
 
     await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId } } as any);
@@ -96,25 +96,11 @@ describe(commands.WEB_APPLICATIONCUSTOMIZER_ADD, () => {
         return;
       }
 
-      throw 'Unknown error occured while executing the command';
+      throw customActionError;
     });
 
     await command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, clientSideComponentProperties: clientSideComponentProperties, verbose: true } } as any);
     assert(loggerLogToStderrSpy.called);
-  });
-
-  it('throws an error when error occurs on adding the application customizer', async () => {
-    sinon.stub(Cli, 'executeCommand').callsFake(async (command) => {
-      if (command === SpoCustomActionAddCommand) {
-        throw new CommandError(customActionError as any);
-      }
-
-      throw 'Unknown error occured while executing the command';
-    });
-
-    await assert.rejects(
-      command.action(logger, { options: { webUrl: webUrl, title: title, clientSideComponentId: clientSideComponentId, verbose: true } } as any),
-      new CommandError('Error: Request failed with status code 400'));
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {

@@ -1,17 +1,17 @@
-# spo web applicationcustomizer add
+# spo applicationcustomizer add
 
 Add an application customizer to a site.
 
 ## Usage
 
 ```sh
-m365 spo web applicationcustomizer add [options]
+m365 spo applicationcustomizer add [options]
 ```
 
 ## Options
 
 `-t, --title <title>`
-: The title of the Application Customizer.
+: The title of the application customizer.
 
 `-u, --webUrl <webUrl>`
 : URL of the site.
@@ -29,7 +29,7 @@ m365 spo web applicationcustomizer add [options]
 Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treat quotes differently. For example, this is how an application customizer can be created from the Windows cmd.exe:
 
 ```sh
-m365 spo web applicationcustomizer add --webUrl https://contoso.sharepoint.com/sites/test --title "YourAppCustomizer" --clientSideComponentId b41916e7-e69d-467f-b37f-ff8ecf8f99f2 --clientSideComponentProperties '{\"testMessage\":\"Test message\"}'
+m365 spo applicationcustomizer add --webUrl https://contoso.sharepoint.com/sites/test --title "YourAppCustomizer" --clientSideComponentId b41916e7-e69d-467f-b37f-ff8ecf8f99f2 --clientSideComponentProperties '{\"testMessage\":\"Test message\"}'
 ```
 
 Note, how the clientSideComponentProperties option has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash `'{"testMessage":"Test message"}'`.
@@ -42,13 +42,13 @@ Note, how the clientSideComponentProperties option has escaped double quotes `'{
 Adds an application customizer to the sales site.
 
 ```sh
-m365 spo web applicationcustomizer add --title 'Some customizer' --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --webUrl https://contoso.sharepoint.com/sites/sales
+m365 spo applicationcustomizer add --title 'Some customizer' --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
 Adds an application customizer to the sales site with some properties.
 
 ```sh
-m365 spo web applicationcustomizer add --title 'Some customizer' --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --clientSideComponentProperties '{ "someProperty": "Some value" }' --webUrl https://contoso.sharepoint.com/sites/sales
+m365 spo applicationcustomizer add --title 'Some customizer' --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --clientSideComponentProperties '{ "someProperty": "Some value" }' --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
 ## Response
