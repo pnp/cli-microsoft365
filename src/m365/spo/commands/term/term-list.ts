@@ -80,16 +80,12 @@ class SpoTermListCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.termGroupId) {
-          if (!validation.isValidGuid(args.options.termGroupId)) {
-            return `${args.options.termGroupId} is not a valid GUID`;
-          }
+        if (args.options.termGroupId && !validation.isValidGuid(args.options.termGroupId)) {
+          return `${args.options.termGroupId} is not a valid GUID`;
         }
 
-        if (args.options.termSetId) {
-          if (!validation.isValidGuid(args.options.termSetId)) {
-            return `${args.options.termSetId} is not a valid GUID`;
-          }
+        if (args.options.termSetId && !validation.isValidGuid(args.options.termSetId)) {
+          return `${args.options.termSetId} is not a valid GUID`;
         }
 
         return true;
@@ -124,7 +120,7 @@ class SpoTermListCommand extends SpoCommand {
           this.setTermDetails(term);
           terms.push(term);
           if (args.options.includeChildTerms && term.TermsCount > 0) {
-            await this.getChildTerms(spoAdminUrl, res, term, terms);
+            await this.getChildTerms(spoAdminUrl, res, term);
           }
         }
       }
@@ -132,33 +128,32 @@ class SpoTermListCommand extends SpoCommand {
       if (!args.options.output || args.options.output === 'json') {
         logger.log(terms);
       }
+      else if (!args.options.includeChildTerms) {
+        // Converted to text friendly output
+        logger.log(terms.map(i => {
+          return {
+            Id: i.Id,
+            Name: i.Name
+          };
+        }));
+      }
       else {
         // Converted to text friendly output
-        if (!args.options.includeChildTerms) {
-          logger.log(terms.map(i => {
-            return {
-              Id: i.Id,
-              Name: i.Name
-            };
-          }));
-        }
-        else {
-          const friendlyOutput: any[] = [];
-          terms.forEach(term => {
-            term.ParentTermId = '';
-            friendlyOutput.push(term);
-            if (term.Children && term.Children.length > 0) {
-              this.getFriendlyChildTerms(term, friendlyOutput);
-            }
-          });
-          logger.log(friendlyOutput.map(i => {
-            return {
-              Id: i.Id,
-              Name: i.Name,
-              ParentTermId: i.ParentTermId
-            };
-          }));
-        }
+        const friendlyOutput: any[] = [];
+        terms.forEach(term => {
+          term.ParentTermId = '';
+          friendlyOutput.push(term);
+          if (term.Children && term.Children.length > 0) {
+            this.getFriendlyChildTerms(term, friendlyOutput);
+          }
+        });
+        logger.log(friendlyOutput.map(i => {
+          return {
+            Id: i.Id,
+            Name: i.Name,
+            ParentTermId: i.ParentTermId
+          };
+        }));
       }
     }
     catch (err: any) {
@@ -166,7 +161,7 @@ class SpoTermListCommand extends SpoCommand {
     }
   }
 
-  private getFriendlyChildTerms(term: Term, friendlyOutput: any[] = []): any {
+  private getFriendlyChildTerms(term: Term, friendlyOutput: any[]): void {
     term.Children.forEach(childTerm => {
       childTerm.ParentTermId = term.Id;
       friendlyOutput.push(childTerm);
@@ -176,7 +171,7 @@ class SpoTermListCommand extends SpoCommand {
     });
   }
 
-  private async getChildTerms(spoAdminUrl: string, res: ContextInfo, parentTerm: Term, terms: Term[] = []): Promise<void> {
+  private async getChildTerms(spoAdminUrl: string, res: ContextInfo, parentTerm: Term): Promise<void> {
     parentTerm.Children = [];
     const data = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="20" ObjectPathId="19" /><Query Id="21" ObjectPathId="19"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="CustomSortOrder" ScalarProperty="true" /><Property Name="CustomProperties" ScalarProperty="true" /><Property Name="LocalCustomProperties" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><Property Id="19" ParentId="16" Name="Terms" /><Identity Id="16" Name="${parentTerm._ObjectIdentity_}" /></ObjectPaths></Request>`;
     const result = await this.executeCsomCall(data, spoAdminUrl, res);
@@ -185,16 +180,21 @@ class SpoTermListCommand extends SpoCommand {
         this.setTermDetails(term);
         parentTerm.Children.push(term);
         if (term.TermsCount > 0) {
-          await this.getChildTerms(spoAdminUrl, res, term, terms);
+          await this.getChildTerms(spoAdminUrl, res, term);
         }
       }
     }
   }
 
+
   private setTermDetails(term: Term): void {
-    term.CreatedDate = new Date(Number(term.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
+    term.CreatedDate = this.parseTermDateToIsoString(term.CreatedDate);
     term.Id = term.Id.replace('/Guid(', '').replace(')/', '');
-    term.LastModifiedDate = new Date(Number(term.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
+    term.LastModifiedDate = this.parseTermDateToIsoString(term.LastModifiedDate);
+  }
+
+  private parseTermDateToIsoString(dateAsString: string): string {
+    return new Date(Number(dateAsString.replace('/Date(', '').replace(')/', ''))).toISOString();
   }
 
   private async executeCsomCall(data: string, spoAdminUrl: string, res: ContextInfo): Promise<TermCollection> {
