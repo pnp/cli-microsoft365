@@ -26,10 +26,10 @@ m365 spo group member add [options]
 : User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
 
 `--userId [userId]`
-: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Id's have to be comma separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Ids have to be comma separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
 
 `--aadGroupId [aadGroupId]`
-: The object Id of the Azure AD group to add as a member. If multiple groups needs to be added, the Id's have to be comma separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+: The object Id of the Azure AD group to add as a member. If multiple groups need to be added, the Ids have to be comma separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
 
 `--aadGroupName [aadGroupName]`
 : The name of the Azure AD group to add as a member. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
@@ -38,7 +38,7 @@ m365 spo group member add [options]
 
 ## Remarks
 
-For the `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list invalid values.
+For the `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list of invalid values.
 
 ## Examples
 

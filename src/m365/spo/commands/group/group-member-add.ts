@@ -215,15 +215,16 @@ class SpoGroupMemberAddCommand extends SpoCommand {
 
     return Promise
       .all(userIdentifiers.split(',').map(async userIdentifier => {
+        const user = userIdentifier.trim();
         try {
           if (args.options.userId) {
-            await this.spoUserGet(args.options, userIdentifier.trim(), logger, validUserNames);
+            await this.spoUserGet(args.options, user, logger, validUserNames);
           }
           else if (args.options.aadGroupId || args.options.aadGroupName) {
-            await this.aadGroupGet(args.options, userIdentifier.trim(), logger, validUserNames);
+            await this.aadGroupGet(args.options, user, logger, validUserNames);
           }
           else {
-            await this.aadUserGet(args.options, userIdentifier.trim(), logger, validUserNames);
+            await this.aadUserGet(args.options, user, logger, validUserNames);
           }
         }
         catch (err: any) {
@@ -282,8 +283,6 @@ class SpoGroupMemberAddCommand extends SpoCommand {
     if (this.debug) {
       logger.logToStderr(aadGroupGetOutput.stderr);
     }
-
-    logger.log(JSON.parse(aadGroupGetOutput.stdout));
 
     validUserNames.push(JSON.parse(aadGroupGetOutput.stdout).mail);
   }
