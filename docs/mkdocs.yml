@@ -265,6 +265,7 @@ nav:
     - Power Platform (pp):
       - aibuildermodel:
         - aibuildermodel list: cmd/pp/aibuildermodel/aibuildermodel-list.md
+        - aibuildermodel remove: cmd/pp/aibuildermodel/aibuildermodel-remove.md
       - card:
         - card clone: cmd/pp/card/card-clone.md
         - card get: cmd/pp/card/card-get.md
