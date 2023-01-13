@@ -163,6 +163,9 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       output: 'json'
     };
     const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
+    if (this.verbose) {
+      logger.logToStderr(output.stderr);
+    }
     const outputParsed = JSON.parse(output.stdout);
     if (outputParsed.length === 0) {
       throw `No component found with the solution id ${solutionId}. Make sure that the solution is available in the app catalog`;
