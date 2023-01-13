@@ -6,6 +6,8 @@ import commands from '../../commands';
 import { FileSharingLinkUtil } from './FileSharingLinkUtil';
 import { Options as SpoFileSharingLinkListOptions } from './file-sharinglink-list';
 import { Cli } from '../../../../cli/Cli';
+import * as spoFileSharingLinkListCommand from './file-sharinglink-list';
+import Command from '../../../../Command';
 import request, { CliRequestOptions } from '../../../../request';
 
 interface CommandArgs {
@@ -16,7 +18,8 @@ interface Options extends GlobalOptions {
   webUrl: string;
   fileUrl?: string;
   fileId?: string;
-  id: string;
+  scope?: string,
+  confirm?: boolean;
 }
 
 class SpoFileSharingLinkClearCommand extends SpoCommand {
@@ -81,7 +84,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
           return `${args.options.fileId} is not a valid GUID`;
         }
 
-        if (args.options.scope && FileSharingLinkUtil.allowedScopes.some(args.options.scope)) {
+        if (args.options.scope && FileSharingLinkUtil.allowedScopes.indexOf(args.options.scope) === -1) {
           return `'${args.options.scope}' is not a valid scope. Allowed values are: ${FileSharingLinkUtil.allowedScopes.join(',')}`;
         }
 
@@ -98,21 +101,31 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
     const clearSharingLinks: () => Promise<void> = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          logger.logToStderr(`Clearing sharing links for file ${args.options.fileUrl || args.options.fileId} ${args.options.scope && ` and scope ${args.options.scope}`}`);
+          logger.logToStderr(`Clearing sharing links for file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` and scope ${args.options.scope}` : ''}`);
         }
 
-        const sharingLinkListOptions: SpoFileSharingLinkListOptions = {
-          webUrl: args.options.webUrl,
-          fileId: args.options.fileId,
-          fileUrl: args.options.fileUrl,
-          scope: args.options.scope,
-          debug: this.debug,
-          verbose: this.verbose
-        };
-
-        const commandOutput = await Cli.executeCommandWithOutput(getCommand as Command, { options: { ...sharingLinkListOptions, _: [] } });
-
-        await request.delete(requestOptions);
+        const fileDetails = await FileSharingLinkUtil.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
+        const sharingLinks = await this.getFileSharingLinks(args.options.webUrl, logger, args.options.fileId, args.options.fileUrl, args.options.scope);
+        const batchRequests = sharingLinks.map((sharingLink, index) => {
+          return {
+            id: index,
+            method: 'DELETE',
+            url: `/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions/${sharingLink.id}`
+          };
+        });
+        for (let i = 0; i < batchRequests.length; i += 20) {
+          const batchRequestChunk = batchRequests.slice(i, i + 20);
+          const requestOptions: CliRequestOptions = {
+            url: 'https://graph.microsoft.com/v1.0/$batch',
+            headers: {
+              accept: 'application/json',
+              'content-type': 'application/json'
+            },
+            responseType: 'json',
+            data: JSON.stringify({ requests: batchRequestChunk })
+          };
+          await request.post(requestOptions);
+        }
       }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
@@ -127,13 +140,34 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove sharing link ${args.options.id} of file ${args.options.fileUrl || args.options.fileId}?`
+        message: `Are you sure you want to clear the sharing links of file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` and scope ${args.options.scope}` : ''}?`
       });
 
       if (result.continue) {
         await clearSharingLinks();
       }
     }
+  }
+
+  private async getFileSharingLinks(webUrl: string, logger: Logger, fileId?: string, fileUrl?: string, scope?: string): Promise<any[]> {
+    const sharingLinkListOptions: SpoFileSharingLinkListOptions = {
+      webUrl: webUrl,
+      fileId: fileId,
+      fileUrl: fileUrl,
+      scope: scope,
+      debug: this.debug,
+      verbose: this.verbose
+    };
+    const commandOutput = await Cli.executeCommandWithOutput(spoFileSharingLinkListCommand as Command, { options: { ...sharingLinkListOptions, _: [] } });
+    logger.log(commandOutput);
+    if (this.verbose) {
+      logger.logToStderr(commandOutput.stderr);
+    }
+    const outputParsed = JSON.parse(commandOutput.stdout);
+    if (outputParsed.length === 0) {
+      throw `There are no sharing links to be removed for the specific file.`;
+    }
+    return outputParsed;
   }
 }
 

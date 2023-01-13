@@ -30,5 +30,4 @@ export class FileSharingLinkUtil {
     const res = await request.get<GraphFileDetails>(requestOptions);
     return res;
   }
-
 }
