@@ -1,19 +1,17 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
+import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { GraphFileDetails } from './GraphFileDetails';
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   webUrl: string;
   fileId?: string;
   fileUrl?: string;
@@ -21,7 +19,7 @@ interface Options extends GlobalOptions {
 }
 
 class SpoFileSharingLinkListCommand extends SpoCommand {
-  private static readonly scope: string[] = ['anonymous', 'users', 'organization'];
+  private static readonly allowedScopes: string[] = ['anonymous', 'users', 'organization'];
 
   public get name(): string {
     return commands.FILE_SHARINGLINK_LIST;
@@ -67,7 +65,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
       },
       {
         option: '--scope [scope]',
-        autocomplete: SpoFileSharingLinkListCommand.scope
+        autocomplete: SpoFileSharingLinkListCommand.allowedScopes
       }
     );
   }
@@ -84,8 +82,8 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
           return `${args.options.fileId} is not a valid GUID`;
         }
 
-        if (args.options.scope && SpoFileSharingLinkListCommand.scope.indexOf(args.options.scope) === -1) {
-          return `'${args.options.scope}' is not a valid scope. Allowed values are: ${SpoFileSharingLinkListCommand.scope.join(',')}`;
+        if (args.options.scope && SpoFileSharingLinkListCommand.allowedScopes.indexOf(args.options.scope) === -1) {
+          return `'${args.options.scope}' is not a valid scope. Allowed values are: ${SpoFileSharingLinkListCommand.allowedScopes.join(',')}`;
         }
 
         return true;
@@ -103,8 +101,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
     }
 
     try {
-      const fileDetails = await this.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
-
+      const fileDetails = await spo.getVroomFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
       let url = `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions?$filter=Link ne null`;
       if (args.options.scope) {
         url += ` and Link/Scope eq '${args.options.scope}'`;
@@ -130,27 +127,6 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getFileDetails(webUrl: string, fileId?: string, fileUrl?: string): Promise<GraphFileDetails> {
-    let requestUrl: string = `${webUrl}/_api/web/`;
-
-    if (fileId) {
-      requestUrl += `GetFileById('${fileId}')`;
-    }
-    else if (fileUrl) {
-      requestUrl += `GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileUrl)}')`;
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: requestUrl += '?$select=SiteId,VroomItemId,VroomDriveId',
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-    const res = await request.get<GraphFileDetails>(requestOptions);
-    return res;
   }
 }
 
