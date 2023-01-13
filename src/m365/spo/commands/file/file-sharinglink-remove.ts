@@ -2,12 +2,10 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { GraphFileDetails } from './GraphFileDetails';
+import { FileSharingLinkUtil } from './FileSharingLinkUtil';
 
 interface CommandArgs {
   options: Options;
@@ -97,8 +95,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
           logger.logToStderr(`Removing sharing link of file ${args.options.fileUrl || args.options.fileId} with id ${args.options.id}...`);
         }
 
-        const fileDetails = await this.getNeededFileInformation(args);
-
+        const fileDetails = await FileSharingLinkUtil.getFileDetails(args.options.webUrl, args.options.fileId!, args.options.fileUrl!);
         const requestOptions: CliRequestOptions = {
           url: `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions/${args.options.id}`,
           headers: {
@@ -129,31 +126,6 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
         await removeSharingLink();
       }
     }
-  }
-
-  private async getNeededFileInformation(args: CommandArgs): Promise<GraphFileDetails> {
-    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
-
-    if (args.options.fileUrl) {
-      const fileServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl);
-      requestUrl += `GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileServerRelativeUrl)}')`;
-    }
-    else {
-      requestUrl += `GetFileById('${args.options.fileId}')`;
-    }
-
-    requestUrl += '?$select=SiteId,VroomItemId,VroomDriveId';
-
-    const requestOptions: CliRequestOptions = {
-      url: requestUrl,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    const res = await request.get<GraphFileDetails>(requestOptions);
-    return res;
   }
 }
 
