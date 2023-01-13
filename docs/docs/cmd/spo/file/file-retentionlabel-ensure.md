@@ -14,7 +14,7 @@ m365 spo file retentionlabel ensure [options]
 : URL of the site where the retentionlabel from a file to apply is located
 
 `--fileUrl [fileUrl]`
-: The server-relative URL of the file that should be labelled. Specify either `fileUrl` or `fileId` but not both.
+: The site- or server relative URL of the file that should be labelled. Specify either `fileUrl` or `fileId` but not both.
 
 `i, --fileId [fileId]`
 : The UniqueId (GUID) of the file that should be labelled. Specify either `fileUrl` or `fileId` but not both.
@@ -23,6 +23,10 @@ m365 spo file retentionlabel ensure [options]
 : Name of the retention label to apply to the file.
 
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+You can also use [spo listitem retentionlabel remove](./../../../cmd/spo//listitem/listitem-retentionlabel-remove.md) for removing the retentionlabel from a listitem.
 
 ## Examples
 

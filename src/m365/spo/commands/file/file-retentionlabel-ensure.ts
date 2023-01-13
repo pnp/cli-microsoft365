@@ -11,6 +11,7 @@ import { FileProperties } from './FileProperties';
 import { Options as SpoListItemRetentionLabelEnsureCommandOptions } from '../listitem/listitem-retentionlabel-ensure';
 import * as SpoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 
 interface CommandArgs {
   options: Options;
@@ -29,7 +30,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Clear the retention label from a file';
+    return 'Apply a retention label to a file';
   }
 
   constructor() {
@@ -91,13 +92,13 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing retention label from file ${args.options.fileId || args.options.fileUrl} in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Applying retention label to file ${args.options.fileId || args.options.fileUrl} in site at ${args.options.webUrl}...`);
     }
     try {
       const fileProperties = await this.getFileProperties(args);
       const options: SpoListItemRetentionLabelEnsureCommandOptions = {
         webUrl: args.options.webUrl,
-        listUrl: fileProperties.listServerRelativeUrl,
+        listId: fileProperties.listId,
         listItemId: fileProperties.id,
         name: args.options.name,
         output: 'json',
@@ -105,14 +106,17 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
         verbose: this.verbose
       };
 
-      await Cli.executeCommandWithOutput(SpoListItemRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
+      const spoListItemRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(SpoListItemRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
+      if (this.verbose) {
+        logger.logToStderr(spoListItemRetentionLabelEnsureCommandOutput.stderr);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getFileProperties(args: CommandArgs): Promise<{ id: string, listServerRelativeUrl: string }> {
+  private async getFileProperties(args: CommandArgs): Promise<{ id: string, listId: string }> {
     const requestOptions: AxiosRequestConfig = {
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -120,19 +124,19 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
       responseType: 'json'
     };
 
+    let requestUrl = `${args.options.webUrl}/_api/web/`;
     if (args.options.fileId) {
-      requestOptions.url = `${args.options.webUrl}/_api/web/GetFileById('${args.options.fileId}')?$expand=ListItemAllFields`;
+      requestUrl += `GetFileById('${args.options.fileId}')`;
     }
     else {
-      requestOptions.url = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.fileUrl!)}')?$expand=ListItemAllFields`;
+      const serverRelativeUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.fileUrl!);
+      requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
 
-    const response = await request.get<FileProperties>(requestOptions);
-    return { id: response.ListItemAllFields.Id, listServerRelativeUrl: this.getListServerRelativeUrl(response.ServerRelativeUrl) };
-  }
+    requestOptions.url = `${requestUrl}?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`;
 
-  private getListServerRelativeUrl(fileUrl: string): string {
-    return fileUrl.replace(/\/[^\/]+$/, '');
+    const response = await request.get<FileProperties>(requestOptions);
+    return { id: response.ListItemAllFields.Id, listId: response.ListItemAllFields.ParentList.Id };
   }
 }
 
