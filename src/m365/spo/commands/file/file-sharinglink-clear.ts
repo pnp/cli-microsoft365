@@ -28,7 +28,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Removes all sharing links of a file';
+    return 'Removes sharing links of a file';
   }
 
   constructor() {
@@ -158,11 +158,12 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
       debug: this.debug,
       verbose: this.verbose
     };
+
     const commandOutput = await Cli.executeCommandWithOutput(spoFileSharingLinkListCommand as Command, { options: { ...sharingLinkListOptions, _: [] } });
-    logger.log(commandOutput);
     if (this.verbose) {
       logger.logToStderr(commandOutput.stderr);
     }
+
     const outputParsed = JSON.parse(commandOutput.stdout);
     if (outputParsed.length === 0) {
       throw `There are no sharing links to be removed for the specific file.`;

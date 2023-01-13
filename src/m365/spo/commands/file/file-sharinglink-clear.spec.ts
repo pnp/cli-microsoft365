@@ -162,7 +162,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Error occured while executing the command.';
     });
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
         return;
       }
@@ -171,6 +171,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: webUrl, fileUrl: fileUrl, confirm: true } });
+    assert(postStub.called);
   });
 
   it('clears sharing links of type anonymous from a specific file retrieved by id', async () => {
@@ -194,7 +195,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Error occured while executing the command.';
     });
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
         return;
       }
@@ -203,6 +204,8 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: webUrl, fileId: fileId, scope: 'anonymous' } });
+    assert(postStub.called);
+
   });
 
   it('clears sharing links in multiple batches if more than 20 sharing links are found', async () => {
