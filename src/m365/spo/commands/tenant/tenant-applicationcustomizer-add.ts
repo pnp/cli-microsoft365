@@ -85,14 +85,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      if (this.verbose) {
-        logger.logToStderr(`Adding application customizer with clientSideComponentId ${args.options.clientSideComponentId} and title ${args.options.title} to the tenant app catalog.`);
-      }
-      const appCatalogUrl = await this.getAppCatalogUrl();
-      if (this.verbose) {
-        logger.logToStderr(`Got tenant app catalog url: ${appCatalogUrl}`);
-      }
-
+      const appCatalogUrl = await this.getAppCatalogUrl(logger);
       const solutionId = await this.getSolutionIdFromComponentManifestList(appCatalogUrl, args.options.clientSideComponentId, logger);
       const solution = await this.getSolutionFromAppCatalog(appCatalogUrl, solutionId, logger);
 
@@ -109,11 +102,17 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
     }
   }
 
-  private async getAppCatalogUrl(): Promise<string> {
+  private async getAppCatalogUrl(logger: Logger): Promise<string> {
     const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } });
+    if (this.verbose) {
+      logger.logToStderr(spoTenantAppCatalogUrlGetCommandOutput.stderr);
+    }
     const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
     if (!appCatalogUrl) {
       throw 'Cannot add tenant-wide application customizer as app catalog cannot be found';
+    }
+    if (this.verbose) {
+      logger.logToStderr(`Got tenant app catalog url: ${appCatalogUrl}`);
     }
     return appCatalogUrl;
   }
@@ -123,7 +122,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       logger.logToStderr('Retrieving component manifest item from the ComponentManifests list on the app catalog site so that we get the solution id');
     }
 
-    const camlQuery = `<View><ViewFields><FieldRef Name='ClientComponentId'></FieldRef><FieldRef Name='SolutionId'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='ClientComponentId' /><Value Type='Guid'>${clientSideComponentId}</Value></Eq></Where></Query></View>`;
+    const camlQuery = `<View><ViewFields><FieldRef Name='ClientComponentId'></FieldRef><FieldRef Name='SolutionId'></FieldRef><FieldRef Name='ClientComponentManifest'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='ClientComponentId' /><Value Type='Guid'>${clientSideComponentId}</Value></Eq></Where></Query></View>`;
     const commandOptions: spoListItemListCommandOptions = {
       webUrl: appCatalogUrl,
       listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/ComponentManifests`,
@@ -133,10 +132,19 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       output: 'json'
     };
     const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
+    if (this.verbose) {
+      logger.logToStderr(output.stderr);
+    }
     const outputParsed = JSON.parse(output.stdout);
-    if (!outputParsed.length) {
+    if (outputParsed.length === 0) {
       throw 'No component found with the specified clientSideComponentId found in the component manifest list. Make sure that the application is added to the application catalog';
     }
+    logger.log(outputParsed);
+    const clientComponentManifest = JSON.parse(outputParsed[0].ClientComponentManifest);
+    if (clientComponentManifest.extensionType !== "ApplicationCustomizer") {
+      throw `The extension type of this component is not of type 'ApplicationCustomizer' but of type '${clientComponentManifest.extensionType}'`;
+    }
+    // check if clientcomponentmanifest is application customizer
     return outputParsed[0].SolutionId;
   }
 
@@ -156,7 +164,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
     };
     const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
     const outputParsed = JSON.parse(output.stdout);
-    if (!outputParsed.length) {
+    if (outputParsed.length === 0) {
       throw `No component found with the solution id ${solutionId}. Make sure that the solution is available in the app catalog`;
     }
     return outputParsed[0];
