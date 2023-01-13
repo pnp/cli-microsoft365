@@ -22,6 +22,9 @@ m365 spo list retentionlabel remove [options]
 `--listUrl [listUrl]`
 : Server- or web-relative URL of the list on which to remove the label. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
+`--confirm`
+: Don't prompt for confirmation.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
