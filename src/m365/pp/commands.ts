@@ -3,6 +3,7 @@ const prefix: string = 'pp';
 export default {
   AIBUILDERMODEL_GET: `${prefix} aibuildermodel get`,
   AIBUILDERMODEL_LIST: `${prefix} aibuildermodel list`,
+  AIBUILDERMODEL_REMOVE: `${prefix} aibuildermodel remove`,
   CARD_CLONE: `${prefix} card clone`,
   CARD_GET: `${prefix} card get`,
   CARD_LIST: `${prefix} card list`,
