@@ -471,6 +471,7 @@ nav:
         - list contenttype default set: cmd/spo/list/list-contenttype-default-set.md        
         - list retentionlabel ensure: cmd/spo/list/list-retentionlabel-ensure.md
         - list retentionlabel get: cmd/spo/list/list-retentionlabel-get.md
+        - list retentionlabel remove: cmd/spo/list/list-retentionlabel-remove.md
         - list roleassignment add: cmd/spo/list/list-roleassignment-add.md
         - list roleassignment remove: cmd/spo/list/list-roleassignment-remove.md
         - list roleinheritance break: cmd/spo/list/list-roleinheritance-break.md

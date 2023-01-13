@@ -120,6 +120,7 @@ export default {
   LIST_REMOVE: `${prefix} list remove`,
   LIST_RETENTIONLABEL_ENSURE: `${prefix} list retentionlabel ensure`,
   LIST_RETENTIONLABEL_GET: `${prefix} list retentionlabel get`,
+  LIST_RETENTIONLABEL_REMOVE: `${prefix} list retentionlabel remove`,
   LIST_ROLEASSIGNMENT_REMOVE: `${prefix} list roleassignment remove`,
   LIST_ROLEASSIGNMENT_ADD: `${prefix} list roleassignment add`,
   LIST_ROLEINHERITANCE_BREAK: `${prefix} list roleinheritance break`,
