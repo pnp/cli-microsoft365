@@ -66,4 +66,4 @@ m365 spo cdn set --type Both --enabled true --noDefaultOrigins
 
 ## More information
 
-- General availability of Microsoft 365 CDN: [https://dev.office.com/blogs/general-availability-of-office-365-cdn](https://dev.office.com/blogs/general-availability-of-office-365-cdn)
+- Use Microsoft 365 CDN with SharePoint Online: [https://learn.microsoft.com/en-us/microsoft-365/enterprise/use-microsoft-365-cdn-with-spo?view=o365-worldwide](https://learn.microsoft.com/en-us/microsoft-365/enterprise/use-microsoft-365-cdn-with-spo?view=o365-worldwide)
