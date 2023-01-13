@@ -27,6 +27,10 @@ m365 onenote page list [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+When we don't specify either `userId`, `userName`, `groupId`, `groupName` or `webUrl`, the OneNote pages will be retrieved of the currently logged in user.
+
 ## Examples
 
 List Microsoft OneNote pages for the currently logged in user

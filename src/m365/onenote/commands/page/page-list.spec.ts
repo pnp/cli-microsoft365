@@ -6,7 +6,6 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
-//, { CommandError } 
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
@@ -241,7 +240,6 @@ describe(commands.PAGE_LIST, () => {
       }
       throw 'Invalid request';
     });
-
 
     await command.action(logger, { options: { webUrl: webUrl } });
     assert(loggerLogSpy.calledWith(pageResponse.value));
