@@ -10,10 +10,18 @@ import commands from '../../commands';
 import { FolderProperties } from './FolderProperties';
 import { Options as SpoListItemRetentionLabelEnsureCommandOptions } from '../listitem/listitem-retentionlabel-ensure';
 import * as SpoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure';
+import { Options as SpoListRetentionLabelEnsureCommandOptions } from '../list/list-retentionlabel-ensure';
+import * as SpoListRetentionLabelEnsureCommand from '../list/list-retentionlabel-ensure';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 
 interface CommandArgs {
   options: Options;
+}
+
+interface folderOptions {
+  id: string,
+  listId: string
 }
 
 interface Options extends GlobalOptions {
@@ -95,24 +103,44 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
     }
     try {
       const folderProperties = await this.getFolderProperties(args);
-      const options: SpoListItemRetentionLabelEnsureCommandOptions = {
-        webUrl: args.options.webUrl,
-        listUrl: folderProperties.listServerRelativeUrl,
-        listItemId: folderProperties.id,
-        name: args.options.name,
-        output: 'json',
-        debug: this.debug,
-        verbose: this.verbose
-      };
+      if (typeof folderProperties !== 'string') {
+        const options: SpoListItemRetentionLabelEnsureCommandOptions = {
+          webUrl: args.options.webUrl,
+          listId: folderProperties.listId,
+          listItemId: folderProperties.id,
+          name: args.options.name,
+          output: 'json',
+          debug: this.debug,
+          verbose: this.verbose
+        };
 
-      await Cli.executeCommandWithOutput(SpoListItemRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
+        const spoListItemRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(SpoListItemRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
+        if (this.verbose) {
+          logger.logToStderr(spoListItemRetentionLabelEnsureCommandOutput.stderr);
+        }
+      }
+      else {
+        const options: SpoListRetentionLabelEnsureCommandOptions = {
+          webUrl: args.options.webUrl,
+          listUrl: folderProperties as string,
+          name: args.options.name,
+          output: 'json',
+          debug: this.debug,
+          verbose: this.verbose
+        };
+
+        const spoListRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(SpoListRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
+        if (this.verbose) {
+          logger.logToStderr(spoListRetentionLabelEnsureCommandOutput.stderr);
+        }
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getFolderProperties(args: CommandArgs): Promise<{ id: string, listServerRelativeUrl: string }> {
+  private async getFolderProperties(args: CommandArgs): Promise<folderOptions | string> {
     const requestOptions: AxiosRequestConfig = {
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -120,19 +148,26 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
       responseType: 'json'
     };
 
+    let requestUrl = `${args.options.webUrl}/_api/web/`;
+
     if (args.options.folderId) {
-      requestOptions.url = `${args.options.webUrl}/_api/web/GetFolderById('${args.options.folderId}')?$expand=ListItemAllFields`;
+      requestUrl += `GetFolderById('${args.options.folderId}')`;
     }
     else {
-      requestOptions.url = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.folderUrl!)}')?$expand=ListItemAllFields`;
+      const serverRelativeUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl!);
+      requestUrl += `GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
 
-    const response = await request.get<FolderProperties>(requestOptions);
-    return { id: response.ListItemAllFields.Id, listServerRelativeUrl: this.getListServerRelativeUrl(response.ServerRelativeUrl) };
-  }
+    requestOptions.url = `${requestUrl}?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`;
 
-  private getListServerRelativeUrl(folderUrl: string): string {
-    return folderUrl.replace(/\/[^\/]+$/, '');
+    const response = await request.get<FolderProperties>(requestOptions);
+
+    // if List, return the server relative list url because Unique ID does not work for api /list(guid 'Unique ID') in command list retentionlabel ensure
+    if (!response.ListItemAllFields) {
+      return response.ServerRelativeUrl;
+    }
+
+    return { id: response.ListItemAllFields.Id, listId: response.ListItemAllFields.ParentList.Id };
   }
 }
 

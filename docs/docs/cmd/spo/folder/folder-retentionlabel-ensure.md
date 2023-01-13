@@ -14,7 +14,7 @@ m365 spo folder retentionlabel ensure [options]
 : URL of the site where the retentionlabel from a file to apply is located
 
 `--folderUrl [folderUrl]`
-: The server-relative URL of the folder that should be labelled. Specify either `folderUrl` or `folderId` but not both.
+: The site- or server relative URL of the folder that should be labelled. Specify either `folderUrl` or `folderId` but not both.
 
 `i, --folderId [folderId]`
 : The UniqueId (GUID) of the folder that should be labelled. Specify either `folderUrl` or `folderId` but not both.
@@ -26,7 +26,7 @@ m365 spo folder retentionlabel ensure [options]
 
 ## Remarks
 
-Adding a retentionlabel is only supported on subfolders. Adding a retentionlabel to a rootfolder is currently not supported by by this command.
+You can also use [spo listitem retentionlabel remove](./../../../cmd/spo//listitem/listitem-retentionlabel-remove.md) for removing the retentionlabel from a listitem.
 
 ## Examples
 

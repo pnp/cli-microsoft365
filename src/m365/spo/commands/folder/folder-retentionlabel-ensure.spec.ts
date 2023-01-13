@@ -12,6 +12,7 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as SpoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure';
+import * as SpoListRetentionLabelEnsureCommand from '../list/list-retentionlabel-ensure';
 const command: Command = require('./folder-retentionlabel-ensure');
 
 describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
@@ -21,6 +22,15 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
   const listId = 1;
   const retentionlabelName = "retentionlabel";
   const SpoListItemRetentionLabelEnsureCommandOutput = `{ "stdout": "", "stderr": "" }`;
+  const SpoListRetentionLabelEnsureCommandOutput = `{ "stdout": "", "stderr": "" }`;
+  const folderResponse = {
+    ListItemAllFields: {
+      Id: listId,
+      ParentList: {
+        Id: '75c4d697-bbff-40b8-a740-bf9b9294e5aa'
+      }
+    }
+  };
 
   let log: any[];
   let logger: Logger;
@@ -75,14 +85,14 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
 
   it('adds the retentionlabel to a folder based on folderUrl', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')?$expand=ListItemAllFields`) {
-        return { ListItemAllFields: { Id: listId }, ServerRelativeUrl: folderUrl };
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+        return folderResponse;
       }
 
       throw 'Invalid request';
     });
 
-    const postSpy = sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoListItemRetentionLabelEnsureCommand) {
         return ({
           stdout: SpoListItemRetentionLabelEnsureCommandOutput
@@ -92,27 +102,25 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
       throw new CommandError('Unknown case');
     });
 
-    await command.action(logger, {
+    await assert.doesNotReject(command.action(logger, {
       options: {
-        debug: false,
         folderUrl: folderUrl,
         webUrl: webUrl,
         name: retentionlabelName
       }
-    });
-    assert(postSpy.called);
+    }));
   });
 
   it('adds the retentionlabel to a folder based on folderId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields`) {
-        return { ListItemAllFields: { Id: listId }, ServerRelativeUrl: folderUrl };
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+        return folderResponse;
       }
 
       throw 'Invalid request';
     });
 
-    const postSpy = sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoListItemRetentionLabelEnsureCommand) {
         return ({
           stdout: SpoListItemRetentionLabelEnsureCommandOutput
@@ -122,15 +130,43 @@ describe(commands.FOLDER_RETENTIONLABEL_ENSURE, () => {
       throw new CommandError('Unknown case');
     });
 
-    await command.action(logger, {
+    await assert.doesNotReject(command.action(logger, {
       options: {
-        debug: false,
+        debug: true,
         folderId: folderId,
         webUrl: webUrl,
         name: retentionlabelName
       }
+    }));
+  });
+
+  it('adds the retentionlabel to a folder if the folder is the rootfolder of a document library based on folderId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+        return { ServerRelativeUrl: '/Shared Documents' };
+      }
+
+      throw 'Invalid request';
     });
-    assert(postSpy.called);
+
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoListRetentionLabelEnsureCommand) {
+        return ({
+          stdout: SpoListRetentionLabelEnsureCommandOutput
+        });
+      }
+
+      throw new CommandError('Unknown case');
+    });
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        debug: true,
+        folderId: folderId,
+        webUrl: webUrl,
+        name: retentionlabelName
+      }
+    }));
   });
 
   it('correctly handles API OData error', async () => {
