@@ -235,7 +235,7 @@ describe(commands.PAGE_LIST, () => {
 
     sinon.stub(request, 'get').callsFake(async (opts: any) => {
       const url = new URL(webUrl);
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/${url.hostname}:${url.pathname}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/sites/${url.hostname}:${url.pathname}?$select=id`) {
         return { id: siteId };
       }
       throw 'Invalid request';
@@ -248,7 +248,7 @@ describe(commands.PAGE_LIST, () => {
   it('throws error when retrieving Microsoft OneNote notebooks for site and no site with specified url is found', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       const url = new URL(webUrl);
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/${url.hostname}:${url.pathname}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/sites/${url.hostname}:${url.pathname}?$select=id`) {
         throw {
           "error": {
             "code": "itemNotFound",
