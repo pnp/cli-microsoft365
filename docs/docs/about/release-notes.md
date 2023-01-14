@@ -4,6 +4,10 @@
 
 ### New commands
 
+**OneNote:**
+
+- [onenote page list](../cmd/onenote/page/page-list.md) - retrieve a list of OneNote pages [#4001](https://github.com/pnp/cli-microsoft365/issues/4001)
+
 **Power Platform:**
 
 - [pp aibuildermodel list](../cmd/pp/aibuildermodel/aibuildermodel-list.md) - list available AI builder models in the specified Power Platform environment [#4174](https://github.com/pnp/cli-microsoft365/issues/4174)
@@ -11,10 +15,13 @@
 **Purview:**
 
 - [purview retentionlabel get](../cmd/purview/retentionlabel/retentionlabel-get.md) - get a retention label [#4146](https://github.com/pnp/cli-microsoft365/issues/4146)
+- [purview retentionlabel add](../cmd/purview/retentionlabel/retentionlabel-add.md) - add a retention label [#4147](https://github.com/pnp/cli-microsoft365/issues/4147)
 
 **SharePoint:**
 
+- [spo file sharinglink get](../cmd/spo/file/file-sharinglink-get.md) - gets details about a specific sharing link of a file [#4024](https://github.com/pnp/cli-microsoft365/issues/4024)
 - [spo file sharinglink list](../cmd/spo/file/file-sharinglink-list.md) - lists all the sharing links of a specific file [#4023](https://github.com/pnp/cli-microsoft365/issues/4023)
+- [spo file sharinglink remove](../cmd/spo/file/file-sharinglink-remove.md) - removes a specific sharing link of a file [#4027](https://github.com/pnp/cli-microsoft365/issues/4027)
 - [spo listitem record lock](../cmd/spo/listitem/listitem-record-lock.md) - locks the list item record [#4237](https://github.com/pnp/cli-microsoft365/issues/4237)
 - [spo listitem record unlock](../cmd/spo/listitem/listitem-record-unlock.md) - unlocks the list item record [#4239](https://github.com/pnp/cli-microsoft365/issues/4239)
 - [spo listitem retentionlabel ensure](../cmd/spo/listitem/listitem-retentionlabel-ensure.md) - adds a retention label to a list item [#4158](https://github.com/pnp/cli-microsoft365/issues/4158)
@@ -30,6 +37,9 @@
 - enhanced spo list retentionlabel set [#4247](https://github.com/pnp/cli-microsoft365/issues/4247)
 - enhanced group member remove [#4098](https://github.com/pnp/cli-microsoft365/issues/4098)
 - updates CI / CD workflow page [#4179](https://github.com/pnp/cli-microsoft365/issues/4179)
+- enhanced 'spo file sharinglink list' with scope option [#4314](https://github.com/pnp/cli-microsoft365/issues/4314)
+- enhanced 'spo group member add' command [#3787](https://github.com/pnp/cli-microsoft365/issues/3787)
+- enhanced 'spo term list' command with '--includeChildTerms' option [#4209](https://github.com/pnp/cli-microsoft365/issues/4209)
 
 ## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
 
