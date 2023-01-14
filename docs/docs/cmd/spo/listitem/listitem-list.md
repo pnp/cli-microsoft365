@@ -13,14 +13,14 @@ m365 spo listitem list [options]
 `-u, --webUrl <webUrl>`
 : URL of the site from which the item should be retrieved.
 
-`-i, --listId [listId]`
-: ID of the list to retrieve items from. Specify `listId` or `listTitle` but not both.
-
 `-l, --listId [listId]`
-: ID of the list where the item should be added. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+: ID of the list. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
 `-t, --listTitle [listTitle]`
-: Title of the list where the item should be added. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+: Title of the list. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
+
+`--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
 `-q, --camlQuery [camlQuery]`
 : CAML query to use to query the list of items with.
