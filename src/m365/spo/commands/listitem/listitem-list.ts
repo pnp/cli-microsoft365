@@ -134,7 +134,7 @@ class SpoListItemListCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['listId', 'listTitle'] }
+      { options: ['listId', 'listTitle', 'listUrl'] }
     );
   }
 
