@@ -4,6 +4,10 @@
 
 ### New commands
 
+**OneNote:**
+
+- [onenote page list](../cmd/onenote/page/page-list.md) - retrieve a list of OneNote pages [#4001](https://github.com/pnp/cli-microsoft365/issues/4001)
+
 **Power Platform:**
 
 - [pp aibuildermodel list](../cmd/pp/aibuildermodel/aibuildermodel-list.md) - list available AI builder models in the specified Power Platform environment [#4174](https://github.com/pnp/cli-microsoft365/issues/4174)
@@ -11,6 +15,7 @@
 **Purview:**
 
 - [purview retentionlabel get](../cmd/purview/retentionlabel/retentionlabel-get.md) - get a retention label [#4146](https://github.com/pnp/cli-microsoft365/issues/4146)
+- [purview retentionlabel add](../cmd/purview/retentionlabel/retentionlabel-add.md) - add a retention label [#4147](https://github.com/pnp/cli-microsoft365/issues/4147)
 
 **SharePoint:**
 
@@ -33,6 +38,8 @@
 - enhanced group member remove [#4098](https://github.com/pnp/cli-microsoft365/issues/4098)
 - updates CI / CD workflow page [#4179](https://github.com/pnp/cli-microsoft365/issues/4179)
 - enhanced 'spo file sharinglink list' with scope option [#4314](https://github.com/pnp/cli-microsoft365/issues/4314)
+- enhanced 'spo group member add' command [#3787](https://github.com/pnp/cli-microsoft365/issues/3787)
+- enhanced 'spo term list' command with '--includeChildTerms' option [#4209](https://github.com/pnp/cli-microsoft365/issues/4209)
 
 ## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
 
