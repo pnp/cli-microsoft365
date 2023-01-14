@@ -11,25 +11,25 @@ m365 spo listitem get [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site from which the item should be retrieved
+: URL of the site from which the item should be retrieved.
 
 `-i, --id <id>`
 : ID of the item to retrieve.
 
 `-l, --listId [listId]`
-: ID of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+: ID of the list. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
 `-t, --listTitle [listTitle]`
-: Title of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+: Title of the list. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
 `--listUrl [listUrl]`
-: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId`, or `listUrl` but not multiple.
 
 `-p, --properties [properties]`
-: Comma-separated list of properties to retrieve. Will retrieve all properties if not specified and json output is requested
+: Comma-separated list of properties to retrieve. Will retrieve all properties if not specified and json output is requested.
 
 `--withPermissions`
-: Set if you want to return associated roles and permissions
+: Set if you want to return associated roles and permissions.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -39,36 +39,35 @@ If you want to specify a lookup type in the `properties` option, define which co
 
 ## Examples
 
-Get an item with the ID parameter from a given list in a given site
+Get an item with the ID parameter from a given list in a given site.
 
 ```sh
 m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
-Get an item columns with the ID parameter from a given list in a given site
+Get an item columns with the ID parameter from a given list in a given site.
 
 ```sh
 m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created"
 ```
 
-Get an item columns and lookup column with the ID parameter from a given list in a given site
+Get an item columns and lookup column with the ID parameter from a given list in a given site.
 
 ```sh
 m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created,Company/Title"
 ```
 
-Get an item with specific properties from a given list based on the server-relative URL in a specific site
+Get an item with specific properties from a given list based on the server-relative URL in a specific site.
 
 ```sh
 m365 spo listitem get --listUrl /sites/project-x/documents --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created,Company/Title"
 ```
 
-Get an item with ID parameter from a given list based on the server-relative URL in a specific site with permissions
+Get an item with ID parameter from a given list based on the server-relative URL in a specific site with permissions.
 
 ```sh
 m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --withPermissions
 ```
-
 
 ## Response
 
