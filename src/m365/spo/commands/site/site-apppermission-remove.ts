@@ -147,7 +147,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeSiteAppPermission: () => Promise<void> = async (): Promise<void> => {
       try {
-        this.siteId = await spo.getSpoGraphSiteId(args.options.siteUrl, logger, this.debug);
+        this.siteId = await spo.getSpoGraphSiteId(args.options.siteUrl);
         const permissionIdsToRemove: string[] = await this.getPermissionIds(args);
         const tasks: Promise<void>[] = [];
 

@@ -94,7 +94,7 @@ class OneNotePageListCommand extends GraphCommand {
     });
   }
 
-  private async getEndpointUrl(args: CommandArgs, logger: Logger): Promise<string> {
+  private async getEndpointUrl(args: CommandArgs): Promise<string> {
     let endpoint: string = `${this.resource}/v1.0/`;
 
     if (args.options.userId) {
@@ -111,7 +111,7 @@ class OneNotePageListCommand extends GraphCommand {
       endpoint += `groups/${groupId}`;
     }
     else if (args.options.webUrl) {
-      const siteId = await spo.getSpoGraphSiteId(args.options.webUrl, logger, this.debug);
+      const siteId = await spo.getSpoGraphSiteId(args.options.webUrl);
       endpoint += `sites/${siteId}`;
     }
     else {
@@ -128,7 +128,7 @@ class OneNotePageListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const endpoint = await this.getEndpointUrl(args, logger);
+      const endpoint = await this.getEndpointUrl(args);
       const items = await odata.getAllItems<OnenotePage>(endpoint);
       logger.log(items);
     }

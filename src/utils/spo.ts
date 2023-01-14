@@ -321,30 +321,24 @@ export const spo = {
     });
   },
 
-  getSpoGraphSiteId(webUrl: string, logger: Logger, debug: boolean): Promise<string> {
-    return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
-      if (debug) {
-        logger.logToStderr(`Retrieving site id from MS Graph...`);
-      }
-      const url = new URL(webUrl);
+  /**
+   * Returns the Graph id of a site 
+   * @param webUrl web url e.g. https://contoso.sharepoint.com/sites/site1
+   */
+  async getSpoGraphSiteId(webUrl: string): Promise<string> {
+    const url = new URL(webUrl);
 
-      const requestOptions: CliRequestOptions = {
-        url: `https://graph.microsoft.com/v1.0/sites/${url.hostname}:${url.pathname}?$select=id`,
-        headers: {
-          'accept': 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/sites/${url.hostname}:${url.pathname}?$select=id`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
 
-      request.get<{ id: string }>(requestOptions)
-        .then((res: { id: string }): void => {
-          resolve(res.id);
-        }).catch((err: any): void => {
-          reject(err);
-        });
-    });
+    const result = await request.get<{ id: string }>(requestOptions);
+    return result.id;
   },
-
 
   /**
    * Ensures the folder path exists

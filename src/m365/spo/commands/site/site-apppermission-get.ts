@@ -63,7 +63,7 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const siteId: string = await spo.getSpoGraphSiteId(args.options.siteUrl, logger, this.debug);
+      const siteId: string = await spo.getSpoGraphSiteId(args.options.siteUrl);
       const permissionObject: SitePermission = await this.getApplicationPermission(args, siteId);
       const transposed: { appDisplayName: string; appId: string; permissionId: string, roles: string }[] = [];
 

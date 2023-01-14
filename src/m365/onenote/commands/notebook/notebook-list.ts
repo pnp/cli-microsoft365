@@ -79,7 +79,7 @@ class OneNoteNotebookListCommand extends GraphCommand {
     );
   }
 
-  private getEndpointUrl(args: CommandArgs, logger: Logger): Promise<string> {
+  private getEndpointUrl(args: CommandArgs): Promise<string> {
     return new Promise<string>((resolve: (endpoint: string) => void, reject: (error: string) => void): void => {
       let endpoint: string = `${this.resource}/v1.0/me/onenote/notebooks`;
 
@@ -107,7 +107,7 @@ class OneNoteNotebookListCommand extends GraphCommand {
           });
       }
       else if (args.options.webUrl) {
-        spo.getSpoGraphSiteId(args.options.webUrl, logger, this.debug)
+        spo.getSpoGraphSiteId(args.options.webUrl)
           .then((siteId: string): void => {
             endpoint = `${this.resource}/v1.0/sites/${siteId}/onenote/notebooks`;
             return resolve(endpoint);
@@ -134,7 +134,7 @@ class OneNoteNotebookListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const endpoint = await this.getEndpointUrl(args, logger);
+      const endpoint = await this.getEndpointUrl(args);
       const items = await odata.getAllItems<Notebook>(endpoint);
       logger.log(items);
     }

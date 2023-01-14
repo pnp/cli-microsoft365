@@ -138,7 +138,7 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      this.siteId = await spo.getSpoGraphSiteId(args.options.siteUrl, logger, this.debug);
+      this.siteId = await spo.getSpoGraphSiteId(args.options.siteUrl);
       const sitePermissionId: string = await this.getPermission(args);
       const requestOptions: any = {
         url: `${this.resource}/v1.0/sites/${this.siteId}/permissions/${sitePermissionId}`,
