@@ -107,8 +107,7 @@ class OneNoteNotebookListCommand extends GraphCommand {
           });
       }
       else if (args.options.webUrl) {
-        this
-          .getSpoSiteId(args, logger)
+        spo.getSpoGraphSiteId(args.options.webUrl, logger, this.debug)
           .then((siteId: string): void => {
             endpoint = `${this.resource}/v1.0/sites/${siteId}/onenote/notebooks`;
             return resolve(endpoint);
@@ -131,10 +130,6 @@ class OneNoteNotebookListCommand extends GraphCommand {
     return aadGroup
       .getGroupByDisplayName(args.options.groupName!)
       .then(group => group.id!);
-  }
-
-  private getSpoSiteId(args: CommandArgs, logger: Logger): Promise<string> {
-    return spo.getSpoGraphSiteId(args.options.webUrl!, logger, this.debug);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
