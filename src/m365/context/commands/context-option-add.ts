@@ -15,9 +15,9 @@ interface Options extends GlobalOptions {
   value: string;
 }
 
-class ContextAddCommand extends ContextCommand {
+class ContextOptionAddCommand extends ContextCommand {
   public get name(): string {
-    return commands.ADD;
+    return commands.OPTION_ADD;
   }
 
   public get description(): string {
@@ -80,4 +80,4 @@ class ContextAddCommand extends ContextCommand {
   }
 }
 
-module.exports = new ContextAddCommand();
+module.exports = new ContextOptionAddCommand();

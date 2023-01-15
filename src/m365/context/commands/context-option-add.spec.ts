@@ -9,7 +9,7 @@ import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./context-option-add');
 
-describe(commands.ADD, () => {
+describe(commands.OPTION_ADD, () => {
   let log: any[];
   let logger: Logger;
 
@@ -48,7 +48,7 @@ describe(commands.ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.OPTION_ADD), true);
   });
 
   it('has a description', () => {
