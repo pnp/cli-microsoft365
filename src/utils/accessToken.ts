@@ -1,6 +1,6 @@
 export const accessToken = {
-  isAppOnlyAccessToken(accessToken: string): boolean {
-    let isAppOnlyAccessToken: boolean = false;
+  isAppOnlyAccessToken(accessToken: string): boolean | undefined {
+    let isAppOnlyAccessToken: boolean | undefined;
 
     if (!accessToken || accessToken.length === 0) {
       return isAppOnlyAccessToken;

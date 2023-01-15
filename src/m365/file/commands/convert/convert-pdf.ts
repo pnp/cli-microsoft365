@@ -4,11 +4,12 @@ import * as os from 'os';
 import * as path from 'path';
 import * as url from 'url';
 import { v4 } from 'uuid';
-import auth, { Auth } from '../../../../Auth';
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { accessToken } from '../../../../utils/accessToken';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -79,8 +80,8 @@ class FileConvertPdfCommand extends GraphCommand {
     let targetIsLocalFile: boolean = true;
     let error: any;
 
-    const isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[auth.defaultResource].accessToken);
-    if (typeof isAppOnlyAuth === 'undefined') {
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+    if (typeof isAppOnlyAccessToken === 'undefined') {
       throw 'Unable to determine authentication type';
     }
 
@@ -99,7 +100,7 @@ class FileConvertPdfCommand extends GraphCommand {
 
     try {
       try {
-        sourceFileUrl = await this.getSourceFileUrl(logger, args, isAppOnlyAuth);
+        sourceFileUrl = await this.getSourceFileUrl(logger, args, isAppOnlyAccessToken);
         const graphFileUrl = await this.getGraphFileUrl(logger, sourceFileUrl, this.sourceFileGraphUrl);
         const fileResponse = await this.convertFile(logger, graphFileUrl);
         await this.writeFileToDisk(logger, fileResponse, localTargetFilePath);
@@ -141,7 +142,7 @@ class FileConvertPdfCommand extends GraphCommand {
       if (err instanceof CommandError) {
         throw err;
       }
-      
+
       this.handleRejectedODataJsonPromise(err);
     }
   }
@@ -155,10 +156,10 @@ class FileConvertPdfCommand extends GraphCommand {
    * file to the user's OneDrive for Business
    * @param logger Logger instance
    * @param args Command args
-   * @param isAppOnlyAuth True if CLI is authenticated in app-only mode
+   * @param isAppOnlyAccessToken True if CLI is authenticated in app-only mode
    * @returns Web URL of the file to upload
    */
-  private getSourceFileUrl(logger: Logger, args: CommandArgs, isAppOnlyAuth: boolean): Promise<string> {
+  private getSourceFileUrl(logger: Logger, args: CommandArgs, isAppOnlyAccessToken: boolean): Promise<string> {
     if (args.options.sourceFile.toLowerCase().startsWith('https://')) {
       return Promise.resolve(args.options.sourceFile);
     }
@@ -167,7 +168,7 @@ class FileConvertPdfCommand extends GraphCommand {
       logger.logToStderr('Uploading local file temporarily for conversion...');
     }
 
-    const driveUrl: string = `${this.resource}/v1.0/${isAppOnlyAuth ? 'drive/root' : 'me/drive/root'}`;
+    const driveUrl: string = `${this.resource}/v1.0/${isAppOnlyAccessToken ? 'drive/root' : 'me/drive/root'}`;
     // we need the original file extension because otherwise Graph won't be able
     // to convert the file to PDF
     this.sourceFileGraphUrl = `${driveUrl}:/${v4()}${path.extname(args.options.sourceFile)}`;
