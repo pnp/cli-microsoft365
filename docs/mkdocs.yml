@@ -122,6 +122,7 @@ nav:
         - config reset: cmd/cli/config/config-reset.md
         - config set: cmd/cli/config/config-set.md
     - Context (context):
+      - add: cmd/context/context-add.md
       - init: cmd/context/context-init.md
       - remove: cmd/context/context-remove.md
     - File (file):
