@@ -91,12 +91,8 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (this.verbose) {
-      logger.logToStderr(`Clears the retention label from list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
-    }
-
     if (args.options.confirm) {
-      await this.removeListRetentionLabel(args);
+      await this.removeListRetentionLabel(logger, args);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -107,40 +103,21 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
       });
 
       if (result.continue) {
-        await this.removeListRetentionLabel(args);
+        await this.removeListRetentionLabel(logger, args);
       }
     }
   }
 
-  private async removeListRetentionLabel(args: CommandArgs): Promise<void> {
+  private async removeListRetentionLabel(logger: Logger, args: CommandArgs): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Clears the retention label from list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
+    }
+
     try {
-      let listRestUrl: string = '';
-      let listServerRelativeUrl: string = '';
-
-      if (args.options.listUrl) {
-        const listServerRelativeUrlFromPath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-
-        listServerRelativeUrl = listServerRelativeUrlFromPath;
+      if (this.verbose) {
+        logger.logToStderr('Getting the list server relative URL');
       }
-      else {
-        if (args.options.listId) {
-          listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
-        }
-        else {
-          listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        const listInstance: ListInstance = await request.get<ListInstance>(requestOptions);
-        listServerRelativeUrl = listInstance.RootFolder.ServerRelativeUrl;
-      }
+      const listServerRelativeUrl: string = await this.getListServerRelativeUrl(args);
 
       const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
       const requestUrl: string = `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`;
@@ -152,9 +129,9 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
         data: {
           listUrl: listAbsoluteUrl,
           complianceTagValue: '',
-          blockDelete: args.options.blockDelete || false,
-          blockEdit: args.options.blockEdit || false,
-          syncToItems: args.options.syncToItems || false
+          blockDelete: false,
+          blockEdit: false,
+          syncToItems: false
         },
         responseType: 'json'
       };
@@ -163,6 +140,34 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
+    }
+  }
+
+  private async getListServerRelativeUrl(args: CommandArgs): Promise<string> {
+    if (args.options.listUrl) {
+      const listServerRelativeUrlFromPath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+
+      return listServerRelativeUrlFromPath;
+    }
+    else {
+      let listRestUrl = '';
+      if (args.options.listId) {
+        listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
+      }
+      else {
+        listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
+      }
+
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const listInstance: ListInstance = await request.get<ListInstance>(requestOptions);
+      return listInstance.RootFolder.ServerRelativeUrl;
     }
   }
 }

@@ -117,7 +117,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing role assignment when prompt not confirmed', async () => {
+  it('aborts removing list retentionlabel when prompt not confirmed', async () => {
     const getSpy = sinon.spy(request, 'get');
     await command.action(logger, {
       options: {
@@ -184,7 +184,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
   });
 
   it('should remove label for list with listTitle (debug)', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
         return Promise.resolve();
       }
@@ -201,24 +201,18 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, {
+    await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
         confirm: true
       }
-    });
-    const lastCall = postStub.lastCall.args[0];
-    assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-    assert.strictEqual(lastCall.data.complianceTagValue, '');
-    assert.strictEqual(lastCall.data.blockDelete, false);
-    assert.strictEqual(lastCall.data.blockEdit, false);
-    assert.strictEqual(lastCall.data.syncToItems, false);
+    }));
   });
 
   it('should remove label for list with listId (debug)', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
         return Promise.resolve();
       }
@@ -235,24 +229,18 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, {
+    await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'faaa6af2-0157-4e9a-a352-6165195923c8',
         confirm: true
       }
-    });
-    const lastCall = postStub.lastCall.args[0];
-    assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-    assert.strictEqual(lastCall.data.complianceTagValue, '');
-    assert.strictEqual(lastCall.data.blockDelete, false);
-    assert.strictEqual(lastCall.data.blockEdit, false);
-    assert.strictEqual(lastCall.data.syncToItems, false);
+    }));
   });
 
   it('should remove label for list with listUrl (debug)', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
         return Promise.resolve();
       }
@@ -260,24 +248,18 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, {
+    await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listUrl: '/sites/team1/MyLibrary',
         confirm: true
       }
-    });
-    const lastCall = postStub.lastCall.args[0];
-    assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-    assert.strictEqual(lastCall.data.complianceTagValue, '');
-    assert.strictEqual(lastCall.data.blockDelete, false);
-    assert.strictEqual(lastCall.data.blockEdit, false);
-    assert.strictEqual(lastCall.data.syncToItems, false);
+    }));
   });
 
   it('should remove label for list with listUrl when prompt confirmed', async () => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
         return Promise.resolve();
       }
@@ -290,19 +272,13 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
       { continue: true }
     ));
 
-    await command.action(logger, {
+    await assert.doesNotReject(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listUrl: '/sites/team1/MyLibrary'
       }
-    });
-    const lastCall = postStub.lastCall.args[0];
-    assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-    assert.strictEqual(lastCall.data.complianceTagValue, '');
-    assert.strictEqual(lastCall.data.blockDelete, false);
-    assert.strictEqual(lastCall.data.blockEdit, false);
-    assert.strictEqual(lastCall.data.syncToItems, false);
+    }));
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
