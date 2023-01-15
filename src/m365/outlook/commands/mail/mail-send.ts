@@ -1,12 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import auth, { Auth } from '../../../../Auth';
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
+import { accessToken } from '../../../../utils/accessToken';
 
 interface CommandArgs {
   options: Options;
@@ -144,8 +145,8 @@ class OutlookMailSendCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[this.resource].accessToken);
-      if (isAppOnlyAuth === true && !args.options.sender) {
+      const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+      if (isAppOnlyAccessToken === true && !args.options.sender) {
         throw `Specify a upn or user id in the 'sender' option when using app only authentication.`;
       }
 

@@ -94,26 +94,26 @@ class TeamsMeetingGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAuth = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
-    if (isAppOnlyAuth) {
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+    if (isAppOnlyAccessToken) {
       if (!args.options.userId && !args.options.userName && !args.options.email) {
         this.handleError(`The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only permissions`);
       }
     }
     else {
-      if (!isAppOnlyAuth && (args.options.userId || args.options.userName || args.options.email)) {
+      if (!isAppOnlyAccessToken && (args.options.userId || args.options.userName || args.options.email)) {
         this.handleError(`The options 'userId', 'userName' and 'email' cannot be used when retrieving meetings using delegated permissions`);
       }
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving meeting for ${isAppOnlyAuth ? 'specific user' : 'currently logged in user'}`);
+      logger.logToStderr(`Retrieving meeting for ${isAppOnlyAccessToken ? 'specific user' : 'currently logged in user'}`);
     }
 
     try {
       let requestUrl = `${this.resource}/v1.0/`;
 
-      if (isAppOnlyAuth) {
+      if (isAppOnlyAccessToken) {
         requestUrl += 'users/';
         if (args.options.userId) {
           requestUrl += args.options.userId;
