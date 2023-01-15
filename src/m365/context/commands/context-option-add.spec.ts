@@ -7,7 +7,7 @@ import Command, { CommandError } from '../../../Command';
 import { telemetry } from '../../../telemetry';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
-const command: Command = require('./context-add');
+const command: Command = require('./context-option-add');
 
 describe(commands.ADD, () => {
   let log: any[];
