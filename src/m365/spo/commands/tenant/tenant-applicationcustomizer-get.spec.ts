@@ -3,6 +3,7 @@ import * as sinon from 'sinon';
 import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
+import { CommandOutput } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -105,16 +106,75 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation when all options are specified', async () => {
+    const actual = await command.validate({
+      options: {
+        title: title,
+        id: id,
+        clientSideComponentId: clientSideComponentId
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when no options are specified', async () => {
+    const actual = await command.validate({
+      options: {
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when title and id options are specified', async () => {
+    const actual = await command.validate({
+      options: {
+        title: title,
+        id: id
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when title and clientSideComponentId options are specified', async () => {
+    const actual = await command.validate({
+      options: {
+        title: title,
+        clientSideComponentId: clientSideComponentId
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when id and clientSideComponentId options are specified', async () => {
+    const actual = await command.validate({
+      options: {
+        id: id,
+        clientSideComponentId: clientSideComponentId
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if id is a valid GUID', async () => {
     const actual = await command.validate({ options: { id: id } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation if title is valid', async () => {
+    const actual = await command.validate({ options: { title: title } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if clientSideComponentId is valid', async () => {
+    const actual = await command.validate({ options: { clientSideComponentId: clientSideComponentId } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('handles error when app catalog not registered', async () => {
     const errorMessage = 'No app catalog URL found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<CommandOutput> => {
       if (command === SpoTenantAppCatalogUrlGetCommand) {
-        return '';
+        return { stdout: '' } as CommandOutput;
       }
       throw 'Invalid request';
     });
@@ -128,13 +188,13 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('retrieves an application customizer by title', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<CommandOutput> => {
       if (command === SpoTenantAppCatalogUrlGetCommand) {
-        return { stdout: appCatalogUrl };
+        return { stdout: appCatalogUrl } as CommandOutput;
       }
 
       if (command === SpoListItemListCommand) {
-        return { stdout: JSON.stringify(applicationCustomizerResponse) };
+        return { stdout: JSON.stringify(applicationCustomizerResponse) } as CommandOutput;
       }
 
       throw 'Invalid request';
@@ -148,14 +208,42 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     assert(loggerLogSpy.calledWith(applicationCustomizerResponse[0]));
   });
 
-  it('retrieves an application customizer by id', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+  it('handles error when multiple application customizers with the specified title found', async () => {
+    const errorMessage = `Multiple application customizers with ${title} was found. Please disambiguate: ${title}, ${title}`;
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<CommandOutput> => {
       if (command === SpoTenantAppCatalogUrlGetCommand) {
-        return { stdout: appCatalogUrl };
+        return { stdout: appCatalogUrl } as CommandOutput;
       }
 
       if (command === SpoListItemListCommand) {
-        return { stdout: JSON.stringify(applicationCustomizerResponse) };
+        return {
+          stdout: JSON.stringify(
+            [
+              { Title: title, GUID: id, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc' },
+              { Title: title, GUID: id, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bd' }
+            ]
+          )
+        } as CommandOutput;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        title: title
+      }
+    }), new CommandError(errorMessage));
+  });
+
+  it('retrieves an application customizer by id', async () => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<CommandOutput> => {
+      if (command === SpoTenantAppCatalogUrlGetCommand) {
+        return { stdout: appCatalogUrl } as CommandOutput;
+      }
+
+      if (command === SpoListItemListCommand) {
+        return { stdout: JSON.stringify(applicationCustomizerResponse) } as CommandOutput;
       }
 
       throw 'Invalid request';
@@ -169,14 +257,42 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     assert(loggerLogSpy.calledWith(applicationCustomizerResponse[0]));
   });
 
-  it('retrieves an application customizer by clientSideComponentId', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+  it('handles error when multiple application customizers with the specified id found', async () => {
+    const errorMessage = `Multiple application customizers with ${id} was found. Please disambiguate: ${title}, Another customizer`;
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<CommandOutput> => {
       if (command === SpoTenantAppCatalogUrlGetCommand) {
-        return { stdout: appCatalogUrl };
+        return { stdout: appCatalogUrl } as CommandOutput;
       }
 
       if (command === SpoListItemListCommand) {
-        return { stdout: JSON.stringify(applicationCustomizerResponse) };
+        return {
+          stdout: JSON.stringify(
+            [
+              { Title: title, GUID: id, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bc' },
+              { Title: 'Another customizer', GUID: id, TenantWideExtensionComponentId: '7096cded-b83d-4eab-96f0-df477ed7c0bd' }
+            ]
+          )
+        } as CommandOutput;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        id: id
+      }
+    }), new CommandError(errorMessage));
+  });
+
+  it('retrieves an application customizer by clientSideComponentId', async () => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<CommandOutput> => {
+      if (command === SpoTenantAppCatalogUrlGetCommand) {
+        return { stdout: appCatalogUrl } as CommandOutput;
+      }
+
+      if (command === SpoListItemListCommand) {
+        return { stdout: JSON.stringify(applicationCustomizerResponse) } as CommandOutput;
       }
 
       throw 'Invalid request';
@@ -190,15 +306,43 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     assert(loggerLogSpy.calledWith(applicationCustomizerResponse[0]));
   });
 
-  it('handles error when specified application customizer not found', async () => {
-    const errorMessage = 'The specified application customizer was not found';
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+  it('handles error when multiple application customizers with the specified clientSideComponentId found', async () => {
+    const errorMessage = `Multiple application customizers with ${clientSideComponentId} was found. Please disambiguate: ${title}, Another customizer`;
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<CommandOutput> => {
       if (command === SpoTenantAppCatalogUrlGetCommand) {
-        return { stdout: appCatalogUrl };
+        return { stdout: appCatalogUrl } as CommandOutput;
       }
 
       if (command === SpoListItemListCommand) {
-        return { stdout: JSON.stringify([]) };
+        return {
+          stdout: JSON.stringify(
+            [
+              { Title: title, GUID: '7096cded-b83d-4eab-96f0-df477ed7c0bc', TenantWideExtensionComponentId: clientSideComponentId },
+              { Title: 'Another customizer', GUID: '7096cded-b83d-4eab-96f0-df477ed7c0bd', TenantWideExtensionComponentId: clientSideComponentId }
+            ]
+          )
+        } as CommandOutput;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        clientSideComponentId: clientSideComponentId
+      }
+    }), new CommandError(errorMessage));
+  });
+
+  it('handles error when specified application customizer not found', async () => {
+    const errorMessage = 'The specified application customizer was not found';
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<CommandOutput> => {
+      if (command === SpoTenantAppCatalogUrlGetCommand) {
+        return { stdout: appCatalogUrl } as CommandOutput;
+      }
+
+      if (command === SpoListItemListCommand) {
+        return { stdout: JSON.stringify([]) } as CommandOutput;
       }
 
       throw 'Invalid request';

@@ -26,7 +26,7 @@ spo tenant applicationcustomizer get [options]
 Retrieves an application customizer by title.
 
 ```sh
-m365 spo tenant applicationcustomizer get --title 'Some customizer'
+m365 spo tenant applicationcustomizer get --title "Some customizer"
 ```
 
 Retrieves an application customizer by id.
