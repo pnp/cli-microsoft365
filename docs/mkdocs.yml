@@ -124,6 +124,8 @@ nav:
     - Context (context):
       - init: cmd/context/context-init.md
       - remove: cmd/context/context-remove.md
+      - option:
+        - remove: cmd/context/context-option-remove.md
     - File (file):
       - add: cmd/file/file-add.md
       - convert:
