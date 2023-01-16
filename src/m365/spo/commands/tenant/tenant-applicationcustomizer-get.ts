@@ -84,8 +84,8 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(SpoTenantAppCatalogUrlGetCommand as Command, { options: { debug: args.options.debug, erbose: args.options.verbose, output: 'text', _: [] } });
-    const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
+    const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(SpoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'json', debug: args.options.debug, verbose: args.options.verbose, _: [] } });
+    const appCatalogUrl: string | undefined = JSON.parse(spoTenantAppCatalogUrlGetCommandOutput.stdout);
 
     if (!appCatalogUrl) {
       throw new CommandError('No app catalog URL found');
@@ -106,7 +106,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
       output: 'json',
       debug: args.options.debug,
       verbose: args.options.verbose,
-      listTitle: 'Tenant Wide Extensions',
+      listUrl: '/lists/TenantWideExtensions',
       webUrl: appCatalogUrl,
       filter: filter
     };
@@ -119,7 +119,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
     }
 
     if (listItemOutput.length > 1) {
-      throw new CommandError(`Multiple application customizers with ${args.options.title || args.options.id || args.options.clientSideComponentId} was found. Please disambiguate: ${listItemOutput.map(item => item.Title).join(', ')}`);
+      throw new CommandError(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} was found. Please disambiguate (IDs): ${listItemOutput.map(item => item.GUID).join(', ')}`);
     }
 
     logger.log(listItemOutput[0]);
