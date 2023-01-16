@@ -10,7 +10,7 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./applicationcustomizer-add');
-import * as SpoCustomActionAddCommand from '../customaction/customaction-add';
+import request from '../../../../request';
 
 
 describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
@@ -23,7 +23,6 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     "status": 400,
     "statusText": "Bad Request"
   };
-
 
   let log: any[];
   let logger: Logger;
@@ -56,7 +55,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Cli.executeCommand
+      request.post
     ]);
   });
 
@@ -78,8 +77,12 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   });
 
   it('adds application customizer to a specific site without specifying clientSideComponentProperties', async () => {
-    sinon.stub(Cli, 'executeCommand').callsFake(async (command, args) => {
-      if (command === SpoCustomActionAddCommand && args.options["clientSideComponentProperties"] === '') {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Web/UserCustomActions'
+        && opts.data['Location'] === 'ClientSideExtension.ApplicationCustomizer'
+        && opts.data['ClientSideComponentId'] === clientSideComponentId
+        && opts.data['Name'] === title
+        && opts.data['ClientSideComponentProperties'] === undefined) {
         return;
       }
 
@@ -91,8 +94,12 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   });
 
   it('adds application customizer to a specific site while specifying clientSideComponentProperties', async () => {
-    sinon.stub(Cli, 'executeCommand').callsFake(async (command, args) => {
-      if (command === SpoCustomActionAddCommand && args.options["clientSideComponentProperties"] === clientSideComponentProperties) {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/Web/UserCustomActions'
+        && opts.data['Location'] === 'ClientSideExtension.ApplicationCustomizer'
+        && opts.data['ClientSideComponentId'] === clientSideComponentId
+        && opts.data['ClientSideComponentProperties'] === clientSideComponentProperties
+        && opts.data['Name'] === title) {
         return;
       }
 
