@@ -21,7 +21,7 @@ class ContextOptionAddCommand extends ContextCommand {
   }
 
   public get description(): string {
-    return 'Removes the CLI for Microsoft 365 context in the current working folder';
+    return 'Adds a CLI for Microsoft 365 context option in the current working folder';
   }
 
   constructor() {
