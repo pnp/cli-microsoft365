@@ -575,6 +575,10 @@ class SpoListAddCommand extends SpoCommand {
       logger.logToStderr(`Creating list in site at ${args.options.webUrl}...`);
     }
 
+    if (args.options.schemaXml) {
+      this.warn(logger, `Option 'schemaXml' is deprecated.`);
+    }
+
     const requestBody: any = this.mapRequestBody(args.options);
 
     const requestOptions: any = {

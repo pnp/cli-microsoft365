@@ -576,6 +576,10 @@ class SpoListSetCommand extends SpoCommand {
       logger.logToStderr(`Updating list in site at ${args.options.webUrl}...`);
     }
 
+    if (args.options.schemaXml) {
+      this.warn(logger, `Option 'schemaXml' is deprecated.`);
+    }
+
     const requestBody: any = this.mapRequestBody(args.options);
 
     let requestUrl = `${args.options.webUrl}/_api/web/`;

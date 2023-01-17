@@ -26,7 +26,7 @@ m365 spo list add [options]
 : The globally unique identifier (GUID) of a template feature that is associated with the list
 
 `--schemaXml [schemaXml]`
-: The schema in Collaborative Application Markup Language (CAML) schemas that defines the list
+: (deprecated) The schema in Collaborative Application Markup Language (CAML) schemas that defines the list
 
 `--allowDeletion [allowDeletion]`
 : Boolean value specifying whether the list can be deleted. Valid values are `true,false`
