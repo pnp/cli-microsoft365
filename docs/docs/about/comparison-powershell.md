@@ -198,7 +198,7 @@ Add-PnPApplicationCustomizer|PnP.PowerShell|[spo customaction add](../cmd/spo/cu
 Add-PnPAvailableSiteClassification|PnP.PowerShell|
 Add-PnPAzureADGroupMember|PnP.PowerShell|
 Add-PnPAzureADGroupOwner|PnP.PowerShell|
-Add-PnPAzureADServicePrincipalAppRole|PnP.PowerShell|(../cmd/aad/sp/sp-add.md)
+Add-PnPAzureADServicePrincipalAppRole|PnP.PowerShell|[aad sp add](../cmd/aad/sp/sp-add.md)
 Add-PnPContentType|PnP.PowerShell|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
 Add-PnPContentTypesFromContentTypeHub|PnP.PowerShell|
 Add-PnPContentTypeToDocumentSet|PnP.PowerShell|
@@ -244,7 +244,7 @@ Add-PnPPlannerTask|PnP.PowerShell|[planner task add](../cmd/planner/task/task-ad
 Add-PnPPublishingImageRendition|PnP.PowerShell|
 Add-PnPPublishingPage|PnP.PowerShell|[spo page add](../cmd/spo/page/page-add.md)
 Add-PnPPublishingPageLayout|PnP.PowerShell|
-Add-PnPRoleDefinition|PnP.PowerShell|
+Add-PnPRoleDefinition|PnP.PowerShell|[spo roledefinition add](../cmd/spo/roledefinition/roledefinition-add.md)
 Add-PnPSiteCollectionAdmin|PnP.PowerShell|
 Add-PnPSiteCollectionAppCatalog|PnP.PowerShell|[spo site appcatalog add](../cmd/spo/site/site-appcatalog-add.md)
 Add-PnPSiteDesign|PnP.PowerShell|[spo sitedesign add](../cmd/spo/sitedesign/sitedesign-add.md)
@@ -254,7 +254,7 @@ Add-PnPSiteScript|PnP.PowerShell|[spo sitescript add](../cmd/spo/sitescript/site
 Add-PnPSiteScriptPackage|PnP.PowerShell|
 Add-PnPSiteTemplate|PnP.PowerShell|
 Add-PnPStoredCredential|PnP.PowerShell|
-Add-PnPTaxonomyField|PnP.PowerShell|
+Add-PnPTaxonomyField|PnP.PowerShell|[spo field add](../cmd/spo/field/field-add.md)
 Add-PnPTeamsChannel|PnP.PowerShell|[teams channel add](../cmd/teams/channel/channel-add.md)
 Add-PnpTeamsChannelUser|PnP.PowerShell|[teams channel member add](../cmd/teams/channel/channel-member-add.md)
 Add-PnPTeamsTab|PnP.PowerShell|[teams tab add](../cmd/teams/tab/tab-add.md)
@@ -334,12 +334,12 @@ Get-PnPAvailableSiteClassification|PnP.PowerShell|
 Get-PnPAzureADActivityReportDirectoryAudit|PnP.PowerShell|
 Get-PnPAzureADActivityReportSignIn|PnP.PowerShell|
 Get-PnPAzureADApp|PnP.PowerShell|[aad app get](../cmd/aad/app/app-get.md)
-Get-PnPAzureADAppPermission|PnP.PowerShell|
+Get-PnPAzureADAppPermission|PnP.PowerShell|[app permission list](../cmd/app/permission/permission-list.md)
 Get-PnPAzureADAppSitePermission|PnP.PowerShell|
 Get-PnPAzureADGroup|PnP.PowerShell|[aad group list](../cmd/aad/group/group-list.md)
 Get-PnPAzureADGroupMember|PnP.PowerShell|
 Get-PnPAzureADGroupOwner|PnP.PowerShell|
-Get-PnPAzureADServicePrincipal|PnP.PowerShell|
+Get-PnPAzureADServicePrincipal|PnP.PowerShell|[aad sp get](../cmd/aad/sp/sp-get.md)
 Get-PnPAzureADServicePrincipalAssignedAppRole|PnP.PowerShell|
 Get-PnPAzureADServicePrincipalAvailableAppRole|PnP.PowerShell|
 Get-PnPAzureADUser|PnP.PowerShell|[aad user get](../cmd/aad/user/user-get.md)
@@ -367,7 +367,7 @@ Get-PnPExternalUser|PnP.PowerShell|[spo externaluser list](../cmd/spo/externalus
 Get-PnPFeature|PnP.PowerShell|[spo feature list](../cmd/spo/feature/feature-list.md)
 Get-PnPField|PnP.PowerShell|[spo field get](../cmd/spo/field/field-get.md), [spo field list](../cmd/spo/field/field-list.md)
 Get-PnPFile|PnP.PowerShell|[spo file get](../cmd/spo/file/file-get.md), [spo file list](../cmd/spo/file/file-list.md)
-Get-PnPFileVersion|PnP.PowerShell|
+Get-PnPFileVersion|PnP.PowerShell|[spo file version get](../cmd/spo/file/file-version-get.md), [spo file version list](../cmd/spo/file/file-version-list.md)
 Get-PnPFlow|PnP.PowerShell|[spo flow get](../cmd/flow/flow-get.md), [spo flow list](../cmd/flow/flow-list.md)
 Get-PnPFlowRun|PnP.PowerShell|[spo flow run get](../cmd/flow/run/run-get.md), [spo flow run list](../cmd/flow/run/run-list.md)
 Get-PnPFolder|PnP.PowerShell|[spo folder get](../cmd/spo/folder/folder-get.md), [spo folder list](../cmd/spo/folder/folder-list.md)
@@ -395,7 +395,7 @@ Get-PnPListInformationRightsManagement|PnP.PowerShell|
 Get-PnPListItem|PnP.PowerShell|[spo listitem get](../cmd/spo/listitem/listitem-get.md), [spo listitem list](../cmd/spo/listitem/listitem-list.md)
 Get-PnPListItemAttachments|PnP.PowerShell|
 Get-PnPListItemComment|PnP.PowerShell|
-Get-PnPListItemPermission|PnP.PowerShell|
+Get-PnPListItemPermission|PnP.PowerShell|[spo listitem get](../cmd/spo/listitem/listitem-get.md)
 Get-PnPListPermissions|PnP.PowerShell|[spo list get](../cmd/spo/list/list-get.md)
 Get-PnPListRecordDeclaration|PnP.PowerShell|
 Get-PnPMasterPage|PnP.PowerShell|
@@ -438,7 +438,7 @@ Get-PnPSharingForNonOwnersOfSite|PnP.PowerShell|
 Get-PnPSite|PnP.PowerShell|[spo site get](../cmd/spo/site/site-get.md), [spo site list](../cmd/spo/site/site-list.md)
 Get-PnPSiteClosure|PnP.PowerShell|
 Get-PnPSiteCollectionAdmin|PnP.PowerShell|
-Get-PnPSiteCollectionAppCatalogs|PnP.PowerShell|
+Get-PnPSiteCollectionAppCatalogs|PnP.PowerShell|[spo site appcatalog list](../cmd/spo/site/site-appcatalog-list.md)
 Get-PnPSiteCollectionTermStore|PnP.PowerShell|
 Get-PnPSiteDesign|PnP.PowerShell|[spo sitedesign get](../cmd/spo/sitedesign/sitedesign-get.md), [spo sitedesign list](../cmd/spo/sitedesign/sitedesign-list.md)
 Get-PnPSiteDesignRights|PnP.PowerShell|[spo sitedesign rights list](../cmd/spo/sitedesign/sitedesign-rights-list.md)
@@ -601,13 +601,13 @@ Remove-PnPContentTypeFromDocumentSet|PnP.PowerShell|
 Remove-PnPContentTypeFromList|PnP.PowerShell|[spo list contenttype remove](../cmd/spo/list/list-contenttype-remove.md)
 Remove-PnPCustomAction|PnP.PowerShell|[spo customaction remove](../cmd/spo/customaction/customaction-remove.md)
 Remove-PnPDeletedMicrosoft365Group|PnP.PowerShell|[aad o365group remove](../cmd/aad/o365group/o365group-remove.md)
-Remove-PnPEventReceiver|PnP.PowerShell|
+Remove-PnPEventReceiver|PnP.PowerShell|[spo eventreceiver remove](../cmd/spo/eventreceiver/eventreceiver-remove.md)
 Remove-PnPExternalUser|PnP.PowerShell|
 Remove-PnPField|PnP.PowerShell|[spo field remove](../cmd/spo/field/field-remove.md)
 Remove-PnPFieldFromContentType|PnP.PowerShell|[spo contenttype field remove](../cmd/spo/contenttype/contenttype-field-remove.md)
 Remove-PnPFile|PnP.PowerShell|[spo file remove](../cmd/spo/file/file-remove.md)
 Remove-PnPFileFromSiteTemplate|PnP.PowerShell|
-Remove-PnPFileVersion|PnP.PowerShell|
+Remove-PnPFileVersion|PnP.PowerShell|[spo file version remove](../cmd/spo/file/file-version-remove.md)
 Remove-PnPFlow|PnP.PowerShell|[flow remove](../cmd/flow/flow-remove.md)
 Remove-PnPFolder|PnP.PowerShell|[spo folder remove](../cmd/spo/folder/folder-remove.md)
 Remove-PnPGraphSubscription|PnP.PowerShell|
@@ -686,7 +686,7 @@ Request-PnPPersonalSite|PnP.PowerShell|
 Request-PnPReIndexList|PnP.PowerShell|
 Request-PnPReIndexWeb|PnP.PowerShell|[spo web reindex](../cmd/spo/web/web-reindex.md)
 Request-PnPSyntexClassifyAndExtract|PnP.PowerShell|
-Reset-PnPFileVersion|PnP.PowerShell|
+Reset-PnPFileVersion|PnP.PowerShell|[spo file version restore](../cmd/spo/file/file-version-restore.md)
 Reset-PnPLabel|PnP.PowerShell|
 Reset-PnPMicrosoft365GroupExpiration|PnP.PowerShell|
 Reset-PnPUserOneDriveQuotaToDefault|PnP.PowerShell|
