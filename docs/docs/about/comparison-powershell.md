@@ -198,7 +198,7 @@ Add-PnPApplicationCustomizer|PnP.PowerShell|[spo customaction add](../cmd/spo/cu
 Add-PnPAvailableSiteClassification|PnP.PowerShell|
 Add-PnPAzureADGroupMember|PnP.PowerShell|
 Add-PnPAzureADGroupOwner|PnP.PowerShell|
->>Add-PnPAzureADServicePrincipalAppRole|PnP.PowerShell|
+Add-PnPAzureADServicePrincipalAppRole|PnP.PowerShell|(../cmd/aad/sp/sp-add.md)
 Add-PnPContentType|PnP.PowerShell|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
 Add-PnPContentTypesFromContentTypeHub|PnP.PowerShell|
 Add-PnPContentTypeToDocumentSet|PnP.PowerShell|
@@ -291,13 +291,14 @@ ConvertTo-PnPClientSidePage|PnP.PowerShell|
 ConvertTo-PnPPage|PnP.PowerShell|
 Copy-PnPFile|PnP.PowerShell|[spo file copy](../cmd/spo/file/file-copy.md)
 Copy-PnPFolder|PnP.PowerShell|[spo folder copy](../cmd/spo/folder/folder-copy.md)
->>Copy-PnPItemProxy|PnP.PowerShell|
+Copy-PnPItemProxy|PnP.PowerShell||PnP.PowerShell|
 Copy-PnPList|PnP.PowerShell|
 Copy-PnPTeamsTeam|PnP.PowerShell|[teams team clone](../cmd/teams/team/team-clone.md)
 Deny-PnPTenantServicePrincipalPermissionRequest|PnP.PowerShell|[spo serviceprincipal permissionrequest deny](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md)
 Disable-PnPFeature|PnP.PowerShell|[spo feature disable](../cmd/spo/feature/feature-disable.md)
 Disable-PnPFlow|PnP.PowerShell|[spo flow disable](../cmd/flow/flow-disable.md)
 Disable-PnPPageScheduling|PnP.PowerShell|
+Disable-PnPPowerShellTelemetry|PnP.PowerShell|
 Disable-PnPSharingForNonOwnersOfSite|PnP.PowerShell|
 Disable-PnPSiteClassification|PnP.PowerShell|[aad siteclassification disable](../cmd/aad/siteclassification/siteclassification-disable.md)
 Disable-PnPTenantServicePrincipal|PnP.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
@@ -306,6 +307,7 @@ Enable-PnPCommSite|PnP.PowerShell|[spo site commsite enable](../cmd/spo/site/sit
 Enable-PnPFeature|PnP.PowerShell|[spo feature enable](../cmd/spo/feature/feature-enable.md)
 Enable-PnPFlow|PnP.PowerShell|[spo flow enable](../cmd/flow/flow-enable.md)
 Enable-PnPPageScheduling|PnP.PowerShell|
+Enable-PnPPowerShellTelemetry|PnP.PowerShell|
 Enable-PnPSiteClassification|PnP.PowerShell|[aad siteclassification enable](../cmd/aad/siteclassification/siteclassification-enable.md)
 Enable-PnPTenantServicePrincipal|PnP.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Export-PnPFlow|PnP.PowerShell|[spo flow export](../cmd/flow/flow-export.md)
@@ -330,12 +332,16 @@ Get-PnPAvailableLanguage|PnP.PowerShell|[spo web installedlanguage list](../cmd/
 Get-PnPAvailableSensitivityLabel|PnP.PowerShell|
 Get-PnPAvailableSiteClassification|PnP.PowerShell|
 Get-PnPAzureADActivityReportDirectoryAudit|PnP.PowerShell|
+Get-PnPAzureADActivityReportSignIn|PnP.PowerShell|
 Get-PnPAzureADApp|PnP.PowerShell|[aad app get](../cmd/aad/app/app-get.md)
 Get-PnPAzureADAppPermission|PnP.PowerShell|
 Get-PnPAzureADAppSitePermission|PnP.PowerShell|
 Get-PnPAzureADGroup|PnP.PowerShell|[aad group list](../cmd/aad/group/group-list.md)
 Get-PnPAzureADGroupMember|PnP.PowerShell|
 Get-PnPAzureADGroupOwner|PnP.PowerShell|
+Get-PnPAzureADServicePrincipal|PnP.PowerShell|
+Get-PnPAzureADServicePrincipalAssignedAppRole|PnP.PowerShell|
+Get-PnPAzureADServicePrincipalAvailableAppRole|PnP.PowerShell|
 Get-PnPAzureADUser|PnP.PowerShell|[aad user get](../cmd/aad/user/user-get.md)
 Get-PnPAzureCertificate|PnP.PowerShell|
 Get-PnPBrowserIdleSignout|PnP.PowerShell|
@@ -351,6 +357,7 @@ Get-PnPContext|PnP.PowerShell|
 Get-PnPCustomAction|PnP.PowerShell|[spo customaction get](../cmd/spo/customaction/customaction-get.md), [spo customaction list](../cmd/spo/customaction/customaction-list.md)
 Get-PnPDefaultColumnValues|PnP.PowerShell|
 Get-PnPDeletedMicrosoft365Group|PnP.PowerShell|[aad o365group list](../cmd/aad/o365group/o365group-list.md)
+Get-PnPDeletedTeam|PnP.PowerShell|
 Get-PnPDiagnostics|PnP.PowerShell|
 Get-PnPDisableSpacesActivation|PnP.PowerShell|
 Get-PnPDocumentSetTemplate|PnP.PowerShell|
@@ -393,6 +400,7 @@ Get-PnPListPermissions|PnP.PowerShell|[spo list get](../cmd/spo/list/list-get.md
 Get-PnPListRecordDeclaration|PnP.PowerShell|
 Get-PnPMasterPage|PnP.PowerShell|
 Get-PnPMessageCenterAnnouncement|PnP.PowerShell|
+Get-PnPMicrosoft365ExpiringGroup|PnP.PowerShell|
 Get-PnPMicrosoft365Group|PnP.PowerShell|[aad o365group get](../cmd/aad/o365group/o365group-get.md)
 Get-PnPMicrosoft365GroupEndpoint|PnP.PowerShell|
 Get-PnPMicrosoft365GroupMember|PnP.PowerShell|[aad o365group user list](../cmd/aad/o365group/o365group-user-list.md)
@@ -428,7 +436,6 @@ Get-PnPServiceCurrentHealth|PnP.PowerShell|[tenant serviceannouncement health ge
 Get-PnPServiceHealthIssue|PnP.PowerShell|[tenant serviceannouncement healthissue get](../cmd/tenant/serviceannouncement/serviceannouncement-healthissue-get.md), [tenant serviceannouncement healthissue list](../cmd/tenant/serviceannouncement/serviceannouncement-healthissue-list.md)
 Get-PnPSharingForNonOwnersOfSite|PnP.PowerShell|
 Get-PnPSite|PnP.PowerShell|[spo site get](../cmd/spo/site/site-get.md), [spo site list](../cmd/spo/site/site-list.md)
-Get-PnPSiteClassification|PnP.PowerShell|[aad siteclassification get](../cmd/aad/siteclassification/siteclassification-get.md)
 Get-PnPSiteClosure|PnP.PowerShell|
 Get-PnPSiteCollectionAdmin|PnP.PowerShell|
 Get-PnPSiteCollectionAppCatalogs|PnP.PowerShell|
@@ -465,6 +472,7 @@ Get-PnPTeamsChannelMessageReply|PnP.PowerShell|[teams message reply list](../cmd
 Get-PnPTeamsChannelUser|PnP.PowerShell|[teams channel member list](../cmd/teams/channel/channel-member-list.md)
 Get-PnPTeamsPrimaryChannel|PnP.PowerShell|[teams channel get](../cmd/teams/channel/channel-get.md)
 Get-PnPTeamsTab|PnP.PowerShell|[teams tab list](../cmd/teams/tab/tab-list.md)
+Get-PnPTeamsTag|PnP.PowerShell|
 Get-PnPTeamsTeam|PnP.PowerShell|[teams team list](../cmd/teams/team/team-list.md)
 Get-PnPTeamsUser|PnP.PowerShell|[teams user list](../cmd/teams/user/user-list.md)
 Get-PnPTemporarilyDisableAppBar|PnP.PowerShell|
@@ -582,11 +590,12 @@ Remove-PnPAdaptiveScopeProperty|PnP.PowerShell|
 Remove-PnPAlert|PnP.PowerShell|
 Remove-PnPApp|PnP.PowerShell|[spo app remove](../cmd/spo/app/app-remove.md)
 Remove-PnPApplicationCustomizer|PnP.PowerShell|
+Remove-PnPAvailableSiteClassification|PnP.PowerShell|
 Remove-PnPAzureADApp|PnP.PowerShell|[aad app remove](../cmd/aad/app/app-remove.md)
-Remove-PnPAzureADAppSitePermission|PnP.PowerShell|
 Remove-PnPAzureADGroup|PnP.PowerShell|
 Remove-PnPAzureADGroupMember|PnP.PowerShell|
 Remove-PnPAzureADGroupOwner|PnP.PowerShell|
+Remove-PnPAzureADServicePrincipalAssignedAppRole|PnP.PowerShell|
 Remove-PnPContentType|PnP.PowerShell|[spo contenttype remove](../cmd/spo/contenttype/contenttype-remove.md)
 Remove-PnPContentTypeFromDocumentSet|PnP.PowerShell|
 Remove-PnPContentTypeFromList|PnP.PowerShell|[spo list contenttype remove](../cmd/spo/list/list-contenttype-remove.md)
@@ -634,7 +643,6 @@ Remove-PnPPublishingImageRendition|PnP.PowerShell|
 Remove-PnPRoleDefinition|PnP.PowerShell|[spo roledefinition remove](../cmd/spo/roledefinition/roledefinition-remove.md)
 Remove-PnPSdnProvider|PnP.PowerShell|
 Remove-PnPSearchConfiguration|PnP.PowerShell|
-Remove-PnPSiteClassification|PnP.PowerShell|
 Remove-PnPSiteCollectionAdmin|PnP.PowerShell|
 Remove-PnPSiteCollectionAppCatalog|PnP.PowerShell|[spo site appcatalog remove](../cmd/spo/site/site-appcatalog-remove.md)
 Remove-PnPSiteCollectionTermStore|PnP.PowerShell|
@@ -689,6 +697,7 @@ Restore-PnPFileVersion|PnP.PowerShell|
 Restore-PnPRecycleBinItem|PnP.PowerShell|[spo site recyclebinitem restore](../cmd/spo/site/site-recyclebinitem-restore.md)
 Restore-PnPTenantRecycleBinItem|PnP.PowerShell|[spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md)
 Restore-PnPTenantSite|PnP.PowerShell|
+Revoke-PnPAzureADAppSitePermission|PnP.PowerShell|
 Revoke-PnPHubSiteRights|PnP.PowerShell|[spo hubsite rights revoke](../cmd/spo/hubsite/hubsite-rights-revoke.md)
 Revoke-PnPSiteDesignRights|PnP.PowerShell|[spo sitedesign rights revoke](../cmd/spo/sitedesign/sitedesign-rights-revoke.md)
 Revoke-PnPTenantServicePrincipalPermission|PnP.PowerShell|[spo serviceprincipal grant revoke](../cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md)
@@ -779,6 +788,7 @@ Set-PnPTeamifyPromptHidden|PnP.PowerShell|
 Set-PnPTeamsChannel|PnP.PowerShell|[teams channel set](../cmd/teams/channel/channel-set.md)
 Set-PnpTeamsChannelUser|PnP.PowerShell|[teams channel member set](../cmd/teams/channel/channel-member-set.md)
 Set-PnPTeamsTab|PnP.PowerShell|
+Set-PnPTeamsTag|PnP.PowerShell|
 Set-PnPTeamsTeam|PnP.PowerShell|[teams team set](../cmd/teams/team/team-set.md)
 Set-PnPTeamsTeamArchivedState|PnP.PowerShell|[teams team archive](../cmd/teams/team/team-archive.md), [teams team unarchive](../cmd/teams/team/team-unarchive.md)
 Set-PnPTeamsTeamPicture|PnP.PowerShell|
@@ -797,6 +807,7 @@ Set-PnPTraceLog|PnP.PowerShell|
 Set-PnPUserOneDriveQuota|PnP.PowerShell|
 Set-PnPUserProfileProperty|PnP.PowerShell|[spo userprofile set](../cmd/spo/userprofile/userprofile-set.md)
 Set-PnPView|PnP.PowerShell|[spo list view set](../cmd/spo/list/list-view-set.md)
+Set-PnPVivaConnectionsDashboardACE|PnP.PowerShell|
 Set-PnPWeb|PnP.PowerShell|[spo web set](../cmd/spo/web/web-set.md)
 Set-PnPWebHeader|PnP.PowerShell|
 Set-PnPWebhookSubscription|PnP.PowerShell|[spo list webhook set](../cmd/spo/list/list-webhook-set.md)
@@ -820,12 +831,10 @@ Unpublish-PnPSyntexModel|PnP.PowerShell|
 Unregister-PnPHubSite|PnP.PowerShell|[spo hubsite unregister](../cmd/spo/hubsite/hubsite-unregister.md)
 Update-PnPApp|PnP.PowerShell|[spo app upgrade](../cmd/spo/app/app-upgrade.md)
 Update-PnPAvailableSiteClassification|PnP.PowerShell|
-Update-PnPSiteClassification|PnP.PowerShell|[aad siteclassification set](../cmd/aad/siteclassification/siteclassification-set.md)
 Update-PnPSiteDesignFromWeb|PnP.PowerShell|
 Update-PnPTeamsApp|PnP.PowerShell|[teams app update](../cmd/teams/app/app-update.md)
 Update-PnPTeamsUser|PnP.PowerShell|[aad o365group user set](../cmd/aad/o365group/o365group-user-set.md)
 Update-PnPUserType|PnP.PowerShell|
-Update-PnPVivaConnectionsDashboardACE|PnP.PowerShell|
 Approve-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Deny-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Disable-Flow|Microsoft.PowerApps.PowerShell|[flow disable](../cmd/flow/flow-disable.md)
