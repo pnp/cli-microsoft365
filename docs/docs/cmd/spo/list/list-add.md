@@ -25,9 +25,6 @@ m365 spo list add [options]
 `--templateFeatureId [templateFeatureId]`
 : The globally unique identifier (GUID) of a template feature that is associated with the list
 
-`--schemaXml [schemaXml]`
-: The schema in Collaborative Application Markup Language (CAML) schemas that defines the list
-
 `--allowDeletion [allowDeletion]`
 : Boolean value specifying whether the list can be deleted. Valid values are `true,false`
 
@@ -199,6 +196,9 @@ m365 spo list add [options]
 `--writeSecurity [writeSecurity]`
 : Gets or sets the Write security setting for the list. Valid values are 1 (All users can modify all items)|2 (Users can modify only items that they create)|4 (Users cannot modify any list item)
 
+`--schemaXml [schemaXml]`
+: (deprecated) The schema in Collaborative Application Markup Language (CAML) schemas that defines the list
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
@@ -207,12 +207,6 @@ Add a list with title _Announcements_ and baseTemplate _Announcements_ in site _
 
 ```sh
 m365 spo list add --title Announcements --baseTemplate Announcements --webUrl https://contoso.sharepoint.com/sites/project-x
-```
-
-Add a list with title _Announcements_, baseTemplate _Announcements_ in site _https://contoso.sharepoint.com/sites/project-x_ using a custom XML schema
-
-```sh
-m365 spo list add --title Announcements --baseTemplate Announcements --webUrl https://contoso.sharepoint.com/sites/project-x --schemaXml '<List xmlns:ows="Microsoft SharePoint" Title="List1" FolderCreation="FALSE" Direction="$Resources:Direction;" Url="Lists/List1" BaseType="0" xmlns="http://schemas.microsoft.com/sharepoint/"><MetaData><ContentTypes><ContentTypeRef ID="0x01"><Folder TargetName="Item" /></ContentTypeRef><ContentTypeRef ID="0x0120" /></ContentTypes><Fields><Field ID="{fa564e0f-0c70-4ab9-b863-0177e6ddd247}" Type="Text" Name="Title" DisplayName="$Resources:core,Title;" Required="TRUE" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="Title" MaxLength="255" /></Fields><Views><View BaseViewID="0" Type="HTML" MobileView="TRUE" TabularView="FALSE"><Toolbar Type="Standard" /><XslLink Default="TRUE">main.xsl</XslLink><RowLimit Paged="TRUE">30</RowLimit><ViewFields><FieldRef Name="LinkTitleNoMenu"></FieldRef></ViewFields><Query><OrderBy><FieldRef Name="Modified" Ascending="FALSE"></FieldRef></OrderBy></Query><ParameterBindings><ParameterBinding Name="AddNewAnnouncement" Location="Resource(wss,addnewitem)" /><ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" /><ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_ONET_HOME)" /></ParameterBindings></View><View BaseViewID="1" Type="HTML" WebPartZoneID="Main" DisplayName="$Resources:core,objectiv_schema_mwsidcamlidC24;" DefaultView="TRUE" MobileView="TRUE" MobileDefaultView="TRUE" SetupPath="pages\viewpage.aspx" ImageUrl="/_layouts/15/images/generic.png?rev=23" Url="AllItems.aspx"><Toolbar Type="Standard" /><XslLink Default="TRUE">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged="TRUE">30</RowLimit><ViewFields><FieldRef Name="LinkTitle"></FieldRef></ViewFields><Query><OrderBy><FieldRef Name="ID"></FieldRef></OrderBy></Query><ParameterBindings><ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" /><ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_DEFAULT)" /></ParameterBindings></View></Views><Forms><Form Type="DisplayForm" Url="DispForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" /><Form Type="EditForm" Url="EditForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" /><Form Type="NewForm" Url="NewForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" /></Forms></MetaData></List>'
 ```
 
 Add a list with title _Announcements_, baseTemplate _Announcements_ in site _https://contoso.sharepoint.com/sites/project-x_ with content types and versioning enabled and major version limit set to _50_

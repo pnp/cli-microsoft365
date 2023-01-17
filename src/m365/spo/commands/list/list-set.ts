@@ -572,6 +572,10 @@ class SpoListSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.schemaXml) {
+      this.warn(logger, `Option 'schemaXml' is deprecated.`);
+    }
+
     if (this.verbose) {
       logger.logToStderr(`Updating list in site at ${args.options.webUrl}...`);
     }
