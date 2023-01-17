@@ -55,7 +55,7 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
         "grantedToIdentitiesV2": [],
         "grantedToIdentities": [],
         "link": {
-          "scope": "anonymous",
+          "scope": "users",
           "type": "view",
           "webUrl": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBsS_o5pIcCyNIL3D_vEyG5Q",
           "preventsDownload": true
@@ -70,7 +70,7 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
         "grantedToIdentitiesV2": [],
         "grantedToIdentities": [],
         "link": {
-          "scope": "anonymous",
+          "scope": "organization",
           "type": "edit",
           "webUrl": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBDyAMq6f9C2eqWwFsbei6nA",
           "preventsDownload": false
@@ -83,17 +83,8 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
     {
       "id": "2a021f54-90a2-4016-b3b3-5f34d2e7d932",
       "roles": "read",
-      "link": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A"
-    },
-    {
-      "id": "a47e5387-8868-497c-bb00-115c66c60390",
-      "roles": "read",
-      "link": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBsS_o5pIcCyNIL3D_vEyG5Q"
-    },
-    {
-      "id": "8bf1ca81-a63f-4796-9af5-d86ded8ce5a7",
-      "roles": "write",
-      "link": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBDyAMq6f9C2eqWwFsbei6nA"
+      "link": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A",
+      "scope": "anonymous"
     }
   ];
 
@@ -101,6 +92,15 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
     return sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
       if (url === `https://graph.microsoft.com/v1.0/sites/${fileDetailsResponse.SiteId}/drives/${fileDetailsResponse.VroomDriveID}/items/${fileDetailsResponse.VroomItemID}/permissions?$filter=Link ne null`) {
         return graphResponse.value;
+      }
+      throw 'Invalid request';
+    });
+  };
+
+  const stubOdataScopeResponse: any = (scope: any = null, graphResponse: any = null) => {
+    return sinon.stub(odata, 'getAllItems').callsFake(async (url: string) => {
+      if (url === `https://graph.microsoft.com/v1.0/sites/${fileDetailsResponse.SiteId}/drives/${fileDetailsResponse.VroomDriveID}/items/${fileDetailsResponse.VroomItemID}/permissions?$filter=Link ne null and Link/Scope eq '${scope}'`) {
+        return graphResponse.value.filter((x: any) => x.link.scope === scope);
       }
       throw 'Invalid request';
     });
@@ -182,8 +182,9 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
     assert(loggerLogSpy.calledWith(graphResponse.value));
   });
 
-  it('retrieves sharing links from file specified by url with output text', async () => {
-    stubOdataResponse(graphResponse);
+  it('retrieves sharing links from file specified by url and scope anonymous', async () => {
+    const scope = 'anonymous';
+    stubOdataScopeResponse(scope, graphResponse);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileUrl)}')?$select=SiteId,VroomItemId,VroomDriveId`) {
         return fileDetailsResponse;
@@ -192,7 +193,52 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, output: 'text', verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'json', verbose: true } } as any);
+    assert(loggerLogSpy.calledWith(graphResponse.value.filter(x => x.link.scope === scope)));
+  });
+
+  it('retrieves sharing links from file specified by url and scope users', async () => {
+    const scope = 'users';
+    stubOdataScopeResponse(scope, graphResponse);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileUrl)}')?$select=SiteId,VroomItemId,VroomDriveId`) {
+        return fileDetailsResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'json', verbose: true } } as any);
+    assert(loggerLogSpy.calledWith(graphResponse.value.filter(x => x.link.scope === scope)));
+  });
+
+  it('retrieves sharing links from file specified by url and scope organization', async () => {
+    const scope = 'organization';
+    stubOdataScopeResponse(scope, graphResponse);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileUrl)}')?$select=SiteId,VroomItemId,VroomDriveId`) {
+        return fileDetailsResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'json', verbose: true } } as any);
+    assert(loggerLogSpy.calledWith(graphResponse.value.filter(x => x.link.scope === scope)));
+  });
+
+  it('retrieves sharing links from file specified by url with output text', async () => {
+    const scope = 'anonymous';
+    stubOdataScopeResponse(scope, graphResponse);
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileUrl)}')?$select=SiteId,VroomItemId,VroomDriveId`) {
+        return fileDetailsResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, scope: scope, output: 'text', verbose: true } } as any);
     assert(loggerLogSpy.calledWith(graphResponseText));
   });
 
@@ -216,6 +262,11 @@ describe(commands.FILE_SHARINGLINK_LIST, () => {
 
   it('fails validation if the fileId option is not a valid GUID', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if invalid scope specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: fileId, scope: 'invalid scope' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

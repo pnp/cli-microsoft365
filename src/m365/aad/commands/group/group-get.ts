@@ -10,9 +10,9 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
-  id: string;
-  title: string;
+export interface Options extends GlobalOptions {
+  id?: string;
+  title?: string;
 }
 
 class AadGroupGetCommand extends GraphCommand {
@@ -79,7 +79,7 @@ class AadGroupGetCommand extends GraphCommand {
         group = await aadGroup.getGroupById(args.options.id);
       }
       else {
-        group = await aadGroup.getGroupByDisplayName(args.options.title);
+        group = await aadGroup.getGroupByDisplayName(args.options.title!);
       }
 
       logger.log(group);

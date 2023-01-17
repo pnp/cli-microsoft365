@@ -16,9 +16,12 @@ interface Options extends GlobalOptions {
   webUrl: string;
   fileId?: string;
   fileUrl?: string;
+  scope?: string;
 }
 
 class SpoFileSharingLinkListCommand extends SpoCommand {
+  private static readonly scope: string[] = ['anonymous', 'users', 'organization'];
+
   public get name(): string {
     return commands.FILE_SHARINGLINK_LIST;
   }
@@ -28,7 +31,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'roles', 'link'];
+    return ['id', 'scope', 'roles', 'link'];
   }
 
   constructor() {
@@ -44,7 +47,8 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         fileId: typeof args.options.fileId !== 'undefined',
-        fileUrl: typeof args.options.fileUrl !== 'undefined'
+        fileUrl: typeof args.options.fileUrl !== 'undefined',
+        scope: typeof args.options.scope !== 'undefined'
       });
     });
   }
@@ -59,6 +63,10 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
       },
       {
         option: '-f, --fileUrl [fileUrl]'
+      },
+      {
+        option: '--scope [scope]',
+        autocomplete: SpoFileSharingLinkListCommand.scope
       }
     );
   }
@@ -73,6 +81,10 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
 
         if (args.options.fileId && !validation.isValidGuid(args.options.fileId)) {
           return `${args.options.fileId} is not a valid GUID`;
+        }
+
+        if (args.options.scope && SpoFileSharingLinkListCommand.scope.indexOf(args.options.scope) === -1) {
+          return `'${args.options.scope}' is not a valid scope. Allowed values are: ${SpoFileSharingLinkListCommand.scope.join(',')}`;
         }
 
         return true;
@@ -91,7 +103,13 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
 
     try {
       const fileDetails = await this.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
-      const sharingLinks = await odata.getAllItems<any>(`https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions?$filter=Link ne null`);
+
+      let url = `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions?$filter=Link ne null`;
+      if (args.options.scope) {
+        url += ` and Link/Scope eq '${args.options.scope}'`;
+      }
+
+      const sharingLinks = await odata.getAllItems<any>(url);
 
       if (!args.options.output || args.options.output === 'json' || args.options.output === 'md') {
         logger.log(sharingLinks);
@@ -102,7 +120,8 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
           return {
             id: i.id,
             roles: i.roles.join(','),
-            link: i.link.webUrl
+            link: i.link.webUrl,
+            scope: i.link.scope
           };
         }));
       }
