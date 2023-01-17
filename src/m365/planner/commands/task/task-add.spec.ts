@@ -7,7 +7,6 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
@@ -180,7 +179,6 @@ describe(commands.TASK_ADD, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
         return Promise.resolve(taskAddResponse);
@@ -209,8 +207,7 @@ describe(commands.TASK_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      accessToken.isAppOnlyAccessToken
+      request.post
     ]);
   });
 
@@ -501,19 +498,6 @@ describe(commands.TASK_ADD, () => {
 
     await command.action(logger, { options: options } as any);
     assert(loggerLogSpy.calledWith(taskAddResponse));
-  });
-
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
-      }
-    }), new CommandError('This command does not support application permissions.'));
   });
 
   it('correctly adds planner bucket with title, bucketId, planTitle, and ownerGroupName', async () => {

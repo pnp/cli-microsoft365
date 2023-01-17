@@ -1,9 +1,7 @@
 import { PlannerBucket } from '@microsoft/microsoft-graph-types';
-import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
@@ -142,11 +140,6 @@ class PlannerBucketSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
-
     try {
       const bucket = await this.getBucket(args);
 

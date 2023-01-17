@@ -1,10 +1,8 @@
 import { PlannerPlan } from '@microsoft/microsoft-graph-types';
-import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
@@ -103,11 +101,6 @@ class PlannerPlanRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
-
     const removePlan: () => Promise<void> = async (): Promise<void> => {
       try {
         const plan = await this.getPlan(args);

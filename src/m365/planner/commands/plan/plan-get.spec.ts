@@ -7,7 +7,6 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -61,7 +60,6 @@ describe(commands.PLAN_GET, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     log = [];
     logger = {
       log: (msg: string) => {
@@ -80,8 +78,7 @@ describe(commands.PLAN_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      accessToken.isAppOnlyAccessToken
+      request.get
     ]);
   });
 
@@ -212,17 +209,6 @@ describe(commands.PLAN_GET, () => {
 
     await command.action(logger, { options: options });
     assert(loggerLogSpy.calledWith(outputResponse));
-  });
-
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        id: validId
-      }
-    }), new CommandError('This command does not support application permissions.'));
   });
 
   it('correctly get planner plan with given title and ownerGroupName', async () => {

@@ -7,7 +7,6 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
@@ -152,7 +151,6 @@ describe(commands.TASK_SET, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     log = [];
     logger = {
       log: (msg: string) => {
@@ -175,8 +173,7 @@ describe(commands.TASK_SET, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      request.patch,
-      accessToken.isAppOnlyAccessToken
+      request.patch
     ]);
   });
 
@@ -417,18 +414,6 @@ describe(commands.TASK_SET, () => {
 
     await command.action(logger, { options: options } as any);
     assert(loggerLogSpy.calledWith(taskResponse));
-  });
-
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        title: 'My Planner Task'
-      }
-    }), new CommandError('This command does not support application permissions.'));
   });
 
   it('uses correct value for urgent priority', async () => {
