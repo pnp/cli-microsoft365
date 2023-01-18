@@ -1,6 +1,6 @@
 # spo file sharinglink add
 
-Creates a new sharing link to a file
+Creates a new sharing link for a file
 
 ## Usage
 
@@ -20,34 +20,34 @@ m365 spo file sharinglink add [options]
 : The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both.
 
 `--type <type>`
-: The type of sharing link to create. Either `view`, `edit`, or `embed`.
+: The type of sharing link to create. Either `view` or `edit`.
 
 `--expirationDateTime [expirationDateTime]`
-: The date and time to set the expiration. This should be defined as a valid ISO 8601 string
+: The date and time to set the expiration. This should be defined as a valid ISO 8601 string.
 
 `--scope [scope]`
-: The scope of link to create. Either `anonymous` or `organization`. If not specified, the default of the organization will be used
+: The scope of link to create. Either `anonymous` or `organization`. If not specified, the default of the organization will be used.
 
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
 
-Creates a sharing link of a file by id and type parameter
+Creates a sharing link of a specific type for a file by id
 
 ```sh
 m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com/sites/demo --fileId daebb04b-a773-4baa-b1d1-3625418e3234 --type view
 ```
 
-Creates a sharing link of a file by url and type parameter
+Creates a sharing link of a specific type for a file by url
 
 ```sh
-m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com/sites/demo --fileId daebb04b-a773-4baa-b1d1-3625418e3234 --type edit
+m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com/sites/demo --fileUrl "Shared Documents/Test1.docx" --type edit
 ```
 
 Creates a sharing link of a file by url with type, scope and expirationDateTime parameter
 
 ```sh
-m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com/sites/demo --fileId daebb04b-a773-4baa-b1d1-3625418e3234 --type edit --scope anonymous --expirationDateTime "2023-01-09T16:20:00Z"
+m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com/sites/demo --fileUrl "Shared Documents/Test1.docx" --type edit --scope anonymous --expirationDateTime "2023-01-09T16:20:00Z"
 ```
 
 ## Response
@@ -74,33 +74,16 @@ m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com/sites/demo
 === "Text"
 
     ```text
-    id   : 1e581e93-609e-4077-8152-c43865db684c
-    link : https://contoso.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBSyMcgRPtyAxqqNAeiEp1kg
-    roles: read
-    scope: anonymous
+    hasPassword       : false
+    expirationDateTime: 2023-10-01T07:00:00Z
+    id                : 1e581e93-609e-4077-8152-c43865db684c
+    link              : {"scope":"anonymous","type":"view","webUrl":"https://contoso.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBSyMcgRPtyAxqqNAeiEp1kg","preventsDownload":false}
+    roles             : ["read"]
     ```
 
 === "CSV"
 
     ```csv
-    id,roles,link,scope
-    1e581e93-609e-4077-8152-c43865db684c,read,https://contoso.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBSyMcgRPtyAxqqNAeiEp1kg,anonymous
-    ```
-
-=== "Markdown"
-
-    ```md
-    # spo file sharinglink add --webUrl "https://contoso.sharepoint.com" --fileUrl "/Shared Documents/Document.docx" --type "view" --scope "anonymous" --expirationDateTime "2023-10-01"
-
-    Date: 9/1/2023
-
-    ## undefined (3374c33e-8f13-4c2f-9b42-e7450786647f)
-
-    Property | Value
-    ---------|-------
-    id | 1e581e93-609e-4077-8152-c43865db684c
-    roles | ["read"]
-    expirationDateTime | 2023-10-01T07:00:00Z
-    hasPassword | false
-    link | {"scope":"anonymous","type":"view","webUrl":"https://contoso.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBSyMcgRPtyAxqqNAeiEp1kg","preventsDownload":false}
+    id,expirationDateTime,roles,hasPassword,link
+    1e581e93-609e-4077-8152-c43865db684c,2023-10-01T07:00:00Z,"[""read""]",,"{""scope"":""anonymous"",""type"":""view"",""webUrl"":""https://contoso.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBSyMcgRPtyAxqqNAeiEp1kg"",""preventsDownload"":false}"
     ```

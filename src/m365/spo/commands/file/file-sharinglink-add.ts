@@ -1,4 +1,3 @@
-import chalk = require('chalk');
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
@@ -22,19 +21,15 @@ interface Options extends GlobalOptions {
 }
 
 class SpoFileSharingLinkAddCommand extends SpoCommand {
-  private static type: string[] = ['view', 'edit', 'embed'];
-  private static scope: string[] = ['anonymous', 'organization'];
+  private static readonly types: string[] = ['view', 'edit'];
+  private static readonly scopes: string[] = ['anonymous', 'organization'];
 
   public get name(): string {
     return commands.FILE_SHARINGLINK_ADD;
   }
 
   public get description(): string {
-    return 'Creates a new sharing link to a file';
-  }
-
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'roles', 'link', 'scope'];
+    return 'Creates a new sharing link for a file';
   }
 
   constructor() {
@@ -70,14 +65,14 @@ class SpoFileSharingLinkAddCommand extends SpoCommand {
       },
       {
         option: '--type <type>',
-        autocomplete: SpoFileSharingLinkAddCommand.type
+        autocomplete: SpoFileSharingLinkAddCommand.types
       },
       {
         option: '--expirationDateTime [expirationDateTime]'
       },
       {
         option: '--scope [scope]',
-        autocomplete: SpoFileSharingLinkAddCommand.scope
+        autocomplete: SpoFileSharingLinkAddCommand.scopes
       }
     );
   }
@@ -95,22 +90,17 @@ class SpoFileSharingLinkAddCommand extends SpoCommand {
         }
 
         if (args.options.type &&
-          SpoFileSharingLinkAddCommand.type.indexOf(args.options.type) < 0) {
-          return `'${args.options.type}' is not a valid type. Allowed types are ${SpoFileSharingLinkAddCommand.type.join(', ')}`;
+          SpoFileSharingLinkAddCommand.types.indexOf(args.options.type) < 0) {
+          return `'${args.options.type}' is not a valid type. Allowed types are ${SpoFileSharingLinkAddCommand.types.join(', ')}`;
         }
 
         if (args.options.scope &&
-          SpoFileSharingLinkAddCommand.scope.indexOf(args.options.scope) < 0) {
-          return `'${args.options.scope}' is not a valid scope type. Allowed scope types are ${SpoFileSharingLinkAddCommand.scope.join(', ')}`;
+          SpoFileSharingLinkAddCommand.scopes.indexOf(args.options.scope) < 0) {
+          return `'${args.options.scope}' is not a valid scope. Allowed scopes are ${SpoFileSharingLinkAddCommand.scopes.join(', ')}`;
         }
 
-        const parsedDateTime = Date.parse(args.options.expirationDateTime as string);
-        if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
-          return `${args.options.expirationDateTime} is not a valid date format. Provide the date in one of the following formats:
-      ${chalk.grey('YYYY-MM-DD')}
-      ${chalk.grey('YYYY-MM-DDThh:mm')}
-      ${chalk.grey('YYYY-MM-DDThh:mmZ')}
-      ${chalk.grey('YYYY-MM-DDThh:mm±hh:mm')}`;
+        if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {
+          return `${args.options.expirationDateTime} is not a valid ISO date string.`;
         }
 
         return true;
@@ -124,7 +114,7 @@ class SpoFileSharingLinkAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Creates a sharing link for file ${args.options.fileId || args.options.fileUrl}...`);
+      logger.logToStderr(`Creating a sharing link for file ${args.options.fileId || args.options.fileUrl}...`);
     }
 
     try {
@@ -138,25 +128,14 @@ class SpoFileSharingLinkAddCommand extends SpoCommand {
         responseType: 'json',
         data: {
           type: args.options.type,
-          ...(args.options.expirationDateTime && { expirationDateTime: args.options.expirationDateTime }),
-          ...(args.options.scope && { scope: args.options.scope })
+          expirationDateTime: args.options.expirationDateTime,
+          scope: args.options.scope
         }
       };
 
-      const sharingLink: any = await request.post(requestOptions);
+      const sharingLink = await request.post<any>(requestOptions);
 
-      if (!args.options.output || args.options.output === 'json' || args.options.output === 'md') {
-        logger.log(sharingLink);
-      }
-      else {
-        //converted to text friendly output
-        logger.log({
-          id: sharingLink.id,
-          roles: sharingLink.roles.join(','),
-          link: sharingLink.link.webUrl,
-          scope: sharingLink.link.scope
-        });
-      }
+      logger.log(sharingLink);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

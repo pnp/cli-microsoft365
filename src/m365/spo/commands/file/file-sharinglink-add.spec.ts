@@ -12,7 +12,6 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
 import { GraphFileDetails } from './GraphFileDetails';
-import { odata } from '../../../../utils/odata';
 const command: Command = require('./file-sharinglink-add');
 
 describe(commands.FILE_SHARINGLINK_ADD, () => {
@@ -61,29 +60,6 @@ describe(commands.FILE_SHARINGLINK_ADD, () => {
     }
   };
 
-  const graphResponseThree = {
-    "id": "2a021f54-90a2-4016-b3b3-5f34d2e7d932",
-    "roles": [
-      "read"
-    ],
-    "hasPassword": false,
-    "grantedToIdentitiesV2": [],
-    "grantedToIdentities": [],
-    "link": {
-      "scope": "anonymous",
-      "type": "embed",
-      "webUrl": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A",
-      "preventsDownload": false
-    }
-  };
-
-  const graphResponseText: any = {
-    "id": "2a021f54-90a2-4016-b3b3-5f34d2e7d932",
-    "roles": "read",
-    "link": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBWnHOpGIcgi4gzw9XiWYJ-A",
-    "scope": "anonymous"
-  };
-
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
@@ -111,8 +87,7 @@ describe(commands.FILE_SHARINGLINK_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      odata.getAllItems
+      request.post
     ]);
   });
 
@@ -150,7 +125,7 @@ describe(commands.FILE_SHARINGLINK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileId: fileId, output: 'json', type: 'view', scope: 'anonymous', verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, fileId: fileId, type: 'view', scope: 'anonymous', verbose: true } } as any);
     assert(loggerLogSpy.calledWith(graphResponseOne));
   });
 
@@ -171,29 +146,8 @@ describe(commands.FILE_SHARINGLINK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, type: 'edit', expirationDateTime: "2023-01-09T16:20:00Z", scope: 'organization', output: 'json', verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, type: 'edit', expirationDateTime: "2023-01-09T16:20:00Z", scope: 'organization', verbose: true } } as any);
     assert(loggerLogSpy.calledWith(graphResponseTwo));
-  });
-
-  it('creates a sharing link from a file specified by the url with output text', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileUrl)}')?$select=SiteId,VroomItemId,VroomDriveId`) {
-        return fileDetailsResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/${fileDetailsResponse.SiteId}/drives/${fileDetailsResponse.VroomDriveID}/items/${fileDetailsResponse.VroomItemID}/createLink`) {
-        return graphResponseThree;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, type: 'embed', scope: 'anonymous', output: 'text', verbose: true } } as any);
-    assert(loggerLogSpy.calledWith(graphResponseText));
   });
 
   it('throws error when file not found by id', async () => {
