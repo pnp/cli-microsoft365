@@ -33,6 +33,7 @@ export default {
   MEMBERSETTINGS_SET: `${prefix} membersettings set`,
   MESSAGE_GET: `${prefix} message get`,
   MESSAGE_LIST: `${prefix} message list`,
+  MESSAGE_SEND: `${prefix} message send`,
   MESSAGE_REPLY_LIST: `${prefix} message reply list`,
   MESSAGINGSETTINGS_LIST: `${prefix} messagingsettings list`,
   MESSAGINGSETTINGS_SET: `${prefix} messagingsettings set`,
