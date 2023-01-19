@@ -89,6 +89,14 @@ In cases, when the option's value starts with a dash (-), specify the option's v
 m365 planner task get --id=-9rMKQooUjZdxgv1qQVZYABEuw
 ```
 
+## Setting empty values
+
+In cases, when the option's value is empty, specify the option's value using the `=` operator. For example to pass an empty string argument to `description` option in the CLI prompt, you would execute:
+
+```sh
+m365 spo contenttype set --description=""
+```
+
 ## Working with SharePoint URLs in `spo` commands
 
 CLI for Microsoft 365 contains a number of commands for managing SharePoint Online. Each of these commands requires you to specify the site or web on which you want to execute the command. For example, to get information about a site collection located at `https://contoso.sharepoint.com/sites/contoso`, you'd execute:
