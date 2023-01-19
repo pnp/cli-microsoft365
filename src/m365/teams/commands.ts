@@ -34,6 +34,7 @@ export default {
   MESSAGE_GET: `${prefix} message get`,
   MESSAGE_LIST: `${prefix} message list`,
   MESSAGE_REPLY_LIST: `${prefix} message reply list`,
+  MESSAGE_SEND: `${prefix} message send`,
   MESSAGINGSETTINGS_LIST: `${prefix} messagingsettings list`,
   MESSAGINGSETTINGS_SET: `${prefix} messagingsettings set`,
   REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS: `${prefix} report deviceusagedistributionusercounts`,

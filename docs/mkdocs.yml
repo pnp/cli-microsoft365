@@ -705,6 +705,7 @@ nav:
       - message:
         - message get: cmd/teams/message/message-get.md
         - message list: cmd/teams/message/message-list.md
+        - message send: cmd/teams/message/message-send.md
         - message reply list: cmd/teams/message/message-reply-list.md
       - messagingsettings:
         - messagingsettings list: cmd/teams/messagingsettings/messagingsettings-list.md
