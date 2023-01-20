@@ -1,11 +1,11 @@
-# context option add
+# context option set
 
-Adds a new key to the CLI for Microsoft 365 context with a value in the current working folder
+Allows to add a new key to the context with value
 
 ## Usage
 
 ```sh
-m365 context option add [options]
+m365 context option set [options]
 ```
 
 ## Options
@@ -23,7 +23,7 @@ m365 context option add [options]
 Adds a new key to the CLI for Microsoft 365 context in the current working folder
 
 ```sh
-m365 context option add --name 'listName' --value 'testList'
+m365 context option set --name 'listName' --value 'testList'
 ```
 
 ## Response

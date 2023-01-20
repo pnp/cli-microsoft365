@@ -1,7 +1,7 @@
 const prefix: string = 'context';
 
 export default {
-  OPTION_ADD: `${prefix} option add`,
   INIT: `${prefix} init`,
-  REMOVE: `${prefix} remove`
+  REMOVE: `${prefix} remove`,
+  OPTION_SET: `${prefix} option set`
 };

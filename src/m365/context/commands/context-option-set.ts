@@ -15,13 +15,13 @@ interface Options extends GlobalOptions {
   value: string;
 }
 
-class ContextOptionAddCommand extends ContextCommand {
+class ContextOptionSetCommand extends ContextCommand {
   public get name(): string {
-    return commands.OPTION_ADD;
+    return commands.OPTION_SET;
   }
 
   public get description(): string {
-    return 'Adds a CLI for Microsoft 365 context option in the current working folder';
+    return 'Allows to add a new key to the context with value.';
   }
 
   constructor() {
@@ -80,4 +80,4 @@ class ContextOptionAddCommand extends ContextCommand {
   }
 }
 
-module.exports = new ContextOptionAddCommand();
+module.exports = new ContextOptionSetCommand();

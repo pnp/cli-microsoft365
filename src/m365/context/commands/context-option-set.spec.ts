@@ -1,15 +1,14 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
 import { telemetry } from '../../../telemetry';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
-const command: Command = require('./context-option-add');
+const command: Command = require('./context-option-set');
 
-describe(commands.OPTION_ADD, () => {
+describe(commands.OPTION_SET, () => {
   let log: any[];
   let logger: Logger;
 
@@ -36,8 +35,7 @@ describe(commands.OPTION_ADD, () => {
     sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
-      fs.writeFileSync,
-      Cli.prompt
+      fs.writeFileSync
     ]);
   });
 
@@ -48,7 +46,7 @@ describe(commands.OPTION_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.OPTION_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.OPTION_SET), true);
   });
 
   it('has a description', () => {
