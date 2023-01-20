@@ -10,7 +10,9 @@
 
 **Power Platform:**
 
+- [pp aibuildermodel get](../cmd/pp/aibuildermodel/aibuildermodel-get.md) - gets an AI builder model in the specified Power Platform environment [#4325](https://github.com/pnp/cli-microsoft365/issues/4325)
 - [pp aibuildermodel list](../cmd/pp/aibuildermodel/aibuildermodel-list.md) - list available AI builder models in the specified Power Platform environment [#4174](https://github.com/pnp/cli-microsoft365/issues/4174)
+- [pp aibuildermodel remove](../cmd/pp/aibuildermodel/aibuildermodel-remove.md) - removes an AI builder model in the specified Power Platform environment [#4326](https://github.com/pnp/cli-microsoft365/issues/4326)
 
 **Purview:**
 
@@ -31,15 +33,19 @@
 - added 'list all files with missing required metadata' sample [#3277](https://github.com/pnp/cli-microsoft365/issues/3277)
 - added own CliRequestOptions [#4277](https://github.com/pnp/cli-microsoft365/issues/4277)
 - deleted 'defines correct option sets' [#4068](https://github.com/pnp/cli-microsoft365/issues/4068)
-- updates the Using Guide with our definition of booleans [#3987](https://github.com/pnp/cli-microsoft365/issues/3987)
+- updated the Using Guide with our definition of booleans [#3987](https://github.com/pnp/cli-microsoft365/issues/3987)
 - enhanced 'teams chat list' with user filter [#3774](https://github.com/pnp/cli-microsoft365/issues/3774)
 - handled missing app service principals in 'aad approleassignment add' [#4307](https://github.com/pnp/cli-microsoft365/issues/4307)
 - enhanced spo list retentionlabel set [#4247](https://github.com/pnp/cli-microsoft365/issues/4247)
 - enhanced group member remove [#4098](https://github.com/pnp/cli-microsoft365/issues/4098)
-- updates CI / CD workflow page [#4179](https://github.com/pnp/cli-microsoft365/issues/4179)
+- updated CI / CD workflow page [#4179](https://github.com/pnp/cli-microsoft365/issues/4179)
 - enhanced 'spo file sharinglink list' with scope option [#4314](https://github.com/pnp/cli-microsoft365/issues/4314)
 - enhanced 'spo group member add' command [#3787](https://github.com/pnp/cli-microsoft365/issues/3787)
 - enhanced 'spo term list' command with '--includeChildTerms' option [#4209](https://github.com/pnp/cli-microsoft365/issues/4209)
+- updated CI / CD workflow to validate docs [#4249](https://github.com/pnp/cli-microsoft365/issues/4249)
+- fixed sample script 'List all tenant-wide extensions' [#4357](https://github.com/pnp/cli-microsoft365/issues/4357)
+- fixed Microsoft Learn documentation link for 'spo upn' [#4352](https://github.com/pnp/cli-microsoft365/issues/4352)
+- enhanced 'spo listitem list' with 'listUrl' option [#4336](https://github.com/pnp/cli-microsoft365/issues/4336)
 
 ## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
 
