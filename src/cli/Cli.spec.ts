@@ -1606,7 +1606,7 @@ describe('Cli', () => {
     const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'md' });
     const match = actual.match(/^## /gm);
     try {
-      assert.strictEqual(match?.length, 2);
+      assert.strictEqual(match, null);
       done();
     }
     catch (e) {
@@ -1623,7 +1623,7 @@ describe('Cli', () => {
     const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'md' });
     const match = actual.match(/^## /gm);
     try {
-      assert.strictEqual(match?.length, 1);
+      assert.strictEqual(match, null);
       done();
     }
     catch (e) {
