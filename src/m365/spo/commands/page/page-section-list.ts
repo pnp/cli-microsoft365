@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
@@ -54,7 +55,7 @@ class SpoPageSectionListCommand extends SpoCommand {
       const clientSidePage = await Page.getPage(args.options.pageName, args.options.webUrl, logger, this.debug, this.verbose);
       const sections: CanvasSection[] = clientSidePage.sections;
 
-      const isJSONOutput = args.options.output === 'json';
+      const isJSONOutput = !Cli.shouldTrimOutput(args.options.output);
       if (sections.length) {
         const output = sections.map(section => Page.getSectionInformation(section, isJSONOutput));
         if (isJSONOutput) {
