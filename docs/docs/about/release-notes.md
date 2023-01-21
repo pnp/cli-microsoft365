@@ -28,6 +28,10 @@
 - [spo listitem record unlock](../cmd/spo/listitem/listitem-record-unlock.md) - unlocks the list item record [#4239](https://github.com/pnp/cli-microsoft365/issues/4239)
 - [spo listitem retentionlabel ensure](../cmd/spo/listitem/listitem-retentionlabel-ensure.md) - adds a retention label to a list item [#4158](https://github.com/pnp/cli-microsoft365/issues/4158)
 
+**Teams:**
+
+- [teams message send](../cmd/teams/message/message-send.md) - sends a message to a channel in a Microsoft Teams team [#4367](https://github.com/pnp/cli-microsoft365/issues/4367)
+
 ### Changes
 
 - added 'list all files with missing required metadata' sample [#3277](https://github.com/pnp/cli-microsoft365/issues/3277)
@@ -46,6 +50,9 @@
 - fixed sample script 'List all tenant-wide extensions' [#4357](https://github.com/pnp/cli-microsoft365/issues/4357)
 - fixed Microsoft Learn documentation link for 'spo upn' [#4352](https://github.com/pnp/cli-microsoft365/issues/4352)
 - enhanced 'spo listitem list' with 'listUrl' option [#4336](https://github.com/pnp/cli-microsoft365/issues/4336)
+- adds application permissions support for Planner commands [#4330](https://github.com/pnp/cli-microsoft365/issues/4330)
+- deprecates schemaXml option for 'spo list' commands [#2906](https://github.com/pnp/cli-microsoft365/issues/2906)
+- adds documentation on how to set empty values [#4345](https://github.com/pnp/cli-microsoft365/issues/4345)
 
 ## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
 
