@@ -307,7 +307,7 @@ Enable-PnPCommSite|PnP.PowerShell|[spo site commsite enable](../cmd/spo/site/sit
 Enable-PnPFeature|PnP.PowerShell|[spo feature enable](../cmd/spo/feature/feature-enable.md)
 Enable-PnPFlow|PnP.PowerShell|[spo flow enable](../cmd/flow/flow-enable.md)
 Enable-PnPPageScheduling|PnP.PowerShell|
-Enable-PnPPowerShellTelemetry|PnP.PowerShell|[cli config set](../telemetry/#disable-telemetry)
+Enable-PnPPowerShellTelemetry|PnP.PowerShell|[cli config set](../telemetry/#re-enable-telemetry)
 Enable-PnPSiteClassification|PnP.PowerShell|[aad siteclassification enable](../cmd/aad/siteclassification/siteclassification-enable.md)
 Enable-PnPTenantServicePrincipal|PnP.PowerShell|[spo serviceprincipal set](../cmd/spo/serviceprincipal/serviceprincipal-set.md)
 Export-PnPFlow|PnP.PowerShell|[spo flow export](../cmd/flow/flow-export.md)
