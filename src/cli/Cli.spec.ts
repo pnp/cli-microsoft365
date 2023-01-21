@@ -1965,4 +1965,19 @@ describe('Cli', () => {
     const actualValue = cli.getSettingWithDefaultValue('key', '');
     assert.strictEqual(actualValue, 'value');
   });
+
+  it('returns true when output is text', () => {
+    const spyShouldTrimOutput = Cli.shouldTrimOutput('text');
+    assert.strictEqual(spyShouldTrimOutput, true);
+  });
+
+  it('returns true when output is csv', () => {
+    const spyShouldTrimOutput = Cli.shouldTrimOutput('csv');
+    assert.strictEqual(spyShouldTrimOutput, true);
+  });
+
+  it('returns false when output is json', () => {
+    const spyShouldTrimOutput = Cli.shouldTrimOutput('json');
+    assert.strictEqual(spyShouldTrimOutput, false);
+  });
 });

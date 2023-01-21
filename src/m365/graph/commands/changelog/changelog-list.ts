@@ -7,6 +7,7 @@ import { Changelog, ChangelogItem } from '../../Changelog';
 import commands from '../../commands';
 import request from '../../../../request';
 import { DOMParser } from '@xmldom/xmldom';
+import { Cli } from '../../../../cli/Cli';
 
 interface CommandArgs {
   options: Options;
@@ -24,12 +25,12 @@ class GraphChangelogListCommand extends AnonymousCommand {
   private allowedVersions: string[] = ['beta', 'v1.0'];
   private allowedChangeTypes: string[] = ['Addition', 'Change', 'Deletion', 'Deprecation'];
   private allowedServices: string[] = [
-    'Applications', 'Calendar', 'Change notifications', 'Cloud communications', 
-    'Compliance', 'Cross-device experiences', 'Customer booking', 'Device and app management', 
-    'Education', 'Files', 'Financials', 'Groups', 
-    'Identity and access', 'Mail', 'Notes', 'Notifications', 
-    'People and workplace intelligence', 'Personal contacts', 'Reports', 'Search', 
-    'Security', 'Sites and lists', 'Tasks and plans', 'Teamwork', 
+    'Applications', 'Calendar', 'Change notifications', 'Cloud communications',
+    'Compliance', 'Cross-device experiences', 'Customer booking', 'Device and app management',
+    'Education', 'Files', 'Financials', 'Groups',
+    'Identity and access', 'Mail', 'Notes', 'Notifications',
+    'People and workplace intelligence', 'Personal contacts', 'Reports', 'Search',
+    'Security', 'Sites and lists', 'Tasks and plans', 'Teamwork',
     'To-do tasks', 'Users', 'Workbooks and charts'
   ];
 
@@ -79,31 +80,31 @@ class GraphChangelogListCommand extends AnonymousCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (
-          args.options.versions && 
+          args.options.versions &&
           args.options.versions.toLocaleLowerCase().split(',').some(x => !this.allowedVersions.map(y => y.toLocaleLowerCase()).includes(x))) {
           return `The verions contains an invalid value. Specify either ${this.allowedVersions.join(', ')} as properties`;
         }
-    
+
         if (
-          args.options.changeType && 
+          args.options.changeType &&
           !this.allowedChangeTypes.map(x => x.toLocaleLowerCase()).includes(args.options.changeType.toLocaleLowerCase())) {
           return `The change type contain an invalid value. Specify either ${this.allowedChangeTypes.join(', ')} as properties`;
         }
-    
+
         if (
-          args.options.services && 
+          args.options.services &&
           args.options.services.toLocaleLowerCase().split(',').some(x => !this.allowedServices.map(y => y.toLocaleLowerCase()).includes(x))) {
           return `The services contains invalid value. Specify either ${this.allowedServices.join(', ')} as properties`;
         }
-    
+
         if (args.options.startDate && !validation.isValidISODate(args.options.startDate)) {
           return 'The startDate is not a valid ISO date string';
         }
-    
+
         if (args.options.endDate && !validation.isValidISODate(args.options.endDate)) {
           return 'The endDate is not a valid ISO date string';
         }
-    
+
         if (args.options.endDate && args.options.startDate && new Date(args.options.endDate) < new Date(args.options.startDate)) {
           return 'The endDate should be later than startDate';
         }
@@ -117,7 +118,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
     try {
       const allowedChangeType = args.options.changeType && this.allowedChangeTypes.find(x => x.toLocaleLowerCase() === args.options.changeType!.toLocaleLowerCase());
       const searchParam = args.options.changeType ? `/?filterBy=${allowedChangeType}` : '';
-  
+
       const requestOptions: any = {
         url: `https://developer.microsoft.com/en-us/graph/changelog/rss${searchParam}`,
         headers: {
@@ -125,15 +126,15 @@ class GraphChangelogListCommand extends AnonymousCommand {
           'x-anonymous': 'true'
         }
       };
-      
+
       const output: any = await request.get(requestOptions);
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(output.toString(), "text/xml");
 
       const changelog = this.filterThroughOptions(args.options, this.mapChangelog(xmlDoc, args));
-      
+
       logger.log(changelog.items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -177,7 +178,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
 
   private mapChangelog(xmlDoc: any, args: CommandArgs): Changelog {
     const channel = xmlDoc.getElementsByTagName('channel').item(0);
-    
+
     const changelog: Changelog = {
       title: channel.getElementsByTagName('title').item(0).textContent,
       description: channel.getElementsByTagName('description').item(0).textContent,
@@ -186,7 +187,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
     } as Changelog;
 
     Array.from(xmlDoc.getElementsByTagName('item')).forEach((item: any) => {
-      const description: string = args.options.output === 'text' ? 
+      const description: string = Cli.shouldTrimOutput(args.options.output) ?
         md.md2plain(item.getElementsByTagName('description').item(0).textContent, '') :
         item.getElementsByTagName('description').item(0).textContent;
 
@@ -194,8 +195,8 @@ class GraphChangelogListCommand extends AnonymousCommand {
         guid: item.getElementsByTagName('guid').item(0).textContent,
         category: item.getElementsByTagName('category').item(1).textContent,
         title: item.getElementsByTagName('title').item(0).textContent,
-        description: args.options.output === 'text' ? 
-          description.length > 50 ? `${description.substring(0, 47)}...` : description : 
+        description: Cli.shouldTrimOutput(args.options.output) ?
+          description.length > 50 ? `${description.substring(0, 47)}...` : description :
           description,
         pubDate: new Date(item.getElementsByTagName('pubDate').item(0).textContent)
       } as ChangelogItem);

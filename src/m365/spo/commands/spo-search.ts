@@ -1,4 +1,5 @@
 import { isNumber } from 'util';
+import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
@@ -334,7 +335,7 @@ class SpoSearchCommand extends SpoCommand {
       logger.log(this.getParsedOutput(args, results));
     }
 
-    if (!args.options.output || args.options.output === 'text') {
+    if (!args.options.output || Cli.shouldTrimOutput(args.options.output)) {
       logger.log("# Rows: " + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRows);
       logger.log("# Rows (Including duplicates): " + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRowsIncludingDuplicates);
       logger.log("Elapsed Time: " + this.getElapsedTime(results));
