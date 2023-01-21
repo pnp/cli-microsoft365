@@ -26,10 +26,6 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
     return commands.LIST_RETENTIONLABEL_REMOVE;
   }
 
-  public alias(): string[] | undefined {
-    return [commands.LIST_LABEL_SET];
-  }
-
   public get description(): string {
     return 'Clears the retention label on the specified list or library.';
   }
@@ -114,15 +110,11 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
     }
 
     try {
-      if (this.verbose) {
-        logger.logToStderr('Getting the list server relative URL');
-      }
-      const listServerRelativeUrl: string = await this.getListServerRelativeUrl(args);
-
+      const listServerRelativeUrl: string = await this.getListServerRelativeUrl(args, logger);
       const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
-      const requestUrl: string = `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`;
+
       const requestOptions: any = {
-        url: requestUrl,
+        url: `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -143,32 +135,33 @@ class SpoListRetentionLabelRemoveCommand extends SpoCommand {
     }
   }
 
-  private async getListServerRelativeUrl(args: CommandArgs): Promise<string> {
-    if (args.options.listUrl) {
-      const listServerRelativeUrlFromPath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+  private async getListServerRelativeUrl(args: CommandArgs, logger: Logger): Promise<string> {
+    if (this.verbose) {
+      logger.logToStderr('Getting the list server relative URL');
+    }
 
-      return listServerRelativeUrlFromPath;
+    if (args.options.listUrl) {
+      return urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+    }
+
+    let listRestUrl = '';
+    if (args.options.listId) {
+      listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
     }
     else {
-      let listRestUrl = '';
-      if (args.options.listId) {
-        listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
-      }
-      else {
-        listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
-      }
-
-      const requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder`,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const listInstance: ListInstance = await request.get<ListInstance>(requestOptions);
-      return listInstance.RootFolder.ServerRelativeUrl;
+      listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
     }
+
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const listInstance: ListInstance = await request.get<ListInstance>(requestOptions);
+    return listInstance.RootFolder.ServerRelativeUrl;
   }
 }
 

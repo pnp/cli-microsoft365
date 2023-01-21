@@ -17,6 +17,11 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let promptOptions: any;
+  const listResponse = {
+    "RootFolder": {
+      "ServerRelativeUrl": "/sites/team1/Shared Documents"
+    }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -147,9 +152,8 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/web/lists/getByTitle('MyLibrary')/?$expand=RootFolder&$select=RootFolder`) {
-        return Promise.resolve({ "RootFolder": { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "MyLibrary", "ProgID": null, "ServerRelativeUrl": "/sites/team1/MyLibrary", "TimeCreated": "2019-01-11T10:03:19Z", "TimeLastModified": "2019-01-11T10:03:20Z", "UniqueId": "faaa6af2-0157-4e9a-a352-6165195923c8", "WelcomePage": "" } }
-        );
+      if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/web/lists/getByTitle('MyLibrary')/?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`) {
+        return Promise.resolve(listResponse);
       }
 
       return Promise.reject('Invalid request');
@@ -166,7 +170,7 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
 
   it('should handle error if list does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/web/lists/getByTitle('MyLibrary')/?$expand=RootFolder&$select=RootFolder`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/web/lists/getByTitle('MyLibrary')/?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`) {
         return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
       }
 
@@ -193,9 +197,8 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/web/lists/getByTitle('MyLibrary')/?$expand=RootFolder&$select=RootFolder`) {
-        return Promise.resolve({ "RootFolder": { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "MyLibrary", "ProgID": null, "ServerRelativeUrl": "/sites/team1/MyLibrary", "TimeCreated": "2019-01-11T10:03:19Z", "TimeLastModified": "2019-01-11T10:03:20Z", "UniqueId": "faaa6af2-0157-4e9a-a352-6165195923c8", "WelcomePage": "" } }
-        );
+      if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/web/lists/getByTitle('MyLibrary')/?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`) {
+        return Promise.resolve(listResponse);
       }
 
       return Promise.reject('Invalid request');
@@ -221,9 +224,8 @@ describe(commands.LIST_RETENTIONLABEL_REMOVE, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/web/lists(guid'faaa6af2-0157-4e9a-a352-6165195923c8')/?$expand=RootFolder&$select=RootFolder`) {
-        return Promise.resolve({ "RootFolder": { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "MyLibrary", "ProgID": null, "ServerRelativeUrl": "/sites/team1/MyLibrary", "TimeCreated": "2019-01-11T10:03:19Z", "TimeLastModified": "2019-01-11T10:03:20Z", "UniqueId": "faaa6af2-0157-4e9a-a352-6165195923c8", "WelcomePage": "" } }
-        );
+      if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/web/lists(guid'faaa6af2-0157-4e9a-a352-6165195923c8')/?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl`) {
+        return Promise.resolve(listResponse);
       }
 
       return Promise.reject('Invalid request');
