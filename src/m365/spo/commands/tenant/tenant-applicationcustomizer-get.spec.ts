@@ -7,6 +7,7 @@ import { CommandOutput } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
+import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -48,6 +49,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  let requests: any[];
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -71,10 +73,12 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    requests = [];
   });
 
   afterEach(() => {
     sinonUtil.restore([
+      request.get,
       Cli.executeCommandWithOutput
     ]);
   });
@@ -188,11 +192,15 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('retrieves an application customizer by title', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<CommandOutput> => {
-      if (command === SpoTenantAppCatalogUrlGetCommand) {
-        return { stdout: JSON.stringify(appCatalogUrl) } as CommandOutput;
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      requests.push(opts);
+      if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
+        return { CorporateCatalogUrl: appCatalogUrl };
       }
+      throw 'Invalid request';
+    });
 
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<CommandOutput> => {
       if (command === SpoListItemListCommand) {
         return { stdout: JSON.stringify(applicationCustomizerResponse) } as CommandOutput;
       }
