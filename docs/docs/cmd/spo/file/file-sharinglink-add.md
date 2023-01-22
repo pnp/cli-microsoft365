@@ -13,10 +13,10 @@ m365 spo file sharinglink add [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the file is located.
 
-`-f, --fileUrl [fileUrl]`
+`--fileUrl [fileUrl]`
 : The server-relative (decoded) URL of the file. Specify either `fileUrl` or `fileId` but not both.
 
-`-i, --fileId [fileId]`
+`--fileId [fileId]`
 : The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both.
 
 `--type <type>`
@@ -35,19 +35,19 @@ m365 spo file sharinglink add [options]
 Creates a sharing link of a specific type for a file by id
 
 ```sh
-m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com/sites/demo --fileId daebb04b-a773-4baa-b1d1-3625418e3234 --type view
+m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com --fileId daebb04b-a773-4baa-b1d1-3625418e3234 --type view
 ```
 
 Creates a sharing link of a specific type for a file by url
 
 ```sh
-m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com/sites/demo --fileUrl "Shared Documents/Test1.docx" --type edit
+m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com --fileUrl "Shared Documents/Test1.docx" --type edit
 ```
 
 Creates a sharing link of a file by url with type, scope and expirationDateTime parameter
 
 ```sh
-m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com/sites/demo --fileUrl "Shared Documents/Test1.docx" --type edit --scope anonymous --expirationDateTime "2023-01-09T16:20:00Z"
+m365 spo file sharinglink add --webUrl https://contoso.sharepoint.com --fileUrl "Shared Documents/Test1.docx" --type edit --scope anonymous --expirationDateTime "2023-01-09T16:20:00Z"
 ```
 
 ## Response

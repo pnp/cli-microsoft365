@@ -146,7 +146,7 @@ describe(commands.FILE_SHARINGLINK_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, type: 'edit', expirationDateTime: "2023-01-09T16:20:00Z", scope: 'organization', verbose: true } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, fileUrl: fileUrl, type: 'edit', expirationDateTime: "2023-01-09T16:20:00Z", scope: 'anonymous', verbose: true } } as any);
     assert(loggerLogSpy.calledWith(graphResponseTwo));
   });
 
@@ -176,6 +176,11 @@ describe(commands.FILE_SHARINGLINK_ADD, () => {
   it('fails validation if the expirationDateTime option is not a valid date', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: fileId, expirationDateTime: 'invalid date', type: 'view' } }, commandInfo);
     assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if the expirationDateTime option a valid date along with the anonymous scope', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileId: fileId, expirationDateTime: '2023-01-09T16:20:00Z', type: 'view', scope: 'anonymous' } }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if invalid scope specified', async () => {

@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   fileId?: string;
   fileUrl?: string;
   type: string;
-  expirationDateTime: string;
+  expirationDateTime?: string;
   scope?: string;
 }
 
@@ -58,10 +58,10 @@ class SpoFileSharingLinkAddCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --fileId [fileId]'
+        option: '--fileId [fileId]'
       },
       {
-        option: '-f, --fileUrl [fileUrl]'
+        option: '--fileUrl [fileUrl]'
       },
       {
         option: '--type <type>',
@@ -89,8 +89,7 @@ class SpoFileSharingLinkAddCommand extends SpoCommand {
           return `${args.options.fileId} is not a valid GUID`;
         }
 
-        if (args.options.type &&
-          SpoFileSharingLinkAddCommand.types.indexOf(args.options.type) < 0) {
+        if (SpoFileSharingLinkAddCommand.types.indexOf(args.options.type) < 0) {
           return `'${args.options.type}' is not a valid type. Allowed types are ${SpoFileSharingLinkAddCommand.types.join(', ')}`;
         }
 
@@ -99,8 +98,10 @@ class SpoFileSharingLinkAddCommand extends SpoCommand {
           return `'${args.options.scope}' is not a valid scope. Allowed scopes are ${SpoFileSharingLinkAddCommand.scopes.join(', ')}`;
         }
 
-        if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {
-          return `${args.options.expirationDateTime} is not a valid ISO date string.`;
+        if (args.options.scope && args.options.scope === 'anonymous' || !args.options.scope) {
+          if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {
+            return `${args.options.expirationDateTime} is not a valid ISO date string.`;
+          }
         }
 
         return true;
