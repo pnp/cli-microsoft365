@@ -13,6 +13,7 @@
 - [pp aibuildermodel get](../cmd/pp/aibuildermodel/aibuildermodel-get.md) - gets an AI builder model in the specified Power Platform environment [#4325](https://github.com/pnp/cli-microsoft365/issues/4325)
 - [pp aibuildermodel list](../cmd/pp/aibuildermodel/aibuildermodel-list.md) - list available AI builder models in the specified Power Platform environment [#4174](https://github.com/pnp/cli-microsoft365/issues/4174)
 - [pp aibuildermodel remove](../cmd/pp/aibuildermodel/aibuildermodel-remove.md) - removes an AI builder model in the specified Power Platform environment [#4326](https://github.com/pnp/cli-microsoft365/issues/4326)
+- [pp solution publish](../cmd/pp/solution/solution-publish.md) - publishes the components of a solution in a Power Platform environment [#3805](https://github.com/pnp/cli-microsoft365/issues/3805)
 
 **Purview:**
 
@@ -24,9 +25,13 @@
 - [spo file sharinglink get](../cmd/spo/file/file-sharinglink-get.md) - gets details about a specific sharing link of a file [#4024](https://github.com/pnp/cli-microsoft365/issues/4024)
 - [spo file sharinglink list](../cmd/spo/file/file-sharinglink-list.md) - lists all the sharing links of a specific file [#4023](https://github.com/pnp/cli-microsoft365/issues/4023)
 - [spo file sharinglink remove](../cmd/spo/file/file-sharinglink-remove.md) - removes a specific sharing link of a file [#4027](https://github.com/pnp/cli-microsoft365/issues/4027)
+- [spo file retentionlabel ensure](../cmd/spo/file/file-retentionlabel-ensure.md) - applies a retention label to a file [#4159](https://github.com/pnp/cli-microsoft365/issues/4159)
+- [spo file retentionlabel remove](../cmd/spo/file/file-retentionlabel-remove.md) - clears a retention label from a file [#4163](https://github.com/pnp/cli-microsoft365/issues/4163)
+- [spo folder retentionlabel ensure](../cmd/spo/folder/folder-retentionlabel-ensure.md) - applies a retention label to a folder [#4160](https://github.com/pnp/cli-microsoft365/issues/4160)
 - [spo listitem record lock](../cmd/spo/listitem/listitem-record-lock.md) - locks the list item record [#4237](https://github.com/pnp/cli-microsoft365/issues/4237)
 - [spo listitem record unlock](../cmd/spo/listitem/listitem-record-unlock.md) - unlocks the list item record [#4239](https://github.com/pnp/cli-microsoft365/issues/4239)
-- [spo listitem retentionlabel ensure](../cmd/spo/listitem/listitem-retentionlabel-ensure.md) - adds a retention label to a list item [#4158](https://github.com/pnp/cli-microsoft365/issues/4158)
+- [spo listitem retentionlabel ensure](../cmd/spo/listitem/listitem-retentionlabel-ensure.md) - applies a retention label to a list item [#4158](https://github.com/pnp/cli-microsoft365/issues/4158)
+- [spo list retentionlabel remove](../cmd/spo/list/list-retentionlabel-remove.md) - clears a retention label from a list [#4290](https://github.com/pnp/cli-microsoft365/issues/4290)
 
 **Teams:**
 
