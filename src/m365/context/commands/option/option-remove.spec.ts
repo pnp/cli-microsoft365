@@ -1,13 +1,13 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { Cli } from '../../../cli/Cli';
-import { Logger } from '../../../cli/Logger';
-import Command, { CommandError } from '../../../Command';
-import { telemetry } from '../../../telemetry';
-import { sinonUtil } from '../../../utils/sinonUtil';
-import commands from '../commands';
-const command: Command = require('./context-option-remove');
+import { Cli } from '../../../../cli/Cli';
+import { Logger } from '../../../../cli/Logger';
+import Command, { CommandError } from '../../../../Command';
+import { telemetry } from '../../../../telemetry';
+import { sinonUtil } from '../../../../utils/sinonUtil';
+import commands from '../../commands';
+const command: Command = require('./option-remove');
 
 describe(commands.OPTION_REMOVE, () => {
   let log: any[];
@@ -61,7 +61,7 @@ describe(commands.OPTION_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the context from the .m365rc.json file when confirm option not passed', async () => {
+  it('prompts before removing the context option from the .m365rc.json file when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
         debug: false
@@ -149,10 +149,7 @@ describe(commands.OPTION_REMOVE, () => {
           "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
           "name": "CLI app"
         }
-      ],
-      "context": {
-        "listId": "5"
-      }
+      ]
     }));
 
     await assert.rejects(command.action(logger, { options: { debug: true, name: 'listName', confirm: true } }), new CommandError(`There is no option listName in the context info`));

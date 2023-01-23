@@ -1,11 +1,11 @@
 import * as fs from 'fs';
-import { Cli } from '../../../cli/Cli';
-import { Logger } from '../../../cli/Logger';
-import { CommandError } from '../../../Command';
-import GlobalOptions from '../../../GlobalOptions';
-import ContextCommand from '../../base/ContextCommand';
-import { M365RcJson } from '../../base/M365RcJson';
-import commands from '../commands';
+import { Cli } from '../../../../cli/Cli';
+import { Logger } from '../../../../cli/Logger';
+import { CommandError } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import ContextCommand from '../../../base/ContextCommand';
+import { M365RcJson } from '../../../base/M365RcJson';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -22,7 +22,7 @@ class ContextOptionRemoveCommand extends ContextCommand {
   }
 
   public get description(): string {
-    return 'Removes a CLI for Microsoft 365 context option in the current working folder';
+    return 'Removes an option by defined option from context';
   }
 
   constructor() {
@@ -52,8 +52,12 @@ class ContextOptionRemoveCommand extends ContextCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Removing context option '${args.options.name}'...`);
+    }
+
     if (args.options.confirm) {
-      this.removeContextOption(args.options.name);
+      this.removeContextOption(args.options.name, logger);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -64,16 +68,19 @@ class ContextOptionRemoveCommand extends ContextCommand {
       });
 
       if (result.continue) {
-        this.removeContextOption(args.options.name);
+        this.removeContextOption(args.options.name, logger);
       }
     }
   }
-  private removeContextOption(name: string): void {
+  private removeContextOption(name: string, logger: Logger): void {
     const filePath: string = '.m365rc.json';
 
     let m365rc: M365RcJson = {};
     if (fs.existsSync(filePath)) {
       try {
+        if (this.verbose) {
+          logger.logToStderr(`Reading context file...`);
+        }
         const fileContents: string = fs.readFileSync(filePath, 'utf8');
         if (fileContents) {
           m365rc = JSON.parse(fileContents);
@@ -89,6 +96,9 @@ class ContextOptionRemoveCommand extends ContextCommand {
     }
     else {
       try {
+        if (this.verbose) {
+          logger.logToStderr(`Removing context option ${name} from the context file...`);
+        }
         delete m365rc.context[name];
         fs.writeFileSync(filePath, JSON.stringify(m365rc, null, 2));
       }

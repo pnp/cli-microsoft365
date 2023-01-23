@@ -1,6 +1,6 @@
 # context option remove
 
-Removes a CLI for Microsoft 365 context option in the current working folder
+Removes an option by defined option from context
 
 ## Usage
 
@@ -14,7 +14,7 @@ m365 context option remove [options]
 : The option name which will be deleted from the context
 
 `--confirm`
-: Don't prompt for confirmation to remove the context
+: Don't prompt for confirmation to remove the context option
 
 --8<-- "docs/cmd/_global.md"
 
