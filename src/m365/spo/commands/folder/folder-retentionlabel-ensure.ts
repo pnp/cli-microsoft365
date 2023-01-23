@@ -19,11 +19,6 @@ interface CommandArgs {
   options: Options;
 }
 
-interface folderOptions {
-  id: string,
-  listId: string
-}
-
 interface Options extends GlobalOptions {
   webUrl: string;
   name: string;
@@ -103,11 +98,11 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
     }
     try {
       const folderProperties = await this.getFolderProperties(args);
-      if (typeof folderProperties !== 'string') {
+      if (folderProperties.ListItemAllFields) {
         const options: SpoListItemRetentionLabelEnsureCommandOptions = {
           webUrl: args.options.webUrl,
-          listId: folderProperties.listId,
-          listItemId: folderProperties.id,
+          listId: folderProperties.ListItemAllFields.Id,
+          listItemId: folderProperties.ListItemAllFields.ParentList.Id,
           name: args.options.name,
           output: 'json',
           debug: this.debug,
@@ -122,7 +117,7 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
       else {
         const options: SpoListRetentionLabelEnsureCommandOptions = {
           webUrl: args.options.webUrl,
-          listUrl: folderProperties as string,
+          listUrl: folderProperties.ServerRelativeUrl,
           name: args.options.name,
           output: 'json',
           debug: this.debug,
@@ -140,7 +135,7 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
     }
   }
 
-  private async getFolderProperties(args: CommandArgs): Promise<folderOptions | string> {
+  private async getFolderProperties(args: CommandArgs): Promise<FolderProperties> {
     const requestOptions: AxiosRequestConfig = {
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -162,12 +157,7 @@ class SpoFolderRetentionLabelEnsureCommand extends SpoCommand {
 
     const response = await request.get<FolderProperties>(requestOptions);
 
-    // if List, return the server relative list url because Unique ID does not work for api /list(guid 'Unique ID') in command list retentionlabel ensure
-    if (!response.ListItemAllFields) {
-      return response.ServerRelativeUrl;
-    }
-
-    return { id: response.ListItemAllFields.Id, listId: response.ListItemAllFields.ParentList.Id };
+    return response;
   }
 }
 
