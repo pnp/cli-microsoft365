@@ -12,6 +12,7 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as SpoListItemRetentionLabelRemoveCommand from '../listitem/listitem-retentionlabel-remove';
+import * as SpoListRetentionLabelRemoveCommand from '../list/list-retentionlabel-remove';
 const command: Command = require('./folder-retentionlabel-remove');
 
 describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
@@ -20,6 +21,7 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
   const folderId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const listId = 1;
   const SpoListItemRetentionLabelRemoveCommandOutput = `{ "stdout": "", "stderr": "" }`;
+  const SpoListRetentionLabelRemoveCommandOutput = `{ "stdout": "", "stderr": "" }`;
   const folderResponse = {
     ListItemAllFields: {
       Id: listId,
@@ -114,7 +116,7 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel from a folder based on folderUrl when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
         return folderResponse;
       }
 
@@ -146,7 +148,7 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel from a folder based on folderId when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
         return folderResponse;
       }
 
@@ -179,7 +181,7 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
 
   it('removes the retentionlabel from a folder based on folderId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
         return folderResponse;
       }
 
@@ -206,6 +208,36 @@ describe(commands.FOLDER_RETENTIONLABEL_REMOVE, () => {
       }
     }));
   });
+
+  it('removes the retentionlabel to a folder if the folder is the rootfolder of a document library based on folderId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFolderById('${folderId}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+        return { ServerRelativeUrl: '/Shared Documents' };
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoListRetentionLabelRemoveCommand) {
+        return ({
+          stdout: SpoListRetentionLabelRemoveCommandOutput
+        });
+      }
+
+      throw new CommandError('Unknown case');
+    });
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        debug: true,
+        folderId: folderId,
+        webUrl: webUrl,
+        confirm: true
+      }
+    }));
+  });
+
 
   it('correctly handles API OData error', async () => {
     const errorMessage = 'Something went wrong';
