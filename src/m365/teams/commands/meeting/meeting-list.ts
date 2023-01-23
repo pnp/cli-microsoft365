@@ -145,7 +145,7 @@ class TeamsMeetingListCommand extends GraphCommand {
 
       const res = await odata.getAllItems<Meeting>(requestUrl);
       const resFiltered = res.filter(y => y.isOnlineMeeting);
-      if (!args.options.output || args.options.output === 'json') {
+      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
         logger.log(resFiltered);
       }
       else {

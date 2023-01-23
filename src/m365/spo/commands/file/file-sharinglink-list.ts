@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
@@ -111,7 +112,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
 
       const sharingLinks = await odata.getAllItems<any>(url);
 
-      if (!args.options.output || args.options.output === 'json' || args.options.output === 'md') {
+      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
         logger.log(sharingLinks);
       }
       else {

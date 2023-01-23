@@ -136,7 +136,7 @@ describe(commands.PAGE_SECTION_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'text' } });
     assert(loggerLogSpy.calledWith([{
       "order": 1,
       "columns": 2
@@ -227,7 +227,7 @@ describe(commands.PAGE_SECTION_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx' } });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', output: 'text' } });
     assert(loggerLogSpy.calledWith([{
       "order": 1,
       "columns": 2
@@ -247,7 +247,7 @@ describe(commands.PAGE_SECTION_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home', output: 'text' } });
     assert(loggerLogSpy.calledWith([{
       "order": 1,
       "columns": 2
