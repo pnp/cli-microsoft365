@@ -13,10 +13,10 @@ m365 spo file sharinglink list [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the file is located.
 
-`-f, --fileUrl [fileUrl]`
+`--fileUrl [fileUrl]`
 : The server-relative (decoded) URL of the file. Specify either `fileUrl` or `fileId` but not both.
 
-`-i, --fileId [fileId]`
+`--fileId [fileId]`
 : The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both.
 
 `--scope [scope]`

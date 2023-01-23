@@ -59,10 +59,10 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --fileId [fileId]'
+        option: '--fileId [fileId]'
       },
       {
-        option: '-f, --fileUrl [fileUrl]'
+        option: '--fileUrl [fileUrl]'
       },
       {
         option: '--scope [scope]',
