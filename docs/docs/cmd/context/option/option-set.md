@@ -20,7 +20,7 @@ m365 context option set [options]
 
 ## Examples
 
-Adds a new key to the CLI for Microsoft 365 context in the current working folder
+Adds a new name to the CLI for Microsoft 365 context in the current working folder
 
 ```sh
 m365 context option set --name 'listName' --value 'testList'

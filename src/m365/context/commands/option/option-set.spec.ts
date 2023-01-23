@@ -1,12 +1,12 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { Logger } from '../../../cli/Logger';
-import Command, { CommandError } from '../../../Command';
-import { telemetry } from '../../../telemetry';
-import { sinonUtil } from '../../../utils/sinonUtil';
-import commands from '../commands';
-const command: Command = require('./context-option-set');
+import { Logger } from '../../../../cli/Logger';
+import Command, { CommandError } from '../../../../Command';
+import { telemetry } from '../../../../telemetry';
+import { sinonUtil } from '../../../../utils/sinonUtil';
+import commands from '../../commands';
+const command: Command = require('./option-set');
 
 describe(commands.OPTION_SET, () => {
   let log: any[];
@@ -106,6 +106,40 @@ describe(commands.OPTION_SET, () => {
     await assert.doesNotReject(command.action(logger, { options: { debug: true, name: 'listName', value: 'testList' } }));
     assert.strictEqual(filePath, '.m365rc.json');
     assert.strictEqual(fileContents, JSON.stringify({
+      context: { listName: 'testList' }
+    }, null, 2));
+  });
+
+  it('Updates an existing key with a new value', async () => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+      "apps": [
+        {
+          "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
+          "name": "CLI app"
+        }
+      ],
+      "context": {
+        listName: "oldListName"
+      }
+    }));
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    await command.action(logger, { options: { verbose: true, name: 'listName', value: 'testList' } });
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      "apps": [
+        {
+          "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
+          "name": "CLI app"
+        }
+      ],
       context: { listName: 'testList' }
     }, null, 2));
   });
