@@ -4,6 +4,11 @@
 
 ### New commands
 
+**Context:**
+
+- [context option set](../cmd/context/option/option-set.md) - Allows to add a new name for the option and value to CLI for Microsoft 365 context in the current working folder [#4045](https://github.com/pnp/cli-microsoft365/issues/4045)
+- [context option remove](../cmd/context/option/option-remove.md) - removes an already available name from the CLI for Microsoft 365 context in the current working folder [#4046](https://github.com/pnp/cli-microsoft365/issues/4046)
+
 **OneNote:**
 
 - [onenote page list](../cmd/onenote/page/page-list.md) - retrieve a list of OneNote pages [#4001](https://github.com/pnp/cli-microsoft365/issues/4001)
