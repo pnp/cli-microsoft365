@@ -28,6 +28,7 @@
 - [spo file retentionlabel ensure](../cmd/spo/file/file-retentionlabel-ensure.md) - applies a retention label to a file [#4159](https://github.com/pnp/cli-microsoft365/issues/4159)
 - [spo file retentionlabel remove](../cmd/spo/file/file-retentionlabel-remove.md) - clears a retention label from a file [#4163](https://github.com/pnp/cli-microsoft365/issues/4163)
 - [spo folder retentionlabel ensure](../cmd/spo/folder/folder-retentionlabel-ensure.md) - applies a retention label to a folder [#4160](https://github.com/pnp/cli-microsoft365/issues/4160)
+- [spo folder retentionlabel remove](../cmd/spo/folder/folder-retentionlabel-remove.md) - clears a retention label from a folder [#4164](https://github.com/pnp/cli-microsoft365/issues/4164)
 - [spo listitem record lock](../cmd/spo/listitem/listitem-record-lock.md) - locks the list item record [#4237](https://github.com/pnp/cli-microsoft365/issues/4237)
 - [spo listitem record unlock](../cmd/spo/listitem/listitem-record-unlock.md) - unlocks the list item record [#4239](https://github.com/pnp/cli-microsoft365/issues/4239)
 - [spo listitem retentionlabel ensure](../cmd/spo/listitem/listitem-retentionlabel-ensure.md) - applies a retention label to a list item [#4158](https://github.com/pnp/cli-microsoft365/issues/4158)
