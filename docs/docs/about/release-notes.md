@@ -6,7 +6,7 @@
 
 **Context:**
 
-- [context option set](../cmd/context/option/option-set.md) - Allows to add a new name for the option and value to CLI for Microsoft 365 context in the current working folder [#4045](https://github.com/pnp/cli-microsoft365/issues/4045)
+- [context option set](../cmd/context/option/option-set.md) - allows to add a new name for the option and value to CLI for Microsoft 365 context in the current working folder [#4045](https://github.com/pnp/cli-microsoft365/issues/4045)
 - [context option remove](../cmd/context/option/option-remove.md) - removes an already available name from the CLI for Microsoft 365 context in the current working folder [#4046](https://github.com/pnp/cli-microsoft365/issues/4046)
 
 **OneNote:**
@@ -27,6 +27,7 @@
 
 **SharePoint:**
 
+- [spo file sharinglink add](../cmd/spo/file/file-sharinglink-add.md) - creates a new sharing link for a file [#4025](https://github.com/pnp/cli-microsoft365/issues/4025)
 - [spo file sharinglink get](../cmd/spo/file/file-sharinglink-get.md) - gets details about a specific sharing link of a file [#4024](https://github.com/pnp/cli-microsoft365/issues/4024)
 - [spo file sharinglink list](../cmd/spo/file/file-sharinglink-list.md) - lists all the sharing links of a specific file [#4023](https://github.com/pnp/cli-microsoft365/issues/4023)
 - [spo file sharinglink remove](../cmd/spo/file/file-sharinglink-remove.md) - removes a specific sharing link of a file [#4027](https://github.com/pnp/cli-microsoft365/issues/4027)
