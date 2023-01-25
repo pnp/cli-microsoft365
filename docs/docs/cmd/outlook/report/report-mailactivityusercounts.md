@@ -37,3 +37,43 @@ Gets the trends on the number of unique users who are performing email activitie
 ```sh
 m365 outlook report mailactivityusercounts --period D7 --output json > "mailactivityusercounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-01-24",
+        "Send": "",
+        "Receive": "2",
+        "Read": "",
+        "Meeting Created": "0",
+        "Meeting Interacted": "",
+        "Report Date": "2023-01-18",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```txt
+    Report Refresh Date,Send,Receive,Read,Meeting Created,Meeting Interacted,Report Date,Report Period
+    2023-01-24,,2,,0,,2023-01-18,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Send,Receive,Read,Meeting Created,Meeting Interacted,Report Date,Report Period
+    2023-01-24,,2,,0,,2023-01-18,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Send,Receive,Read,Meeting Created,Meeting Interacted,Report Date,Report Period
+    2023-01-24,,2,,0,,2023-01-18,7
+    ```

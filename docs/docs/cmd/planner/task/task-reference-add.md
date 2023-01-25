@@ -43,3 +43,49 @@ Add a new reference with the url _https://www.microsoft.com_ and with the type E
 ```sh
 m365 planner task reference add --taskId "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --url "https://www.microsoft.com" --type "Excel"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "https%3A//microsoft%2Ecom": {
+        "alias": null,
+        "type": null,
+        "previewPriority": "8585269190192498871PB",
+        "lastModifiedDateTime": "2023-01-25T23:05:26.24332Z",
+        "lastModifiedBy": {
+          "user": {
+            "displayName": null,
+            "id": "b2091e18-7882-4efe-b7d1-90703f5a5c65"
+          }
+        }
+      }
+    }
+    ```
+
+=== "Text"
+
+    ```txt
+    https%3A//microsoft%2Ecom: {"alias":null,"type":null,"previewPriority":"8585269190192498871PB","lastModifiedDateTime":"2023-01-25T23:05:26.24332Z","lastModifiedBy":{"user":{"displayName":null,"id":"b2091e18-7882-4efe-b7d1-90703f5a5c65"}}}
+    ```
+
+=== "CSV"
+
+    ```csv
+    https%3A//microsoft%2Ecom
+    "{""alias"":null,""type"":null,""previewPriority"":""8585269190192498871PB"",""lastModifiedDateTime"":""2023-01-25T23:05:26.24332Z"",""lastModifiedBy"":{""user"":{""displayName"":null,""id"":""b2091e18-7882-4efe-b7d1-90703f5a5c65""}}}"
+    ```
+
+=== "Markdown"
+
+    ```md
+    # planner task reference add --taskId "OopX1ANphEu7Lm4-0tVtl5cAFRGQ" --url "https://microsoft.com"
+
+    Date: 4/2/2023
+
+    Property | Value
+    ---------|-------
+    https%3A//microsoft%2Ecom | {"alias":null,"type":null,"previewPriority":"8585269190192498871PB;","lastModifiedDateTime":"2023-01-25T23:05:26.24332Z","lastModifiedBy":{"user":{"displayName":null,"id":"b2091e18-7882-4efe-b7d1-90703f5a5c65"}}}
+    ```

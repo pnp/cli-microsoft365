@@ -123,3 +123,7 @@ Send an email with multiple attachments
 ```sh
 m365 outlook mail send --to chris@contoso.com --subject "Monthly reports" --bodyContents "Here are the reports of this month." --attachment "C:/Reports/File1.jpg" --attachment "C:/Reports/File2.docx" --attachment "C:/Reports/File3.xlsx"
 ```
+
+## Response
+
+The command won't return a response on success.

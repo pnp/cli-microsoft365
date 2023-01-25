@@ -55,3 +55,134 @@ Retrieve the specified planner task with the title _My Planner Task_ from the bu
 ```sh
 m365 planner task get --title "My Planner Task" --bucketName "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "planId": "oUHpnKBFekqfGE_PS6GGUZcAFY7b",
+      "bucketId": "vncYUXCRBke28qMLB-d4xJcACtNz",
+      "title": "Important task",
+      "orderHint": "8585269235419217847",
+      "assigneePriority": "",
+      "percentComplete": 50,
+      "startDateTime": "2023-01-20T00:00:00Z",
+      "createdDateTime": "2023-01-25T21:49:03.555796Z",
+      "dueDateTime": "2023-02-15T00:00:00Z",
+      "hasDescription": true,
+      "previewType": "automatic",
+      "completedDateTime": null,
+      "completedBy": null,
+      "referenceCount": 0,
+      "checklistItemCount": 2,
+      "activeChecklistItemCount": 2,
+      "conversationThreadId": null,
+      "priority": 5,
+      "id": "OopX1ANphEu7Lm4-0tVtl5cAFRGQ",
+      "createdBy": {
+        "user": {
+          "displayName": null,
+          "id": "b2091e18-7882-4efe-b7d1-90703f5a5c65"
+        },
+        "application": {
+          "displayName": null,
+          "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
+        }
+      },
+      "appliedCategories": {},
+      "assignments": {},
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      "references": {},
+      "checklist": {
+        "4e3c8841-560c-436e-ba06-cc7731680d59": {
+          "isChecked": false,
+          "title": "Communicate with customer",
+          "orderHint": "8585269209601773376",
+          "lastModifiedDateTime": "2023-01-25T22:32:05.3002431Z",
+          "lastModifiedBy": {
+            "user": {
+              "displayName": null,
+              "id": "b2091e18-7882-4efe-b7d1-90703f5a5c65"
+            }
+          }
+        }
+      }
+    }
+    ```
+
+=== "Text"
+
+    ```txt
+    activeChecklistItemCount: 1
+    appliedCategories       : {}
+    assigneePriority        :
+    assignments             : {}
+    bucketId                : vncYUXCRBke28qMLB-d4xJcACtNz
+    checklist               : {"4e3c8841-560c-436e-ba06-cc7731680d59":{"isChecked":false,"title":"Communicate with customer","orderHint":"8585269209601773376","lastModifiedDateTime":"2023-01-25T22:32:05.3002431Z","lastModifiedBy":{"user":{"displayName":null,"id":"b2091e18-7882-4efe-b7d1-90703f5a5c65"}}}}
+    checklistItemCount      : 1
+    completedBy             : null
+    completedDateTime       : null
+    conversationThreadId    : null
+    createdBy               : {"user":{"displayName":null,"id":"b2091e18-7882-4efe-b7d1-90703f5a5c65"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}
+    createdDateTime         : 2023-01-25T21:49:03.555796Z
+    description             : Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    dueDateTime             : 2023-02-15T00:00:00Z
+    hasDescription          : true
+    id                      : OopX1ANphEu7Lm4-0tVtl5cAFRGQ
+    orderHint               : 8585269235419217847
+    percentComplete         : 50
+    planId                  : oUHpnKBFekqfGE_PS6GGUZcAFY7b
+    previewType             : automatic
+    priority                : 5
+    referenceCount          : 0
+    references              : {}
+    startDateTime           : 2023-01-20T00:00:00Z
+    title                   : Important task
+    ```
+
+=== "CSV"
+
+    ```csv
+    planId,bucketId,title,orderHint,assigneePriority,percentComplete,startDateTime,createdDateTime,dueDateTime,hasDescription,previewType,completedDateTime,completedBy,referenceCount,checklistItemCount,activeChecklistItemCount,conversationThreadId,priority,id,createdBy,appliedCategories,assignments,description,references,checklist
+    oUHpnKBFekqfGE_PS6GGUZcAFY7b,vncYUXCRBke28qMLB-d4xJcACtNz,Important task,8585269235419217847,,50,2023-01-20T00:00:00Z,2023-01-25T21:49:03.555796Z,2023-02-15T00:00:00Z,1,automatic,,,0,1,1,,5,OopX1ANphEu7Lm4-0tVtl5cAFRGQ,"{""user"":{""displayName"":null,""id"":""b2091e18-7882-4efe-b7d1-90703f5a5c65""},""application"":{""displayName"":null,""id"":""31359c7f-bd7e-475c-86db-fdb8c937548e""}}",{},{},"Lorem ipsum dolor sit amet, consectetur adipiscing elit.",{},"{""4e3c8841-560c-436e-ba06-cc7731680d59"":{""isChecked"":false,""title"":""Communicate with customer"",""orderHint"":""8585269209601773376"",""lastModifiedDateTime"":""2023-01-25T22:32:05.3002431Z"",""lastModifiedBy"":{""user"":{""displayName"":null,""id"":""b2091e18-7882-4efe-b7d1-90703f5a5c65""}}}}"
+    ```
+
+=== "Markdown"
+
+    ```md
+    # planner task get --id "OopX1ANphEu7Lm4-0tVtl5cAFRGQ"
+
+    Date: 25/1/2023
+
+    ## Important task (OopX1ANphEu7Lm4-0tVtl5cAFRGQ)
+
+    Property | Value
+    ---------|-------
+    planId | oUHpnKBFekqfGE\_PS6GGUZcAFY7b
+    bucketId | vncYUXCRBke28qMLB-d4xJcACtNz
+    title | Important task
+    orderHint | 8585269235419217847
+    assigneePriority |
+    percentComplete | 50
+    startDateTime | 2023-01-20T00:00:00Z
+    createdDateTime | 2023-01-25T21:49:03.555796Z
+    dueDateTime | 2023-02-15T00:00:00Z
+    hasDescription | true
+    previewType | automatic
+    completedDateTime | null
+    completedBy | null
+    referenceCount | 0
+    checklistItemCount | 1
+    activeChecklistItemCount | 1
+    conversationThreadId | null
+    priority | 5
+    id | OopX1ANphEu7Lm4-0tVtl5cAFRGQ
+    createdBy | {"user":{"displayName":null,"id":"b2091e18-7882-4efe-b7d1-90703f5a5c65"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}
+    appliedCategories | {}
+    assignments | {}
+    description | Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    references | {}
+    checklist | {"4e3c8841-560c-436e-ba06-cc7731680d59":{"isChecked":false,"title":"Communicate with customer","orderHint":"8585269209601773376","lastModifiedDateTime":"2023-01-25T22:32:05.3002431Z","lastModifiedBy":{"user":{"displayName":null,"id":"b2091e18-7882-4efe-b7d1-90703f5a5c65"}}}}
+    ```
