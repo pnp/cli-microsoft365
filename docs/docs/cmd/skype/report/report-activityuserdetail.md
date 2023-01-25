@@ -46,3 +46,70 @@ Gets details about Skype for Business activity by user for the last week and exp
 ```sh
 m365 skype report activityuserdetail --period D7 --output json > "activityuserdetail.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-01-25",
+        "User Principal Name": "john.doe@contoso.com",
+        "Is Deleted": "False",
+        "Deleted Date": "",
+        "Last Activity Date": "2021-03-22",
+        "Total Peer-to-peer Session Count": "0",
+        "Total Organized Conference Count": "0",
+        "Total Participated Conference Count": "0",
+        "Peer-to-peer Last Activity Date": "2021-03-22",
+        "Organized Conference Last Activity Date": "2021-02-15",
+        "Participated Conference Last Activity Date": "2021-02-15",
+        "Peer-to-peer IM Count": "0",
+        "Peer-to-peer Audio Count": "0",
+        "Peer-to-peer Audio Minutes": "0",
+        "Peer-to-peer Video Count": "0",
+        "Peer-to-peer Video Minutes": "0",
+        "Peer-to-peer App Sharing Count": "0",
+        "Peer-to-peer File Transfer Count": "0",
+        "Organized Conference IM Count": "0",
+        "Organized Conference Audio/Video Count": "0",
+        "Organized Conference Audio/Video Minutes": "0",
+        "Organized Conference App Sharing Count": "0",
+        "Organized Conference Web Count": "0",
+        "Organized Conference Dial-in/out 3rd Party Count": "0",
+        "Organized Conference Dial-in/out Microsoft Count": "0",
+        "Organized Conference Dial-in Microsoft Minutes": "0",
+        "Organized Conference Dial-out Microsoft Minutes": "0",
+        "Participated Conference IM Count": "0",
+        "Participated Conference Audio/Video Count": "0",
+        "Participated Conference Audio/Video Minutes": "0",
+        "Participated Conference App Sharing Count": "0",
+        "Participated Conference Web Count": "0",
+        "Participated Conference Dial-in/out 3rd Party Count": "0",
+        "Assigned Products": "MICROSOFT 365 E5+MICROSOFT POWER APPS PLAN 2 TRIAL+POWER BI (FREE)+MICROSOFT POWER AUTOMATE FREE+POWER AUTOMATE PER USER PLAN",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```txt
+    Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Total Peer-to-peer Session Count,Total Organized Conference Count,Total Participated Conference Count,Peer-to-peer Last Activity Date,Organized Conference Last Activity Date,Participated Conference Last Activity Date,Peer-to-peer IM Count,Peer-to-peer Audio Count,Peer-to-peer Audio Minutes,Peer-to-peer Video Count,Peer-to-peer Video Minutes,Peer-to-peer App Sharing Count,Peer-to-peer File Transfer Count,Organized Conference IM Count,Organized Conference Audio/Video Count,Organized Conference Audio/Video Minutes,Organized Conference App Sharing Count,Organized Conference Web Count,Organized Conference Dial-in/out 3rd Party Count,Organized Conference Dial-in/out Microsoft Count,Organized Conference Dial-in Microsoft Minutes,Organized Conference Dial-out Microsoft Minutes,Participated Conference IM Count,Participated Conference Audio/Video Count,Participated Conference Audio/Video Minutes,Participated Conference App Sharing Count,Participated Conference Web Count,Participated Conference Dial-in/out 3rd Party Count,Assigned Products,Report Period
+    2023-01-25,john.doe@contoso.com,False,,2021-03-22,0,0,0,2021-03-22,2021-02-15,2021-02-15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,MICROSOFT 365 E5+MICROSOFT POWER APPS PLAN 2 TRIAL+POWER BI (FREE)+MICROSOFT POWER AUTOMATE FREE+POWER AUTOMATE PER USER PLAN,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Total Peer-to-peer Session Count,Total Organized Conference Count,Total Participated Conference Count,Peer-to-peer Last Activity Date,Organized Conference Last Activity Date,Participated Conference Last Activity Date,Peer-to-peer IM Count,Peer-to-peer Audio Count,Peer-to-peer Audio Minutes,Peer-to-peer Video Count,Peer-to-peer Video Minutes,Peer-to-peer App Sharing Count,Peer-to-peer File Transfer Count,Organized Conference IM Count,Organized Conference Audio/Video Count,Organized Conference Audio/Video Minutes,Organized Conference App Sharing Count,Organized Conference Web Count,Organized Conference Dial-in/out 3rd Party Count,Organized Conference Dial-in/out Microsoft Count,Organized Conference Dial-in Microsoft Minutes,Organized Conference Dial-out Microsoft Minutes,Participated Conference IM Count,Participated Conference Audio/Video Count,Participated Conference Audio/Video Minutes,Participated Conference App Sharing Count,Participated Conference Web Count,Participated Conference Dial-in/out 3rd Party Count,Assigned Products,Report Period
+    2023-01-25,john.doe@contoso.com,False,,2021-03-22,0,0,0,2021-03-22,2021-02-15,2021-02-15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,MICROSOFT 365 E5+MICROSOFT POWER APPS PLAN 2 TRIAL+POWER BI (FREE)+MICROSOFT POWER AUTOMATE FREE+POWER AUTOMATE PER USER PLAN,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,User Principal Name,Is Deleted,Deleted Date,Last Activity Date,Total Peer-to-peer Session Count,Total Organized Conference Count,Total Participated Conference Count,Peer-to-peer Last Activity Date,Organized Conference Last Activity Date,Participated Conference Last Activity Date,Peer-to-peer IM Count,Peer-to-peer Audio Count,Peer-to-peer Audio Minutes,Peer-to-peer Video Count,Peer-to-peer Video Minutes,Peer-to-peer App Sharing Count,Peer-to-peer File Transfer Count,Organized Conference IM Count,Organized Conference Audio/Video Count,Organized Conference Audio/Video Minutes,Organized Conference App Sharing Count,Organized Conference Web Count,Organized Conference Dial-in/out 3rd Party Count,Organized Conference Dial-in/out Microsoft Count,Organized Conference Dial-in Microsoft Minutes,Organized Conference Dial-out Microsoft Minutes,Participated Conference IM Count,Participated Conference Audio/Video Count,Participated Conference Audio/Video Minutes,Participated Conference App Sharing Count,Participated Conference Web Count,Participated Conference Dial-in/out 3rd Party Count,Assigned Products,Report Period
+    2023-01-25,john.doe@contoso.com,False,,2021-03-22,0,0,0,2021-03-22,2021-02-15,2021-02-15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,MICROSOFT 365 E5+MICROSOFT POWER APPS PLAN 2 TRIAL+POWER BI (FREE)+MICROSOFT POWER AUTOMATE FREE+POWER AUTOMATE PER USER PLAN,7
+    ```

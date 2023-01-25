@@ -37,3 +37,46 @@ Gets the count of unique users per email app for the last week and exports the r
 ```sh
 m365 outlook report mailappusageappsusercounts --period D7 --output json > "mailappusageappsusercounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-01-25",
+        "Mail For Mac": "",
+        "Outlook For Mac": "6",
+        "Outlook For Windows": "108",
+        "Outlook For Mobile": "61",
+        "Other For Mobile": "",
+        "Outlook For Web": "2",
+        "POP3 App": "",
+        "IMAP4 App": "",
+        "SMTP App": "",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```txt
+    Report Refresh Date,Mail For Mac,Outlook For Mac,Outlook For Windows,Outlook For Mobile,Other For Mobile,Outlook For Web,POP3 App,IMAP4 App,SMTP App,Report Period
+    2023-01-25,,6,108,61,,2,,,,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Mail For Mac,Outlook For Mac,Outlook For Windows,Outlook For Mobile,Other For Mobile,Outlook For Web,POP3 App,IMAP4 App,SMTP App,Report Period
+    2023-01-25,,6,108,61,,2,,,,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Mail For Mac,Outlook For Mac,Outlook For Windows,Outlook For Mobile,Other For Mobile,Outlook For Web,POP3 App,IMAP4 App,SMTP App,Report Period
+    2023-01-25,,6,108,61,,2,,,,7
+    ```

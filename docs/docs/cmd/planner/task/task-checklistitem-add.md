@@ -34,3 +34,58 @@ Adds a checked checklist item with title _My checklist item_ to a Microsoft Plan
 ```sh
 m365 planner task checklistitem add --taskId 2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2 --title "My checklist item" --isChecked
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "b65db83e-d777-49db-8cdd-57a41b86f48c": {
+        "isChecked": false,
+        "title": "Communicate with customer",
+        "orderHint": "8585269221832287402",
+        "lastModifiedDateTime": "2023-01-25T22:11:42.2488405Z",
+        "lastModifiedBy": {
+          "user": {
+            "displayName": null,
+            "id": "b2091e18-7882-4efe-b7d1-90703f5a5c65"
+          }
+        }
+      }
+    }
+    ```
+
+=== "Text"
+
+    ```txt
+    id       : b65db83e-d777-49db-8cdd-57a41b86f48c
+    isChecked: false
+    title    : Communicate with customer
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,title,isChecked
+    b65db83e-d777-49db-8cdd-57a41b86f48c,Communicate with customer,
+    ```
+
+=== "Markdown"
+
+    ```md
+    # planner task checklistitem add --taskId "OopX1ANphEu7Lm4-0tVtl5cAFRGQ" --title "Communicate with customer"
+
+    Date: 25/1/2023
+
+    ## Communicate with customer (b65db83e-d777-49db-8cdd-57a41b86f48c)
+
+    Property | Value
+    ---------|-------
+    id | b65db83e-d777-49db-8cdd-57a41b86f48c
+    isChecked | false
+    title | Communicate with customer
+    orderHint | 8585269209601773376
+    lastModifiedDateTime | 2023-01-25T22:32:05.3002431Z
+    lastModifiedBy | {"user":{"displayName":null,"id":"b2091e18-7882-4efe-b7d1-90703f5a5c65"}}
+    ```

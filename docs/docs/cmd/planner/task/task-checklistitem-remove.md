@@ -34,3 +34,7 @@ Removes a checklist item with the id _40012_ from the Planner task with the id _
 ```sh
 m365 planner task checklistitem remove --id "40012" --taskId "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --confirm
 ```
+
+## Response
+
+The command won't return a response on success.
