@@ -1,10 +1,10 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils/odata';
+import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { FileSharingLinkUtil } from './FileSharingLinkUtil';
 
 interface CommandArgs {
   options: Options;
@@ -18,6 +18,8 @@ export interface Options extends GlobalOptions {
 }
 
 class SpoFileSharingLinkListCommand extends SpoCommand {
+  public readonly allowedScopes: string[] = ['anonymous', 'users', 'organization'];
+
   public get name(): string {
     return commands.FILE_SHARINGLINK_LIST;
   }
@@ -62,7 +64,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
       },
       {
         option: '--scope [scope]',
-        autocomplete: FileSharingLinkUtil.allowedScopes
+        autocomplete: this.allowedScopes
       }
     );
   }
@@ -79,8 +81,8 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
           return `${args.options.fileId} is not a valid GUID`;
         }
 
-        if (args.options.scope && FileSharingLinkUtil.allowedScopes.indexOf(args.options.scope) === -1) {
-          return `'${args.options.scope}' is not a valid scope. Allowed values are: ${FileSharingLinkUtil.allowedScopes.join(',')}`;
+        if (args.options.scope && this.allowedScopes.indexOf(args.options.scope) === -1) {
+          return `'${args.options.scope}' is not a valid scope. Allowed values are: ${this.allowedScopes.join(',')}`;
         }
 
         return true;
@@ -98,7 +100,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
     }
 
     try {
-      const fileDetails = await FileSharingLinkUtil.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
+      const fileDetails = await spo.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
       let url = `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions?$filter=Link ne null`;
       if (args.options.scope) {
         url += ` and Link/Scope eq '${args.options.scope}'`;

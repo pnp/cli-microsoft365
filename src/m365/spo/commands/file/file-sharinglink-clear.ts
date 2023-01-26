@@ -3,12 +3,12 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { FileSharingLinkUtil } from './FileSharingLinkUtil';
 import { Options as SpoFileSharingLinkListOptions } from './file-sharinglink-list';
 import { Cli } from '../../../../cli/Cli';
 import * as spoFileSharingLinkListCommand from './file-sharinglink-list';
 import Command from '../../../../Command';
 import request, { CliRequestOptions } from '../../../../request';
+import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -18,11 +18,13 @@ interface Options extends GlobalOptions {
   webUrl: string;
   fileUrl?: string;
   fileId?: string;
-  scope?: string,
+  scope?: string;
   confirm?: boolean;
 }
 
 class SpoFileSharingLinkClearCommand extends SpoCommand {
+  public readonly allowedScopes: string[] = ['anonymous', 'users', 'organization'];
+
   public get name(): string {
     return commands.FILE_SHARINGLINK_CLEAR;
   }
@@ -64,7 +66,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
       },
       {
         option: '--scope [scope]',
-        autocomplete: FileSharingLinkUtil.allowedScopes
+        autocomplete: this.allowedScopes
       },
       {
         option: '--confirm'
@@ -84,8 +86,8 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
           return `${args.options.fileId} is not a valid GUID`;
         }
 
-        if (args.options.scope && FileSharingLinkUtil.allowedScopes.indexOf(args.options.scope) === -1) {
-          return `'${args.options.scope}' is not a valid scope. Allowed values are: ${FileSharingLinkUtil.allowedScopes.join(',')}`;
+        if (args.options.scope && this.allowedScopes.indexOf(args.options.scope) === -1) {
+          return `'${args.options.scope}' is not a valid scope. Allowed values are: ${this.allowedScopes.join(',')}`;
         }
 
         return true;
@@ -101,10 +103,10 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
     const clearSharingLinks: () => Promise<void> = async (): Promise<void> => {
       try {
         if (this.verbose) {
-          logger.logToStderr(`Clearing sharing links for file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` and scope ${args.options.scope}` : ''}`);
+          logger.logToStderr(`Clearing sharing links for file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` with scope ${args.options.scope}` : ''}`);
         }
 
-        const fileDetails = await FileSharingLinkUtil.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
+        const fileDetails = await spo.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
         const sharingLinks = await this.getFileSharingLinks(args.options.webUrl, logger, args.options.fileId, args.options.fileUrl, args.options.scope);
         const batchRequests = sharingLinks.map((sharingLink, index) => {
           return {
@@ -140,7 +142,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to clear the sharing links of file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` and scope ${args.options.scope}` : ''}?`
+        message: `Are you sure you want to clear the sharing links of file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` with scope ${args.options.scope}` : ''}?`
       });
 
       if (result.continue) {
@@ -160,14 +162,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
     };
 
     const commandOutput = await Cli.executeCommandWithOutput(spoFileSharingLinkListCommand as Command, { options: { ...sharingLinkListOptions, _: [] } });
-    if (this.verbose) {
-      logger.logToStderr(commandOutput.stderr);
-    }
-
     const outputParsed = JSON.parse(commandOutput.stdout);
-    if (outputParsed.length === 0) {
-      throw `There are no sharing links to be removed for the specific file.`;
-    }
     return outputParsed;
   }
 }

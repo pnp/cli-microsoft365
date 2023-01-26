@@ -33,7 +33,6 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
 
   let log: any[];
   let logger: Logger;
-  //let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let promptOptions: any;
 
@@ -63,7 +62,6 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       return { continue: false };
     });
     promptOptions = undefined;
-    //loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -205,7 +203,6 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
 
     await command.action(logger, { options: { verbose: true, webUrl: webUrl, fileId: fileId, scope: 'anonymous' } });
     assert(postStub.called);
-
   });
 
   it('clears sharing links in multiple batches if more than 20 sharing links are found', async () => {
@@ -248,7 +245,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     assert.strictEqual(amountOfBatches, 3);
   });
 
-  it('throws error when no sharing links are found', async () => {
+  it('continues when no sharing links are found', async () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
@@ -269,7 +266,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Error occured while executing the command.';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } } as any), new CommandError(`There are no sharing links to be removed for the specific file.`));
+    command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } } as any);
   });
 
   it('throws error when file not found by id', async () => {

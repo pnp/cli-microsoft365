@@ -5,8 +5,9 @@ import auth from '../Auth';
 import { Logger } from "../cli/Logger";
 import config from "../config";
 import { BasePermissions } from '../m365/spo/base-permissions';
-import request from "../request";
+import request, { CliRequestOptions } from "../request";
 import { formatting } from './formatting';
+import { GraphFileDetails } from '../m365/spo/commands/file/GraphFileDetails';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -545,5 +546,36 @@ export const spo = {
         reject('Cannot proceed. Folder _ObjectIdentity_ not found'); // this is not suppose to happen
       }, (err: any): void => { reject(err); });
     });
+  },
+
+  /**
+   * Retrieves the SiteId, VroomItemId and VroomDriveId from a specific file
+   * @param webUrl web url
+   * @param fileId Id of the file
+   * @param fileUrl Url of the file
+   */
+  async getFileDetails(webUrl: string, fileId?: string, fileUrl?: string): Promise<GraphFileDetails> {
+    let requestUrl: string = `${webUrl}/_api/web/`;
+
+    if (fileUrl) {
+      const fileServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
+      requestUrl += `GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileServerRelativeUrl)}')`;
+    }
+    else {
+      requestUrl += `GetFileById('${fileId}')`;
+    }
+
+    requestUrl += '?$select=SiteId,VroomItemId,VroomDriveId';
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<GraphFileDetails>(requestOptions);
+    return res;
   }
 };

@@ -11,7 +11,7 @@ m365 spo file sharinglink clear [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: The URL of the site.
+: The URL of the site where the file is located.
 
 `--fileUrl [fileUrl]`
 : The server-relative (decoded) URL of the file. Specify either `fileUrl` or `fileId` but not both.
@@ -32,13 +32,13 @@ m365 spo file sharinglink clear [options]
 Removes all sharing links from a file specified by id without prompting for confirmation
 
 ```sh
-m365 spo file sharinglink remove --webUrl https://contoso.sharepoint.com/sites/demo --fileId daebb04b-a773-4baa-b1d1-3625418e3234 --confirm
+m365 spo file sharinglink clear --webUrl https://contoso.sharepoint.com/sites/demo --fileId daebb04b-a773-4baa-b1d1-3625418e3234 --confirm
 ```
 
 Removes sharing links of type anonymous from a file specified by url with prompting for confirmation
 
 ```sh
-m365 spo file sharinglink remove --webUrl https://contoso.sharepoint.com/sites/demo --fileUrl 'Shared Documents/document.docx' --scope anonymous
+m365 spo file sharinglink clear --webUrl https://contoso.sharepoint.com/sites/demo --fileUrl '/sites/demo/Shared Documents/document.docx' --scope anonymous
 ```
 
 ## Response
