@@ -12,7 +12,6 @@ import commands from '../../commands';
 const command: Command = require('./applicationcustomizer-add');
 import request from '../../../../request';
 
-
 describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   const webUrl = 'https://contoso.sharepoint.com';
   const title = 'PageFooter';
@@ -22,6 +21,27 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     "url": "https://mathijsdev2.sharepoint.com/_api/Web/UserCustomActions",
     "status": 400,
     "statusText": "Bad Request"
+  };
+  const customActionAddResponse = {
+    ClientSideComponentId: '799883f5-7962-4384-a10a-105adaec6ffc',
+    ClientSideComponentProperties: '',
+    CommandUIExtension: null,
+    Description: null,
+    Group: null,
+    Id: 'bdcea35f-d5d9-45a2-a075-4d1e2f519e74',
+    ImageUrl: null,
+    Location: 'ClientSideExtension.ApplicationCustomizer',
+    Name: 'Some customizer',
+    RegistrationId: null,
+    RegistrationType: 0,
+    Rights: '{"High":"0","Low":"0"}',
+    Scope: 'Web',
+    ScriptBlock: null,
+    ScriptSrc: null,
+    Sequence: 0,
+    Title: 'Some customizer',
+    Url: null,
+    VersionOfUserCustomAction: '16.0.1.0'
   };
 
   let log: any[];
@@ -100,7 +120,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
         && opts.data['ClientSideComponentId'] === clientSideComponentId
         && opts.data['ClientSideComponentProperties'] === clientSideComponentProperties
         && opts.data['Name'] === title) {
-        return;
+        return customActionAddResponse;
       }
 
       throw customActionError;

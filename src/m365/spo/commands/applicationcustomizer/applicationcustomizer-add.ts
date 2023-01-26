@@ -100,7 +100,9 @@ class SpoApplicationCustomizerAddCommand extends SpoCommand {
       title: args.options.title,
       clientSideComponentId: args.options.clientSideComponentId,
       clientSideComponentProperties: args.options.clientSideComponentProperties || '',
-      location: 'ClientSideExtension.ApplicationCustomizer'
+      location: 'ClientSideExtension.ApplicationCustomizer',
+      debug: this.debug,
+      verbose: this.verbose
     };
     await Cli.executeCommand(spoCustomActionAddCommand as Command, { options: { ...options, _: [] } });
   }
