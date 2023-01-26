@@ -1,11 +1,10 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
+import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { GraphFileDetails } from './GraphFileDetails';
 
 interface CommandArgs {
   options: Options;
@@ -121,7 +120,7 @@ class SpoFileSharingLinkAddCommand extends SpoCommand {
     }
 
     try {
-      const fileDetails = await this.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
+      const fileDetails = await spo.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
 
       const requestOptions: CliRequestOptions = {
         url: `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/createLink`,
@@ -143,27 +142,6 @@ class SpoFileSharingLinkAddCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
-  }
-
-  private async getFileDetails(webUrl: string, fileId?: string, fileUrl?: string): Promise<GraphFileDetails> {
-    let requestUrl: string = `${webUrl}/_api/web/`;
-
-    if (fileId) {
-      requestUrl += `GetFileById('${fileId}')`;
-    }
-    else if (fileUrl) {
-      requestUrl += `GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileUrl)}')`;
-    }
-
-    const requestOptions: CliRequestOptions = {
-      url: requestUrl += '?$select=SiteId,VroomItemId,VroomDriveId',
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-    const res = await request.get<GraphFileDetails>(requestOptions);
-    return res;
   }
 }
 
