@@ -35,8 +35,19 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        status: typeof args.options.status !== 'undefined',
+        triggerStartTime: typeof args.options.triggerStartTime !== 'undefined',
+        triggerEndTime: typeof args.options.triggerEndTime !== 'undefined'
+      });
+    });
   }
 
   #initOptions(): void {
