@@ -77,13 +77,7 @@ class SpoNavigationNodeListCommand extends SpoCommand {
 
     try {
       const res = await odata.getAllItems<NavigationNode>(`${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}`);
-      logger.log(res.map(n => {
-        return {
-          Id: n.Id,
-          Title: n.Title,
-          Url: n.Url
-        };
-      }));
+      logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

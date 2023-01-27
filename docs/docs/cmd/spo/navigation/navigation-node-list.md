@@ -39,7 +39,13 @@ m365 spo navigation node list --webUrl https://contoso.sharepoint.com/sites/team
     ```json
     [
       {
+        "AudienceIds": null,
+        "CurrentLCID": 1033,
         "Id": 2032,
+        "IsDocLib": true,
+        "IsExternal": true,
+        "IsVisible": true,
+        "ListTemplateType": 0,
         "Title": "Navigation Link",
         "Url": "https://contoso.sharepoint.com"
       }
@@ -49,14 +55,36 @@ m365 spo navigation node list --webUrl https://contoso.sharepoint.com/sites/team
 === "Text"
 
     ```text
-    Id    Title            Url
-    ----  ---------------  ------------------------------
-    2032  Navigation Link  https://contoso.sharepoint.com
+    AudienceIds  CurrentLCID  Id    IsDocLib  IsExternal  IsVisible  ListTemplateType  Title              Url
+    -----------  -----------  ----  --------  ----------  ---------  ----------------  -----------------  ---------------------------
+    null         1033         2032  true      false       true       0                 Navigation Link    https://contoso.sharepoint.com
     ```
 
 === "CSV"
 
     ```csv
-    Id,Title,Url
-    2032,Navigation Link,https://contoso.sharepoint.com
+    AudienceIds,CurrentLCID,Id,IsDocLib,IsExternal,IsVisible,ListTemplateType,Title,Url
+    ,1033,2032,1,,1,0,Navigation Link,https://contoso.sharepoint.com
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo navigation node list --webUrl "https://contoso.sharepoint.com" --location "QuickLaunch"
+
+    Date: 27/1/2023
+
+    ## Home (1031)
+
+    Property | Value
+    ---------|-------
+    AudienceIds | null
+    CurrentLCID | 1033
+    Id | 2032
+    IsDocLib | true
+    IsExternal | false
+    IsVisible | true
+    ListTemplateType | 0
+    Title | Navigation Link
+    Url | https://contoso.sharepoint.com
     ```

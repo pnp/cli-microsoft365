@@ -17,6 +17,28 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  const navigationNodeResponse = {
+    value: [
+      {
+        "Id": 2003,
+        "IsDocLib": true,
+        "IsExternal": false,
+        "IsVisible": true,
+        "ListTemplateType": 0,
+        "Title": "Node 1",
+        "Url": "/sites/team-a/SitePages/page1.aspx"
+      },
+      {
+        "Id": 2004,
+        "IsDocLib": true,
+        "IsExternal": false,
+        "IsVisible": true,
+        "ListTemplateType": 0,
+        "Title": "Node 2",
+        "Url": "/sites/team-a/SitePages/page2.aspx"
+      }
+    ]
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -65,38 +87,38 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
   });
 
   it('gets nodes from the top navigation', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
-        return Promise.resolve({ value: [{ "Id": 2003, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 1", "Url": "/sites/team-a/SitePages/page1.aspx" }, { "Id": 2004, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 2", "Url": "/sites/team-a/SitePages/page2.aspx" }] });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar') {
+        return navigationNodeResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } });
-    assert(loggerLogSpy.calledWith([{ "Id": 2003, "Title": "Node 1", "Url": "/sites/team-a/SitePages/page1.aspx" }, { "Id": 2004, "Title": "Node 2", "Url": "/sites/team-a/SitePages/page2.aspx" }]));
+    assert(loggerLogSpy.calledWith(navigationNodeResponse.value));
   });
 
   it('gets nodes from the quick launch', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/quicklaunch`) > -1) {
-        return Promise.resolve({ value: [{ "Id": 2003, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 1", "Url": "/sites/team-a/SitePages/page1.aspx" }, { "Id": 2004, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 2", "Url": "/sites/team-a/SitePages/page2.aspx" }] });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/quicklaunch') {
+        return navigationNodeResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch' } });
-    assert(loggerLogSpy.calledWith([{ "Id": 2003, "Title": "Node 1", "Url": "/sites/team-a/SitePages/page1.aspx" }, { "Id": 2004, "Title": "Node 2", "Url": "/sites/team-a/SitePages/page2.aspx" }]));
+    assert(loggerLogSpy.calledWith(navigationNodeResponse.value));
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
-        return Promise.reject({ error: 'An error has occurred' });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar') {
+        throw 'An error has occurred';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } } as any),
@@ -105,11 +127,11 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
 
   it('correctly handles random API error (string error)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
-        return Promise.reject('An error has occurred');
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar') {
+        throw 'Invalid request';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } } as any), new CommandError('An error has occurred'));
