@@ -21,7 +21,7 @@ m365 planner roster add [options]
     This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
 !!! important
-    To be able to create a new Roster, the Planner Roster creation tenant setting should be enabled. Point them to our [planner tenant settings list](./cmd/planner/tenant/tenant-settings-list.md) command.
+    To be able to create a new Roster, the Planner Roster creation tenant setting should be enabled. Point them to our [planner tenant settings list](../tenant/tenant-settings-list.md) command.
 
 ## Examples
 
