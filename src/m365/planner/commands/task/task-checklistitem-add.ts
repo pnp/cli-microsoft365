@@ -56,10 +56,11 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const etag = await this.getTaskDetailsEtag(args.options.taskId);
+      const checklistItemId = v4();
       const body: PlannerTaskDetails = {
         checklist: {
           // Generate new GUID for new task checklist item
-          [v4()]: {
+          [checklistItemId]: {
             '@odata.type': 'microsoft.graph.plannerChecklistItem',
             title: args.options.title,
             isChecked: args.options.isChecked || false
@@ -79,14 +80,9 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
       };
 
       const result = await request.patch<PlannerTaskDetails>(requestOptions);
-      if (args.options.output === 'json') {
-        logger.log(result.checklist);
-      }
-      else {
-        // Transform checklist item object to text friendly format
-        const output = Object.getOwnPropertyNames(result.checklist).map(prop => ({ id: prop, ...(result.checklist as any)[prop] }));
-        logger.log(output);
-      }
+      const addedChecklistItem = (result.checklist as any)[checklistItemId];
+      addedChecklistItem.id = checklistItemId;
+      logger.log(addedChecklistItem);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

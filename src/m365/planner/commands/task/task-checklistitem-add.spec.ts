@@ -20,14 +20,9 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
     id: validTaskId
   };
 
-  const taskDetailsWithChecklistResponse = {
+  const taskDetailsWithChecklistResponse: any = {
     id: validTaskId,
-    checklist: {
-      '00000000-0000-0000-0000-000000000000': {
-        title: validTitle,
-        isChecked: false
-      }
-    }
+    checklist: {}
   };
 
   let log: string[];
@@ -92,19 +87,26 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
   });
 
   it('correctly adds checklist item', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    let checklistItemId = '';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
-        return Promise.resolve(taskDetailsResponse);
+        return taskDetailsResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
-        return Promise.resolve(taskDetailsWithChecklistResponse);
+        checklistItemId = Object.keys(opts.data.checklist)[0];
+        taskDetailsWithChecklistResponse.checklist[checklistItemId] = {
+          title: validTitle,
+          isChecked: false
+        };
+        return taskDetailsWithChecklistResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, {
@@ -114,23 +116,29 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
         output: 'json'
       }
     });
-    assert(loggerLogSpy.calledWith(taskDetailsWithChecklistResponse.checklist));
+    assert(loggerLogSpy.calledWith(taskDetailsWithChecklistResponse.checklist[checklistItemId]));
   });
 
   it('correctly adds checklist item with text output', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    let checklistItemId = '';
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
-        return Promise.resolve(taskDetailsResponse);
+        return taskDetailsResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
-        return Promise.resolve(taskDetailsWithChecklistResponse);
+        checklistItemId = Object.keys(opts.data.checklist)[0];
+        taskDetailsWithChecklistResponse.checklist[checklistItemId] = {
+          title: validTitle,
+          isChecked: false
+        };
+        return taskDetailsWithChecklistResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await command.action(logger, {
@@ -140,23 +148,23 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
         output: 'text'
       }
     });
-    assert(loggerLogSpy.calledWith([{ id: '00000000-0000-0000-0000-000000000000', title: validTitle, isChecked: false }]));
+    assert(loggerLogSpy.calledWith({ isChecked: false, title: validTitle, id: checklistItemId }));
   });
 
   it('fails when unexpected API error was thrown', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
-        return Promise.resolve(taskDetailsResponse);
+        return taskDetailsResponse;
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
-        return Promise.reject('Something went wrong.');
+        throw 'Something went wrong.';
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await assert.rejects(command.action(logger, {
@@ -168,12 +176,12 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
   });
 
   it('fails when Planner task does not exist', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
-        return Promise.reject('The request item is not found.');
+        throw 'The request item is not found.';
       }
 
-      return Promise.reject('Invalid Request');
+      throw 'Invalid Request';
     });
 
     await assert.rejects(command.action(logger, {
