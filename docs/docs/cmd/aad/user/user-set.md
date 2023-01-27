@@ -83,6 +83,6 @@ Change password of the currently logged in user
 m365 aad user set --objectId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --currentPassword SLBF5gnRtyYc --newPassword 6NLUId79Lc24
 ```
 
-### Response
+## Response
 
 The command won't return a response on success.
