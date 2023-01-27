@@ -53,7 +53,7 @@ describe(commands.TASK_ADD, () => {
     "startDateTime": null,
     "createdDateTime": "2021-12-12T19:03:26.7408136Z",
     "dueDateTime": null,
-    "hasDescription": false,
+    "hasDescription": true,
     "previewType": "automatic",
     "completedDateTime": null,
     "completedBy": null,
