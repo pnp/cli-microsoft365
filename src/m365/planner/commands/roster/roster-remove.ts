@@ -51,7 +51,7 @@ class PlannerRosterRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.confirm) {
-      await this.removeRoster(args);
+      await this.removeRoster(args, logger);
     }
     else {
       const result = await Cli.prompt<{ continue: boolean }>({
@@ -61,12 +61,15 @@ class PlannerRosterRemoveCommand extends GraphCommand {
         message: `Are you sure you want to remove the roster ${args.options.id}?`
       });
       if (result.continue) {
-        await this.removeRoster(args);
+        await this.removeRoster(args, logger);
       }
     }
   }
 
-  private async removeRoster(args: CommandArgs): Promise<void> {
+  private async removeRoster(args: CommandArgs, logger: Logger): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Removing roster ${args.options.id}`);
+    }
     try {
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/beta/planner/rosters/${args.options.id}`,

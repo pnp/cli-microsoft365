@@ -102,7 +102,7 @@ describe(commands.PLAN_REMOVE, () => {
 
   it('Correctly deletes plan by id', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com//beta/planner/rosters/${validRosterId}`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}`) {
         return;
       }
 
@@ -111,6 +111,7 @@ describe(commands.PLAN_REMOVE, () => {
 
     await command.action(logger, {
       options: {
+        verbose: true,
         id: validRosterId,
         confirm: true
       }
@@ -119,7 +120,7 @@ describe(commands.PLAN_REMOVE, () => {
 
   it('Correctly deletes plan by id when prompt confirmed', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com//beta/planner/rosters/${validRosterId}`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}`) {
         return;
       }
 
