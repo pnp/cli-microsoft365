@@ -220,6 +220,7 @@ nav:
         - plan set: cmd/planner/plan/plan-set.md
       - roster:
         - roster add: cmd/planner/roster/roster-add.md
+        - roster remove: cmd/planner/roster/roster-remove.md
       - task:
         - task add: cmd/planner/task/task-add.md
         - task get: cmd/planner/task/task-get.md
