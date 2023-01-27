@@ -218,7 +218,7 @@ nav:
         - plan list: cmd/planner/plan/plan-list.md
         - plan remove: cmd/planner/plan/plan-remove.md
         - plan set: cmd/planner/plan/plan-set.md
-      -roster:
+      - roster:
         - roster add: cmd/planner/roster/roster-add.md
       - task:
         - task add: cmd/planner/task/task-add.md
