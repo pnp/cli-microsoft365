@@ -10,6 +10,7 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import * as SpoCustomActionListCommand from './customaction-list';
 const command: Command = require('./customaction-get');
 
 describe(commands.CUSTOMACTION_GET, () => {
@@ -46,7 +47,8 @@ describe(commands.CUSTOMACTION_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      Cli.executeCommandWithOutput
     ]);
   });
 
@@ -392,6 +394,103 @@ describe(commands.CUSTOMACTION_GET, () => {
     }
   });
 
+  it('retrieves a user custom actions by clientSideComponentId', async () => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoCustomActionListCommand) {
+        return ({
+          stdout: `[{ "ClientSideComponentId": "4358e70e-ec3c-4713-beb6-39c88f7621d1", "ClientSideComponentProperties": {"listTitle":"News","listViewTitle":"Published News"}, "CommandUIExtension": null, "Description": null, "Group": null, "HostProperties": "", "Id": "f405303c-6048-4636-9660-1b7b2cadaef9", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "{f405303c-6048-4636-9660-1b7b2cadaef9}", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": 0, "Low": 0 }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 65536, "Title": "NewsTicker", "Url": null, "VersionOfUserCustomAction": "1.0.1.0"},{ "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4", "ClientSideComponentProperties": {"testMessage":"Test message"}, "CommandUIExtension": null, "Description": null, "Group": null, "Id": "d26af83a-6421-4bb3-9f5c-8174ba645c80", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "{d26af83a-6421-4bb3-9f5c-8174ba645c80}", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": 0, "Low": 0 }, "Scope": "1", "ScriptBlock": null, "ScriptSrc": null, "Sequence": 65536, "Title": "Places", "Url": null, "VersionOfUserCustomAction": "1.0.1.0" }]`
+        });
+      }
+
+      throw new CommandError('Unknown case');
+    });
+
+    await command.action(logger, {
+      options: {
+        clientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
+      ClientSideComponentProperties: { "testMessage": "Test message" },
+      CommandUIExtension: null,
+      Description: null,
+      Group: null,
+      Id: 'd26af83a-6421-4bb3-9f5c-8174ba645c80',
+      ImageUrl: null,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      Name: '{d26af83a-6421-4bb3-9f5c-8174ba645c80}',
+      RegistrationId: null,
+      RegistrationType: 0,
+      Rights: '{"High":0,"Low":0}',
+      Scope: '1',
+      ScriptBlock: null,
+      ScriptSrc: null,
+      Sequence: 65536,
+      Title: 'Places',
+      Url: null,
+      VersionOfUserCustomAction: '1.0.1.0'
+    }));
+  });
+
+  it('throws error when multiple user custom actions with same clientSideComponentId were found', async () => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoCustomActionListCommand) {
+        return ({
+          stdout: `[{ "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4", "ClientSideComponentProperties": {"listTitle":"News","listViewTitle":"Published News"}, "CommandUIExtension": null, "Description": null, "Group": null, "HostProperties": "", "Id": "f405303c-6048-4636-9660-1b7b2cadaef9", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "{f405303c-6048-4636-9660-1b7b2cadaef9}", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": 0, "Low": 0 }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 65536, "Title": "NewsTicker", "Url": null, "VersionOfUserCustomAction": "1.0.1.0"},{ "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4", "ClientSideComponentProperties": {"testMessage":"Test message"}, "CommandUIExtension": null, "Description": null, "Group": null, "Id": "d26af83a-6421-4bb3-9f5c-8174ba645c80", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "{d26af83a-6421-4bb3-9f5c-8174ba645c80}", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": 0, "Low": 0 }, "Scope": "1", "ScriptBlock": null, "ScriptSrc": null, "Sequence": 65536, "Title": "Places", "Url": null, "VersionOfUserCustomAction": "1.0.1.0" }]`
+        });
+      }
+
+      throw new CommandError('Unknown case');
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        clientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }), new CommandError(`Multiple user custom actions with ClientSideComponentId '015e0fcf-fe9d-4037-95af-0a4776cdfbb4' found. Please disambiguate using IDs: f405303c-6048-4636-9660-1b7b2cadaef9, d26af83a-6421-4bb3-9f5c-8174ba645c80`));
+  });
+
+  it('throws error when no user custom actions were found based on clientSideComponentId', async () => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoCustomActionListCommand) {
+        return ({
+          stdout: `[{ "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4", "ClientSideComponentProperties": {"listTitle":"News","listViewTitle":"Published News"}, "CommandUIExtension": null, "Description": null, "Group": null, "HostProperties": "", "Id": "f405303c-6048-4636-9660-1b7b2cadaef9", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "{f405303c-6048-4636-9660-1b7b2cadaef9}", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": 0, "Low": 0 }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 65536, "Title": "NewsTicker", "Url": null, "VersionOfUserCustomAction": "1.0.1.0"},{ "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4", "ClientSideComponentProperties": {"testMessage":"Test message"}, "CommandUIExtension": null, "Description": null, "Group": null, "Id": "d26af83a-6421-4bb3-9f5c-8174ba645c80", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "{d26af83a-6421-4bb3-9f5c-8174ba645c80}", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": 0, "Low": 0 }, "Scope": "1", "ScriptBlock": null, "ScriptSrc": null, "Sequence": 65536, "Title": "Places", "Url": null, "VersionOfUserCustomAction": "1.0.1.0" }]`
+        });
+      }
+
+      throw new CommandError('Unknown case');
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        clientSideComponentId: '4358e70e-ec3c-4713-beb6-39c88f7621d1',
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }), new CommandError(`No user custom action with ClientSideComponentId '4358e70e-ec3c-4713-beb6-39c88f7621d1' found`));
+  });
+
+  it('throws error when no user custom actions were found by the list user custom action command based on clientSideComponentId', async () => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoCustomActionListCommand) {
+        return ({
+          stdout: ''
+        });
+      }
+
+      throw new CommandError('Unknown case');
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        clientSideComponentId: '4358e70e-ec3c-4713-beb6-39c88f7621d1',
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }), new CommandError(`No user custom action with ClientSideComponentId '4358e70e-ec3c-4713-beb6-39c88f7621d1' found`));
+  });
+
   it('searchAllScopes called when scope is All', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
@@ -548,6 +647,17 @@ describe(commands.CUSTOMACTION_GET, () => {
       options:
       {
         id: "foo",
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the clientSideComponentId option is not a valid guid', async () => {
+    const actual = await command.validate({
+      options:
+      {
+        clientSideComponentId: "foo",
         webUrl: 'https://contoso.sharepoint.com'
       }
     }, commandInfo);

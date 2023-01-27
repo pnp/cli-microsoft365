@@ -6,6 +6,10 @@ import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { CustomAction } from './customaction';
+import { Options as SpoCustomActionListCommandOptions } from './customaction-list';
+import * as SpoCustomActionListCommand from './customaction-list';
+import { Cli } from '../../../../cli/Cli';
+import Command from '../../../../Command';
 
 interface CommandArgs {
   options: Options;
@@ -14,6 +18,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   title?: string;
+  clientSideComponentId?: string;
   webUrl: string;
   scope?: string;
 }
@@ -39,6 +44,9 @@ class SpoCustomActionGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
         scope: args.options.scope || 'All'
       });
     });
@@ -51,6 +59,9 @@ class SpoCustomActionGetCommand extends SpoCommand {
       },
       {
         option: '-t, --title [title]'
+      },
+      {
+        option: '-c, --clientSideComponentId [clientSideComponentId]'
       },
       {
         option: '-u, --webUrl <webUrl>'
@@ -82,13 +93,17 @@ class SpoCustomActionGetCommand extends SpoCommand {
           }
         }
 
+        if (args.options.clientSideComponentId && validation.isValidGuid(args.options.clientSideComponentId) === false) {
+          return `${args.options.clientSideComponentId} is not valid. Custom action clientSideComponentId (Guid) expected.`;
+        }
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title'] });
+    this.optionSets.push({ options: ['id', 'title', 'clientSideComponentId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -136,40 +151,64 @@ class SpoCustomActionGetCommand extends SpoCommand {
     }
   }
 
-  private getCustomAction(options: Options): Promise<CustomAction> {
-    const filter: string = options.id ?
-      `('${formatting.encodeQueryParameter(options.id as string)}')` :
-      `?$filter=Title eq '${formatting.encodeQueryParameter(options.title as string)}'`;
+  private async getCustomAction(options: Options): Promise<CustomAction> {
+    if (options.clientSideComponentId) {
+      const customActionListCommandoptions: SpoCustomActionListCommandOptions = {
+        webUrl: options.webUrl,
+        scope: options.scope,
+        output: 'json',
+        debug: this.debug,
+        verbose: this.verbose
+      };
 
-    const requestOptions: any = {
-      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions${filter}`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
+      const output = await Cli.executeCommandWithOutput(SpoCustomActionListCommand as Command, { options: { ...customActionListCommandoptions, _: [] } });
 
-    if (options.id) {
-      return request
-        .get<CustomAction>(requestOptions)
-        .then((res: CustomAction): Promise<CustomAction> => {
-          return Promise.resolve(res);
-        });
+      if (!output.stdout) {
+        throw `No user custom action with ClientSideComponentId '${options.clientSideComponentId}' found`;
+      }
+      const getCustomActionListOutput: CustomAction[] = JSON.parse(output.stdout);
+      const result: CustomAction[] = getCustomActionListOutput.filter((x: CustomAction) => x.ClientSideComponentId === options.clientSideComponentId);
+
+      if (result.length === 0) {
+        throw `No user custom action with ClientSideComponentId '${options.clientSideComponentId}' found`;
+      }
+
+      if (result.length > 1) {
+        throw `Multiple user custom actions with ClientSideComponentId '${options.clientSideComponentId}' found. Please disambiguate using IDs: ${result.map(a => a.Id).join(', ')}`;
+      }
+
+      return result[0];
     }
+    else {
+      const filter: string = options.id ?
+        `('${formatting.encodeQueryParameter(options.id as string)}')` :
+        `?$filter=Title eq '${formatting.encodeQueryParameter(options.title as string)}'`;
 
-    return request
-      .get<{ value: CustomAction[] }>(requestOptions)
-      .then((res: { value: CustomAction[] }): Promise<CustomAction> => {
-        if (res.value.length === 1) {
-          return Promise.resolve(res.value[0]);
-        }
+      const requestOptions: any = {
+        url: `${options.webUrl}/_api/${options.scope}/UserCustomActions${filter}`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-        if (res.value.length === 0) {
-          return Promise.reject(`No user custom action with title '${options.title}' found`);
-        }
+      if (options.id) {
+        const result = await request.get<CustomAction>(requestOptions);
+        return result;
+      }
 
-        return Promise.reject(`Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${res.value.map(a => a.Id).join(', ')}`);
-      });
+      const result = await request.get<{ value: CustomAction[] }>(requestOptions);
+
+      if (result.value.length === 0) {
+        throw `No user custom action with title '${options.title}' found`;
+      }
+
+      if (result.value.length > 1) {
+        throw `Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${result.value.map(a => a.Id).join(', ')}`;
+      }
+
+      return result.value[0];
+    }
   }
 
   /**
@@ -177,29 +216,23 @@ class SpoCustomActionGetCommand extends SpoCommand {
    * If custom action not found then 
    * another get request is send with `site` scope.
    */
-  private searchAllScopes(options: Options): Promise<CustomAction> {
-    return new Promise<CustomAction>((resolve: (customAction: CustomAction) => void, reject: (error: any) => void): void => {
+  private async searchAllScopes(options: Options): Promise<CustomAction> {
+    try {
       options.scope = "Web";
 
-      this
-        .getCustomAction(options)
-        .then((webResult: CustomAction): void => {
-          if (webResult["odata.null"] !== true) {
-            return resolve(webResult);
-          }
+      const webResult = await this.getCustomAction(options);
+      if (webResult["odata.null"] !== true) {
+        return webResult;
+      }
 
-          options.scope = "Site";
-          this
-            .getCustomAction(options)
-            .then((siteResult: CustomAction): void => {
-              return resolve(siteResult);
-            }, (err: any): void => {
-              reject(err);
-            });
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
+      options.scope = "Site";
+      const siteResult = await this.getCustomAction(options);
+      return siteResult;
+
+    }
+    catch (err) {
+      throw err;
+    }
   }
 
   private humanizeScope(scope: number): string {
