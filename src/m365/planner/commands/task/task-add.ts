@@ -213,6 +213,9 @@ class PlannerTaskAddCommand extends GraphCommand {
 
       const newTask = await request.post<PlannerTask>(requestOptions);
       const result = await this.updateTaskDetails(args.options, newTask);
+      if (result.description) {
+        result.hasDescription = true;
+      }
       logger.log(result);
     }
     catch (err: any) {
