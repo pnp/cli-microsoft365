@@ -20,7 +20,7 @@ m365 planner roster remove [options]
 
 ## Remarks
 !!! attention
-    Deleting a Planner Roster will also delete all plans within the Roster.
+    Deleting a Planner Roster will also delete the plan within the Roster.
 
 !!! attention
     This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
