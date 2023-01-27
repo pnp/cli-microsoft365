@@ -128,7 +128,7 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
   it('correctly handles random API error (string error)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar') {
-        throw 'Invalid request';
+        throw 'An error has occurred';
       }
 
       throw 'Invalid request';
