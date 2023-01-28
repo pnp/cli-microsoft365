@@ -15,7 +15,7 @@ const command: Command = require('./plan-list');
 describe(commands.PLAN_LIST, () => {
   const ownerGroupId = '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4';
   const ownerGroupName = 'spridermvp';
-  const rosterId = '6519868f-868f-6519-8f86-19658f861965';
+  const rosterId = 'FeMZFDoK8k2oWmuGE-XFHZcAEwtn';
   const groupsResponse = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
     "value": [
@@ -174,15 +174,6 @@ describe(commands.PLAN_LIST, () => {
     const actual = await command.validate({
       options: {
         ownerGroupId: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the rosterId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        rosterId: 'invalid'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
