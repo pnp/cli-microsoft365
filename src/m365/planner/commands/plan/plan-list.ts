@@ -38,7 +38,8 @@ class PlannerPlanListCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
-        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined'
+        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
+        rosterId: typeof args.options.rosterId !== 'undefined'
       });
     });
   }
