@@ -38,6 +38,14 @@ export const planner = {
   },
 
   /**
+   * Get all Planner plans for a specific roster.
+   * @param rosterId Roster ID.
+   */
+  getPlansByRosterId(rosterId: string): Promise<PlannerPlan[]> {
+    return odata.getAllItems<PlannerPlan>(`${graphResource}/beta/planner/rosters/${rosterId}/plans`, 'none');
+  },
+
+  /**
    * Get Planner plan by title in a specific group. 
    * @param title Title of the Planner plan. Case insensitive.
    * @param groupId Owner group ID .
