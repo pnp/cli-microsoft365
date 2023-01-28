@@ -38,12 +38,27 @@ export const planner = {
   },
 
   /**
+   * Get all Planner plans for a specific roster.
+   * @param rosterId Roster ID.
+   */
+  getPlansByRosterId(rosterId: string): Promise<PlannerPlan[]> {
+    return odata.getAllItems<PlannerPlan>(`${graphResource}/beta/planner/rosters/${rosterId}/plans`, 'none');
+  },
+
+  /**
    * Get Planner plan by title in a specific group. 
    * @param title Title of the Planner plan. Case insensitive.
-   * @param groupId Owner group ID .
+   * @param groupId Owner group ID.
+   * @param rosterId Roster ID.
    */
-  async getPlanByTitle(title: string, groupId: string): Promise<PlannerPlan> {
-    const plans = await this.getPlansByGroupId(groupId);
+  async getPlanByTitle(title: string, groupId?: string, rosterId?: string): Promise<PlannerPlan> {
+    let plans: PlannerPlan[] = [];
+    if (groupId) {
+      plans = await this.getPlansByGroupId(groupId);
+    }
+    else if (rosterId) {
+      plans = await this.getPlansByRosterId(rosterId);
+    }
     const filteredPlans = plans.filter(p => p.title && p.title.toLowerCase() === title.toLowerCase());
 
     if (!filteredPlans.length) {
