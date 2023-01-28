@@ -13,6 +13,11 @@ import commands from '../../commands';
 const command: Command = require('./navigation-node-add');
 
 describe(commands.NAVIGATION_NODE_ADD, () => {
+  const webUrl = 'https://contoso.sharepoint.com/sites/team-a';
+  const nodeUrl = '/sites/team-a/sitepages/about.aspx';
+  const title = 'About';
+  const audienceIds = '7aa4a1ca-4035-4f2f-bac7-7beada59b5ba,4bbf236f-a131-4019-b4a2-315902fcfa3a';
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -69,95 +74,38 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
   });
 
   it('adds new navigation node to the top navigation', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1 &&
+    const nodeAddResponse = {
+      "AudienceIds": null,
+      "CurrentLCID": 1033,
+      "Id": 2001,
+      "IsDocLib": true,
+      "IsExternal": false,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "About",
+      "Url": "/sites/team-a/sitepages/about.aspx"
+    };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/topnavigationbar` &&
         JSON.stringify(opts.data) === JSON.stringify({
-          Title: 'About',
-          Url: '/sites/team-a/sitepages/about.aspx',
+          Title: title,
+          Url: nodeUrl,
           IsExternal: false
         })) {
-        return Promise.resolve(
-          {
-            "Id": 2001,
-            "IsDocLib": true,
-            "IsExternal": false,
-            "IsVisible": true,
-            "ListTemplateType": 0,
-            "Title": "About",
-            "Url": "/sites/team-a/sitepages/about.aspx"
-          });
+        return nodeAddResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } });
-    assert(loggerLogSpy.calledWith({
-      "Id": 2001,
-      "IsDocLib": true,
-      "IsExternal": false,
-      "IsVisible": true,
-      "ListTemplateType": 0,
-      "Title": "About",
-      "Url": "/sites/team-a/sitepages/about.aspx"
-    }));
-  });
-
-  it('adds new navigation node to the top navigation (debug)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
-        return Promise.resolve(
-          {
-            "Id": 2001,
-            "IsDocLib": true,
-            "IsExternal": false,
-            "IsVisible": true,
-            "ListTemplateType": 0,
-            "Title": "About",
-            "Url": "/sites/team-a/sitepages/about.aspx"
-          });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } });
-    assert(loggerLogSpy.calledWith({
-      "Id": 2001,
-      "IsDocLib": true,
-      "IsExternal": false,
-      "IsVisible": true,
-      "ListTemplateType": 0,
-      "Title": "About",
-      "Url": "/sites/team-a/sitepages/about.aspx"
-    }));
+    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl, verbose: true } });
+    assert(loggerLogSpy.calledWith(nodeAddResponse));
   });
 
   it('adds new navigation node pointing to an external URL to the quick launch', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/quicklaunch`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          Title: 'About us',
-          Url: 'https://contoso.com/about-us',
-          IsExternal: true
-        })) {
-        return Promise.resolve(
-          {
-            "Id": 2001,
-            "IsDocLib": true,
-            "IsExternal": true,
-            "IsVisible": true,
-            "ListTemplateType": 0,
-            "Title": "About us",
-            "Url": "https://contoso.com/about-us"
-          });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', title: 'About us', url: 'https://contoso.com/about-us', isExternal: true } });
-    assert(loggerLogSpy.calledWith({
+    const nodeAddResponse = {
+      "AudienceIds": null,
+      "CurrentLCID": 1033,
       "Id": 2001,
       "IsDocLib": true,
       "IsExternal": true,
@@ -165,34 +113,28 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       "ListTemplateType": 0,
       "Title": "About us",
       "Url": "https://contoso.com/about-us"
-    }));
+    };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/quicklaunch` &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          Title: title,
+          Url: nodeUrl,
+          IsExternal: true
+        })) {
+        return nodeAddResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, location: 'QuickLaunch', title: title, url: nodeUrl, isExternal: true, verbose: true } });
+    assert(loggerLogSpy.calledWith(nodeAddResponse));
   });
 
   it('adds new navigation node below an existing node', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/GetNodeById(1000)/Children`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          Title: 'About',
-          Url: '/sites/team-a/sitepages/about.aspx',
-          IsExternal: false
-        })) {
-        return Promise.resolve(
-          {
-            "Id": 2001,
-            "IsDocLib": true,
-            "IsExternal": false,
-            "IsVisible": true,
-            "ListTemplateType": 0,
-            "Title": "About",
-            "Url": "/sites/team-a/sitepages/about.aspx"
-          });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', parentNodeId: 1000, title: 'About', url: '/sites/team-a/sitepages/about.aspx' } });
-    assert(loggerLogSpy.calledWith({
+    const nodeAddResponse = {
+      "AudienceIds": null,
+      "CurrentLCID": 1033,
       "Id": 2001,
       "IsDocLib": true,
       "IsExternal": false,
@@ -200,70 +142,133 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       "ListTemplateType": 0,
       "Title": "About",
       "Url": "/sites/team-a/sitepages/about.aspx"
-    }));
+    };
+    const parentNodeId = 1000;
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${parentNodeId})/Children` &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          Title: title,
+          Url: nodeUrl,
+          IsExternal: false
+        })) {
+        return nodeAddResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, parentNodeId: 1000, title: title, url: nodeUrl, verbose: true } });
+    assert(loggerLogSpy.calledWith(nodeAddResponse));
+  });
+
+  it('adds new navigation node to the top navigation with audience targetting', async () => {
+    const nodeAddResponse = {
+      "AudienceIds": audienceIds.split(','),
+      "CurrentLCID": 1033,
+      "Id": 2001,
+      "IsDocLib": true,
+      "IsExternal": false,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "About",
+      "Url": "/sites/team-a/sitepages/about.aspx"
+    };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/topnavigationbar` &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          Title: title,
+          Url: nodeUrl,
+          IsExternal: false,
+          AudienceIds: audienceIds.split(',')
+        })) {
+        return nodeAddResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl, audienceIds: audienceIds, verbose: true } });
+    assert(loggerLogSpy.calledWith(nodeAddResponse));
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
-        return Promise.reject({ error: 'An error has occurred' });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/topnavigationbar`) {
+        throw { error: 'An error has occurred' };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl } } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly handles random API error (string error)', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
-        return Promise.reject('An error has occurred');
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/topnavigationbar`) {
+        throw 'An error has occurred';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', location: 'TopNavigationBar', title: 'About', url: '/sites/team-s/sitepages/about.aspx' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'invalid', location: 'TopNavigationBar', title: title, url: nodeUrl } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the specified parentNodeId is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: 'About', url: '/sites/team-s/sitepages/about.aspx', parentNodeId: 'invalid' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, title: title, url: nodeUrl, parentNodeId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if specified location is not valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'invalid', title: 'About', url: '/sites/team-s/sitepages/about.aspx' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, location: 'invalid', title: title, url: nodeUrl } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if audienceIds contains an invalid audienceId', async () => {
+    const invalidAudienceIds = `${audienceIds},invalid`;
+    const actual = await command.validate({ options: { webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl, audienceIds: invalidAudienceIds } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if audienceIds contains more than 10 guids', async () => {
+    const invalidAudienceIds = `${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds},${audienceIds}`;
+    const actual = await command.validate({ options: { webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl, audienceIds: invalidAudienceIds } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when location is TopNavigationBar and all required properties are present', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when location is QuickLaunch and all required properties are present', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, location: 'QuickLaunch', title: title, url: nodeUrl } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when location is TopNavigationBar and the link is external', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx', isExternal: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: nodeUrl, isExternal: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when location is QuickLaunch and the link is external', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', title: 'About', url: '/sites/team-a/sitepages/about.aspx', isExternal: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, location: 'QuickLaunch', title: title, url: nodeUrl, isExternal: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when location is not specified but parentNodeId is', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', parentNodeId: 2000, title: 'About', url: '/sites/team-a/sitepages/about.aspx' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when audienceIds contains less than 10 ids and all are valid', async () => {
+    const actual = await command.validate({ options: { webUrl: webUrl, parentNodeId: 2000, title: title, url: nodeUrl, audienceIds: audienceIds } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

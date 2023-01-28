@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -10,6 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  audienceIds?: string;
   isExternal?: boolean;
   location?: string;
   parentNodeId?: number;
@@ -41,7 +42,8 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         isExternal: args.options.isExternal,
         location: typeof args.options.location !== 'undefined',
-        parentNodeId: typeof args.options.parentNodeId !== 'undefined'
+        parentNodeId: typeof args.options.parentNodeId !== 'undefined',
+        audienceIds: typeof args.options.audienceIds !== 'undefined'
       });
     });
   }
@@ -66,6 +68,9 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       },
       {
         option: '--isExternal'
+      },
+      {
+        option: '--audienceIds [audienceIds]'
       }
     );
   }
@@ -87,6 +92,22 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
           if (args.options.location !== 'QuickLaunch' &&
             args.options.location !== 'TopNavigationBar') {
             return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
+          }
+        }
+
+        if (args.options.audienceIds) {
+          const audienceIdsSplitted = args.options.audienceIds.split(',');
+          if (audienceIdsSplitted.length > 10) {
+            return 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of auciendeIds to be set is 10.';
+          }
+          const invalidAudienceIds: string[] = [];
+          audienceIdsSplitted.map(audienceId => {
+            if (!validation.isValidGuid(audienceId)) {
+              invalidAudienceIds.push(audienceId);
+            }
+          });
+          if (invalidAudienceIds.length > 0) {
+            return `Invalid audienceIds have been entered. Invalid ids are: ${invalidAudienceIds.join(',')}`;
           }
         }
 
@@ -114,17 +135,15 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       `GetNodeById(${args.options.parentNodeId})/Children` :
       (args.options.location as string).toLowerCase();
 
-    const requestOptions: any = {
+    const requestBody = this.getRequestBody(args.options);
+
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api/web/navigation/${nodesCollection}`,
       headers: {
         accept: 'application/json;odata=nometadata',
         'content-type': 'application/json;odata=nometadata'
       },
-      data: {
-        Title: args.options.title,
-        Url: args.options.url,
-        IsExternal: args.options.isExternal === true
-      },
+      data: requestBody,
       responseType: 'json'
     };
 
@@ -135,6 +154,20 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private getRequestBody(options: Options): any {
+    const requestBody: any = {
+      Title: options.title,
+      Url: options.url,
+      IsExternal: options.isExternal === true
+    };
+
+    if (options.audienceIds) {
+      requestBody.AudienceIds = options.audienceIds.split(',');
+    }
+
+    return requestBody;
   }
 }
 
