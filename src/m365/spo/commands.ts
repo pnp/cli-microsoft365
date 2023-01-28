@@ -166,6 +166,7 @@ export default {
   NAVIGATION_NODE_ADD: `${prefix} navigation node add`,
   NAVIGATION_NODE_LIST: `${prefix} navigation node list`,
   NAVIGATION_NODE_REMOVE: `${prefix} navigation node remove`,
+  NAVIGATION_NODE_SET: `${prefix} navigation node set`,
   ORGASSETSLIBRARY_ADD: `${prefix} orgassetslibrary add`,
   ORGASSETSLIBRARY_LIST: `${prefix} orgassetslibrary list`,
   ORGASSETSLIBRARY_REMOVE: `${prefix} orgassetslibrary remove`,

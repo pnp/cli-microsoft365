@@ -522,6 +522,7 @@ nav:
         - navigation node add: cmd/spo/navigation/navigation-node-add.md
         - navigation node list: cmd/spo/navigation/navigation-node-list.md
         - navigation node remove: cmd/spo/navigation/navigation-node-remove.md
+        - navigation node set: cmd/spo/navigation/navigation-node-set.md
       - orgassetslibrary:
         - orgassetslibrary add: cmd/spo/orgassetslibrary/orgassetslibrary-add.md
         - orgassetslibrary list: cmd/spo/orgassetslibrary/orgassetslibrary-list.md
