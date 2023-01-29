@@ -13,7 +13,7 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class PurviewRetentionEventTypeGetCommand extends GraphCommand {
+class PurviewRetentionEventtypeGetCommand extends GraphCommand {
   public get name(): string {
     return commands.RETENTIONEVENTTYPE_GET;
   }
@@ -72,4 +72,4 @@ class PurviewRetentionEventTypeGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new PurviewRetentionEventTypeGetCommand();
+module.exports = new PurviewRetentionEventtypeGetCommand();
