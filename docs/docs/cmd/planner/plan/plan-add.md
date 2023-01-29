@@ -14,10 +14,13 @@ m365 planner plan add [options]
 : Title of the plan to add.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the Group that owns the plan. A valid group must exist before this option can be set. Specify either `ownerGroupId` or `ownerGroupName` but not both.
+: ID of the Group that owns the plan. A valid group must exist before this option can be set. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the Group that owns the plan. A valid group must exist before this option can be set. Specify either `ownerGroupId` or `ownerGroupName` but not both.
+: Name of the Group that owns the plan. A valid group must exist before this option can be set. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId`.
+
+`--rosterId [rosterId]`
+: ID of the Planner Roster. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId`.
 
 `--shareWithUserIds [shareWithUserIds]`
 : The comma-separated IDs of the users with whom you want to share the plan. Specify either `shareWithUserIds` or `shareWithUserNames` but not both.
@@ -29,23 +32,25 @@ m365 planner plan add [options]
 
 ## Remarks
 
-Related to the options `--shareWithUserIds` and `--shareWithUserNames`. If you are leveraging Microsoft 365 groups, use the `aad o365group user` commands to manage group membership to share the [group's](https://pnp.github.io/cli-microsoft365/cmd/aad/o365group/o365group-user-add/) plan. You can also add existing members of the group to this collection though it is not required for them to access the plan owned by the group.
+- Related to the options `--shareWithUserIds` and `--shareWithUserNames`. If you are leveraging Microsoft 365 groups, use the `aad o365group user` commands to manage group membership to share the [group's](https://pnp.github.io/cli-microsoft365/cmd/aad/o365group/o365group-user-add/) plan. You can also add existing members of the group to this collection though it is not required for them to access the plan owned by the group.
+
+- Hint: Unlike for groups, a Planner Roster can contain only 1 plan.
 
 ## Examples
 
-Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_
+Adds a Microsoft Planner plan with a Group by id
 
 ```sh
 m365 planner plan add --title 'My Planner Plan' --ownerGroupId '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
 ```
 
-Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _My Planner Group_
+Adds a Microsoft Planner plan with with a Group by name
 
 ```sh
 m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Group'
 ```
 
-Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _My Planner Group_ and share it with the users _Allan.Carroll@contoso.com_ and _Ida.Stevens@contoso.com_
+Adds a Microsoft Planner plan with with a Group by name and share it with the given users
 
 ```sh
 m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Group' --shareWithUserNames 'Allan.Carroll@contoso.com,Ida.Stevens@contoso.com'
