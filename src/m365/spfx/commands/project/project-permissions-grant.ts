@@ -26,7 +26,7 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
   public async commandAction(logger: Logger): Promise<void> {
     this.projectRootPath = this.getProjectRoot(process.cwd());
     if (this.projectRootPath === null) {
-      throw new CommandError(`Couldn't find project root folder`, SpfxProjectPermissionsGrantCommand.ERROR_NO_PROJECT_ROOT_FOLDER);
+      throw new CommandError(`Couldn't find project root folder`, SpfxProjectPermissionSGrantCommand.ERROR_NO_PROJECT_ROOT_FOLDER);
     }
 
     if (this.debug) {
