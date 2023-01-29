@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
   title?: string;
   url: string;
   footerEnabled?: boolean;
+  navAudienceTargetingEnabled?: boolean;
   searchScope?: string;
 }
 
@@ -53,6 +54,7 @@ class SpoWebSetCommand extends SpoCommand {
         title: typeof args.options.title !== 'undefined',
         quickLaunchEnabled: args.options.quickLaunchEnabled,
         footerEnabled: args.options.footerEnabled,
+        navAudienceTargetingEnabled: args.options.navAudienceTargetingEnabled,
         searchScope: args.options.searchScope !== 'undefined'
       });
       this.trackUnknownOptions(this.telemetryProperties, args.options);
@@ -91,6 +93,10 @@ class SpoWebSetCommand extends SpoCommand {
       },
       {
         option: '--footerEnabled [footerEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--navAudienceTargetingEnabled [navAudienceTargetingEnabled]',
         autocomplete: ['true', 'false']
       },
       {
@@ -168,6 +174,9 @@ class SpoWebSetCommand extends SpoCommand {
     }
     if (typeof args.options.footerEnabled !== 'undefined') {
       payload.FooterEnabled = args.options.footerEnabled;
+    }
+    if (typeof args.options.navAudienceTargetingEnabled !== 'undefined') {
+      payload.navAudienceTargetingEnabled = args.options.navAudienceTargetingEnabled;
     }
     if (typeof args.options.searchScope !== 'undefined') {
       const searchScope = args.options.searchScope.toLowerCase();
