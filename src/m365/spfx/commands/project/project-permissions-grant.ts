@@ -8,7 +8,7 @@ import { Options as SpoServicePrincipalGrantAddCommandOptions } from '../../../s
 import * as SpoServicePrincipalGrantAddCommand from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add';
 import { Cli } from '../../../../cli/Cli';
 
-class SpfxProjectPermissionsGrantCommand extends BaseProjectCommand {
+class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
 
   public get name(): string {
@@ -78,4 +78,4 @@ class SpfxProjectPermissionsGrantCommand extends BaseProjectCommand {
   }
 }
 
-module.exports = new SpfxProjectPermissionsGrantCommand();
+module.exports = new SpfxProjectPermissionSGrantCommand();
