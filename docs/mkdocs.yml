@@ -541,6 +541,7 @@ nav:
         - mail send: cmd/spo/mail/mail-send.md
       - navigation:
         - navigation node add: cmd/spo/navigation/navigation-node-add.md
+        - navigation node get: cmd/spo/navigation/navigation-node-get.md
         - navigation node list: cmd/spo/navigation/navigation-node-list.md
         - navigation node remove: cmd/spo/navigation/navigation-node-remove.md
         - navigation node set: cmd/spo/navigation/navigation-node-set.md
