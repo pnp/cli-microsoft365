@@ -204,7 +204,7 @@ describe(commands.RUN_LIST, () => {
 
   it('retrieves all runs between two dates for a specific flow', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs?api-version=2016-11-01&$filter=startTime ge ${triggerStartTime} and startTime le ${triggerEndTime}`) {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs?api-version=2016-11-01&$filter=startTime ge ${triggerStartTime} and startTime lt ${triggerEndTime}`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -284,5 +284,4 @@ describe(commands.RUN_LIST, () => {
     const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, status: status, triggerStartTime: triggerStartTime, triggerEndTime: triggerEndTime } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-
 });

@@ -136,7 +136,7 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
       filters.push(`startTime ge ${triggerStartTime}`);
     }
     if (triggerEndTime) {
-      filters.push(`startTime le ${triggerEndTime}`);
+      filters.push(`startTime lt ${triggerEndTime}`);
     }
     return filters;
   }
