@@ -17,10 +17,13 @@ m365 planner plan set [options]
 : Title of the plan. Specify either `id` or `title` but not both.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the group to which the plan belongs. Specify either `ownerGroupId` or `ownerGroupName` when using `title`.
+: ID of the group to which the plan belongs. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId` when using `title`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the Group to which the plan belongs. Specify either `ownerGroupId` or `ownerGroupName` when using `title`.
+: Name of the Group to which the plan belongs. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId` when using `title`.
+
+`--rosterId [rosterId]`
+: ID of the Planner Roster. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId` when using `title`.
 
 `--newTitle [newTitle]`
 : New title of the plan.

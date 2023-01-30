@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   title?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
+  rosterId?: string;
   newTitle?: string;
   shareWithUserIds?: string;
   shareWithUserNames?: string;
@@ -52,6 +53,7 @@ class PlannerPlanSetCommand extends GraphCommand {
         title: typeof args.options.title !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
         ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
+        rosterId: typeof args.options.rosterId !== 'undefined',
         newTitle: typeof args.options.newTitle !== 'undefined',
         shareWithUserIds: typeof args.options.shareWithUserIds !== 'undefined',
         shareWithUserNames: typeof args.options.shareWithUserNames !== 'undefined'
@@ -74,6 +76,9 @@ class PlannerPlanSetCommand extends GraphCommand {
         option: '--ownerGroupName [ownerGroupName]'
       },
       {
+        option: '--rosterId [rosterId]'
+      },
+      {
         option: '--newTitle [newTitle]'
       },
       {
@@ -91,14 +96,6 @@ class PlannerPlanSetCommand extends GraphCommand {
         if (args.options.title) {
           if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
             return `${args.options.ownerGroupId} is not a valid GUID`;
-          }
-
-          if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-            return 'Specify either ownerGroupId or ownerGroupName when using title';
-          }
-
-          if (args.options.ownerGroupId && args.options.ownerGroupName) {
-            return 'Specify either ownerGroupId or ownerGroupName when using title but not both';
           }
         }
 
@@ -155,7 +152,16 @@ class PlannerPlanSetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title'] });
+    this.optionSets.push(
+      {
+        options: ['id', 'title']
+      },
+      {
+        options: ['ownerGroupId', 'ownerGroupName', 'rosterId'],
+        runsWhen: (args) => {
+          return args.options.title !== undefined;
+        }
+      });
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -180,8 +186,12 @@ class PlannerPlanSetCommand extends GraphCommand {
       return id;
     }
 
-    const groupId: string = await this.getGroupId(args);
-    const plan: PlannerPlan = await planner.getPlanByTitle(title!, groupId);
+    let groupId: string = '';
+
+    if (!args.options.rosterId) {
+      groupId = await this.getGroupId(args);
+    }
+    const plan: PlannerPlan = await planner.getPlanByTitle(title!, groupId, args.options.rosterId, 'minimal');
     return plan.id!;
   }
 
