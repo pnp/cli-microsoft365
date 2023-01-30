@@ -23,7 +23,7 @@ m365 spo navigation node set [options]
 : New URL of the navigation node.
 
 `--audienceIds [audienceIds]`
-: Comma separated list of group IDs that will be used for audience targeting. Speficy an empty string "" to clear this value. The limit is 10 ids per navigation node.
+: Comma separated list of group IDs that will be used for audience targeting. Speficy an empty string `""` to clear this value. The limit is 10 ids per navigation node.
 
 `--isExternal [isExternal]`
 : Whether the navigation node points to an external URL. Valid values: `true` or `false`.
@@ -32,7 +32,7 @@ m365 spo navigation node set [options]
 
 ## Remarks
 
-To make use of use the option `audienceIds`, you have to make sure that the audience targeting of the web has been enabled. To enable the audience targeting for a specific web using the CLI for Microsoft 365, please refer to [`spo web set`](../web/web-set.md).
+To enable/disable audience targeting for the nsavigation bar, use command [`spo web set`](../web/web-set.md).
 
 ## Examples
 
@@ -45,7 +45,7 @@ m365 spo navigation node set --webUrl https://contoso.sharepoint.com/sites/marke
 Updates the URL of a navigation node
 
 ```sh
-m365 spo navigation node set --webUrl https://contoso.sharepoint.com/sites/marketing --id 2209 --url "https://www.microsoft.com"
+m365 spo navigation node set --webUrl https://contoso.sharepoint.com/sites/marketing --id 2209 --url "https://www.microsoft.com" --isExternal true
 ```
 
 Updates audience targeting of a navigation node with 3 groups

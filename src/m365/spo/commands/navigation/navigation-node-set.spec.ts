@@ -61,7 +61,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.NAVIGATION_NODE_SET), true);
+    assert.strictEqual(command.name, commands.NAVIGATION_NODE_SET);
   });
 
   it('has a description', () => {
@@ -69,44 +69,53 @@ describe(commands.NAVIGATION_NODE_SET, () => {
   });
 
   it('correctly updates existing navigation node', async () => {
+    const requestBody = {
+      Title: title,
+      Url: nodeUrl,
+      IsExternal: false,
+      AudienceIds: audienceIds.split(',')
+    };
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`
-        && opts.data['Title'] === title
-        && opts.data['Url'] === nodeUrl
-        && JSON.stringify(opts.data['AudienceIds']) === JSON.stringify(audienceIds.split(','))
-        && opts.data['IsExternal'] === false) {
-        return;
+      if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
+        return '';
       }
 
       throw 'Invalid request';
     });
     await command.action(logger, { options: { webUrl: webUrl, id: id, title: title, url: nodeUrl, isExternal: false, audienceIds: audienceIds } } as any);
-    assert(patchStub.called);
+    assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
   });
 
   it('correctly clears audienceIds from existing navigation node', async () => {
+    const requestBody = {
+      AudienceIds: [],
+      IsExternal: undefined,
+      Title: undefined,
+      Url: undefined
+    };
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`
-        && JSON.stringify(opts.data['AudienceIds']) === JSON.stringify([])) {
-        return;
+      if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
+        return '';
       }
 
       throw 'Invalid request';
     });
     await command.action(logger, { options: { webUrl: webUrl, id: id, audienceIds: "" } } as any);
-    assert(patchStub.called);
+    assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
   });
 
-  it('correctly handles API error', async () => {
+  it('correctly handles navigation node that does not exist', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
-        throw { error: 'An error has occurred' };
+        return {
+          'odata.null': true
+        };
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: id, title: title, verbose: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: id, title: title, verbose: true } } as any), new CommandError('Navigation node does not exist.'));
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {

@@ -39,9 +39,9 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        isExternal: args.options.isExternal,
-        location: typeof args.options.location !== 'undefined',
-        parentNodeId: typeof args.options.parentNodeId !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        url: typeof args.options.url !== 'undefined',
+        isExternal: typeof args.options.isExternal !== 'undefined',
         audienceIds: typeof args.options.audienceIds !== 'undefined'
       });
     });
@@ -82,18 +82,18 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (!args.options.audienceIds && !args.options.url && !args.options.isExternal && !args.options.title) {
+        if (args.options.audienceIds === undefined && !args.options.url && args.options.isExternal === undefined && !args.options.title) {
           return `Please specify atleast one property to update.`;
         }
 
         if (args.options.audienceIds) {
           const audienceIdsSplitted = args.options.audienceIds.split(',');
           if (audienceIdsSplitted.length > 10) {
-            return 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of auciendeIds to be set is 10.';
+            return 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of audienceIds is 10.';
           }
 
-          if (!validation.isValidGuidArray(args.options.audienceIds.split(','))) {
-            return `The option audienceIds contains invalid GUIDs`;
+          if (!validation.isValidGuidArray(audienceIdsSplitted)) {
+            return `The option audienceIds contains one or more invalid GUIDs`;
           }
         }
 
@@ -103,52 +103,40 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (this.verbose) {
-      logger.logToStderr(`Setting navigation node...`);
-    }
-    logger.log(args.options);
-    const requestBody = this.mapRequestBody(args.options);
-
-    const requestOptions: CliRequestOptions = {
-      url: `${args.options.webUrl}/_api/web/navigation/GetNodeById(${args.options.id})`,
-      headers: {
-        accept: 'application/json;odata=nometadata',
-        'content-type': 'application/json;odata=nometadata'
-      },
-      data: requestBody,
-      responseType: 'json'
-    };
-
     try {
-      await request.patch(requestOptions);
+      if (this.verbose) {
+        logger.logToStderr(`Setting navigation node...`);
+      }
+      const requestBody: any = {
+        Title: args.options.title,
+        IsExternal: args.options.isExternal,
+        Url: args.options.url
+      };
+
+      if (args.options.audienceIds !== undefined) {
+        requestBody.AudienceIds = args.options.audienceIds === '' ? [] : args.options.audienceIds.split(',');
+      }
+
+      const requestOptions: CliRequestOptions = {
+        url: `${args.options.webUrl}/_api/web/navigation/GetNodeById(${args.options.id})`,
+        headers: {
+          accept: 'application/json;odata=nometadata',
+          'content-type': 'application/json;odata=nometadata'
+        },
+        data: requestBody,
+        responseType: 'json'
+      };
+
+      const response = await request.patch<any>(requestOptions);
+      if (response['odata.null'] === true) {
+        throw `Navigation node does not exist.`;
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private mapRequestBody(options: Options): any {
-    const requestBody: any = {};
-    if (options.title) {
-      requestBody.Title = options.title;
-    }
-    if (options.isExternal !== undefined) {
-      requestBody.IsExternal = options.isExternal;
-    }
-    if (options.url) {
-      requestBody.Url = options.url;
-    }
-    if (options.audienceIds !== undefined) {
-      if (options.audienceIds === '') {
-        requestBody.AudienceIds = [];
-      }
-      else {
-        requestBody.AudienceIds = options.audienceIds.split(',');
-      }
-
-    }
-    return requestBody;
-  }
 }
 
 module.exports = new SpoNavigationNodeSetCommand();
