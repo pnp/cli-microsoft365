@@ -11,6 +11,7 @@ export default {
   PLAN_LIST: `${prefix} plan list`,
   PLAN_REMOVE: `${prefix} plan remove`,
   PLAN_SET: `${prefix} plan set`,
+  ROSTER_GET: `${prefix} roster get`,
   TASK_ADD: `${prefix} task add`,
   TASK_CHECKLISTITEM_ADD: `${prefix} task checklistitem add`,
   TASK_CHECKLISTITEM_LIST: `${prefix} task checklistitem list`,
