@@ -24,6 +24,10 @@ class SpoNavigationNodeListCommand extends SpoCommand {
     return 'Lists nodes from the specified site navigation';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['AudienceIds', 'CurrentLCID', 'Id', 'IsDocLib', 'IsExternal', 'IsVisible', 'ListTemplateType', 'Title', 'Url'];
+  }
+
   constructor() {
     super();
 
