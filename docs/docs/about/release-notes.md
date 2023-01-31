@@ -1,5 +1,14 @@
 # Release notes
 
+## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
+
+### New commands
+
+### Changes
+
+- removed duplicate util app only permissions [#4142](https://github.com/pnp/cli-microsoft365/issues/4142)
+- added util for retrieving graph site id from webUrl [#4316](https://github.com/pnp/cli-microsoft365/issues/4316)
+
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
 ### New commands
