@@ -27,6 +27,10 @@ m365 planner plan remove [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+If you wish to delete a plan contained within a Planner Roster, you should remove the roster to remove the plan.
+
 ## Examples
 
 Removes the Microsoft Planner plan by ID
