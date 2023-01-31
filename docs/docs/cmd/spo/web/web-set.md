@@ -38,7 +38,7 @@ m365 spo web set [options]
 : Set to `true` to enable footer and to `false` to disable it
 
 `--navAudienceTargetingEnabled [navAudienceTargetingEnabled]`
-: Enable or disable site navigation audience targeting. Allowed values: true or false.
+: Enable or disable site navigation audience targeting. Allowed values: `true` or `false`.
 
 `--searchScope [searchScope]`
 : Search scope to set in the site. Allowed values `DefaultScope,Tenant,Hub,Site`
@@ -93,7 +93,7 @@ m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --footerEnabl
 Enable navigation audience targetting in the site
 
 ```sh
-m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --navAudienceTargetingEnabled  true
+m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --navAudienceTargetingEnabled true
 ```
 
 Set search scope to tenant scope

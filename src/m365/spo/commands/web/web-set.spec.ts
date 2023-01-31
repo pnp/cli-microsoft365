@@ -455,31 +455,22 @@ describe(commands.WEB_SET, () => {
   });
 
   it('enables navAudienceTargetingEnabled', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    const postRequestStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (JSON.stringify(opts.data) === JSON.stringify({
-        navAudienceTargetingEnabled: true
+        NavAudienceTargetingEnabled: true
       })) {
-        return Promise.resolve();
+        return {};
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
+
+    const requestBody = {
+      NavAudienceTargetingEnabled: true
+    };
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', navAudienceTargetingEnabled: true } });
-  });
-
-  it('disables navAudienceTargetingEnabled', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.data) === JSON.stringify({
-        navAudienceTargetingEnabled: false
-      })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', navAudienceTargetingEnabled: false } });
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
   it('fails validation if search scope is not valid', async () => {
