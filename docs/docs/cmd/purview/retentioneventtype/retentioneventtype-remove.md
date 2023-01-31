@@ -5,7 +5,7 @@ Delete a retention event type
 ## Usage
 
 ```sh
-m365 purview retentionlabel remove [options]
+m365 purview retentioneventtype remove [options]
 ```
 
 ## Options
