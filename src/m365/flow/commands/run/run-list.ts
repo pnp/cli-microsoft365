@@ -101,7 +101,7 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
     }
 
     let url: string = `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs?api-version=2016-11-01`;
-    const filters = this.getFilters(args.options.status, args.options.triggerStartTime, args.options.triggerEndTime);
+    const filters = this.getFilters(args.options);
     if (filters.length > 0) {
       url += `&$filter=${filters.join(' and ')}`;
     }
@@ -127,16 +127,16 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
     }
   }
 
-  private getFilters(status?: string, triggerStartTime?: string, triggerEndTime?: string): string[] {
+  private getFilters(options: Options): string[] {
     const filters = [];
-    if (status) {
-      filters.push(`Status eq '${status}'`);
+    if (options.status) {
+      filters.push(`status eq '${options.status}'`);
     }
-    if (triggerStartTime) {
-      filters.push(`startTime ge ${triggerStartTime}`);
+    if (options.triggerStartTime) {
+      filters.push(`startTime ge ${options.triggerStartTime}`);
     }
-    if (triggerEndTime) {
-      filters.push(`startTime lt ${triggerEndTime}`);
+    if (options.triggerEndTime) {
+      filters.push(`startTime lt ${options.triggerEndTime}`);
     }
     return filters;
   }
