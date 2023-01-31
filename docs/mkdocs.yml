@@ -318,6 +318,7 @@ nav:
       - retentionevent:
         - retentionevent list: cmd/purview/retentionevent/retentionevent-list.md
       - retentioneventtype:
+        - retentioneventtype add: cmd/purview/retentioneventtype/retentioneventtype-add.md
         - retentioneventtype get: cmd/purview/retentioneventtype/retentioneventtype-get.md
         - retentioneventtype list: cmd/purview/retentioneventtype/retentioneventtype-list.md
       - retentionlabel:
