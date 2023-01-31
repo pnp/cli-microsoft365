@@ -456,10 +456,8 @@ describe(commands.WEB_SET, () => {
 
   it('enables navAudienceTargetingEnabled', async () => {
     const postRequestStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (JSON.stringify(opts.data) === JSON.stringify({
-        NavAudienceTargetingEnabled: true
-      })) {
-        return {};
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web') {
+        return;
       }
 
       throw 'Invalid request';
