@@ -57,16 +57,16 @@ m365 spo navigation node list --webUrl https://contoso.sharepoint.com/sites/team
 === "Text"
 
     ```text
-    AudienceIds                                  CurrentLCID  Id    IsDocLib  IsExternal  IsVisible  ListTemplateType  Title              Url
-    -------------------------------------------  -----------  ----  --------  ----------  ---------  ----------------  -----------------  ---------------------------
-    5786b8e8-c495-4734-b345-756733960730         1033         2032  true      false       true       0                 Navigation Link    https://contoso.sharepoint.com
+    Id    Title            Url
+    ----  ---------------  ------------------------------
+    2032  Navigation Link  https://contoso.sharepoint.com
     ```
 
 === "CSV"
 
     ```csv
-    AudienceIds,CurrentLCID,Id,IsDocLib,IsExternal,IsVisible,ListTemplateType,Title,Url
-    5786b8e8-c495-4734-b345-756733960730,1033,2032,1,,1,0,Navigation Link,https://contoso.sharepoint.com
+    Id,Title,Url
+    2032,Navigation Link,https://contoso.sharepoint.com
     ```
 
 === "Markdown"

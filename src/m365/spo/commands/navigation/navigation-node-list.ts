@@ -25,7 +25,7 @@ class SpoNavigationNodeListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['AudienceIds', 'CurrentLCID', 'Id', 'IsDocLib', 'IsExternal', 'IsVisible', 'ListTemplateType', 'Title', 'Url'];
+    return ['Id', 'Title', 'Url'];
   }
 
   constructor() {
