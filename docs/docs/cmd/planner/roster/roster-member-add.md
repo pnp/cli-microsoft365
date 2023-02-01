@@ -10,6 +10,15 @@ m365 planner roster member add [options]
 
 ## Options
 
+`--rosterId <rosterId>`
+: ID of the Planner Roster.
+
+`--userId [userId]`
+: User's Azure AD ID. Specify either `userId`, `userName` but not both.
+
+`--userName [userName]`
+: User's UPN (user principal name, e.g. johndoe@example.com). Specify either `userId`, `userName` but not both.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
