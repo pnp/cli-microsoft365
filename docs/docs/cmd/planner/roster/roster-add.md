@@ -21,7 +21,7 @@ m365 planner roster add [options]
     This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
 !!! important
-    To be able to create a new Roster, the Planner Roster creation tenant setting should be enabled. Point them to our [planner tenant settings list](../tenant/tenant-settings-list.md) command.
+    To be able to create a new Roster, the Planner Roster creation tenant setting should be enabled. Use the [planner tenant settings list](../tenant/tenant-settings-list.md) command to check if this setting is enabled for your tenant.
 
 ## Examples
 
@@ -57,4 +57,4 @@ m365 planner roster add
     ```
     
 ## Additional information
-- Rosters are a new type of container for Microsoft Planner plans. This enables users to create a Planner plan without the need to create a new Microsoft 365 group (with a mailbox, SharePoint site, ...). Access to Roster-contained plans is controlled by the members on the Roster. A Planner Roster can contain only 1 plan.
+Rosters are a new type of container for Microsoft Planner plans. This enables users to create a Planner plan without the need to create a new Microsoft 365 group (with a mailbox, SharePoint site, ...). Access to Roster-contained plans is controlled by the members on the Roster. A Planner Roster can contain only 1 plan.

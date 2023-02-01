@@ -67,7 +67,7 @@ describe(commands.ROSTER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ROSTER_ADD), true);
+    assert.strictEqual(commands.ROSTER_ADD, true);
   });
 
   it('has a description', () => {
@@ -76,7 +76,7 @@ describe(commands.ROSTER_ADD, () => {
 
   it('adds a new roster', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === 'https://graph.microsoft.com/beta/planner/rosters')) {
+      if (opts.url === 'https://graph.microsoft.com/beta/planner/rosters') {
         return rosterResponse;
       }
 

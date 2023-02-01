@@ -13,19 +13,13 @@ class PlannerRosterAddCommand extends GraphCommand {
     return 'Creates a new Microsoft Planner Roster';
   }
 
-  constructor() {
-    super();
-  }
-
   public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
       logger.logToStderr('Creating a new Microsoft Planner Roster');
     }
 
     try {
-      const requestBody: any = {
-        "@odata.type": "#microsoft.graph.plannerRoster"
-      };
+      const requestBody: any = {};
 
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/beta/planner/rosters`,
