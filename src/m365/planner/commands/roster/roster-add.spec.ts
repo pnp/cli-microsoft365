@@ -67,7 +67,7 @@ describe(commands.ROSTER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(commands.ROSTER_ADD, true);
+    assert.strictEqual(command.name, commands.ROSTER_ADD);
   });
 
   it('has a description', () => {
