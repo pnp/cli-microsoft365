@@ -37,14 +37,8 @@ class PurviewRetentionEventTypeSetCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        behaviorDuringRetentionPeriod: typeof args.options.behaviorDuringRetentionPeriod !== 'undefined',
-        actionAfterRetentionPeriod: typeof args.options.actionAfterRetentionPeriod !== 'undefined',
-        retentionDuration: typeof args.options.retentionDuration !== 'undefined',
-        retentionTrigger: typeof args.options.retentionTrigger !== 'undefined',
-        defaultRecordBehavior: typeof args.options.defaultRecordBehavior !== 'undefined',
-        descriptionForUsers: typeof args.options.descriptionForUsers !== 'undefined',
-        descriptionForAdmins: typeof args.options.descriptionForAdmins !== 'undefined',
-        labelToBeApplied: typeof args.options.labelToBeApplied !== 'undefined'
+        newDisplayName: typeof args.options.newDisplayName !== 'undefined',
+        description: typeof args.options.description !== 'undefined'
       });
     });
   }
