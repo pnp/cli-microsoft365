@@ -100,13 +100,13 @@ describe(commands.PLAN_REMOVE, () => {
     assert(deleteSpy.notCalled);
   });
 
-  it('Correctly deletes plan by id', async () => {
+  it('correctly deletes plan by id', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}`) {
         return;
       }
 
-      return 'Invalid Request';
+      throw 'Invalid Request';
     });
 
     await command.action(logger, {
@@ -118,13 +118,13 @@ describe(commands.PLAN_REMOVE, () => {
     });
   });
 
-  it('Correctly deletes plan by id when prompt confirmed', async () => {
+  it('correctly deletes plan by id when prompt confirmed', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}`) {
         return;
       }
 
-      return 'Invalid Request';
+      throw 'Invalid Request';
     });
 
     sinonUtil.restore(Cli.prompt);
@@ -140,13 +140,13 @@ describe(commands.PLAN_REMOVE, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'delete').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'delete').callsFake(() => Promise.reject('The requested item is not found.'));
 
     await assert.rejects(command.action(logger, {
       options: {
         id: validRosterId,
         confirm: true
       }
-    }), new CommandError("An error has occurred"));
+    }), new CommandError("The requested item is not found."));
   });
 });

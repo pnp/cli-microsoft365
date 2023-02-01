@@ -41,7 +41,7 @@ class PlannerRosterRemoveCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '--id <id>'
       },
       {
         option: '--confirm'
@@ -58,7 +58,7 @@ class PlannerRosterRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the roster ${args.options.id}?`
+        message: `Are you sure you want to remove roster ${args.options.id}?`
       });
       if (result.continue) {
         await this.removeRoster(args, logger);
