@@ -13,6 +13,7 @@ export default {
   PLAN_SET: `${prefix} plan set`,
   ROSTER_ADD: `${prefix} roster add`,
   ROSTER_MEMBER_ADD: `${prefix} roster member add`,
+  ROSTER_MEMBER_LIST: `${prefix} roster member list`,
   ROSTER_REMOVE: `${prefix} roster remove`,
   TASK_ADD: `${prefix} task add`,
   TASK_CHECKLISTITEM_ADD: `${prefix} task checklistitem add`,
