@@ -32,7 +32,7 @@ m365 spo navigation node set [options]
 
 ## Remarks
 
-To enable/disable audience targeting for the nsavigation bar, use command [`spo web set`](../web/web-set.md).
+To enable/disable audience targeting for the navigation bar, use the [`spo web set`](../web/web-set.md) command.
 
 ## Examples
 

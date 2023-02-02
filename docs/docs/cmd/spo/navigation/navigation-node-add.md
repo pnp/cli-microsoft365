@@ -35,7 +35,7 @@ m365 spo navigation node add [options]
 
 ## Remarks
 
-In order to use option `audienceIds`, make sure that audience targeted navigation is enabled using command [spo web set](../web/web-set.md).
+To enable/disable audience targeting for the navigation bar, use the [`spo web set`](../web/web-set.md) command.
 
 ## Examples
 
