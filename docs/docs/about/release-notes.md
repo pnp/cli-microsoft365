@@ -9,9 +9,17 @@
 - [planner roster add](../cmd/planner/roster/roster-add.md) - creates a new Microsoft Planner Roster [#4389](https://github.com/pnp/cli-microsoft365/issues/4389)
 - [planner roster remove](../cmd/planner/roster/roster-remove.md) - removes a Microsoft Planner Roster [#4390](https://github.com/pnp/cli-microsoft365/issues/4390)
 
+**Purview:**
+
+- [purview retentioneventtype get](../cmd/purview/retentioneventtype/retentioneventtype-get.md) - gets a retention event type [#4339](https://github.com/pnp/cli-microsoft365/issues/4339)
+
 **SharePoint:**
 
 - [spo navigation node set](../cmd/spo/navigation/navigation-node-set.md) - updates a SharePoint navigation node [#4416](https://github.com/pnp/cli-microsoft365/issues/4416)
+
+**SharePoint Framework:**
+
+- [spfx project permissions grant](../cmd/spfx/project/project-permissions-grant.md) - grants API permissions defined in the current SPFx project [#4347](https://github.com/pnp/cli-microsoft365/issues/4347)
 
 ### Changes
 
@@ -22,6 +30,8 @@
 - extended 'flow run list' with extra filtering options [#4388](https://github.com/pnp/cli-microsoft365/issues/4388)
 - extended 'spo navigation node add' with support for audience targeting [#4418](https://github.com/pnp/cli-microsoft365/issues/4418)
 - adds remark to 'planner plan remove' on how to remove a Roster plan [#4403](https://github.com/pnp/cli-microsoft365/issues/4403)
+- fixed issue removing plan by title [#4448](https://github.com/pnp/cli-microsoft365/issues/4448)
+- enhanced planner plan add [#4400](https://github.com/pnp/cli-microsoft365/issues/4400)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
