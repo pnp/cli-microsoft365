@@ -7,6 +7,7 @@ import { BaseProjectCommand } from './base-project-command';
 import { Options as SpoServicePrincipalGrantAddCommandOptions } from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add';
 import * as SpoServicePrincipalGrantAddCommand from '../../../spo/commands/serviceprincipal/serviceprincipal-grant-add';
 import { Cli } from '../../../../cli/Cli';
+import { WebApiPermissionRequests } from './WebApiPermissionRequests';
 
 class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -34,7 +35,7 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
     }
 
     try {
-      const webApiPermissionsRequest = this.getWebApiPermissionRequest(path.join(this.projectRootPath, 'config', 'package-solution.json'));
+      const webApiPermissionsRequest: Array<WebApiPermissionRequests> = this.getWebApiPermissionRequest(path.join(this.projectRootPath, 'config', 'package-solution.json'));
       for (const permission of webApiPermissionsRequest) {
         const options: SpoServicePrincipalGrantAddCommandOptions = {
           resource: permission.resource,
@@ -66,7 +67,7 @@ class SpfxProjectPermissionSGrantCommand extends BaseProjectCommand {
     }
   }
 
-  private getWebApiPermissionRequest(filePath: string): any {
+  private getWebApiPermissionRequest(filePath: string): Array<WebApiPermissionRequests> {
     if (!fs.existsSync(filePath)) {
       throw (`The package-solution.json file could not be found`);
     }

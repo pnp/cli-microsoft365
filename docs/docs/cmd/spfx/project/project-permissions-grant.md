@@ -15,7 +15,7 @@ m365 spfx project permissions grant [options]
 ## Remarks
 
 !!! important
-    Run this command in the folder where the project that you want to rename is located.
+    Run this command in the folder where the project is located from where you want to grant the permissions.
 
 This command grant the permissions defined in: _package-solution.json_.
 
