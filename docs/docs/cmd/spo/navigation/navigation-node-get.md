@@ -32,7 +32,10 @@ m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/team-
 
     ```json
     {
-      "AudienceIds": null,
+      "AudienceIds": [
+        "0d718612-8407-4d6b-833c-6891a553354f",
+        "f864446f-b4d7-475a-a2ba-1080c6474020"
+      ],
       "CurrentLCID": 1033,
       "Id": 2209,
       "IsDocLib": true,
@@ -47,7 +50,7 @@ m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/team-
 === "Text"
 
     ```text
-    AudienceIds     : null
+    AudienceIds     : ["0d718612-8407-4d6b-833c-6891a553354f", "f864446f-b4d7-475a-a2ba-1080c6474020"]
     CurrentLCID     : 1033
     Id              : 2209
     IsDocLib        : true
@@ -62,7 +65,7 @@ m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/team-
 
     ```csv
     AudienceIds,CurrentLCID,Id,IsDocLib,IsExternal,IsVisible,ListTemplateType,Title,Url
-    ,1033,2209,1,,1,100,Work Status,/sites/team-a/Lists/Work Status/AllItems.aspx
+    [""0d718612-8407-4d6b-833c-6891a553354f"", ""f864446f-b4d7-475a-a2ba-1080c6474020""],1033,2209,1,,1,100,Work Status,/sites/team-a/Lists/Work Status/AllItems.aspx
     ```
 
 === "Markdown"
@@ -76,7 +79,7 @@ m365 spo navigation node get --webUrl https://contoso.sharepoint.com/sites/team-
 
     Property | Value
     ---------|-------
-    AudienceIds | null
+    AudienceIds | ["0d718612-8407-4d6b-833c-6891a553354f", "f864446f-b4d7-475a-a2ba-1080c6474020"]
     CurrentLCID | 1033
     Id | 2209
     IsDocLib | true
