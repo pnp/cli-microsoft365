@@ -637,9 +637,7 @@ export class Auth {
     }
 
     if (resource === 'https://api.bap.microsoft.com' || resource === 'https://api.powerapps.com') {
-      // api.bap.microsoft.com and api.powerapps.com are not valid resources
-      // we need to use https://management.azure.com/ instead
-      resource = 'https://management.azure.com/';
+      resource = 'https://service.powerapps.com/';
     }
 
     if (resource === 'https://api.powerbi.com') {
