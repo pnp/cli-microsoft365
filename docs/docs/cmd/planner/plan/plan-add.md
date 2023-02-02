@@ -50,6 +50,12 @@ Adds a Microsoft Planner plan with with a Group by name
 m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Group'
 ```
 
+Adds a Microsoft Planner plan with a Roster by id
+
+```sh
+m365 planner plan add --title 'My Planner Plan' --rosterId 'tYqYlNd6eECmsNhN_fcq85cAGAnd'
+```
+
 Adds a Microsoft Planner plan with with a Group by name and share it with the given users
 
 ```sh
