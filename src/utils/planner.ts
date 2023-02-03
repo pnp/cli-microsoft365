@@ -42,14 +42,8 @@ export const planner = {
    * @param title Title of the Planner plan. Case insensitive.
    * @param groupId Owner group ID .
    */
-  async getPlanByTitle(title: string, groupId?: string, rosterId?: string): Promise<PlannerPlan> {
-    let plans: PlannerPlan[] = [];
-    if (groupId) {
-      plans = await this.getPlansByGroupId(groupId);
-    }
-    else if (rosterId) {
-      plans = await this.getPlansByRosterId(rosterId);
-    }
+  async getPlanByTitle(title: string, groupId: string): Promise<PlannerPlan> {
+    const plans: PlannerPlan[] = await this.getPlansByGroupId(groupId);
 
     const filteredPlans = plans.filter(p => p.title && p.title.toLowerCase() === title.toLowerCase());
 
