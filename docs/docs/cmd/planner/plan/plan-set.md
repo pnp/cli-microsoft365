@@ -11,19 +11,19 @@ m365 planner plan set [options]
 ## Options
 
 `-i, --id [id]`
-: ID of the plan. Specify either `id` or `title` but not both.
+: ID of the plan. Specify either `id`, `title` or `rosterId` but not multiple.
 
 `-t, --title [title]`
-: Title of the plan. Specify either `id` or `title` but not both.
-
-`--ownerGroupId [ownerGroupId]`
-: ID of the group to which the plan belongs. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId` when using `title`.
-
-`--ownerGroupName [ownerGroupName]`
-: Name of the Group to which the plan belongs. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId` when using `title`.
+: Title of the plan. Specify either `id`, `title` or `rosterId` but not multiple.
 
 `--rosterId [rosterId]`
-: ID of the Planner Roster. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId` when using `title`.
+: ID of the Planner Roster. Specify either `id`, `title` or `rosterId` but not multiple.
+
+`--ownerGroupId [ownerGroupId]`
+: ID of the group to which the plan belongs. Specify either `ownerGroupId` or `ownerGroupName` when using `title` but not both.
+
+`--ownerGroupName [ownerGroupName]`
+: Name of the Group to which the plan belongs. Specify either `ownerGroupId` or `ownerGroupName` when using `title` but not both.
 
 `--newTitle [newTitle]`
 : New title of the plan.
@@ -42,6 +42,9 @@ This command allows using unknown options.
 
 `--category1 [category1]`
 : New label for a category. Define the category key within your option to update the related label. Category 1 to 25 are available. E.g., `--category4`, `--category12`.
+
+!!! attention
+    When using `rosterId`, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
 ## Examples
 
