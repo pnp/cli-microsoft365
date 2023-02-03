@@ -1,12 +1,12 @@
 import { OnenotePage } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -111,7 +111,7 @@ class OneNotePageListCommand extends GraphCommand {
       endpoint += `groups/${groupId}`;
     }
     else if (args.options.webUrl) {
-      const siteId = await this.getSpoSiteId(args.options.webUrl);
+      const siteId = await spo.getSpoGraphSiteId(args.options.webUrl);
       endpoint += `sites/${siteId}`;
     }
     else {
@@ -124,20 +124,6 @@ class OneNotePageListCommand extends GraphCommand {
   private async getGroupId(groupName: string): Promise<string> {
     const group = await aadGroup.getGroupByDisplayName(groupName);
     return group.id!;
-  }
-
-  private async getSpoSiteId(webUrl: string): Promise<string> {
-    const url = new URL(webUrl);
-    const requestOptions: CliRequestOptions = {
-      url: `${this.resource}/v1.0/sites/${url.hostname}:${url.pathname}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const site = await request.get<{ id: string }>(requestOptions);
-    return site.id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

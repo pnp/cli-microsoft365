@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -10,6 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  audienceIds?: string;
   isExternal?: boolean;
   location?: string;
   parentNodeId?: number;
@@ -41,7 +42,8 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         isExternal: args.options.isExternal,
         location: typeof args.options.location !== 'undefined',
-        parentNodeId: typeof args.options.parentNodeId !== 'undefined'
+        parentNodeId: typeof args.options.parentNodeId !== 'undefined',
+        audienceIds: typeof args.options.audienceIds !== 'undefined'
       });
     });
   }
@@ -66,6 +68,9 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       },
       {
         option: '--isExternal'
+      },
+      {
+        option: '--audienceIds [audienceIds]'
       }
     );
   }
@@ -87,6 +92,17 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
           if (args.options.location !== 'QuickLaunch' &&
             args.options.location !== 'TopNavigationBar') {
             return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
+          }
+        }
+
+        if (args.options.audienceIds) {
+          const audienceIdsSplitted = args.options.audienceIds.split(',');
+          if (audienceIdsSplitted.length > 10) {
+            return 'The maximum amount of audienceIds per navigation node exceeded. The maximum amount of auciendeIds is 10.';
+          }
+
+          if (!validation.isValidGuidArray(audienceIdsSplitted)) {
+            return 'The option audienceIds contains one or more invalid GUIDs';
           }
         }
 
@@ -114,18 +130,19 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       `GetNodeById(${args.options.parentNodeId})/Children` :
       (args.options.location as string).toLowerCase();
 
-    const requestOptions: any = {
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api/web/navigation/${nodesCollection}`,
       headers: {
         accept: 'application/json;odata=nometadata',
         'content-type': 'application/json;odata=nometadata'
       },
+      responseType: 'json',
       data: {
+        AudienceIds: args.options.audienceIds?.split(','),
         Title: args.options.title,
         Url: args.options.url,
         IsExternal: args.options.isExternal === true
-      },
-      responseType: 'json'
+      }
     };
 
     try {

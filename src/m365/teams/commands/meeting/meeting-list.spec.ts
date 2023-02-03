@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { telemetry } from '../../../../telemetry';
-import auth, { Auth } from '../../../../Auth';
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -11,6 +11,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { Cli } from '../../../../cli/Cli';
 import * as userGetCommand from '../../../aad/commands/user/user-get';
+import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./meeting-list');
 
 describe(commands.MEETING_LIST, () => {
@@ -314,7 +315,7 @@ describe(commands.MEETING_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      Auth.isAppOnlyAuth,
+      accessToken.isAppOnlyAccessToken,
       request.get,
       Cli.executeCommandWithOutput
     ]);
@@ -343,7 +344,7 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('lists messages using application permissions for a specific userName and specifying only startDateTime', async () => {
-    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userName}/events?$filter=start/dateTime ge '${startDateTime}'`) {
@@ -357,7 +358,7 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('lists messages using application permissions for a specific userId with a pretty output and specifying both startDateTime and endDateTime', async () => {
-    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/events?$filter=start/dateTime ge '${startDateTime}' and end/dateTime le '${endDateTime}'`) {
@@ -371,7 +372,7 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('lists messages using application permissions for a specific user retrieved by email and specifying all other possible options', async () => {
-    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === userGetCommand) {
@@ -392,7 +393,7 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('lists messages using delegated permissions specifying both startDateTime and only retrieving the events that the user is organizer from', async () => {
-    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => false);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/events?$filter=start/dateTime ge '${startDateTime}' and isOrganizer eq true`) {
@@ -435,14 +436,14 @@ describe(commands.MEETING_LIST, () => {
   });
 
   it('throws an error when the userName, userId or email is not filled in when signed in using app-only authentication', async () => {
-    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
 
     await assert.rejects(command.action(logger, { options: { verbose: true, startDateTime: '2022-04-04' } } as any),
       new CommandError(`The option 'userId', 'userName' or 'email' is required when retrieving meetings using app only permissions`));
   });
 
   it('throws an error when the userName is filled in when signed in using delegated authentication', async () => {
-    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => false);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
 
     await assert.rejects(command.action(logger, { options: { verbose: true, startDateTime: '2022-04-04', userName: userName } } as any),
       new CommandError(`The options 'userId', 'userName' and 'email' cannot be used when retrieving meetings using delegated permissions`));

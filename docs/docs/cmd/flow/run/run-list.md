@@ -16,6 +16,15 @@ m365 flow run list [options]
 `-e, --environmentName <environmentName>`
 : The name of the environment to which the flow belongs
 
+`--status [status]` 
+: Filter the results to only flow runs with a given status: `Succeeded`, `Running`, `Failed` or `Cancelled`. By default all flow runs are listed.
+
+`--triggerStartTime [triggerStartTime]`
+: Time indicating the inclusive start of a time range of flow runs to return. This should be defined as a valid ISO 8601 string (2021-12-16T18:28:48.6964197Z).
+
+`--triggerEndTime [triggerEndTime]`
+: Time indicating the exclusive end of a time range of flow runs to return. This should be defined as a valid ISO 8601 string (2021-12-16T18:28:48.6964197Z).
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -33,6 +42,18 @@ List runs of the specified Microsoft Flow
 
 ```sh
 m365 flow run list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a
+```
+
+List runs of the specified Microsoft Flow with a specific status
+
+```sh
+m365 flow run list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --status Running
+```
+
+List runs of the specified Microsoft Flow between a specific time range
+
+```sh
+m365 flow run list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --triggerStartTime 2023-01-21T18:19:00Z --triggerEndTime 2023-01-22T00:00:00Z
 ```
 
 ## Response

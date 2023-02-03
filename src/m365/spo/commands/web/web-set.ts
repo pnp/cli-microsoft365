@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
   title?: string;
   url: string;
   footerEnabled?: boolean;
+  navAudienceTargetingEnabled?: boolean;
   searchScope?: string;
 }
 
@@ -48,11 +49,12 @@ class SpoWebSetCommand extends SpoCommand {
         description: typeof args.options.description !== 'undefined',
         headerEmphasis: typeof args.options.headerEmphasis !== 'undefined',
         headerLayout: typeof args.options.headerLayout !== 'undefined',
-        megaMenuEnabled: args.options.megaMenuEnabled,
+        megaMenuEnabled: typeof args.options.megaMenuEnabled !== 'undefined',
         siteLogoUrl: typeof args.options.siteLogoUrl !== 'undefined',
         title: typeof args.options.title !== 'undefined',
-        quickLaunchEnabled: args.options.quickLaunchEnabled,
-        footerEnabled: args.options.footerEnabled,
+        quickLaunchEnabled: typeof args.options.quickLaunchEnabled !== 'undefined',
+        footerEnabled: typeof args.options.footerEnabled !== 'undefined',
+        navAudienceTargetingEnabled: typeof args.options.navAudienceTargetingEnabled !== 'undefined',
         searchScope: args.options.searchScope !== 'undefined'
       });
       this.trackUnknownOptions(this.telemetryProperties, args.options);
@@ -94,6 +96,10 @@ class SpoWebSetCommand extends SpoCommand {
         autocomplete: ['true', 'false']
       },
       {
+        option: '--navAudienceTargetingEnabled [navAudienceTargetingEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
         option: '--searchScope [searchScope]',
         autocomplete: SpoWebSetCommand.searchScopeOptions
       }
@@ -101,7 +107,7 @@ class SpoWebSetCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.boolean.push('megaMenuEnabled', 'footerEnabled', 'quickLaunchEnabled');
+    this.types.boolean.push('megaMenuEnabled', 'footerEnabled', 'quickLaunchEnabled', 'navAudienceTargetingEnabled');
   }
 
   #initValidators(): void {
@@ -168,6 +174,9 @@ class SpoWebSetCommand extends SpoCommand {
     }
     if (typeof args.options.footerEnabled !== 'undefined') {
       payload.FooterEnabled = args.options.footerEnabled;
+    }
+    if (typeof args.options.navAudienceTargetingEnabled !== 'undefined') {
+      payload.NavAudienceTargetingEnabled = args.options.navAudienceTargetingEnabled;
     }
     if (typeof args.options.searchScope !== 'undefined') {
       const searchScope = args.options.searchScope.toLowerCase();

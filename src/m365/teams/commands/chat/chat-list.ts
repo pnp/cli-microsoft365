@@ -84,16 +84,16 @@ class TeamsChatListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAuth: boolean = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
 
-    if (isAppOnlyAuth && !args.options.userId && !args.options.userName) {
+    if (isAppOnlyAccessToken && !args.options.userId && !args.options.userName) {
       throw `The option 'userId' or 'userName' is required when obtaining chats using app only permissions`;
     }
-    else if (!isAppOnlyAuth && (args.options.userId || args.options.userName)) {
+    else if (!isAppOnlyAccessToken && (args.options.userId || args.options.userName)) {
       throw `The options 'userId' or 'userName' cannot be used when obtaining chats using delegated permissions`;
     }
 
-    let requestUrl = `${this.resource}/v1.0/${!isAppOnlyAuth ? 'me' : `users/${args.options.userId || args.options.userName}`}/chats`;
+    let requestUrl = `${this.resource}/v1.0/${!isAppOnlyAccessToken ? 'me' : `users/${args.options.userId || args.options.userName}`}/chats`;
 
     if (args.options.type) {
       requestUrl += `?$filter=chatType eq '${args.options.type}'`;

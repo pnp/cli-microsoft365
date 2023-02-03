@@ -1,12 +1,12 @@
 import { Notebook } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -67,12 +67,12 @@ class OneNoteNotebookListCommand extends GraphCommand {
         }
 
         if (args.options.userId && args.options.userName) {
-	        return 'Specify either userId or userName, but not both';
-	      }
+          return 'Specify either userId or userName, but not both';
+        }
 
         if (args.options.groupId && args.options.groupName) {
-	        return 'Specify either groupId or groupName, but not both';
-	      }
+          return 'Specify either groupId or groupName, but not both';
+        }
 
         return true;
       }
@@ -107,8 +107,7 @@ class OneNoteNotebookListCommand extends GraphCommand {
           });
       }
       else if (args.options.webUrl) {
-        this
-          .getSpoSiteId(args)
+        spo.getSpoGraphSiteId(args.options.webUrl)
           .then((siteId: string): void => {
             endpoint = `${this.resource}/v1.0/sites/${siteId}/onenote/notebooks`;
             return resolve(endpoint);
@@ -133,27 +132,12 @@ class OneNoteNotebookListCommand extends GraphCommand {
       .then(group => group.id!);
   }
 
-  private getSpoSiteId(args: CommandArgs): Promise<string> {
-    const url = new URL(args.options.webUrl!);
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/sites/${url.hostname}:${url.pathname}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ id: string }>(requestOptions)
-      .then((site: { id: string }) => site.id);
-  }
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const endpoint = await this.getEndpointUrl(args);
       const items = await odata.getAllItems<Notebook>(endpoint);
       logger.log(items);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
