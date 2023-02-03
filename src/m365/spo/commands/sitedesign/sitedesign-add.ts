@@ -17,6 +17,7 @@ interface Options extends GlobalOptions {
   description?: string;
   previewImageUrl?: string;
   previewImageAltText?: string;
+  thumbnailUrl?: string;
   isDefault?: boolean;
 }
 
@@ -45,6 +46,7 @@ class SpoSiteDesignAddCommand extends SpoCommand {
         description: (!(!args.options.description)).toString(),
         previewImageUrl: (!(!args.options.previewImageUrl)).toString(),
         previewImageAltText: (!(!args.options.previewImageAltText)).toString(),
+        thumbnailUrl: (!(!args.options.thumbnailUrl)).toString(),
         isDefault: args.options.isDefault || false
       });
     });
@@ -70,6 +72,9 @@ class SpoSiteDesignAddCommand extends SpoCommand {
       },
       {
         option: '-a, --previewImageAltText [previewImageAltText]'
+      },
+      {
+        option: '--thumbnailUrl [thumbnailUrl]'
       },
       {
         option: '--isDefault'
@@ -117,6 +122,9 @@ class SpoSiteDesignAddCommand extends SpoCommand {
       if (args.options.previewImageAltText) {
         info.PreviewImageAltText = args.options.previewImageAltText;
       }
+      if (args.options.thumbnailUrl) {
+        info.ThumbnailUrl = args.options.thumbnailUrl;
+      }
       if (args.options.isDefault) {
         info.IsDefault = true;
       }
@@ -134,7 +142,8 @@ class SpoSiteDesignAddCommand extends SpoCommand {
 
       const res = await request.post(requestOptions);
       logger.log(res);
-    } 
+      console.log(res);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
