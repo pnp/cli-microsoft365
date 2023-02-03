@@ -1,6 +1,7 @@
 const prefix: string = 'purview';
 
 export default {
+  RETENTIONEVENT_LIST: `${prefix} retentionevent list`,
   RETENTIONEVENTTYPE_GET: `${prefix} retentioneventtype get`,
   AUDITLOG_LIST: `${prefix} auditlog list`,
   RETENTIONLABEL_ADD: `${prefix} retentionlabel add`,
