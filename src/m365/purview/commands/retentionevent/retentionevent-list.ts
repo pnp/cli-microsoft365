@@ -3,7 +3,7 @@ import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
-class PurviewRetentionLabelListCommand extends GraphCommand {
+class PurviewRetentionEventListCommand extends GraphCommand {
   public get name(): string {
     return commands.RETENTIONEVENT_LIST;
   }
@@ -27,4 +27,4 @@ class PurviewRetentionLabelListCommand extends GraphCommand {
   }
 }
 
-module.exports = new PurviewRetentionLabelListCommand();
+module.exports = new PurviewRetentionEventListCommand();
