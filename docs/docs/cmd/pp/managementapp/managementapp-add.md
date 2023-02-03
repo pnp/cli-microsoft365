@@ -79,7 +79,7 @@ m365 pp managementapp add --name "My app"
 
     Date: 9/1/2023
 
-    ## undefined (undefined)
+
 
     Property | Value
     ---------|-------

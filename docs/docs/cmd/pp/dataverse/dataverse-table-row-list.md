@@ -96,7 +96,7 @@ m365 pp dataverse table row list --environment "Default-2ca3eaa5-140f-4175-8261-
 
     Date: 9/1/2023
 
-    ## undefined (undefined)
+
 
     Property | Value
     ---------|-------

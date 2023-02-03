@@ -101,7 +101,7 @@ m365 pp aibuildermodel list --environment "Default-d87a7535-dd31-4437-bfe1-95340
 
     Date: 9/1/2023
 
-    ## undefined (undefined)
+
 
     Property | Value
     ---------|-------

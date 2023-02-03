@@ -83,7 +83,7 @@ m365 pp card clone --environment "Default-d87a7535-dd31-4437-bfe1-95340acd55c5" 
 
     Date: 9/1/2023
 
-    ## undefined (undefined)
+
 
     Property | Value
     ---------|-------

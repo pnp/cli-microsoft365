@@ -89,7 +89,7 @@ m365 pp solution publisher get --environment "Default-2ca3eaa5-140f-4175-8261-32
     
     Date: 9/1/2023
 
-    ## undefined (undefined)
+
 
     Property | Value
     ---------|-------
