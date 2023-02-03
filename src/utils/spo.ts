@@ -7,7 +7,6 @@ import config from "../config";
 import { BasePermissions } from '../m365/spo/base-permissions';
 import request, { CliRequestOptions } from "../request";
 import { formatting } from './formatting';
-import { GraphFileDetails } from '../m365/spo/commands/file/GraphFileDetails';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -60,6 +59,12 @@ export interface SpoOperation {
 export interface IdentityResponse {
   objectIdentity: string;
   serverRelativeUrl: string;
+}
+
+export interface GraphFileDetails {
+  SiteId: string;
+  VroomDriveID: string;
+  VroomItemID: string;
 }
 
 export const spo = {
@@ -551,10 +556,10 @@ export const spo = {
   /**
    * Retrieves the SiteId, VroomItemId and VroomDriveId from a specific file
    * @param webUrl web url
-   * @param fileId Id of the file
-   * @param fileUrl Url of the file
+   * @param fileId GUID ID of the file
+   * @param fileUrl Decoded URL of the file
    */
-  async getFileDetails(webUrl: string, fileId?: string, fileUrl?: string): Promise<GraphFileDetails> {
+  async getVroomFileDetails(webUrl: string, fileId?: string, fileUrl?: string): Promise<GraphFileDetails> {
     let requestUrl: string = `${webUrl}/_api/web/`;
 
     if (fileUrl) {

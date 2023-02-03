@@ -6,13 +6,13 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import { formatting } from '../../../../utils/formatting';
-import { GraphFileDetails } from './GraphFileDetails';
 import { urlUtil } from '../../../../utils/urlUtil';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { GraphFileDetails } from '../../../../utils/spo';
 const command: Command = require('./file-sharinglink-get');
 
 describe(commands.FILE_SHARINGLINK_GET, () => {

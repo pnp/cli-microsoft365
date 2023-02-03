@@ -95,7 +95,7 @@ class SpoFileSharingLinkRemoveCommand extends SpoCommand {
           logger.logToStderr(`Removing sharing link of file ${args.options.fileUrl || args.options.fileId} with id ${args.options.id}...`);
         }
 
-        const fileDetails = await spo.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
+        const fileDetails = await spo.getVroomFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
         const requestOptions: CliRequestOptions = {
           url: `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions/${args.options.id}`,
           headers: {

@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
 }
 
 class SpoFileSharingLinkClearCommand extends SpoCommand {
-  public readonly allowedScopes: string[] = ['anonymous', 'users', 'organization'];
+  private readonly allowedScopes: string[] = ['anonymous', 'users', 'organization'];
 
   public get name(): string {
     return commands.FILE_SHARINGLINK_CLEAR;
@@ -106,27 +106,19 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
           logger.logToStderr(`Clearing sharing links for file ${args.options.fileUrl || args.options.fileId}${args.options.scope ? ` with scope ${args.options.scope}` : ''}`);
         }
 
-        const fileDetails = await spo.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
-        const sharingLinks = await this.getFileSharingLinks(args.options.webUrl, logger, args.options.fileId, args.options.fileUrl, args.options.scope);
-        const batchRequests = sharingLinks.map((sharingLink, index) => {
-          return {
-            id: index,
-            method: 'DELETE',
-            url: `/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions/${sharingLink.id}`
-          };
-        });
-        for (let i = 0; i < batchRequests.length; i += 20) {
-          const batchRequestChunk = batchRequests.slice(i, i + 20);
-          const requestOptions: CliRequestOptions = {
-            url: 'https://graph.microsoft.com/v1.0/$batch',
-            headers: {
-              accept: 'application/json',
-              'content-type': 'application/json'
-            },
-            responseType: 'json',
-            data: JSON.stringify({ requests: batchRequestChunk })
-          };
-          await request.post(requestOptions);
+        const fileDetails = await spo.getVroomFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
+        const sharingLinks = await this.getFileSharingLinks(args.options.webUrl, args.options.fileId, args.options.fileUrl, args.options.scope);
+
+        const requestOptions: CliRequestOptions = {
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
+
+        for (const sharingLink of sharingLinks) {
+          requestOptions.url = `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions/${sharingLink.id}`;
+          await request.delete(requestOptions);
         }
       }
       catch (err: any) {
@@ -151,7 +143,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
     }
   }
 
-  private async getFileSharingLinks(webUrl: string, logger: Logger, fileId?: string, fileUrl?: string, scope?: string): Promise<any[]> {
+  private async getFileSharingLinks(webUrl: string, fileId?: string, fileUrl?: string, scope?: string): Promise<any[]> {
     const sharingLinkListOptions: SpoFileSharingLinkListOptions = {
       webUrl: webUrl,
       fileId: fileId,

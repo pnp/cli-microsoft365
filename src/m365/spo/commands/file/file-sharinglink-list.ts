@@ -100,7 +100,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
     }
 
     try {
-      const fileDetails = await spo.getFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
+      const fileDetails = await spo.getVroomFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
       let url = `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions?$filter=Link ne null`;
       if (args.options.scope) {
         url += ` and Link/Scope eq '${args.options.scope}'`;

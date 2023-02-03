@@ -6,7 +6,6 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import { formatting } from '../../../../utils/formatting';
-import { GraphFileDetails } from './GraphFileDetails';
 import { urlUtil } from '../../../../utils/urlUtil';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
@@ -14,6 +13,7 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as spoFileSharingLinkListCommand from './file-sharinglink-list';
+import { GraphFileDetails } from '../../../../utils/spo';
 const command: Command = require('./file-sharinglink-clear');
 
 describe(commands.FILE_SHARINGLINK_CLEAR, () => {
@@ -25,7 +25,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     VroomDriveID: 'b!FeaYl4alXkWEhoSRP0ksSSOaj9osSfFPqj5bQNdluvlwfL79GNVISZZCf6nfB3vY',
     VroomItemID: '01A5WCPNXHFAS23ZNOF5D3XU2WU7S3I2AU'
   };
-  const sharingLink = { "id": "8c2c9168-7d3d-4119-bcab-3c5340ce603b", "roles": ["read"], "hasPassword": false, "grantedToIdentitiesV2": [{ "group": { "displayName": "h Members", "email": "h@mathijsdev2.onmicrosoft.com", "id": "94da1e01-bbab-41e9-b9a4-4595c5805a6b" }, "siteUser": { "displayName": "h Members", "email": "h@mathijsdev2.onmicrosoft.com", "id": "428", "loginName": "c:0o.c|federateddirectoryclaimprovider|94da1e01-bbab-41e9-b9a4-4595c5805a6b" } }], "grantedToIdentities": [{ "user": { "displayName": "h Members", "email": "h@mathijsdev2.onmicrosoft.com", "id": "94da1e01-bbab-41e9-b9a4-4595c5805a6b" } }], "link": { "scope": "anonymous", "type": "view", "webUrl": "https://mathijsdev2.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBea_L-lv1lND19RSCJGtWNg", "preventsDownload": false } };
+  const sharingLink = { "id": "8c2c9168-7d3d-4119-bcab-3c5340ce603b", "roles": ["read"], "hasPassword": false, "grantedToIdentitiesV2": [{ "group": { "displayName": "h Members", "email": "h@contoso.onmicrosoft.com", "id": "94da1e01-bbab-41e9-b9a4-4595c5805a6b" }, "siteUser": { "displayName": "h Members", "email": "h@contoso.onmicrosoft.com", "id": "428", "loginName": "c:0o.c|federateddirectoryclaimprovider|94da1e01-bbab-41e9-b9a4-4595c5805a6b" } }], "grantedToIdentities": [{ "user": { "displayName": "h Members", "email": "h@mathijsdev2.onmicrosoft.com", "id": "94da1e01-bbab-41e9-b9a4-4595c5805a6b" } }], "link": { "scope": "anonymous", "type": "view", "webUrl": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBea_L-lv1lND19RSCJGtWNg", "preventsDownload": false } };
   const sharingLinksListCommandResponse = {
     "stdout": JSON.stringify([sharingLink]),
     "stderr": ""
@@ -66,7 +66,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post,
+      request.delete,
       request.get,
       Cli.prompt,
       Cli.executeCommandWithOutput
@@ -137,7 +137,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     assert(promptIssued);
   });
 
-  it('clears all sharing links from a specific file retrieved by url', async () => {
+  it('clears sharing links from a specific file retrieved by url', async () => {
     const fileServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
 
     sinonUtil.restore(Cli.prompt);
@@ -160,8 +160,8 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Error occured while executing the command.';
     });
 
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/sites/${fileInformationResponse.SiteId}/drives/${fileInformationResponse.VroomDriveID}/items/${fileInformationResponse.VroomItemID}/permissions/${sharingLink.id}`) {
         return;
       }
 
@@ -169,7 +169,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: webUrl, fileUrl: fileUrl, confirm: true } });
-    assert(postStub.called);
+    assert(deleteStub.called);
   });
 
   it('clears sharing links of type anonymous from a specific file retrieved by id', async () => {
@@ -193,8 +193,8 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
       throw 'Error occured while executing the command.';
     });
 
-    const postStub = sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/sites/${fileInformationResponse.SiteId}/drives/${fileInformationResponse.VroomDriveID}/items/${fileInformationResponse.VroomItemID}/permissions/${sharingLink.id}`) {
         return;
       }
 
@@ -202,47 +202,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     });
 
     await command.action(logger, { options: { verbose: true, webUrl: webUrl, fileId: fileId, scope: 'anonymous' } });
-    assert(postStub.called);
-  });
-
-  it('clears sharing links in multiple batches if more than 20 sharing links are found', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileById('${fileId}')?$select=SiteId,VroomItemId,VroomDriveId`) {
-        return fileInformationResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    const sharingLinkResponseLarge: any[] = [];
-    for (let i = 0; i < 50; i++) {
-      sharingLinkResponseLarge.push(sharingLink);
-    }
-    let amountOfBatches = 0;
-
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFileSharingLinkListCommand) {
-        return { "stdout": JSON.stringify(sharingLinkResponseLarge) };
-      }
-      throw 'Error occured while executing the command.';
-    });
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/$batch') {
-        amountOfBatches++;
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: { verbose: true, webUrl: webUrl, fileId: fileId, scope: 'anonymous' } });
-    assert.strictEqual(amountOfBatches, 3);
+    assert(deleteStub.called);
   });
 
   it('continues when no sharing links are found', async () => {
