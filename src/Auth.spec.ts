@@ -2058,7 +2058,7 @@ describe('Auth', () => {
   });
 
   it('correctly retrieves resource for https://api.bap.microsoft.com', () => {
-    assert.strictEqual(Auth.getResourceFromUrl('https://api.bap.microsoft.com'), 'https://management.azure.com/');
+    assert.strictEqual(Auth.getResourceFromUrl('https://api.bap.microsoft.com'), 'https://api.bap.microsoft.com/');
   });
 
   it('correctly retrieves resource for https://api.powerbi.com', () => {
