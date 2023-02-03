@@ -154,10 +154,10 @@ class PlannerPlanSetCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       {
-        options: ['id', 'title']
+        options: ['id', 'title', 'rosterId']
       },
       {
-        options: ['ownerGroupId', 'ownerGroupName', 'rosterId'],
+        options: ['ownerGroupId', 'ownerGroupName'],
         runsWhen: (args) => {
           return args.options.title !== undefined;
         }
@@ -188,11 +188,15 @@ class PlannerPlanSetCommand extends GraphCommand {
 
     let groupId: string = '';
 
-    if (!args.options.rosterId) {
-      groupId = await this.getGroupId(args);
+    if (args.options.rosterId) {
+      const plans: PlannerPlan[] = await planner.getPlansByRosterId(args.options.rosterId);
+      return plans[0].id!;
     }
-    const plan: PlannerPlan = await planner.getPlanByTitle(title!, groupId, args.options.rosterId, 'minimal');
-    return plan.id!;
+    else {
+      groupId = await this.getGroupId(args);
+      const plan: PlannerPlan = await planner.getPlanByTitle(title!, groupId);
+      return plan.id!;
+    }
   }
 
   private getUserIds(options: Options): Promise<string[]> {
