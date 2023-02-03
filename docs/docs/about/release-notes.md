@@ -32,6 +32,9 @@
 - adds remark to 'planner plan remove' on how to remove a Roster plan [#4403](https://github.com/pnp/cli-microsoft365/issues/4403)
 - fixed issue removing plan by title [#4448](https://github.com/pnp/cli-microsoft365/issues/4448)
 - enhanced planner plan add [#4400](https://github.com/pnp/cli-microsoft365/issues/4400)
+- fixed onenote notebook list with validator checks [#4315](https://github.com/pnp/cli-microsoft365/issues/4315)
+- extended md output rendering of headings [#4380](https://github.com/pnp/cli-microsoft365/issues/4380)
+- added Cli.shouldTrimOutput method [#4288](https://github.com/pnp/cli-microsoft365/issues/4288)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
