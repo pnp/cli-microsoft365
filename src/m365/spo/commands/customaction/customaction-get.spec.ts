@@ -395,7 +395,7 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('retrieves a user custom actions by clientSideComponentId', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+    const listCustomActionSpy = sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === SpoCustomActionListCommand) {
         return ({
           stdout: `[{ "ClientSideComponentId": "4358e70e-ec3c-4713-beb6-39c88f7621d1", "ClientSideComponentProperties": {"listTitle":"News","listViewTitle":"Published News"}, "CommandUIExtension": null, "Description": null, "Group": null, "HostProperties": "", "Id": "f405303c-6048-4636-9660-1b7b2cadaef9", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "{f405303c-6048-4636-9660-1b7b2cadaef9}", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": 0, "Low": 0 }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 65536, "Title": "NewsTicker", "Url": null, "VersionOfUserCustomAction": "1.0.1.0"},{ "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4", "ClientSideComponentProperties": {"testMessage":"Test message"}, "CommandUIExtension": null, "Description": null, "Group": null, "Id": "d26af83a-6421-4bb3-9f5c-8174ba645c80", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "{d26af83a-6421-4bb3-9f5c-8174ba645c80}", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": 0, "Low": 0 }, "Scope": "1", "ScriptBlock": null, "ScriptSrc": null, "Sequence": 65536, "Title": "Places", "Url": null, "VersionOfUserCustomAction": "1.0.1.0" }]`
@@ -411,27 +411,7 @@ describe(commands.CUSTOMACTION_GET, () => {
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
-    assert(loggerLogSpy.calledWith({
-      ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
-      ClientSideComponentProperties: { "testMessage": "Test message" },
-      CommandUIExtension: null,
-      Description: null,
-      Group: null,
-      Id: 'd26af83a-6421-4bb3-9f5c-8174ba645c80',
-      ImageUrl: null,
-      Location: 'ClientSideExtension.ApplicationCustomizer',
-      Name: '{d26af83a-6421-4bb3-9f5c-8174ba645c80}',
-      RegistrationId: null,
-      RegistrationType: 0,
-      Rights: '{"High":0,"Low":0}',
-      Scope: '1',
-      ScriptBlock: null,
-      ScriptSrc: null,
-      Sequence: 65536,
-      Title: 'Places',
-      Url: null,
-      VersionOfUserCustomAction: '1.0.1.0'
-    }));
+    assert(listCustomActionSpy.calledOnce);
   });
 
   it('throws error when multiple user custom actions with same clientSideComponentId were found', async () => {

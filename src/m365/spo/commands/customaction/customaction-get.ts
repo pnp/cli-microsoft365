@@ -94,7 +94,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
         }
 
         if (args.options.clientSideComponentId && validation.isValidGuid(args.options.clientSideComponentId) === false) {
-          return `${args.options.clientSideComponentId} is not valid. Custom action clientSideComponentId (Guid) expected.`;
+          return `${args.options.clientSideComponentId} is not a valid GUID.`;
         }
 
         return true;
@@ -217,22 +217,16 @@ class SpoCustomActionGetCommand extends SpoCommand {
    * another get request is send with `site` scope.
    */
   private async searchAllScopes(options: Options): Promise<CustomAction> {
-    try {
-      options.scope = "Web";
+    options.scope = "Web";
 
-      const webResult = await this.getCustomAction(options);
-      if (webResult["odata.null"] !== true) {
-        return webResult;
-      }
-
-      options.scope = "Site";
-      const siteResult = await this.getCustomAction(options);
-      return siteResult;
-
+    const webResult = await this.getCustomAction(options);
+    if (webResult["odata.null"] !== true) {
+      return webResult;
     }
-    catch (err) {
-      throw err;
-    }
+
+    options.scope = "Site";
+    const siteResult = await this.getCustomAction(options);
+    return siteResult;
   }
 
   private humanizeScope(scope: number): string {
