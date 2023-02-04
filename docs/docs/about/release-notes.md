@@ -12,6 +12,7 @@
 **Purview:**
 
 - [purview retentioneventtype get](../cmd/purview/retentioneventtype/retentioneventtype-get.md) - gets a retention event type [#4339](https://github.com/pnp/cli-microsoft365/issues/4339)
+- [purview auditlog list](../cmd/purview/auditlog/auditlog-list.md) - lists audit logs within your tenant [#4232](https://github.com/pnp/cli-microsoft365/issues/4232)
 
 **SharePoint:**
 
@@ -35,6 +36,8 @@
 - fixed onenote notebook list with validator checks [#4315](https://github.com/pnp/cli-microsoft365/issues/4315)
 - extended md output rendering of headings [#4380](https://github.com/pnp/cli-microsoft365/issues/4380)
 - added Cli.shouldTrimOutput method [#4288](https://github.com/pnp/cli-microsoft365/issues/4288)
+- enhanced 'planner plan list' with rosterId [#4402](https://github.com/pnp/cli-microsoft365/issues/4402)
+- enhanced 'planner plan get' with rosterId [#4401](https://github.com/pnp/cli-microsoft365/issues/4401)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
