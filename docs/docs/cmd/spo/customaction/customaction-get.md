@@ -29,7 +29,7 @@ m365 spo customaction get [options]
 
 ## Remarks
 
-If the command finds multiple user custom actions with the specified `title` or `clientSideComponentId`, it will prompt you to disambiguate which user custom action it should use, listing the discovered IDs.
+If the command finds multiple user custom actions with the specified `title` or `clientSideComponentId`, it will prompt you to disambiguate which user custom action it should get, listing the discovered IDs.
 
 ## Examples
 
