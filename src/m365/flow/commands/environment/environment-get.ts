@@ -5,6 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
 import * as FlowEnvironmentListCommand from './environment-list';
+import { FlowEnvironmentDetails } from './FlowEnvironmentDetails';
 
 interface CommandArgs {
   options: Options;
@@ -47,7 +48,7 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
     }
 
     try {
-      const options: any = {
+      const options: GlobalOptions = {
         output: 'json',
         debug: this.debug,
         verbose: this.verbose
@@ -56,7 +57,7 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
       const output = await Cli.executeCommandWithOutput(FlowEnvironmentListCommand as Command, { options: { ...options, _: [] } });
       const flowEnvironmentListOutput = JSON.parse(output.stdout);
 
-      const flowItem: any = flowEnvironmentListOutput.filter(((flow: any) => args.options.name ? flow.name === args.options.name : flow.properties.isDefault === true))[0];
+      const flowItem: FlowEnvironmentDetails = flowEnvironmentListOutput.filter(((flow: any) => args.options.name ? flow.name === args.options.name : flow.properties.isDefault === true))[0];
 
       flowItem.displayName = flowItem.properties.displayName;
       flowItem.provisioningState = flowItem.properties.provisioningState;
