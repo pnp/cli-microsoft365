@@ -43,8 +43,13 @@ class PlannerRosterMemberListCommand extends GraphCommand {
     }
 
     const url = `${this.resource}/beta/planner/rosters/${args.options.rosterId}/members`;
-    const response = await odata.getAllItems(url);
-    logger.log(response);
+    try {
+      const response = await odata.getAllItems(url);
+      logger.log(response);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
 }

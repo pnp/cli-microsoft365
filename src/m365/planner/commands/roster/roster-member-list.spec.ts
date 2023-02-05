@@ -78,7 +78,7 @@ describe(commands.ROSTER_MEMBER_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ROSTER_MEMBER_LIST), true);
+    assert.strictEqual(command.name, commands.ROSTER_MEMBER_LIST);
   });
 
   it('has a description', () => {
@@ -94,16 +94,21 @@ describe(commands.ROSTER_MEMBER_LIST, () => {
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { rosterId: validRosterId, debug: true } });
+    await command.action(logger, { options: { rosterId: validRosterId, verbose: true } });
     assert(loggerLogSpy.calledWith(rosterMemberResponse.value));
   });
 
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'get').callsFake(async () => { throw 'An error has occurred'; });
+    const error = {
+      error: {
+        message: "The requested item is not found."
+      }
+    };
+    sinon.stub(request, 'get').callsFake(async () => { throw error; });
 
     await assert.rejects(command.action(logger, {
       options: { rosterId: validRosterId }
-    }), new CommandError("An error has occurred"));
+    }), new CommandError('The requested item is not found.'));
   });
 });

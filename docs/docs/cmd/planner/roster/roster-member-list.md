@@ -46,10 +46,9 @@ m365 planner roster member list --rosterId tYqYlNd6eECmsNhN_fcq85cAGAnd
 === "Text"
 
     ```text
-    id      : b3a1be03-54a5-43d2-b4fb-6562fe9bec0b
-    roles   : []
-    tenantId: 5b7b813c-2339-48cd-8c51-bd4fcb269420
-    userId  : 2056d2f6-3257-4253-8cfc-b73393e414e5
+    id                                    userId                                tenantId                             roles
+    ------------------------------------  ------------------------------------  ------------------------------------ ------------------------------------
+    b3a1be03-54a5-43d2-b4fb-6562fe9bec0b  2056d2f6-3257-4253-8cfc-b73393e414e5  5b7b813c-2339-48cd-8c51-bd4fcb269420 []
     ```
 
 === "CSV"
@@ -57,4 +56,21 @@ m365 planner roster member list --rosterId tYqYlNd6eECmsNhN_fcq85cAGAnd
     ```csv
     id,userId,tenantId,roles
     b3a1be03-54a5-43d2-b4fb-6562fe9bec0b,2056d2f6-3257-4253-8cfc-b73393e414e5,5b7b813c-2339-48cd-8c51-bd4fcb269420,[]
+    ```
+
+=== "Markdown"
+
+    ```md
+    # planner roster member list --rosterId "RuY-PSpdw02drevnYDTCJpgAEfoI"
+
+    Date: 5/2/2023
+
+    ## b3a1be03-54a5-43d2-b4fb-6562fe9bec0b
+
+    Property | Value
+    ---------|-------
+    id | b3a1be03-54a5-43d2-b4fb-6562fe9bec0b
+    userId | 2056d2f6-3257-4253-8cfc-b73393e414e5
+    tenantId | 5b7b813c-2339-48cd-8c51-bd4fcb269420
+    roles | []
     ```
