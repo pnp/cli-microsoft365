@@ -76,7 +76,7 @@ describe(commands.ROSTER_MEMBER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ROSTER_MEMBER_ADD), true);
+    assert.strictEqual(command.name, commands.ROSTER_MEMBER_ADD);
   });
 
   it('has a description', () => {
@@ -103,9 +103,9 @@ describe(commands.ROSTER_MEMBER_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('adds a new roster by userId', async () => {
+  it('correctly adds a new roster member by userId', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members`)) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members`) {
         return rosterMemberResponse;
       }
 
@@ -124,26 +124,31 @@ describe(commands.ROSTER_MEMBER_ADD, () => {
         });
       }
 
-      throw new CommandError('Unknown case');
+      throw 'Unknown case';
     });
 
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members`)) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members`) {
         return rosterMemberResponse;
       }
 
       throw `Invalid request ${opts.url}`;
     });
 
-    await command.action(logger, { options: { debug: true, rosterId: validRosterId, userName: validUserName } });
+    await command.action(logger, { options: { verbose: true, rosterId: validRosterId, userName: validUserName } });
     assert(loggerLogSpy.calledWith(rosterMemberResponse));
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake(async () => { throw 'An error has occurred'; });
+    const error = {
+      error: {
+        message: "The requested item is not found."
+      }
+    };
+    sinon.stub(request, 'post').callsFake(async () => { throw error; });
 
     await assert.rejects(command.action(logger, {
       options: { rosterId: validRosterId, userId: validUserId }
-    }), new CommandError("An error has occurred"));
+    }), new CommandError('The requested item is not found.'));
   });
 });

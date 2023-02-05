@@ -70,7 +70,7 @@ class PlannerRosterMemberAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.userId && !validation.isValidGuid(args.options.userId as string)) {
+        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
           return `${args.options.userId} is not a valid GUID`;
         }
 
@@ -86,17 +86,15 @@ class PlannerRosterMemberAddCommand extends GraphCommand {
 
     try {
       const userId = await this.getUserId(logger, args);
-      const requestBody: any = {
-        "@odata.type": "#microsoft.graph.plannerRosterMember",
-        "userId": userId
-      };
 
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/beta/planner/rosters/${args.options.rosterId}/members`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
-        data: requestBody,
+        data: {
+          userId: userId
+        },
         responseType: 'json'
       };
 
@@ -126,7 +124,7 @@ class PlannerRosterMemberAddCommand extends GraphCommand {
 
     const aadUserGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...aadUserGetCommandoptions, _: [] } });
 
-    if (this.debug) {
+    if (this.verbose) {
       logger.logToStderr(aadUserGetOutput.stderr);
     }
 
