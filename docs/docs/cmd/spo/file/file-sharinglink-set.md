@@ -29,10 +29,16 @@ m365 spo file sharinglink set [options]
 
 ## Examples
 
-Updates an anonymous sharing link from a file with the expirationDateTime parameter
+Updates an anonymous sharing link from a file by a specified site-relative URL with the expirationDateTime parameter
 
 ```sh
-m365 spo file sharinglink set --webUrl https://contoso.sharepoint.com --fileUrl "/Shared Documents/Document.docx" --expirationDateTime "2023-01-09T16:57:00.000Z"
+m365 spo file sharinglink set --webUrl https://contoso.sharepoint.com --fileUrl "/sites/demo/Shared Documents/Document.docx" --id "7c9f97c9-1bda-433c-9364-bb83e81771ee" --expirationDateTime "2023-01-09T16:57:00.000Z"
+```
+
+Updates an anonymous sharing link from a file by id with the expirationDateTime parameter
+
+```sh
+m365 spo file sharinglink set --webUrl https://contoso.sharepoint.com --fileId daebb04b-a773-4baa-b1d1-3625418e3234 --id "7c9f97c9-1bda-433c-9364-bb83e81771ee" --expirationDateTime "2023-01-09T16:57:00.000Z"
 ```
 
 ## Response
@@ -52,7 +58,7 @@ m365 spo file sharinglink set --webUrl https://contoso.sharepoint.com --fileUrl 
       "link": {
         "scope": "anonymous",
         "type": "view",
-        "webUrl": "https://ordidev.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBftmUNAiXjm0y-_527_fI9g",
+        "webUrl": "https://contoso.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBftmUNAiXjm0y-_527_fI9g",
         "preventsDownload": false
       }
     }
@@ -66,7 +72,7 @@ m365 spo file sharinglink set --webUrl https://contoso.sharepoint.com --fileUrl 
     grantedToIdentitiesV2: []
     hasPassword          : false
     id                   : 7c9f97c9-1bda-433c-9364-bb83e81771ee
-    link                 : {"scope":"anonymous","type":"view","webUrl":"https://ordidev.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBftmUNAiXjm0y-_527_fI9g","preventsDownload":false}
+    link                 : {"scope":"anonymous","type":"view","webUrl":"https://contoso.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBftmUNAiXjm0y-_527_fI9g","preventsDownload":false}
     roles                : ["read"]
     ```
 
@@ -74,5 +80,25 @@ m365 spo file sharinglink set --webUrl https://contoso.sharepoint.com --fileUrl 
 
     ```csv
     id,roles,expirationDateTime,hasPassword,grantedToIdentitiesV2,grantedToIdentities,link
-    7c9f97c9-1bda-433c-9364-bb83e81771ee,"[""read""]",2023-02-09T16:57:00Z,,[],[],"{""scope"":""anonymous"",""type"":""view"",""webUrl"":""https://ordidev.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBftmUNAiXjm0y-_527_fI9g"",""preventsDownload"":false}"
+    7c9f97c9-1bda-433c-9364-bb83e81771ee,"[""read""]",2023-02-09T16:57:00Z,,[],[],"{""scope"":""anonymous"",""type"":""view"",""webUrl"":""https://contoso.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBftmUNAiXjm0y-_527_fI9g"",""preventsDownload"":false}"
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo file sharinglink set --webUrl "https://contoso.sharepoint.com" --fileUrl "/sites/demo/Shared Documents/Document.docx" --expirationDateTime "2023-02-09T16:57:00.000Z" --id "7c9f97c9-1bda-433c-9364-bb83e81771ee"
+
+    Date: 5/2/2023
+
+    ## 7c9f97c9-1bda-433c-9364-bb83e81771ee
+
+    Property | Value
+    ---------|-------
+    id | 7c9f97c9-1bda-433c-9364-bb83e81771ee
+    roles | ["read"]
+    expirationDateTime | 2023-02-09T16:57:00Z
+    hasPassword | false
+    grantedToIdentitiesV2 | []
+    grantedToIdentities | []
+    link | {"scope":"anonymous","type":"view","webUrl":"https://contoso.sharepoint.com/:b:/g/EbZx4QPyndlGp6HV-gvSPksBftmUNAiXjm0y-\_527\_fI9g","preventsDownload":false}
     ```
