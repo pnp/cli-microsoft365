@@ -145,7 +145,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
     }
 
     const groupId = await this.getGroupId(args);
-    return await planner.getPlanByTitle(title!, groupId, 'minimal');
+    return await planner.getPlanByTitle(title!, groupId, undefined, 'minimal');
   }
 
   private async getGroupId(args: CommandArgs): Promise<string> {
