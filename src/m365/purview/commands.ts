@@ -4,6 +4,7 @@ export default {
   AUDITLOG_LIST: `${prefix} auditlog list`,
   RETENTIONEVENT_GET: `${prefix} retentionevent get`,
   RETENTIONEVENT_LIST: `${prefix} retentionevent list`,
+  RETENTIONEVENT_REMOVE: `${prefix} retentionevent remove`,
   RETENTIONEVENTTYPE_ADD: `${prefix} retentioneventtype add`,
   RETENTIONEVENTTYPE_GET: `${prefix} retentioneventtype get`,
   RETENTIONEVENTTYPE_LIST: `${prefix} retentioneventtype list`,
