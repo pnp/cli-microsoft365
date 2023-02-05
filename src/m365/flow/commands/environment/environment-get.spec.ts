@@ -8,8 +8,6 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import { Cli } from '../../../../cli/Cli';
-import * as FlowEnvironmentListCommand from './environment-list';
 import { FlowEnvironmentDetails } from './FlowEnvironmentDetails';
 const command: Command = require('./environment-get');
 
@@ -17,38 +15,39 @@ describe(commands.ENVIRONMENT_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  const flowStdout: string = `[{ "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5", "location": "europe", "type": "Microsoft.ProcessSimple/environments", "id": "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5", "properties": { "displayName": "Contoso (default)", "createdTime": "2018-03-22T20:20:46.08653Z", "createdBy": { "id": "SYSTEM", "displayName": "SYSTEM", "type": "NotSpecified" }, "provisioningState": "Succeeded", "creationType": "DefaultTenant", "environmentSku": "Default", "environmentType": "Production", "isDefault": true, "azureRegionHint": "westeurope", "runtimeEndpoints": { "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com", "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com", "microsoft.PowerApps": "https://europe.api.powerapps.com", "microsoft.Flow": "https://europe.api.flow.microsoft.com" } } }]`;
-  const flowResponse: FlowEnvironmentDetails = {
-    displayName: "Contoso (default)",
-    provisioningState: "Succeeded",
-    environmentSku: "Default",
-    azureRegionHint: "westeurope",
-    isDefault: true,
-    name: "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
-    location: "europe",
-    type: "Microsoft.ProcessSimple/environments",
-    id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
-    properties: {
+  const flowResponse: { value: Array<FlowEnvironmentDetails> } = {
+    value: [{
       displayName: "Contoso (default)",
-      createdTime: "2018-03-22T20:20:46.08653Z",
-      createdBy: {
-        id: "SYSTEM",
-        displayName: "SYSTEM",
-        type: "NotSpecified"
-      },
       provisioningState: "Succeeded",
-      creationType: "DefaultTenant",
       environmentSku: "Default",
-      environmentType: "Production",
-      isDefault: true,
       azureRegionHint: "westeurope",
-      runtimeEndpoints: {
-        "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
-        "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
-        "microsoft.PowerApps": "https://europe.api.powerapps.com",
-        "microsoft.Flow": "https://europe.api.flow.microsoft.com"
+      isDefault: true,
+      name: "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
+      location: "europe",
+      type: "Microsoft.ProcessSimple/environments",
+      id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
+      properties: {
+        displayName: "Contoso (default)",
+        createdTime: "2018-03-22T20:20:46.08653Z",
+        createdBy: {
+          id: "SYSTEM",
+          displayName: "SYSTEM",
+          type: "NotSpecified"
+        },
+        provisioningState: "Succeeded",
+        creationType: "DefaultTenant",
+        environmentSku: "Default",
+        environmentType: "Production",
+        isDefault: true,
+        azureRegionHint: "westeurope",
+        runtimeEndpoints: {
+          "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
+          "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
+          "microsoft.PowerApps": "https://europe.api.powerapps.com",
+          "microsoft.Flow": "https://europe.api.flow.microsoft.com"
+        }
       }
-    }
+    }]
   };
 
   before(() => {
@@ -76,8 +75,7 @@ describe(commands.ENVIRONMENT_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      Cli.executeCommandWithOutput
+      request.get
     ]);
   });
 
@@ -103,48 +101,42 @@ describe(commands.ENVIRONMENT_GET, () => {
   });
 
   it('retrieves information about the specified environment (debug)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === FlowEnvironmentListCommand) {
-        return ({
-          stdout: flowStdout
-        });
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`)) {
+        return flowResponse;
       }
 
-      throw 'Unknown case';
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
-    assert(loggerLogSpy.calledWith(flowResponse));
+    assert(loggerLogSpy.calledWith(flowResponse.value[0]));
   });
 
   it('retrieves information about the specified environment', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === FlowEnvironmentListCommand) {
-        return ({
-          stdout: flowStdout
-        });
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`)) {
+        return flowResponse;
       }
 
-      throw 'Unknown case';
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
-    assert(loggerLogSpy.calledWith(flowResponse));
+    assert(loggerLogSpy.calledWith(flowResponse.value[0]));
   });
 
   it('retrieves information about the default environment', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === FlowEnvironmentListCommand) {
-        return ({
-          stdout: flowStdout
-        });
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`)) {
+        return flowResponse;
       }
 
-      throw 'Unknown case';
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogSpy.calledWith(flowResponse));
+    assert(loggerLogSpy.calledWith(flowResponse.value[0]));
   });
 
   it('correctly handles no environment found', async () => {

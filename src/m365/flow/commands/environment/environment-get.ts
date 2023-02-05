@@ -1,10 +1,8 @@
-import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import { odata } from '../../../../utils/odata';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
-import * as FlowEnvironmentListCommand from './environment-list';
 import { FlowEnvironmentDetails } from './FlowEnvironmentDetails';
 
 interface CommandArgs {
@@ -48,16 +46,8 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
     }
 
     try {
-      const options: GlobalOptions = {
-        output: 'json',
-        debug: this.debug,
-        verbose: this.verbose
-      };
-
-      const output = await Cli.executeCommandWithOutput(FlowEnvironmentListCommand as Command, { options: { ...options, _: [] } });
-      const flowEnvironmentListOutput = JSON.parse(output.stdout);
-
-      const flowItem: FlowEnvironmentDetails = flowEnvironmentListOutput.filter(((flow: any) => args.options.name ? flow.name === args.options.name : flow.properties.isDefault === true))[0];
+      const response = await odata.getAllItems<FlowEnvironmentDetails>(`${this.resource}providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`);
+      const flowItem: FlowEnvironmentDetails = response.filter(((flow: any) => args.options.name ? flow.name === args.options.name : flow.properties.isDefault === true))[0];
 
       flowItem.displayName = flowItem.properties.displayName;
       flowItem.provisioningState = flowItem.properties.provisioningState;
