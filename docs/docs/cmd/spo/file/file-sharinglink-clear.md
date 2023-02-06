@@ -19,7 +19,7 @@ m365 spo file sharinglink clear [options]
 `--fileId [fileId]`
 : The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both.
 
-`--scope [scope]`
+`-s, --scope [scope]`
 : Scope of the sharing link. Possible options are: `anonymous`, `users` or `organization`. If not specified, all links will be removed.
 
 `--confirm`
