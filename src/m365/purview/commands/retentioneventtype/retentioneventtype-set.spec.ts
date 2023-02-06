@@ -15,12 +15,10 @@ const command: Command = require('./retentioneventtype-set');
 
 describe(commands.RETENTIONEVENTTYPE_SET, () => {
   const validId = 'e554d69c-0992-4f9b-8a66-fca3c4d9c531';
-  const newDisplayName = 'New display name';
   const description = 'Updated description';
 
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -48,7 +46,6 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -86,17 +83,17 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
   });
 
   it('passes validation with valid id and a single option specified', async () => {
-    const actual = await command.validate({ options: { id: validId, newDisplayName: newDisplayName } }, commandInfo);
+    const actual = await command.validate({ options: { id: validId, description: description } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('correctly sets title and description of a specific retention event type by id', async () => {
+  it('correctly sets description of a specific retention event type by id', async () => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     const requestBody = {
-      displayName: newDisplayName,
       description: description
     };
 
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${validId}`) {
         return;
       }
@@ -104,8 +101,8 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
       throw 'Invalid Request';
     });
 
-    await command.action(logger, { options: { id: validId, newDisplayName: newDisplayName, description: description, verbose: true } });
-    assert.deepStrictEqual(loggerLogToStderrSpy.lastCall.args[0].data, requestBody);
+    await command.action(logger, { options: { id: validId, description: description, verbose: true } });
+    assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
   });
 
   it('throws an error when we execute the command using application permissions', async () => {
@@ -114,23 +111,20 @@ describe(commands.RETENTIONEVENTTYPE_SET, () => {
       new CommandError('This command does not support application permissions.'));
   });
 
-  it('handles error when event type does not exist', async () => {
-    sinon.stub(request, 'patch').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${validId}`) {
-        throw {
-          'error': {
-            'code': 'UnknownError',
-            'message': `There is no rule matching identity 'ca0e1f8d-4e42-4a81-be85-022502d70c4f'.`,
-            'innerError': {
-              'date': '2023-01-31T21:51:20',
-              'request-id': '8160d45b-55b3-4f2a-b741-1da41c454809',
-              'client-request-id': '8160d45b-55b3-4f2a-b741-1da41c454809'
-            }
+  it('handles error when retention event type does not exist', async () => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    sinon.stub(request, 'patch').callsFake(async () => {
+      throw {
+        'error': {
+          'code': 'UnknownError',
+          'message': `There is no rule matching identity 'ca0e1f8d-4e42-4a81-be85-022502d70c4f'.`,
+          'innerError': {
+            'date': '2023-01-31T21:51:20',
+            'request-id': '8160d45b-55b3-4f2a-b741-1da41c454809',
+            'client-request-id': '8160d45b-55b3-4f2a-b741-1da41c454809'
           }
-        };
-      }
-
-      throw 'Invalid request';
+        }
+      };
     });
 
     await assert.rejects(command.action(logger, {
