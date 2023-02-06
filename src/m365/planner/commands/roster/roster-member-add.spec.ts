@@ -110,7 +110,7 @@ describe(commands.ROSTER_MEMBER_ADD, () => {
     assert(loggerLogSpy.calledWith(rosterMemberResponse));
   });
 
-  it('adds a new roster by userName', async () => {
+  it('adds a new member to the roster by userName', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
       if (command === AadUserGetCommand) {
         return ({
