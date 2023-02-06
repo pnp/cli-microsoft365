@@ -64,7 +64,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
         option: '--fileUrl [fileUrl]'
       },
       {
-        option: '--scope [scope]',
+        option: '-s, --scope [scope]',
         autocomplete: SpoFileSharingLinkListCommand.allowedScopes
       }
     );
