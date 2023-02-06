@@ -25,6 +25,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -89,7 +90,6 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
   });
 
   it('prompts before removing the specified retention event type when confirm option not passed', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     await command.action(logger, { options: { id: validId } });
 
     let promptIssued = false;
@@ -102,14 +102,12 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
   });
 
   it('aborts removing the specified retention event type when confirm option not passed and prompt not confirmed', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     const deleteSpy = sinon.spy(request, 'delete');
     await command.action(logger, { options: { id: validId } });
     assert(deleteSpy.notCalled);
   });
 
   it('correctly deletes retention event type by id', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${validId}`) {
         return;

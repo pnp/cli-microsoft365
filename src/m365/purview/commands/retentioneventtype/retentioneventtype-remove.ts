@@ -69,6 +69,7 @@ class PurviewRetentionEventTypeRemoveCommand extends GraphCommand {
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.');
     }
+
     const removeRetentionEventType: () => Promise<void> = async (): Promise<void> => {
       try {
         const requestOptions: CliRequestOptions = {
