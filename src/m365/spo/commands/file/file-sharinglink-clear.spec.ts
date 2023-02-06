@@ -205,30 +205,6 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     assert(deleteStub.called);
   });
 
-  it('continues when no sharing links are found', async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFileById('${fileId}')?$select=SiteId,VroomItemId,VroomDriveId`) {
-        return fileInformationResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === spoFileSharingLinkListCommand) {
-        return { "stdout": "[]" };
-      }
-      throw 'Error occured while executing the command.';
-    });
-
-    command.action(logger, { options: { webUrl: webUrl, fileId: fileId, verbose: true } } as any);
-  });
-
   it('throws error when file not found by id', async () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (

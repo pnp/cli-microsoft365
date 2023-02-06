@@ -18,7 +18,7 @@ export interface Options extends GlobalOptions {
 }
 
 class SpoFileSharingLinkListCommand extends SpoCommand {
-  public readonly allowedScopes: string[] = ['anonymous', 'users', 'organization'];
+  private static readonly allowedScopes: string[] = ['anonymous', 'users', 'organization'];
 
   public get name(): string {
     return commands.FILE_SHARINGLINK_LIST;
@@ -64,7 +64,7 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
       },
       {
         option: '--scope [scope]',
-        autocomplete: this.allowedScopes
+        autocomplete: SpoFileSharingLinkListCommand.allowedScopes
       }
     );
   }
@@ -81,8 +81,8 @@ class SpoFileSharingLinkListCommand extends SpoCommand {
           return `${args.options.fileId} is not a valid GUID`;
         }
 
-        if (args.options.scope && this.allowedScopes.indexOf(args.options.scope) === -1) {
-          return `'${args.options.scope}' is not a valid scope. Allowed values are: ${this.allowedScopes.join(',')}`;
+        if (args.options.scope && SpoFileSharingLinkListCommand.allowedScopes.indexOf(args.options.scope) === -1) {
+          return `'${args.options.scope}' is not a valid scope. Allowed values are: ${SpoFileSharingLinkListCommand.allowedScopes.join(',')}`;
         }
 
         return true;

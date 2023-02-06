@@ -65,7 +65,7 @@ class SpoFileSharingLinkClearCommand extends SpoCommand {
         option: '--fileId [fileId]'
       },
       {
-        option: '--scope [scope]',
+        option: '-s, --scope [scope]',
         autocomplete: this.allowedScopes
       },
       {
