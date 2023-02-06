@@ -24,6 +24,8 @@ const dictionary = [
   'customizer',
   'dataverse',
   'default',
+  'event',
+  'eventreceiver',
   'external',
   'externalize',
   'fun',
