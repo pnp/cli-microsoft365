@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -64,8 +65,7 @@ class SpoUserProfileGetCommand extends SpoCommand {
       };
 
       const res: { UserProfileProperties: { Key: string; Value: string }[] } = await request.get<{ UserProfileProperties: { Key: string; Value: string }[] }>(requestOptions);
-      if (!args.options.output ||
-        args.options.output === 'text') {
+      if (!args.options.output || Cli.shouldTrimOutput(args.options.output)) {
         res.UserProfileProperties = JSON.stringify(res.UserProfileProperties) as any;
       }
 

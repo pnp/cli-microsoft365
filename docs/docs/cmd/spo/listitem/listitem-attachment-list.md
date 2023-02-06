@@ -14,10 +14,10 @@ m365 spo listitem attachment list [options]
 URL of the site from which the item should be retrieved
 
 `--listId [listId]`
-: ID of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+: ID of the list where the item should be retrieved. Specify either `listTitle`, `listId` or `listUrl`
 
 `--listTitle [listTitle]`
-: Title of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+: Title of the list where the item should be retrieved. Specify either `listTitle`, `listId` or `listUrl`
 
 `--listUrl [listUrl]`
 : Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`

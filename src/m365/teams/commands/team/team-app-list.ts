@@ -85,7 +85,7 @@ class TeamsTeamAppListCommand extends GraphCommand {
       const teamId: string = await this.getTeamId(args);
       const res = await odata.getAllItems<any>(`${this.resource}/v1.0/teams/${teamId}/installedApps?$expand=teamsApp,teamsAppDefinition`);
 
-      if (args.options.output === 'json') {
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(res);
       }
       else {

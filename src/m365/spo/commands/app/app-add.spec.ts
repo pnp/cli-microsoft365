@@ -90,7 +90,7 @@ describe(commands.APP_ADD, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    await command.action(logger, { options: { filePath: 'spfx.sppkg' } });
+    await command.action(logger, { options: { filePath: 'spfx.sppkg', output: 'text' } });
     assert(loggerLogSpy.calledWith("bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"));
   });
 

@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -137,7 +138,7 @@ class SpoFileSharingInfoGetCommand extends SpoCommand {
       // typically, we don't do this, but in this case, we need to due to
       // the complexity of the retrieved object and the fact that we can't
       // use the generic way of simplifying the output
-      if (args.options.output === 'json') {
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(res);
       }
       else {

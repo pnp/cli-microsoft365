@@ -1,4 +1,5 @@
 import { TeamsAppDefinition, TeamsAppInstallation } from '@microsoft/microsoft-graph-types';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -87,7 +88,7 @@ class TeamsUserAppListCommand extends GraphCommand {
         (i as any).appId = appId;
       });
 
-      if (args.options.output === 'json') {
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(items);
       }
       else {

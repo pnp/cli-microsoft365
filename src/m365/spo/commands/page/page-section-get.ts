@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils/validation';
@@ -27,11 +28,11 @@ class SpoPageSectionGetCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -45,14 +46,14 @@ class SpoPageSectionGetCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (isNaN(args.options.section)) {
           return `${args.options.section} is not a number`;
         }
-    
+
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
@@ -65,7 +66,7 @@ class SpoPageSectionGetCommand extends SpoCommand {
       const sections: CanvasSection[] = clientSidePage.sections
         .filter(section => section.order === args.options.section);
 
-      const isJSONOutput = args.options.output === 'json';
+      const isJSONOutput = !Cli.shouldTrimOutput(args.options.output);
       if (sections.length) {
         logger.log(Page.getSectionInformation(sections[0], isJSONOutput));
       }

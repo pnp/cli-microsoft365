@@ -23,6 +23,7 @@ describe(commands.PLAN_ADD, () => {
   const validTitle = 'Plan name';
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000002';
+  const validRosterId = 'iryDKm9VLku2HIoC2G-TX5gABJw0';
   const user = 'user@contoso.com';
   const userId = '00000000-0000-0000-0000-000000000000';
   const user1 = 'user1@contoso.com';
@@ -41,6 +42,11 @@ describe(commands.PLAN_ADD, () => {
 
   const planResponse = {
     "id": validId,
+    "title": validTitle
+  };
+
+  const planRosterResponse = {
+    "id": validRosterId,
     "title": validTitle
   };
 
@@ -239,6 +245,49 @@ describe(commands.PLAN_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith(planResponse));
+  });
+
+  it('correctly adds planner plan with given title with available rosterId', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+        return Promise.resolve(planRosterResponse);
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    await command.action(logger, {
+      options: {
+        title: validTitle,
+        rosterId: validRosterId
+      }
+    });
+    assert(loggerLogSpy.calledWith(planRosterResponse));
+  });
+
+  it('correctly handles adding planner plan to a roster with an already linked plan', async () => {
+    const multipleRostersError = {
+      "error": {
+        "error": {
+          "message": "You do not have the required permissions to access this item, or the item may not exist."
+        }
+      }
+    };
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+        throw multipleRostersError;
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        title: validTitle,
+        rosterId: validRosterId
+      }
+    }), new CommandError(`You can only add 1 plan to a Roster`));
   });
 
   it('correctly adds planner plan with given title with available ownerGroupName', async () => {

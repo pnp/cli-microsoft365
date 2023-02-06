@@ -254,7 +254,7 @@ describe(commands.WEB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: true, headerLayout: 'compact', headerEmphasis: 1, megaMenuEnabled: true, footerEnabled: true } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: true, headerLayout: 'compact', headerEmphasis: 1, megaMenuEnabled: true, footerEnabled: true, navAudienceTargetingEnabled: true } });
   });
 
   it('Update Welcome page', async () => {
@@ -416,6 +416,16 @@ describe(commands.WEB_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation if navAudienceTargetingEnabled is set to true', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', navAudienceTargetingEnabled: true } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if navAudienceTargetingEnabled is set to false', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', navAudienceTargetingEnabled: false } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('enables footer', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (JSON.stringify(opts.data) === JSON.stringify({
@@ -442,6 +452,23 @@ describe(commands.WEB_SET, () => {
     });
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: false } });
+  });
+
+  it('enables navAudienceTargetingEnabled', async () => {
+    const postRequestStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web') {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    const requestBody = {
+      NavAudienceTargetingEnabled: true
+    };
+
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a', navAudienceTargetingEnabled: true } });
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
   it('fails validation if search scope is not valid', async () => {

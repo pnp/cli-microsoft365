@@ -602,9 +602,21 @@ export default abstract class Command {
           return;
         }
 
+        const title = this.getLogItemTitle(l);
+        const id = this.getLogItemId(l);
+
+        if (title && id) {
+          output.push(`## ${title} (${id})`);
+        }
+        else if (title) {
+          output.push(`## ${title}`);
+        }
+        else if (id) {
+          output.push(`## ${id}`);
+        }
+
         output.push(
-          `## ${this.getLogItemTitle(l)} (${this.getLogItemId(l)})`, os.EOL,
-          os.EOL,
+          os.EOL, os.EOL,
           `Property | Value`, os.EOL,
           `---------|-------`, os.EOL
         );

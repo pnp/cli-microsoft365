@@ -1,5 +1,6 @@
 import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { v4 } from 'uuid';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
@@ -79,7 +80,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
       };
 
       const result = await request.patch<PlannerTaskDetails>(requestOptions);
-      if (args.options.output === 'json') {
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(result.checklist);
       }
       else {
