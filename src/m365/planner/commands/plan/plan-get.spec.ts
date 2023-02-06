@@ -144,10 +144,9 @@ describe(commands.PLAN_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when title and valid rosterId specified', async () => {
+  it('passes validation when rosterId specified', async () => {
     const actual = await command.validate({
       options: {
-        title: validTitle,
         rosterId: validRosterId
       }
     }, commandInfo);
@@ -224,7 +223,7 @@ describe(commands.PLAN_GET, () => {
     assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('correctly get planner plan with given title and rosterId', async () => {
+  it('correctly get planner plan with given rosterId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
         return { "value": [planResponse] };
@@ -238,7 +237,6 @@ describe(commands.PLAN_GET, () => {
     });
 
     const options: any = {
-      title: validTitle,
       rosterId: validRosterId
     };
 

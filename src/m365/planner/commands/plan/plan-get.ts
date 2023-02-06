@@ -15,9 +15,9 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   title?: string;
+  rosterId?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
-  rosterId?: string;
 }
 
 class PlannerPlanGetCommand extends GraphCommand {
@@ -47,9 +47,9 @@ class PlannerPlanGetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
+        rosterId: typeof args.options.rosterId !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
-        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
-        rosterId: typeof args.options.rosterId !== 'undefined'
+        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined'
       });
     });
   }
@@ -63,13 +63,13 @@ class PlannerPlanGetCommand extends GraphCommand {
         option: '-t, --title [title]'
       },
       {
+        option: '--rosterId [rosterId]'
+      },
+      {
         option: '--ownerGroupId [ownerGroupId]'
       },
       {
         option: '--ownerGroupName [ownerGroupName]'
-      },
-      {
-        option: '--rosterId [rosterId]'
       }
     );
   }
@@ -89,10 +89,10 @@ class PlannerPlanGetCommand extends GraphCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       {
-        options: ['id', 'title']
+        options: ['id', 'title', 'rosterId']
       },
       {
-        options: ['ownerGroupId', 'ownerGroupName', 'rosterId'],
+        options: ['ownerGroupId', 'ownerGroupName'],
         runsWhen: (args) => {
           return args.options.title !== undefined;
         }
@@ -108,11 +108,19 @@ class PlannerPlanGetCommand extends GraphCommand {
         logger.log(result);
       }
       else {
-        let groupId = undefined;
-        if (args.options.ownerGroupId || args.options.ownerGroupName) {
-          groupId = await this.getGroupId(args);
+        let plan: PlannerPlan = {};
+        if (args.options.rosterId) {
+          const plans: PlannerPlan[] = await planner.getPlansByRosterId(args.options.rosterId);
+          plan = plans[0];
         }
-        const plan = await planner.getPlanByTitle(args.options.title!, groupId, args.options.rosterId);
+        else {
+          let groupId = undefined;
+          if (args.options.ownerGroupId || args.options.ownerGroupName) {
+            groupId = await this.getGroupId(args);
+          }
+          plan = await planner.getPlanByTitle(args.options.title!, groupId);
+        }
+
         const result = await this.getPlanDetails(plan);
 
         if (result) {

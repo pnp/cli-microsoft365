@@ -11,19 +11,19 @@ m365 planner plan get [options]
 ## Options
 
 `-i, --id [id]`
-: ID of the plan. Specify either `id` or `title` but not both.
+: ID of the plan. Specify either `id`, `title` or `rosterId` but not multiple.
 
 `-t, --title [title]`
-: Title of the plan. Specify either `id` or `title` but not both.
-
-`--ownerGroupId [ownerGroupId]`
-: ID of the Group that owns the plan. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId` when using `title`.
-
-`--ownerGroupName [ownerGroupName]`
-: Name of the Group that owns the plan. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId` when using `title`.
+: Title of the plan. Specify either `id`, `title` or `rosterId` but not multiple.
 
 `--rosterId [rosterId]`
-: ID of the Planner Roster. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId` when using `title`.
+: ID of the Planner Roster. Specify either `id`, `title` or `rosterId` but not multiple.
+
+`--ownerGroupId [ownerGroupId]`
+: ID of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title` but not both.
+
+`--ownerGroupName [ownerGroupName]`
+: Name of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title` but not both.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -34,28 +34,28 @@ When using `rosterId`, the command is based on an API that is currently in previ
 
 ## Examples
 
-Returns the Microsoft Planner plan with id _gndWOTSK60GfPQfiDDj43JgACDCb_
+Returns the Microsoft Planner plan by id
 
 ```sh
 m365 planner plan get --id "gndWOTSK60GfPQfiDDj43JgACDCb"
 ```
 
-Returns the Microsoft Planner plan with title _MyPlan_ for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_
+Returns the Microsoft Planner plan by title and owner group id 
 
 ```sh
 m365 planner plan get --title "MyPlan" --ownerGroupId "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4"
 ```
 
-Returns the Microsoft Planner plan with title _MyPlan_ for Group _My Planner Group_
+Returns the Microsoft Planner plan by title and owner group name
 
 ```sh
 m365 planner plan get --title "MyPlan" --ownerGroupName "My Planner Group"
 ```
 
-Returns the Microsoft Planner plan with title _MyPlan_ for Roster _FeMZFDoK8k2oWmuGE-XFHZcAEwtn_
+Returns the Microsoft Planner plan by roster id
 
 ```sh
-m365 planner plan get --title "MyPlan" --rosterId "FeMZFDoK8k2oWmuGE-XFHZcAEwtn"
+m365 planner plan get --rosterId "FeMZFDoK8k2oWmuGE-XFHZcAEwtn"
 ```
 
 ## Response
