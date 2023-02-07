@@ -24,7 +24,6 @@ const dictionary = [
   'customizer',
   'dataverse',
   'default',
-  'event',
   'external',
   'externalize',
   'fun',
@@ -88,7 +87,8 @@ const dictionary = [
 
 // list of words that should be capitalized in a specific way
 const capitalized = [
-  'OAuth2'
+  'OAuth2',
+  'EventType'
 ];
 
 // sort dictionary to put the longest words first
