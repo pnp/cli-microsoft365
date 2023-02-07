@@ -20,7 +20,7 @@ m365 purview retentioneventtype add [options]
 
 ## Examples
 
-Create a retention event type contract expiry event.
+Create a retention event type *contract expiry event*.
 
 ```sh
 m365 purview retentioneventtype add --displayName 'contract expiry event' --description 'A retention event type to start a retention period based on the date that a contract expired.'
@@ -30,6 +30,9 @@ m365 purview retentioneventtype add --displayName 'contract expiry event' --desc
 
 !!! attention
     This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
+
+!!! attention
+    This command currently only supports delegated permissions.
 
 ## More information
 

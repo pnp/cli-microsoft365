@@ -54,6 +54,7 @@ class PurviewRetentionEventTypeAddCommand extends GraphCommand {
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.');
     }
+
     const requestBody = {
       displayName: args.options.displayName,
       description: args.options.description
