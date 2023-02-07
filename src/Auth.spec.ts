@@ -2057,6 +2057,10 @@ describe('Auth', () => {
     assert.strictEqual(Auth.getResourceFromUrl('https://contoso.sharepoint.com/sites/team-a'), 'https://contoso.sharepoint.com');
   });
 
+  it('correctly retrieves resource for https://api.powerapps.com', () => {
+    assert.strictEqual(Auth.getResourceFromUrl('https://api.powerapps.com'), 'https://service.powerapps.com/');
+  });
+
   it('correctly retrieves resource for https://api.bap.microsoft.com', () => {
     assert.strictEqual(Auth.getResourceFromUrl('https://api.bap.microsoft.com'), 'https://api.bap.microsoft.com/');
   });
