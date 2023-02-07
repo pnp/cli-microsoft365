@@ -25,6 +25,13 @@ m365 purview retentionevent list
 !!! attention
     This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
 
+!!! attention
+    This command currently does not support app only permissions.
+
+## More information
+
+This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
+
 ## Response
 
 
@@ -33,7 +40,7 @@ m365 purview retentionevent list
     ```json
     [
       {
-        "displayName": "Retention Event",
+        "displayName": "Contract Expiry Event",
         "description": null,
         "eventTriggerDateTime": "2023-02-03T13:51:40Z",
         "eventStatus": null,
@@ -62,16 +69,16 @@ m365 purview retentionevent list
 === "Text"
 
     ```text
-    id                                    displayName      eventTriggerDateTime
-    ------------------------------------  ---------------  --------------------
-    7248cfa8-c03a-4ec1-49a4-08db05edc686  Retention Event  2023-02-03T13:51:40Z
+    id                                    displayName            eventTriggerDateTime
+    ------------------------------------  ---------------------  --------------------
+    7248cfa8-c03a-4ec1-49a4-08db05edc686  Contract Expiry Event  2023-02-03T13:51:40Z
     ```
 
 === "CSV"
 
     ```csv
     id,displayName,isInUse
-    7248cfa8-c03a-4ec1-49a4-08db05edc686,Retention Event,2023-02-03T13:51:40Z
+    7248cfa8-c03a-4ec1-49a4-08db05edc686,Contract Expiry Event,2023-02-03T13:51:40Z
     ```
 
 === "Markdown"
@@ -81,11 +88,11 @@ m365 purview retentionevent list
 
     Date: 3/2/2023
 
-    ## Retention Event (7248cfa8-c03a-4ec1-49a4-08db05edc686)
+    ## Contract Expiry Event (7248cfa8-c03a-4ec1-49a4-08db05edc686)
 
     Property | Value
     ---------|-------
-    displayName | Retention Event
+    displayName | Contract Expiry Event
     description | null
     eventTriggerDateTime | 2023-02-03T13:51:40Z
     eventStatus | null

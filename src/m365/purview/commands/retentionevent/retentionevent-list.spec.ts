@@ -8,6 +8,7 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentionevent-list');
 
 describe(commands.RETENTIONEVENTTYPE_GET, () => {
@@ -56,6 +57,10 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
   });
 
   beforeEach(() => {
@@ -111,7 +116,7 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: {} });
+    await command.action(logger, { options: { verbose: true } });
     assert(loggerLogSpy.calledWith(mockResponseArray));
   });
 
@@ -125,5 +130,13 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: {} }), new CommandError('An error has occurred'));
+  });
+
+  it('throws error if something fails using application permissions', async () => {
+    sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError(`This command currently does not support app only permissions.`));
   });
 });
