@@ -10,6 +10,7 @@ export interface Term {
   Name: string;
   TermsCount: number;
   ParentTermId?: string;
+  PathOfTerm: string;
   Children: Term[];
 }
 
