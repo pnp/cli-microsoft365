@@ -120,6 +120,7 @@ class PlannerPlanGetCommand extends GraphCommand {
           }
           plan = await planner.getPlanByTitle(args.options.title!, groupId);
         }
+
         const result = await this.getPlanDetails(plan);
 
         if (result) {
