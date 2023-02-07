@@ -23,3 +23,49 @@ Show the information about the current login to the Microsoft 365
 ```sh
 m365 status
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "connectedAs": "john.doe@contoso.onmicrosoft.com",
+      "authType": "DeviceCode",
+      "appId": "31359c7f-bd7e-475c-86db-fdb8c937548e",
+      "appTenant": "common"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    appId      : 31359c7f-bd7e-475c-86db-fdb8c937548e
+    appTenant  : common
+    authType   : DeviceCode
+    connectedAs: john.doe@contoso.onmicrosoft.com
+    ```
+
+=== "CSV"
+
+    ```csv
+    connectedAs,authType,appId,appTenant
+    john.doe@contoso.onmicrosoft.com,DeviceCode,31359c7f-bd7e-475c-86db-fdb8c937548e,common
+    ```
+
+=== "Markdown"
+
+    ```md
+    # status
+
+    Date: 7/2/2023
+
+
+
+    Property | Value
+    ---------|-------
+    connectedAs | john.doe@contoso.onmicrosoft.com
+    authType | DeviceCode
+    appId | 31359c7f-bd7e-475c-86db-fdb8c937548e
+    appTenant | common
+    ```
