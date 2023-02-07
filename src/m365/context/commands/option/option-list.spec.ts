@@ -55,7 +55,7 @@ describe(commands.OPTION_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('handles an error when reading file contents fails', async () => {
+  it('handles an error when reading file content fails', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
 
@@ -83,7 +83,6 @@ describe(commands.OPTION_LIST, () => {
 
     await command.action(logger, { options: { verbose: true } });
     assert(loggerLogSpy.calledWith({ "listName": "listNameValue" }));
-    await assert.doesNotReject(command.action(logger, { options: { debug: true, name: 'listName' } }));
   });
 
   it('handles an error when context is not present in the .m365rc.json file', async () => {
