@@ -86,8 +86,14 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const appCatalogUrl = await this.getAppCatalogUrl(logger);
-      const solutionId = await this.getSolutionIdFromComponentManifestList(appCatalogUrl, args.options.clientSideComponentId, logger);
-      const solution = await this.getSolutionFromAppCatalog(appCatalogUrl, solutionId, logger);
+      const componentManifest = await this.getComponentManifest(appCatalogUrl, args.options.clientSideComponentId, logger);
+      const clientComponentManifest = JSON.parse(componentManifest.ClientComponentManifest);
+
+      if (clientComponentManifest.extensionType !== "ApplicationCustomizer") {
+        throw `The extension type of this component is not of type 'ApplicationCustomizer' but of type '${clientComponentManifest.extensionType}'`;
+      }
+
+      const solution = await this.getSolutionFromAppCatalog(appCatalogUrl, componentManifest.SolutionId, logger);
 
       if (!solution.ContainsTenantWideExtension) {
         throw `The solution does not contain an extension that can be deployed to all sites. Make sure that you've entered the correct component Id.`;
@@ -95,6 +101,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       else if (!solution.SkipFeatureDeployment) {
         throw 'The solution has not been deployed to all sites. Make sure to deploy this solution to all sites.';
       }
+
       await this.addTenantWideExtension(appCatalogUrl, args.options, logger);
     }
     catch (err: any) {
@@ -107,6 +114,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
     if (this.verbose) {
       logger.logToStderr(spoTenantAppCatalogUrlGetCommandOutput.stderr);
     }
+
     const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
     if (!appCatalogUrl) {
       throw 'Cannot add tenant-wide application customizer as app catalog cannot be found';
@@ -114,10 +122,11 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
     if (this.verbose) {
       logger.logToStderr(`Got tenant app catalog url: ${appCatalogUrl}`);
     }
+
     return appCatalogUrl;
   }
 
-  private async getSolutionIdFromComponentManifestList(appCatalogUrl: string, clientSideComponentId: string, logger: Logger): Promise<string> {
+  private async getComponentManifest(appCatalogUrl: string, clientSideComponentId: string, logger: Logger): Promise<any> {
     if (this.verbose) {
       logger.logToStderr('Retrieving component manifest item from the ComponentManifests list on the app catalog site so that we get the solution id');
     }
@@ -131,21 +140,18 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       debug: this.debug,
       output: 'json'
     };
+
     const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
     if (this.verbose) {
       logger.logToStderr(output.stderr);
     }
+
     const outputParsed = JSON.parse(output.stdout);
     if (outputParsed.length === 0) {
       throw 'No component found with the specified clientSideComponentId found in the component manifest list. Make sure that the application is added to the application catalog';
     }
-    logger.log(outputParsed);
-    const clientComponentManifest = JSON.parse(outputParsed[0].ClientComponentManifest);
-    if (clientComponentManifest.extensionType !== "ApplicationCustomizer") {
-      throw `The extension type of this component is not of type 'ApplicationCustomizer' but of type '${clientComponentManifest.extensionType}'`;
-    }
-    // check if clientcomponentmanifest is application customizer
-    return outputParsed[0].SolutionId;
+
+    return outputParsed[0];
   }
 
   private async getSolutionFromAppCatalog(appCatalogUrl: string, solutionId: string, logger: Logger): Promise<Solution> {
@@ -162,10 +168,12 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       debug: this.debug,
       output: 'json'
     };
+
     const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
     if (this.verbose) {
       logger.logToStderr(output.stderr);
     }
+
     const outputParsed = JSON.parse(output.stdout);
     if (outputParsed.length === 0) {
       throw `No component found with the solution id ${solutionId}. Make sure that the solution is available in the app catalog`;
@@ -193,6 +201,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       debug: this.debug,
       output: options.output
     };
+
     await Cli.executeCommand(spoListItemAddCommand as Command, { options: { ...commandOptions, _: [] } });
   }
 }
