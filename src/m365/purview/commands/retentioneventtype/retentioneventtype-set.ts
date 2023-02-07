@@ -60,7 +60,7 @@ class PurviewRetentionEventTypeSetCommand extends GraphCommand {
         }
 
         if (!args.options.description) {
-          return `Specify atleast an option to update.`;
+          return 'Specify at least one option to update.';
         }
 
         return true;
@@ -74,7 +74,7 @@ class PurviewRetentionEventTypeSetCommand extends GraphCommand {
     }
 
     if (this.verbose) {
-      logger.log(`Starting to update retention event type with id ${args.options.id}`);
+      logger.log(`Updating retention event type with id ${args.options.id}`);
     }
 
     try {
