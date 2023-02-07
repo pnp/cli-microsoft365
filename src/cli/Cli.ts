@@ -19,6 +19,7 @@ import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
 import { validation } from '../utils/validation';
 import { telemetry } from '../telemetry';
+import { M365RcJson } from '../m365/base/M365RcJson';
 const packageJSON = require('../../package.json');
 
 export interface CommandOutput {
@@ -150,6 +151,8 @@ export class Cli {
 
     try {
       // process options before passing them on to validation stage
+      const contextCommandOptions = this.loadOptionsFromContext(this.commandToExecute.options, optionsWithoutShorts.options.debug);
+      optionsWithoutShorts.options = { ...contextCommandOptions, ...optionsWithoutShorts.options };
       await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
     }
     catch (e: any) {
@@ -333,6 +336,51 @@ export class Cli {
     }
 
     this.loadCommandFromFile(commandFilePath);
+  }
+
+  private loadOptionsFromContext(commandOptions: CommandOptionInfo[], debug: boolean | undefined): any {
+    const filePath: string = '.m365rc.json';
+    let m365rc: M365RcJson = {};
+
+    if (!fs.existsSync(filePath)) {
+      return;
+    }
+
+    if (debug!) {
+      Cli.error('found .m365rc.json file');
+    }
+
+    try {
+      const fileContents: string = fs.readFileSync(filePath, 'utf8');
+      if (fileContents) {
+        m365rc = JSON.parse(fileContents);
+      }
+    }
+    catch (e) {
+      this.closeWithError(`Error parsing ${filePath}`, { options: {} });
+    }
+
+    if (!m365rc.context) {
+      return;
+    }
+
+    if (debug!) {
+      Cli.error('found context in .m365rc.json file');
+    }
+
+    const context = m365rc.context;
+
+    const foundOptions: any = {};
+    commandOptions.forEach(option => {
+      if (context[option.name]) {
+        foundOptions[option.name] = context[option.name];
+        if (debug!) {
+          Cli.error(`returning ${option.name} option from context`);
+        }
+      }
+    });
+
+    return foundOptions;
   }
 
   /**
