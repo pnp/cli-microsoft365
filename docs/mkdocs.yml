@@ -315,14 +315,13 @@ nav:
         - auditlog list: cmd/purview/auditlog/auditlog-list.md
       - retentioneventtype:
         - retentioneventtype get: cmd/purview/retentioneventtype/retentioneventtype-get.md
+        - retentioneventtype list: cmd/purview/retentioneventtype/retentioneventtype-list.md
       - retentionlabel:
         - retentionlabel add: cmd/purview/retentionlabel/retentionlabel-add.md
         - retentionlabel get: cmd/purview/retentionlabel/retentionlabel-get.md
         - retentionlabel list: cmd/purview/retentionlabel/retentionlabel-list.md
         - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
         - retentionlabel set: cmd/purview/retentionlabel/retentionlabel-set.md
-      - retentioneventtype:
-        - retentioneventtype list: cmd/purview/retentioneventtype/retentioneventtype-list.md
     - Search (search):
       - externalconnection:
         - externalconnection add: cmd/search/externalconnection/externalconnection-add.md

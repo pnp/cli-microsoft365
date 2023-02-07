@@ -24,8 +24,13 @@ m365 purview retentioneventtype list
 
 !!! attention
     This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
+
 !!! attention
-    This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
+    This command currently does not support app only permissions.
+
+## More information
+
+This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
 
 ## Response
 
@@ -35,7 +40,7 @@ m365 purview retentioneventtype list
     ```json
     [
       {
-        "displayName": "Retention Event Type",
+        "displayName": "Contract Expiry Event",
         "description": "",
         "createdDateTime": "2023-02-02T15:47:54Z",
         "lastModifiedDateTime": "2023-02-02T15:47:54Z",
@@ -59,14 +64,14 @@ m365 purview retentioneventtype list
 === "Text"
 
     ```text
-    id                                    displayName           createdDateTime
-    ------------------------------------  --------------------  --------------------
-    81fa91bd-66cd-4c6c-b0cb-71f37210dc74  Retention Event Type  2023-02-02T15:47:54Z
+    id                                    displayName            createdDateTime
+    ------------------------------------  ---------------------  --------------------
+    81fa91bd-66cd-4c6c-b0cb-71f37210dc74  Contract Expiry Event  2023-02-02T15:47:54Z
     ```
 
 === "CSV"
 
     ```csv
     id,displayName,createdDateTime
-    81fa91bd-66cd-4c6c-b0cb-71f37210dc74,Retention Event Type,2023-02-02T15:47:54Z
+    81fa91bd-66cd-4c6c-b0cb-71f37210dc74,Contract Expiry Event,2023-02-02T15:47:54Z
     ```
