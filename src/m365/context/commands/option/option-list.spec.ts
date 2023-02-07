@@ -1,7 +1,6 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import { telemetry } from '../../../../telemetry';
@@ -63,11 +62,6 @@ describe(commands.OPTION_LIST, () => {
   });
 
   it(`retrieves context info options from the existing .m365rc.json file`, async () => {
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
-
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
       "apps": [
