@@ -8,6 +8,7 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentionlabel-list');
 
 describe(commands.RETENTIONLABEL_LIST, () => {
@@ -51,8 +52,9 @@ describe(commands.RETENTIONLABEL_LIST, () => {
     "@odata.count": 2,
     "value": mockResponseArray
   };
-  //##endregion
+  //#endregion
 
+  let atStub: sinon.SinonStub;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -62,6 +64,10 @@ describe(commands.RETENTIONLABEL_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
   });
 
   beforeEach(() => {
@@ -79,10 +85,12 @@ describe(commands.RETENTIONLABEL_LIST, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    atStub = sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
+      accessToken.isAppOnlyAccessToken,
       request.get
     ]);
   });
@@ -94,6 +102,7 @@ describe(commands.RETENTIONLABEL_LIST, () => {
       pid.getProcessName
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -131,5 +140,12 @@ describe(commands.RETENTIONLABEL_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: {} }), new CommandError('An error has occurred'));
+  });
+
+  it('throws an error when we execute the command using application permissions', async () => {
+    atStub.restore();
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    await assert.rejects(command.action(logger, { options: {} }),
+      new CommandError('This command does not support application permissions.'));
   });
 });

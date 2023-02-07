@@ -10,11 +10,13 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentionlabel-remove');
 
 describe(commands.RETENTIONLABEL_REMOVE, () => {
   const validId = 'e554d69c-0992-4f9b-8a66-fca3c4d9c531';
 
+  let atStub: sinon.SinonStub;
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
@@ -25,6 +27,10 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -46,10 +52,12 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
+    atStub = sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
+      accessToken.isAppOnlyAccessToken,
       request.delete,
       Cli.prompt
     ]);
@@ -62,6 +70,7 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
       pid.getProcessName
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -163,5 +172,12 @@ describe(commands.RETENTIONLABEL_REMOVE, () => {
         confirm: true
       }
     }), new CommandError("An error has occurred"));
+  });
+
+  it('throws an error when we execute the command using application permissions', async () => {
+    atStub.restore();
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    await assert.rejects(command.action(logger, { options: { id: validId } }),
+      new CommandError('This command does not support application permissions.'));
   });
 });

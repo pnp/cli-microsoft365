@@ -10,6 +10,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
+import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentioneventtype-get');
 
 describe(commands.RETENTIONEVENTTYPE_GET, () => {
@@ -34,6 +35,7 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
     }
   };
 
+  let atStub: sinon.SinonStub;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -44,6 +46,10 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -62,10 +68,12 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    atStub = sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
+      accessToken.isAppOnlyAccessToken,
       request.get
     ]);
   });
@@ -125,5 +133,12 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
         id: retentionEventTypeId
       }
     }), new CommandError(errorMessage));
+  });
+
+  it('throws an error when we execute the command using application permissions', async () => {
+    atStub.restore();
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    await assert.rejects(command.action(logger, { options: { id: retentionEventTypeId } }),
+      new CommandError('This command does not support application permissions.'));
   });
 });

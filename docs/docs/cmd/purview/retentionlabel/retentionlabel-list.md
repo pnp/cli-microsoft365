@@ -25,6 +25,9 @@ m365 purview retentionlabel list
 !!! attention
     This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
 
+!!! attention
+    This command currently only supports delegated permissions.
+
 ## Response
 
 

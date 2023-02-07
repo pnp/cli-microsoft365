@@ -10,11 +10,13 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentionlabel-set');
 
 describe(commands.RETENTIONLABEL_SET, () => {
   const validId = 'e554d69c-0992-4f9b-8a66-fca3c4d9c531';
 
+  let atStub: sinon.SinonStub;
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
@@ -25,6 +27,10 @@ describe(commands.RETENTIONLABEL_SET, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -42,10 +48,12 @@ describe(commands.RETENTIONLABEL_SET, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
+    atStub = sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
+      accessToken.isAppOnlyAccessToken,
       request.patch
     ]);
   });
@@ -57,6 +65,7 @@ describe(commands.RETENTIONLABEL_SET, () => {
       pid.getProcessName
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -156,5 +165,12 @@ describe(commands.RETENTIONLABEL_SET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { id: validId, retentionDays: 180, actionAfterRetentionPeriod: 'none' } }), new CommandError('Error occured when updating the retention label'));
+  });
+
+  it('throws an error when we execute the command using application permissions', async () => {
+    atStub.restore();
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    await assert.rejects(command.action(logger, { options: { id: validId } }),
+      new CommandError('This command does not support application permissions.'));
   });
 });
