@@ -15,39 +15,37 @@ describe(commands.ENVIRONMENT_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  const flowResponse: { value: Array<FlowEnvironmentDetails> } = {
-    value: [{
+  const flowResponse: FlowEnvironmentDetails = {
+    displayName: "Contoso (default)",
+    provisioningState: "Succeeded",
+    environmentSku: "Default",
+    azureRegionHint: "westeurope",
+    isDefault: true,
+    name: "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
+    location: "europe",
+    type: "Microsoft.ProcessSimple/environments",
+    id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
+    properties: {
       displayName: "Contoso (default)",
+      createdTime: "2018-03-22T20:20:46.08653Z",
+      createdBy: {
+        id: "SYSTEM",
+        displayName: "SYSTEM",
+        type: "NotSpecified"
+      },
       provisioningState: "Succeeded",
+      creationType: "DefaultTenant",
       environmentSku: "Default",
-      azureRegionHint: "westeurope",
+      environmentType: "Production",
       isDefault: true,
-      name: "Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
-      location: "europe",
-      type: "Microsoft.ProcessSimple/environments",
-      id: "/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5",
-      properties: {
-        displayName: "Contoso (default)",
-        createdTime: "2018-03-22T20:20:46.08653Z",
-        createdBy: {
-          id: "SYSTEM",
-          displayName: "SYSTEM",
-          type: "NotSpecified"
-        },
-        provisioningState: "Succeeded",
-        creationType: "DefaultTenant",
-        environmentSku: "Default",
-        environmentType: "Production",
-        isDefault: true,
-        azureRegionHint: "westeurope",
-        runtimeEndpoints: {
-          "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
-          "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
-          "microsoft.PowerApps": "https://europe.api.powerapps.com",
-          "microsoft.Flow": "https://europe.api.flow.microsoft.com"
-        }
+      azureRegionHint: "westeurope",
+      runtimeEndpoints: {
+        "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
+        "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
+        "microsoft.PowerApps": "https://europe.api.powerapps.com",
+        "microsoft.Flow": "https://europe.api.flow.microsoft.com"
       }
-    }]
+    }
   };
 
   before(() => {
@@ -89,7 +87,7 @@ describe(commands.ENVIRONMENT_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.ENVIRONMENT_GET), true);
+    assert.strictEqual(command.name, commands.ENVIRONMENT_GET);
   });
 
   it('has a description', () => {
@@ -102,7 +100,7 @@ describe(commands.ENVIRONMENT_GET, () => {
 
   it('retrieves information about the specified environment (debug)', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`)) {
+      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`)) {
         return flowResponse;
       }
 
@@ -110,12 +108,12 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await command.action(logger, { options: { debug: true, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
-    assert(loggerLogSpy.calledWith(flowResponse.value[0]));
+    assert(loggerLogSpy.calledWith(flowResponse));
   });
 
   it('retrieves information about the specified environment', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`)) {
+      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`)) {
         return flowResponse;
       }
 
@@ -123,12 +121,12 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await command.action(logger, { options: { name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
-    assert(loggerLogSpy.calledWith(flowResponse.value[0]));
+    assert(loggerLogSpy.calledWith(flowResponse));
   });
 
   it('retrieves information about the default environment', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`)) {
+      if ((opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/~default?api-version=2016-11-01`)) {
         return flowResponse;
       }
 
@@ -136,7 +134,7 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
 
     await command.action(logger, { options: { verbose: true } });
-    assert(loggerLogSpy.calledWith(flowResponse.value[0]));
+    assert(loggerLogSpy.calledWith(flowResponse));
   });
 
   it('correctly handles no environment found', async () => {

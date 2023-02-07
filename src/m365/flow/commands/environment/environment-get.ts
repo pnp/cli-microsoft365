@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
+import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
 import { FlowEnvironmentDetails } from './FlowEnvironmentDetails';
@@ -42,13 +43,28 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about Microsoft Flow environment ${args.options.name}...`);
+      logger.logToStderr(`Retrieving information about Microsoft Flow environment ${args.options.name ? args.options.name : ''}...`);
     }
 
-    try {
-      const response = await odata.getAllItems<FlowEnvironmentDetails>(`${this.resource}providers/Microsoft.ProcessSimple/environments?api-version=2016-11-01`);
-      const flowItem: FlowEnvironmentDetails = response.filter(((flow: any) => args.options.name ? flow.name === args.options.name : flow.properties.isDefault === true))[0];
+    let requestUrl = `${this.resource}providers/Microsoft.ProcessSimple/environments/`;
 
+    if (args.options.name) {
+      requestUrl += `${formatting.encodeQueryParameter(args.options.name)}`;
+    }
+    else {
+      requestUrl += `~default`;
+    }
+
+    const requestOptions: any = {
+      url: `${requestUrl}?api-version=2016-11-01`,
+      headers: {
+        accept: 'application/json'
+      },
+      responseType: 'json'
+    };
+
+    try {
+      const flowItem: FlowEnvironmentDetails = await request.get<any>(requestOptions);
       flowItem.displayName = flowItem.properties.displayName;
       flowItem.provisioningState = flowItem.properties.provisioningState;
       flowItem.environmentSku = flowItem.properties.environmentSku;
