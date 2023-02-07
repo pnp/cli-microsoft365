@@ -159,3 +159,29 @@ Log in to Microsoft 365 using a client secret.
 ```sh
 m365 login --authType secret --secret topSeCr3t@007
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code CQBMTLEFC to authenticate.
+    ```
+
+=== "Text"
+
+    ```text
+    To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code CQBMTLEFC to authenticate.
+    ```
+
+=== "CSV"
+
+    ```csv
+    To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code CQBMTLEFC to authenticate.
+    ```
+
+=== "Markdown"
+
+    ```md
+    To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code CQBMTLEFC to authenticate.
+    ```

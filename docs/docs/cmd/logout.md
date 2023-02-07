@@ -29,3 +29,7 @@ Log out from Microsoft 365 in debug mode including detailed debug information in
 ```sh
 m365 logout --debug
 ```
+
+## Response
+
+The command won't return a response on success.
