@@ -46,7 +46,7 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
     "@odata.count": 2,
     "value": mockResponseArray
   };
-  //##endregion
+  //#endregion
 
   let log: string[];
   let logger: Logger;
