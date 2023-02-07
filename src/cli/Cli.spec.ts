@@ -1861,7 +1861,7 @@ describe('Cli', () => {
   });
 
   it(`replaces option value with the content of the specified file when value starts with @ and the specified file exists`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.txt'));
     sinon.stub(fs, 'readFileSync').callsFake(_ => 'abc');
     cli
       .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt', '-o', 'text'])
@@ -1979,5 +1979,22 @@ describe('Cli', () => {
   it('returns false, for the method shouldTrimOutput, when output is json', () => {
     const spyShouldTrimOutput = Cli.shouldTrimOutput('json');
     assert.strictEqual(spyShouldTrimOutput, false);
+  });
+
+  it(`populates option from context file`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.json'));
+    sinon.stub(fs, 'readFileSync').callsFake(_ => '{"context": {"parameterY": "test"}}');
+    cli
+      .execute(rootFolder, ['cli', 'mock', '--parameterX', 'abc'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith('abc'));
+          assert(cliLogStub.calledWith('test'));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(`Error: ${e}`));
   });
 });
