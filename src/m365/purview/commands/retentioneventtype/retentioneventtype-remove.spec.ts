@@ -15,7 +15,7 @@ const command: Command = require('./retentioneventtype-remove');
 
 describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
   const validId = 'e554d69c-0992-4f9b-8a66-fca3c4d9c531';
-
+  let atStub: sinon.SinonStub;
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
@@ -25,7 +25,6 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
       accessToken: 'abc',
@@ -52,6 +51,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
       promptOptions = options;
       return { continue: false };
     });
+    atStub = sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
@@ -125,7 +125,6 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
   });
 
   it('correctly deletes retention event type by id when prompt confirmed', async () => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${validId}`) {
         return;
@@ -138,6 +137,7 @@ describe(commands.RETENTIONEVENTTYPE_REMOVE, () => {
   });
 
   it('throws an error when we execute the command using application permissions', async () => {
+    atStub.restore();
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     await assert.rejects(command.action(logger, { options: { id: validId } }),
       new CommandError('This command does not support application permissions.'));
