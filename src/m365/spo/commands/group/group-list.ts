@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
@@ -99,7 +100,7 @@ class SpoGroupListCommand extends SpoCommand {
 
     const groupProperties = await request.get<AssociatedGroupPropertiesCollection>(requestOptions);
     logger.log(groupProperties);
-    if (!options.output || options.output === 'json') {
+    if (!options.output || !Cli.shouldTrimOutput(options.output)) {
       logger.log(groupProperties);
     }
     else {

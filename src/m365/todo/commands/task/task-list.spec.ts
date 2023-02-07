@@ -238,7 +238,8 @@ describe(commands.TASK_LIST, () => {
 
     await command.action(logger, {
       options: {
-        listName: 'Tasks List'
+        listName: 'Tasks List',
+        output: 'text'
       }
     });
     const actual = JSON.stringify(log[log.length - 1]);

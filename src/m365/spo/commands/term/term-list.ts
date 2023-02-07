@@ -1,4 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -125,7 +126,7 @@ class SpoTermListCommand extends SpoCommand {
         }
       }
 
-      if (!args.options.output || args.options.output === 'json') {
+      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
         logger.log(terms);
       }
       else if (!args.options.includeChildTerms) {

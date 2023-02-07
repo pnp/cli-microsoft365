@@ -84,3 +84,17 @@ m365 pp solution get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339
     uniquename,version,publisher
     Default,1.0,Default Publisher for org6633049a
     ```
+
+=== "Markdown"
+
+    ```md
+    # pp solution get --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --id "ee62fd63-e49e-4c09-80de-8fae1b9a427e"
+
+    Date: 9/1/2023
+
+    Property | Value
+    ---------|-------
+    uniquename | Crc00f1
+    version | 1.0.0.0
+    publisher | CDS Default Publisher
+    ```

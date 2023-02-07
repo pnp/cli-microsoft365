@@ -222,6 +222,8 @@ nav:
         - roster add: cmd/planner/roster/roster-add.md
         - roster get: cmd/planner/roster/roster-get.md        
         - roster remove: cmd/planner/roster/roster-remove.md
+        - roster member add: cmd/planner/roster/roster-member-add.md
+        - roster member list: cmd/planner/roster/roster-member-list.md
       - task:
         - task add: cmd/planner/task/task-add.md
         - task get: cmd/planner/task/task-get.md
@@ -312,6 +314,8 @@ nav:
       - tenant:
         - tenant settings list: cmd/pp/tenant/tenant-settings-list.md
     - Purview (purview):
+      - auditlog:
+        - auditlog list: cmd/purview/auditlog/auditlog-list.md
       - retentioneventtype:
         - retentioneventtype get: cmd/purview/retentioneventtype/retentioneventtype-get.md
       - retentionlabel:
@@ -358,6 +362,8 @@ nav:
         - app upgrade: cmd/spo/app/app-upgrade.md
         - app instance list: cmd/spo/app/app-instance-list.md
         - app teamspackage download: cmd/spo/app/app-teamspackage-download.md
+      - applicationcustomizer:
+        - applicationcustomizer add: cmd/spo/applicationcustomizer/applicationcustomizer-add.md
       - apppage:
         - apppage add: cmd/spo/apppage/apppage-add.md
         - apppage set: cmd/spo/apppage/apppage-set.md
@@ -420,9 +426,11 @@ nav:
         - file roleinheritance reset: cmd/spo/file/file-roleinheritance-reset.md
         - file sharinginfo get: cmd/spo/file/file-sharinginfo-get.md
         - file sharinglink add: cmd/spo/file/file-sharinglink-add.md
+        - file sharinglink clear: cmd/spo/file/file-sharinglink-clear.md
         - file sharinglink get: cmd/spo/file/file-sharinglink-get.md
         - file sharinglink list: cmd/spo/file/file-sharinglink-list.md
         - file sharinglink remove: cmd/spo/file/file-sharinglink-remove.md
+        - file sharinglink set: cmd/spo/file/file-sharinglink-set.md
         - file version clear: cmd/spo/file/file-version-clear.md
         - file version get: cmd/spo/file/file-version-get.md
         - file version list: cmd/spo/file/file-version-list.md

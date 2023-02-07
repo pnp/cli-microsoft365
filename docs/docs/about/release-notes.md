@@ -8,13 +8,19 @@
 
 - [planner roster add](../cmd/planner/roster/roster-add.md) - creates a new Microsoft Planner Roster [#4389](https://github.com/pnp/cli-microsoft365/issues/4389)
 - [planner roster remove](../cmd/planner/roster/roster-remove.md) - removes a Microsoft Planner Roster [#4390](https://github.com/pnp/cli-microsoft365/issues/4390)
+- [planner roster member add](../cmd/planner/roster/roster-member-add.md) - adds a user to a Microsoft Planner Roster [#4392](https://github.com/pnp/cli-microsoft365/issues/4392)
+- [planner roster member list](../cmd/planner/roster/roster-member-list.md) - lists members of the specified Microsoft Planner Roster [#4391](https://github.com/pnp/cli-microsoft365/issues/4391)
 
 **Purview:**
 
+- [purview auditlog list](../cmd/purview/auditlog/auditlog-list.md) - lists audit logs within your tenant [#4232](https://github.com/pnp/cli-microsoft365/issues/4232)
 - [purview retentioneventtype get](../cmd/purview/retentioneventtype/retentioneventtype-get.md) - gets a retention event type [#4339](https://github.com/pnp/cli-microsoft365/issues/4339)
 
 **SharePoint:**
 
+- [spo applicationcustomizer add](../cmd/spo/applicationcustomizer/applicationcustomizer-add.md) - add an application customizer to a site [#3465](https://github.com/pnp/cli-microsoft365/issues/3465)
+- [spo file sharinglink clear](../cmd/spo/file/file-sharinglink-clear.md) - removes sharing links of a file [#4028](https://github.com/pnp/cli-microsoft365/issues/4028)
+- [spo file sharinglink set](../cmd/spo/file/file-sharinglink-set.md) - updates a sharing link of a file [#4026](https://github.com/pnp/cli-microsoft365/issues/4026)
 - [spo navigation node set](../cmd/spo/navigation/navigation-node-set.md) - updates a SharePoint navigation node [#4416](https://github.com/pnp/cli-microsoft365/issues/4416)
 
 **SharePoint Framework:**
@@ -29,9 +35,15 @@
 - extended output of 'spo navigation node list' [#4415](https://github.com/pnp/cli-microsoft365/issues/4415)
 - extended 'flow run list' with extra filtering options [#4388](https://github.com/pnp/cli-microsoft365/issues/4388)
 - extended 'spo navigation node add' with support for audience targeting [#4418](https://github.com/pnp/cli-microsoft365/issues/4418)
-- adds remark to 'planner plan remove' on how to remove a Roster plan [#4403](https://github.com/pnp/cli-microsoft365/issues/4403)
+- added remark to 'planner plan remove' on how to remove a Roster plan [#4403](https://github.com/pnp/cli-microsoft365/issues/4403)
 - fixed issue removing plan by title [#4448](https://github.com/pnp/cli-microsoft365/issues/4448)
 - enhanced planner plan add [#4400](https://github.com/pnp/cli-microsoft365/issues/4400)
+- fixed onenote notebook list with validator checks [#4315](https://github.com/pnp/cli-microsoft365/issues/4315)
+- extended md output rendering of headings [#4380](https://github.com/pnp/cli-microsoft365/issues/4380)
+- added Cli.shouldTrimOutput method [#4288](https://github.com/pnp/cli-microsoft365/issues/4288)
+- enhanced 'planner plan list' with rosterId [#4402](https://github.com/pnp/cli-microsoft365/issues/4402)
+- enhanced 'planner plan get' with rosterId [#4401](https://github.com/pnp/cli-microsoft365/issues/4401)
+- added markdown output for 'pa' and 'pp' commands to docs [#4295](https://github.com/pnp/cli-microsoft365/issues/4295)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
@@ -95,9 +107,9 @@
 - fixed sample script 'List all tenant-wide extensions' [#4357](https://github.com/pnp/cli-microsoft365/issues/4357)
 - fixed Microsoft Learn documentation link for 'spo upn' [#4352](https://github.com/pnp/cli-microsoft365/issues/4352)
 - enhanced 'spo listitem list' with 'listUrl' option [#4336](https://github.com/pnp/cli-microsoft365/issues/4336)
-- adds application permissions support for Planner commands [#4330](https://github.com/pnp/cli-microsoft365/issues/4330)
-- deprecates schemaXml option for 'spo list' commands [#2906](https://github.com/pnp/cli-microsoft365/issues/2906)
-- adds documentation on how to set empty values [#4345](https://github.com/pnp/cli-microsoft365/issues/4345)
+- added application permissions support for Planner commands [#4330](https://github.com/pnp/cli-microsoft365/issues/4330)
+- deprecated schemaXml option for 'spo list' commands [#2906](https://github.com/pnp/cli-microsoft365/issues/2906)
+- added documentation on how to set empty values [#4345](https://github.com/pnp/cli-microsoft365/issues/4345)
 
 ## [v6.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.1.0)
 

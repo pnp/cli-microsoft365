@@ -86,3 +86,24 @@ m365 pp tenant settings list
     disableCapacityAllocationByEnvironmentAdmins,disableEnvironmentCreationByNonAdminUsers,disableNPSCommentsReachout,disablePortalsCreationByNonAdminUsers,disableSupportTicketsVisibleByAllUsers,disableSurveyFeedback,disableTrialEnvironmentCreationByNonAdminUsers,walkMeOptOut
     false,false,false,false,false,false,false,false
     ```
+
+=== "Markdown"
+
+    ```md
+    # pp tenant settings list
+
+    Date: 6/2/2023
+
+    Property | Value
+    ---------|-------
+    walkMeOptOut | false
+    disableNPSCommentsReachout | false
+    disableNewsletterSendout | false
+    disableEnvironmentCreationByNonAdminUsers | false
+    disablePortalsCreationByNonAdminUsers | false
+    disableSurveyFeedback | false
+    disableTrialEnvironmentCreationByNonAdminUsers | false
+    disableCapacityAllocationByEnvironmentAdmins | false
+    disableSupportTicketsVisibleByAllUsers | false
+    powerPlatform | {"search":{"disableDocsSearch":false,"disableCommunitySearch":false,"disableBingVideoSearch":false},"teamsIntegration":{"shareWithColleaguesUserLimit":10000},"powerApps":{"disableShareWithEveryone":false,"enableGuestsToMake":false,"disableMembersIndicator":false},"environments":{},"governance":{"disableAdminDigest":false,"disableDeveloperEnvironmentCreationByNonAdminUsers":false},"licensing":{"disableBillingPolicyCreationByNonAdminUsers":false},"powerPages":{}}
+    ```
