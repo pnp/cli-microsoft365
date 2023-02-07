@@ -44,6 +44,9 @@
 - enhanced 'planner plan list' with rosterId [#4402](https://github.com/pnp/cli-microsoft365/issues/4402)
 - enhanced 'planner plan get' with rosterId [#4401](https://github.com/pnp/cli-microsoft365/issues/4401)
 - added markdown output for 'pa' and 'pp' commands to docs [#4295](https://github.com/pnp/cli-microsoft365/issues/4295)
+- fixed 'planner task add' that always returns 'hasDescription: false [#4406](https://github.com/pnp/cli-microsoft365/issues/4406)
+- enhanced 'spo sitedesign add' with the option 'thumbnailUrl'. [#4453](https://github.com/pnp/cli-microsoft365/issues/4453)
+- fixed planner plan remove command by title [#4464](https://github.com/pnp/cli-microsoft365/issues/4464)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
