@@ -58,6 +58,9 @@ m365 purview retentionlabel set --id c37d695e-d581-4ae9-82a0-9364eba4291e --beha
 !!! attention
     This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
 
+!!! attention
+    This command currently only supports delegated permissions.
+
 ## Response
 
 The command won't return a response on success.

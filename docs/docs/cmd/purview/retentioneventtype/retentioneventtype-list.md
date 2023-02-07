@@ -26,7 +26,7 @@ m365 purview retentioneventtype list
     This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
 
 !!! attention
-    This command currently does not support app only permissions.
+    This command currently only supports delegated permissions.
 
 ## More information
 

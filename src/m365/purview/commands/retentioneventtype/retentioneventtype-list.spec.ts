@@ -52,6 +52,10 @@ describe(commands.RETENTIONEVENTTYPE_LIST, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
   });
 
   beforeEach(() => {
@@ -86,6 +90,7 @@ describe(commands.RETENTIONEVENTTYPE_LIST, () => {
       pid.getProcessName
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -127,10 +132,10 @@ describe(commands.RETENTIONEVENTTYPE_LIST, () => {
 
 
   it('throws error if something fails using application permissions', async () => {
-    sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
 
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError(`This command currently does not support app only permissions.`));
+      new CommandError(`This command does not support application permissions.`));
   });
 });

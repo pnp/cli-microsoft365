@@ -10,6 +10,7 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentionlabel-add');
 
 describe(commands.RETENTIONLABEL_ADD, () => {
@@ -65,6 +66,10 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -83,10 +88,12 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
+      accessToken.isAppOnlyAccessToken,
       request.post
     ]);
   });
@@ -98,6 +105,7 @@ describe(commands.RETENTIONLABEL_ADD, () => {
       pid.getProcessName
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -226,5 +234,12 @@ describe(commands.RETENTIONLABEL_ADD, () => {
         retentionDuration: retentionDuration
       }
     }), new CommandError("An error has occurred"));
+  });
+
+  it('throws an error when we execute the command using application permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    await assert.rejects(command.action(logger, { options: { displayName: displayName } }),
+      new CommandError('This command does not support application permissions.'));
   });
 });

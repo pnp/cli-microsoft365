@@ -31,6 +31,9 @@ m365 purview retentionlabel remove --id 'e554d69c-0992-4f9b-8a66-fca3c4d9c531'
 !!! attention
     This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
 
+!!! attention
+    This command currently only supports delegated permissions.
+
 ## Response
 
 The command won't return a response on success.

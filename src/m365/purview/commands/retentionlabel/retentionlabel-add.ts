@@ -1,7 +1,9 @@
+import auth from '../../../../Auth';
 import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { accessToken } from '../../../../utils/accessToken';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -117,6 +119,10 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.');
+    }
+
     const retentionTrigger: string = args.options.retentionTrigger ? args.options.retentionTrigger : 'dateLabeled';
     const defaultRecordBehavior: string = args.options.defaultRecordBehavior ? args.options.defaultRecordBehavior : 'startLocked';
 

@@ -58,6 +58,9 @@ m365 purview retentionlabel add --displayName 'some label' --behaviorDuringReten
 !!! attention
     This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
 
+!!! attention
+    This command currently only supports delegated permissions.
+
 ## More information
 
 - Create retentionLabel: [https://learn.microsoft.com/en-us/graph/api/security-retentionlabel-post?view=graph-rest-beta&tabs=http](https://learn.microsoft.com/en-us/graph/api/security-retentionlabel-post?view=graph-rest-beta&tabs=http)
