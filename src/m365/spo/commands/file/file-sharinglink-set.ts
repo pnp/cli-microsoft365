@@ -1,10 +1,10 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
-import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -12,18 +12,19 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  fileUrl?: string;
-  fileId?: string;
   id: string;
+  fileId?: string;
+  fileUrl?: string;
+  expirationDateTime: string;
 }
 
-class SpoFileSharingLinkGetCommand extends SpoCommand {
+class SpoFileSharingLinkSetCommand extends SpoCommand {
   public get name(): string {
-    return commands.FILE_SHARINGLINK_GET;
+    return commands.FILE_SHARINGLINK_SET;
   }
 
   public get description(): string {
-    return 'Gets details about a specific sharing link of a file';
+    return 'Updates a sharing link of a file';
   }
 
   constructor() {
@@ -38,8 +39,8 @@ class SpoFileSharingLinkGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        fileUrl: typeof args.options.fileUrl !== 'undefined',
-        fileId: typeof args.options.fileId !== 'undefined'
+        fileId: typeof args.options.fileId !== 'undefined',
+        fileUrl: typeof args.options.fileUrl !== 'undefined'
       });
     });
   }
@@ -50,13 +51,16 @@ class SpoFileSharingLinkGetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--fileUrl [fileUrl]'
-      },
-      {
         option: '--fileId [fileId]'
       },
       {
-        option: '-i, --id <id>'
+        option: '--fileUrl [fileUrl]'
+      },
+      {
+        option: '--id <id>'
+      },
+      {
+        option: '--expirationDateTime <expirationDateTime>'
       }
     );
   }
@@ -73,32 +77,45 @@ class SpoFileSharingLinkGetCommand extends SpoCommand {
           return `${args.options.fileId} is not a valid GUID`;
         }
 
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        if (!validation.isValidISODateTime(args.options.expirationDateTime)) {
+          return `'${args.options.expirationDateTime}' is not a valid ISO date string`;
+        }
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['fileUrl', 'fileId'] });
+    this.optionSets.push({ options: ['fileId', 'fileUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving sharing link for file ${args.options.fileUrl || args.options.fileId} with id ${args.options.id}...`);
+      logger.logToStderr(`Updating sharing link of file ${args.options.fileId || args.options.fileUrl}...`);
     }
 
     try {
       const fileDetails = await spo.getVroomFileDetails(args.options.webUrl, args.options.fileId, args.options.fileUrl);
+
       const requestOptions: CliRequestOptions = {
         url: `https://graph.microsoft.com/v1.0/sites/${fileDetails.SiteId}/drives/${fileDetails.VroomDriveID}/items/${fileDetails.VroomItemID}/permissions/${args.options.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
-        responseType: 'json'
+        responseType: 'json',
+        data: {
+          expirationDateTime: args.options.expirationDateTime
+        }
       };
 
-      const res = await request.get(requestOptions);
-      logger.log(res);
+      const sharingLink = await request.patch<any>(requestOptions);
+
+      logger.log(sharingLink);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -106,4 +123,4 @@ class SpoFileSharingLinkGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFileSharingLinkGetCommand();
+module.exports = new SpoFileSharingLinkSetCommand();
