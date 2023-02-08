@@ -28,6 +28,9 @@ m365 purview retentionevent get --id c37d695e-d581-4ae9-82a0-9364eba4291e
 !!! attention
     This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
+!!! attention
+    This command currently only supports delegated permissions.
+
 ## More information
 
 This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
@@ -41,8 +44,8 @@ This command is part of a series of commands that have to do with event-based re
 
     ```json
     {
-        "displayName": "Employee Termination",
-        "description": "This event occurs when an employee is terminated.",
+        "displayName": "Contract xyz expired",
+        "description": "The retention period for documents related to Contract xyz started because the contract expired.",
         "eventTriggerDateTime": "2023-02-01T09:16:37Z",
         "lastStatusUpdateDateTime": "2023-02-01T09:21:15Z",
         "createdDateTime": "2023-02-01T09:17:40Z",
@@ -90,8 +93,8 @@ This command is part of a series of commands that have to do with event-based re
     ```text
     createdBy               : {"user":{"id":null,"displayName":"John Doe"}}
     createdDateTime         : 2023-02-01T09:17:40Z
-    description             : This event occurs when an employee is terminated.
-    displayName             : Employee Termination    
+    description             : The retention period for documents related to Contract xyz started because the contract expired.
+    displayName             : Contract xyz expired    
     eventTriggerDateTime    : 2023-02-01T09:16:37Z
     id                      : c37d695e-d581-4ae9-82a0-9364eba4291e
     lastModifiedBy          : {"user":{"id":null,"displayName":"John Doe"}}
@@ -103,7 +106,7 @@ This command is part of a series of commands that have to do with event-based re
 
     ```csv
     displayName,description,eventTriggerDateTime,lastStatusUpdateDateTime,createdDateTime,lastModifiedDateTime,id,createdBy,lastModifiedBy
-    Employee Termination,This event occurs when an employee is terminated.,2023-02-01T09:16:37Z,2023-02-01T09:21:15Z,2023-02-01T09:17:40Z,2023-02-01T09:17:40Z,c37d695e-d581-4ae9-82a0-9364eba4291e,{"user":{"id":null,"displayName":"John Doe"}},{"user":{"id":null,"displayName":"John Doe"}}
+    Contract xyz expired,The retention period for documents related to Contract xyz started because the contract expired.,2023-02-01T09:16:37Z,2023-02-01T09:21:15Z,2023-02-01T09:17:40Z,2023-02-01T09:17:40Z,c37d695e-d581-4ae9-82a0-9364eba4291e,{"user":{"id":null,"displayName":"John Doe"}},{"user":{"id":null,"displayName":"John Doe"}}
     ```
 
 === "Markdown"
@@ -113,12 +116,12 @@ This command is part of a series of commands that have to do with event-based re
 
     Date: 2/1/2023
 
-    ## Employee Termination (c37d695e-d581-4ae9-82a0-9364eba4291e)
+    ## Contract xyz expired (c37d695e-d581-4ae9-82a0-9364eba4291e)
 
     Property | Value
     ---------|-------
-    displayName | Employee Termination
-    description | This event occurs when an employee is terminated.
+    displayName | Contract xyz expired
+    description | The retention period for documents related to Contract xyz started because the contract expired.
     eventTriggerDateTime | 2023-02-01T09:16:37Z
     lastStatusUpdateDateTime: 2023-02-01T09:21:15Z
     createdDateTime | 2023-02-01T09:17:40Z

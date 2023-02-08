@@ -8,6 +8,7 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { accessToken } from '../../../../utils/accessToken';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
 const command: Command = require('./retentionevent-get');
@@ -68,6 +69,10 @@ describe(commands.RETENTIONEVENT_GET, () => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -149,5 +154,13 @@ describe(commands.RETENTIONEVENT_GET, () => {
         id: retentionEventId
       }
     }), new CommandError(errorMessage));
+  });
+
+  it('throws error if something fails using application permissions', async () => {
+    sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
+
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError(`This command currently does not support app only permissions.`));
   });
 });
