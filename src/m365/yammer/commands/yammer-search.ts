@@ -1,3 +1,4 @@
+import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../request';
@@ -268,7 +269,7 @@ class YammerSearchCommand extends YammerCommand {
     try {
       await this.getAllItems(logger, args, 1);
 
-      if (args.options.output === 'json') {
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(
           {
             summary: this.summary,

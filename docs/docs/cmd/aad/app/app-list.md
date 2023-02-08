@@ -23,6 +23,7 @@ m365 aad app list
 ## Response
 
 === "JSON"
+
     ```json
     [
       {
@@ -136,6 +137,7 @@ m365 aad app list
     ```
 
 === "Text"
+
     ```text
     appId                                 id                                    displayName                                                              signInAudience
     ------------------------------------  ------------------------------------  -----------------------------------------------------------------------  ----------------------------------
@@ -143,6 +145,7 @@ m365 aad app list
     ```
 
 === "CSV"
+
     ```csv
     appId,id,displayName,signInAudience
     61ed4fab-a861-4307-bb87-a6a53dbe39f5,ff2798f7-1c7a-4607-8a7b-3d5e0c18c756,TestAppPermissions,AzureADMyOrg

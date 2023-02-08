@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils/odata';
@@ -64,7 +65,7 @@ class PpSolutionListCommand extends PowerPlatformCommand {
       const requestUrl = `${dynamicsApiUrl}/api/data/v9.0/solutions?$filter=isvisible eq true&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`;
       const res = await odata.getAllItems<Solution>(requestUrl);
 
-      if (!args.options.output || args.options.output === 'json') {
+      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
         logger.log(res);
       }
       else {

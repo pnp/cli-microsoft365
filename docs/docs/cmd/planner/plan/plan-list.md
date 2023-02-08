@@ -11,12 +11,20 @@ m365 planner plan list [options]
 ## Options
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` but not both.
+: ID of the Group that owns the plan. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` but not both.
+: Name of the Group that owns the plan. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId`.
+
+`--rosterId [rosterId]`
+: ID of the Planner Roster. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId`.
 
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+!!! attention
+When using rosterId, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
 ## Examples
 
@@ -30,6 +38,12 @@ Returns a list of Microsoft Planner plans for Group _My Planner Group_
 
 ```sh
 m365 planner plan list --ownerGroupName "My Planner Group"
+```
+
+Returns a list of Microsoft Planner plans for Roster _FeMZFDoK8k2oWmuGE-XFHZcAEwtn_
+
+```sh
+m365 planner plan list --rosterId "FeMZFDoK8k2oWmuGE-XFHZcAEwtn"
 ```
 
 ## Response

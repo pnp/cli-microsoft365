@@ -542,7 +542,7 @@ export class Cli {
     // data so that returned objects contain only default properties specified
     // on the current command. If there is no current command or the
     // command doesn't specify default properties, return original data
-    if (options.output === 'text' || options.output === 'csv') {
+    if (this.shouldTrimOutput(options.output)) {
       const cli: Cli = Cli.getInstance();
       const currentCommand: CommandInfo | undefined = cli.commandToExecute;
 
@@ -888,5 +888,9 @@ export class Cli {
         args.options[option] = fs.readFileSync(filePath, 'utf-8');
       }
     });
+  }
+
+  public static shouldTrimOutput(output: string | undefined): boolean {
+    return output === 'text' || output === 'csv';
   }
 }

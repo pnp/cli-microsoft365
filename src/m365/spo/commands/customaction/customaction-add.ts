@@ -11,7 +11,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   webUrl: string;
   name: string;
   title: string;
@@ -140,15 +140,15 @@ class SpoCustomActionAddCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (args.options.registrationId && !args.options.registrationType) {
           return 'Option registrationId is specified, but registrationType is missing';
         }
-    
+
         if (args.options.registrationType && !args.options.registrationId) {
           return 'Option registrationType is specified, but registrationId is missing';
         }
-    
+
         const location: string = args.options.location.toLowerCase();
         const locationsRequireGroup: string[] = [
           'microsoft.sharepoint.standardmenu', 'microsoft.sharepoint.contenttypesettings',
@@ -157,57 +157,57 @@ class SpoCustomActionAddCommand extends SpoCommand {
           'microsoft.sharepoint.listedit.documentlibrary', 'microsoft.sharepoint.peoplepage',
           'microsoft.sharepoint.sitesettings'
         ];
-    
+
         if (locationsRequireGroup.indexOf(location) > -1 && !args.options.group) {
           return `The location specified requires the group option to be specified as well`;
         }
-    
+
         if (location === 'scriptlink' &&
           !args.options.scriptSrc &&
           !args.options.scriptBlock
         ) {
           return 'Option scriptSrc or scriptBlock is required when the location is set to ScriptLink';
         }
-    
+
         if ((args.options.scriptSrc || args.options.scriptBlock) && location !== 'scriptlink') {
           return 'Option scriptSrc or scriptBlock is specified, but the location option is different than ScriptLink. Please use --actionUrl, if the location should be different than ScriptLink';
         }
-    
+
         if (args.options.scriptSrc && args.options.scriptBlock) {
           return 'Either option scriptSrc or scriptBlock can be specified, but not both';
         }
-    
+
         if (args.options.sequence && (args.options.sequence < 0 || args.options.sequence > 65536)) {
           return 'Invalid option sequence. Expected value in range from 0 to 65536';
         }
-    
+
         if (args.options.clientSideComponentId && validation.isValidGuid(args.options.clientSideComponentId) === false) {
           return `ClientSideComponentId ${args.options.clientSideComponentId} is not a valid GUID`;
         }
-    
+
         if (args.options.clientSideComponentProperties && !args.options.clientSideComponentId) {
           return `Option clientSideComponentProperties is specified, but the clientSideComponentId option is missing`;
         }
-    
+
         if (args.options.scope &&
           args.options.scope !== 'Site' &&
           args.options.scope !== 'Web'
         ) {
           return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web`;
         }
-    
+
         if (args.options.rights) {
           const rights = args.options.rights.split(',');
-    
+
           for (const item of rights) {
             const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
-    
+
             if (!kind) {
               return `Rights option '${item}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`;
             }
           }
         }
-    
+
         return true;
       }
     );
@@ -233,9 +233,9 @@ class SpoCustomActionAddCommand extends SpoCommand {
       if (!args.options.scope) {
         args.options.scope = 'Web';
       }
-  
+
       const requestBody: any = this.mapRequestBody(args.options);
-  
+
       const requestOptions: any = {
         url: `${args.options.webUrl}/_api/${args.options.scope}/UserCustomActions`,
         headers: {

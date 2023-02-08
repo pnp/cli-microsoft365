@@ -218,6 +218,9 @@ nav:
         - plan list: cmd/planner/plan/plan-list.md
         - plan remove: cmd/planner/plan/plan-remove.md
         - plan set: cmd/planner/plan/plan-set.md
+      - roster:
+        - roster add: cmd/planner/roster/roster-add.md
+        - roster remove: cmd/planner/roster/roster-remove.md
       - task:
         - task add: cmd/planner/task/task-add.md
         - task get: cmd/planner/task/task-get.md
@@ -308,8 +311,12 @@ nav:
       - tenant:
         - tenant settings list: cmd/pp/tenant/tenant-settings-list.md
     - Purview (purview):
+      - auditlog:
+        - auditlog list: cmd/purview/auditlog/auditlog-list.md
       - retentionevent:
-          - retentionevent get: cmd/purview/retentionevent/retentionevent-get.md
+        - retentionevent get: cmd/purview/retentionevent/retentionevent-get.md
+      - retentioneventtype:
+        - retentioneventtype get: cmd/purview/retentioneventtype/retentioneventtype-get.md
       - retentionlabel:
         - retentionlabel add: cmd/purview/retentionlabel/retentionlabel-add.md
         - retentionlabel get: cmd/purview/retentionlabel/retentionlabel-get.md
@@ -335,6 +342,7 @@ nav:
       - project:
         - project doctor: cmd/spfx/project/project-doctor.md
         - project externalize: cmd/spfx/project/project-externalize.md
+        - project permissions grant: cmd/spfx/project/project-permissions-grant.md
         - project rename: cmd/spfx/project/project-rename.md
         - project upgrade: cmd/spfx/project/project-upgrade.md
     - SharePoint Online (spo):
@@ -353,6 +361,8 @@ nav:
         - app upgrade: cmd/spo/app/app-upgrade.md
         - app instance list: cmd/spo/app/app-instance-list.md
         - app teamspackage download: cmd/spo/app/app-teamspackage-download.md
+      - applicationcustomizer:
+        - applicationcustomizer add: cmd/spo/applicationcustomizer/applicationcustomizer-add.md
       - apppage:
         - apppage add: cmd/spo/apppage/apppage-add.md
         - apppage set: cmd/spo/apppage/apppage-set.md
@@ -524,6 +534,7 @@ nav:
         - navigation node add: cmd/spo/navigation/navigation-node-add.md
         - navigation node list: cmd/spo/navigation/navigation-node-list.md
         - navigation node remove: cmd/spo/navigation/navigation-node-remove.md
+        - navigation node set: cmd/spo/navigation/navigation-node-set.md
       - orgassetslibrary:
         - orgassetslibrary add: cmd/spo/orgassetslibrary/orgassetslibrary-add.md
         - orgassetslibrary list: cmd/spo/orgassetslibrary/orgassetslibrary-list.md

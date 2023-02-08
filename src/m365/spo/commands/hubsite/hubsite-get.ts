@@ -91,7 +91,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
         throw 'includeAssociatedSites option is only allowed with json output mode';
       }
 
-      if (args.options.includeAssociatedSites === true && args.options.output && args.options.output === 'json') {
+      if (args.options.includeAssociatedSites === true && args.options.output && !Cli.shouldTrimOutput(args.options.output)) {
         const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
         const associatedSitesCommandOutput = await this.getAssociatedSites(spoAdminUrl, hubSite.SiteId, logger, args);
         const associatedSites: AssociatedSite[] = JSON.parse((associatedSitesCommandOutput as CommandOutput).stdout) as AssociatedSite[];

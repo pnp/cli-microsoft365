@@ -1,3 +1,4 @@
+import { Cli } from "../../../../cli/Cli";
 import { Logger } from "../../../../cli/Logger";
 import GlobalOptions from "../../../../GlobalOptions";
 import request from "../../../../request";
@@ -51,7 +52,7 @@ class PlannerTaskChecklistItemListCommand extends GraphCommand {
 
     try {
       const res = await request.get<any>(requestOptions);
-      if (!args.options.output || args.options.output === 'json') {
+      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
         logger.log(res.checklist);
       }
       else {

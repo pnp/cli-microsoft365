@@ -1606,7 +1606,7 @@ describe('Cli', () => {
     const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'md' });
     const match = actual.match(/^## /gm);
     try {
-      assert.strictEqual(match?.length, 2);
+      assert.strictEqual(match, null);
       done();
     }
     catch (e) {
@@ -1623,7 +1623,7 @@ describe('Cli', () => {
     const actual = (Cli as any).formatOutput(mockCommand, input, { output: 'md' });
     const match = actual.match(/^## /gm);
     try {
-      assert.strictEqual(match?.length, 1);
+      assert.strictEqual(match, null);
       done();
     }
     catch (e) {
@@ -1964,5 +1964,20 @@ describe('Cli', () => {
     sinon.stub(config, 'get').callsFake(() => 'value');
     const actualValue = cli.getSettingWithDefaultValue('key', '');
     assert.strictEqual(actualValue, 'value');
+  });
+
+  it('returns true, for the method shouldTrimOutput, when output is text', () => {
+    const spyShouldTrimOutput = Cli.shouldTrimOutput('text');
+    assert.strictEqual(spyShouldTrimOutput, true);
+  });
+
+  it('returns true, for the method shouldTrimOutput, when output is csv', () => {
+    const spyShouldTrimOutput = Cli.shouldTrimOutput('csv');
+    assert.strictEqual(spyShouldTrimOutput, true);
+  });
+
+  it('returns false, for the method shouldTrimOutput, when output is json', () => {
+    const spyShouldTrimOutput = Cli.shouldTrimOutput('json');
+    assert.strictEqual(spyShouldTrimOutput, false);
   });
 });
