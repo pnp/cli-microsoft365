@@ -61,8 +61,6 @@ m365 teams messagingsettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 
     Date: 1/3/2023
 
-    ## undefined (undefined)
-
     Property | Value
     ---------|-------
     allowUserEditMessages | true

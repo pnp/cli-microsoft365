@@ -103,7 +103,7 @@ m365 teams message reply list --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --ch
 
     Date: 1/3/2023
 
-    ## undefined (1672744052534)
+    ## 1672744052534
 
     Property | Value
     ---------|-------

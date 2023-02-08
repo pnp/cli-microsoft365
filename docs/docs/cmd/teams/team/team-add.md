@@ -102,7 +102,7 @@ m365 teams team add --name "Architecture" --description "Architecture Discussion
 
     Date: 1/3/2023
 
-    ## undefined (d708ecb3-3325-4f6e-a0f7-2f982901b856)
+    ## d708ecb3-3325-4f6e-a0f7-2f982901b856
 
     Property | Value
     ---------|-------

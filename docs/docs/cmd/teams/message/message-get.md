@@ -120,7 +120,7 @@ m365 teams message get --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --channelId
 
     Date: 1/3/2023
 
-    ## undefined (1540747442203)
+    ## 1540747442203
 
     Property | Value
     ---------|-------

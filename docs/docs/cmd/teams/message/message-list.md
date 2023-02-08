@@ -109,7 +109,7 @@ m365 teams message list --teamId fce9e580-8bba-4638-ab5c-ab40016651e3 --channelI
 
     Date: 1/3/2023
 
-    ## undefined (1666799217259)
+    ## 1666799217259
 
     Property | Value
     ---------|-------
