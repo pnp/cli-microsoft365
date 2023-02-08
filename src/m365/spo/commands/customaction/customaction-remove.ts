@@ -3,6 +3,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -136,32 +137,22 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     }
   }
 
-  private getCustomActionId(options: Options): Promise<string> {
+  private async getCustomActionId(options: Options): Promise<string> {
     if (options.id) {
       return Promise.resolve(options.id);
     }
 
-    const customActionRequestOptions: any = {
-      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions?$filter=Title eq '${formatting.encodeQueryParameter(options.title as string)}'`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
+    const customActions = await spo.getCustomActions(options.webUrl, options.scope, `Title eq '${formatting.encodeQueryParameter(options.title as string)}'`);
 
-    return request
-      .get<{ value: CustomAction[] }>(customActionRequestOptions)
-      .then((res: { value: CustomAction[] }): Promise<string> => {
-        if (res.value.length === 1) {
-          return Promise.resolve(res.value[0].Id);
-        }
+    if (customActions.length === 1) {
+      return customActions[0].Id;
+    }
 
-        if (res.value.length === 0) {
-          return Promise.reject(`No user custom action with title '${options.title}' found`);
-        }
+    if (customActions.length === 0) {
+      throw `No user custom action with title '${options.title}' found`;
+    }
 
-        return Promise.reject(`Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${res.value.map(a => a.Id).join(', ')}`);
-      });
+    throw `Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${customActions.map(a => a.Id).join(', ')}`;
   }
 
   private removeScopedCustomAction(options: Options): Promise<undefined> {
