@@ -54,7 +54,6 @@ describe(commands.RETENTIONLABEL_LIST, () => {
   };
   //#endregion
 
-  let atStub: sinon.SinonStub;
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -85,7 +84,7 @@ describe(commands.RETENTIONLABEL_LIST, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
-    atStub = sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
@@ -143,7 +142,7 @@ describe(commands.RETENTIONLABEL_LIST, () => {
   });
 
   it('throws an error when we execute the command using application permissions', async () => {
-    atStub.restore();
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     await assert.rejects(command.action(logger, { options: {} }),
       new CommandError('This command does not support application permissions.'));

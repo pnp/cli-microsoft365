@@ -16,7 +16,6 @@ const command: Command = require('./retentionlabel-set');
 describe(commands.RETENTIONLABEL_SET, () => {
   const validId = 'e554d69c-0992-4f9b-8a66-fca3c4d9c531';
 
-  let atStub: sinon.SinonStub;
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
@@ -48,7 +47,7 @@ describe(commands.RETENTIONLABEL_SET, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    atStub = sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
@@ -168,7 +167,7 @@ describe(commands.RETENTIONLABEL_SET, () => {
   });
 
   it('throws an error when we execute the command using application permissions', async () => {
-    atStub.restore();
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     await assert.rejects(command.action(logger, { options: { id: validId } }),
       new CommandError('This command does not support application permissions.'));
