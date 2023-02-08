@@ -101,6 +101,32 @@ describe(commands.HOMESITE_SET, () => {
     assert(loggerLogSpy.calledWith('The Home site has been set to https://contoso.sharepoint.com/sites/Work.'));
   });
 
+  it('sets the specified site as the Home Site and sets the Viva Connections default experience to True', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="ValidateMultipleHomeSitesParameterExists" Id="85" ObjectPathId="81"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="ValidateVivaHomeParameterExists" Id="86" ObjectPathId="81"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetSPHSiteWithConfigurations" Id="87" ObjectPathId="81"><Parameters><Parameter Type="String"> https://contoso.sharepoint.com/sites/Work</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="81" Name="b6e793a0-e066-6000-3c4a-cb1f897402b4|908bed80-a04a-4433-b4a0-883d9847d110:d872ec63-6bea-4678-9429-078f4fa93560&#xA;Tenant" /></ObjectPaths></Request>`) {
+        return Promise.resolve(JSON.stringify(
+          [
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8929.1227", "ErrorInfo": null, "TraceCorrelationId": "e4f2e59e-c0a9-0000-3dd0-1d8ef12cc742"
+            }, 86, {
+              "IsNull": false
+            }, 87, "The Home site has been set to https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fWork and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details."
+          ]
+        ));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options: {
+        siteUrl: "https://contoso.sharepoint.com/sites/Work",
+        VivaConnectionsDefaultStart: true
+      }
+    } as any);
+    assert(loggerLogSpy.calledWith('The Home site has been set to https://contoso.sharepoint.com/sites/Work and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details.'));
+  });
+
   it('correctly handles error when setting the Home Site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="57" ObjectPathId="56" /><Method Name="SetSPHSite" Id="58" ObjectPathId="56"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/Work</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="56" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
