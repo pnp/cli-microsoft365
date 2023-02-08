@@ -75,3 +75,23 @@ This command is part of a series of commands that have to do with event-based re
     id,displayName,createdDateTime
     81fa91bd-66cd-4c6c-b0cb-71f37210dc74,Contract Expiry Event,2023-02-02T15:47:54Z
     ```
+
+=== "Markdown"
+
+    ```md
+    # purview retentioneventtype list
+
+    Date: 8/2/2023
+
+    ## Contract Expiry Event (81fa91bd-66cd-4c6c-b0cb-71f37210dc74)
+
+    Property | Value
+    ---------|-------
+    displayName | Contract Expiry Event
+    description | null
+    createdDateTime | 2023-02-02T15:47:54Z
+    lastModifiedDateTime | 2023-02-02T15:47:54Z
+    id | 81fa91bd-66cd-4c6c-b0cb-71f37210dc74
+    createdBy | {"user":{"id":"36155f4e-bdbd-4101-ba20-5e78f5fba9a9","displayName":null}}
+    lastModifiedBy | {"user":{"id":"36155f4e-bdbd-4101-ba20-5e78f5fba9a9","displayName":null}}
+    ```
