@@ -40,7 +40,7 @@ This command is part of a series of commands that have to do with event-based re
     ```json
     [
       {
-        "displayName": "Contract Expiry Event",
+        "displayName": "Contract xyz expired",
         "description": null,
         "eventTriggerDateTime": "2023-02-03T13:51:40Z",
         "eventStatus": null,
@@ -71,14 +71,14 @@ This command is part of a series of commands that have to do with event-based re
     ```text
     id                                    displayName            eventTriggerDateTime
     ------------------------------------  ---------------------  --------------------
-    7248cfa8-c03a-4ec1-49a4-08db05edc686  Contract Expiry Event  2023-02-03T13:51:40Z
+    7248cfa8-c03a-4ec1-49a4-08db05edc686  Contract xyz expired  2023-02-03T13:51:40Z
     ```
 
 === "CSV"
 
     ```csv
     id,displayName,isInUse
-    7248cfa8-c03a-4ec1-49a4-08db05edc686,Contract Expiry Event,2023-02-03T13:51:40Z
+    7248cfa8-c03a-4ec1-49a4-08db05edc686,Contract xyz expired,2023-02-03T13:51:40Z
     ```
 
 === "Markdown"
@@ -88,11 +88,11 @@ This command is part of a series of commands that have to do with event-based re
 
     Date: 3/2/2023
 
-    ## Contract Expiry Event (7248cfa8-c03a-4ec1-49a4-08db05edc686)
+    ## Contract xyz expired (7248cfa8-c03a-4ec1-49a4-08db05edc686)
 
     Property | Value
     ---------|-------
-    displayName | Contract Expiry Event
+    displayName | Contract xyz expired
     description | null
     eventTriggerDateTime | 2023-02-03T13:51:40Z
     eventStatus | null
