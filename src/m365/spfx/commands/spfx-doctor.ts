@@ -3,8 +3,8 @@ import * as child_process from 'child_process';
 import { satisfies } from 'semver';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
-import AnonymousCommand from '../../base/AnonymousCommand';
 import commands from '../commands';
+import { BaseProjectCommand } from './project/base-project-command';
 
 interface CommandArgs {
   options: Options;
@@ -77,7 +77,7 @@ interface SpfxVersionPrerequisites {
   yo: VersionCheck;
 }
 
-class SpfxDoctorCommand extends AnonymousCommand {
+class SpfxDoctorCommand extends BaseProjectCommand {
   private readonly versions: { [version: string]: SpfxVersionPrerequisites } = {
     '1.0.0': {
       gulpCli: {
@@ -539,6 +539,8 @@ class SpfxDoctorCommand extends AnonymousCommand {
       args.options.output = 'text';
     }
 
+    this.projectRootPath = this.getProjectRoot(process.cwd());
+
     logger.log(' ');
     logger.log('CLI for Microsoft 365 SharePoint Framework doctor');
     logger.log('Verifying configuration of your system for working with the SharePoint Framework');
@@ -701,44 +703,41 @@ class SpfxDoctorCommand extends AnonymousCommand {
     return (<any>SharePointVersion)[sp.toUpperCase()];
   }
 
-  private getSharePointFrameworkVersion(logger: Logger): Promise<string> {
-    return new Promise<string>((resolve: (version: string) => void, reject: (error: string) => void): void => {
+  private async getSharePointFrameworkVersion(logger: Logger): Promise<string> {
+    if (this.projectRootPath !== null) {
+      const spfxVersion = this.getProjectVersion();
+      if (spfxVersion) {
+        return spfxVersion;
+      }
+    }
+    try {
+      const spfxVersion = await this.getPackageVersion('@microsoft/sp-core-library', PackageSearchMode.LocalOnly, HandlePromise.Fail, logger);
       if (this.debug) {
-        logger.logToStderr('Detecting SharePoint Framework version based on @microsoft/sp-core-library local...');
+        logger.logToStderr(`Found @microsoft/sp-core-library@${spfxVersion}`);
+      }
+      return spfxVersion;
+    }
+    catch {
+      if (this.debug) {
+        logger.logToStderr(`@microsoft/sp-core-library not found. Search for @microsoft/generator-sharepoint local or global...`);
       }
 
-      this
-        .getPackageVersion('@microsoft/sp-core-library', PackageSearchMode.LocalOnly, HandlePromise.Fail, logger)
-        .then((version: string): Promise<string> => {
-          if (this.debug) {
-            logger.logToStderr(`Found @microsoft/sp-core-library@${version}`);
-          }
+      try {
+        return await this.getPackageVersion('@microsoft/generator-sharepoint', PackageSearchMode.LocalAndGlobal, HandlePromise.Fail, logger);
+      }
+      catch (error: any) {
+        if (this.debug) {
+          logger.logToStderr('@microsoft/generator-sharepoint not found');
+        }
 
-          return Promise.resolve(version);
-        })
-        .catch((): Promise<string> => {
-          if (this.debug) {
-            logger.logToStderr(`@microsoft/sp-core-library not found. Search for @microsoft/generator-sharepoint local or global...`);
-          }
-
-          return this.getPackageVersion('@microsoft/generator-sharepoint', PackageSearchMode.LocalAndGlobal, HandlePromise.Fail, logger);
-        })
-        .then((version: string): void => {
-          resolve(version);
-        })
-        .catch((error?: string): void => {
-          if (this.debug) {
-            logger.logToStderr('@microsoft/generator-sharepoint not found');
-          }
-
-          if (error && error.indexOf('ENOENT') > -1) {
-            reject('npm not found');
-          }
-          else {
-            resolve('');
-          }
-        });
-    });
+        if (error && error.indexOf('ENOENT') > -1) {
+          throw 'npm not found';
+        }
+        else {
+          return '';
+        }
+      }
+    }
   }
 
   private getPackageVersion(packageName: string, searchMode: PackageSearchMode, handlePromise: HandlePromise, logger: Logger): Promise<string> {
