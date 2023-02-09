@@ -74,7 +74,7 @@ describe(commands.PLAN_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the specified roster when confirm option not passed with id', async () => {
+  it('prompts before removing the specified Roster when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
         id: validRosterId
@@ -90,7 +90,7 @@ describe(commands.PLAN_REMOVE, () => {
     assert(promptIssued);
   });
 
-  it('aborts removing the specified plan when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified Roster when confirm option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     await command.action(logger, {
       options: {
@@ -100,7 +100,7 @@ describe(commands.PLAN_REMOVE, () => {
     assert(deleteSpy.notCalled);
   });
 
-  it('correctly deletes plan by id', async () => {
+  it('correctly deletes Roster by id', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}`) {
         return;
@@ -118,7 +118,7 @@ describe(commands.PLAN_REMOVE, () => {
     });
   });
 
-  it('correctly deletes plan by id when prompt confirmed', async () => {
+  it('correctly deletes Roster by id when prompt confirmed', async () => {
     sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}`) {
         return;
@@ -153,6 +153,6 @@ describe(commands.PLAN_REMOVE, () => {
         id: validRosterId,
         confirm: true
       }
-    }), new CommandError("The requested item is not found."));
+    }), new CommandError('The requested item is not found.'));
   });
 });
