@@ -151,7 +151,7 @@ export class Cli {
 
     try {
       // process options before passing them on to validation stage
-      const contextCommandOptions = this.loadOptionsFromContext(this.commandToExecute.options);
+      const contextCommandOptions = this.loadOptionsFromContext(this.commandToExecute.options, optionsWithoutShorts.options.debug);
       optionsWithoutShorts.options = { ...contextCommandOptions, ...optionsWithoutShorts.options };
       await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
     }
@@ -338,12 +338,16 @@ export class Cli {
     this.loadCommandFromFile(commandFilePath);
   }
 
-  private loadOptionsFromContext(commandOptions: CommandOptionInfo[]): any {
+  private loadOptionsFromContext(commandOptions: CommandOptionInfo[], debug: boolean | undefined): any {
     const filePath: string = '.m365rc.json';
     let m365rc: M365RcJson = {};
 
     if (!fs.existsSync(filePath)) {
       return;
+    }
+
+    if (debug!) {
+      Cli.error('found .m365rc.json file');
     }
 
     try {
@@ -360,12 +364,19 @@ export class Cli {
       return;
     }
 
+    if (debug!) {
+      Cli.error('found context in .m365rc.json file');
+    }
+
     const context = m365rc.context;
 
     const foundOptions: any = {};
     commandOptions.forEach(option => {
       if (context[option.name]) {
         foundOptions[option.name] = context[option.name];
+        if (debug!) {
+          Cli.error(`returning ${option.name} option from context`);
+        }
       }
     });
 

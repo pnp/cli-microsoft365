@@ -1837,6 +1837,111 @@ describe('Cli', () => {
     }
   });
 
+  it(`runs properly when context file not found`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    cli
+      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'json'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`populates option from context file`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
+    sinon.stub(fs, 'readFileSync').onCall(0).callsFake(_ => '{"context": {"parameterY": "456"}}').onCall(1).callsFake(_ => '{}');
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return undefined;
+      }
+      return defaultValue;
+    });
+    cli
+      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`populates option from context file (debug mode)`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
+    sinon.stub(fs, 'readFileSync').onCall(0).callsFake(_ => '{"context": {"parameterY": "456"}}').onCall(1).callsFake(_ => '{}');
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return undefined;
+      }
+      return defaultValue;
+    });
+    cli
+      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text', '--debug'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`runs properly when context m365rc file found but without any context`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
+    sinon.stub(fs, 'readFileSync').onCall(0).callsFake(_ => '{}').onCall(1).callsFake(_ => '{}');
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return undefined;
+      }
+      return defaultValue;
+    });
+    cli
+      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`throws error when context json parse fails`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
+    sinon.stub(fs, 'readFileSync').onCall(0).callsFake(_ => 'I will not parse').onCall(1).callsFake(_ => '{}');
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return undefined;
+      }
+      return defaultValue;
+    });
+    cli
+      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text'])
+      .then(_ => {
+        done('Promise completed while error expected');
+      }, _ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.red('Error: Error parsing .m365rc.json')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
   it(`exits with the specified exit code`, () => {
     try {
       (cli as any).closeWithError(new CommandError('Error', 5), { options: {} });
@@ -1979,86 +2084,5 @@ describe('Cli', () => {
   it('returns false, for the method shouldTrimOutput, when output is json', () => {
     const spyShouldTrimOutput = Cli.shouldTrimOutput('json');
     assert.strictEqual(spyShouldTrimOutput, false);
-  });
-
-  it(`populates option from context file`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
-    sinon.stub(fs, 'readFileSync').onCall(0).callsFake(_ => '{"context": {"parameterY": "456"}}').onCall(1).callsFake(_ => '{}');
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return undefined;
-      }
-      return defaultValue;
-    });
-    cli
-      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it(`runs properly when context file not found`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
-    cli
-      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it(`runs properly when context m365rc file found but without any context`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
-    sinon.stub(fs, 'readFileSync').onCall(0).callsFake(_ => '{}').onCall(1).callsFake(_ => '{}');
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return undefined;
-      }
-      return defaultValue;
-    });
-    cli
-      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliLogStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it(`throws error when context josn parse fails`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake((path) => path.toString() === '.m365rc.json');
-    sinon.stub(fs, 'readFileSync').onCall(0).callsFake(_ => 'I will not parse').onCall(1).callsFake(_ => '{}');
-    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
-      if (settingName === settingsNames.prompt) {
-        return undefined;
-      }
-      return defaultValue;
-    });
-    cli
-      .execute(rootFolder, ['cli', 'mock', '--parameterX', '123', '--output', 'text'])
-      .then(_ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.red('Error parsing .m365rc.json')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
   });
 });
