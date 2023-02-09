@@ -7,7 +7,6 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
@@ -24,6 +23,7 @@ describe(commands.PLAN_ADD, () => {
   const validTitle = 'Plan name';
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000002';
+  const validRosterId = 'iryDKm9VLku2HIoC2G-TX5gABJw0';
   const user = 'user@contoso.com';
   const userId = '00000000-0000-0000-0000-000000000000';
   const user1 = 'user1@contoso.com';
@@ -42,6 +42,11 @@ describe(commands.PLAN_ADD, () => {
 
   const planResponse = {
     "id": validId,
+    "title": validTitle
+  };
+
+  const planRosterResponse = {
+    "id": validRosterId,
     "title": validTitle
   };
 
@@ -106,7 +111,6 @@ describe(commands.PLAN_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     (command as any).items = [];
   });
 
@@ -114,8 +118,7 @@ describe(commands.PLAN_ADD, () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      request.patch,
-      accessToken.isAppOnlyAccessToken
+      request.patch
     ]);
   });
 
@@ -226,18 +229,6 @@ describe(commands.PLAN_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: validTitle,
-        ownerGroupId: validOwnerGroupId
-      }
-    }), new CommandError('This command does not support application permissions.'));
-  });
-
   it('correctly adds planner plan with given title with available ownerGroupId', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
@@ -254,6 +245,49 @@ describe(commands.PLAN_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith(planResponse));
+  });
+
+  it('correctly adds planner plan with given title with available rosterId', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+        return Promise.resolve(planRosterResponse);
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    await command.action(logger, {
+      options: {
+        title: validTitle,
+        rosterId: validRosterId
+      }
+    });
+    assert(loggerLogSpy.calledWith(planRosterResponse));
+  });
+
+  it('correctly handles adding planner plan to a roster with an already linked plan', async () => {
+    const multipleRostersError = {
+      "error": {
+        "error": {
+          "message": "You do not have the required permissions to access this item, or the item may not exist."
+        }
+      }
+    };
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+        throw multipleRostersError;
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        title: validTitle,
+        rosterId: validRosterId
+      }
+    }), new CommandError(`You can only add 1 plan to a Roster`));
   });
 
   it('correctly adds planner plan with given title with available ownerGroupName', async () => {

@@ -28,6 +28,9 @@ m365 spo sitedesign add [options]
 `-a, --previewImageAltText [previewImageAltText]`
 : The alt text description of the image for accessibility
 
+`--thumbnailUrl [thumbnailUrl]`
+: The new URL of a thumbnail image. If none is specified SharePoint will use a generic image
+
 `--isDefault`
 : Set if the site design is applied as the default site design
 

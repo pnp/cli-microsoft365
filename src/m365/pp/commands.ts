@@ -1,7 +1,9 @@
 const prefix: string = 'pp';
 
 export default {
+  AIBUILDERMODEL_GET: `${prefix} aibuildermodel get`,
   AIBUILDERMODEL_LIST: `${prefix} aibuildermodel list`,
+  AIBUILDERMODEL_REMOVE: `${prefix} aibuildermodel remove`,
   CARD_CLONE: `${prefix} card clone`,
   CARD_GET: `${prefix} card get`,
   CARD_LIST: `${prefix} card list`,
@@ -22,6 +24,7 @@ export default {
   MANAGEMENTAPP_LIST: `${prefix} managementapp list`,
   SOLUTION_GET: `${prefix} solution get`,
   SOLUTION_LIST: `${prefix} solution list`,
+  SOLUTION_PUBLISH: `${prefix} solution publish`,
   SOLUTION_REMOVE: `${prefix} solution remove`,
   SOLUTION_PUBLISHER_ADD: `${prefix} solution publisher add`,
   SOLUTION_PUBLISHER_GET: `${prefix} solution publisher get`,

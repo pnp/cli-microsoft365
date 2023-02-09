@@ -13,8 +13,11 @@ export interface FolderProperties {
   WelcomePage: string;
   ListItemAllFields: ListItemAllFields;
 }
+
 export interface ListItemAllFields {
   RoleAssignments: RoleAssignment[];
+  ParentList: ParentListFields;
+  Id: string;
 }
 export interface RoleAssignment {
   Member: Member;
@@ -23,4 +26,8 @@ export interface RoleAssignment {
 export interface Member {
   PrincipalType: number;
   PrincipalTypeString: string;
+}
+
+export interface ParentListFields {
+  Id: string;
 }

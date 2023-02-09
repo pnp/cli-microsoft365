@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -90,21 +91,6 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
     this.optionSets.push({ options: ['id', 'appId', 'appDisplayName'] });
   }
 
-  private getSpoSiteId(args: CommandArgs): Promise<string> {
-    const url = new URL(args.options.siteUrl);
-    const siteRequestOptions: any = {
-      url: `${this.resource}/v1.0/sites/${url.hostname}:${url.pathname}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ id: string }>(siteRequestOptions)
-      .then((site: { id: string }) => site.id);
-  }
-
   private getFilteredPermissions(args: CommandArgs, permissions: SitePermission[]): SitePermission[] {
     let filterProperty: string = 'displayName';
     let filterValue: string = args.options.appDisplayName as string;
@@ -152,7 +138,7 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      this.siteId = await this.getSpoSiteId(args);
+      this.siteId = await spo.getSpoGraphSiteId(args.options.siteUrl);
       const sitePermissionId: string = await this.getPermission(args);
       const requestOptions: any = {
         url: `${this.resource}/v1.0/sites/${this.siteId}/permissions/${sitePermissionId}`,

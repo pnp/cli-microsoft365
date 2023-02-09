@@ -17,7 +17,7 @@ The following script lists all tenant-wide extensions deployed in the tenant. Th
     $fields = "Id, Title, TenantWideExtensionDisabled, TenantWideExtensionLocation"
 
     $appcatalogurl = m365 spo tenant appcatalogurl get
-    m365 spo listitem list --title $listName --webUrl $appcatalogurl --fields $fields
+    m365 spo listitem list --listTitle $listName --webUrl $appcatalogurl --fields $fields
     ```
 
 === "Bash"
@@ -25,11 +25,11 @@ The following script lists all tenant-wide extensions deployed in the tenant. Th
     ```bash
     #!/bin/bash
 
-    listName="Tenant Wide Extensions"
-    fields="Id, Title, TenantWideExtensionLocation, TenantWideExtensionDisabled"
+    listName = "Tenant Wide Extensions"
+    fields = "Id, Title, TenantWideExtensionLocation, TenantWideExtensionDisabled"
 
-    appcatalogurl=$(m365 spo tenant appcatalogurl get)
-    m365 spo listitem list --title "$listName" --webUrl $appcatalogurl --fields  "$fields"
+    appcatalogurl = $(m365 spo tenant appcatalogurl get)
+    m365 spo listitem list --listTitle "$listName" --webUrl $appcatalogurl --fields "$fields"
     ```
 
 !!! note

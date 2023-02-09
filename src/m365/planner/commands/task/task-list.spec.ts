@@ -7,7 +7,6 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
@@ -278,7 +277,6 @@ describe(commands.TASK_LIST, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
@@ -327,8 +325,7 @@ describe(commands.TASK_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      accessToken.isAppOnlyAccessToken
+      request.get
     ]);
   });
 
@@ -523,18 +520,6 @@ describe(commands.TASK_LIST, () => {
         ownerGroupName: 'foo'
       }
     }), new CommandError(`The specified group 'foo' does not exist.`));
-  });
-
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        bucketId: 'FtzysDykv0-9s9toWiZhdskAD67z',
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
-      }
-    }), new CommandError('This command does not support application permissions.'));
   });
 
   it('fails validation when bucketName not found', async () => {

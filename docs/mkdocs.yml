@@ -124,6 +124,9 @@ nav:
     - Context (context):
       - init: cmd/context/context-init.md
       - remove: cmd/context/context-remove.md
+      - option:
+        - remove: cmd/context/option/option-remove.md
+        - set: cmd/context/option/option-set.md
     - File (file):
       - add: cmd/file/file-add.md
       - convert:
@@ -177,6 +180,8 @@ nav:
     - OneNote (onenote):
       - notebook:
         - notebook list: cmd/onenote/notebook/notebook-list.md
+      - page:
+        - page list: cmd/onenote/page/page-list.md
     - Outlook (outlook):
       - mail:
         - mail send: cmd/outlook/mail/mail-send.md
@@ -213,6 +218,11 @@ nav:
         - plan list: cmd/planner/plan/plan-list.md
         - plan remove: cmd/planner/plan/plan-remove.md
         - plan set: cmd/planner/plan/plan-set.md
+      - roster:
+        - roster add: cmd/planner/roster/roster-add.md
+        - roster remove: cmd/planner/roster/roster-remove.md
+        - roster member add: cmd/planner/roster/roster-member-add.md
+        - roster member list: cmd/planner/roster/roster-member-list.md
       - task:
         - task add: cmd/planner/task/task-add.md
         - task get: cmd/planner/task/task-get.md
@@ -264,7 +274,9 @@ nav:
         - run resubmit: cmd/flow/run/run-resubmit.md
     - Power Platform (pp):
       - aibuildermodel:
+        - aibuildermodel get: cmd/pp/aibuildermodel/aibuildermodel-get.md
         - aibuildermodel list: cmd/pp/aibuildermodel/aibuildermodel-list.md
+        - aibuildermodel remove: cmd/pp/aibuildermodel/aibuildermodel-remove.md
       - card:
         - card clone: cmd/pp/card/card-clone.md
         - card get: cmd/pp/card/card-get.md
@@ -292,6 +304,7 @@ nav:
       - solution:
         - solution get: cmd/pp/solution/solution-get.md
         - solution list: cmd/pp/solution/solution-list.md
+        - solution publish: 'cmd/pp/solution/solution-publish.md'
         - solution remove: cmd/pp/solution/solution-remove.md
         - solution publisher add: cmd/pp/solution/solution-publisher-add.md
         - solution publisher get: cmd/pp/solution/solution-publisher-get.md
@@ -300,7 +313,19 @@ nav:
       - tenant:
         - tenant settings list: cmd/pp/tenant/tenant-settings-list.md
     - Purview (purview):
+      - auditlog:
+        - auditlog list: cmd/purview/auditlog/auditlog-list.md
+      - retentionevent:
+        - retentionevent get: cmd/purview/retentionevent/retentionevent-get.md
+        - retentionevent list: cmd/purview/retentionevent/retentionevent-list.md
+      - retentioneventtype:
+        - retentioneventtype add: cmd/purview/retentioneventtype/retentioneventtype-add.md
+        - retentioneventtype get: cmd/purview/retentioneventtype/retentioneventtype-get.md
+        - retentioneventtype list: cmd/purview/retentioneventtype/retentioneventtype-list.md
+        - retentioneventtype remove: cmd/purview/retentioneventtype/retentioneventtype-remove.md
+        - retentioneventtype set: cmd/purview/retentioneventtype/retentioneventtype-set.md
       - retentionlabel:
+        - retentionlabel add: cmd/purview/retentionlabel/retentionlabel-add.md
         - retentionlabel get: cmd/purview/retentionlabel/retentionlabel-get.md
         - retentionlabel list: cmd/purview/retentionlabel/retentionlabel-list.md
         - retentionlabel remove: cmd/purview/retentionlabel/retentionlabel-remove.md
@@ -324,6 +349,7 @@ nav:
       - project:
         - project doctor: cmd/spfx/project/project-doctor.md
         - project externalize: cmd/spfx/project/project-externalize.md
+        - project permissions grant: cmd/spfx/project/project-permissions-grant.md
         - project rename: cmd/spfx/project/project-rename.md
         - project upgrade: cmd/spfx/project/project-upgrade.md
     - SharePoint Online (spo):
@@ -342,6 +368,8 @@ nav:
         - app upgrade: cmd/spo/app/app-upgrade.md
         - app instance list: cmd/spo/app/app-instance-list.md
         - app teamspackage download: cmd/spo/app/app-teamspackage-download.md
+      - applicationcustomizer:
+        - applicationcustomizer add: cmd/spo/applicationcustomizer/applicationcustomizer-add.md
       - apppage:
         - apppage add: cmd/spo/apppage/apppage-add.md
         - apppage set: cmd/spo/apppage/apppage-set.md
@@ -396,14 +424,19 @@ nav:
         - file move: cmd/spo/file/file-move.md
         - file remove: cmd/spo/file/file-remove.md
         - file rename: cmd/spo/file/file-rename.md
+        - file retentionlabel ensure: cmd/spo/file/file-retentionlabel-ensure.md
+        - file retentionlabel remove: cmd/spo/file/file-retentionlabel-remove.md
         - file roleassignment add: cmd/spo/file/file-roleassignment-add.md
         - file roleassignment remove: cmd/spo/file/file-roleassignment-remove.md
         - file roleinheritance break: cmd/spo/file/file-roleinheritance-break.md
         - file roleinheritance reset: cmd/spo/file/file-roleinheritance-reset.md
         - file sharinginfo get: cmd/spo/file/file-sharinginfo-get.md
+        - file sharinglink add: cmd/spo/file/file-sharinglink-add.md
+        - file sharinglink clear: cmd/spo/file/file-sharinglink-clear.md
         - file sharinglink get: cmd/spo/file/file-sharinglink-get.md
         - file sharinglink list: cmd/spo/file/file-sharinglink-list.md
         - file sharinglink remove: cmd/spo/file/file-sharinglink-remove.md
+        - file sharinglink set: cmd/spo/file/file-sharinglink-set.md
         - file version clear: cmd/spo/file/file-version-clear.md
         - file version get: cmd/spo/file/file-version-get.md
         - file version list: cmd/spo/file/file-version-list.md
@@ -417,6 +450,8 @@ nav:
         - folder move: cmd/spo/folder/folder-move.md
         - folder remove: cmd/spo/folder/folder-remove.md
         - folder rename: cmd/spo/folder/folder-rename.md
+        - folder retentionlabel ensure: cmd/spo/folder/folder-retentionlabel-ensure.md
+        - folder retentionlabel remove: cmd/spo/folder/folder-retentionlabel-remove.md
         - folder roleassignment add: cmd/spo/folder/folder-roleassignment-add.md
         - folder roleassignment remove: cmd/spo/folder/folder-roleassignment-remove.md
         - folder roleinheritance break: cmd/spo/folder/folder-roleinheritance-break.md
@@ -464,6 +499,7 @@ nav:
         - list contenttype default set: cmd/spo/list/list-contenttype-default-set.md        
         - list retentionlabel ensure: cmd/spo/list/list-retentionlabel-ensure.md
         - list retentionlabel get: cmd/spo/list/list-retentionlabel-get.md
+        - list retentionlabel remove: cmd/spo/list/list-retentionlabel-remove.md
         - list roleassignment add: cmd/spo/list/list-roleassignment-add.md
         - list roleassignment remove: cmd/spo/list/list-roleassignment-remove.md
         - list roleinheritance break: cmd/spo/list/list-roleinheritance-break.md
@@ -507,6 +543,7 @@ nav:
         - navigation node add: cmd/spo/navigation/navigation-node-add.md
         - navigation node list: cmd/spo/navigation/navigation-node-list.md
         - navigation node remove: cmd/spo/navigation/navigation-node-remove.md
+        - navigation node set: cmd/spo/navigation/navigation-node-set.md
       - orgassetslibrary:
         - orgassetslibrary add: cmd/spo/orgassetslibrary/orgassetslibrary-add.md
         - orgassetslibrary list: cmd/spo/orgassetslibrary/orgassetslibrary-list.md
@@ -616,7 +653,8 @@ nav:
       - tenant:
         - tenant appcatalog add: cmd/spo/tenant/tenant-appcatalog-add.md
         - tenant appcatalogurl get: cmd/spo/tenant/tenant-appcatalogurl-get.md
-        - tenant applicationcustomizer get: cmd/spo/tenant/tenant-applicationcustomizer-get.md
+        - tenant applicationcustomizer add: cmd/spo/tenant/tenant-applicationcustomizer-add.md
+        - tenant applicationcustomizer get: cmd/spo/tenant/tenant-applicationcustomizer-get.md        
         - tenant recyclebinitem list: cmd/spo/tenant/tenant-recyclebinitem-list.md
         - tenant recyclebinitem remove: cmd/spo/tenant/tenant-recyclebinitem-remove.md
         - tenant recyclebinitem restore: cmd/spo/tenant/tenant-recyclebinitem-restore.md
@@ -701,6 +739,7 @@ nav:
       - message:
         - message get: cmd/teams/message/message-get.md
         - message list: cmd/teams/message/message-list.md
+        - message send: cmd/teams/message/message-send.md
         - message reply list: cmd/teams/message/message-reply-list.md
       - messagingsettings:
         - messagingsettings list: cmd/teams/messagingsettings/messagingsettings-list.md

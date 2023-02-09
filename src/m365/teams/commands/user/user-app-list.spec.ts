@@ -180,7 +180,8 @@ describe(commands.USER_APP_LIST, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        userId: userId
+        userId: userId,
+        output: 'text'
       }
     } as any);
     assert(loggerLogSpy.calledWith([
@@ -214,7 +215,8 @@ describe(commands.USER_APP_LIST, () => {
 
     await command.action(logger, {
       options: {
-        userName: userName
+        userName: userName,
+        output: 'text'
       }
     } as any);
     assert(loggerLogSpy.calledWith([

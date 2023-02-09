@@ -1,8 +1,7 @@
-import auth from "../../../../Auth";
+import { Cli } from "../../../../cli/Cli";
 import { Logger } from "../../../../cli/Logger";
 import GlobalOptions from "../../../../GlobalOptions";
 import request from "../../../../request";
-import { accessToken } from "../../../../utils/accessToken";
 import { formatting } from "../../../../utils/formatting";
 import GraphCommand from "../../../base/GraphCommand";
 import commands from "../../commands";
@@ -43,11 +42,6 @@ class PlannerTaskChecklistItemListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
-
     const requestOptions: any = {
       url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(args.options.taskId)}/details?$select=checklist`,
       headers: {
@@ -58,7 +52,7 @@ class PlannerTaskChecklistItemListCommand extends GraphCommand {
 
     try {
       const res = await request.get<any>(requestOptions);
-      if (!args.options.output || args.options.output === 'json') {
+      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
         logger.log(res.checklist);
       }
       else {

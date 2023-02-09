@@ -178,9 +178,6 @@ m365 spo list set [options]
 `--restrictUserUpdates [restrictUserUpdates]`
 : A boolean value that indicates whether the this list is a restricted one or not The value can't be changed if there are existing items in the list
 
-`--schemaXml [schemaXml]`
-: The schema in Collaborative Application Markup Language (CAML) schemas that defines the list
-
 `--sendToLocationName [sendToLocationName]`
 : Gets or sets a file name to use when copying an item in the list to another document library.
 
@@ -204,6 +201,9 @@ m365 spo list set [options]
 
 `--writeSecurity [writeSecurity]`
 : Gets or sets the Write security setting for the list. Valid values are 1 (All users can modify all items)|2 (Users can modify only items that they create)|4 (Users cannot modify any list item)
+
+`--schemaXml [schemaXml]`
+: (deprecated) The schema in Collaborative Application Markup Language (CAML) schemas that defines the list
 
 --8<-- "docs/cmd/_global.md"
 

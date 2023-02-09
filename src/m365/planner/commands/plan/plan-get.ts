@@ -1,9 +1,7 @@
 import { PlannerPlan, PlannerPlanDetails } from '@microsoft/microsoft-graph-types';
-import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
@@ -19,6 +17,7 @@ interface Options extends GlobalOptions {
   title?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
+  rosterId?: string;
 }
 
 class PlannerPlanGetCommand extends GraphCommand {
@@ -49,7 +48,8 @@ class PlannerPlanGetCommand extends GraphCommand {
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
-        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined'
+        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
+        rosterId: typeof args.options.rosterId !== 'undefined'
       });
     });
   }
@@ -67,6 +67,9 @@ class PlannerPlanGetCommand extends GraphCommand {
       },
       {
         option: '--ownerGroupName [ownerGroupName]'
+      },
+      {
+        option: '--rosterId [rosterId]'
       }
     );
   }
@@ -74,14 +77,6 @@ class PlannerPlanGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.title && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName';
-        }
-
-        if (args.options.title && args.options.ownerGroupId && args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName but not both';
-        }
-
         if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
           return `${args.options.ownerGroupId} is not a valid GUID`;
         }
@@ -93,16 +88,19 @@ class PlannerPlanGetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      { options: ['id', 'title'] }
+      {
+        options: ['id', 'title']
+      },
+      {
+        options: ['ownerGroupId', 'ownerGroupName', 'rosterId'],
+        runsWhen: (args) => {
+          return args.options.title !== undefined;
+        }
+      }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
-
     try {
       if (args.options.id) {
         const plan = await planner.getPlanById(args.options.id);
@@ -110,8 +108,11 @@ class PlannerPlanGetCommand extends GraphCommand {
         logger.log(result);
       }
       else {
-        const groupId = await this.getGroupId(args);
-        const plan = await planner.getPlanByTitle(args.options.title!, groupId);
+        let groupId = undefined;
+        if (args.options.ownerGroupId || args.options.ownerGroupName) {
+          groupId = await this.getGroupId(args);
+        }
+        const plan = await planner.getPlanByTitle(args.options.title!, groupId, args.options.rosterId);
         const result = await this.getPlanDetails(plan);
 
         if (result) {
@@ -124,8 +125,8 @@ class PlannerPlanGetCommand extends GraphCommand {
     }
   }
 
-  private getPlanDetails(plan: PlannerPlan): Promise<PlannerPlan & PlannerPlanDetails> {
-    const requestOptionsTaskDetails: any = {
+  private async getPlanDetails(plan: PlannerPlan): Promise<PlannerPlan & PlannerPlanDetails> {
+    const requestOptionsTaskDetails: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/plans/${plan.id}/details`,
       headers: {
         'accept': 'application/json;odata.metadata=none',
@@ -134,21 +135,17 @@ class PlannerPlanGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get(requestOptionsTaskDetails)
-      .then(planDetails => {
-        return { ...plan, ...planDetails as PlannerPlanDetails };
-      });
+    const planDetails = await request.get(requestOptionsTaskDetails);
+    return { ...plan, ...planDetails as PlannerPlanDetails };
   }
 
-  private getGroupId(args: CommandArgs): Promise<string> {
+  private async getGroupId(args: CommandArgs): Promise<string> {
     if (args.options.ownerGroupId) {
-      return Promise.resolve(args.options.ownerGroupId);
+      return args.options.ownerGroupId;
     }
 
-    return aadGroup
-      .getGroupByDisplayName(args.options.ownerGroupName!)
-      .then(group => group.id!);
+    const group = await aadGroup.getGroupByDisplayName(args.options.ownerGroupName!);
+    return group.id!;
   }
 }
 

@@ -152,6 +152,27 @@ describe(commands.CARD_GET, () => {
   it('throws error when no card found', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards?$filter=name eq '${validName}'`)) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return ({ "value": [] });
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        environment: validEnvironment,
+        name: validName
+      }
+    }), new CommandError(`The specified card '${validName}' does not exist.`));
+  });
+
+  it('throws error when multiple cards with same name were found', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
     const multipleCardsResponse = {
       value: [
         { cardid: '69703efe-4149-ed11-bba2-000d3adf7537' },
@@ -174,27 +195,6 @@ describe(commands.CARD_GET, () => {
         name: validName
       }
     }), new CommandError(`Multiple cards with name '${validName}' found: ${multipleCardsResponse.value.map(x => x.cardid).join(',')}`));
-  });
-
-  it('throws error when multiple cards with same name were found', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards?$filter=name eq '${validName}'`)) {
-        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
-          return ({ "value": [] });
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        environment: validEnvironment,
-        name: validName
-      }
-    }), new CommandError(`The specified card '${validName}' does not exist.`));
   });
 
   it('retrieves a specific card with the name parameter', async () => {

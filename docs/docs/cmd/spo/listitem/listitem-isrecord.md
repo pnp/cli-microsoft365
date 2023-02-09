@@ -17,10 +17,10 @@ m365 spo listitem isrecord [options]
 : The ID of the list item to check if it is a record
 
 `-l, --listId [listId]`
-: ID of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+: ID of the list where the item should be checked. Specify either `listTitle`, `listId` or `listUrl`
 
 `-t, --listTitle [listTitle]`
-: Title of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+: Title of the list where the item should be checked. Specify either `listTitle`, `listId` or `listUrl`
 
 `--listUrl [listUrl]`
 : Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`

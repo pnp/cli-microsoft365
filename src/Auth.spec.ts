@@ -15,6 +15,7 @@ import { Cli } from './cli/Cli';
 import { Logger } from './cli/Logger';
 import { CommandError } from './Command';
 import request from './request';
+import { accessToken } from "./utils/accessToken";
 import { sinonUtil } from './utils/sinonUtil';
 
 class MockTokenStorage implements TokenStorage {
@@ -2065,11 +2066,11 @@ describe('Auth', () => {
   });
 
   it('returns undefined if access token is not set when determining auth type', () => {
-    assert.strictEqual(Auth.isAppOnlyAuth(''), undefined);
+    assert.strictEqual(accessToken.isAppOnlyAccessToken(''), undefined);
   });
 
   it(`returns undefined if access token is not valid`, () => {
-    assert.strictEqual(Auth.isAppOnlyAuth('123.456'), undefined);
+    assert.strictEqual(accessToken.isAppOnlyAccessToken('123.456'), undefined);
   });
 
   it('returns public client for device code auth', () => {

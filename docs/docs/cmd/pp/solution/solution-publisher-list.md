@@ -69,3 +69,21 @@ m365 pp solution publisher list --environment "Default-2ca3eaa5-140f-4175-8261-3
     00000001-0000-0000-0000-00000000005a,Cree38e,CDS Default Publisher
     ```
 
+=== "Markdown"
+
+    ```md
+    # pp solution publisher list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339"
+    
+    Date: 9/1/2023
+
+    Property | Value
+    ---------|-------
+    publisherid | 00000001-0000-0000-0000-00000000005a
+    uniquename | Cree38e
+    friendlyname | CDS Default Publisher
+    versionnumber | 1074060
+    isreadonly | false
+    description | null
+    customizationprefix | cr6c3
+    customizationoptionvalueprefix | 43186
+    ```

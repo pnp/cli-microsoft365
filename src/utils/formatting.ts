@@ -126,5 +126,28 @@ export const formatting = {
       default:
         return value;
     }
+  },
+
+  /**
+   * Converts an object into an xml:
+   * @obj the actual objec
+   * @returns A string containing the xml 
+   */
+  objectToXml(obj: any): string {
+    let xml = '';
+    for (const prop in obj) {
+      xml += "<" + prop + ">";
+      if (obj[prop] instanceof Array) {
+        for (const array in obj[prop]) {
+          xml += this.objectToXml(new Object(obj[prop][array]));
+        }
+      }
+      else {
+        xml += obj[prop];
+      }
+      xml += "</" + prop + ">";
+    }
+    xml = xml.replace(/<\/?[0-9]{1,}>/g, '');
+    return xml;
   }
 };

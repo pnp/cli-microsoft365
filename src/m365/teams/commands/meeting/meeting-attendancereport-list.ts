@@ -83,21 +83,21 @@ class TeamsMeetingAttendancereportListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const isAppOnlyAuth: boolean = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
-    if (isAppOnlyAuth && !args.options.userId && !args.options.userName && !args.options.email) {
+    const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+    if (isAppOnlyAccessToken && !args.options.userId && !args.options.userName && !args.options.email) {
       this.handleError(`The option 'userId', 'userName' or 'email' is required when retrieving meeting attendance report using app only permissions`);
     }
-    else if (!isAppOnlyAuth && (args.options.userId || args.options.userName || args.options.email)) {
+    else if (!isAppOnlyAccessToken && (args.options.userId || args.options.userName || args.options.email)) {
       this.handleError(`The options 'userId', 'userName' and 'email' cannot be used when retrieving meeting attendance reports using delegated permissions`);
     }
 
     try {
       if (this.verbose) {
-        logger.logToStderr(`Retrieving attendance report for ${isAppOnlyAuth ? 'specific user' : 'currently logged in user'}`);
+        logger.logToStderr(`Retrieving attendance report for ${isAppOnlyAccessToken ? 'specific user' : 'currently logged in user'}`);
       }
 
       let requestUrl = `${this.resource}/v1.0/`;
-      if (isAppOnlyAuth) {
+      if (isAppOnlyAccessToken) {
         requestUrl += 'users/';
         if (args.options.userId) {
           requestUrl += args.options.userId;

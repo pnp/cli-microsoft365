@@ -1,10 +1,9 @@
 import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { v4 } from 'uuid';
-import auth from '../../../../Auth';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -56,11 +55,6 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
-
     try {
       const etag = await this.getTaskDetailsEtag(args.options.taskId);
       const body: PlannerTaskDetails = {
@@ -86,7 +80,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
       };
 
       const result = await request.patch<PlannerTaskDetails>(requestOptions);
-      if (args.options.output === 'json') {
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(result.checklist);
       }
       else {

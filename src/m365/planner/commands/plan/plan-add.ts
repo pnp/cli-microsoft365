@@ -1,10 +1,9 @@
 import { PlannerPlan, PlannerPlanDetails, User } from '@microsoft/microsoft-graph-types';
-import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
+import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { aadGroup } from '../../../../utils/aadGroup';
-import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -18,6 +17,7 @@ interface Options extends GlobalOptions {
   title: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
+  rosterId?: string;
   shareWithUserIds?: string;
   shareWithUserNames?: string;
 }
@@ -67,6 +67,9 @@ class PlannerPlanAddCommand extends GraphCommand {
         option: "--ownerGroupName [ownerGroupName]"
       },
       {
+        option: "--rosterId [rosterId]"
+      },
+      {
         option: '--shareWithUserIds [shareWithUserIds]'
       },
       {
@@ -96,27 +99,31 @@ class PlannerPlanAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['ownerGroupId', 'ownerGroupName'] });
+    this.optionSets.push({ options: ['ownerGroupId', 'ownerGroupName', 'rosterId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
-
     try {
-      const groupId = await this.getGroupId(args);
+      const data: any = {
+        title: args.options.title
+      };
+      if (args.options.rosterId) {
+        data.container = {
+          "url": `https://graph.microsoft.com/v1.0/planner/rosters/${args.options.rosterId}`
+        };
+      }
+      else {
+        const groupId = await this.getGroupId(args);
+        data.owner = groupId;
+      }
+
       const requestOptions: any = {
         url: `${this.resource}/v1.0/planner/plans`,
         headers: {
           'accept': 'application/json;odata.metadata=none'
         },
         responseType: 'json',
-        data: {
-          owner: groupId,
-          title: args.options.title
-        }
+        data: data
       };
 
       const newPlan = await request.post<any>(requestOptions);
@@ -124,6 +131,9 @@ class PlannerPlanAddCommand extends GraphCommand {
       logger.log(result);
     }
     catch (err: any) {
+      if (err.error && err.error.error.message === "You do not have the required permissions to access this item, or the item may not exist.") {
+        throw new CommandError("You can only add 1 plan to a Roster");
+      }
       this.handleRejectedODataJsonPromise(err);
     }
   }

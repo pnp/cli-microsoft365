@@ -5,7 +5,7 @@ import auth from '../Auth';
 import { Logger } from "../cli/Logger";
 import config from "../config";
 import { BasePermissions } from '../m365/spo/base-permissions';
-import request from "../request";
+import request, { CliRequestOptions } from "../request";
 import { formatting } from './formatting';
 
 export interface ContextInfo {
@@ -59,6 +59,12 @@ export interface SpoOperation {
 export interface IdentityResponse {
   objectIdentity: string;
   serverRelativeUrl: string;
+}
+
+export interface GraphFileDetails {
+  SiteId: string;
+  VroomDriveID: string;
+  VroomItemID: string;
 }
 
 export const spo = {
@@ -322,6 +328,25 @@ export const spo = {
   },
 
   /**
+   * Returns the Graph id of a site 
+   * @param webUrl web url e.g. https://contoso.sharepoint.com/sites/site1
+   */
+  async getSpoGraphSiteId(webUrl: string): Promise<string> {
+    const url = new URL(webUrl);
+
+    const requestOptions: CliRequestOptions = {
+      url: `https://graph.microsoft.com/v1.0/sites/${url.hostname}:${url.pathname}?$select=id`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const result = await request.get<{ id: string }>(requestOptions);
+    return result.id;
+  },
+
+  /**
    * Ensures the folder path exists
    * @param webFullUrl web full url e.g. https://contoso.sharepoint.com/sites/site1
    * @param folderToEnsure web relative or server relative folder path e.g. /Documents/MyFolder or /sites/site1/Documents/MyFolder
@@ -545,5 +570,36 @@ export const spo = {
         reject('Cannot proceed. Folder _ObjectIdentity_ not found'); // this is not suppose to happen
       }, (err: any): void => { reject(err); });
     });
+  },
+
+  /**
+   * Retrieves the SiteId, VroomItemId and VroomDriveId from a specific file.
+   * @param webUrl Web url
+   * @param fileId GUID ID of the file
+   * @param fileUrl Decoded URL of the file
+   */
+  async getVroomFileDetails(webUrl: string, fileId?: string, fileUrl?: string): Promise<GraphFileDetails> {
+    let requestUrl: string = `${webUrl}/_api/web/`;
+
+    if (fileUrl) {
+      const fileServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
+      requestUrl += `GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileServerRelativeUrl)}')`;
+    }
+    else {
+      requestUrl += `GetFileById('${fileId}')`;
+    }
+
+    requestUrl += '?$select=SiteId,VroomItemId,VroomDriveId';
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<GraphFileDetails>(requestOptions);
+    return res;
   }
 };

@@ -7,7 +7,6 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
@@ -128,7 +127,6 @@ describe(commands.BUCKET_ADD, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets` &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -167,8 +165,7 @@ describe(commands.BUCKET_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      accessToken.isAppOnlyAccessToken
+      request.post
     ]);
   });
 
@@ -332,18 +329,6 @@ describe(commands.BUCKET_ADD, () => {
         ownerGroupName: 'foo'
       }
     }), new CommandError(`The specified group 'foo' does not exist.`));
-  });
-
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: 'My Planner Bucket',
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
-      }
-    }), new CommandError('This command does not support application permissions.'));
   });
 
   it('correctly handles API OData error', async () => {
