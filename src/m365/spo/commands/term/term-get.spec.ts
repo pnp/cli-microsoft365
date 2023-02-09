@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import * as os from 'os';
 import * as sinon from 'sinon';
 import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
@@ -213,6 +214,9 @@ describe(commands.TERM_GET, () => {
 
   it('correctly handles multiple terms not found by name', async () => {
     const childItems = [{ "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmtEP0Wk4LJvk+y0GrLwtClew==", "CreatedDate": "\/Date(1675790717780)\/", "Id": "\/Guid(9316fd10-c982-4fbe-b2d0-6acbc2d0a57b)\/", "LastModifiedDate": "\/Date(1675790717780)\/", "Name": "Test Child Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": false, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Term;Test Child Term", "TermsCount": 0 }, { "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "b50094a0-80a4-6000-110c-b074a0d4c336|fec14c62-7c3b-481b-851b-c80d7802b224:te:kTm3XibpGUiE5nxBtVMTf25aOnte4ElDn7uvWBPvXfjuQ1jPsltwT78ny15SLpmtNXuY\u002fJxmJ0m9jOekcLeh2w==", "CreatedDate": "\/Date(1675795608853)\/", "Id": "\/Guid(fc987b35-669c-4927-bd8c-e7a470b7a1db)\/", "LastModifiedDate": "\/Date(1675795608853)\/", "Name": "Test Child Term", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|joe@contoso.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Test Child Term", "TermsCount": 0 }];
+    const disambiguationText = childItems.map(c => {
+      return `- ${c.Id.replace('/Guid(', '').replace(')/', '')} - ${c.PathOfTerm}`;
+    }).join(os.EOL);
 
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery' &&
@@ -231,7 +235,7 @@ describe(commands.TERM_GET, () => {
         termGroupId: termGroupId,
         termSetId: termSetId
       }
-    } as any), new CommandError(`Multiple terms with the specific term name found. The ids are: ${childItems.map(t => t.Id.replace('/Guid(', '').replace(')/', '')).join(', ')}`));
+    } as any), new CommandError(`Multiple terms with the specific term name found. Please disambiguate:${os.EOL}${disambiguationText}`));
   });
 
   it('correctly handles term not found by id', async () => {
@@ -352,4 +356,5 @@ describe(commands.TERM_GET, () => {
 
     await assert.rejects(command.action(logger, { options: { name: termName, termGroupName: termGroupName, termSetName: termSetName } } as any), new CommandError('getRequestDigest error'));
   });
+
 });

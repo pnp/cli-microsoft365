@@ -9,6 +9,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { Term } from './Term';
 import { TermCollection } from './TermCollection';
+import * as os from 'os';
 
 interface CommandArgs {
   options: Options;
@@ -146,7 +147,11 @@ class SpoTermGetCommand extends SpoCommand {
           throw `Term with name '${args.options.name}' could not be found.`;
         }
         if (terms._Child_Items_.length > 1) {
-          throw `Multiple terms with the specific term name found. The ids are: ${terms._Child_Items_.map(t => this.replaceTermId(t.Id)).join(', ')}`;
+          const disambiguationText = terms._Child_Items_.map(c => {
+            return `- ${this.replaceTermId(c.Id)} - ${c.PathOfTerm}`;
+          }).join(os.EOL);
+
+          throw new Error(`Multiple terms with the specific term name found. Please disambiguate:${os.EOL}${disambiguationText}`);
         }
         term = terms._Child_Items_[0];
       }
