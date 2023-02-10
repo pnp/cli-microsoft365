@@ -6,8 +6,7 @@ import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { odata } from '../../../../utils/odata';
-import { formatting } from '../../../../utils/formatting';
-import { User } from '@microsoft/microsoft-graph-types';
+import { aadUser } from '../../../../utils/aadUser';
 
 
 interface CommandArgs {
@@ -86,65 +85,40 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr('Removing a member from a Microsoft Planner Roster');
+      logger.logToStderr('Removing member ${name || id} from a Microsoft Planner Roster');
     }
 
     if (args.options.confirm) {
-      await this.removeRosterMember(args, logger);
+      await this.removeRosterMember(args);
     }
     else {
-      const rosterMembers = await this.getRosterMembers(args);
-      let message = '';
-      if (rosterMembers === 1) {
-        message = `Are you sure you want to remove the last member from the roster '${args.options.rosterId}'?`;
-      }
-      else {
-        message = `Are you sure you want to remove member '${args.options.userId || args.options.userName}'?`;
-      }
       const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: message
+        message: `Are you sure you want to remove member '${args.options.userId || args.options.userName}'?`
       });
 
       if (result.continue) {
-        await this.removeRosterMember(args, logger);
+        const rosterMembersContinue = await this.getRosterMembersContinue(args);
+        if (rosterMembersContinue) {
+          await this.removeRosterMember(args);
+        }
       }
     }
   }
 
-  private async getUserId(logger: Logger, args: CommandArgs): Promise<string> {
-    if (this.verbose) {
-      logger.logToStderr("Getting the user ID");
-    }
-
+  private async getUserId(args: CommandArgs): Promise<string> {
     if (args.options.userId) {
       return args.options.userId;
     }
 
-    const requestUrl: string = `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(args.options.userName as string)}'`;
-
-    const requestOptions: any = {
-      url: requestUrl,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const res = await request.get<{ value: User[] }>(requestOptions);
-
-    if (res.value.length === 0) {
-      throw `The specified user with user name ${args.options.userName} does not exist`;
-    }
-
-    return res.value[0].id!;
+    return aadUser.getUserId(args.options.userName!);
   }
 
-  private async removeRosterMember(args: CommandArgs, logger: Logger): Promise<void> {
+  private async removeRosterMember(args: CommandArgs): Promise<void> {
     try {
-      const userId = await this.getUserId(logger, args);
+      const userId = await this.getUserId(args);
 
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/beta/planner/rosters/${args.options.rosterId}/members/${userId}`,
@@ -161,9 +135,20 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
     }
   }
 
-  private async getRosterMembers(args: CommandArgs): Promise<number> {
-    const response = await odata.getAllItems(`${this.resource}/beta/planner/rosters/${args.options.rosterId}/members`);
-    return response.length;
+  private async getRosterMembersContinue(args: CommandArgs): Promise<boolean> {
+    const rosterMembers = await odata.getAllItems(`${this.resource}/beta/planner/rosters/${args.options.rosterId}/members?$select=Id`);
+    if (rosterMembers.length === 1) {
+      const result = await Cli.prompt<{ continue: boolean }>({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the last member from the roster '${args.options.rosterId}'?`
+      });
+
+      return result.continue;
+    }
+
+    return true;
   }
 }
 

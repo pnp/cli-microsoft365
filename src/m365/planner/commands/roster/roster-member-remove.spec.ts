@@ -8,7 +8,6 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
-import { powerPlatform } from '../../../../utils/powerPlatform';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
@@ -23,20 +22,22 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
   const rosterMemberResponse = {
     value: [
       {
-        id: "78ccf530-bbf0-47e4-aae6-da5f8c6fb142",
-        userId: "78ccf530-bbf0-47e4-aae6-da5f8c6fb142",
-        tenantId: "0cac6cda-2e04-4a3d-9c16-9c91470d7022",
-        roles: []
+        id: "78ccf530-bbf0-47e4-aae6-da5f8c6fb142"
       },
       {
-        id: "eb77fbcf-6fe8-458b-985d-1747284793bc",
-        userId: "eb77fbcf-6fe8-458b-985d-1747284793bc",
-        tenantId: "0cac6cda-2e04-4a3d-9c16-9c91470d7022",
-        roles: []
+        id: "eb77fbcf-6fe8-458b-985d-1747284793bc"
       }
     ]
   };
-  const userResponse = { value: [{ "id": validUserId, "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": validUserName }] };
+
+  const singleRosterMemberResponse = {
+    value: [
+      {
+        id: "78ccf530-bbf0-47e4-aae6-da5f8c6fb142"
+      }
+    ]
+  };
+  const userResponse = { value: [{ "id": validUserId }] };
   //#endregion
 
   let log: string[];
@@ -77,7 +78,6 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     sinonUtil.restore([
       request.delete,
       request.get,
-      powerPlatform.getDynamicsInstanceApiUrl,
       Cli.prompt
     ]);
   });
@@ -121,7 +121,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
 
   it('prompts before removing the specified roster member when confirm option not passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
         return rosterMemberResponse;
       }
 
@@ -145,7 +145,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
 
   it('prompts before removing the last roster member when confirm option not passed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
         return ({ value: [rosterMemberResponse.value[0]] });
       }
 
@@ -171,7 +171,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     const postSpy = sinon.spy(request, 'delete');
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
         return rosterMemberResponse;
       }
 
@@ -191,13 +191,13 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
-  it('removes the specified roster member when prompt confirmed', async () => {
+  it('removes the last specified roster member when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) {
         return userResponse;
       }
 
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
         return rosterMemberResponse;
       }
 
@@ -216,6 +216,43 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        rosterId: validRosterId,
+        userName: validUserName
+      }
+    });
+    assert(loggerLogToStderrSpy.called);
+  });
+
+  it('removes the specified roster member when prompt confirmed', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) {
+        return userResponse;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
+        return singleRosterMemberResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members/${validUserId}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
     await command.action(logger, {
       options: {
         debug: true,
@@ -232,7 +269,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
         return;
       }
 
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
         return rosterMemberResponse;
       }
 
@@ -252,7 +289,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
 
   it('fails to get user for roster when user with provided user name does not exists', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'`) > -1) {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) > -1) {
         return ({ value: [] });
       }
 
