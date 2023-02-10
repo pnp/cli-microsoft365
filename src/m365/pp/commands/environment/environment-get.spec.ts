@@ -7,33 +7,20 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./environment-get');
 
 describe(commands.ENVIRONMENT_GET, () => {
-  const name = '5ca1c616-6060-46ba-abc1-18d312f1cb3a';
-  const environmentResponse: any = {
-    "value": [
-      {
-        "id": `/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/${name}`,
-        "type": "Microsoft.BusinessAppPlatform/scopes/environments",
-        "location": "unitedstates",
-        "name": `${name}`,
-        "properties": {
-          "displayName": "My Power Platform Environment",
-          "isDefault": false
-        }
-      },
-      {
-        "id": `/providers/Microsoft.BusinessAppPlatform/environments/Default-de347bc8-1aeb-4406-8cb3-97db021cadb4`,
-        "type": "Microsoft.BusinessAppPlatform/environments",
-        "location": "unitedstates",
-        "name": "Default-de347bc8-1aeb-4406-8cb3-97db021cadb4",
-        "properties": {
-          "displayName": "contoso (default)",
-          "isDefault": true
-        }
-      }
-    ]
+  const environmentName = 'Default-de347bc8-1aeb-4406-8cb3-97db021cadb4';
+  const environmentResponse = {
+    "id": `/providers/Microsoft.BusinessAppPlatform/environments/Default-de347bc8-1aeb-4406-8cb3-97db021cadb4`,
+    "type": "Microsoft.BusinessAppPlatform/environments",
+    "location": "unitedstates",
+    "name": "Default-de347bc8-1aeb-4406-8cb3-97db021cadb4",
+    "properties": {
+      "displayName": "contoso (default)",
+      "isDefault": true
+    }
   };
 
   let log: string[];
@@ -88,30 +75,6 @@ describe(commands.ENVIRONMENT_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['name', 'id']);
   });
 
-  it('correctly handles no environments', async () => {
-    const errorMessage = 'The specified Power Platform environment does not exist';
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments?api-version=2020-10-01`) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return {
-            value: []
-          };
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        name: name
-      }
-    }), new CommandError(errorMessage));
-  });
-
   it('correctly handles API OData error', async () => {
     const errorMessage = `Resource '' does not exist or one of its queried reference-property objects are not present`;
     sinon.stub(request, 'get').callsFake(async () => {
@@ -121,14 +84,14 @@ describe(commands.ENVIRONMENT_GET, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: true,
-        name: name
+        name: environmentName
       }
     }), new CommandError(errorMessage));
   });
 
   it('retrieves Microsoft Power Platform environment by name', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments?api-version=2020-10-01`) {
+      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${formatting.encodeQueryParameter(environmentName)}?api-version=2020-10-01`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -141,33 +104,16 @@ describe(commands.ENVIRONMENT_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: true,
-        name: name
+        name: environmentName,
+        verbose: true
       }
     });
-    assert(loggerLogSpy.calledWith(environmentResponse.value[0]));
+    assert(loggerLogSpy.calledWith(environmentResponse));
   });
 
   it('retrieves default Microsoft Power Platform environment', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments?api-version=2020-10-01`) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return environmentResponse;
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, { options: {} });
-    assert(loggerLogSpy.calledWith(environmentResponse.value[1]));
-  });
-
-  it('retrieves Microsoft Power Platform environment as Admin', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2020-10-01`) {
+      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/~Default?api-version=2020-10-01`) {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -180,12 +126,33 @@ describe(commands.ENVIRONMENT_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: true,
+        verbose: true
+      }
+    });
+    assert(loggerLogSpy.calledWith(environmentResponse));
+  });
+
+  it('retrieves Microsoft Power Platform environment as Admin', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/${formatting.encodeQueryParameter(environmentName)}?api-version=2020-10-01`) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
+          return environmentResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        name: environmentName,
         asAdmin: true,
-        name: name
+        verbose: true
       }
     });
 
-    assert(loggerLogSpy.calledWith(environmentResponse.value[0]));
+    assert(loggerLogSpy.calledWith(environmentResponse));
   });
 });
