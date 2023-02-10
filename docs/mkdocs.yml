@@ -404,6 +404,7 @@ nav:
         - cdn policy list: cmd/spo/cdn/cdn-policy-list.md
         - cdn policy set: cmd/spo/cdn/cdn-policy-set.md
       - commandset:
+        - commandset add: cmd/spo/commandset/commandset-add.md
         - commandset get: cmd/spo/commandset/commandset-get.md
         - commandset list: cmd/spo/commandset/commandset-list.md
         - commandset remove: cmd/spo/commandset/commandset-remove.md
