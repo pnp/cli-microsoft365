@@ -1,15 +1,13 @@
-import { Cli } from '../../../../cli/Cli';
-import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
+import request, { CliRequestOptions } from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
+import { spo } from '../../../../utils/spo';
 import GlobalOptions from '../../../../GlobalOptions';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import * as SpoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get';
-import * as SpoListItemListCommand from '../listitem/listitem-list';
-import { Options as SpoListItemListCommandOptions } from '../listitem/listitem-list';
-import { ListItemInstance } from '../listitem/ListItemInstance';
+import { ListItemInstanceCollection } from '../listitem/ListItemInstanceCollection';
 
 interface CommandArgs {
   options: Options;
@@ -84,45 +82,64 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(SpoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'json', debug: args.options.debug, verbose: args.options.verbose, _: [] } });
-    const appCatalogUrl: string | undefined = JSON.parse(spoTenantAppCatalogUrlGetCommandOutput.stdout);
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      console.log(`${spoUrl}/_api/SP_TenantSettings_Current`);
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/SP_TenantSettings_Current`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        }
+      };
 
-    if (!appCatalogUrl) {
-      throw new CommandError('No app catalog URL found');
+      const res: string = await request.get(requestOptions);
+      const json = JSON.parse(res);
+      console.log(json);
+      const appCatalogUrl: string | undefined = json.CorporateCatalogUrl;
+
+      if (!appCatalogUrl) {
+        throw 'No app catalog URL found';
+      }
+
+      let filter: string = '';
+      if (args.options.title) {
+        filter = `Title eq '${args.options.title}'`;
+      }
+      else if (args.options.id) {
+        filter = `GUID eq '${args.options.id}'`;
+      }
+      else if (args.options.clientSideComponentId) {
+        filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
+      }
+
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
+      console.log(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=${filter}`);
+      const reqOptions: CliRequestOptions = {
+        url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=${filter}`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const listItemInstances = await request.get<ListItemInstanceCollection>(reqOptions);
+      console.log(listItemInstances);
+      listItemInstances.value.forEach(v => delete v['ID']);
+      console.log(listItemInstances);
+
+      if (listItemInstances.value.length === 0) {
+        throw 'The specified application customizer was not found';
+      }
+
+      if (listItemInstances.value.length > 1) {
+        throw `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} was found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.GUID).join(', ')}`;
+      }
+
+      logger.log(listItemInstances.value[0]);
     }
-
-    let filter: string = '';
-    if (args.options.title) {
-      filter = `Title eq '${args.options.title}'`;
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
-    else if (args.options.id) {
-      filter = `GUID eq '${args.options.id}'`;
-    }
-    else if (args.options.clientSideComponentId) {
-      filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
-    }
-
-    const options: SpoListItemListCommandOptions = {
-      output: 'json',
-      debug: args.options.debug,
-      verbose: args.options.verbose,
-      listUrl: '/lists/TenantWideExtensions',
-      webUrl: appCatalogUrl,
-      filter: filter
-    };
-
-    const spoListItemGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(SpoListItemListCommand as Command, { options: { ...options, _: [] } });
-    const listItemOutput = JSON.parse(spoListItemGetCommandOutput.stdout) as ListItemInstance[];
-
-    if (listItemOutput.length === 0) {
-      throw new CommandError('The specified application customizer was not found');
-    }
-
-    if (listItemOutput.length > 1) {
-      throw new CommandError(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} was found. Please disambiguate (IDs): ${listItemOutput.map(item => item.GUID).join(', ')}`);
-    }
-
-    logger.log(listItemOutput[0]);
   }
 }
 
