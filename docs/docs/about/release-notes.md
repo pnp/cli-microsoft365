@@ -21,6 +21,7 @@
 - [purview auditlog list](../cmd/purview/auditlog/auditlog-list.md) - lists audit logs within your tenant [#4232](https://github.com/pnp/cli-microsoft365/issues/4232)
 - [purview retentionevent get](../cmd/purview/retentionevent/retentionevent-get.md) - gets a retention event [#4372](https://github.com/pnp/cli-microsoft365/issues/4372)
 - [purview retentionevent list](../cmd/purview/retentionevent/retentionevent-list.md) - lists retention event [#4371](https://github.com/pnp/cli-microsoft365/issues/4371)
+- [purview retentionevent remove](../cmd/purview/retentionevent/retentionevent-remove.md) - removes a retention event [#4374](https://github.com/pnp/cli-microsoft365/issues/4374)
 - [purview retentioneventtype add](../cmd/purview/retentioneventtype/retentioneventtype-add.md) - adds a retention event type [#4341](https://github.com/pnp/cli-microsoft365/issues/4341)
 - [purview retentioneventtype get](../cmd/purview/retentioneventtype/retentioneventtype-get.md) - gets a retention event type [#4339](https://github.com/pnp/cli-microsoft365/issues/4339)
 - [purview retentioneventtype list](../cmd/purview/retentioneventtype/retentioneventtype-list.md) - lists retention event types [#4334](https://github.com/pnp/cli-microsoft365/issues/4334)
@@ -61,6 +62,9 @@
 - enhanced 'spo sitedesign add' with the option 'thumbnailUrl'. [#4453](https://github.com/pnp/cli-microsoft365/issues/4453)
 - fixed planner plan remove command by title [#4464](https://github.com/pnp/cli-microsoft365/issues/4464)
 - enhanced 'planner plan set' [#4404](https://github.com/pnp/cli-microsoft365/issues/4404)
+- improved 'planner plan get' rosterId handling [#4465](https://github.com/pnp/cli-microsoft365/issues/4465)
+- refactored customaction commands to query get/list through a util class [#4327](https://github.com/pnp/cli-microsoft365/issues/4327)
+- enhanced documentation for 'login', 'logout', 'request', 'status', 'version' [#4474](https://github.com/pnp/cli-microsoft365/issues/4474)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
