@@ -21,6 +21,7 @@ nav:
     - Automate your CI/CD workflow using CLI GitHub Actions: user-guide/github-actions.md
     - Manage Microsoft 365 apps with the CLI: user-guide/manage-microsoft-365-apps.md
     - Use CLI programmatically: user-guide/use-cli-api.md
+    - Use CLI for Microsoft 365 context: user-guide/using-cli-context.md
   - Commands:
     - cmd/login.md
     - cmd/logout.md
