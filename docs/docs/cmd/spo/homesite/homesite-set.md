@@ -13,7 +13,7 @@ m365 spo homesite set [options]
 `-u, --siteUrl <siteUrl>`
 : The URL of the site to set as Home Site
 
-`-v, --VivaConnectionsDefaultStart [VivaConnectionsDefaultStart]`
+`-v, --vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]`
 : When set to true, the VivaConnectionsDefaultStart parameter will keep the Viva Connections landing experience to the SharePoint home site. If set to false, the Viva Connections home experience will be used. 
 
 --8<-- "docs/cmd/_global.md"
