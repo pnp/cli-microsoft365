@@ -4,12 +4,17 @@
 
 ### New commands
 
+**Context:**
+
+- [context option list](../cmd/context/option/option-list.md) - list all options added to the context [#4044](https://github.com/pnp/cli-microsoft365/issues/4044)
+
 **Planner:**
 
 - [planner roster add](../cmd/planner/roster/roster-add.md) - creates a new Microsoft Planner Roster [#4389](https://github.com/pnp/cli-microsoft365/issues/4389)
 - [planner roster remove](../cmd/planner/roster/roster-remove.md) - removes a Microsoft Planner Roster [#4390](https://github.com/pnp/cli-microsoft365/issues/4390)
 - [planner roster member add](../cmd/planner/roster/roster-member-add.md) - adds a user to a Microsoft Planner Roster [#4392](https://github.com/pnp/cli-microsoft365/issues/4392)
 - [planner roster member list](../cmd/planner/roster/roster-member-list.md) - lists members of the specified Microsoft Planner Roster [#4391](https://github.com/pnp/cli-microsoft365/issues/4391)
+- [planner roster get](../cmd/planner/roster/roster-get.md) - gets information about the specific Microsoft Planner Roster [#4395](https://github.com/pnp/cli-microsoft365/issues/4395)
 
 **Purview:**
 
@@ -29,6 +34,7 @@
 - [spo file sharinglink set](../cmd/spo/file/file-sharinglink-set.md) - updates a sharing link of a file [#4026](https://github.com/pnp/cli-microsoft365/issues/4026)
 - [spo navigation node set](../cmd/spo/navigation/navigation-node-set.md) - updates a SharePoint navigation node [#4416](https://github.com/pnp/cli-microsoft365/issues/4416)
 - [spo tenant applicationcustomizer add](../cmd/spo/tenant/tenant-applicationcustomizer-add.md) - adds an application customizer as a tenant wide extension [#4220](https://github.com/pnp/cli-microsoft365/issues/4220)
+- [spo navigation node get](../cmd/spo/navigation/navigation-node-get.md) - gets information about a specific navigation node [#4414](https://github.com/pnp/cli-microsoft365/issues/4414)
 
 **SharePoint Framework:**
 
@@ -54,6 +60,7 @@
 - fixed 'planner task add' that always returns 'hasDescription: false [#4406](https://github.com/pnp/cli-microsoft365/issues/4406)
 - enhanced 'spo sitedesign add' with the option 'thumbnailUrl'. [#4453](https://github.com/pnp/cli-microsoft365/issues/4453)
 - fixed planner plan remove command by title [#4464](https://github.com/pnp/cli-microsoft365/issues/4464)
+- enhanced 'planner plan set' [#4404](https://github.com/pnp/cli-microsoft365/issues/4404)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
