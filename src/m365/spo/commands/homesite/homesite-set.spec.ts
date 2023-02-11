@@ -121,7 +121,7 @@ describe(commands.HOMESITE_SET, () => {
     await command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/Work",
-        VivaConnectionsDefaultStart: true
+        vivaConnectionsDefaultStart: true
       }
     } as any);
     assert(loggerLogSpy.calledWith('The Home site has been set to https://contoso.sharepoint.com/sites/Work and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details.'));
