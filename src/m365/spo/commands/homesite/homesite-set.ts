@@ -14,7 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   siteUrl: string;
-  VivaConnectionsDefaultStart?: boolean;
+  vivaConnectionsDefaultStart?: boolean;
 }
 
 class SpoHomeSiteSetCommand extends SpoCommand {
@@ -31,6 +31,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
 
     this.#initOptions();
     this.#initValidators();
+    this.#initTypes();
   }
 
   #initOptions(): void {
@@ -39,7 +40,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '-v, --VivaConnectionsDefaultStart [VivaConnectionsDefaultStart]'
+        option: '--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]'
       }
     );
   }
@@ -50,13 +51,17 @@ class SpoHomeSiteSetCommand extends SpoCommand {
     );
   }
 
+  #initTypes(): void {
+    this.types.boolean.push('vivaConnectionsDefaultStart');
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       const reqDigest = await spo.getRequestDigest(spoAdminUrl);
       let requestData: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">`;
-      if (args.options.VivaConnectionsDefaultStart) {
-        requestData += `<Actions><Method Name="ValidateMultipleHomeSitesParameterExists" Id="85" ObjectPathId="81"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="ValidateVivaHomeParameterExists" Id="86" ObjectPathId="81"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetSPHSiteWithConfigurations" Id="87" ObjectPathId="81"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.siteUrl)}</Parameter><Parameter Type="Boolean">${args.options.VivaConnectionsDefaultStart}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="81" Name="b6e793a0-e066-6000-3c4a-cb1f897402b4|908bed80-a04a-4433-b4a0-883d9847d110:d872ec63-6bea-4678-9429-078f4fa93560&#xA;Tenant" /></ObjectPaths></Request>`;
+      if (args.options.vivaConnectionsDefaultStart) {
+        requestData += `<Actions><Method Name="ValidateMultipleHomeSitesParameterExists" Id="85" ObjectPathId="81"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="ValidateVivaHomeParameterExists" Id="86" ObjectPathId="81"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetSPHSiteWithConfigurations" Id="87" ObjectPathId="81"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.siteUrl)}</Parameter><Parameter Type="Boolean">${args.options.vivaConnectionsDefaultStart}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="81" Name="b6e793a0-e066-6000-3c4a-cb1f897402b4|908bed80-a04a-4433-b4a0-883d9847d110:d872ec63-6bea-4678-9429-078f4fa93560&#xA;Tenant" /></ObjectPaths></Request>`;
       }
       else {
         requestData += `<Actions><ObjectPath Id="57" ObjectPathId="56" /><Method Name="SetSPHSite" Id="58" ObjectPathId="56"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.siteUrl)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="56" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`;
