@@ -85,7 +85,7 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr('Removing member ${name || id} from a Microsoft Planner Roster');
+      logger.logToStderr(`Removing member ${args.options.userName || args.options.userId} from a Microsoft Planner Roster`);
     }
 
     if (args.options.confirm) {
@@ -100,10 +100,7 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
       });
 
       if (result.continue) {
-        const rosterMembersContinue = await this.getRosterMembersContinue(args);
-        if (rosterMembersContinue) {
-          await this.removeRosterMember(args);
-        }
+        await this.removeRosterMember(args);
       }
     }
   }
@@ -113,39 +110,44 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
       return args.options.userId;
     }
 
-    return aadUser.getUserId(args.options.userName!);
+    return aadUser.getUserIdByUpn(args.options.userName!);
   }
 
   private async removeRosterMember(args: CommandArgs): Promise<void> {
     try {
-      const userId = await this.getUserId(args);
+      const rosterMembersContinue = await this.removeLastMemberConfirmation(args);
+      if (rosterMembersContinue) {
+        const userId = await this.getUserId(args);
 
-      const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/beta/planner/rosters/${args.options.rosterId}/members/${userId}`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
+        const requestOptions: CliRequestOptions = {
+          url: `${this.resource}/beta/planner/rosters/${args.options.rosterId}/members/${userId}`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
 
-      await request.delete(requestOptions);
+        await request.delete(requestOptions);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async getRosterMembersContinue(args: CommandArgs): Promise<boolean> {
-    const rosterMembers = await odata.getAllItems(`${this.resource}/beta/planner/rosters/${args.options.rosterId}/members?$select=Id`);
-    if (rosterMembers.length === 1) {
-      const result = await Cli.prompt<{ continue: boolean }>({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the last member from the roster '${args.options.rosterId}'?`
-      });
+  private async removeLastMemberConfirmation(args: CommandArgs): Promise<boolean> {
+    if (!args.options.confirm) {
+      const rosterMembers = await odata.getAllItems(`${this.resource}/beta/planner/rosters/${args.options.rosterId}/members?$select=Id`);
+      if (rosterMembers.length === 1) {
+        const result = await Cli.prompt<{ continue: boolean }>({
+          type: 'confirm',
+          name: 'continue',
+          default: false,
+          message: `Are you sure you want to remove the last member from the roster '${args.options.rosterId}'? When the last user is removed, the Roster and all its contents will be deleted within 30 days`
+        });
 
-      return result.continue;
+        return result.continue;
+      }
     }
 
     return true;

@@ -9,7 +9,6 @@ const validUserName = "john.doe@contoso.onmicrosoft.com";
 const validUserId = "2056d2f6-3257-4253-8cfc-b73393e414e5";
 const userResponse = { value: [{ "id": validUserId }] };
 
-
 describe('utils/aadGroup', () => {
   afterEach(() => {
     sinonUtil.restore([
@@ -26,7 +25,7 @@ describe('utils/aadGroup', () => {
       return 'Invalid Request';
     });
 
-    const actual = await aadUser.getUserId(validUserName);
+    const actual = await aadUser.getUserIdByUpn(validUserName);
     assert.strictEqual(actual, validUserId);
   });
 
@@ -36,16 +35,10 @@ describe('utils/aadGroup', () => {
         return ({ value: [] });
       }
 
-      throw `The specified user with user name ${validUserName} does not exist`;
+      throw `Invalid request`;
     });
 
-    try {
-      await aadUser.getUserId(validUserName);
-      assert.fail('Error expected, but was not thrown.');
-    }
-    catch (ex) {
-      assert.deepStrictEqual(ex, Error(`The specified user with user name ${validUserName} does not exist`));
-    }
+    await assert.rejects(aadUser.getUserIdByUpn(validUserName), `User not found`);
   });
 
 }); 

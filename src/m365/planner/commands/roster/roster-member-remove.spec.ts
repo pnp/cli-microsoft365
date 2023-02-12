@@ -120,14 +120,6 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
   });
 
   it('prompts before removing the specified roster member when confirm option not passed', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
-        return rosterMemberResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
     await command.action(logger, {
       options: {
         rosterId: validRosterId,
@@ -144,9 +136,25 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
   });
 
   it('prompts before removing the last roster member when confirm option not passed', async () => {
+    let secondPromptOptions: any;
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
+      if (options.message === `Are you sure you want to remove member '${validUserId}'?`) {
+        return (
+          { continue: true }
+        );
+      }
+      else {
+        secondPromptOptions = options;
+        return (
+          { continue: false }
+        );
+      }
+    });
+
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
-        return ({ value: [rosterMemberResponse.value[0]] });
+        return (singleRosterMemberResponse);
       }
 
       throw 'Invalid request';
@@ -155,28 +163,21 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
     await command.action(logger, {
       options: {
         rosterId: validRosterId,
-        userid: validUserId
+        userId: validUserId
       }
     });
+
     let promptIssued = false;
 
-    if (promptOptions && promptOptions.type === 'confirm') {
+    if (secondPromptOptions && secondPromptOptions.type === 'confirm' && secondPromptOptions.message === `Are you sure you want to remove the last member from the roster '${validRosterId}'? When the last user is removed, the Roster and all its contents will be deleted within 30 days`) {
       promptIssued = true;
     }
 
     assert(promptIssued);
   });
 
-  it('aborts removing the specified specified roster member when confirm option not passed and prompt not confirmed', async () => {
+  it('aborts removing the specified roster member when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
-        return rosterMemberResponse;
-      }
-
-      throw 'Invalid request';
-    });
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
@@ -192,42 +193,6 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
   });
 
   it('removes the last specified roster member when prompt confirmed', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) {
-        return userResponse;
-      }
-
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
-        return rosterMemberResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members/${validUserId}`) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        rosterId: validRosterId,
-        userName: validUserName
-      }
-    });
-    assert(loggerLogToStderrSpy.called);
-  });
-
-  it('removes the specified roster member when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) {
         return userResponse;
@@ -255,7 +220,43 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: true,
+        verbose: true,
+        rosterId: validRosterId,
+        userName: validUserName
+      }
+    });
+    assert(loggerLogToStderrSpy.called);
+  });
+
+  it('removes the specified roster member when prompt confirmed', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) {
+        return userResponse;
+      }
+
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
+        return rosterMemberResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members/${validUserId}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await command.action(logger, {
+      options: {
+        verbose: true,
         rosterId: validRosterId,
         userName: validUserName
       }
@@ -269,40 +270,18 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
         return;
       }
 
-      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members?$select=Id`) {
-        return rosterMemberResponse;
-      }
-
       throw 'Invalid request';
     });
 
     await command.action(logger, {
       options: {
-        debug: true,
+        verbose: true,
         rosterId: validRosterId,
         userId: validUserId,
         confirm: true
       }
     });
     assert(loggerLogToStderrSpy.called);
-  });
-
-  it('fails to get user for roster when user with provided user name does not exists', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) > -1) {
-        return ({ value: [] });
-      }
-
-      throw `The specified user with user name ${validUserName} does not exist`;
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        rosterId: validRosterId,
-        userName: validUserName,
-        confirm: true
-      }
-    }), new CommandError(`The specified user with user name ${validUserName} does not exist`));
   });
 
   it('correctly handles random API error', async () => {

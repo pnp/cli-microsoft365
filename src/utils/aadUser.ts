@@ -1,18 +1,16 @@
-import request from "../request";
+import request, { CliRequestOptions } from "../request";
 import { formatting } from "./formatting";
 
 const graphResource = 'https://graph.microsoft.com';
 
 export const aadUser = {
   /**
-   * Retrieve a single group.
-   * @param id Group ID.
+   * Retrieve a single user.
+   * @param id User ID.
    */
-  async getUserId(userName: string): Promise<string> {
-    const requestUrl: string = `${graphResource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(userName)}'&$select=Id`;
-
-    const requestOptions: any = {
-      url: requestUrl,
+  async getUserIdByUpn(upn: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
+      url: `${graphResource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(upn)}'&$select=Id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -22,7 +20,7 @@ export const aadUser = {
     const res = await request.get<{ value: { id: string }[] }>(requestOptions);
 
     if (res.value.length === 0) {
-      throw Error(`The specified user with user name ${userName} does not exist`);
+      throw `The specified user with user name ${upn} does not exist`;
     }
 
     return res.value[0].id;
