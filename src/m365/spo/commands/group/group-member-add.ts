@@ -284,7 +284,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       logger.logToStderr(aadGroupGetOutput.stderr);
     }
 
-    validUserNames.push(JSON.parse(aadGroupGetOutput.stdout).mail);
+    validUserNames.push(JSON.parse(aadGroupGetOutput.stdout).id);
   }
 
   private async spoUserGet(options: Options, userIdentifier: string, logger: Logger, validUserNames: string[]): Promise<void> {
