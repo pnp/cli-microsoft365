@@ -660,5 +660,25 @@ export const spo = {
 
     const customActionOnSite = await getById(webUrl, id, "Site");
     return customActionOnSite;
+  },
+
+  /**
+   * Retrieves an spo user from a SharePoint site by Id.
+   * @param webUrl Web url
+   * @param id The Id of the user
+   */
+  async getUserById(webUrl: string, id: string): Promise<any> {
+    const requestOptions: any = {
+      url: `${webUrl}/_api/web/siteusers/GetById('${formatting.encodeQueryParameter(id)}')`,
+      method: 'GET',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<any>(requestOptions);
+
+    return res;
   }
 };

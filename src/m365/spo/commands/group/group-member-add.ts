@@ -1,20 +1,14 @@
-import { Cli } from '../../../../cli/Cli';
-import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
-import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
-import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
-import * as AadGroupGetCommand from '../../../aad/commands/group/group-get';
-import { Options as AadGroupGetCommandOptions } from '../../../aad/commands/group/group-get';
-import * as SpoUserGetCommand from '../user/user-get';
-import { Options as SpoUserGetCommandOptions } from '../user/user-get';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { aadUser } from '../../../../utils/aadUser';
 import { SharingResult } from './SharingResult';
+import { aadGroup } from '../../../../utils/aadGroup';
+import { spo } from '../../../../utils/spo';
 
 interface CommandArgs {
   options: Options;
@@ -163,9 +157,6 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       };
 
       const sharingResult = await request.post<SharingResult>(requestOptions);
-      if (sharingResult.ErrorMessage !== null) {
-        throw sharingResult.ErrorMessage;
-      }
 
       logger.log(sharingResult.UsersAddedToGroup);
     }
@@ -211,102 +202,53 @@ class SpoGroupMemberAddCommand extends SpoCommand {
 
     const validUserNames: string[] = [];
     const invalidUserNames: string[] = [];
-    const userIdentifiers: string = args.options.userName || args.options.email || args.options.aadGroupId! || args.options.aadGroupName! || args.options.userId!.toString();
+    const identifiers: string = args.options.userName || args.options.email || args.options.aadGroupId! || args.options.aadGroupName! || args.options.userId!.toString();
 
     return Promise
-      .all(userIdentifiers.split(',').map(async userIdentifier => {
-        const user = userIdentifier.trim();
+      .all(identifiers.split(',').map(async identifier => {
+        const trimmedIdentifier = identifier.trim();
         try {
           if (args.options.userId) {
-            await this.spoUserGet(args.options, user, logger, validUserNames);
+            if (this.verbose) {
+              logger.logToStderr(`Get UPN from SharePoint for user ${trimmedIdentifier}`);
+            }
+            const spoUser = await spo.getUserById(args.options.webUrl, trimmedIdentifier);
+            validUserNames.push(spoUser.UserPrincipalName);
           }
-          else if (args.options.aadGroupId || args.options.aadGroupName) {
-            await this.aadGroupGet(args.options, user, logger, validUserNames);
+          else if (args.options.userName) {
+            validUserNames.push(trimmedIdentifier);
+          }
+          else if (args.options.aadGroupId) {
+            validUserNames.push(trimmedIdentifier);
+          }
+          else if (args.options.aadGroupName) {
+            if (this.verbose) {
+              logger.logToStderr(`Get UPN from Azure AD for group ${trimmedIdentifier}`);
+            }
+            const group = await aadGroup.getGroupByDisplayName(trimmedIdentifier);
+            validUserNames.push(group.id!);
           }
           else {
-            await this.aadUserGet(args.options, user, logger, validUserNames);
+            if (this.verbose) {
+              logger.logToStderr(`Get UPN from Azure AD for user ${trimmedIdentifier}`);
+            }
+            const upn = await aadUser.getUserUpnByEmail(trimmedIdentifier);
+            validUserNames.push(upn);
           }
         }
         catch (err: any) {
-          logger.logToStderr(err.stderr);
-          invalidUserNames.push(userIdentifier);
+          invalidUserNames.push(identifier);
 
           return err;
         }
       }))
       .then((): Promise<string[]> => {
         if (invalidUserNames.length > 0) {
-          return Promise.reject(`Users not added to the group because the following users don't exist: ${invalidUserNames.join(', ')}`);
+          return Promise.reject(`Resource not added to the group because the following resources don't exist: ${invalidUserNames.join(', ')}`);
         }
 
         return Promise.resolve(validUserNames);
       });
-  }
-
-  private async aadUserGet(options: Options, userIdentifier: string, logger: Logger, validUserNames: string[]): Promise<void> {
-    if (this.verbose) {
-      logger.logToStderr(`Get UPN from Azure AD for user ${userIdentifier}`);
-    }
-
-    const aadUserGetCommandoptions: AadUserGetCommandOptions = {
-      ...(options.userName && { userName: userIdentifier }),
-      ...(options.email && { email: userIdentifier }),
-      output: 'json',
-      debug: options.debug,
-      verbose: options.verbose
-    };
-
-    const aadUserGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...aadUserGetCommandoptions, _: [] } });
-
-    if (this.debug) {
-      logger.logToStderr(aadUserGetOutput.stderr);
-    }
-
-    validUserNames.push(JSON.parse(aadUserGetOutput.stdout).userPrincipalName);
-  }
-
-  private async aadGroupGet(options: Options, userIdentifier: string, logger: Logger, validUserNames: string[]): Promise<void> {
-    if (this.verbose) {
-      logger.logToStderr(`Get UPN from Azure AD for group ${userIdentifier}`);
-    }
-
-    const aadUserGetCommandoptions: AadGroupGetCommandOptions = {
-      ...(options.aadGroupId && { id: userIdentifier }),
-      ...(options.aadGroupName && { title: userIdentifier }),
-      output: 'json',
-      debug: options.debug,
-      verbose: options.verbose
-    };
-
-    const aadGroupGetOutput: CommandOutput = await Cli.executeCommandWithOutput(AadGroupGetCommand as Command, { options: { ...aadUserGetCommandoptions, _: [] } });
-
-    if (this.debug) {
-      logger.logToStderr(aadGroupGetOutput.stderr);
-    }
-
-    validUserNames.push(JSON.parse(aadGroupGetOutput.stdout).id);
-  }
-
-  private async spoUserGet(options: Options, userIdentifier: string, logger: Logger, validUserNames: string[]): Promise<void> {
-    if (this.verbose) {
-      logger.logToStderr(`Get UPN from SharePoint for user ${userIdentifier}`);
-    }
-
-    const spoUserGetCommandoptions: SpoUserGetCommandOptions = {
-      id: userIdentifier,
-      webUrl: options.webUrl,
-      output: 'json',
-      debug: options.debug,
-      verbose: options.verbose
-    };
-
-    const spoUserGetOutput: CommandOutput = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...spoUserGetCommandoptions, _: [] } });
-
-    if (this.debug) {
-      logger.logToStderr(spoUserGetOutput.stderr);
-    }
-
-    validUserNames.push(JSON.parse(spoUserGetOutput.stdout).UserPrincipalName);
   }
 
   private getFormattedUserList(activeUserList: string[]): any {
