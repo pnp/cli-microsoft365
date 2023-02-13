@@ -46,34 +46,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     ]
   };
 
-  const jsonGroupNotFound =
-  {
-    status: 404,
-    statusText: "Not Found",
-    error: {
-      "odata.error": {
-        code: "-2146232832, Microsoft.SharePoint.SPException",
-        message: {
-          lang: "en-US",
-          value: "Group cannot be found."
-        }
-      }
-    }
-  };
-
-  const jsonErrorResponseInvalidUsers =
-  {
-    ErrorMessage: "Couldn't resolve the users.",
-    IconUrl: null,
-    InvitedUsers: null,
-    Name: null,
-    PermissionsPageRelativeUrl: null,
-    StatusCode: -9,
-    UniquelyPermissionedUsers: null,
-    Url: null,
-    UsersAddedToGroup: null
-  };
-
   const jsonGenericError =
   {
     ErrorMessage: "The selected permission level is not valid.",
@@ -87,87 +59,8 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     UsersAddedToGroup: null
   };
 
-  const userInformation: any =
-  {
-    businessPhones: [],
-    displayName: "Alex Wilber",
-    givenName: "Alex Wilber",
-    id: "59b75414-4511-4c65-86a3-b6f5cd806748",
-    jobTitle: "",
-    mail: "Alex.Wilber@contoso.com",
-    mobilePhone: null,
-    officeLocation: null,
-    preferredLanguage: null,
-    surname: "User",
-    userPrincipalName: "Alex.Wilber@contoso.com"
-  };
-
-  const spoUserInformation: any =
-  {
-    Id: 9,
-    IsHiddenInUI: false,
-    LoginName: "i:0#.f|membership|Alex.Wilber@contoso.com",
-    Title: "Alex Wilber",
-    PrincipalType: 1,
-    Email: "",
-    Expiration: "",
-    IsEmailAuthenticationGuestUser: false,
-    IsShareByEmailGuestUser: false,
-    IsSiteAdmin: false,
-    UserId: {
-      NameId: "10032002529a911c",
-      NameIdIssuer: "urn:federation:microsoftonline"
-    },
-    UserPrincipalName: "Alex.Wilber@contoso.com"
-  };
-
-  const azureGroupInformation: any = {
-    id: "56ca9023-3449-4e98-a96a-69e81a6f4983",
-    deletedDateTime: null,
-    classification: null,
-    createdDateTime: "2022-12-08T09:17:53Z",
-    creationOptions: [
-      "Team",
-      "ExchangeProvisioningFlags:3552"
-    ],
-    description: "azuregroupname",
-    displayName: "azuregroupname",
-    expirationDateTime: null,
-    groupTypes: [
-      "Unified"
-    ],
-    isAssignableToRole: null,
-    mail: "azuregroupname@contoso.onmicrosoft.com",
-    mailEnabled: true,
-    mailNickname: "azuregroupname",
-    membershipRule: null,
-    membershipRuleProcessingState: null,
-    onPremisesDomainName: null,
-    onPremisesLastSyncDateTime: null,
-    onPremisesNetBiosName: null,
-    onPremisesSamAccountName: null,
-    onPremisesSecurityIdentifier: null,
-    onPremisesSyncEnabled: null,
-    preferredDataLocation: null,
-    preferredLanguage: null,
-    proxyAddresses: [
-      "SPO:SPO_0cfa47ca-d4f4-44d6-ac7d-b83e815b3184@SPO_0cac6cda-2e04-4a3d-9c16-9c91470d7022",
-      "SMTP:john.doe@contoso.onmicrosoft.com"
-    ],
-    renewedDateTime: "2022-12-08T09:17:53Z",
-    resourceBehaviorOptions: [
-      "HideGroupInOutlook",
-      "SubscribeMembersToCalendarEventsDisabled",
-      "WelcomeEmailDisabled"
-    ],
-    resourceProvisioningOptions: [
-      "Team"
-    ],
-    securityEnabled: false,
-    securityIdentifier: "S-1-12-1-1456115747-1318597705-3899222697-2202627866",
-    theme: null,
-    visibility: "Public",
-    onPremisesProvisioningErrors: []
+  const groupResponse = {
+    Id: 32
   };
 
   before(() => {
@@ -198,8 +91,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      Cli.executeCommandWithOutput
+      request.post
     ]);
   });
 
@@ -353,11 +245,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('adds user to a SharePoint Group by groupId and userName', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
-      stdout: JSON.stringify(userInformation),
-      stderr: ''
-    }));
-
     sinon.stub(request, 'post').callsFake(opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
         opts.data) {
@@ -366,15 +253,14 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
-    sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')`) {
-        return Promise.resolve({
-          Id: 32
-        });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
+        return groupResponse;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw 'Invalid request';
     });
+
     await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
@@ -386,11 +272,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('adds user to a SharePoint Group by groupId and userId (Debug)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
-      stdout: JSON.stringify(spoUserInformation),
-      stderr: ''
-    }));
-
     sinon.stub(request, 'post').callsFake(opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
         opts.data) {
@@ -400,10 +281,17 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/siteusers/GetById('9')?$select=AadObjectId`) {
         return Promise.resolve({
-          Id: 32
+          AadObjectId: {
+            NameId: '6cc1797e-5463-45ec-bb1a-b93ec198bab6',
+            NameIdIssuer: 'urn:federation:microsoftonline'
+          }
         });
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
+        return Promise.resolve(groupResponse);
       }
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
@@ -420,21 +308,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('adds user to a SharePoint Group by groupId and userName (Debug)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
-      stdout: JSON.stringify(userInformation),
-      stderr: ''
-    }));
-
-    sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')`) {
-        return Promise.resolve({
-          Id: 32
-        });
-      }
-
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
-    });
-
     sinon.stub(request, 'post').callsFake(opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
         opts.data) {
@@ -443,6 +316,15 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
+        return groupResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
     await command.action(logger, {
       options: {
         debug: true,
@@ -455,12 +337,11 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('adds user to a SharePoint Group by groupName and email (DEBUG)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
-      stdout: JSON.stringify(userInformation),
-      stderr: ''
-    }));
-
     sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq 'Alex.Wilber%40contoso.com'&$select=id`) {
+        return Promise.resolve({ value: [{ id: "2056d2f6-3257-4253-8cfc-b73393e414e5" }] });
+      }
+
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetByName(`) > -1) {
         return Promise.resolve({
           Id: 7
@@ -489,11 +370,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('adds user to a SharePoint Group by groupId and aadGroupId (Debug)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
-      stdout: JSON.stringify(azureGroupInformation),
-      stderr: ''
-    }));
-
     sinon.stub(request, 'post').callsFake(opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
         opts.data) {
@@ -502,15 +378,15 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
-    sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')`) {
-        return Promise.resolve({
-          Id: 32
-        });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
+        return groupResponse;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw 'Invalid request';
     });
+
     await command.action(logger, {
       options: {
         debug: true,
@@ -523,11 +399,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('adds user to a SharePoint Group by groupId and aadGroupName (Debug)', async () => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
-      stdout: JSON.stringify(azureGroupInformation),
-      stderr: ''
-    }));
-
     sinon.stub(request, 'post').callsFake(opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
         opts.data) {
@@ -537,10 +408,16 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
         return Promise.resolve({
-          Id: 32
+          value: [{
+            id: 'Group name'
+          }]
         });
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
+        return Promise.resolve(groupResponse);
       }
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
@@ -557,11 +434,13 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   });
 
   it('fails to get group when does not exists', async () => {
+    const errorMessage = 'The specified group does not exist in the SharePoint site';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetByName('`) > -1) {
-        return Promise.resolve({});
+        return Promise.reject({ error: { 'odata.error': { message: { value: errorMessage } } } });
       }
-      return Promise.reject('The specified group not exist in the SharePoint site');
+
+      return Promise.reject('Invalid request');
     });
 
     await assert.rejects(command.action(logger, {
@@ -571,45 +450,17 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         groupName: "Contoso Site Owners",
         email: "Alex.Wilber@contoso.com"
       }
-    }), new CommandError(`The specified group does not exist in the SharePoint site`));
+    }), new CommandError(errorMessage));
   });
 
-  it('handles error when adding user to a SharePoint Group - Invalid Group', async () => {
+  it('handles generic error when adding user to a SharePoint Group by groupId and userName', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('`) > -1) {
-        return Promise.reject(jsonGroupNotFound);
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/siteusers/GetById('9')`) {
+        return Promise.reject(`User not found`);
       }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
 
-    });
-    await assert.rejects(command.action(logger, {
-      options: {
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 99999999,
-        userName: "Alex.Wilber@contoso.com"
-      }
-    }), new CommandError("Group cannot be found."));
-  });
-
-  it('handles error when adding user to a SharePoint Group ID - Username Does Not exist', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('4')`) {
-        return Promise.resolve({
-          Id: 4
-        });
-      }
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
-    });
-
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.reject({
-      error: `Resource 'Alex.Wilber@invalidcontoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present.`,
-      stderr: `Resource 'Alex.Wilber@invalidcontoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present. stderr`
-    }));
-
-    sinon.stub(request, 'post').callsFake(opts => {
-      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
-        opts.data) {
-        return Promise.resolve(jsonErrorResponseInvalidUsers);
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
+        return Promise.resolve(groupResponse);
       }
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
@@ -619,28 +470,13 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 4,
-        userName: "Alex.Wilber@invalidcontoso.onmicrosoft.com"
+        groupId: 32,
+        userId: 9
       }
-    }), new CommandError(`Users not added to the group because the following users don't exist: Alex.Wilber@invalidcontoso.onmicrosoft.com`));
+    }), new CommandError(`Resource '9' does not exist.`));
   });
 
-  it('Handles generic error when adding user to a SharePoint Group by groupId and userName', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')`) {
-        return Promise.resolve({
-          Id: 32
-        });
-      }
-
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
-    });
-
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
-      stdout: JSON.stringify(userInformation),
-      stderr: ''
-    }));
-
+  it('handles error when adding user to SharePoint Group group', async () => {
     sinon.stub(request, 'post').callsFake(opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
         opts.data) {
@@ -650,39 +486,20 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        userName: "Alex.Wilber@contoso.com"
-      }
-    }), new CommandError(`The selected permission level is not valid.`));
-  });
-
-  it('Handles generic error when adding user to a SharePoint Group by groupId and userId', async () => {
-    sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')`) {
-        return Promise.resolve({
-          Id: 32
-        });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')?$select=Id`) {
+        return groupResponse;
       }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+      throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.reject({
-      error: `User cannot be found`,
-      stderr: `User cannot be found`
-    }));
-
     await assert.rejects(command.action(logger, {
       options: {
-        debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
-        userId: 19
+        userName: 'Alex.Wilber@contoso.com'
       }
-    }), new CommandError(`Users not added to the group because the following users don't exist: 19`));
+    }), new CommandError('The selected permission level is not valid.'));
   });
 });

@@ -16,11 +16,31 @@ export const aadUser = {
       },
       responseType: 'json'
     };
-
     const res = await request.get<{ value: { id: string }[] }>(requestOptions);
 
     if (res.value.length === 0) {
       throw Error(`The specified user with user name ${upn} does not exist.`);
+    }
+
+    return res.value[0].id;
+  },
+
+  /**
+  * Retrieve the ID of a user by its email.
+  * @param mail User email.
+  */
+  async getUserIdByEmail(email: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
+      url: `${graphResource}/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(email)}'&$select=id`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+    const res = await request.get<{ value: { id: string }[] }>(requestOptions);
+
+    if (res.value.length === 0) {
+      throw Error(`The specified user with email ${email} does not exist`);
     }
 
     return res.value[0].id;

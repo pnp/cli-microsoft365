@@ -909,6 +909,24 @@ describe('utils/spo', () => {
     assert.deepEqual(customAction, customActionOnSiteResponse1);
   });
 
+  it(`retrieves Azure AD ID by SPO user ID sucessfully`, async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/siteusers/GetById('9')?$select=AadObjectId`) {
+        return {
+          AadObjectId: {
+            NameId: '6cc1797e-5463-45ec-bb1a-b93ec198bab6',
+            NameIdIssuer: 'urn:federation:microsoftonline'
+          }
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const customAction = await spo.getUserAzureIdBySpoId('https://contoso.sharepoint.com/sites/sales', '9');
+    assert.deepEqual(customAction, '6cc1797e-5463-45ec-bb1a-b93ec198bab6');
+  });
+
   it(`throws error retrieving a custom action by id with a wrong scope value`, async () => {
     try {
       await spo.getCustomActionById('https://contoso.sharepoint.com/sites/sales', 'd1e5e0d6-109d-40c4-a53e-924073fe9bbd', 'Invalid');

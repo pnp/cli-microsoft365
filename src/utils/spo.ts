@@ -675,5 +675,24 @@ export const spo = {
 
     const result = await request.get<{ CorporateCatalogUrl: string }>(requestOptions);
     return result.CorporateCatalogUrl;
+  },
+
+  /**
+   * Retrieves the Azure AD ID from a SP user.
+   * @param webUrl Web url
+   * @param id The Id of the user
+   */
+  async getUserAzureIdBySpoId(webUrl: string, id: string): Promise<any> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/web/siteusers/GetById('${formatting.encodeQueryParameter(id)}')?$select=AadObjectId`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<{ AadObjectId: { NameId: string, NameIdIssuer: string } }>(requestOptions);
+
+    return res.AadObjectId.NameId;
   }
 };
