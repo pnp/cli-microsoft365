@@ -1824,6 +1824,11 @@ const sidebars: SidebarsConfig = {
               type: 'doc',
               label: 'threatassessment get',
               id: 'cmd/purview/threatassessment/threatassessment-get'
+            },
+            {
+              type: 'doc',
+              label: 'threatassessment list',
+              id: 'cmd/purview/threatassessment/threatassessment-list'
             }
           ]
         }
