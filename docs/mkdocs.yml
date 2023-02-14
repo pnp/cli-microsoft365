@@ -53,6 +53,8 @@ nav:
       - groupsettingtemplate:
         - groupsettingtemplate get: cmd/aad/groupsettingtemplate/groupsettingtemplate-get.md
         - groupsettingtemplate list: cmd/aad/groupsettingtemplate/groupsettingtemplate-list.md
+      - license:
+        - license list: cmd/aad/license/license-list.md
       - o365group:
         - o365group add: cmd/aad/o365group/o365group-add.md
         - o365group get: cmd/aad/o365group/o365group-get.md
