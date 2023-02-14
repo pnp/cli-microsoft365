@@ -36,7 +36,7 @@ m365 aad user recyclebinitem list
         "officeLocation": "Washington",
         "preferredLanguage": "nl-BE",
         "surname": "John",
-        "userPrincipalName": "7e06b56615f340138bf879874d52e68a277@contoso.com",
+        "userPrincipalName": "7e06b56615f340138bf879874d52e68ajohn@contoso.com",
         "id": "7e06b566-15f3-4013-8bf8-79874d52e68a"
       }
     ]
@@ -47,14 +47,14 @@ m365 aad user recyclebinitem list
     ```text
     id                                    displayName  userPrincipalName
     ------------------------------------  -----------  -----------------------------------------------
-    7e06b566-15f3-4013-8bf8-79874d52e68a  John Doe     7e06b56615f340138bf879874d52e68a277@contoso.com
+    7e06b566-15f3-4013-8bf8-79874d52e68a  John Doe     7e06b56615f340138bf879874d52e68ajohn@contoso.com
     ```
 
 === "CSV"
 
     ```csv
     id,displayName,userPrincipalName
-    7e06b566-15f3-4013-8bf8-79874d52e68a,John Doe,7e06b56615f340138bf879874d52e68a277@contoso.com
+    7e06b566-15f3-4013-8bf8-79874d52e68a,John Doe,7e06b56615f340138bf879874d52e68ajohn@contoso.com
     ```
 
 === "Markdown"
@@ -77,6 +77,6 @@ m365 aad user recyclebinitem list
     officeLocation | Washington
     preferredLanguage | nl-BE
     surname | John
-    userPrincipalName | 7e06b56615f340138bf879874d52e68a277@contoso.com
+    userPrincipalName | 7e06b56615f340138bf879874d52e68ajohn@contoso.com
     id | 7e06b566-15f3-4013-8bf8-79874d52e68a
     ```
