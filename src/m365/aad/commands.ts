@@ -60,6 +60,7 @@ export default {
   USER_LIST: `${prefix} user list`,
   USER_PASSWORD_VALIDATE: `${prefix} user password validate`,
   USER_RECYCLEBINITEM_CLEAR: `${prefix} user recyclebinitem clear`,
+  USER_RECYCLEBINITEM_LIST: `${prefix} user recyclebinitem list`,
   USER_RECYCLEBINITEM_REMOVE: `${prefix} user recyclebinitem remove`,
   USER_REMOVE: `${prefix} user remove`,
   USER_SET: `${prefix} user set`,
