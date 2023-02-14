@@ -59,6 +59,7 @@ export default {
   USER_HIBP: `${prefix} user hibp`,
   USER_LIST: `${prefix} user list`,
   USER_PASSWORD_VALIDATE: `${prefix} user password validate`,
+  USER_RECYCLEBINITEM_CLEAR: `${prefix} user recyclebinitem clear`,
   USER_SET: `${prefix} user set`,
   USER_SIGNIN_LIST: `${prefix} user signin list`
 };
