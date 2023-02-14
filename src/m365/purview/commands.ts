@@ -19,5 +19,6 @@ export default {
   SENSITIVITYLABEL_GET: `${prefix} sensitivitylabel get`,
   SENSITIVITYLABEL_LIST: `${prefix} sensitivitylabel list`,
   SENSITIVITYLABEL_POLICYSETTINGS_LIST: `${prefix} sensitivitylabel policysettings list`,
-  THREATASSESSMENT_GET: `${prefix} threatassessment get`
+  THREATASSESSMENT_GET: `${prefix} threatassessment get`,
+  THREATASSESMENT_LIST: `${prefix} threatassessment list`
 };
