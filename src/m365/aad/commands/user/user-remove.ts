@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class PpCardRemoveCommand extends GraphCommand {
+class AadUserRemoveCommand extends GraphCommand {
 
   public get name(): string {
     return commands.USER_REMOVE;
@@ -117,4 +117,4 @@ class PpCardRemoveCommand extends GraphCommand {
   }
 }
 
-module.exports = new PpCardRemoveCommand();
+module.exports = new AadUserRemoveCommand();
