@@ -11,7 +11,7 @@ import { odata } from '../../../../utils/odata';
 const command: Command = require('./user-recyclebinitem-list');
 
 describe(commands.USER_RECYCLEBINITEM_LIST, () => {
-  const deletedUsersResponse = [{ "id": "4c099956-ca9a-4e60-ad5f-3f8447122706" }];
+  const deletedUsersResponse = [{ "businessPhones": [], "displayName": "John Doe", "givenName": "John Doe", "jobTitle": "Developer", "mail": "john@contoso.com", "mobilePhone": "0476345130", "officeLocation": "Washington", "preferredLanguage": "nl-BE", "surname": "John", "userPrincipalName": "7e06b56615f340138bf879874d52e68a277@contoso.com", "id": "7e06b566-15f3-4013-8bf8-79874d52e68a" }];
   const graphGetUrl = 'https://graph.microsoft.com/v1.0/directory/deletedItems/microsoft.graph.user';
 
   let log: string[];
