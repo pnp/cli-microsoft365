@@ -16,16 +16,16 @@ const command: Command = require('./roster-member-remove');
 describe(commands.ROSTER_MEMBER_REMOVE, () => {
   let commandInfo: CommandInfo;
   //#region Mocked Responses
-  const validRosterId = "iryDKm9VLku2HIoC2G-TX5gABJw0";
-  const validUserId = "2056d2f6-3257-4253-8cfc-b73393e414e5";
-  const validUserName = "john.doe@contoso.com";
+  const validRosterId = 'iryDKm9VLku2HIoC2G-TX5gABJw0';
+  const validUserId = '2056d2f6-3257-4253-8cfc-b73393e414e5';
+  const validUserName = 'john.doe@contoso.com';
   const rosterMemberResponse = {
     value: [
       {
-        id: "78ccf530-bbf0-47e4-aae6-da5f8c6fb142"
+        id: '78ccf530-bbf0-47e4-aae6-da5f8c6fb142'
       },
       {
-        id: "eb77fbcf-6fe8-458b-985d-1747284793bc"
+        id: 'eb77fbcf-6fe8-458b-985d-1747284793bc'
       }
     ]
   };
@@ -33,17 +33,16 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
   const singleRosterMemberResponse = {
     value: [
       {
-        id: "78ccf530-bbf0-47e4-aae6-da5f8c6fb142"
+        id: '78ccf530-bbf0-47e4-aae6-da5f8c6fb142'
       }
     ]
   };
-  const userResponse = { value: [{ "id": validUserId }] };
+  const userResponse = { value: [{ 'id': validUserId }] };
   //#endregion
 
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -66,7 +65,6 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
       return { continue: false };
@@ -104,6 +102,16 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
       options: {
         rosterId: validRosterId,
         userId: 'Invalid GUID'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if userName is not a valid userName.', async () => {
+    const actual = await command.validate({
+      options: {
+        rosterId: validRosterId,
+        userName: 'John Doe'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -169,7 +177,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
 
     let promptIssued = false;
 
-    if (secondPromptOptions && secondPromptOptions.type === 'confirm' && secondPromptOptions.message === `Are you sure you want to remove the last member from the roster '${validRosterId}'? When the last user is removed, the Roster and all its contents will be deleted within 30 days`) {
+    if (secondPromptOptions && secondPromptOptions.type === 'confirm') {
       promptIssued = true;
     }
 
@@ -177,7 +185,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
   });
 
   it('aborts removing the specified roster member when confirm option not passed and prompt not confirmed', async () => {
-    const postSpy = sinon.spy(request, 'delete');
+    const deleteSpy = sinon.spy(request, 'delete');
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
@@ -189,7 +197,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
         userid: validUserId
       }
     });
-    assert(postSpy.notCalled);
+    assert(deleteSpy.notCalled);
   });
 
   it('removes the last specified roster member when prompt confirmed', async () => {
@@ -205,7 +213,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const deleteSpy = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members/${validUserId}`) {
         return;
       }
@@ -225,7 +233,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
         userName: validUserName
       }
     });
-    assert(loggerLogToStderrSpy.called);
+    assert(deleteSpy.called);
   });
 
   it('removes the specified roster member when prompt confirmed', async () => {
@@ -241,7 +249,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const deleteSpy = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members/${validUserId}`) {
         return;
       }
@@ -261,11 +269,11 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
         userName: validUserName
       }
     });
-    assert(loggerLogToStderrSpy.called);
+    assert(deleteSpy.called);
   });
 
   it('removes the specified roster member without confirmation prompt', async () => {
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const deleteSpy = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/members/${validUserId}`) {
         return;
       }
@@ -281,7 +289,7 @@ describe(commands.ROSTER_MEMBER_REMOVE, () => {
         confirm: true
       }
     });
-    assert(loggerLogToStderrSpy.called);
+    assert(deleteSpy.called);
   });
 
   it('correctly handles random API error', async () => {

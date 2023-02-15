@@ -5,8 +5,8 @@ const graphResource = 'https://graph.microsoft.com';
 
 export const aadUser = {
   /**
-   * Retrieve a single user.
-   * @param id User ID.
+   * Retrieve the id of the user.
+   * @param upn User UPN.
    */
   async getUserIdByUpn(upn: string): Promise<string> {
     const requestOptions: CliRequestOptions = {
@@ -20,7 +20,7 @@ export const aadUser = {
     const res = await request.get<{ value: { id: string }[] }>(requestOptions);
 
     if (res.value.length === 0) {
-      throw `The specified user with user name ${upn} does not exist`;
+      throw Error(`The specified user with user name ${upn} does not exist`);
     }
 
     return res.value[0].id;

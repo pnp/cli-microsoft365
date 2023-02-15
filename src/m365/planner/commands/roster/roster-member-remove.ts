@@ -78,6 +78,10 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
           return `${args.options.userId} is not a valid GUID`;
         }
 
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid userName`;
+        }
+
         return true;
       }
     );
@@ -85,7 +89,7 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Removing member ${args.options.userName || args.options.userId} from a Microsoft Planner Roster`);
+      logger.logToStderr(`Removing member ${args.options.userName || args.options.userId} from the Microsoft Planner Roster`);
     }
 
     if (args.options.confirm) {
@@ -143,7 +147,7 @@ class PlannerRosterMemberRemoveCommand extends GraphCommand {
           type: 'confirm',
           name: 'continue',
           default: false,
-          message: `Are you sure you want to remove the last member from the roster '${args.options.rosterId}'? When the last user is removed, the Roster and all its contents will be deleted within 30 days`
+          message: `You are about to remove the last member of this Roster.  When this happens, the Roster and all its contents will be deleted within 30 days. Are you sure you want to proceed?`
         });
 
         return result.continue;

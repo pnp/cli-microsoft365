@@ -1,22 +1,22 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import request from "../request";
+import request from '../request';
 import { aadUser } from './aadUser';
 import { formatting } from './formatting';
 import { sinonUtil } from "./sinonUtil";
 
-const validUserName = "john.doe@contoso.onmicrosoft.com";
-const validUserId = "2056d2f6-3257-4253-8cfc-b73393e414e5";
-const userResponse = { value: [{ "id": validUserId }] };
+const validUserName = 'john.doe@contoso.onmicrosoft.com';
+const validUserId = '2056d2f6-3257-4253-8cfc-b73393e414e5';
+const userResponse = { value: [{ 'id': validUserId }] };
 
-describe('utils/aadGroup', () => {
+describe('utils/aadUser', () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get
     ]);
   });
 
-  it('correctly get a single user by id.', async () => {
+  it('correctly get a single user by upn.', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) {
         return userResponse;
@@ -29,16 +29,16 @@ describe('utils/aadGroup', () => {
     assert.strictEqual(actual, validUserId);
   });
 
-  it('throws error message when no user was found using userName', async () => {
+  it('throws error message when no user was found with a specific upn', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) {
         return ({ value: [] });
       }
 
       throw `Invalid request`;
     });
 
-    await assert.rejects(aadUser.getUserIdByUpn(validUserName), `User not found`);
+    await assert.rejects(aadUser.getUserIdByUpn(validUserName), Error(`The specified user with user name ${validUserName} does not exist`));
   });
 
 }); 
