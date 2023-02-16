@@ -72,6 +72,10 @@ class AadUserGetCommand extends GraphCommand {
           return `${args.options.id} is not a valid GUID`;
         }
 
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid userName`;
+        }
+
         return true;
       }
     );
