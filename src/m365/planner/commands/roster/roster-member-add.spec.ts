@@ -90,6 +90,16 @@ describe(commands.ROSTER_MEMBER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation when userName is not a valid upn', async () => {
+    const actual = await command.validate({
+      options: {
+        rosterId: validRosterId,
+        userName: 'Invalid upn'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if required options specified (id)', async () => {
     const actual = await command.validate({ options: { rosterId: validRosterId, userId: validUserId } }, commandInfo);
     assert.strictEqual(actual, true);
