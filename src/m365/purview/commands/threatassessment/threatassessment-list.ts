@@ -24,7 +24,7 @@ class PurviewThreatassesmentCommand extends GraphCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['Id', 'contentType', 'category'];
+    return ['id', 'contentType', 'category'];
   }
 
   constructor() {
@@ -74,8 +74,30 @@ class PurviewThreatassesmentCommand extends GraphCommand {
     }
 
     try {
-      const items = await odata.getAllItems<any>(url);
-      logger.log(items);
+      const items = await odata.getAllItems<any>(url, 'minimal');
+      if (args.options.type) {
+        let type: string;
+        switch (args.options.type) {
+          case 'mail':
+            type = '#microsoft.graph.mailAssessmentRequest';
+            break;
+          case 'file':
+            type = '#microsoft.graph.fileAssessmentRequest';
+            break;
+          case 'emailFile':
+            type = '#microsoft.graph.emailFileAssessmentRequest';
+            break;
+          case 'url':
+            type = '#microsoft.graph.urlAssessmentRequest';
+            break;
+        }
+
+        const filteredItems = items.filter(item => item['@odata.type'] === type);
+        logger.log(filteredItems);
+      }
+      else {
+        logger.log(items);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
