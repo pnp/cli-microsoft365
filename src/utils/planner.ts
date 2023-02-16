@@ -51,13 +51,10 @@ export const planner = {
    * @param groupId Owner group ID.
    * @param rosterId Roster ID.
    */
-  async getPlanByTitle(title: string, groupId?: string, rosterId?: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan> {
+  async getPlanByTitle(title: string, groupId?: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan> {
     let plans: PlannerPlan[] = [];
     if (groupId) {
       plans = await this.getPlansByGroupId(groupId, metadata);
-    }
-    else if (rosterId) {
-      plans = await this.getPlansByRosterId(rosterId, metadata);
     }
     const filteredPlans = plans.filter(p => p.title && p.title.toLowerCase() === title.toLowerCase());
 

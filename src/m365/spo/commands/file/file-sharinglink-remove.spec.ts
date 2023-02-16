@@ -9,7 +9,7 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { formatting } from '../../../../utils/formatting';
-import { GraphFileDetails } from './GraphFileDetails';
+import { GraphFileDetails } from '../../../../utils/spo';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';

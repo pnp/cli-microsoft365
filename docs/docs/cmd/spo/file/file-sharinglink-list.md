@@ -19,7 +19,7 @@ m365 spo file sharinglink list [options]
 `--fileId [fileId]`
 : The UniqueId (GUID) of the file. Specify either `fileUrl` or `fileId` but not both.
 
-`--scope [scope]`
+`-s, --scope [scope]`
 : Filter the results to only sharing links of a given scope: `anonymous`, `users` or `organization`. By default all sharing links are listed.
 
 --8<-- "docs/cmd/_global.md"

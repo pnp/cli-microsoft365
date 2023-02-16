@@ -11,7 +11,7 @@ import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { formatting } from '../../../../utils/formatting';
-import { GraphFileDetails } from './GraphFileDetails';
+import { GraphFileDetails } from '../../../../utils/spo';
 const command: Command = require('./file-sharinglink-add');
 
 describe(commands.FILE_SHARINGLINK_ADD, () => {

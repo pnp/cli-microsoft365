@@ -7,6 +7,8 @@ import config from "../config";
 import { BasePermissions } from '../m365/spo/base-permissions';
 import request, { CliRequestOptions } from "../request";
 import { formatting } from './formatting';
+import { CustomAction } from '../m365/spo/commands/customaction/customaction';
+import { odata } from './odata';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -59,6 +61,12 @@ export interface SpoOperation {
 export interface IdentityResponse {
   objectIdentity: string;
   serverRelativeUrl: string;
+}
+
+export interface GraphFileDetails {
+  SiteId: string;
+  VroomDriveID: string;
+  VroomItemID: string;
 }
 
 export const spo = {
@@ -564,5 +572,104 @@ export const spo = {
         reject('Cannot proceed. Folder _ObjectIdentity_ not found'); // this is not suppose to happen
       }, (err: any): void => { reject(err); });
     });
+  },
+
+  /**
+   * Retrieves the SiteId, VroomItemId and VroomDriveId from a specific file.
+   * @param webUrl Web url
+   * @param fileId GUID ID of the file
+   * @param fileUrl Decoded URL of the file
+   */
+  async getVroomFileDetails(webUrl: string, fileId?: string, fileUrl?: string): Promise<GraphFileDetails> {
+    let requestUrl: string = `${webUrl}/_api/web/`;
+
+    if (fileUrl) {
+      const fileServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, fileUrl);
+      requestUrl += `GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(fileServerRelativeUrl)}')`;
+    }
+    else {
+      requestUrl += `GetFileById('${fileId}')`;
+    }
+
+    requestUrl += '?$select=SiteId,VroomItemId,VroomDriveId';
+
+    const requestOptions: CliRequestOptions = {
+      url: requestUrl,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<GraphFileDetails>(requestOptions);
+    return res;
+  },
+
+  /**
+   * Retrieves a list of Custom Actions from a SharePoint site.
+   * @param webUrl Web url
+   * @param scope The scope of custom actions to retrieve, allowed values "Site", "Web" or "All".
+   * @param filter An OData filter query to limit the results.
+   */
+  async getCustomActions(webUrl: string, scope: string | undefined, filter?: string): Promise<CustomAction[]> {
+    if (scope && scope !== "All" && scope !== "Site" && scope !== "Web") {
+      throw `Invalid scope '${scope}'. Allowed values are 'Site', 'Web' or 'All'.`;
+    }
+
+    const queryString = filter ? `?$filter=${filter}` : "";
+
+    if (scope && scope !== "All") {
+      return await odata.getAllItems<CustomAction>(`${webUrl}/_api/${scope}/UserCustomActions${queryString}`);
+    }
+
+    const customActions = [
+      ...await odata.getAllItems<CustomAction>(`${webUrl}/_api/Site/UserCustomActions${queryString}`),
+      ...await odata.getAllItems<CustomAction>(`${webUrl}/_api/Web/UserCustomActions${queryString}`)
+    ];
+
+    return customActions;
+  },
+
+
+  /**
+   * Retrieves a Custom Actions from a SharePoint site by Id.
+   * @param webUrl Web url
+   * @param id The Id of the Custom Action
+   * @param scope The scope of custom actions to retrieve, allowed values "Site", "Web" or "All".
+   */
+  async getCustomActionById(webUrl: string, id: string, scope?: string): Promise<CustomAction | undefined> {
+    if (scope && scope !== "All" && scope !== "Site" && scope !== "Web") {
+      throw `Invalid scope '${scope}'. Allowed values are 'Site', 'Web' or 'All'.`;
+    }
+
+    async function getById(webUrl: string, id: string, scope: string): Promise<CustomAction | undefined> {
+      const requestOptions: any = {
+        url: `${webUrl}/_api/${scope}/UserCustomActions(guid'${id}')`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const result = await request.get<CustomAction>(requestOptions);
+
+      if (result["odata.null"] === true) {
+        return undefined;
+      }
+
+      return result;
+    }
+
+    if (scope && scope !== "All") {
+      return await getById(webUrl, id, scope);
+    }
+
+    const customActionOnWeb = await getById(webUrl, id, "Web");
+    if (customActionOnWeb) {
+      return customActionOnWeb;
+    }
+
+    const customActionOnSite = await getById(webUrl, id, "Site");
+    return customActionOnSite;
   }
 };

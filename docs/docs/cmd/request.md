@@ -74,3 +74,77 @@ Call the Microsoft Graph to get a profile photo.
 ```sh
 m365 request --url "https://graph.microsoft.com/beta/me/photo/\$value" --filePath ./profile-pic.jpg
 ```
+
+## Response
+
+The responses below are an example based on the `url` option with the value 'https://graph.microsoft.com/v1.0/me'. The output may differ based on the `url` options
+
+=== "JSON"
+
+    ```json
+    {
+      "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users/$entity",
+      "businessPhones": [
+        "123456789"
+      ],
+      "displayName": "John Doe",
+      "givenName": "John",
+      "jobTitle": null,
+      "mail": "john.doe@contoso.onmicrosoft.com",
+      "mobilePhone": null,
+      "officeLocation": null,
+      "preferredLanguage": "en-US",
+      "surname": "Doe",
+      "userPrincipalName": "john.doe@contoso.onmicrosoft.com",
+      "id": "1df1fffa-62b8-44a9-9c7c-49853f5b4ac6"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    @odata.context   : https://graph.microsoft.com/v1.0/$metadata#users/$entity
+    businessPhones   : ["123456789"]
+    displayName      : John Doe
+    givenName        : John
+    id               : 1df1fffa-62b8-44a9-9c7c-49853f5b4ac6
+    jobTitle         : null
+    mail             : john.doe@contoso.onmicrosoft.com
+    mobilePhone      : null
+    officeLocation   : null
+    preferredLanguage: en-US
+    surname          : Doe
+    userPrincipalName: john.doe@contoso.onmicrosoft.com
+    ```
+
+=== "CSV"
+
+    ```csv
+    @odata.context,businessPhones,displayName,givenName,jobTitle,mail,mobilePhone,officeLocation,preferredLanguage,surname,userPrincipalName,id
+    https://graph.microsoft.com/v1.0/$metadata#users/$entity,"[""123456789""]",John Doe,John,,john.doe@contoso.onmicrosoft.com,,,en-US,Doe,john.doe@contoso.onmicrosoft.com,1df1fffa-62b8-44a9-9c7c-49853f5b4ac6
+    ```
+
+=== "Markdown"
+
+    ```md
+    # request --url "https://graph.microsoft.com/v1.0/me" --method "get"
+
+    Date: 7/2/2023
+
+    ## John Doe (1df1fffa-62b8-44a9-9c7c-49853f5b4ac6)
+
+    Property | Value
+    ---------|-------
+    @odata.context | https://graph.microsoft.com/v1.0/$metadata#users/$entity
+    businessPhones | ["494594133"]
+    displayName | John Doe
+    givenName | John
+    jobTitle | null
+    mail | john.doe@contoso.onmicrosoft.com
+    mobilePhone | null
+    officeLocation | null
+    preferredLanguage | en-US
+    surname | Doe
+    userPrincipalName | john.doe@contoso.onmicrosoft.com
+    id | 1df1fffa-62b8-44a9-9c7c-49853f5b4ac6
+    ```
