@@ -50,12 +50,11 @@ class PaEnvironmentGetCommand extends PowerAppsCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const environmentName = args.options.name ? formatting.encodeQueryParameter(args.options.name) : "~default";
-
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about Microsoft Power Apps environment ${environmentName}...`);
+      logger.logToStderr(`Retrieving information about Microsoft Power Apps environment ${args.options.name || 'default'}...`);
     }
 
+    const environmentName = args.options.name ? formatting.encodeQueryParameter(args.options.name) : '~default';
     const requestOptions: any = {
       url: `${this.resource}/providers/Microsoft.PowerApps/environments/${environmentName}?api-version=2016-11-01`,
       headers: {
