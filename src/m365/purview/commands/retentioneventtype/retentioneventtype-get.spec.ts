@@ -84,6 +84,7 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
       pid.getProcessName
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {

@@ -108,6 +108,7 @@ describe(commands.RETENTIONEVENT_GET, () => {
       pid.getProcessName
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -163,6 +164,6 @@ describe(commands.RETENTIONEVENT_GET, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
 
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError(`This command currently does not support app only permissions.`));
+      new CommandError(`This command does not support application permissions.`));
   });
 });

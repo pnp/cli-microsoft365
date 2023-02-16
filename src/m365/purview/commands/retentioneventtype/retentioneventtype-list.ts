@@ -19,13 +19,11 @@ class PurviewRetentionEventTypeListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
+    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.');
+    }
+
     try {
-      const isAppOnlyAccessToken = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
-
-      if (isAppOnlyAccessToken) {
-        throw 'This command currently does not support app only permissions.';
-      }
-
       const items = await odata.getAllItems(`${this.resource}/beta/security/triggerTypes/retentionEventTypes`);
       logger.log(items);
     }
