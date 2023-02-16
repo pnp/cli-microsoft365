@@ -95,6 +95,7 @@ nav:
       - user:
         - user get: cmd/aad/user/user-get.md        
         - user hibp: cmd/aad/user/user-hibp.md
+        - user license: cmd/aad/user/user-license-add.md
         - user list: cmd/aad/user/user-list.md
         - user set: cmd/aad/user/user-set.md        
         - user guest add: cmd/aad/user/user-guest-add.md

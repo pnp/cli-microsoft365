@@ -64,8 +64,8 @@ class AadUserLicenseAddCommand extends GraphCommand {
           return `${args.options.userId} is not a valid GUID`;
         }
 
-        if (!validation.isValidGuid(args.options.id as string)) {
-          return `${args.options.id} is not a valid GUID`;
+        if (args.options.ids && args.options.ids.split(',').some(e => !validation.isValidGuid(e))) {
+          return `${args.options.ids} contains one or more invalid GUIDs`;
         }
 
         return true;
@@ -81,7 +81,7 @@ class AadUserLicenseAddCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const addLicenses = args.options.ids.split(',').map(x => { return { "disabledPlans": [], "skuId": x }; });
-    const requestBody = { "addLicenses": addLicenses };
+    const requestBody = { "addLicenses": addLicenses, "removeLicenses": [] };
 
     const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/users/${args.options.userId || args.options.userName}/assignLicense`,
