@@ -12,7 +12,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
 const command: Command = require('./threatassessment-list');
 
-describe(commands.THREATASSESMENT_LIST, () => {
+describe(commands.THREATASSESSMENT_LIST, () => {
   //#region Mocked Responses
   let commandInfo: CommandInfo;
   const threatAssesmentResponse: any = {
@@ -216,7 +216,7 @@ describe(commands.THREATASSESMENT_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.THREATASSESMENT_LIST);
+    assert.strictEqual(command.name, commands.THREATASSESSMENT_LIST);
   });
 
   it('has a description', () => {
