@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad user recyclebinitem clear](../cmd/aad/user/user-recyclebinitem-clear.md) - removes all users from the tenant recycle bin [#4501](https://github.com/pnp/cli-microsoft365/issues/4501)
+
 **Context:**
 
 - [context option list](../cmd/context/option/option-list.md) - list all options added to the context [#4044](https://github.com/pnp/cli-microsoft365/issues/4044)
@@ -11,10 +15,11 @@
 **Planner:**
 
 - [planner roster add](../cmd/planner/roster/roster-add.md) - creates a new Microsoft Planner Roster [#4389](https://github.com/pnp/cli-microsoft365/issues/4389)
+- [planner roster get](../cmd/planner/roster/roster-get.md) - gets information about the specific Microsoft Planner Roster [#4395](https://github.com/pnp/cli-microsoft365/issues/4395)
 - [planner roster remove](../cmd/planner/roster/roster-remove.md) - removes a Microsoft Planner Roster [#4390](https://github.com/pnp/cli-microsoft365/issues/4390)
 - [planner roster member add](../cmd/planner/roster/roster-member-add.md) - adds a user to a Microsoft Planner Roster [#4392](https://github.com/pnp/cli-microsoft365/issues/4392)
 - [planner roster member list](../cmd/planner/roster/roster-member-list.md) - lists members of the specified Microsoft Planner Roster [#4391](https://github.com/pnp/cli-microsoft365/issues/4391)
-- [planner roster get](../cmd/planner/roster/roster-get.md) - gets information about the specific Microsoft Planner Roster [#4395](https://github.com/pnp/cli-microsoft365/issues/4395)
+- [planner roster member remove](../cmd/planner/roster/roster-member-remove.md) - removes a member from a Microsoft Planner Roster [#4394](https://github.com/pnp/cli-microsoft365/issues/4394)
 
 **Purview:**
 
@@ -65,6 +70,8 @@
 - improved 'planner plan get' rosterId handling [#4465](https://github.com/pnp/cli-microsoft365/issues/4465)
 - refactored customaction commands to query get/list through a util class [#4327](https://github.com/pnp/cli-microsoft365/issues/4327)
 - enhanced documentation for 'login', 'logout', 'request', 'status', 'version' [#4474](https://github.com/pnp/cli-microsoft365/issues/4474)
+- enhanced purview commands to show an error when using application permissions [#4450](https://github.com/pnp/cli-microsoft365/issues/4450)
+- enhanced 'pa environment get' to retrieve the default environment [#4491](https://github.com/pnp/cli-microsoft365/issues/4491)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
@@ -136,7 +143,7 @@
 
 ### New commands
 
-**Azure AD:**
+**Azure Active Directory:**
 
 - [aad group get](../cmd/aad/group/group-get.md) - get information about a specified Azure AD Group [#3786](https://github.com/pnp/cli-microsoft365/issues/3786) 
 
