@@ -44,5 +44,23 @@ export const aadUser = {
     }
 
     return res.value[0].id;
+  },
+
+  /**
+   * Retrieve the UPN of a user by its ID.
+   * @param id User ID.
+   */
+  async getUpnByUserId(id: string): Promise<string> {
+    const requestOptions: CliRequestOptions = {
+      url: `${graphResource}/v1.0/users/${id}?$select=userPrincipalName`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<{ userPrincipalName: string }>(requestOptions);
+
+    return res.userPrincipalName;
   }
 };

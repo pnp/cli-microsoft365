@@ -298,6 +298,7 @@ export default {
   THEME_LIST: `${prefix} theme list`,
   THEME_REMOVE: `${prefix} theme remove`,
   THEME_SET: `${prefix} theme set`,
+  USER_ENSURE: `${prefix} user ensure`,
   USER_GET: `${prefix} user get`,
   USER_LIST: `${prefix} user list`,
   USER_REMOVE: `${prefix} user remove`,
