@@ -5,6 +5,7 @@ import { Logger } from '../cli/Logger';
 import request from '../request';
 import { sinonUtil } from '../utils/sinonUtil';
 import { FormDigestInfo, spo } from '../utils/spo';
+import { formatting } from './formatting';
 
 const stubPostResponses: any = (
   folderAddResp: any = null
@@ -945,5 +946,95 @@ describe('utils/spo', () => {
     catch (e) {
       assert.deepEqual(e, `Invalid scope 'Invalid'. Allowed values are 'Site', 'Web' or 'All'.`);
     }
+  });
+
+  //# region Retention Label Mock Responses
+  const retentionLabelResponse = {
+    value: [{
+      AcceptMessagesOnlyFromSendersOrMembers: false,
+      AccessType: null,
+      AllowAccessFromUnmanagedDevice: null,
+      AutoDelete: true,
+      BlockDelete: true,
+      BlockEdit: false,
+      ComplianceFlags: 1,
+      ContainsSiteLabel: false,
+      DisplayName: '',
+      EncryptionRMSTemplateId: null,
+      HasRetentionAction: true,
+      IsEventTag: true,
+      MultiStageReviewerEmail: null,
+      NextStageComplianceTag: null,
+      Notes: null,
+      RequireSenderAuthenticationEnabled: false,
+      ReviewerEmail: null,
+      SharingCapabilities: null,
+      SuperLock: false,
+      TagDuration: 2555,
+      TagId: 'f6e20c71-7d56-414d-bb98-8ee927a308bd',
+      TagName: 'Retention Label',
+      TagRetentionBasedOn: 'Retention Label Parent',
+      UnlockedAsDefault: false
+    }]
+  };
+
+  const retentionLabelOutput = {
+    complianceTag: 'Retention Label',
+    isEventBasedTag: true,
+    isTagPolicyHold: true,
+    isTagPolicyRecord: false,
+    isTagSuperLock: false,
+    isUnlockedAsDefault: false
+  };
+  //# endregion
+
+  it(`retrieves the web retention labels by name`, async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter('https://contoso.sharepoint.com/sites/sales')}'`) {
+        return retentionLabelResponse;
+      }
+
+      throw 'invalid request';
+    });
+
+    const retentionLabel = await spo.getWebRetentionLabelInformationByName('https://contoso.sharepoint.com/sites/sales', 'Retention Label');
+    assert.deepEqual(retentionLabel, retentionLabelOutput);
+  });
+
+  it('throws error message when no retention label was found by name', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter('https://contoso.sharepoint.com/sites/sales')}'`) {
+        return ({ value: [] });
+      }
+
+      throw `Invalid request`;
+    });
+
+    await assert.rejects(spo.getWebRetentionLabelInformationByName('https://contoso.sharepoint.com/sites/sales', 'Retention Label'), `Retention label not found`);
+  });
+
+  it(`retrieves the web retention labels by name`, async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter('https://contoso.sharepoint.com/sites/sales')}'`) {
+        return retentionLabelResponse;
+      }
+
+      throw 'invalid request';
+    });
+
+    const retentionLabel = await spo.getWebRetentionLabelInformationById('https://contoso.sharepoint.com/sites/sales', 'f6e20c71-7d56-414d-bb98-8ee927a308bd');
+    assert.deepEqual(retentionLabel, retentionLabelOutput);
+  });
+
+  it('throws error message when no retention label was found by id', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter('https://contoso.sharepoint.com/sites/sales')}'`) {
+        return ({ value: [] });
+      }
+
+      throw `Invalid request`;
+    });
+
+    await assert.rejects(spo.getWebRetentionLabelInformationById('https://contoso.sharepoint.com/sites/sales', 'f6e20c71-7d56-414d-bb98-8ee927a308bd'), `Retention label not found`);
   });
 });

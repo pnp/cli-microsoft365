@@ -22,6 +22,9 @@ m365 spo file retentionlabel ensure [options]
 `--name <name>`
 : Name of the retention label to apply to the file.
 
+`-a, --assetId [assetId]`
+: A Compliance Asset Id to set on the item after it's labeled. See below for more information.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -40,6 +43,12 @@ Applies a retention label to a file based on the label name and the fileId
 
 ```sh
 m365 spo file retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --fileId '26541f96-017c-4189-a604-599e083533b8'  --name 'Some label'
+```
+
+Applies a event-based retention label to a file based on the label name, the fileId and the asset id
+
+```sh
+m365 spo file retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --fileId '26541f96-017c-4189-a604-599e083533b8'  --name 'Some label' --assetId 'XYZ'
 ```
 
 ## Response

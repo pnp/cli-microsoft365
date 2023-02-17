@@ -18,6 +18,13 @@ const command: Command = require('./listitem-retentionlabel-ensure');
 describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
   //#region Mock Responses
+  const webUrl = 'https://contoso.sharepoint.com';
+  const listUrl = '/sites/project-x/list';
+  const listTitle = 'test';
+  const listId = 'b2307a39-e878-458b-bc90-03bc578531d6';
+  const labelName = 'Some label';
+  const labelId = 'def61080-111c-4aea-b72f-5b60e516e36c';
+
   const mockSpoWebRetentionLabelListResponseArray = [
     {
       "AcceptMessagesOnlyFromSendersOrMembers": false,
@@ -46,14 +53,65 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
       "UnlockedAsDefault": false
     }
   ];
-  //#endregion
 
-  const webUrl = 'https://contoso.sharepoint.com';
-  const listUrl = '/sites/project-x/list';
-  const listTitle = 'test';
-  const listId = 'b2307a39-e878-458b-bc90-03bc578531d6';
-  const labelName = 'Some label';
-  const labelId = 'def61080-111c-4aea-b72f-5b60e516e36c';
+  const retentionLabelResponse = {
+    value: [{
+      AcceptMessagesOnlyFromSendersOrMembers: false,
+      AccessType: null,
+      AllowAccessFromUnmanagedDevice: null,
+      AutoDelete: true,
+      BlockDelete: true,
+      BlockEdit: false,
+      ComplianceFlags: 1,
+      ContainsSiteLabel: false,
+      DisplayName: '',
+      EncryptionRMSTemplateId: null,
+      HasRetentionAction: true,
+      IsEventTag: true,
+      MultiStageReviewerEmail: null,
+      NextStageComplianceTag: null,
+      Notes: null,
+      RequireSenderAuthenticationEnabled: false,
+      ReviewerEmail: null,
+      SharingCapabilities: null,
+      SuperLock: false,
+      TagDuration: 2555,
+      TagId: labelId,
+      TagName: labelName,
+      TagRetentionBasedOn: 'Retention Label Parent',
+      UnlockedAsDefault: false
+    }]
+  };
+
+  const nonEventretentionLabelResponse = {
+    value: [{
+      AcceptMessagesOnlyFromSendersOrMembers: false,
+      AccessType: null,
+      AllowAccessFromUnmanagedDevice: null,
+      AutoDelete: true,
+      BlockDelete: true,
+      BlockEdit: false,
+      ComplianceFlags: 1,
+      ContainsSiteLabel: false,
+      DisplayName: '',
+      EncryptionRMSTemplateId: null,
+      HasRetentionAction: true,
+      IsEventTag: false,
+      MultiStageReviewerEmail: null,
+      NextStageComplianceTag: null,
+      Notes: null,
+      RequireSenderAuthenticationEnabled: false,
+      ReviewerEmail: null,
+      SharingCapabilities: null,
+      SuperLock: false,
+      TagDuration: 2555,
+      TagId: labelId,
+      TagName: labelName,
+      TagRetentionBasedOn: 'Retention Label Parent',
+      UnlockedAsDefault: false
+    }]
+  };
+  //#endregion
 
   let log: any[];
   let logger: Logger;
@@ -173,10 +231,18 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     assert(actual);
   });
 
-  it('applies a retentionlabel based on listId and name', async () => {
+  it('applies a retentionlabel based on listId and name with assetId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(1)/SetComplianceTag()`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":false,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
         return;
       }
 
@@ -195,11 +261,34 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     assert(loggerLogStderrSpy.notCalled);
   });
 
-  it('applies a retentionlabel based on listId and id (debug)', async () => {
+  it('applies a retentionlabel based on listId, id and with assetId (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(1)/SetComplianceTag()`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":false,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
         return;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${listId}')/items(${1})/ValidateUpdateListItem()`) {
+        return {
+          "value": [
+            {
+              "ErrorCode": 0,
+              "ErrorMessage": null,
+              "FieldName": "ComplianceAssetId",
+              "FieldValue": "XYZ",
+              "HasException": false,
+              "ItemId": 1
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
@@ -211,16 +300,40 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
         listId: listId,
         webUrl: webUrl,
         listItemId: 1,
-        id: labelId
+        id: labelId,
+        assetId: 'XYZ'
       }
     }));
   });
 
-  it('applies a retentionlabel based on listTitle and id (debug)', async () => {
+  it('applies a retentionlabel based on listTitle, id and assetId (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(1)/SetComplianceTag()`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":false,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
         return;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(${1})/ValidateUpdateListItem()`) {
+        return {
+          "value": [
+            {
+              "ErrorCode": 0,
+              "ErrorMessage": null,
+              "FieldName": "ComplianceAssetId",
+              "FieldValue": "XYZ",
+              "HasException": false,
+              "ItemId": 1
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
@@ -232,16 +345,40 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
         listTitle: listTitle,
         webUrl: webUrl,
         listItemId: 1,
-        id: labelId
+        id: labelId,
+        assetId: 'XYZ'
       }
     }));
   });
 
-  it('applies a retentionlabel based on listUrl and id (debug)', async () => {
+  it('applies a retentionlabel based on listUrl, id and assetId (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@listUrl)/items(1)/SetComplianceTag()?@listUrl='${formatting.encodeQueryParameter(listUrl)}'`
-        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":false,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
+        && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
         return;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetList(@listUrl)/items(${1})/ValidateUpdateListItem()?@listUrl='${formatting.encodeQueryParameter(listUrl)}'`) {
+        return {
+          "value": [
+            {
+              "ErrorCode": 0,
+              "ErrorMessage": null,
+              "FieldName": "ComplianceAssetId",
+              "FieldValue": "XYZ",
+              "HasException": false,
+              "ItemId": 1
+            }
+          ]
+        };
       }
 
       throw 'Invalid request';
@@ -253,25 +390,45 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
         listUrl: listUrl,
         webUrl: webUrl,
         listItemId: 1,
-        id: labelId
+        id: labelId,
+        assetId: 'XYZ'
       }
     }));
   });
 
-  it('throws an error when a retentionlabel cannot be found on the site', async () => {
+  it('fails adding the non event based retentionlabel with assetId', async () => {
+    const error = { error: { message: "The label that's being applied is not an event-based label" } };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return nonEventretentionLabelResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
-        listId: listId,
+        debug: true,
+        listUrl: listUrl,
         webUrl: webUrl,
         listItemId: 1,
-        name: 'Some non-existing label'
+        id: labelId,
+        assetId: 'XYZ'
       }
-    }), new CommandError('The specified retention label does not exist'));
+    }), new CommandError(error.error.message));
   });
 
   it('correctly handles API OData error', async () => {
     const errorMessage = 'Something went wrong';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelResponse;
+      }
+
+      throw 'Invalid request';
+    });
 
     sinon.stub(request, 'post').callsFake(async () => { throw { error: { error: { message: errorMessage } } }; });
 

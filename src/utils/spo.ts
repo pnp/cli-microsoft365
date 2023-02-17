@@ -9,6 +9,8 @@ import request, { CliRequestOptions } from "../request";
 import { formatting } from './formatting';
 import { CustomAction } from '../m365/spo/commands/customaction/customaction';
 import { odata } from './odata';
+import { ListItemRetentionLabel } from '../m365/spo/commands/listitem/ListItemRetentionLabel';
+import { SiteRetentionLabel } from '../m365/spo/commands/listitem/SiteRetentionLabel';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -694,5 +696,49 @@ export const spo = {
     const res = await request.get<{ AadObjectId: { NameId: string, NameIdIssuer: string } }>(requestOptions);
 
     return res.AadObjectId.NameId;
+  },
+
+  async getWebRetentionLabelInformationByName(webUrl: string, name: string): Promise<ListItemRetentionLabel> {
+
+    const requestUrl: string = `${webUrl}/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`;
+
+    const labels: SiteRetentionLabel[] = await odata.getAllItems(requestUrl);
+
+    const label = labels.find(l => l.TagName === name);
+
+    if (label === undefined) {
+      throw new Error(`The specified retention label does not exist`);
+    }
+
+    return {
+      complianceTag: label.TagName,
+      isTagPolicyHold: label.BlockDelete,
+      isTagPolicyRecord: label.BlockEdit,
+      isEventBasedTag: label.IsEventTag,
+      isTagSuperLock: label.SuperLock,
+      isUnlockedAsDefault: label.UnlockedAsDefault
+    } as ListItemRetentionLabel;
+  },
+
+  async getWebRetentionLabelInformationById(webUrl: string, id: string): Promise<ListItemRetentionLabel> {
+
+    const requestUrl: string = `${webUrl}/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`;
+
+    const labels: SiteRetentionLabel[] = await odata.getAllItems(requestUrl);
+
+    const label = labels.find(l => l.TagId === id);
+
+    if (label === undefined) {
+      throw new Error(`The specified retention label does not exist`);
+    }
+
+    return {
+      complianceTag: label.TagName,
+      isTagPolicyHold: label.BlockDelete,
+      isTagPolicyRecord: label.BlockEdit,
+      isEventBasedTag: label.IsEventTag,
+      isTagSuperLock: label.SuperLock,
+      isUnlockedAsDefault: label.UnlockedAsDefault
+    } as ListItemRetentionLabel;
   }
 };

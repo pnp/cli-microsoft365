@@ -12,7 +12,6 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import * as SpoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure';
 const command: Command = require('./file-retentionlabel-ensure');
 
 describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
@@ -21,7 +20,6 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const listId = 1;
   const retentionlabelName = "retentionlabel";
-  const SpoListItemRetentionLabelEnsureCommandOutput = `{ "stdout": "", "stderr": "" }`;
   const fileResponse = {
     ListItemAllFields: {
       Id: listId,
@@ -29,6 +27,68 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
         Id: '75c4d697-bbff-40b8-a740-bf9b9294e5aa'
       }
     }
+  };
+
+  const retentionEnsureResponse = {
+    "odata.null": true
+  };
+
+  const retentionLabelResponse = {
+    value: [{
+      AcceptMessagesOnlyFromSendersOrMembers: false,
+      AccessType: null,
+      AllowAccessFromUnmanagedDevice: null,
+      AutoDelete: true,
+      BlockDelete: true,
+      BlockEdit: false,
+      ComplianceFlags: 1,
+      ContainsSiteLabel: false,
+      DisplayName: '',
+      EncryptionRMSTemplateId: null,
+      HasRetentionAction: true,
+      IsEventTag: true,
+      MultiStageReviewerEmail: null,
+      NextStageComplianceTag: null,
+      Notes: null,
+      RequireSenderAuthenticationEnabled: false,
+      ReviewerEmail: null,
+      SharingCapabilities: null,
+      SuperLock: false,
+      TagDuration: 2555,
+      TagId: 'f6e20c71-7d56-414d-bb98-8ee927a308bd',
+      TagName: retentionlabelName,
+      TagRetentionBasedOn: 'Retention Label Parent',
+      UnlockedAsDefault: false
+    }]
+  };
+
+  const nonEventretentionLabelResponse = {
+    value: [{
+      AcceptMessagesOnlyFromSendersOrMembers: false,
+      AccessType: null,
+      AllowAccessFromUnmanagedDevice: null,
+      AutoDelete: true,
+      BlockDelete: true,
+      BlockEdit: false,
+      ComplianceFlags: 1,
+      ContainsSiteLabel: false,
+      DisplayName: '',
+      EncryptionRMSTemplateId: null,
+      HasRetentionAction: true,
+      IsEventTag: false,
+      MultiStageReviewerEmail: null,
+      NextStageComplianceTag: null,
+      Notes: null,
+      RequireSenderAuthenticationEnabled: false,
+      ReviewerEmail: null,
+      SharingCapabilities: null,
+      SuperLock: false,
+      TagDuration: 2555,
+      TagId: 'f6e20c71-7d56-414d-bb98-8ee927a308bd',
+      TagName: retentionlabelName,
+      TagRetentionBasedOn: 'Retention Label Parent',
+      UnlockedAsDefault: false
+    }]
   };
 
   let log: any[];
@@ -62,7 +122,7 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      Cli.executeCommandWithOutput
+      request.post
     ]);
   });
 
@@ -90,17 +150,19 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
         return fileResponse;
       }
 
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelResponse;
+      }
+
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoListItemRetentionLabelEnsureCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelEnsureCommandOutput
-        });
-      }
 
-      throw new CommandError('Unknown case');
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${fileResponse.ListItemAllFields.ParentList.Id}')/items(${listId})/SetComplianceTag()`) {
+        return retentionEnsureResponse;
+      }
+      throw 'Invalid request';
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -118,17 +180,18 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
         return fileResponse;
       }
 
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelResponse;
+      }
+
       throw 'Invalid request';
     });
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
-      if (command === SpoListItemRetentionLabelEnsureCommand) {
-        return ({
-          stdout: SpoListItemRetentionLabelEnsureCommandOutput
-        });
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${fileResponse.ListItemAllFields.ParentList.Id}')/items(${listId})/SetComplianceTag()`) {
+        return retentionEnsureResponse;
       }
-
-      throw new CommandError('Unknown case');
+      throw 'Invalid request';
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -137,6 +200,54 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
         fileId: fileId,
         webUrl: webUrl,
         name: retentionlabelName
+      }
+    }));
+  });
+
+  it('adds the event based retentionlabel from a file based on fileUrl with assetId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+        return fileResponse;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return retentionLabelResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${fileResponse.ListItemAllFields.ParentList.Id}')/items(${listId})/SetComplianceTag()`) {
+        return retentionEnsureResponse;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${fileResponse.ListItemAllFields.ParentList.Id}')/items(${listId})/ValidateUpdateListItem()`) {
+        return {
+          "value": [
+            {
+              "ErrorCode": 0,
+              "ErrorMessage": null,
+              "FieldName": "ComplianceAssetId",
+              "FieldValue": "XYZ",
+              "HasException": false,
+              "ItemId": 1
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.doesNotReject(command.action(logger, {
+      options: {
+        verbose: true,
+        fileUrl: fileUrl,
+        webUrl: webUrl,
+        name: retentionlabelName,
+        assetId: 'XYZ'
       }
     }));
   });
@@ -165,6 +276,32 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
       }
     });
     assert(containsTypeOption);
+  });
+
+  it('fails adding the non event based retentionlabel with assetId', async () => {
+    const error = { error: { message: "The label that's being applied is not an event-based label" } };
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`) {
+        return fileResponse;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`) {
+        return nonEventretentionLabelResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: retentionlabelName,
+        fileUrl: fileUrl,
+        webUrl: webUrl,
+        assetId: 'XYZ'
+      }
+    }), new CommandError(error.error.message));
   });
 
   it('fails validation if both fileUrl or fileId options are not passed', async () => {

@@ -1,17 +1,14 @@
-import { AxiosRequestConfig } from 'axios';
-import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { FileProperties } from './FileProperties';
-import { Options as SpoListItemRetentionLabelEnsureCommandOptions } from '../listitem/listitem-retentionlabel-ensure';
-import * as SpoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
+import { spo } from '../../../../utils/spo';
+import { ListItemRetentionLabel } from '../listitem/ListItemRetentionLabel';
 
 interface CommandArgs {
   options: Options;
@@ -22,6 +19,7 @@ interface Options extends GlobalOptions {
   name: string;
   fileUrl?: string;
   fileId?: string;
+  assetId?: string;
 }
 
 class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
@@ -46,7 +44,8 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         fileUrl: typeof args.options.fileUrl !== 'undefined',
-        fileId: typeof args.options.fileId !== 'undefined'
+        fileId: typeof args.options.fileId !== 'undefined',
+        assetId: typeof args.options.assetId !== 'undefined'
       });
     });
   }
@@ -64,6 +63,9 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
       },
       {
         option: '-i, --fileId [fileId]'
+      },
+      {
+        option: '-a, --assetId [assetId]'
       }
     );
   }
@@ -92,21 +94,31 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const fileProperties = await this.getFileProperties(logger, args);
+      const fileProperties: FileProperties = await this.getFileProperties(logger, args);
 
-      const options: SpoListItemRetentionLabelEnsureCommandOptions = {
-        webUrl: args.options.webUrl,
-        listId: fileProperties.ListItemAllFields.ParentList.Id,
-        listItemId: fileProperties.ListItemAllFields.Id,
-        name: args.options.name,
-        output: 'json',
-        debug: this.debug,
-        verbose: this.verbose
+      const labelInformation: ListItemRetentionLabel = await spo.getWebRetentionLabelInformationByName(args.options.webUrl, args.options.name);
+
+      if (args.options.assetId && !labelInformation.isEventBasedTag) {
+        throw `The label that's being applied is not an event-based label`;
+      }
+
+      const requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(fileProperties.ListItemAllFields.ParentList.Id)}')/items(${fileProperties.ListItemAllFields.Id})/SetComplianceTag()`;
+
+      const requestOptions: CliRequestOptions = {
+        url: requestUrl,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        data: labelInformation,
+        responseType: 'json'
       };
 
-      const spoListItemRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(SpoListItemRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
+      const response = await request.post(requestOptions);
+      if (args.options.assetId) {
+        await this.applyAssetId(args.options.webUrl, fileProperties.ListItemAllFields.ParentList.Id, fileProperties.ListItemAllFields.Id, args.options.assetId);
+      }
       if (this.verbose) {
-        logger.logToStderr(spoListItemRetentionLabelEnsureCommandOutput.stderr);
+        logger.log(response);
       }
     }
     catch (err: any) {
@@ -129,7 +141,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
       requestUrl += `GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${requestUrl}?$expand=ListItemAllFields,ListItemAllFields/ParentList&$select=ServerRelativeUrl,ListItemAllFields/ParentList/Id,ListItemAllFields/Id`,
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -138,6 +150,23 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
     };
 
     return await request.get<FileProperties>(requestOptions);
+  }
+
+  private async applyAssetId(webUrl: string, listId: string, listItemId: string, assetId: string): Promise<void> {
+    const requestUrl = `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')`;
+
+    const requestBody = { "formValues": [{ "FieldName": "ComplianceAssetId", "FieldValue": assetId }] };
+
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}/items(${listItemId})/ValidateUpdateListItem()`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: requestBody,
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
   }
 }
 
