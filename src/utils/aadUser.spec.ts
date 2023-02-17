@@ -8,6 +8,7 @@ import { sinonUtil } from './sinonUtil';
 const validUserName = 'john.doe@contoso.onmicrosoft.com';
 const validUserId = '2056d2f6-3257-4253-8cfc-b73393e414e5';
 const userResponse = { value: [{ id: validUserId }] };
+const userPrincipalNameResponse = { userPrincipalName: validUserName };
 
 describe('utils/aadUser', () => {
   afterEach(() => {
@@ -39,5 +40,18 @@ describe('utils/aadUser', () => {
     });
 
     await assert.rejects(aadUser.getUserIdByUpn(validUserName), Error(`The specified user with user name ${validUserName} does not exist.`));
+  });
+
+  it('correctly get upn by user id', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${validUserId}?$select=userPrincipalName`) {
+        return userPrincipalNameResponse;
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await aadUser.getUpnByUserId(validUserId);
+    assert.strictEqual(actual, validUserName);
   });
 }); 

@@ -682,6 +682,7 @@ nav:
         - theme remove: cmd/spo/theme/theme-remove.md
         - theme set: cmd/spo/theme/theme-set.md
       - user:
+        - user ensure: cmd/spo/user/user-ensure.md
         - user get: cmd/spo/user/user-get.md
         - user list: cmd/spo/user/user-list.md
         - user remove: cmd/spo/user/user-remove.md
