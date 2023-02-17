@@ -20,16 +20,16 @@ m365 spo group member add [options]
 : Name of the SharePoint Group to which the user needs to be added, specify either `groupId` or `groupName`
 
 `--userName [userName]`
-: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+: User's UPN (user principal name, eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
 
 `--email [email]`
-: User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma separated (ex. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+: User's email (eg. megan.bowen@contoso.com). If multiple users need to be added, they have to be comma-separated (e.g. megan.bowen@contoso.com,alex.wilber@contoso.com). Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
 
 `--userId [userId]`
-: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Ids have to be comma separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+: The user Id of the user to add as a member. (Id of the site user, for example: 14) If multiple users need to be added, the Ids have to be comma-separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
 
 `--aadGroupId [aadGroupId]`
-: The object Id of the Azure AD group to add as a member. If multiple groups need to be added, the Ids have to be comma separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
+: The object Id of the Azure AD group to add as a member. If multiple groups need to be added, the Ids have to be comma-separated. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
 
 `--aadGroupName [aadGroupName]`
 : The name of the Azure AD group to add as a member. Specify either `userId`, `userName`, `email`, `aadGroupId` or `aadGroupName`
