@@ -160,9 +160,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
       throw `Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${customActions.map(a => a.Id).join(', ')}`;
     }
     else {
-      const result: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, '');
-
-      const customActions: CustomAction[] = result.filter((x: CustomAction) => x.ClientSideComponentId === options.clientSideComponentId);
+      const customActions: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `ClientSideComponentId eq guid'${options.clientSideComponentId}'`);
 
       if (customActions.length === 0) {
         throw `No user custom action with ClientSideComponentId '${options.clientSideComponentId}' found`;
@@ -172,7 +170,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
         throw `Multiple user custom actions with ClientSideComponentId '${options.clientSideComponentId}' found. Please disambiguate using IDs: ${customActions.map((customAction: CustomAction) => customAction.Id).join(', ')}`;
       }
 
-      return result[0];
+      return customActions[0];
     }
   }
 
