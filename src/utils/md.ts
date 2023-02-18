@@ -58,6 +58,13 @@ function convertContentTabs(md: string): string {
   });
 }
 
+function convertMdOutput(md: string): string {
+  const regex = new RegExp('(?<=^    ```md)(.*)(?=    ```)', 'gms');
+  return md.replace(regex, (match, content: string) => {
+    return content.replace(/^    /gms, '');
+  });
+}
+
 function convertCodeFences(md: string): string {
   const regex = new RegExp('^```.*?(?:\r\n|\n)(.*?)```(?:\r\n|\n)', 'gms');
   return md.replace(regex, (match, code: string) => {
@@ -91,6 +98,7 @@ const convertFunctions = [
   convertAdmonitions,
   convertDd,
   convertHyperlinks,
+  convertMdOutput,
   convertContentTabs,
   convertCodeFences,
   removeInlineMarkup,
