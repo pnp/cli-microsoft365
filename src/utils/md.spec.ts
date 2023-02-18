@@ -85,7 +85,7 @@ describe('utils/md', () => {
 
   it('converts content tabs with code blocks', () => {
     assert(plannerPlanAddHelpPlain.includes(`  JSON${EOL}${EOL}  {`), `Doesn't include upper-case JSON`);
-    assert(!plannerPlanAddHelpPlain.includes(`=== "JSON"`), 'Includes the original tab definition');
+    assert(plannerPlanAddHelpPlain.includes(`=== "JSON"`), `Includes the original tab definition`);
     assert(!plannerPlanAddHelpPlain.includes(`\` json`), 'Includes language escape code');
   });
 

@@ -59,7 +59,7 @@ function convertContentTabs(md: string): string {
 }
 
 function convertMdOutput(md: string): string {
-  const regex = new RegExp('(?<=`md)(.*)(?=`)', 'gms');
+  const regex = new RegExp('(?<=^    ```md)(.*)(?=    ```)', 'gms');
   return md.replace(regex, (match, content: string) => {
     return content.replace(/^    /gms, '');
   });
