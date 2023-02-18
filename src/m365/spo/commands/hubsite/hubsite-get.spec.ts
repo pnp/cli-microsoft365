@@ -331,7 +331,7 @@ describe(commands.HUBSITE_GET, () => {
   it(`fails validation if the specified url is invalid`, async () => {
     const actual = await command.validate({
       options: {
-        url: '/'
+        url: 'invalid URL'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
