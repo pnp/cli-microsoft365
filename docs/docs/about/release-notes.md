@@ -75,6 +75,7 @@
 - enhanced 'pa environment get' to retrieve the default environment [#4491](https://github.com/pnp/cli-microsoft365/issues/4491)
 - added sample script to download attachments from SPO [#2660](https://github.com/pnp/cli-microsoft365/issues/2660)
 - modified command execution of 'm365 context' [#4047](https://github.com/pnp/cli-microsoft365/issues/4047)
+- enhanced 'flow environment get' [#4445](https://github.com/pnp/cli-microsoft365/issues/4445)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
