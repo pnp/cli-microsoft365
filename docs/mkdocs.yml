@@ -226,6 +226,7 @@ nav:
         - roster get: cmd/planner/roster/roster-get.md
         - roster remove: cmd/planner/roster/roster-remove.md
         - roster member add: cmd/planner/roster/roster-member-add.md
+        - roster member get: cmd/planner/roster/roster-member-get.md
         - roster member list: cmd/planner/roster/roster-member-list.md
         - roster member remove: cmd/planner/roster/roster-member-remove.md
       - task:
