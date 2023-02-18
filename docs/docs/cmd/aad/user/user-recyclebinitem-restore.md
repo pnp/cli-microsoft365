@@ -1,6 +1,6 @@
 # aad user recyclebinitem restore
 
-Removes all users from the tenant recycle bin
+Restores a user from the recycle bin in the current tenant
 
 ## Usage
 

@@ -20,7 +20,7 @@ class AadUserRecycleBinItemRestoreCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Restores a user from the recycle bin in the current tenant';
+    return 'Restores a user from the tenant recycle bin';
   }
 
   constructor() {
