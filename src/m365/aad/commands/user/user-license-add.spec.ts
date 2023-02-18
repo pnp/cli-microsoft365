@@ -135,7 +135,9 @@ describe(commands.USER_LICENSE_ADD, () => {
 
   it('correctly handles random API error', async () => {
     const error = {
-      error: 'The license cannot be added.'
+      error: {
+        message: 'The license cannot be added.'
+      }
     };
     sinon.stub(request, 'post').callsFake(async () => { throw error; });
 
@@ -143,6 +145,6 @@ describe(commands.USER_LICENSE_ADD, () => {
       options: {
         userName: validUserName, ids: validIds
       }
-    }), new CommandError(error.error));
+    }), new CommandError(error.error.message));
   });
 });
