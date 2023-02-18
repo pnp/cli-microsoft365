@@ -96,6 +96,7 @@ nav:
         - user add: cmd/aad/user/user-add.md      
         - user get: cmd/aad/user/user-get.md        
         - user hibp: cmd/aad/user/user-hibp.md
+        - user license remove: cmd/aad/user/user-license-remove.md
         - user list: cmd/aad/user/user-list.md
         - user remove: cmd/aad/user/user-remove.md
         - user set: cmd/aad/user/user-set.md        
