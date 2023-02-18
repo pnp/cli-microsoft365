@@ -68,6 +68,7 @@ export default {
   USER_RECYCLEBINITEM_LIST: `${prefix} user recyclebinitem list`,
   USER_RECYCLEBINITEM_REMOVE: `${prefix} user recyclebinitem remove`,
   USER_REMOVE: `${prefix} user remove`,
+  USER_RECYCLEBINITEM_RESTORE: `${prefix} user recyclebinitem restore`,
   USER_SET: `${prefix} user set`,
   USER_SIGNIN_LIST: `${prefix} user signin list`
 };

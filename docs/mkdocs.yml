@@ -109,6 +109,7 @@ nav:
         - user recyclebinitem clear: cmd/aad/user/user-recyclebinitem-clear.md
         - user recyclebinitem list: cmd/aad/user/user-recyclebinitem-list.md
         - user recyclebinitem remove: cmd/aad/user/user-recyclebinitem-remove.md
+        - user recyclebinitem restore: cmd/aad/user/user-recyclebinitem-restore.md
         - user signin list: cmd/aad/user/user-signin-list.md
     - Adaptive Card (adaptivecard):
       - send: cmd/adaptivecard/adaptivecard-send.md
