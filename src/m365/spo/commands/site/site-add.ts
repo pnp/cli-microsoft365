@@ -48,7 +48,6 @@ interface CreateGroupExResponse {
 class SpoSiteAddCommand extends SpoCommand {
   private context?: FormDigestInfo;
   private spoAdminUrl?: string;
-  private dots?: string;
 
   private get supportedLcids(): number[] {
     // Languages supported by SharePoint
@@ -452,8 +451,6 @@ class SpoSiteAddCommand extends SpoCommand {
   }
 
   public async createClassicSite(logger: Logger, args: CommandArgs): Promise<void> {
-    this.dots = '';
-
     try {
       this.spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       this.context = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
@@ -525,7 +522,6 @@ class SpoSiteAddCommand extends SpoCommand {
               reject,
               logger,
               currentContext: this.context as FormDigestInfo,
-              dots: this.dots,
               verbose: this.verbose,
               debug: this.debug
             });
@@ -669,7 +665,6 @@ class SpoSiteAddCommand extends SpoCommand {
                 reject,
                 logger,
                 currentContext: this.context as FormDigestInfo,
-                dots: this.dots,
                 verbose: this.verbose,
                 debug: this.debug
               });
