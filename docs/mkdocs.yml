@@ -336,6 +336,7 @@ nav:
       - auditlog:
         - auditlog list: cmd/purview/auditlog/auditlog-list.md
       - retentionevent:
+        - retentionevent add: cmd/purview/retentionevent/retentionevent-add.md
         - retentionevent get: cmd/purview/retentionevent/retentionevent-get.md
         - retentionevent list: cmd/purview/retentionevent/retentionevent-list.md
         - retentionevent remove: cmd/purview/retentionevent/retentionevent-remove.md
