@@ -100,6 +100,7 @@ nav:
         - user guest add: cmd/aad/user/user-guest-add.md
         - user password validate: cmd/aad/user/user-password-validate.md
         - user recyclebinitem clear: cmd/aad/user/user-recyclebinitem-clear.md
+        - user recyclebinitem remove: cmd/aad/user/user-recyclebinitem-remove.md
         - user signin list: cmd/aad/user/user-signin-list.md
     - Adaptive Card (adaptivecard):
       - send: cmd/adaptivecard/adaptivecard-send.md

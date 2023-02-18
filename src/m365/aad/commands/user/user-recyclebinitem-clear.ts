@@ -68,7 +68,7 @@ class AadUserRecycleBinItemClearCommand extends GraphCommand {
           }
 
           const requestOptions: CliRequestOptions = {
-            url: 'https://graph.microsoft.com/v1.0/$batch',
+            url: `${this.resource}/v1.0/$batch`,
             headers: {
               accept: 'application/json',
               'content-type': 'application/json'
