@@ -5,7 +5,7 @@
     "title": "Replace site collection admin with another user",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/replace-site-collection-admin",
     "creationDateTime": "2021-05-17",
-    "updateDateTime": "2021-05-17",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "The script removes a user from a site collection and adds a new one as site collection admin.",
     "longDescription": [
       "The script removes a user from a site collection and adds a new one as site collection admin."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

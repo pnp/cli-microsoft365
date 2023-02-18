@@ -40,7 +40,7 @@ This script shows how you can use the CLI to:
         $allFiles = $allFiles | ConvertFrom-Json
         foreach ($file in $allFiles) {
           $fileUrl = $file.ServerRelativeUrl -replace $sourceSite, ''
-          m365 spo file copy --webUrl "$tenatUrl$sourceSite" --sourceUrl $fileUrl --targetUrl "$targetSite/$targetLibrary" --allowSchemaMismatch
+          m365 spo file copy --webUrl "$tenatUrl$sourceSite" --sourceUrl $fileUrl --targetUrl "$targetSite/$targetLibrary"
         }
     }
 
@@ -67,7 +67,7 @@ This script shows how you can use the CLI to:
         $allFiles = $allFiles | ConvertFrom-Json
         foreach ($file in $allFiles) {
           $fileUrl = $file.ServerRelativeUrl -replace $sourceSite, ''
-          m365 spo file copy --webUrl "$tenatUrl$sourceSite" --sourceUrl $fileUrl --targetUrl "$targetSite/$targetLibrary" --allowSchemaMismatch
+          m365 spo file copy --webUrl "$tenatUrl$sourceSite" --sourceUrl $fileUrl --targetUrl "$targetSite/$targetLibrary"
         }
       }
       else {

@@ -5,7 +5,7 @@
     "title": "List all external users in site groups across all site collections",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-externalusers-in-sitegroups",
     "creationDateTime": "2022-07-25",
-    "updateDateTime": "2022-07-25",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script shows how you can check if external users are added to site groups.",
     "longDescription": [
       "This script shows how you can check if external users are added to site groups. It will show all external users across all site collections and the site groups they where added to."
@@ -24,7 +24,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

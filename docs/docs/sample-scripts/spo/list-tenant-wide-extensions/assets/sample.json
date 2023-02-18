@@ -5,7 +5,7 @@
     "title": "CLI - List all tenant-wide extensions",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-tenant-wide-extensions",
     "creationDateTime": "2020-04-12",
-    "updateDateTime": "2020-04-12",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script lists all tenant-wide extensions deployed in the tenant.",
     "longDescription": [
       "The following script lists all tenant-wide extensions deployed in the tenant. The sample returns the Id, Title, Extension Location and Extension Disabled status of each extension."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

@@ -34,7 +34,7 @@ Prerequisites:
     $localFileDownloadFolderPath = $PSScriptRoot
     $spolSiteUrl = $spolHostName + $spolSiteRelativeUrl
 
-    $spolLibItems = m365 spo listitem list --webUrl $spolSiteUrl --title $spolDocLibTitle --fields 'FileRef,FileLeafRef' --filter "FSObjType eq 0" -o json | ConvertFrom-Json
+    $spolLibItems = m365 spo listitem list --webUrl $spolSiteUrl --listTitle $spolDocLibTitle --fields 'FileRef,FileLeafRef' --filter "FSObjType eq 0" -o json | ConvertFrom-Json
 
     if ($spolLibItems.Count -gt 0) {
       ForEach ($spolLibItem in $spolLibItems) {

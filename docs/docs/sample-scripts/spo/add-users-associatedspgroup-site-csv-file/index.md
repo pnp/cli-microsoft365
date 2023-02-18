@@ -77,6 +77,6 @@ Permission Level mapping assumptions are given below
     Foreach ($PermissionLevel in $GroupedResult) {
         Write-Host "Adding $($PermissionLevel.PermissionLevel) Permission users to the SharePoint Group ID: $($PermissionLevel.SPGroupId)"
         #Since the command supports multiple usernames to be added in the single command, script will add users in single command execution
-        m365 spo group user add --webUrl $siteURL --groupId $PermissionLevel.SPGroupId --userName $PermissionLevel.UsernameValues
+        m365 spo group member add --webUrl $siteURL --groupId $PermissionLevel.SPGroupId --userName $PermissionLevel.UsernameValues
     }
     ```

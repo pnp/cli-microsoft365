@@ -5,7 +5,7 @@
     "title": "Insert pictures in a SharePoint Document Library into a Word document",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/insert-sp-library-pictures-into-word",
     "creationDateTime": "2020-06-20",
-    "updateDateTime": "2020-06-20",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Script shows how to download and insert many pictures.",
     "longDescription": [
       "This PowerShell script shows how to download and insert many pictures in a SharePoint Document Library into a Word document in a two-column table with file name using CLI for Microsoft 365 commands and PowerShell Script."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

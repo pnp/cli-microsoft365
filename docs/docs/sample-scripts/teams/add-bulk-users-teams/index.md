@@ -39,6 +39,6 @@ Inspired by: [Rakesh Pandey](https://www.flexmind.co/blog/how-to-add-bulk-users-
     #Add users to the Team
     foreach ($row in $usersCsvFile) {
       Write-Host "Adding $($row.UPN) to the $($row.teamName) Team" -ForegroundColor Magenta
-      m365 aad o365group user add --groupId $row.teamId --userName $($row.UPN) --role $($row.role)
+      m365 aad o365group user add --groupId $row.teamId --userName "$($row.UPN)" --role $row.role
     }
     ```

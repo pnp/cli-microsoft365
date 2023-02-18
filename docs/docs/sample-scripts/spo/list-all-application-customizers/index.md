@@ -17,7 +17,7 @@ List all the application customizers in a tenant. Scope is default `All`. Here w
     foreach ($site in $sites) {                                                      
       write-host $site.Title                      
       write-host $site.Path                                             
-      m365 spo customaction list --url $site.Path   
+      m365 spo customaction list --webUrl $site.Path   
     } 
     ```
 
@@ -38,6 +38,6 @@ List all the application customizers in a tenant. Scope is default `All`. Here w
       siteName=$(echo ${site} | jq -r '.Title')
       echo $siteUrl
       echo $siteName
-      m365 spo customaction list --url $siteUrl
+      m365 spo customaction list --webUrl $siteUrl
     done
     ```

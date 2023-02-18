@@ -85,7 +85,7 @@ Retrieves all activities for a specific Microsoft Teams Team and shares the top 
 
     #Score per user
     foreach ($teamsUser in $resultsGrouped) {
-        $user = m365 aad user get --id $teamsUser.Name --output json | ConvertFrom-Json
+        $user = m365 aad user get --id $teamsUser.UserId --output json | ConvertFrom-Json
 
         # Count points
         # Each  post is two points, 1 extra point awarded for each Post with Subject

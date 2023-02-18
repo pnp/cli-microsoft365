@@ -5,7 +5,7 @@
     "title": "CLI - Export all flows in environment",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/export-all-flows-in-environment",
     "creationDateTime": "2021-06-16",
-    "updateDateTime": "2021-06-16",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script will get all flows in your default environment and export them.",
     "longDescription": [
       "This script will get all flows in your default environment and export them as both a ZIP file for importing back into Power Automate and as a JSON file for importing into Azure as an Azure Logic App."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

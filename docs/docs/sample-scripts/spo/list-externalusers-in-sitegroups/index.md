@@ -24,7 +24,7 @@ This script shows how you can check if external users are added to site groups. 
 
     Write-Host "Retrieving all sites and check external users..." -ForegroundColor Green
 
-    $sites = m365 spo site list --type All | ConvertFrom-Json
+    $sites = m365 spo site list | ConvertFrom-Json
     $siteCount = $sites.Count
     $siteCounter = 0
     $results = [System.Collections.ArrayList]::new()

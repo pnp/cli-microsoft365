@@ -5,7 +5,7 @@
     "title": "List all application customizers in a tenant",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-application-customizers",
     "creationDateTime": "2021-06-17",
-    "updateDateTime": "2021-06-17",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "List all the application customizers in a tenant.",
     "longDescription": [
       "List all the application customizers in a tenant."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

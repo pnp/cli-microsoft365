@@ -15,7 +15,7 @@ When you just want to deploy certain SharePoint solution to a specific site, it'
     ```powershell
     $site = "https://contoso.sharepoint.com/sites/site"
     m365 login
-    m365 spo site appcatalog add --url $site
+    m365 spo site appcatalog add --siteUrl $site
     Write-output "App Catalog Created on " $site
     ```
 
@@ -27,6 +27,6 @@ When you just want to deploy certain SharePoint solution to a specific site, it'
     site=https://tricks365.sharepoint.com/sites/site
 
     m365 login
-    m365 spo site appcatalog add --url $site
+    m365 spo site appcatalog add --siteUrl $site
     echo "App Catalog Created on $site"
     ```

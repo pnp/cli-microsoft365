@@ -30,19 +30,18 @@ This is a script which takes a subset or all members of the default owner group 
         Write-Host "Processing site No : $SiteCounter / $TotalSiteCount."
         Write-Host "Site URL - $($site.Url)"
         # Getting only Associated Owner and Member Groups using JMES Query
-        $AssociatedGroups = m365 spo web get --webUrl $site.Url --withGroups --query "{MemberGroup: AssociatedMemberGroup, OwnerGroup: AssociatedOwnerGroup}" --output json | ConvertFrom-Json
+        $AssociatedGroups = m365 spo web get --url $site.Url --withGroups --query "{MemberGroup: AssociatedMemberGroup, OwnerGroup: AssociatedOwnerGroup}" --output json | ConvertFrom-Json
 
         # Getting list of members from the Owner Group
-        $UserList = m365 spo group user list --webUrl $site.Url --groupId $AssociatedGroups.OwnerGroup.Id --query "value" --output json | ConvertFrom-Json
+        $UserList = m365 spo group member list --webUrl $site.Url --groupId $AssociatedGroups.OwnerGroup.Id --query "value" --output json | ConvertFrom-Json
 
         Write-Host "Total Users available in the Group, $($AssociatedGroups.OwnerGroup.Title) : "$UserList.Count
         Foreach ($User in $UserList){
-
             # Adding the user to Member Group
-            m365 spo group user add --webUrl $site.Url --groupId $AssociatedGroups.MemberGroup.Id --userName "$($User.UserPrincipalName)"
+            m365 spo group member add --webUrl $site.Url --groupId $AssociatedGroups.MemberGroup.Id --userName "$($User.UserPrincipalName)"
             
             # Removing the user from Owner Group
-            m365 spo group user remove --webUrl $site.Url --groupId $AssociatedGroups.OwnerGroup.Id --userName "$($User.UserPrincipalName)" --confirm
+            m365 spo group member remove --webUrl $site.Url --groupId $AssociatedGroups.OwnerGroup.Id --userName "$($User.UserPrincipalName)" --confirm
         }
         $SiteCounter++
     }

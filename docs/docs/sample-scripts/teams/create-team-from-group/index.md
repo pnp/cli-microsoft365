@@ -48,7 +48,7 @@ A sample script which creates a Microsoft 365 Group, associates a logo to it and
     }
 
     Write-Host "Teamify the Group"
-    m365 aad o365group teamify --groupId $group.id
+    m365 aad o365group teamify --id $group.id
 
     Write-Host "Provisioning channels"
     $channelNames | ForEach-Object {

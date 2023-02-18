@@ -16,7 +16,7 @@ Author: [Veronique Lengelle](https://twitter.com/veronicageek), Inspired by [Sal
     #Declare variables
     $siteURL = "https://<TENANT-NAME>.sharepoint.com/sites/<YOUR-SITE>"
     $listName = "<YOUR-LIST-NAME>"
-    $allItems = m365 spo listitem list --webUrl $siteUrl --title $listName --fields "ID, HasUniqueRoleAssignments, Title" | ConvertFrom-Json
+    $allItems = m365 spo listitem list --webUrl $siteUrl --listTitle $listName --fields "ID,HasUniqueRoleAssignments,Title" | ConvertFrom-Json
     $results = @()
 
     #Loop through each item in the list
@@ -44,7 +44,7 @@ Author: [Veronique Lengelle](https://twitter.com/veronicageek), Inspired by [Sal
     foreach($list in $allLists){
         if ($list.Hidden -eq $false){ 
             
-            $allItems = m365 spo listitem list --webUrl $siteURL --id $list.Id --fields "ID, HasUniqueRoleAssignments, Title" | ConvertFrom-Json
+            $allItems = m365 spo listitem list --webUrl $siteURL --listId $list.Id --fields "ID,HasUniqueRoleAssignments,Title" | ConvertFrom-Json
             
             foreach($item in $allItems){
                 $results += [pscustomobject][ordered]@{

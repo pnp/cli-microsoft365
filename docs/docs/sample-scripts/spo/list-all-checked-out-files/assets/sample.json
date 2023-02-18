@@ -5,7 +5,7 @@
     "title": "List all checked out files in SharePoint",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-checked-out-files",
     "creationDateTime": "2022-02-19",
-    "updateDateTime": "2022-02-19",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script will retrieve all the checked out files in a particular site.",
     "longDescription": [
       "This script will retrieve all the checked out files in a particular site."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

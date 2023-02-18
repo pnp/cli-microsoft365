@@ -5,7 +5,7 @@
     "title": "List site collections and their lists",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-site-collection-lists",
     "creationDateTime": "2021-03-12",
-    "updateDateTime": "2021-03-12",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Script helps you to list and export all site collection and their lists SharePoint Online sites.",
     "longDescription": [
       "This script helps you to list and export all site collection and their lists SharePoint Online sites, ideal for getting insights into the size of your environment."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [
