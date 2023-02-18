@@ -22,7 +22,6 @@ describe(commands.USER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -45,7 +44,6 @@ describe(commands.USER_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
       return { continue: false };
@@ -86,12 +84,21 @@ describe(commands.USER_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if required options specified (id)', async () => {
+  it('fails validation when userName is not a valid upn', async () => {
+    const actual = await command.validate({
+      options: {
+        userName: 'Invalid upn'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if required options specified (userId)', async () => {
     const actual = await command.validate({ options: { id: validId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified (name)', async () => {
+  it('passes validation if required options specified (userName)', async () => {
     const actual = await command.validate({ options: { userName: validUsername } }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -112,21 +119,24 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('aborts removing the specified user when confirm option not passed and prompt not confirmed', async () => {
-    const postSpy = sinon.spy(request, 'delete');
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
-    ));
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${validId}`) {
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
     await command.action(logger, {
       options: {
         id: validId
       }
     });
-    assert(postSpy.notCalled);
+    assert(deleteStub.notCalled);
   });
 
   it('removes the specified user by id', async () => {
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${validId}`) {
         return;
       }
@@ -140,15 +150,15 @@ describe(commands.USER_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: true,
+        verbose: true,
         id: validId
       }
     });
-    assert(loggerLogToStderrSpy.called);
+    assert(deleteStub.called);
   });
 
   it('removes the specified user by userName', async () => {
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${validUsername}`) {
         return;
       }
@@ -162,15 +172,15 @@ describe(commands.USER_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: true,
+        verbose: true,
         userName: validUsername
       }
     });
-    assert(loggerLogToStderrSpy.called);
+    assert(deleteStub.called);
   });
 
   it('removes the specified user by Username without confirmation prompt', async () => {
-    sinon.stub(request, 'delete').callsFake(async (opts) => {
+    const deleteStub = sinon.stub(request, 'delete').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${validUsername}`) {
         return;
       }
@@ -180,12 +190,12 @@ describe(commands.USER_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: true,
+        verbose: true,
         userName: validUsername,
         confirm: true
       }
     });
-    assert(loggerLogToStderrSpy.called);
+    assert(deleteStub.called);
   });
 
   it('correctly handles API OData error', async () => {
@@ -199,7 +209,7 @@ describe(commands.USER_REMOVE, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: true,
+        verbose: true,
         id: validId,
         confirm: true
       }

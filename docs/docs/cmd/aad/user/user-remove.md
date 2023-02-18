@@ -23,12 +23,17 @@ m365 aad user remove [options]
 
 ## Remarks
 
-If the user with the specified id or user name doesn't exist, you will get a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
+!!! important
+    If the user with the specified id or user name doesn't exist, you will get a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
 
-For removing a user you need one of the following roles:
-- User Administrator
-- Privileged Authentication Administrator
-- Global Administrator
+!!! important
+    For removing a user you need one of the following roles:
+    - User Administrator
+    - Privileged Authentication Administrator
+    - Global Administrator
+
+!!! note
+    After running this command, it may take a minute before all deleted users are effectively removed from the tenant.
 
 ## Examples
 
