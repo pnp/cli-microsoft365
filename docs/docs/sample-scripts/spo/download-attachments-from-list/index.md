@@ -12,18 +12,18 @@ Download attachments from a SharePoint Online list.
 === "PowerShell"
 
     ```powershell
-   param
-(
-    [Parameter(Mandatory = $true)] [string] $SiteURL,
-    [Parameter(Mandatory = $true)] [string] $ListTitle,
-    [Parameter(Mandatory = $true)] [string] $DownloadDirectory
-)   
- 
-$m365Status = m365 status
-if ($m365Status -match "Logged Out") {
-  Write-Host "Logging in the User!"
-  m365 login --authType browser
-}
+    param
+    (
+        [Parameter(Mandatory = $true)] [string] $SiteURL,
+        [Parameter(Mandatory = $true)] [string] $ListTitle,
+        [Parameter(Mandatory = $true)] [string] $DownloadDirectory
+    )
+
+    $m365Status = m365 status
+    if ($m365Status -match "Logged Out") {
+      Write-Host "Logging in the User!"
+      m365 login --authType browser
+    }
 
     Try {
  
@@ -52,5 +52,4 @@ if ($m365Status -match "Logged Out") {
     Catch {
         write-host -f Red "Error Downloading List Attachments!" $_.Exception.Message
     }
-
     ```

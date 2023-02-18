@@ -873,6 +873,7 @@ nav:
       - sample-scripts/spo/remove-site-scripts/index.md
       - sample-scripts/spo/detecting-pii-exists-in-sharepointlist-column/index.md
       - sample-scripts/spo/disable-tenant-wide-extension/index.md
+      - sample-scripts/spo/download-attachments-from-list/index.md
       - sample-scripts/spo/empty-tenant-recyclebin/index.md
       - sample-scripts/spo/ensure-siteassets-library/index.md
       - sample-scripts/spo/export-configs-tenant-wide-extensions/index.md
