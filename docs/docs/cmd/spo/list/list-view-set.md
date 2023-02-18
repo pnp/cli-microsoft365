@@ -19,7 +19,7 @@ m365 spo list view set [options]
 `--listTitle [listTitle]`
 : Title of the list where the view is located. Specify either `listId`, `listTitle`, or `listUrl`.
 
- `--listUrl [listUrl]`
+`--listUrl [listUrl]`
 : Server- or site-relative URL of the list. Specify either `listId` , `listTitle` or `listUrl`.
 
 `--id [id]`
