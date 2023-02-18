@@ -97,7 +97,7 @@ class AadUserLicenseAddCommand extends GraphCommand {
       logger.log(response);
     }
     catch (err: any) {
-      this.handleRejectedODataPromise(err);
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }
