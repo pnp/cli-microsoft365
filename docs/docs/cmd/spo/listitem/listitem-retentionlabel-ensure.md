@@ -36,6 +36,10 @@ m365 spo listitem retentionlabel ensure [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+The `--assetId` option has to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
+
 ## Examples
 
 Applies a retention label to a list item in a given site based on the list id and label name

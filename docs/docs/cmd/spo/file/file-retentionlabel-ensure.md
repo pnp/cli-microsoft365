@@ -31,6 +31,8 @@ m365 spo file retentionlabel ensure [options]
 
 You can also use [spo listitem retentionlabel remove](./../../../cmd/spo//listitem/listitem-retentionlabel-remove.md) for removing the retentionlabel from a listitem.
 
+The `--assetId` option has to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.
+
 ## Examples
 
 Applies a retention label to a file based on the label name and the fileUrl
