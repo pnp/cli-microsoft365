@@ -61,6 +61,7 @@ export default {
   USER_HIBP: `${prefix} user hibp`,
   USER_LICENSE_ADD: `${prefix} user license add`,
   USER_LICENSE_LIST: `${prefix} user license list`,
+  USER_LICENSE_REMOVE: `${prefix} user license remove`,
   USER_LIST: `${prefix} user list`,
   USER_PASSWORD_VALIDATE: `${prefix} user password validate`,
   USER_RECYCLEBINITEM_CLEAR: `${prefix} user recyclebinitem clear`,

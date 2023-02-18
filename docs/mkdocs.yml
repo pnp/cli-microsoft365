@@ -98,12 +98,13 @@ nav:
         - user add: cmd/aad/user/user-add.md      
         - user get: cmd/aad/user/user-get.md        
         - user hibp: cmd/aad/user/user-hibp.md
-        - user license: cmd/aad/user/user-license-add.md
         - user list: cmd/aad/user/user-list.md
         - user remove: cmd/aad/user/user-remove.md
         - user set: cmd/aad/user/user-set.md        
         - user guest add: cmd/aad/user/user-guest-add.md
+        - user license add: cmd/aad/user/user-license-add.md
         - user license list: cmd/aad/user/user-license-list.md
+        - user license remove: cmd/aad/user/user-license-remove.md
         - user password validate: cmd/aad/user/user-password-validate.md
         - user recyclebinitem clear: cmd/aad/user/user-recyclebinitem-clear.md
         - user recyclebinitem list: cmd/aad/user/user-recyclebinitem-list.md
