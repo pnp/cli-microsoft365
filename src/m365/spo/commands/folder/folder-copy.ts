@@ -20,8 +20,6 @@ interface Options extends GlobalOptions {
 }
 
 class SpoFolderCopyCommand extends SpoCommand {
-  private dots?: string;
-
   public get name(): string {
     return commands.FOLDER_COPY;
   }
@@ -32,12 +30,12 @@ class SpoFolderCopyCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -45,7 +43,7 @@ class SpoFolderCopyCommand extends SpoCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -62,7 +60,7 @@ class SpoFolderCopyCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
@@ -99,12 +97,10 @@ class SpoFolderCopyCommand extends SpoCommand {
 
     try {
       const jobInfo = await request.post<any>(requestOptions);
-      this.dots = '';
-
       const copyJobInfo: any = jobInfo.value[0];
       const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
-      
+
       await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
         setTimeout(() => {
           spo.waitUntilCopyJobFinished({
@@ -114,7 +110,6 @@ class SpoFolderCopyCommand extends SpoCommand {
             resolve,
             reject,
             logger,
-            dots: this.dots,
             debug: this.debug,
             verbose: this.verbose
           });
