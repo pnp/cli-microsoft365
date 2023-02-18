@@ -13,7 +13,7 @@ m365 spo list contenttype list [options]
 `-u, --webUrl <webUrl>`
 : URL of the site where the list is located.
 
-`-i, --listId [listId]`
+`-l, --listId [listId]`
 : ID of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-t, --listTitle [listTitle]`
