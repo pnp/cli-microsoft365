@@ -263,6 +263,30 @@ export const spo = {
     });
   },
 
+  getTenantAppCatalogUrl(logger: Logger, debug: boolean): Promise<string | null> {
+    return new Promise<string>((resolve: (tenantAppCatalogUrl: string) => void, reject: (error: any) => void): void => {
+      spo
+        .getSpoUrl(logger, debug)
+        .then((spoUrl: string): void => {
+          const requestOptions: any = {
+            url: `${spoUrl}/_api/SP_TenantSettings_Current`,
+            headers: {
+              accept: 'application/json;odata=nometadata'
+            },
+            responseType: 'json'
+          };
+
+          request
+            .get<{ CorporateCatalogUrl: string }>(requestOptions)
+            .then((res: { CorporateCatalogUrl: string }): void => {
+              resolve(res.CorporateCatalogUrl);
+            });
+        }, (error: any): void => {
+          reject(error);
+        });
+    });
+  },
+
   getSpoAdminUrl(logger: Logger, debug: boolean): Promise<string> {
     return new Promise<string>((resolve: (spoAdminUrl: string) => void, reject: (error: any) => void): void => {
       spo

@@ -83,20 +83,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
-      console.log(`${spoUrl}/_api/SP_TenantSettings_Current`);
-      const requestOptions: any = {
-        url: `${spoUrl}/_api/SP_TenantSettings_Current`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        }
-      };
-
-      const res: string = await request.get(requestOptions);
-      const json = JSON.parse(res);
-      console.log(json);
-      const appCatalogUrl: string | undefined = json.CorporateCatalogUrl;
-
+      const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
       if (!appCatalogUrl) {
         throw 'No app catalog URL found';
       }
@@ -113,7 +100,6 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
       }
 
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-      console.log(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=${filter}`);
       const reqOptions: CliRequestOptions = {
         url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=${filter}`,
         headers: {
@@ -123,17 +109,16 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
       };
 
       const listItemInstances = await request.get<ListItemInstanceCollection>(reqOptions);
-      console.log(listItemInstances);
-      listItemInstances.value.forEach(v => delete v['ID']);
-      console.log(listItemInstances);
 
       if (listItemInstances.value.length === 0) {
         throw 'The specified application customizer was not found';
       }
 
       if (listItemInstances.value.length > 1) {
-        throw `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} was found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.GUID).join(', ')}`;
+        throw `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.GUID).join(', ')}`;
       }
+
+      listItemInstances.value.forEach(v => delete v['ID']);
 
       logger.log(listItemInstances.value[0]);
     }

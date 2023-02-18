@@ -728,4 +728,27 @@ describe('utils/spo', () => {
         done(err);
       });
   });
+
+  it('retrieves tenant app catalog url', (done) => {
+    sinon.stub(spo, 'getSpoUrl').callsFake(() => Promise.resolve('https://contoso.sharepoint.com'));
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
+        return Promise.resolve(JSON.stringify({ CorporateCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    spo
+      .getTenantAppCatalogUrl(logger, false)
+      .then((tenantAppCatalogUrl: string | null) => {
+        try {
+          assert.strictEqual(tenantAppCatalogUrl, 'https://contoso.sharepoint.com/sites/appcatalog');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
 });

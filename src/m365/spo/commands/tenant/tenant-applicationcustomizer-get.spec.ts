@@ -11,6 +11,7 @@ import { pid } from '../../../../utils/pid';
 import { formatting } from '../../../../utils/formatting';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { urlUtil } from '../../../../utils/urlUtil';
+import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
 const command: Command = require('./tenant-applicationcustomizer-get');
 
@@ -61,6 +62,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     auth.service.connected = true;
     auth.service.spoUrl = spoUrl;
     commandInfo = Cli.getCommandInfo(command);
+    sinon.stub(spo, 'getTenantAppCatalogUrl').callsFake(async () => appCatalogUrl);
   });
 
   beforeEach(() => {
@@ -89,7 +91,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      spo.getTenantAppCatalogUrl
     ]);
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
@@ -167,7 +170,7 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if title is valid', async () => {
+  it('passed validation when title specified', async () => {
     const actual = await command.validate({ options: { title: title } }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -177,15 +180,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly handles if tenant appcatalog is null or not exist', async () => {
+  it('throws error when tenant app catalog doesn\'t exist', async () => {
     const errorMessage = 'No app catalog URL found';
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return JSON.stringify({ "CorporateCatalogUrl": null });
-      }
-
-      throw 'Invalid request';
-    });
 
     await assert.rejects(command.action(logger, {
       options: {
@@ -196,10 +192,6 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
 
   it('retrieves an application customizer by title', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return JSON.stringify({ "CorporateCatalogUrl": appCatalogUrl });
-      }
-
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, listUrl);
       if (opts.url === `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=Title eq '${title}'`) {
         return applicationCustomizerResponse;
@@ -217,12 +209,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('handles error when multiple application customizers with the specified title found', async () => {
-    const errorMessage = `Multiple application customizers with ${title} was found. Please disambiguate (IDs): 14125658-a9bc-4ddf-9c75-1b5767c9a337, 14125658-a9bc-4ddf-9c75-1b5767c9a338`;
+    const errorMessage = `Multiple application customizers with ${title} were found. Please disambiguate (IDs): 14125658-a9bc-4ddf-9c75-1b5767c9a337, 14125658-a9bc-4ddf-9c75-1b5767c9a338`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return JSON.stringify({ "CorporateCatalogUrl": appCatalogUrl });
-      }
-
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, listUrl);
       if (opts.url === `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=Title eq '${title}'`) {
         return {
@@ -246,10 +234,6 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
 
   it('retrieves an application customizer by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return JSON.stringify({ "CorporateCatalogUrl": appCatalogUrl });
-      }
-
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, listUrl);
       if (opts.url === `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=GUID eq '${id}'`) {
         return applicationCustomizerResponse;
@@ -268,10 +252,6 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
 
   it('retrieves an application customizer by clientSideComponentId', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return JSON.stringify({ "CorporateCatalogUrl": appCatalogUrl });
-      }
-
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, listUrl);
       if (opts.url === `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionComponentId eq '${clientSideComponentId}'`) {
         return applicationCustomizerResponse;
@@ -289,12 +269,8 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   });
 
   it('handles error when multiple application customizers with the clientSideComponentId found', async () => {
-    const errorMessage = `Multiple application customizers with ${clientSideComponentId} was found. Please disambiguate (IDs): 14125658-a9bc-4ddf-9c75-1b5767c9a337, 14125658-a9bc-4ddf-9c75-1b5767c9a338`;
+    const errorMessage = `Multiple application customizers with ${clientSideComponentId} were found. Please disambiguate (IDs): 14125658-a9bc-4ddf-9c75-1b5767c9a337, 14125658-a9bc-4ddf-9c75-1b5767c9a338`;
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return JSON.stringify({ "CorporateCatalogUrl": appCatalogUrl });
-      }
-
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, listUrl);
       if (opts.url === `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionComponentId eq '${clientSideComponentId}'`) {
         return {
@@ -319,10 +295,6 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
   it('handles error when specified application customizer not found', async () => {
     const errorMessage = 'The specified application customizer was not found';
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
-        return JSON.stringify({ "CorporateCatalogUrl": appCatalogUrl });
-      }
-
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, listUrl);
       if (opts.url === `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=Title eq '${title}'`) {
         return { value: [] };

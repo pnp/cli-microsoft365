@@ -11,10 +11,10 @@ spo tenant applicationcustomizer get [options]
 ## Options
 
 `-t, --title [title]`
-: The title of the Application Customizer. Specify either `title`, `id`, or `clientSideComponentId`.
+: The title of the application customizer. Specify either `title`, `id`, or `clientSideComponentId`.
 
 `-i, --id [id]`
-: The product id of the Application Customizer. Specify either `title`, `id`, or `clientSideComponentId`.
+: The product id of the application customizer. Specify either `title`, `id`, or `clientSideComponentId`.
 
 `-c, --clientSideComponentId  [clientSideComponentId]`
 : The Client Side Component Id (GUID) of the application customizer. Specify either `title`, `id`, or `clientSideComponentId`.
