@@ -44,13 +44,13 @@ m365 spo file retentionlabel ensure --webUrl https://contoso.sharepoint.com/site
 Applies a retention label to a file based on the label name and the fileId
 
 ```sh
-m365 spo file retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --fileId '26541f96-017c-4189-a604-599e083533b8'  --name 'Some label'
+m365 spo file retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --fileId '26541f96-017c-4189-a604-599e083533b8' --name 'Some label'
 ```
 
 Applies a event-based retention label to a file based on the label name, the fileId and the asset id
 
 ```sh
-m365 spo file retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --fileId '26541f96-017c-4189-a604-599e083533b8'  --name 'Some label' --assetId 'XYZ'
+m365 spo file retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --fileId '26541f96-017c-4189-a604-599e083533b8' --name 'Some label' --assetId 'XYZ'
 ```
 
 ## Response

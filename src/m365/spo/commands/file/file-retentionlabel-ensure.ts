@@ -101,6 +101,9 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
       if (args.options.assetId && !labelInformation.isEventBasedTag) {
         throw `The label that's being applied is not an event-based label`;
       }
+      if (args.options.assetId && labelInformation.isEventBasedTag) {
+        await this.applyAssetId(args.options.webUrl, fileProperties.ListItemAllFields.ParentList.Id, fileProperties.ListItemAllFields.Id, args.options.assetId);
+      }
 
       const requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(fileProperties.ListItemAllFields.ParentList.Id)}')/items(${fileProperties.ListItemAllFields.Id})/SetComplianceTag()`;
 
@@ -114,9 +117,7 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
       };
 
       const response = await request.post(requestOptions);
-      if (args.options.assetId) {
-        await this.applyAssetId(args.options.webUrl, fileProperties.ListItemAllFields.ParentList.Id, fileProperties.ListItemAllFields.Id, args.options.assetId);
-      }
+
       if (this.verbose) {
         logger.log(response);
       }
