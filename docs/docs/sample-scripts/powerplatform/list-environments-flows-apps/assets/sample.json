@@ -5,7 +5,7 @@
     "title": "List all Power Platform Environments and their Flows and Apps",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/powerplatform/list-environments-flows-apps",
     "creationDateTime": "2022-09-10",
-    "updateDateTime": "2022-09-10",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script will retrieve all environments as an Administrator and loop through all Flows and Apps to provide you with a report indicating how much Power Platform components are in use in the tenant.",
     "longDescription": [
       "This script will retrieve all environments as an Administrator and loop through all Flows and Apps to provide you with a report indicating how much Power Platform components are in use in the tenant."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

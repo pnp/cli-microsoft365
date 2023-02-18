@@ -5,7 +5,7 @@
     "title": "Upload local files and folders to SharePoint Online",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/upload-local-files-and-folder",
     "creationDateTime": "2021-04-13",
-    "updateDateTime": "2021-04-13",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script shows how you can use the CLI to upload files located on a local folder to a SharePoint Online library.",
     "longDescription": [
       "This script shows how you can use the CLI to upload files located on a local folder to a SharePoint Online library or subfolder. This is a simple script that could be used for simple data migration scenarios. The given example uploads to the given site to Shared Documents library all files and sub folders of ./import local folder"
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

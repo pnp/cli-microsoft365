@@ -5,7 +5,7 @@
     "title": "Monitor and notify Microsoft 365 health status",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/tenant/tenant-monitor-notify-healthstatus",
     "creationDateTime": "2021-03-25",
-    "updateDateTime": "2021-03-25",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This is a script which monitors the health status of your Microsoft 365 tenant and notifies if something is not normal.",
     "longDescription": [
       "This is a script which monitors the health status of your Microsoft 365 tenant and notifies if something is not normal. Script creates a SharePoint List and will add the outage content to that. It will also send an email notification to the configured user."
@@ -20,7 +20,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

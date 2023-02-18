@@ -5,7 +5,7 @@
     "title": "Detecting PII exists in SharePoint List using AWS Comprehend",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/detecting-pii-exists-in-sharepointlist-column",
     "creationDateTime": "2022-02-12",
-    "updateDateTime": "2022-02-12",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "The script uses Amazon Comprehend to detect PII entities from a specific SharePoint List column record the results in another list and CSV report.",
     "longDescription": [
       "In this post, I showcased using Amazon Comprehend to detect PII entities from a specific SharePoint List column and record the results in another list and CSV report via the AWS CLI and CLI for Microsoft 365."
@@ -20,7 +20,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

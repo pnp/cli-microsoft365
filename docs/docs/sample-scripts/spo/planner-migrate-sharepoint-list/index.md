@@ -100,10 +100,10 @@ Use the CLI for Microsoft 365 to migrate an existing plan to a SharePoint Online
                 $viewName = "All Items"
                 $viewFields = @("Progress", "Priority", "Assigned_x0020_to", "Due date", "Start date");
                 foreach ($field in $viewFields) {
-                    m365 spo list view field add --webUrl $SiteUrl --listTitle  $list.title  --viewTitle $viewName --fieldTitle $field
+                    m365 spo list view field add --webUrl $SiteUrl --listTitle $list.title --viewTitle $viewName --title $field
                 }
-                $view = m365 spo list view set --webUrl $SiteUrl --listTitle $list.title --viewTitle $viewName --ViewQuery '<GroupBy Collapse=\"TRUE\" GroupLimit=\"30\"><FieldRef Name=\"Bucket\" /></GroupBy><OrderBy><FieldRef Name=\"ID\" /></OrderBy>'
-                $view = m365 spo list view set --webUrl $SiteUrl --listTitle $list.title --viewTitle $viewName --ViewType2 "TILES"
+                $view = m365 spo list view set --webUrl $SiteUrl --listTitle $list.title --title $viewName --ViewQuery '<GroupBy Collapse=\"TRUE\" GroupLimit=\"30\"><FieldRef Name=\"Bucket\" /></GroupBy><OrderBy><FieldRef Name=\"ID\" /></OrderBy>'
+                $view = m365 spo list view set --webUrl $SiteUrl --listTitle $list.title --title $viewName --ViewType2 "TILES"
             }
 
             Write-Host "Migrating tasks"

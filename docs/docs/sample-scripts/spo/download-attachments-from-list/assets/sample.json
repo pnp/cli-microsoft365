@@ -5,7 +5,7 @@
     "title": "Download attachments from a SharePoint Online list",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/download-attachments-from-list",
     "creationDateTime": "2023-02-18",
-    "updateDateTime": "2023-02-18",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Script helps to download attachments from a SharePoint Online list.",
     "longDescription": [
       "Download attachments from a SharePoint Online list to a local directory "
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "6.2.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

@@ -18,13 +18,13 @@ This script helps you to quickly remove SharePoint API permissions.
     $.verbose = false;
 
     console.log('Retrieving granted API permissions...');
-    const apiPermissions = JSON.parse(await $`m365 spo sp grant list -o json`);
+    const apiPermissions = JSON.parse(await $`m365 serviceprincipal sp grant list -o json`);
 
     for (let i = 0; i < apiPermissions.length; i++) {
       const permission = apiPermissions[i];
       console.log(`Removing permission ${permission.Resource}/${permission.Scope} (${permission.ObjectId})...`);
       try {
-        await $`m365 spo serviceprincipal grant revoke --grantId ${permission.ObjectId}`
+        await $`m365 spo serviceprincipal grant revoke --id ${permission.ObjectId}`
         console.log(chalk.green('DONE'));
       }
       catch (err) {

@@ -57,7 +57,7 @@ Prerequisites:
         Try {
     
             #Get All Items from the List
-            $ListItems = m365 spo listitem list --webUrl $SiteURL --title $ListTitle -o json | ConvertFrom-Json -AsHashtable
+            $ListItems = m365 spo listitem list --webUrl $SiteURL --listTitle $ListTitle -o json | ConvertFrom-Json -AsHashtable
              
             #Iterate through each list item
             Foreach ($Item in $ListItems) {

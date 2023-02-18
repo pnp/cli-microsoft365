@@ -5,7 +5,7 @@
     "title": "Add multiple lists in multiple sites",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/add-multiple-lists-in-multiple-sites",
     "creationDateTime": "2021-07-05",
-    "updateDateTime": "2021-07-05",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Adds multiple lists in multiple sites.",
     "longDescription": [
       "Adds multiple lists in multiple sites."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

@@ -51,8 +51,7 @@ Uninstalls an app from the specified users and / or unpublish it from the Micros
       if ($Uninstall) {
         if ($CurrentUser) {
           # Getting the reference of the currently connected user
-          $connectedAs = m365 status -o json | ConvertFrom-Json
-          $user = m365 aad user get --userName $connectedAs.connectedAs -o json | ConvertFrom-Json
+          $user = m365 aad user get --id "@meId" -o json | ConvertFrom-Json
 
           if ($user) {
             $Users += $user.userPrincipalName

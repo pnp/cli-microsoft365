@@ -5,7 +5,7 @@
     "title": "Remove SharePoint API permissions",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/remove-api-permissions",
     "creationDateTime": "2021-06-17",
-    "updateDateTime": "2021-06-17",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script helps you to quickly remove SharePoint API permissions.",
     "longDescription": [
       "When building SharePoint Framework solutions connected to APIs secured with Azure Active Directory, you might need to clear the list of granted API permissions. This script helps you to quickly remove SharePoint API permissions."
@@ -20,7 +20,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

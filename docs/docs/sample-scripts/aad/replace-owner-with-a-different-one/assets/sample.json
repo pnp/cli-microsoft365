@@ -5,7 +5,7 @@
     "title": "CLI - Replace an owner in a Microsoft 365 Group or Microsoft Team",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/replace-owner-with-a-different-one",
     "creationDateTime": "2021-04-28",
-    "updateDateTime": "2021-04-28",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Find all the Microsoft 365 Groups that a user is an Owner of and replace them with someone else.",
     "longDescription": [
       "Find all the Microsoft 365 Groups that a user is an Owner of and replace them with someone else useful for when an employee leaves and ownership needs to be updated."
@@ -23,7 +23,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

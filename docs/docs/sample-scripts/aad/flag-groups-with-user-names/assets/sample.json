@@ -5,7 +5,7 @@
     "title": "Scan for Microsoft 365 Groups created with user's first or last name",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/flag-groups-with-user-names",
     "creationDateTime": "2020-03-28",
-    "updateDateTime": "2020-03-28",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This sample script scans the Microsoft 365 groups that may contain user’s first or last name as the group mail.",
     "longDescription": [
       "We can use the group naming policy to enforce a consistent naming strategy for groups created by users in our organization. A naming policy can help us and our users identify the function of the group. We can use the policy to block specific words from being used in group names and aliases. But what if we need to find out the list of Microsoft 365 groups created with user’s givenName or surname as their mail? This sample script scans the Microsoft 365 groups that may contain user’s first or last name as the group mail."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

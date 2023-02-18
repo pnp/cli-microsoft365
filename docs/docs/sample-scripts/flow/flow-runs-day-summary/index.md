@@ -25,19 +25,16 @@ This script creates a report of all flow runs from current day and sends the rep
 
     $flows = m365 flow list --environmentName $environment --output json
     $flows = $flows | ConvertFrom-Json
-    $currentDayDate = Get-Date
-    $previousDayDate = (Get-Date).AddDays(-1)
+    $currentDayDate = (Get-Date).ToUniversalTime().ToString("o")
+    $previousDayDate = (Get-Date).AddDays(-1).ToUniversalTime().ToString("o")
 
     $adaptiveCardDescription = ""
     foreach ($flow in $flows) 
     {
-        $flowRuns = m365 flow run list --environmentName $environment --flowName $flow.name --output json
-        $flowRuns = $flowRuns | ConvertFrom-Json
+        $todayRuns = m365 flow run list --environmentName $environment --flowName $flow.name --triggerStartTime $previousDayDate --triggerEndTime $currentDayDate --output json | ConvertFrom-Json
 
         $displayName = $flow.displayName
         $id = $flow.name
-
-        $todayRuns = $flowRuns.Where({[DateTime]$_.properties.endTime -le $currentDayDate -and [DateTime]$_.properties.endTime -gt $previousDayDate})
         
         $todayRunsCount = 0
         $todaySuccessRunsCount = 0

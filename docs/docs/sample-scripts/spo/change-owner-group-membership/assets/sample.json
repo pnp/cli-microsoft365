@@ -5,7 +5,7 @@
     "title": "Change group membership of all SharePoint Online sites",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/change-owner-group-membership",
     "creationDateTime": "2022-03-19",
-    "updateDateTime": "2022-03-19",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Script which downgrades the permission to the default member group.",
     "longDescription": [
       "This is a script which takes a subset or all members of the default owner group and downgrades the permission to the default member group."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [
