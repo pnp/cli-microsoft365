@@ -202,6 +202,11 @@ describe(commands.USER_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation preferredLanguage is not a valid preferredLanguage', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, userName: userName, preferredLanguage: 'z' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation if both managerUserId and managerUserName are specified', async () => {
     const actual = await command.validate({ options: { displayName: displayName, userName: userName, managerUserId: managerUserId, managerUserName: managerUserName } }, commandInfo);
     assert.notStrictEqual(actual, true);
