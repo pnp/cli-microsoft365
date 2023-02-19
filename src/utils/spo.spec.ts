@@ -262,6 +262,26 @@ describe('utils/spo', () => {
     });
   });
 
+  it('retrieves tenant app catalog url', async () => {
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
+        return Promise.resolve({ webUrl: 'https://contoso.sharepoint.com' });
+      }
+
+      if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
+        return Promise.resolve({ CorporateCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const spoUrl = await spo.getSpoUrl(logger, false);
+    const tenantAppCatalogUrl = await spo.getTenantAppCatalogUrl(logger, false);
+    assert.deepEqual(spoUrl, 'https://contoso.sharepoint.com');
+    assert.deepEqual(tenantAppCatalogUrl, 'https://contoso.sharepoint.com/sites/appcatalog');
+  });
+
   it('retrieves SPO URL from MS Graph when not retrieved previously', (done) => {
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -844,23 +864,5 @@ describe('utils/spo', () => {
     catch (e) {
       assert.deepEqual(e, `Invalid scope 'Invalid'. Allowed values are 'Site', 'Web' or 'All'.`);
     }
-  });
-
-  it('retrieves tenant app catalog url', async () => {
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
-        return Promise.resolve({ webUrl: 'https://contoso.sharepoint.com' });
-      }
-
-      if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
-        return Promise.resolve({ CorporateCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const tenantAppCatalogUrl = await spo.getTenantAppCatalogUrl(logger, false);
-    assert.deepEqual(tenantAppCatalogUrl, 'https://contoso.sharepoint.com/sites/appcatalog');
   });
 });
