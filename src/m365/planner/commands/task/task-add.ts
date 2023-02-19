@@ -1,9 +1,7 @@
 import { PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
-import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
@@ -179,17 +177,12 @@ class PlannerTaskAddCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['planId', 'planTitle'],
-      ['bucketId', 'bucketName']
+      { options: ['planId', 'planTitle'] },
+      { options: ['bucketId', 'bucketName'] }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
-
     try {
       this.planId = await this.getPlanId(args);
       this.bucketId = await this.getBucketId(args, this.planId);
@@ -220,6 +213,11 @@ class PlannerTaskAddCommand extends GraphCommand {
 
       const newTask = await request.post<PlannerTask>(requestOptions);
       const result = await this.updateTaskDetails(args.options, newTask);
+
+      if (result.description) {
+        result.hasDescription = true;
+      }
+
       logger.log(result);
     }
     catch (err: any) {
@@ -229,7 +227,7 @@ class PlannerTaskAddCommand extends GraphCommand {
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
+      url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}/details`,
       headers: {
         accept: 'application/json'
       },

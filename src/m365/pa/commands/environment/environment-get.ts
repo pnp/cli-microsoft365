@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
 
@@ -9,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  name?: string;
 }
 
 class PaEnvironmentGetCommand extends PowerAppsCommand {
@@ -27,25 +28,35 @@ class PaEnvironmentGetCommand extends PowerAppsCommand {
 
   constructor() {
     super();
-  
+
+    this.#initTelemetry();
     this.#initOptions();
   }
-  
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        name: typeof args.options.name !== 'undefined'
+      });
+    });
+  }
+
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-n, --name <name>'
+        option: '-n, --name [name]'
       }
     );
   }
-  
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about Microsoft Power Apps environment ${args.options.name}...`);
+      logger.logToStderr(`Retrieving information about Microsoft Power Apps environment ${args.options.name || 'default'}...`);
     }
 
+    const environmentName = args.options.name ? formatting.encodeQueryParameter(args.options.name) : '~default';
     const requestOptions: any = {
-      url: `${this.resource}/providers/Microsoft.PowerApps/environments/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+      url: `${this.resource}/providers/Microsoft.PowerApps/environments/${environmentName}?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

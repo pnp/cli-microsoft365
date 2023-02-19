@@ -42,6 +42,10 @@ Removes user with login name _i:0#.f|membership|john.doe@mytenant.onmicrosoft.co
 m365 spo user remove --webUrl "https://contoso.sharepoint.com/sites/HR" --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - Remove-PnPUser - [https://docs.microsoft.com/en-us/powershell/module/sharepoint-pnp/remove-pnpuser?view=sharepoint-ps](https://docs.microsoft.com/en-us/powershell/module/sharepoint-pnp/remove-pnpuser?view=sharepoint-ps)

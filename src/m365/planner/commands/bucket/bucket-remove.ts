@@ -1,11 +1,8 @@
 import { PlannerBucket } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
-import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
@@ -88,61 +85,56 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id) {
-	      if (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
-	        return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
-	      }
-	    }
-	    else {
-	      if (!args.options.planId && !args.options.planTitle) {
-	        return 'Specify either planId or planTitle when using name';
-	      }
+          if (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
+            return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
+          }
+        }
+        else {
+          if (!args.options.planId && !args.options.planTitle) {
+            return 'Specify either planId or planTitle when using name';
+          }
 
-	      if (args.options.planId && args.options.planTitle) {
-	        return 'Specify either planId or planTitle when using name but not both';  
-	      }
+          if (args.options.planId && args.options.planTitle) {
+            return 'Specify either planId or planTitle when using name but not both';
+          }
 
-	      if (args.options.planTitle) {
-	        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-	          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-	        }
+          if (args.options.planTitle) {
+            if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
+              return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+            }
 
-	        if (args.options.ownerGroupId && args.options.ownerGroupName) {
-	          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-	        }
+            if (args.options.ownerGroupId && args.options.ownerGroupName) {
+              return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+            }
 
-	        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
-	          return `${args.options.ownerGroupId} is not a valid GUID`;
-	        }
-	      }
-	      else {
-	        if (args.options.ownerGroupId || args.options.ownerGroupName) {
-	          return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
-	        }
-	      }
-	    }
+            if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
+              return `${args.options.ownerGroupId} is not a valid GUID`;
+            }
+          }
+          else {
+            if (args.options.ownerGroupId || args.options.ownerGroupName) {
+              return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
+            }
+          }
+        }
 
-	    return true;
+        return true;
       }
     );
   }
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'name']
+      { options: ['id', 'name'] }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
-
     const removeBucket: () => Promise<void> = async (): Promise<void> => {
       try {
         const bucket = await this.getBucket(args);
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/buckets/${bucket.id}`,
           headers: {
             accept: 'application/json;odata.metadata=none',
@@ -162,7 +154,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       await removeBucket();
     }
     else {
-      const result = await Cli.prompt<{continue: boolean}>({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -177,7 +169,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
 
   private getBucket(args: CommandArgs): Promise<PlannerBucket> {
     if (args.options.id) {
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/buckets/${args.options.id}`,
         headers: {
           accept: 'application/json'
@@ -191,7 +183,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     return this
       .getPlanId(args)
       .then(planId => {
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
           headers: {
             accept: 'application/json'

@@ -2,6 +2,7 @@ import * as os from 'os';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -57,7 +58,7 @@ class OutlookMessageListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['folderId', 'folderName']);
+    this.optionSets.push({ options: ['folderId', 'folderName'] });
   }
 
   public defaultProperties(): string[] | undefined {
@@ -93,7 +94,7 @@ class OutlookMessageListCommand extends GraphCommand {
 
     return new Promise<string>((resolve: (folderId: string) => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/me/mailFolders?$filter=displayName eq '${encodeURIComponent(args.options.folderName as string)}'&$select=id`,
+        url: `${this.resource}/v1.0/me/mailFolders?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.folderName as string)}'&$select=id`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

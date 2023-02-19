@@ -1,10 +1,9 @@
-import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { CommandOutput } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
@@ -25,7 +24,7 @@ interface Options extends GlobalOptions {
   onlyAllowMembersViewMembership?: boolean;
   allowRequestToJoinLeave?: boolean;
   autoAcceptRequestToJoinLeave?: boolean;
-  requestToJoinLeaveEmailSetting?: boolean;
+  requestToJoinLeaveEmailSetting?: string;
   ownerEmail?: string;
   ownerUserName?: string;
 }
@@ -44,6 +43,7 @@ class SpoGroupSetCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
     this.#initOptionSets();
   }
@@ -55,10 +55,10 @@ class SpoGroupSetCommand extends SpoCommand {
         name: typeof args.options.name !== 'undefined',
         newName: typeof args.options.newName !== 'undefined',
         description: typeof args.options.description !== 'undefined',
-        allowMembersEditMembership: typeof args.options.allowMembersEditMembership !== 'undefined',
-        onlyAllowMembersViewMembership: typeof args.options.onlyAllowMembersViewMembership !== 'undefined',
-        allowRequestToJoinLeave: typeof args.options.allowRequestToJoinLeave !== 'undefined',
-        autoAcceptRequestToJoinLeave: typeof args.options.autoAcceptRequestToJoinLeave !== 'undefined',
+        allowMembersEditMembership: args.options.allowMembersEditMembership,
+        onlyAllowMembersViewMembership: args.options.onlyAllowMembersViewMembership,
+        allowRequestToJoinLeave: args.options.allowRequestToJoinLeave,
+        autoAcceptRequestToJoinLeave: args.options.autoAcceptRequestToJoinLeave,
         requestToJoinLeaveEmailSetting: typeof args.options.requestToJoinLeaveEmailSetting !== 'undefined',
         ownerEmail: typeof args.options.ownerEmail !== 'undefined',
         ownerUserName: typeof args.options.ownerUserName !== 'undefined'
@@ -84,16 +84,20 @@ class SpoGroupSetCommand extends SpoCommand {
         option: '--description [description]'
       },
       {
-        option: '--allowMembersEditMembership [allowMembersEditMembership]'
+        option: '--allowMembersEditMembership [allowMembersEditMembership]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--onlyAllowMembersViewMembership [onlyAllowMembersViewMembership]'
+        option: '--onlyAllowMembersViewMembership [onlyAllowMembersViewMembership]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--allowRequestToJoinLeave [allowRequestToJoinLeave]'
+        option: '--allowRequestToJoinLeave [allowRequestToJoinLeave]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--autoAcceptRequestToJoinLeave [autoAcceptRequestToJoinLeave]'
+        option: '--autoAcceptRequestToJoinLeave [autoAcceptRequestToJoinLeave]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--requestToJoinLeaveEmailSetting [requestToJoinLeaveEmailSetting]'
@@ -105,6 +109,10 @@ class SpoGroupSetCommand extends SpoCommand {
         option: '--ownerUserName [ownerUserName]'
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('allowMembersEditMembership', 'onlyAllowMembersViewMembership', 'allowRequestToJoinLeave', 'autoAcceptRequestToJoinLeave');
   }
 
   #initValidators(): void {
@@ -123,27 +131,17 @@ class SpoGroupSetCommand extends SpoCommand {
           return 'Specify either ownerEmail or ownerUserName but not both';
         }
 
-        const booleanOptions = [
-          args.options.allowMembersEditMembership, args.options.onlyAllowMembersViewMembership,
-          args.options.allowRequestToJoinLeave, args.options.autoAcceptRequestToJoinLeave
-        ];
-        for (const option of booleanOptions) {
-          if (typeof option !== 'undefined' && !validation.isValidBoolean(option as any)) {
-            return `Value '${option}' is not a valid boolean`;
-          }
-        }
-
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api/web/sitegroups/${args.options.id ? `GetById(${args.options.id})` : `GetByName('${args.options.name}')`}`,
       headers: {
         accept: 'application/json;odata.metadata=none',
@@ -178,7 +176,7 @@ class SpoGroupSetCommand extends SpoCommand {
     return this
       .getOwnerId(options)
       .then((ownerId: number): Promise<void> => {
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${options.webUrl}/_api/web/sitegroups/${options.id ? `GetById(${options.id})` : `GetByName('${options.name}')`}/SetUserAsOwner(${ownerId})`,
           headers: {
             accept: 'application/json;odata.metadata=none',
@@ -205,7 +203,7 @@ class SpoGroupSetCommand extends SpoCommand {
       .then((output: CommandOutput) => {
         const getUserOutput = JSON.parse(output.stdout);
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${options.webUrl}/_api/web/ensureUser('${getUserOutput.userPrincipalName}')?$select=Id`,
           headers: {
             accept: 'application/json',

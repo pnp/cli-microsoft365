@@ -7,6 +7,7 @@ import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -62,20 +63,20 @@ class TeamsTeamRemoveCommand extends GraphCommand {
     );
   }
 
-  #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
-  }
-
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-	      return `${args.options.id} is not a valid GUID`;
-	    }
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
 
-	    return true;
+        return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {
@@ -99,7 +100,7 @@ class TeamsTeamRemoveCommand extends GraphCommand {
       try {
         const teamId: string = await this.getTeamId(args);
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/groups/${encodeURIComponent(teamId)}`,
+          url: `${this.resource}/v1.0/groups/${formatting.encodeQueryParameter(teamId)}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -107,7 +108,7 @@ class TeamsTeamRemoveCommand extends GraphCommand {
         };
 
         await request.delete(requestOptions);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -123,7 +124,7 @@ class TeamsTeamRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the team ${args.options.id ? args.options.id : args.options.name}?`
       });
-      
+
       if (result.continue) {
         await removeTeam();
       }

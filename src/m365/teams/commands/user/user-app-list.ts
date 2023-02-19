@@ -1,7 +1,9 @@
 import { TeamsAppDefinition, TeamsAppInstallation } from '@microsoft/microsoft-graph-types';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -71,13 +73,13 @@ class TeamsUserAppListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['userId', 'userName']);
+    this.optionSets.push({ options: ['userId', 'userName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const userId: string = (await this.getUserId(args)).value;
-      const endpoint: string = `${this.resource}/v1.0/users/${encodeURIComponent(userId)}/teamwork/installedApps?$expand=teamsAppDefinition`;
+      const endpoint: string = `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(userId)}/teamwork/installedApps?$expand=teamsAppDefinition,teamsApp`;
 
       const items = await odata.getAllItems<TeamsAppInstallation>(endpoint);
       items.forEach(i => {
@@ -86,7 +88,7 @@ class TeamsUserAppListCommand extends GraphCommand {
         (i as any).appId = appId;
       });
 
-      if (args.options.output === 'json') {
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(items);
       }
       else {
@@ -99,7 +101,7 @@ class TeamsUserAppListCommand extends GraphCommand {
           };
         }));
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -111,7 +113,7 @@ class TeamsUserAppListCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
+      url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userName)}/id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

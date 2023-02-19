@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -19,7 +19,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(autocomplete, 'generateShCompletion').callsFake(() => { });
   });
@@ -51,7 +51,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       autocomplete.generateShCompletion
     ]);
@@ -71,7 +71,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    await command.action(logger, { options: { debug: false, profile: profilePath } });
+    await command.action(logger, { options: { profile: profilePath } });
     assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'));
   });
 
@@ -91,7 +91,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    await command.action(logger, { options: { debug: false, profile: profilePath } });
+    await command.action(logger, { options: { profile: profilePath } });
     assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
     assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
   });
@@ -114,7 +114,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    await command.action(logger, { options: { debug: false, profile: profilePath } });
+    await command.action(logger, { options: { profile: profilePath } });
     assert(mkdirSyncStub.calledWith(path.dirname(profilePath), { recursive: true }), 'Profile path not created');
     assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
     assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
@@ -141,7 +141,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, profile: profilePath } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, { options: { profile: profilePath } } as any), new CommandError(error));
     assert(mkdirSyncStub.calledWith(path.dirname(profilePath), { recursive: true }), 'Profile path not created');
     assert(writeFileSyncStub.notCalled, 'Profile file created');
     assert(appendFileSyncStub.notCalled, 'Completion script appended');
@@ -154,7 +154,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { throw error; });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, profile: profilePath } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, { options: { profile: profilePath } } as any), new CommandError(error));
     assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
     assert(appendFileSyncStub.notCalled, 'Completion script appended');
   });
@@ -166,18 +166,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { throw error; });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, profile: profilePath } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, { options: { profile: profilePath } } as any), new CommandError(error));
     assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

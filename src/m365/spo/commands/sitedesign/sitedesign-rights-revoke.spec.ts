@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -66,7 +66,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -96,7 +96,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } });
+    await command.action(logger, { options: { confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -115,7 +115,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF,AdeleV' } });
+    await command.action(logger, { options: { confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF,AdeleV' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -134,7 +134,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com,AdeleV@contoso.com' } });
+    await command.action(logger, { options: { confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com,AdeleV@contoso.com' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -153,12 +153,12 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com, AdeleV@contoso.com' } });
+    await command.action(logger, { options: { confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com, AdeleV@contoso.com' } });
     assert(loggerLogSpy.notCalled);
   });
 
   it('prompts before revoking access to the specified site design when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
+    await command.action(logger, { options: { siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -170,7 +170,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
   it('aborts revoking access to the site design when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    await command.action(logger, { options: { debug: false, siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
+    await command.action(logger, { options: { siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
     assert(postSpy.notCalled);
   });
 
@@ -181,27 +181,16 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { debug: false, siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
+    await command.action(logger, { options: { siteDesignId: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
     assert(postStub.called);
   });
 
   it('correctly handles error when site script not found', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject('File Not Found.' );
+      return Promise.reject('File Not Found.');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } } as any), new CommandError('File Not Found.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { confirm: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports specifying id', () => {

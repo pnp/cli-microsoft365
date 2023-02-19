@@ -8,8 +8,11 @@ export interface Term {
   LastModifiedDate: string;
   LocalCustomProperties: Hash;
   Name: string;
+  TermsCount: number;
+  ParentTermId?: string;
+  Children: Term[];
 }
 
 export interface Hash {
-  [key: string] : string;
+  [key: string]: string;
 }

@@ -1,11 +1,10 @@
-import request from "../request";
+import request, { CliRequestOptions } from "../request";
 import { odata } from "./odata";
 import { PlannerPlan } from "@microsoft/microsoft-graph-types";
-import { AxiosRequestConfig } from "axios";
 
 const graphResource = 'https://graph.microsoft.com';
 
-const getRequestOptions = (url: string, metadata: 'none' | 'minimal' | 'full'): AxiosRequestConfig => ({
+const getRequestOptions = (url: string, metadata: 'none' | 'minimal' | 'full'): CliRequestOptions => ({
   url: url,
   headers: {
     accept: `application/json;odata.metadata=${metadata}`
@@ -21,7 +20,7 @@ export const planner = {
    */
   async getPlanById(id: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan> {
     const requestOptions = getRequestOptions(`${graphResource}/v1.0/planner/plans/${id}`, metadata);
-    
+
     try {
       return await request.get<PlannerPlan>(requestOptions);
     }
@@ -34,17 +33,29 @@ export const planner = {
    * Get all Planner plans for a specific group.
    * @param groupId Group ID.
    */
-  getPlansByGroupId(groupId: string): Promise<PlannerPlan[]> {
-    return odata.getAllItems<PlannerPlan>(`${graphResource}/v1.0/groups/${groupId}/planner/plans`, 'none');
+  getPlansByGroupId(groupId: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan[]> {
+    return odata.getAllItems<PlannerPlan>(`${graphResource}/v1.0/groups/${groupId}/planner/plans`, metadata);
+  },
+
+  /**
+   * Get all Planner plans for a specific roster.
+   * @param rosterId Roster ID.
+   */
+  getPlansByRosterId(rosterId: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan[]> {
+    return odata.getAllItems<PlannerPlan>(`${graphResource}/beta/planner/rosters/${rosterId}/plans`, metadata);
   },
 
   /**
    * Get Planner plan by title in a specific group. 
    * @param title Title of the Planner plan. Case insensitive.
-   * @param groupId Owner group ID .
+   * @param groupId Owner group ID.
+   * @param rosterId Roster ID.
    */
-  async getPlanByTitle(title: string, groupId: string): Promise<PlannerPlan> {
-    const plans = await this.getPlansByGroupId(groupId);
+  async getPlanByTitle(title: string, groupId?: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan> {
+    let plans: PlannerPlan[] = [];
+    if (groupId) {
+      plans = await this.getPlansByGroupId(groupId, metadata);
+    }
     const filteredPlans = plans.filter(p => p.title && p.title.toLowerCase() === title.toLowerCase());
 
     if (!filteredPlans.length) {

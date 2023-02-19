@@ -16,8 +16,8 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   contentTypeId: string;
   id: string;
-  hidden?: string;
-  required?: string;
+  hidden?: boolean;
+  required?: boolean;
   webUrl: string;
 }
 
@@ -70,10 +70,12 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         option: '-f, --id <id>'
       },
       {
-        option: '-r, --required [required]'
+        option: '-r, --required [required]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--hidden [hidden]'
+        option: '--hidden [hidden]',
+        autocomplete: ['true', 'false']
       }
     );
   }
@@ -84,21 +86,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
-        if (typeof args.options.required !== 'undefined') {
-          if (args.options.required !== 'true' &&
-            args.options.required !== 'false') {
-            return `${args.options.required} is not a valid boolean value. Allowed values are true|false`;
-          }
-        }
-    
-        if (typeof args.options.hidden !== 'undefined') {
-          if (args.options.hidden !== 'true' &&
-            args.options.hidden !== 'false') {
-            return `${args.options.hidden} is not a valid boolean value. Allowed values are true|false`;
-          }
-        }
-    
+
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
@@ -106,6 +94,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('contentTypeId', 'c');
+    this.types.boolean.push('required', 'hidden');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -115,9 +104,9 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       if (this.verbose) {
         logger.logToStderr(`Retrieving field link for field ${args.options.id}...`);
       }
-  
+
       let requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.id}')`,
+        url: `${args.options.webUrl}/_api/web/contenttypes('${formatting.encodeQueryParameter(args.options.contentTypeId)}')/fieldlinks('${args.options.id}')`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
@@ -137,7 +126,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           logger.logToStderr('Field link not found. Creating...');
           logger.logToStderr(`Retrieving information about site column ${args.options.id}...`);
         }
-  
+
         requestOptions = {
           url: `${args.options.webUrl}/_api/web/fields('${args.options.id}')?$select=SchemaXmlWithResourceTokens`,
           headers: {
@@ -145,7 +134,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           },
           responseType: 'json'
         };
-  
+
         const field = await request.get<{ SchemaXmlWithResourceTokens: string; }>(requestOptions);
         schemaXmlWithResourceTokens = field.SchemaXmlWithResourceTokens;
         await this.createFieldLink(logger, args, schemaXmlWithResourceTokens);
@@ -156,7 +145,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         requestOptions = {
-          url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.id}')`,
+          url: `${args.options.webUrl}/_api/web/contenttypes('${formatting.encodeQueryParameter(args.options.contentTypeId)}')/fieldlinks('${args.options.id}')`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },
@@ -172,15 +161,15 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       if (!this.fieldLink) {
         throw `Couldn't find field link for field ${args.options.id}`;
       }
-      
+
       let updateHidden: boolean = false;
       let updateRequired: boolean = false;
       if (typeof args.options.hidden !== 'undefined' &&
-        this.fieldLink.Hidden !== (args.options.hidden === 'true')) {
+        this.fieldLink.Hidden !== args.options.hidden) {
         updateHidden = true;
       }
       if (typeof args.options.required !== 'undefined' &&
-        this.fieldLink.Required !== (args.options.required === 'true')) {
+        this.fieldLink.Required !== args.options.required) {
         updateRequired = true;
       }
 
@@ -195,7 +184,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         if (this.verbose) {
           logger.logToStderr(`Retrieving site collection id...`);
         }
-  
+
         requestOptions = {
           url: `${args.options.webUrl}/_api/site?$select=Id`,
           headers: {
@@ -203,7 +192,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           },
           responseType: 'json'
         };
-  
+
         const site = await request.get<{ Id: string }>(requestOptions);
         this.siteId = site.Id;
       }
@@ -230,9 +219,9 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       }
 
       const requiredProperty: string = typeof args.options.required !== 'undefined' &&
-        (this.fieldLink as FieldLink).Required !== (args.options.required === 'true') ? `<SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">${args.options.required}</Parameter></SetProperty>` : '';
+        (this.fieldLink as FieldLink).Required !== args.options.required ? `<SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">${args.options.required}</Parameter></SetProperty>` : '';
       const hiddenProperty: string = typeof args.options.hidden !== 'undefined' &&
-        (this.fieldLink as FieldLink).Hidden !== (args.options.hidden === 'true') ? `<SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">${args.options.hidden}</Parameter></SetProperty>` : '';
+        (this.fieldLink as FieldLink).Hidden !== args.options.hidden ? `<SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">${args.options.hidden}</Parameter></SetProperty>` : '';
 
       requestOptions = {
         url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,

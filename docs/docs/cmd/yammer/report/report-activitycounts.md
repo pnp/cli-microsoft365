@@ -37,3 +37,34 @@ Gets the trends on the amount of Yammer activity in your organization by how man
 ```sh
 m365 yammer report activitycounts --period D7 --output json > "activitycounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2022-11-09",
+        "Liked": "12",
+        "Posted": "6",
+        "Read": "435",
+        "Report Date": "2022-11-09",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    Report Refresh Date,Liked,Posted,Read,Report Date,Report Period
+    2022-11-09,12,6,435,2022-11-09,90
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Liked,Posted,Read,Report Date,Report Period
+    2022-11-09,12,6,435,2022-11-09,90
+    ```

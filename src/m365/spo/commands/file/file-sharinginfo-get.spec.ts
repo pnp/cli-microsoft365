@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -464,7 +464,7 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -497,7 +497,7 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -534,17 +534,6 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
     }), new CommandError(err));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('Retrieves Sharing Information When Site ID is Passed - JSON Output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
@@ -572,7 +561,6 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         fileId: 'b2307a39-e878-458b-bc90-03bc578531d6',
         output: 'json'

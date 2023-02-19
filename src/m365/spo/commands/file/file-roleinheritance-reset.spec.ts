@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -25,7 +25,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -60,7 +60,7 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      telemetry.trackEvent
     ]);
     auth.service.connected = false;
   });
@@ -71,11 +71,6 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['fileId', 'fileUrl']]);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
@@ -186,16 +181,5 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
         confirm: true
       }
     }), new CommandError(errorMessage));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

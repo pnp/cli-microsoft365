@@ -17,7 +17,8 @@ m365 teams app publish [options]
 
 ## Remarks
 
-You can only publish a Teams app as a global administrator.
+!!! important
+    To use this command you must be a Global administrator.
 
 ## Examples
 
@@ -26,3 +27,32 @@ Add the _teams-manifest.zip_ file to the organization's app catalog
 ```sh
 m365 teams app publish --filePath ./teams-manifest.zip
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+        "id": "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
+        "externalId": "b5561ec9-8cab-4aa3-8aa2-d8d7172e4311",
+        "displayName": "Test App",
+        "distributionMethod": "organization"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    displayName       : Test App
+    distributionMethod: organization
+    externalId        : b5561ec9-8cab-4aa3-8aa2-d8d7172e4311
+    id                : e3e29acb-8c79-412b-b746-e6c39ff4cd22
+    ```
+
+=== "CSV"
+
+    ```csv
+    id,externalId,displayName,distributionMethod
+    e3e29acb-8c79-412b-b746-e6c39ff4cd22,b5561ec9-8cab-4aa3-8aa2-d8d7172e4311,Test App,organization
+    ```

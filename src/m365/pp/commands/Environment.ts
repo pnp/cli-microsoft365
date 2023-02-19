@@ -3,4 +3,7 @@ export interface Environment {
   type: string;
   location: string;
   name: string;
+  properties: {
+    isDefault: boolean;
+  }
 }

@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -10,16 +11,16 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  allowAddRemoveApps?: string;
-  allowCreateUpdateChannels?: string;
-  allowCreateUpdateRemoveConnectors?: string;
-  allowCreateUpdateRemoveTabs?: string;
-  allowDeleteChannels?: string;
+  allowAddRemoveApps?: boolean;
+  allowCreateUpdateChannels?: boolean;
+  allowCreateUpdateRemoveConnectors?: boolean;
+  allowCreateUpdateRemoveTabs?: boolean;
+  allowDeleteChannels?: boolean;
   teamId: string;
 }
 
 class TeamsMemberSettingsSetCommand extends GraphCommand {
-  private static props: string[] = [
+  private static booleanProps: string[] = [
     'allowAddRemoveApps',
     'allowCreateUpdateChannels',
     'allowCreateUpdateRemoveConnectors',
@@ -40,12 +41,13 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
-      TeamsMemberSettingsSetCommand.props.forEach(p => {
+      TeamsMemberSettingsSetCommand.booleanProps.forEach(p => {
         this.telemetryProperties[p] = (args.options as any)[p];
       });
     });
@@ -57,21 +59,30 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
         option: '-i, --teamId <teamId>'
       },
       {
-        option: '--allowAddRemoveApps [allowAddRemoveApps]'
+        option: '--allowAddRemoveApps [allowAddRemoveApps]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--allowCreateUpdateChannels [allowCreateUpdateChannels]'
+        option: '--allowCreateUpdateChannels [allowCreateUpdateChannels]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--allowCreateUpdateRemoveConnectors [allowCreateUpdateRemoveConnectors]'
+        option: '--allowCreateUpdateRemoveConnectors [allowCreateUpdateRemoveConnectors]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--allowCreateUpdateRemoveTabs [allowCreateUpdateRemoveTabs]'
+        option: '--allowCreateUpdateRemoveTabs [allowCreateUpdateRemoveTabs]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--allowDeleteChannels [allowDeleteChannels]'
+        option: '--allowDeleteChannels [allowDeleteChannels]',
+        autocomplete: ['true', 'false']
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('allowAddRemoveApps', 'allowCreateUpdateChannels', 'allowCreateUpdateRemoveConnectors', 'allowCreateUpdateRemoveTabs', 'allowDeleteChannels');
   }
 
   #initValidators(): void {
@@ -79,20 +90,6 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.teamId)) {
           return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        let isValid: boolean = true;
-        let value, property: string = '';
-        TeamsMemberSettingsSetCommand.props.every(p => {
-          property = p;
-          value = (args.options as any)[p];
-          isValid = typeof value === 'undefined' ||
-            value === 'true' ||
-            value === 'false';
-          return isValid;
-        });
-        if (!isValid) {
-          return `Value ${value} for option ${property} is not a valid boolean`;
         }
 
         return true;
@@ -104,14 +101,14 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
     const data: any = {
       memberSettings: {}
     };
-    TeamsMemberSettingsSetCommand.props.forEach(p => {
+    TeamsMemberSettingsSetCommand.booleanProps.forEach(p => {
       if (typeof (args.options as any)[p] !== 'undefined') {
-        data.memberSettings[p] = (args.options as any)[p] === 'true';
+        data.memberSettings[p] = (args.options as any)[p];
       }
     });
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(args.options.teamId)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -121,7 +118,7 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
 
     try {
       await request.patch(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

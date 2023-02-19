@@ -1,10 +1,7 @@
 import { PlannerBucket } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
-import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
@@ -39,6 +36,7 @@ class PlannerBucketGetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -81,59 +79,53 @@ class PlannerBucketGetCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id) {
-	      if (args.options.planId ||args.options.planTitle  || args.options.ownerGroupId || args.options.ownerGroupName) {
-	        return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
-	      }
-	      if (args.options.name) {
-	        return 'Specify either id or name';
-	      }
-	    }
+          if (args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
+            return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
+          }
+        }
 
-	    if (args.options.name) {
-	      if (!args.options.planId && !args.options.planTitle) {
-	        return 'Specify either planId or planTitle when using name';
-	      }
+        if (args.options.name) {
+          if (!args.options.planId && !args.options.planTitle) {
+            return 'Specify either planId or planTitle when using name';
+          }
 
-	      if (args.options.planId && args.options.planTitle) {
-	        return 'Specify either planId or planTitle when using name but not both';
-	      }
+          if (args.options.planId && args.options.planTitle) {
+            return 'Specify either planId or planTitle when using name but not both';
+          }
 
-	      if (args.options.planTitle) {
-	        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-	          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-	        }
+          if (args.options.planTitle) {
+            if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
+              return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+            }
 
-	        if (args.options.ownerGroupId && args.options.ownerGroupName) {
-	          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-	        }
+            if (args.options.ownerGroupId && args.options.ownerGroupName) {
+              return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+            }
 
-	        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
-	          return `${args.options.ownerGroupId} is not a valid GUID`;
-	        }
-	      }
-	      
-	      if (args.options.planId) {
-	        if (args.options.ownerGroupId || args.options.ownerGroupName) {
-	          return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
-	        }
-	      }
-	    }
+            if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
+              return `${args.options.ownerGroupId} is not a valid GUID`;
+            }
+          }
 
-	    if (!args.options.id && !args.options.name) {
-	      return 'Please specify id or name';
-	    }
+          if (args.options.planId) {
+            if (args.options.ownerGroupId || args.options.ownerGroupName) {
+              return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
+            }
+          }
+        }
 
-	    return true;
+        return true;
       }
     );
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {    
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['id', 'name'] }
+    );
+  }
 
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const bucketId = await this.getBucketId(args);
       const bucket = await this.getBucketById(bucketId);
@@ -192,7 +184,7 @@ class PlannerBucketGetCommand extends GraphCommand {
   }
 
   private async getBucketById(id: string): Promise<PlannerBucket> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/planner/buckets/${id}`,
       headers: {
         accept: 'application/json;odata.metadata=none'

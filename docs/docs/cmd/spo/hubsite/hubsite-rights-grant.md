@@ -21,13 +21,10 @@ m365 spo hubsite rights grant [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
+!!! important
+    To use this command you must be a Global or SharePoint administrator.
 
 ## Examples
 
@@ -48,6 +45,10 @@ Grant user with email _PattiF@contoso.com_ permission to join sites to the hub s
 ```sh
 m365 spo hubsite rights grant --hubSiteUrl https://contoso.sharepoint.com/sites/sales --principals PattiF@contoso.com --rights Join
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

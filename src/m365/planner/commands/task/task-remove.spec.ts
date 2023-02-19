@@ -1,13 +1,14 @@
 import * as assert from 'assert';
 import * as os from 'os';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -114,7 +115,7 @@ describe(commands.TASK_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -154,7 +155,7 @@ describe(commands.TASK_REMOVE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       auth.restoreAuth
     ]);
@@ -168,11 +169,6 @@ describe(commands.TASK_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title']]);
   });
 
   it('fails validation when title and id is used', async () => {
@@ -296,7 +292,7 @@ describe(commands.TASK_REMOVE, () => {
 
   it('fails validation when no groups found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return Promise.resolve({ "value": [] });
       }
 
@@ -316,7 +312,7 @@ describe(commands.TASK_REMOVE, () => {
 
   it('fails validation when multiple groups found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return Promise.resolve(multipleGroupResponse);
       }
 
@@ -503,7 +499,7 @@ describe(commands.TASK_REMOVE, () => {
 
   it('correctly deletes task by title', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return Promise.resolve(singleGroupResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
@@ -542,16 +538,5 @@ describe(commands.TASK_REMOVE, () => {
         ownerGroupName: validOwnerGroupName
       }
     });
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

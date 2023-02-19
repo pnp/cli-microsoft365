@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.GROUPSETTING_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -53,7 +53,7 @@ describe(commands.GROUPSETTING_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -147,7 +147,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } });
+    await command.action(logger, { options: { templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } });
     assert(loggerLogSpy.calledWith({
       displayName: null,
       id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
@@ -325,7 +325,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } });
+    await command.action(logger, { options: { templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } });
     assert(loggerLogSpy.calledWith({
       displayName: null,
       id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
@@ -454,7 +454,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } } as any),
       new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`));
   });
 
@@ -483,7 +483,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } } as any),
+    await assert.rejects(command.action(logger, { options: { templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } } as any),
       new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`));
   });
 
@@ -500,16 +500,5 @@ describe(commands.GROUPSETTING_ADD, () => {
   it('allows unknown properties', () => {
     const allowUnknownOptions = command.allowUnknownOptions();
     assert.strictEqual(allowUnknownOptions, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

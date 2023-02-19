@@ -6,6 +6,7 @@ import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -15,7 +16,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   id?: string;
   name?: string;
 }
@@ -71,7 +72,7 @@ class TeamsTeamGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {
@@ -94,15 +95,15 @@ class TeamsTeamGetCommand extends GraphCommand {
     try {
       const teamId: string = await this.getTeamId(args);
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}`,
+        url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
         responseType: 'json'
       };
-      const res: Team = await request.get<Team>(requestOptions);
+      const res = await request.get<Team>(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

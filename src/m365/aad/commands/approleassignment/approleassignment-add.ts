@@ -2,6 +2,7 @@ import * as os from 'os';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -91,20 +92,20 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appObjectId', 'appDisplayName']);
+    this.optionSets.push({ options: ['appId', 'appObjectId', 'appDisplayName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let objectId: string = '';
     let queryFilter: string = '';
     if (args.options.appId) {
-      queryFilter = `$filter=appId eq '${encodeURIComponent(args.options.appId)}'`;
+      queryFilter = `$filter=appId eq '${formatting.encodeQueryParameter(args.options.appId)}'`;
     }
     else if (args.options.appObjectId) {
-      queryFilter = `$filter=id eq '${encodeURIComponent(args.options.appObjectId)}'`;
+      queryFilter = `$filter=id eq '${formatting.encodeQueryParameter(args.options.appObjectId)}'`;
     }
     else {
-      queryFilter = `$filter=displayName eq '${encodeURIComponent(args.options.appDisplayName as string)}'`;
+      queryFilter = `$filter=displayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName as string)}'`;
     }
 
     const getServicePrinciplesRequestOptions: any = {
@@ -117,13 +118,18 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
 
     try {
       const servicePrincipalResult = await request.get<{ value: ServicePrincipal[] }>(getServicePrinciplesRequestOptions);
+
+      if (servicePrincipalResult.value.length === 0) {
+        return Promise.reject(`The specified service principal doesn't exist`);
+      }
+
       if (servicePrincipalResult.value.length > 1) {
         throw 'More than one service principal found. Please use the appId or appObjectId option to make sure the right service principal is specified.';
       }
 
       objectId = servicePrincipalResult.value[0].id;
 
-      let resource: string = encodeURIComponent(args.options.resource);
+      let resource: string = formatting.encodeQueryParameter(args.options.resource);
 
       // try resolve aliases that the user might enter since these are seen in the Azure portal
       switch (args.options.resource.toLocaleLowerCase()) {

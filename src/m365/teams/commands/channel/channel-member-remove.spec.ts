@@ -1,12 +1,13 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -31,7 +32,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -71,7 +72,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
@@ -82,14 +83,6 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct option sets', () => {
-    assert.deepStrictEqual(command.optionSets, [
-      ['teamId', 'teamName'],
-      ['channelId', 'channelName'],
-      ['userId', 'userName', 'id']
-    ]);
   });
 
   it('fails validation if the teamId is not a valid guid', async () => {
@@ -153,11 +146,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamName: 'Team Name',
-      channelId: '19:00000000000000000000000000000000@thread.skype',
-      id: '00000',
-      confirm: true } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamName: 'Team Name',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        id: '00000',
+        confirm: true
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('correctly get teams id by team name', async () => {
@@ -199,17 +195,20 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelName: 'Channel Name',
-      id: '00000',
-      confirm: true } } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
-  });  
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelName: 'Channel Name',
+        id: '00000',
+        confirm: true
+      }
+    } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
+  });
 
   it('fails to get channel when channel does is not private', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('00000000-0000-0000-0000-000000000000')}/channels?$filter=displayName eq '${encodeURIComponent('Other Channel')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter('00000000-0000-0000-0000-000000000000')}/channels?$filter=displayName eq '${formatting.encodeQueryParameter('Other Channel')}'`) {
         return Promise.resolve({
           "value": [
             {
@@ -223,11 +222,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelName: 'Other Channel',
-      id: '00000',
-      confirm: true } } as any), new CommandError('The specified channel is not a private channel'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelName: 'Other Channel',
+        id: '00000',
+        confirm: true
+      }
+    } as any), new CommandError('The specified channel is not a private channel'));
   });
 
   it('correctly get channel id by channel name', async () => {
@@ -283,11 +285,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelId: '19:00000000000000000000000000000000@thread.skype',
-      userId: '00000000-0000-0000-0000-000000000000',
-      confirm: true } } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        userId: '00000000-0000-0000-0000-000000000000',
+        confirm: true
+      }
+    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does not return userId', async () => {
@@ -307,11 +312,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelId: '19:00000000000000000000000000000000@thread.skype',
-      userId: '00000000-0000-0000-0000-000000000000',
-      confirm: true } } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        userId: '00000000-0000-0000-0000-000000000000',
+        confirm: true
+      }
+    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does not exist by userName', async () => {
@@ -332,11 +340,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelId: '19:00000000000000000000000000000000@thread.skype',
-      userName: 'user@domainname.com',
-      confirm: true } } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        userName: 'user@domainname.com',
+        confirm: true
+      }
+    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does not return email', async () => {
@@ -355,12 +366,15 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       }
       return Promise.reject('Invalid request');
     });
-    
-    await assert.rejects(command.action(logger, { options: {
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelId: '19:00000000000000000000000000000000@thread.skype',
-      userName: 'user@domainname.com',
-      confirm: true } } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        userName: 'user@domainname.com',
+        confirm: true
+      }
+    } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
   it('fails to get member when member does multiple exist with username', async () => {
@@ -386,11 +400,14 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelId: '19:00000000000000000000000000000000@thread.skype',
-      userName: 'user@domainname.com',
-      confirm: true } } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found: 00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        userName: 'user@domainname.com',
+        confirm: true
+      }
+    } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found: 00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'));
   });
 
   it('correctly get member id by user id', async () => {
@@ -548,20 +565,11 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      confirm: true,
-      teamId: '00000000-0000-0000-0000-000000000000' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        confirm: true,
+        teamId: '00000000-0000-0000-0000-000000000000'
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 });

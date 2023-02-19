@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as os from 'os';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -42,7 +42,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -74,7 +74,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -188,6 +188,24 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       new CommandError(`The scope value 'Sites.Read.All' you have specified does not exist for SharePoint. ${os.EOL}Available scopes (application permissions) are: ${os.EOL}Scope1${os.EOL}Scope2`));
   });
 
+  it('rejects if service principal does not exist', async () => {
+    postRequestStub();
+    sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
+      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
+        // fake first call for getting service principal
+        if (opts.url.indexOf('startswith') === -1) {
+          return Promise.resolve({ "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals", "value": [] });
+        }
+        // second get request for searching for service principals by resource options value specified
+        return Promise.resolve({ "value": [{ objectId: "5edf62fd-ae7a-4a99-af2e-fc5950aaed07", "appRoles": [{ value: 'Scope1', id: '1' }, { value: 'Scope2', id: '2' }] }] });
+      }
+      return Promise.reject();
+    });
+
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } } as any),
+      new CommandError("The specified service principal doesn't exist"));
+  });
+
   it('rejects if more than one service principal found', async () => {
     postRequestStub();
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
@@ -220,7 +238,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } } as any),
+    await assert.rejects(command.action(logger, { options: { appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
@@ -257,17 +275,6 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   it('passes validation when the appId option specified', async () => {
     const actual = await command.validate({ options: { appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying appId', () => {

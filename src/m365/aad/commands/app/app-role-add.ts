@@ -2,6 +2,7 @@ import { v4 } from 'uuid';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -101,7 +102,7 @@ class AadAppRoleAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appObjectId', 'appName']);
+    this.optionSets.push({ options: ['appId', 'appObjectId', 'appName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -177,8 +178,8 @@ class AadAppRoleAddCommand extends GraphCommand {
     }
 
     const filter: string = appId ?
-      `appId eq '${encodeURIComponent(appId)}'` :
-      `displayName eq '${encodeURIComponent(appName as string)}'`;
+      `appId eq '${formatting.encodeQueryParameter(appId)}'` :
+      `displayName eq '${formatting.encodeQueryParameter(appName as string)}'`;
 
     const requestOptions: any = {
       url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,

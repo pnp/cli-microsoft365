@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.LIST_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -57,7 +57,7 @@ describe(commands.LIST_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -72,7 +72,7 @@ describe(commands.LIST_REMOVE, () => {
   });
 
   it('prompts before removing list when confirmation argument not passed (id)', async () => {
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -83,7 +83,7 @@ describe(commands.LIST_REMOVE, () => {
   });
 
   it('prompts before removing list when confirmation argument not passed (title)', async () => {
-    await command.action(logger, { options: { debug: false, title: 'My list', webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { title: 'My list', webUrl: 'https://contoso.sharepoint.com' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -98,7 +98,7 @@ describe(commands.LIST_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
     assert(requests.length === 0);
   });
 
@@ -121,7 +121,7 @@ describe(commands.LIST_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists(guid'`) > -1 &&
@@ -168,23 +168,11 @@ describe(commands.LIST_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
       }
     });
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {

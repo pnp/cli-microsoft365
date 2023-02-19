@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -17,7 +17,7 @@ describe(commands.ENVIRONMENT_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
@@ -47,7 +47,7 @@ describe(commands.ENVIRONMENT_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -65,11 +65,11 @@ describe(commands.ENVIRONMENT_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['name', 'id', 'location', 'displayName', 'provisioningState', 'environmentSku', 'azureRegionHint', 'isDefault']);
   });
 
-  it('retrieves information about the specified environment (debug)', async () => {
+  it('retrieves information about the default environment', async () => {
     const env: any = { "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5", "location": "europe", "type": "Microsoft.PowerApps/environments", "id": "/providers/Microsoft.PowerApps/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5", "properties": { "displayName": "Contoso (default)", "createdTime": "2018-03-22T20:20:46.08653Z", "createdBy": { "id": "SYSTEM", "displayName": "SYSTEM", "type": "NotSpecified" }, "provisioningState": "Succeeded", "creationType": "DefaultTenant", "environmentSku": "Default", "environmentType": "Production", "isDefault": true, "azureRegionHint": "westeurope", "runtimeEndpoints": { "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com", "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com", "microsoft.PowerApps": "https://europe.api.powerapps.com", "microsoft.Flow": "https://europe.api.flow.microsoft.com" } } };
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`) > -1) {
+      if (opts.url === 'https://api.powerapps.com/providers/Microsoft.PowerApps/environments/~default?api-version=2016-11-01') {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -80,7 +80,7 @@ describe(commands.ENVIRONMENT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
+    await command.action(logger, { options: { verbose: true } });
     assert(loggerLogSpy.calledWith(env));
   });
 
@@ -88,7 +88,7 @@ describe(commands.ENVIRONMENT_GET, () => {
     const env: any = { "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5", "location": "europe", "type": "Microsoft.PowerApps/environments", "id": "/providers/Microsoft.PowerApps/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5", "properties": { "displayName": "Contoso (default)", "createdTime": "2018-03-22T20:20:46.08653Z", "createdBy": { "id": "SYSTEM", "displayName": "SYSTEM", "type": "NotSpecified" }, "provisioningState": "Succeeded", "creationType": "DefaultTenant", "environmentSku": "Default", "environmentType": "Production", "isDefault": true, "azureRegionHint": "westeurope", "runtimeEndpoints": { "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com", "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com", "microsoft.PowerApps": "https://europe.api.powerapps.com", "microsoft.Flow": "https://europe.api.flow.microsoft.com" } } };
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`) > -1) {
+      if (opts.url === 'https://api.powerapps.com/providers/Microsoft.PowerApps/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01') {
         if (opts.headers &&
           opts.headers.accept &&
           (opts.headers.accept as string).indexOf('application/json') === 0) {
@@ -99,7 +99,7 @@ describe(commands.ENVIRONMENT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
+    await command.action(logger, { options: { verbose: true, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
     assert(loggerLogSpy.calledWith(env));
   });
 
@@ -113,7 +113,7 @@ describe(commands.ENVIRONMENT_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } } as any),
+    await assert.rejects(command.action(logger, { options: { name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } } as any),
       new CommandError(`Access to the environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' is denied.`));
   });
 
@@ -131,29 +131,7 @@ describe(commands.ENVIRONMENT_GET, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any),
+    await assert.rejects(command.action(logger, { options: { name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--name') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

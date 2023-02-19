@@ -45,6 +45,11 @@ m365 spo term add [options]
 !!! important
     To use this command you have to have permissions to access the tenant admin site.
 
+## Remarks
+
+!!! warning "Escaping JSON in PowerShell"
+    When using the `--customProperties` and/or `--localCustomProperties` options it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.md#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.md#passing-complex-content-into-cli-options) instead.
+
 ## Examples
 
 Add taxonomy term with the specified name to the term group and term set specified by their names

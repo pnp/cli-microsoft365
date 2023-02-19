@@ -3,6 +3,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from "../../../../utils/formatting";
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -65,13 +66,13 @@ class AadAppRoleRemoveCommand extends GraphCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {    
+      async (args: CommandArgs) => {
         if (args.options.id) {
           if (!validation.isValidGuid(args.options.id)) {
             return `${args.options.id} is not a valid GUID`;
           }
         }
-    
+
         return true;
       }
     );
@@ -79,8 +80,8 @@ class AadAppRoleRemoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['appId', 'appObjectId', 'appName'],
-      ['name', 'claim', 'id']
+      { options: ['appId', 'appObjectId', 'appName'] },
+      { options: ['name', 'claim', 'id'] }
     );
   }
 
@@ -220,8 +221,8 @@ class AadAppRoleRemoveCommand extends GraphCommand {
     }
 
     const filter: string = appId ?
-      `appId eq '${encodeURIComponent(appId)}'` :
-      `displayName eq '${encodeURIComponent(appName as string)}'`;
+      `appId eq '${formatting.encodeQueryParameter(appId)}'` :
+      `displayName eq '${formatting.encodeQueryParameter(appName as string)}'`;
 
     const requestOptions: any = {
       url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,

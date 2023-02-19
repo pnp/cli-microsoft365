@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -97,7 +96,7 @@ class SpoContentTypeGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -116,13 +115,13 @@ class SpoContentTypeGetCommand extends SpoCommand {
     requestUrl += "/contenttypes";
 
     if (args.options.id) {
-      requestUrl += `('${encodeURIComponent(args.options.id)}')`;
+      requestUrl += `('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
     else if (args.options.name) {
-      requestUrl += `?$filter=Name eq '${encodeURIComponent(args.options.name)}'`;
+      requestUrl += `?$filter=Name eq '${formatting.encodeQueryParameter(args.options.name)}'`;
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
       headers: {
         accept: 'application/json;odata=nometadata'

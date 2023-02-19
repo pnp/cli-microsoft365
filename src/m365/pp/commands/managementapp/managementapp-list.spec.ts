@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -16,7 +16,7 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
@@ -46,7 +46,7 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -64,7 +64,7 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01") {
         return Promise.resolve({
-          "value": [{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548e"}]
+          "value": [{ "applicationId": "31359c7f-bd7e-475c-86db-fdb8c937548e" }]
         });
       }
       return Promise.reject('Invalid request');
@@ -76,7 +76,7 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
       }
     });
     const actual = JSON.stringify(log[log.length - 1]);
-    const expected = JSON.stringify([{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548e"}]);
+    const expected = JSON.stringify([{ "applicationId": "31359c7f-bd7e-475c-86db-fdb8c937548e" }]);
 
     assert.strictEqual(actual, expected);
   });
@@ -85,7 +85,7 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01") {
         return Promise.resolve({
-          "value": [{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548e"},{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548f"}]
+          "value": [{ "applicationId": "31359c7f-bd7e-475c-86db-fdb8c937548e" }, { "applicationId": "31359c7f-bd7e-475c-86db-fdb8c937548f" }]
         });
       }
       return Promise.reject('Invalid request');
@@ -97,7 +97,7 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
       }
     });
     const actual = JSON.stringify(log[log.length - 1]);
-    const expected = JSON.stringify([{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548e"}, {"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548f"}]);
+    const expected = JSON.stringify([{ "applicationId": "31359c7f-bd7e-475c-86db-fdb8c937548e" }, { "applicationId": "31359c7f-bd7e-475c-86db-fdb8c937548f" }]);
 
     assert.strictEqual(actual, expected);
   });
@@ -106,7 +106,7 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01") {
         return Promise.resolve({
-          "value": [ {} ]
+          "value": [{}]
         });
       }
       return Promise.reject('Invalid request');
@@ -118,7 +118,7 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
       }
     });
     const actual = JSON.stringify(log[log.length - 1]);
-    const expected = JSON.stringify([ {} ]);
+    const expected = JSON.stringify([{}]);
     assert.strictEqual(actual, expected);
   });
 
@@ -127,17 +127,6 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

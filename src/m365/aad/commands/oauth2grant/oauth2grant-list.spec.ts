@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -51,7 +51,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -141,7 +141,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
+    await command.action(logger, { options: { spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
     assert(loggerLogSpy.calledWith([{
       "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       "consentType": "AllPrincipals",
@@ -194,7 +194,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } });
+    await command.action(logger, { options: { spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } });
     assert(loggerLogSpy.calledWith([{
       "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
       "consentType": "AllPrincipals",
@@ -228,7 +228,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
+    await command.action(logger, { options: { spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -246,7 +246,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, spObjectId: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+    await assert.rejects(command.action(logger, { options: { spObjectId: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
@@ -258,17 +258,6 @@ describe(commands.OAUTH2GRANT_LIST, () => {
   it('passes validation when the spObjectId option specified', async () => {
     const actual = await command.validate({ options: { spObjectId: '6a7b1395-d313-4682-8ed4-65a6265a6320' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying spObjectId', () => {

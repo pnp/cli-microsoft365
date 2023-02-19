@@ -11,31 +11,31 @@ m365 spo page add [options]
 ## Options
 
 `-n, --name <name>`
-: Name of the page to create
+: Name of the page to create.
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the page should be created
+: URL of the site where the page should be created.
 
 `-t, --title [title]`
-: Title of the page to create. If not specified, will use the page name as its title
+: Title of the page to create. If not specified, will use the page name as its title.
 
 `-l, --layoutType [layoutType]`
-: Layout of the page. Allowed values `Article`, `Home`, `SingleWebPartAppPage`, `RepostPage`,`HeaderlessSearchResults`, `Spaces`, `Topic`. Default `Article`
+: Layout of the page. Allowed values `Article`, `Home`, `SingleWebPartAppPage`, `RepostPage`, `HeaderlessSearchResults`, `Spaces`, `Topic`. Default `Article`.
 
 `-p, --promoteAs [promoteAs]`
-: Create the page for a specific purpose. Allowed values `HomePage`, `NewsPage`
+: Create the page for a specific purpose. Allowed values `HomePage`, `NewsPage`, `Template`.
 
 `--commentsEnabled`
-: Set to enable comments on the page
+: Set to enable comments on the page.
 
 `--publish`
-: Set to publish the page
+: Set to publish the page.
 
 `--publishMessage [publishMessage]`
-: Message to set when publishing the page
+: Message to set when publishing the page.
 
 `--description [description]`
-: The description to set for the page
+: The description to set for the page.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -100,3 +100,7 @@ Create new article page with description
 ```sh
 m365 spo page add --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --description "Description to add for the page"
 ```
+
+## Response
+
+The command won't return a response on success.

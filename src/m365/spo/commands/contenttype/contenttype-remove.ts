@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -74,7 +75,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -98,15 +99,15 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
           if (this.verbose) {
             logger.logToStderr(`Looking up the ID of content type ${contentTypeIdentifierLabel}...`);
           }
-  
+
           const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/availableContentTypes?$filter=(Name eq '${encodeURIComponent(args.options.name as string)}')`,
+            url: `${args.options.webUrl}/_api/web/availableContentTypes?$filter=(Name eq '${formatting.encodeQueryParameter(args.options.name as string)}')`,
             headers: {
               accept: 'application/json;odata=nometadata'
             },
             responseType: 'json'
           };
-  
+
           contentTypeIdResult = await request.get<{ value: { StringId: string }[] }>(requestOptions);
         }
 
@@ -118,7 +119,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
 
           //execute delete operation
           const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(contentTypeId)}')`,
+            url: `${args.options.webUrl}/_api/web/contenttypes('${formatting.encodeQueryParameter(contentTypeId)}')`,
             headers: {
               'X-HTTP-Method': 'DELETE',
               'If-Match': '*',

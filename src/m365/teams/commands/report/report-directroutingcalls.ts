@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -76,10 +77,10 @@ class TeamsReportDirectroutingcallsCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const toDateTimeParameter: string = encodeURIComponent(args.options.toDateTime ? args.options.toDateTime : new Date().toISOString());
+    const toDateTimeParameter: string = formatting.encodeQueryParameter(args.options.toDateTime ? args.options.toDateTime : new Date().toISOString());
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=${encodeURIComponent(args.options.fromDateTime)},toDateTime=${toDateTimeParameter})`,
+      url: `${this.resource}/v1.0/communications/callRecords/getDirectRoutingCalls(fromDateTime=${formatting.encodeQueryParameter(args.options.fromDateTime)},toDateTime=${toDateTimeParameter})`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -89,7 +90,7 @@ class TeamsReportDirectroutingcallsCommand extends GraphCommand {
     try {
       const res: { value: any[] } = await request.get<{ value: any[] }>(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

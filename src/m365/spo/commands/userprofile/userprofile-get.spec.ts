@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.USERPROFILE_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -60,7 +60,7 @@ describe(commands.USERPROFILE_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = true;
@@ -170,17 +170,6 @@ describe(commands.USERPROFILE_GET, () => {
     }));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports specifying userName', () => {
     const options = command.options;
     let containsOption = false;
@@ -197,9 +186,11 @@ describe(commands.USERPROFILE_GET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false,
-      userName: 'john.doe@contoso.onmicrosoft.com' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        userName: 'john.doe@contoso.onmicrosoft.com'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the user principal name is not a valid', async () => {

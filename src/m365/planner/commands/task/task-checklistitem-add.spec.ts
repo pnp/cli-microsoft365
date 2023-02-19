@@ -1,11 +1,11 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -36,7 +36,7 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -46,7 +46,6 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     log = [];
     logger = {
       log: (msg: string) => {
@@ -66,15 +65,14 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.patch,
-      accessToken.isAppOnlyAccessToken
+      request.patch
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -95,14 +93,14 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
 
   it('correctly adds checklist item', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
       }
 
       return Promise.reject('Invalid Request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsWithChecklistResponse);
       }
 
@@ -121,14 +119,14 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
 
   it('correctly adds checklist item with text output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
       }
 
       return Promise.reject('Invalid Request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsWithChecklistResponse);
       }
 
@@ -147,14 +145,14 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
 
   it('fails when unexpected API error was thrown', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
       }
 
       return Promise.reject('Invalid Request');
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.reject('Something went wrong.');
       }
 
@@ -171,7 +169,7 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
 
   it('fails when Planner task does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.reject('The request item is not found.');
       }
 
@@ -184,28 +182,5 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
         title: validTitle
       }
     }), new CommandError('Planner task was not found.'));
-  });
-
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        name: 'My Planner Bucket',
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
-      }
-    }), new CommandError('This command does not support application permissions.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

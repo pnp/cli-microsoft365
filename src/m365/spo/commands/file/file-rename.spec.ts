@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -35,7 +35,7 @@ describe(commands.FILE_RENAME, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -60,7 +60,7 @@ describe(commands.FILE_RENAME, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get, 
+      request.get,
       request.post,
       Cli.executeCommand
     ]);
@@ -68,7 +68,7 @@ describe(commands.FILE_RENAME, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       auth.restoreAuth
     ]);
@@ -110,13 +110,15 @@ describe(commands.FILE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: 
-      { 
-        webUrl: 'https://contoso.sharepoint.com/sites/portal', 
+    await command.action(logger, {
+      options:
+      {
+        webUrl: 'https://contoso.sharepoint.com/sites/portal',
         sourceUrl: '/Shared Documents/abc.pdf',
         force: true,
         targetFileName: 'def.pdf'
-      } });
+      }
+    });
     assert(loggerLogSpy.calledWith(renameResponseJson));
   });
 
@@ -206,16 +208,5 @@ describe(commands.FILE_RENAME, () => {
         targetFileName: 'def.pdf'
       }
     }), new CommandError(fileDeleteError.error.message));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

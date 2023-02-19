@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -58,7 +57,7 @@ class TodoListGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -72,7 +71,7 @@ class TodoListGetCommand extends GraphCommand {
   }
 
   private async getList(options: Options): Promise<any> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

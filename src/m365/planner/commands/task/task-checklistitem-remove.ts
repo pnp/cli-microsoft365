@@ -3,6 +3,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -27,11 +28,11 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -39,7 +40,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       { option: '-i, --id <id>' },
@@ -59,7 +60,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the checklist item with id ${args.options.id} from the planner task?`
       });
-      
+
       if (result.continue) {
         await this.removeChecklistitem(args);
       }
@@ -97,7 +98,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
 
   private getTaskDetails(taskId: string): Promise<PlannerTaskDetails> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details?$select=checklist`,
+      url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}/details?$select=checklist`,
       headers: {
         accept: 'application/json;odata.metadata=minimal'
       },

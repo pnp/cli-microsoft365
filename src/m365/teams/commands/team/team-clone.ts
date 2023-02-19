@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -108,7 +109,7 @@ class TeamsTeamCloneCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'name']
+      { options: ['id', 'name'] }
     );
   }
 
@@ -132,7 +133,7 @@ class TeamsTeamCloneCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.id as string)}/clone`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(args.options.id as string)}/clone`,
       headers: {
         "content-type": "application/json",
         accept: 'application/json;odata.metadata=none'
@@ -143,7 +144,7 @@ class TeamsTeamCloneCommand extends GraphCommand {
 
     try {
       await request.post(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

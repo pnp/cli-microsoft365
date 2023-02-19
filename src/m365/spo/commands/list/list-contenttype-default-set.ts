@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -103,7 +102,7 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -188,7 +187,7 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
   }
 
   private async getContentTypeOrder(baseUrl: string, logger: Logger): Promise<StringValue[]> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${baseUrl}/RootFolder?$select=ContentTypeOrder,UniqueContentTypeOrder`,
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -213,7 +212,7 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
   }
 
   private async updateContentTypeOrder(baseUrl: string, contentTypeOrder: StringValue[]): Promise<void> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${baseUrl}/RootFolder`,
       headers: {
         'accept': 'application/json;odata=nometadata',
@@ -230,7 +229,7 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
   }
 
   private async getListContentTypes(baseUrl: string): Promise<string[]> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${baseUrl}/ContentTypes?$select=Id`,
       headers: {
         'accept': 'application/json;odata=nometadata'

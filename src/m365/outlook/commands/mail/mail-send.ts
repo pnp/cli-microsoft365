@@ -1,13 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { AxiosRequestConfig } from 'axios';
-import auth, { Auth } from '../../../../Auth';
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { validation } from '../../../../utils/validation';
+import { formatting } from '../../../../utils/formatting';
+import { accessToken } from '../../../../utils/accessToken';
 
 interface CommandArgs {
   options: Options;
@@ -41,6 +41,7 @@ class OutlookMailSendCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -94,9 +95,14 @@ class OutlookMailSendCommand extends GraphCommand {
         option: '--attachment [attachment]'
       },
       {
-        option: '--saveToSentItems [saveToSentItems]'
+        option: '--saveToSentItems [saveToSentItems]',
+        autocomplete: ['true', 'false']
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('saveToSentItems');
   }
 
   #initValidators(): void {
@@ -106,10 +112,6 @@ class OutlookMailSendCommand extends GraphCommand {
           args.options.bodyContentType !== 'Text' &&
           args.options.bodyContentType !== 'HTML') {
           return `${args.options.bodyContentType} is not a valid value for the bodyContentType option. Allowed values are Text|HTML`;
-        }
-
-        if (args.options.saveToSentItems && !validation.isValidBoolean(args.options.saveToSentItems as any)) {
-          return `${args.options.saveToSentItems} is not a valid value for the saveToSentItems option. Allowed values are true|false`;
         }
 
         if (args.options.importance && ['low', 'normal', 'high'].indexOf(args.options.importance) === -1) {
@@ -143,13 +145,13 @@ class OutlookMailSendCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      const isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[this.resource].accessToken);
-      if (isAppOnlyAuth === true && !args.options.sender) {
+      const isAppOnlyAccessToken: boolean | undefined = accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken);
+      if (isAppOnlyAccessToken === true && !args.options.sender) {
         throw `Specify a upn or user id in the 'sender' option when using app only authentication.`;
       }
-  
-      const requestOptions: AxiosRequestConfig = {
-        url: `${this.resource}/v1.0/${args.options.sender ? 'users/' + encodeURIComponent(args.options.sender) : 'me'}/sendMail`,
+
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/v1.0/${args.options.sender ? 'users/' + formatting.encodeQueryParameter(args.options.sender) : 'me'}/sendMail`,
         headers: {
           accept: 'application/json;odata.metadata=none',
           'content-type': 'application/json'
@@ -157,7 +159,7 @@ class OutlookMailSendCommand extends GraphCommand {
         responseType: 'json',
         data: this.getRequestBody(args.options)
       };
-  
+
       await request.post(requestOptions);
     }
     catch (err: any) {

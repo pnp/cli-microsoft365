@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import * as chalk from 'chalk';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -20,6 +19,7 @@ interface Options extends GlobalOptions {
   listUrl?: string;
   notificationUrl?: string;
   expirationDateTime?: string;
+  clientState?: string;
   id: string;
 }
 
@@ -48,7 +48,8 @@ class SpoListWebhookSetCommand extends SpoCommand {
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
         notificationUrl: typeof args.options.notificationUrl !== 'undefined',
-        expirationDateTime: typeof args.options.expirationDateTime !== 'undefined'
+        expirationDateTime: typeof args.options.expirationDateTime !== 'undefined',
+        clientState: typeof args.options.clientState !== 'undefined'
       });
     });
   }
@@ -75,6 +76,9 @@ class SpoListWebhookSetCommand extends SpoCommand {
       },
       {
         option: '-e, --expirationDateTime [expirationDateTime]'
+      },
+      {
+        option: '-c, --clientState [clientState]'
       }
     );
   }
@@ -97,8 +101,8 @@ class SpoListWebhookSetCommand extends SpoCommand {
           }
         }
 
-        if (!args.options.notificationUrl && !args.options.expirationDateTime) {
-          return 'Specify notificationUrl, expirationDateTime or both, at least one is required';
+        if (!args.options.notificationUrl && !args.options.expirationDateTime && !args.options.clientState) {
+          return 'Specify notificationUrl, expirationDateTime, clientState or multiple, at least one is required';
         }
 
         const parsedDateTime = Date.parse(args.options.expirationDateTime as string);
@@ -116,7 +120,7 @@ class SpoListWebhookSetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -137,17 +141,14 @@ class SpoListWebhookSetCommand extends SpoCommand {
       requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/Subscriptions('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
 
-    const requestBody: any = {};
-    if (args.options.notificationUrl) {
-      requestBody.notificationUrl = args.options.notificationUrl;
-    }
-    if (args.options.expirationDateTime) {
-      requestBody.expirationDateTime = args.options.expirationDateTime;
-    }
+    const requestBody: any = {
+      notificationUrl: args.options.notificationUrl,
+      expirationDateTime: args.options.expirationDateTime,
+      clientState: args.options.clientState
+    };
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: requestUrl,
-      method: 'PATCH',
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -157,7 +158,6 @@ class SpoListWebhookSetCommand extends SpoCommand {
 
     try {
       await request.patch(requestOptions);
-      // REST patch call doesn't return anything
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

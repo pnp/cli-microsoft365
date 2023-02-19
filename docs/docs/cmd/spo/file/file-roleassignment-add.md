@@ -11,28 +11,28 @@ m365 spo file roleassignment add [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the file is located
+: URL of the site where the file is located.
 
 `--fileUrl [fileUrl]`
-: The server-relative URL of the file to retrieve. Specify either `fileUrl` or `fileId` but not both
+: The server-relative URL of the file to retrieve. Specify either `fileUrl` or `fileId` but not both.
 
 `i, --fileId [fileId]`
-: The UniqueId (GUID) of the file to retrieve. Specify either `fileUrl` or `fileId` but not both
+: The UniqueId (GUID) of the file to retrieve. Specify either `fileUrl` or `fileId` but not both.
 
 `--principalId [principalId]`
-: The SharePoint Id of the principal. It may be either a user id or group id to add a role assignment for. Specify either upn, groupName or principalId.
+: The SharePoint Id of the principal. It may be either a user id or group id to add a role assignment for. Specify either `upn`, `groupName`, or `principalId` but not multiple.
 
 `--upn [upn]`
-: upn/email of user to assign role to. Specify either upn, groupName or principalId.
+: upn/email of user to assign role to. Specify either `upn`, `groupName`, or `principalId` but not multiple.
 
 `--groupName [groupName]`
-: The group name of Azure AD or SharePoint group. Specify either upn, groupName or principalId.
+: The group name of Azure AD or SharePoint group. Specify either `upn`, `groupName`, or `principalId` but not multiple.
 
 `--roleDefinitionId [roleDefinitionId]`
-: ID of role definition. Specify either roleDefinitionId or roleDefinitionName but not both
+: ID of role definition. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.
 
 `--roleDefinitionName [roleDefinitionName]`
-: Enter the name of a role definition, like 'Contribute', 'Read', etc. Specify either roleDefinitionId or roleDefinitionName but not both
+: Enter the name of a role definition, like 'Contribute', 'Read', etc. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.
 
 --8<-- "docs/cmd/_global.md"
 

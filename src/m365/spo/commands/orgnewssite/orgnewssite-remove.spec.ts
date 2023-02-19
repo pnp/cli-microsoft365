@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -64,7 +64,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       spo.getRequestDigest
     ]);
@@ -94,7 +94,6 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         confirm: true,
         url: "http://contoso.sharepoint.com/sites/site1"
@@ -121,7 +120,6 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         confirm: false,
         url: "http://contoso.sharepoint.com/sites/site1"
@@ -206,16 +204,5 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
       }
     });
     assert(containsConfirmOption);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

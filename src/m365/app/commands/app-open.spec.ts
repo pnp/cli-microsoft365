@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as fs from 'fs';
-import appInsights from '../../../appInsights';
+import { telemetry } from '../../../telemetry';
 import auth from '../../../Auth';
 import { Cli } from '../../../cli/Cli';
 import { CommandInfo } from '../../../cli/CommandInfo';
@@ -24,7 +24,7 @@ describe(commands.OPEN, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     sinon.stub(fs, 'existsSync').callsFake(() => true);
@@ -59,7 +59,7 @@ describe(commands.OPEN, () => {
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => false));
   });
 
-  afterEach(() => {    
+  afterEach(() => {
     openStub.restore();
     getSettingWithDefaultValueStub.restore();
   });
@@ -67,7 +67,7 @@ describe(commands.OPEN, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       fs.existsSync,
       fs.readFileSync
@@ -93,22 +93,10 @@ describe(commands.OPEN, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('shows message with url when the app specified with the appId is found', async () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId
       }
     });
@@ -119,19 +107,17 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         appId: appId
       }
     });
     assert(loggerLogSpy.calledWith(`Use a web browser to open the page https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`));
   });
-  
+
   it('shows message with preview-url when the app specified with the appId is found', async () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId,
         preview: true
       }
@@ -146,7 +132,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId
       }
     });
@@ -160,7 +145,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await command.action(logger, {
       options: {
-        debug: false,
         appId: appId,
         preview: true
       }
@@ -177,7 +161,6 @@ describe(commands.OPEN, () => {
     const appId = "9b1b1e42-794b-4c71-93ac-5ed92488b67f";
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: appId,
         preview: true
       }

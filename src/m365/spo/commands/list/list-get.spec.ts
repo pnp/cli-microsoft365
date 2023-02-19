@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.LIST_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -51,7 +51,7 @@ describe(commands.LIST_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -184,7 +184,7 @@ describe(commands.LIST_GET, () => {
     }));
   });
 
-  it('retrieves details of list if title and properties option is passed', async () => {
+  it('retrieves details of list if title and properties option is passed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve(
         {
@@ -199,7 +199,7 @@ describe(commands.LIST_GET, () => {
         debug: true,
         title: 'Documents',
         webUrl: 'https://contoso.sharepoint.com',
-        properties:'Title,Id'
+        properties: 'Title,Id'
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -208,8 +208,7 @@ describe(commands.LIST_GET, () => {
     }));
   });
 
-
-  it('retrieves details of list if list id and properties option is passed', async () => {
+  it('retrieves details of list if list id and properties option is passed (debug)', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve(
         {
@@ -224,7 +223,31 @@ describe(commands.LIST_GET, () => {
         debug: true,
         id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
         webUrl: 'https://contoso.sharepoint.com',
-        properties:'Title,Id'
+        properties: 'Title,Id'
+      }
+    });
+    assert(loggerLogSpy.calledWith({
+      Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
+      Title: 'Documents'
+    }));
+  });
+
+  it('retrieves details of list if url and properties option is passed (debug)', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.resolve(
+        {
+          "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
+          "Title": "Documents"
+        }
+      );
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        url: 'Shared Documents',
+        webUrl: 'https://contoso.sharepoint.com',
+        properties: 'Title,Id'
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -427,7 +450,6 @@ describe(commands.LIST_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
         webUrl: 'https://contoso.sharepoint.com',
         withPermissions: true
@@ -768,10 +790,9 @@ describe(commands.LIST_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
         webUrl: 'https://contoso.sharepoint.com',
-        properties:'Title,Id',
+        properties: 'Title,Id',
         withPermissions: true
       }
     });
@@ -1061,10 +1082,9 @@ describe(commands.LIST_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         title: 'Documents',
         webUrl: 'https://contoso.sharepoint.com',
-        properties:'Title,Id',
+        properties: 'Title,Id',
         withPermissions: true
       }
     });
@@ -1242,22 +1262,10 @@ describe(commands.LIST_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {
@@ -1282,12 +1290,6 @@ describe(commands.LIST_GET, () => {
     assert(containsTypeOption);
   });
 
-  
-  it('fails validation if both id and title options are not passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -1306,10 +1308,5 @@ describe(commands.LIST_GET, () => {
   it('passes validation if the id option is a valid GUID', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert(actual);
-  });
-
-  it('fails validation if both id and title options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', title: 'Documents' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 });

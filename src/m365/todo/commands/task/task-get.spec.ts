@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -40,7 +40,7 @@ describe(commands.TASK_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -72,7 +72,7 @@ describe(commands.TASK_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -118,7 +118,7 @@ describe(commands.TASK_GET, () => {
       throw 'The specified task list does not exist';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, listName: 'Tasks List' } } as any), new CommandError('The specified task list does not exist'));
+    await assert.rejects(command.action(logger, { options: { listName: 'Tasks List' } } as any), new CommandError('The specified task list does not exist'));
   });
 
   it('passes validation if only listId is passed', async () => {
@@ -152,9 +152,9 @@ describe(commands.TASK_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
-        listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA='
+        listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=',
+        output: 'text'
       }
     });
     assert(loggerLogSpy.calledWith(taskResponseText));
@@ -171,7 +171,6 @@ describe(commands.TASK_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
         listId: 'AAMkADY3NmM5ZjhiLTc3M2ItNDg5ZC1iNGRiLTAyM2FmMjVjZmUzOQAuAAAAAAAZ1T9YqZrvS66KkevskFAXAQBEMhhN5VK7RaaKpIc1KhMKAAAZ3e1AAAA=',
         output: 'json'
@@ -205,7 +204,6 @@ describe(commands.TASK_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: 'AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=',
         listName: 'Tasks List',
         output: 'json'
@@ -213,16 +211,5 @@ describe(commands.TASK_GET, () => {
     });
 
     assert(loggerLogSpy.calledWith(taskResponse));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

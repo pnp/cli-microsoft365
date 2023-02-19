@@ -14,7 +14,7 @@ m365 spo navigation node remove [options]
 : Absolute URL of the site to which navigation should be modified
 
 `-l, --location <location>`
-: Navigation type where the node should be added. Available options: `QuickLaunch,TopNavigationBar`
+: Navigation type where the node should be removed. Available options: `QuickLaunch,TopNavigationBar`
 
 `-i, --id <id>`
 : ID of the node to remove
@@ -37,3 +37,7 @@ Remove a node from the quick launch without prompting for confirmation
 ```sh
 m365 spo navigation node remove --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --id 2003 --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

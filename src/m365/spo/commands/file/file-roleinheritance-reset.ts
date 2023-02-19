@@ -1,9 +1,8 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import { AxiosRequestConfig } from 'axios';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { formatting } from '../../../../utils/formatting';
 import SpoCommand from '../../../base/SpoCommand';
@@ -85,7 +84,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['fileId', 'fileUrl']);
+    this.optionSets.push({ options: ['fileId', 'fileUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -93,7 +92,7 @@ class SpoFileRoleInheritanceResetCommand extends SpoCommand {
       try {
         const fileURL: string = await this.getFileURL(args);
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileURL)}')/ListItemAllFields/resetroleinheritance`,
           headers: {
             accept: 'application/json;odata=nometadata'

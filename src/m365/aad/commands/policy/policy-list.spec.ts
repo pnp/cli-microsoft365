@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.POLICY_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.POLICY_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -100,7 +100,6 @@ describe(commands.POLICY_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         type: "authorization"
       }
     });
@@ -150,7 +149,6 @@ describe(commands.POLICY_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         type: "tokenLifetime"
       }
     });
@@ -262,7 +260,6 @@ describe(commands.POLICY_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false
       }
     });
     assert(loggerLogSpy.calledWith([
@@ -319,7 +316,7 @@ describe(commands.POLICY_LIST, () => {
       return Promise.reject("An error has occurred.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, type: "foo" } } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: { type: "foo" } } as any), new CommandError("An error has occurred."));
   });
 
   it('correctly handles API OData error for all policies', async () => {
@@ -327,7 +324,7 @@ describe(commands.POLICY_LIST, () => {
       return Promise.reject("An error has occurred.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError("An error has occurred."));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
   });
 
   it('accepts type to be activityBasedTimeout', async () => {
@@ -408,16 +405,5 @@ describe(commands.POLICY_LIST, () => {
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

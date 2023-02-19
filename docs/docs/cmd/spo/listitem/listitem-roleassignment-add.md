@@ -79,3 +79,7 @@ Add role assignment to specified listitem in specified list located in specified
 ```sh
 m365 spo listitem roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --listTitle "someList" --listItemId 1 --principalId 11 --roleDefinitionName "Full Control"
 ```
+
+## Response
+
+The command won't return a response on success.

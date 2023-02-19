@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.FEATURE_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -50,7 +50,7 @@ describe(commands.FEATURE_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -86,7 +86,6 @@ describe(commands.FEATURE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Site'
@@ -126,7 +125,6 @@ describe(commands.FEATURE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web'
@@ -170,7 +168,6 @@ describe(commands.FEATURE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
@@ -250,7 +247,6 @@ describe(commands.FEATURE_LIST, () => {
     });
 
     const options: any = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site'
     };
@@ -269,7 +265,6 @@ describe(commands.FEATURE_LIST, () => {
     });
 
     const options: any = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
     };
@@ -289,7 +284,6 @@ describe(commands.FEATURE_LIST, () => {
 
     const options: any = {
       verbose: true,
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site'
     };
@@ -318,7 +312,6 @@ describe(commands.FEATURE_LIST, () => {
 
     const options: any = {
       verbose: true,
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
     };
@@ -348,7 +341,6 @@ describe(commands.FEATURE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web'
       }
@@ -367,23 +359,11 @@ describe(commands.FEATURE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'Site'
       }
     }), new CommandError(err));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsVerboseOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsVerboseOption = true;
-      }
-    });
-    assert(containsVerboseOption);
   });
 
   it('supports specifying scope', () => {

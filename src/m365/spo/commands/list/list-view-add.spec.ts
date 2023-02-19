@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -11,6 +11,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import { urlUtil } from '../../../../utils/urlUtil';
 import request from '../../../../request';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./list-view-add');
 
 describe(commands.LIST_VIEW_ADD, () => {
@@ -48,7 +49,7 @@ describe(commands.LIST_VIEW_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -79,7 +80,7 @@ describe(commands.LIST_VIEW_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -93,14 +94,10 @@ describe(commands.LIST_VIEW_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('has correct option sets', () => {
-    assert.deepStrictEqual(command.optionSets, [['listId', 'listTitle', 'listUrl']]);
-  });
-
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ 
-      options: { 
-        webUrl: 'invalid', 
+    const actual = await command.validate({
+      options: {
+        webUrl: 'invalid',
         listTitle: validListTitle,
         title: validTitle,
         fields: validFieldsInput
@@ -110,9 +107,9 @@ describe(commands.LIST_VIEW_ADD, () => {
   });
 
   it('fails validation if listId is not a valid GUID', async () => {
-    const actual = await command.validate({ 
-      options: { 
-        webUrl: validWebUrl, 
+    const actual = await command.validate({
+      options: {
+        webUrl: validWebUrl,
         listId: 'invalid',
         title: validTitle,
         fields: validFieldsInput
@@ -122,9 +119,9 @@ describe(commands.LIST_VIEW_ADD, () => {
   });
 
   it('fails validation if rowLimit is not a number', async () => {
-    const actual = await command.validate({ 
-      options: { 
-        webUrl: validWebUrl, 
+    const actual = await command.validate({
+      options: {
+        webUrl: validWebUrl,
         listId: validListId,
         title: validTitle,
         fields: validFieldsInput,
@@ -135,9 +132,9 @@ describe(commands.LIST_VIEW_ADD, () => {
   });
 
   it('fails validation if rowLimit is lower than 1', async () => {
-    const actual = await command.validate({ 
-      options: { 
-        webUrl: validWebUrl, 
+    const actual = await command.validate({
+      options: {
+        webUrl: validWebUrl,
         listId: validListId,
         title: validTitle,
         fields: validFieldsInput,
@@ -148,9 +145,9 @@ describe(commands.LIST_VIEW_ADD, () => {
   });
 
   it('fails validation when setting default and personal option', async () => {
-    const actual = await command.validate({ 
-      options: { 
-        webUrl: validWebUrl, 
+    const actual = await command.validate({
+      options: {
+        webUrl: validWebUrl,
         listId: validListId,
         title: validTitle,
         fields: validFieldsInput,
@@ -162,9 +159,9 @@ describe(commands.LIST_VIEW_ADD, () => {
   });
 
   it('correctly validates options', async () => {
-    const actual = await command.validate({ 
-      options: { 
-        webUrl: validWebUrl, 
+    const actual = await command.validate({
+      options: {
+        webUrl: validWebUrl,
         listId: validListId,
         title: validTitle,
         fields: validFieldsInput
@@ -175,7 +172,7 @@ describe(commands.LIST_VIEW_ADD, () => {
 
   it('Correctly add view by list title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/lists/getByTitle(\'${encodeURIComponent(validListTitle)}\')/views/add`) {
+      if (opts.url === `${validWebUrl}/_api/web/lists/getByTitle(\'${formatting.encodeQueryParameter(validListTitle)}\')/views/add`) {
         return Promise.resolve(viewCreationResponse);
       }
 
@@ -195,7 +192,7 @@ describe(commands.LIST_VIEW_ADD, () => {
 
   it('Correctly add view by list id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/lists(guid\'${encodeURIComponent(validListId)}\')/views/add`) {
+      if (opts.url === `${validWebUrl}/_api/web/lists(guid\'${formatting.encodeQueryParameter(validListId)}\')/views/add`) {
         return Promise.resolve(viewCreationResponse);
       }
 
@@ -215,7 +212,7 @@ describe(commands.LIST_VIEW_ADD, () => {
 
   it('Correctly add view by list URL', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `${validWebUrl}/_api/web/GetList(\'${encodeURIComponent(urlUtil.getServerRelativePath(validWebUrl, validListUrl))}\')/views/add`) {
+      if (opts.url === `${validWebUrl}/_api/web/GetList(\'${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(validWebUrl, validListUrl))}\')/views/add`) {
         return Promise.resolve(viewCreationResponse);
       }
 
@@ -239,22 +236,14 @@ describe(commands.LIST_VIEW_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      webUrl: validWebUrl,
-      listUrl: validListUrl,
-      title: validTitle,
-      fields: validFieldsInput,
-      rowLimit: 100 } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: validWebUrl,
+        listUrl: validListUrl,
+        title: validTitle,
+        fields: validFieldsInput,
+        rowLimit: 100
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 });

@@ -51,10 +51,17 @@ function convertHyperlinks(md: string): string {
   });
 }
 
+function convertContentTabs(md: string): string {
+  const regex = new RegExp('^=== "(.+?)"(?:\r\n|\n){2}((?:^    (?:.*?(?:\r\n|\n))?)+)', 'gms');
+  return md.replace(regex, (match, title: string, content: string) => {
+    return `  ${title}${EOL}${EOL}${content.replace(/^    /gms, '')}`;
+  });
+}
+
 function convertCodeFences(md: string): string {
   const regex = new RegExp('^```.*?(?:\r\n|\n)(.*?)```(?:\r\n|\n)', 'gms');
   return md.replace(regex, (match, code: string) => {
-    return `  ${code}${EOL}`;
+    return `${code.replace(/^(.+)$/gm, '  $1')}${EOL}`;
   });
 }
 
@@ -68,12 +75,23 @@ function removeTooManyEmptyLines(md: string): string {
   return md.replace(regex, Array(4).join(EOL));
 }
 
+function escapeMd(mdString: string | undefined): string | undefined {
+  if (!mdString) {
+    return mdString;
+  }
+
+  return mdString.toString()
+    .replace(/([_*~`|])/g, '\\$1')
+    .replace(/\n/g, '<br>');
+}
+
 const convertFunctions = [
   convertTitle,
   convertHeadings,
   convertAdmonitions,
   convertDd,
   convertHyperlinks,
+  convertContentTabs,
   convertCodeFences,
   removeInlineMarkup,
   removeTooManyEmptyLines
@@ -87,5 +105,6 @@ export const md = {
     });
 
     return md;
-  }
+  },
+  escapeMd
 };

@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import commands from '../../commands';
@@ -94,7 +95,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -130,14 +131,14 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
       }
 
       const requestOptions: any = {
-        url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(appId)}')`,
+        url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${formatting.encodeQueryParameter(appId)}')`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
       };
 
-      const res =  await request.get<AppMetadata>(requestOptions);
+      const res = await request.get<AppMetadata>(requestOptions);
       logger.log(res);
     }
     catch (err: any) {

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.TAB_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.TAB_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -233,11 +233,13 @@ describe(commands.TAB_GET, () => {
       return Promise.reject('Channel id is not in a valid format: 29:00000000000000000000000000000000@thread.skype');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelId: '29:00000000000000000000000000000000@thread.skype',
-      id: '00000000-0000-0000-0000-000000000000' } } as any), new CommandError('Channel id is not in a valid format: 29:00000000000000000000000000000000@thread.skype'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '29:00000000000000000000000000000000@thread.skype',
+        id: '00000000-0000-0000-0000-000000000000'
+      }
+    } as any), new CommandError('Channel id is not in a valid format: 29:00000000000000000000000000000000@thread.skype'));
   });
 
   it('should get a Microsoft Teams Tab by id', async () => {
@@ -314,11 +316,14 @@ describe(commands.TAB_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      teamName: 'Team Name',
-      channelName: 'Channel Name',
-      name: 'Tab Name' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        teamName: 'Team Name',
+        channelName: 'Channel Name',
+        name: 'Tab Name'
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('should get a Microsoft Teams Tab by Team name', async () => {
@@ -507,11 +512,14 @@ describe(commands.TAB_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelName: 'Channel Name',
-      name: 'Tab Name' } } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelName: 'Channel Name',
+        name: 'Tab Name'
+      }
+    } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
   it('fails to get tab when tab does not exists', async () => {
@@ -522,21 +530,13 @@ describe(commands.TAB_GET, () => {
       return Promise.reject('The specified tab does not exist in the Microsoft Teams team channel');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      teamId: '00000000-0000-0000-0000-000000000000',
-      channelId: '19:00000000000000000000000000000000@thread.skype',
-      name: 'Tab Name' } } as any), new CommandError('The specified tab does not exist in the Microsoft Teams team channel'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        name: 'Tab Name'
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('The specified tab does not exist in the Microsoft Teams team channel'));
   });
 });

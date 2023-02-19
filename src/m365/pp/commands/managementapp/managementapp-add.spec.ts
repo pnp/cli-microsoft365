@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -77,7 +77,6 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
     }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
@@ -94,7 +93,6 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My app'
       }
     }), new CommandError(`No Azure AD application registration with name My app found`));
@@ -116,7 +114,6 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My app'
       }
     }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
@@ -127,7 +124,6 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
     }), new CommandError(`An error has occurred`));
@@ -138,7 +134,6 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My app'
       }
     }), new CommandError(`An error has occurred`));
@@ -245,16 +240,5 @@ describe(commands.MANAGEMENTAPP_ADD, () => {
     });
     const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
     assert.strictEqual(call.args[0].applicationId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

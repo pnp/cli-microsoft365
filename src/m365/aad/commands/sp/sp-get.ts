@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -63,18 +64,18 @@ class AadSpGetCommand extends GraphCommand {
         if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
           return `${args.options.appId} is not a valid appId GUID`;
         }
-    
+
         if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
           return `${args.options.appObjectId} is not a valid objectId GUID`;
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appDisplayName', 'appObjectId']);
+    this.optionSets.push({ options: ['appId', 'appDisplayName', 'appObjectId'] });
   }
 
   private getSpId(args: CommandArgs): Promise<string> {
@@ -84,10 +85,10 @@ class AadSpGetCommand extends GraphCommand {
 
     let spMatchQuery: string = '';
     if (args.options.appDisplayName) {
-      spMatchQuery = `displayName eq '${encodeURIComponent(args.options.appDisplayName)}'`;
+      spMatchQuery = `displayName eq '${formatting.encodeQueryParameter(args.options.appDisplayName)}'`;
     }
     else if (args.options.appId) {
-      spMatchQuery = `appId eq '${encodeURIComponent(args.options.appId)}'`;
+      spMatchQuery = `appId eq '${formatting.encodeQueryParameter(args.options.appId)}'`;
     }
 
     const idRequestOptions: any = {

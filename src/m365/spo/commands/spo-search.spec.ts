@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../appInsights';
+import { telemetry } from '../../../telemetry';
 import auth from '../../../Auth';
 import { Cli } from '../../../cli/Cli';
 import { CommandInfo } from '../../../cli/CommandInfo';
@@ -299,7 +299,7 @@ describe(commands.SEARCH, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -329,7 +329,7 @@ describe(commands.SEARCH, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -364,7 +364,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: 'IsDocument:1'
       }
     });
@@ -378,7 +377,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: 'IsDocument:1',
         allResults: true,
         rowLimit: 1
@@ -394,7 +392,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: '*',
         trimDuplicates: true
       }
@@ -409,7 +406,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: '*',
         sortList: 'Rank:ascending'
       }
@@ -424,7 +420,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: '*',
         enableStemming: false
       }
@@ -439,7 +434,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: '*',
         enableStemming: true
       }
@@ -454,7 +448,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: '*',
         culture: 1043
       }
@@ -469,7 +462,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         queryText: 'IsDocument:1',
         allResults: true,
         rowLimit: 1
@@ -485,7 +477,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: 'IsDocument:1',
         selectProperties: 'Path'
       }
@@ -500,7 +491,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: '*',
         refinementFilters: 'fileExtension:equals("docx")'
       }
@@ -515,7 +505,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: '*',
         queryTemplate: '{searchterms} fileType:docx'
       }
@@ -530,7 +519,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: '*',
         sourceId: '6e71030e-5e16-4406-9bff-9c1829843083'
       }
@@ -545,7 +533,6 @@ describe(commands.SEARCH, () => {
     await command.action(logger, {
       options: {
         output: 'text',
-        debug: false,
         queryText: '*',
         rankingModelId: 'd4ac6500-d1d0-48aa-86d4-8fe9a57a74af'
       }
@@ -871,20 +858,12 @@ describe(commands.SEARCH, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError(err));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com'
       }
-    });
-    assert(containsDebugOption);
+    } as any), new CommandError(err));
   });
 
   it('supports specifying queryText', () => {

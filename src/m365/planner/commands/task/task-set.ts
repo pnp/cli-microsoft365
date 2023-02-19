@@ -1,9 +1,7 @@
 import { PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
-import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
@@ -111,79 +109,74 @@ class PlannerTaskSetCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.bucketId && args.options.bucketName) {
-	      return 'Specify either bucketId or bucketName but not both';
-	    }
+          return 'Specify either bucketId or bucketName but not both';
+        }
 
-	    if (args.options.bucketName && !args.options.planId && !args.options.planTitle) {
-	      return 'Specify either planId or planTitle when using bucketName';
-	    }
+        if (args.options.bucketName && !args.options.planId && !args.options.planTitle) {
+          return 'Specify either planId or planTitle when using bucketName';
+        }
 
-	    if (args.options.bucketName && args.options.planId && args.options.planTitle) {
-	      return 'Specify either planId or planTitle when using bucketName but not both';
-	    }
+        if (args.options.bucketName && args.options.planId && args.options.planTitle) {
+          return 'Specify either planId or planTitle when using bucketName but not both';
+        }
 
-	    if (args.options.planTitle && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-	    }
+        if (args.options.planTitle && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+        }
 
-	    if (args.options.planTitle && args.options.ownerGroupId && args.options.ownerGroupName) {
-	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-	    }
+        if (args.options.planTitle && args.options.ownerGroupId && args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+        }
 
-	    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-	      return `${args.options.ownerGroupId} is not a valid GUID`;
-	    }
+        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+          return `${args.options.ownerGroupId} is not a valid GUID`;
+        }
 
-	    if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
-	      return 'The startDateTime is not a valid ISO date string';
-	    }
+        if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
+          return 'The startDateTime is not a valid ISO date string';
+        }
 
-	    if (args.options.dueDateTime && !validation.isValidISODateTime(args.options.dueDateTime)) {
-	      return 'The dueDateTime is not a valid ISO date string';
-	    }
+        if (args.options.dueDateTime && !validation.isValidISODateTime(args.options.dueDateTime)) {
+          return 'The dueDateTime is not a valid ISO date string';
+        }
 
-	    if (args.options.percentComplete && isNaN(args.options.percentComplete)) {
-	      return `percentComplete is not a number`;
-	    }
+        if (args.options.percentComplete && isNaN(args.options.percentComplete)) {
+          return `percentComplete is not a number`;
+        }
 
-	    if (args.options.percentComplete && (args.options.percentComplete < 0 || args.options.percentComplete > 100)) {
-	      return `percentComplete should be between 0 and 100`;
-	    }
+        if (args.options.percentComplete && (args.options.percentComplete < 0 || args.options.percentComplete > 100)) {
+          return `percentComplete should be between 0 and 100`;
+        }
 
-	    if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
-	      return 'assignedToUserIds contains invalid GUID';
-	    }
+        if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
+          return 'assignedToUserIds contains invalid GUID';
+        }
 
-	    if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
-	      return 'Specify either assignedToUserIds or assignedToUserNames but not both';
-	    }
-	    
-	    if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
-	      return 'The appliedCategories contains invalid value. Specify either category1, category2, category3, category4, category5 and/or category6 as properties';
-	    }
+        if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
+          return 'Specify either assignedToUserIds or assignedToUserNames but not both';
+        }
 
-	    if (args.options.priority !== undefined) {
-	      if (typeof args.options.priority === "number") {
-	        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
-	          return 'priority should be an integer between 0 and 10.';
-	        }
-	      }
-	      else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
-	        return `${args.options.priority} is not a valid priority value. Allowed values are ${taskPriority.priorityValues.join('|')}.`;
-	      }
-	    }
+        if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
+          return 'The appliedCategories contains invalid value. Specify either category1, category2, category3, category4, category5 and/or category6 as properties';
+        }
 
-	    return true;
+        if (args.options.priority !== undefined) {
+          if (typeof args.options.priority === "number") {
+            if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
+              return 'priority should be an integer between 0 and 10.';
+            }
+          }
+          else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
+            return `${args.options.priority} is not a valid priority value. Allowed values are ${taskPriority.priorityValues.join('|')}.`;
+          }
+        }
+
+        return true;
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
-
     try {
       this.bucketId = await this.getBucketId(args.options);
       this.assignments = await this.generateUserAssignments(args.options);
@@ -243,7 +236,7 @@ class PlannerTaskSetCommand extends GraphCommand {
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
+      url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}/details`,
       headers: {
         accept: 'application/json'
       },
@@ -257,7 +250,7 @@ class PlannerTaskSetCommand extends GraphCommand {
 
   private getTaskEtag(taskId: string): Promise<string> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}`,
+      url: `${this.resource}/v1.0/planner/tasks/${formatting.encodeQueryParameter(taskId)}`,
       headers: {
         accept: 'application/json'
       },

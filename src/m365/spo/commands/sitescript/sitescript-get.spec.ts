@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.SITESCRIPT_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -59,7 +59,7 @@ describe(commands.SITESCRIPT_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -102,7 +102,7 @@ describe(commands.SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    await command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
     assert(loggerLogSpy.calledWith({
       "Content": JSON.stringify({
         "$schema": "schema.json",
@@ -175,18 +175,7 @@ describe(commands.SITESCRIPT_GET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports specifying id', () => {

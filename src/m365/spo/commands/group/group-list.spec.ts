@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -88,7 +88,7 @@ describe(commands.GROUP_LIST, () => {
   let commandInfo: CommandInfo;
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -119,7 +119,7 @@ describe(commands.GROUP_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -147,7 +147,6 @@ describe(commands.GROUP_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
@@ -164,7 +163,6 @@ describe(commands.GROUP_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         associatedGroupsOnly: true
       }
@@ -182,7 +180,6 @@ describe(commands.GROUP_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         associatedGroupsOnly: true,
         output: 'json'
@@ -201,7 +198,6 @@ describe(commands.GROUP_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         associatedGroupsOnly: true,
         output: 'text'

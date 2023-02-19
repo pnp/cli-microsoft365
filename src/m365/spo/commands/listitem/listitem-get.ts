@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -20,6 +19,7 @@ interface Options extends GlobalOptions {
   listUrl?: string;
   id: string;
   properties?: string;
+  withPermissions?: boolean;
 }
 
 class SpoListItemGetCommand extends SpoCommand {
@@ -50,7 +50,8 @@ class SpoListItemGetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined'
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        withPermissions: !!args.options.withPermissions
       });
     });
   }
@@ -74,6 +75,9 @@ class SpoListItemGetCommand extends SpoCommand {
       },
       {
         option: '-p, --properties [properties]'
+      },
+      {
+        option: '--withPermissions'
       }
     );
   }
@@ -111,7 +115,7 @@ class SpoListItemGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -134,8 +138,8 @@ class SpoListItemGetCommand extends SpoCommand {
     const expandPropertiesArray: string[] = propertiesToExpand.filter((item, pos) => propertiesToExpand.indexOf(item) === pos);
     const fieldExpand: string = expandPropertiesArray.length > 0 ? `&$expand=${expandPropertiesArray.join(",")}` : ``;
 
-    const requestOptions: AxiosRequestConfig = {
-      url: `${requestUrl}/items(${args.options.id})?$select=${encodeURIComponent(propertiesSelect.join(","))}${fieldExpand}`,
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}/items(${args.options.id})?$select=${formatting.encodeQueryParameter(propertiesSelect.join(","))}${fieldExpand}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -143,9 +147,17 @@ class SpoListItemGetCommand extends SpoCommand {
     };
 
     try {
-      const response = await request.get<any>(requestOptions);
-      delete response['ID'];
-      logger.log(<ListItemInstance>response);
+      const itemProperties = await request.get<any>(requestOptions);
+      if (args.options.withPermissions) {
+        requestOptions.url = `${requestUrl}/items(${args.options.id})/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
+        const response = await request.get<{ value: any[] }>(requestOptions);
+        response.value.forEach((r: any) => {
+          r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
+        });
+        itemProperties.RoleAssignments = response.value;
+      }
+      delete itemProperties['ID'];
+      logger.log(<ListItemInstance>itemProperties);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

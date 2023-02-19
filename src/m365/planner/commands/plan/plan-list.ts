@@ -1,12 +1,10 @@
-import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import { accessToken } from '../../../../utils/accessToken';
 import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { aadGroup } from '../../../../utils/aadGroup';
 
 interface CommandArgs {
   options: Options;
@@ -15,6 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   ownerGroupId?: string;
   ownerGroupName?: string;
+  rosterId?: string;
 }
 
 class PlannerPlanListCommand extends GraphCommand {
@@ -23,7 +22,7 @@ class PlannerPlanListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Returns a list of plans associated with a specified group';
+    return 'Returns a list of plans associated with a specified group or roster';
   }
 
   constructor() {
@@ -39,7 +38,8 @@ class PlannerPlanListCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
-        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined'
+        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
+        rosterId: typeof args.options.rosterId !== 'undefined'
       });
     });
   }
@@ -51,24 +51,27 @@ class PlannerPlanListCommand extends GraphCommand {
       },
       {
         option: "--ownerGroupName [ownerGroupName]"
+      },
+      {
+        option: "--rosterId [rosterId]"
       }
     );
   }
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {    
-        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+      async (args: CommandArgs) => {
+        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
           return `${args.options.ownerGroupId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['ownerGroupId', 'ownerGroupName']);
+    this.optionSets.push({ options: ['ownerGroupId', 'ownerGroupName', 'rosterId'] });
   }
 
   public defaultProperties(): string[] | undefined {
@@ -76,16 +79,18 @@ class PlannerPlanListCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
-
     try {
-      const groupId = await this.getGroupId(args);
-      const result = await planner.getPlansByGroupId(groupId);
-      if (result && result.length > 0) {
-        logger.log(result);
+      let plannerPlans = null;
+      if (args.options.ownerGroupId || args.options.ownerGroupName) {
+        const groupId = await this.getGroupId(args);
+        plannerPlans = await planner.getPlansByGroupId(groupId);
+      }
+      else {
+        plannerPlans = await planner.getPlansByRosterId(args.options.rosterId!);
+      }
+
+      if (plannerPlans && plannerPlans.length > 0) {
+        logger.log(plannerPlans);
       }
     }
     catch (err: any) {
@@ -93,14 +98,13 @@ class PlannerPlanListCommand extends GraphCommand {
     }
   }
 
-  private getGroupId(args: CommandArgs): Promise<string> {
+  private async getGroupId(args: CommandArgs): Promise<string> {
     if (args.options.ownerGroupId) {
-      return Promise.resolve(args.options.ownerGroupId);
+      return args.options.ownerGroupId;
     }
 
-    return aadGroup
-      .getGroupByDisplayName(args.options.ownerGroupName!)
-      .then(group => group.id!);
+    const group = await aadGroup.getGroupByDisplayName(args.options.ownerGroupName!);
+    return group.id!;
   }
 }
 

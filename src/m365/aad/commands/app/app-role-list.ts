@@ -2,6 +2,7 @@ import { AppRole } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -52,7 +53,7 @@ class AadAppRoleListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appObjectId', 'appName']);
+    this.optionSets.push({ options: ['appId', 'appObjectId', 'appName'] });
   }
 
   public defaultProperties(): string[] | undefined {
@@ -82,8 +83,8 @@ class AadAppRoleListCommand extends GraphCommand {
     }
 
     const filter: string = appId ?
-      `appId eq '${encodeURIComponent(appId)}'` :
-      `displayName eq '${encodeURIComponent(appName as string)}'`;
+      `appId eq '${formatting.encodeQueryParameter(appId)}'` :
+      `displayName eq '${formatting.encodeQueryParameter(appName as string)}'`;
 
     const requestOptions: any = {
       url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,

@@ -13,7 +13,7 @@ m365 spo list contenttype remove [options]
 `-u, --webUrl <webUrl>`
 : URL of the site where the list is located.
 
-`-i, --listId [listId]`
+`-l, --listId [listId]`
 : ID of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-t, --listTitle [listTitle]`
@@ -49,3 +49,7 @@ Remove content type with a specific id from the list retrieved by server relativ
 ```sh
 m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'sites/project-x/Documents' --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import appInsights from '../../../appInsights';
+import { telemetry } from '../../../telemetry';
 import auth from '../../../Auth';
 import { Cli } from '../../../cli/Cli';
 import { CommandInfo } from '../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     auth.service.connected = true;
@@ -57,7 +57,7 @@ describe(commands.ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       fs.readFileSync
     ]);
@@ -560,7 +560,6 @@ describe(commands.ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso-my.sharepoint.com/personal/steve_contoso_com/Documents'
       }
@@ -635,7 +634,6 @@ describe(commands.ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/sites/Contoso/Shared Documents'
       }
@@ -694,7 +692,6 @@ describe(commands.ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/sites/Contoso/Shared Documents',
         siteUrl: 'https://contoso.sharepoint.com/sites/Contoso'
@@ -786,7 +783,6 @@ describe(commands.ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents'
       }
@@ -853,7 +849,6 @@ describe(commands.ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         filePath: 'https://contoso.sharepoint.com/Shared Documents/file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
       }
@@ -944,7 +939,6 @@ describe(commands.ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/Shared Documents'
       }
@@ -959,11 +953,13 @@ describe(commands.ADD, () => {
 
   it(`fails validation if the specified siteUrl is invalid`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = await command.validate({ options: {
-      filePath: 'file.pdf',
-      folderUrl: 'https://contoso.sharepoint.com/Shared Documents',
-      siteUrl: '/'
-    } }, commandInfo);
+    const actual = await command.validate({
+      options: {
+        filePath: 'file.pdf',
+        folderUrl: 'https://contoso.sharepoint.com/Shared Documents',
+        siteUrl: '/'
+      }
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -971,16 +967,5 @@ describe(commands.ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = await command.validate({ options: { filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

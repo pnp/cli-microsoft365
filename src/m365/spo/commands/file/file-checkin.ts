@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -80,17 +81,17 @@ class SpoFileCheckinCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (args.options.id) {
           if (!validation.isValidGuid(args.options.id)) {
             return `${args.options.id} is not a valid GUID`;
           }
         }
-    
+
         if (args.options.comment && args.options.comment.length > 1023) {
           return 'The length of the comment must be less than 1024 letters';
         }
-    
+
         if (args.options.type) {
           const allowedValues: string[] = ['minor', 'major', 'overwrite'];
           const type: string = args.options.type.toLowerCase();
@@ -98,14 +99,14 @@ class SpoFileCheckinCommand extends SpoCommand {
             return 'Wrong type specified. Available values are Minor|Major|Overwrite';
           }
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['url', 'id']);
+    this.optionSets.push({ options: ['url', 'id'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -122,16 +123,16 @@ class SpoFileCheckinCommand extends SpoCommand {
 
     let comment: string = '';
     if (args.options.comment) {
-      comment = encodeURIComponent(args.options.comment);
+      comment = formatting.encodeQueryParameter(args.options.comment);
     }
 
     let requestUrl: string = '';
     if (args.options.id) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${encodeURIComponent(args.options.id)}')/checkin(comment='${comment}',checkintype=${type})`;
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${formatting.encodeQueryParameter(args.options.id)}')/checkin(comment='${comment}',checkintype=${type})`;
     }
 
     if (args.options.url) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(args.options.url)}')/checkin(comment='${comment}',checkintype=${type})`;
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.url)}')/checkin(comment='${comment}',checkintype=${type})`;
     }
 
     const requestOptions: any = {

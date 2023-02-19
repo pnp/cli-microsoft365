@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as fs from 'fs';
-import appInsights from '../../../../appInsights';
-import auth, { Auth } from '../../../../Auth';
+import { telemetry } from '../../../../telemetry';
+import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
@@ -11,6 +11,8 @@ import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
+import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./mail-send');
 
 describe(commands.MAIL_SEND, () => {
@@ -20,7 +22,7 @@ describe(commands.MAIL_SEND, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[auth.defaultResource] = {
@@ -44,13 +46,13 @@ describe(commands.MAIL_SEND, () => {
       }
     };
     (command as any).items = [];
-    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => false);   
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Auth.isAppOnlyAuth,
+      accessToken.isAppOnlyAccessToken,
       fs.existsSync,
       fs.readFileSync,
       fs.lstatSync
@@ -60,7 +62,7 @@ describe(commands.MAIL_SEND, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -97,7 +99,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -152,7 +154,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -185,7 +187,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', cc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', cc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -218,7 +220,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bcc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bcc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -233,7 +235,7 @@ describe(commands.MAIL_SEND, () => {
         },
         toRecipients: [{ emailAddress: { address: 'mail@domain.com' } }]
       },
-      saveToSentItems: 'false'
+      saveToSentItems: false
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -245,7 +247,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'false' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: false } });
     assert.strictEqual(actual, expected);
   });
 
@@ -309,17 +311,12 @@ describe(commands.MAIL_SEND, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),
+    await assert.rejects(command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),
       new CommandError(`An error has occurred`));
   });
 
   it('fails validation if bodyContentType is invalid', async () => {
     const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if saveToSentItems is invalid', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -351,7 +348,7 @@ describe(commands.MAIL_SEND, () => {
 
       return { isFile: () => true } as any;
     });
-    
+
     const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -397,24 +394,13 @@ describe(commands.MAIL_SEND, () => {
   });
 
   it('passes validation when saveToSentItems is set to false', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'false' } }, commandInfo);
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: false } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when saveToSentItems is set to true', async () => {
-    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: true } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('sends email using a specified group mailbox', async () => {
@@ -440,7 +426,7 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', mailbox: 'sales@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', mailbox: 'sales@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -459,25 +445,27 @@ describe(commands.MAIL_SEND, () => {
     });
     sinon.stub(request, 'post').callsFake((opts) => {
       actual = JSON.stringify(opts.data);
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/${encodeURIComponent('some-user@domain.com')}/sendMail`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${formatting.encodeQueryParameter('some-user@domain.com')}/sendMail`) {
         return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', sender: 'some-user@domain.com', bodyContents: 'Lorem ipsum' } });
+    await command.action(logger, { options: { subject: 'Lorem ipsum', to: 'mail@domain.com', sender: 'some-user@domain.com', bodyContents: 'Lorem ipsum' } });
     assert.strictEqual(actual, expected);
   });
 
-  it('throws an error when the sender is not defined when signed in using app only authentication', async() => {
-    sinonUtil.restore([ Auth.isAppOnlyAuth ]);
-    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
+  it('throws an error when the sender is not defined when signed in using app only authentication', async () => {
+    sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false, 
-      subject: 'Lorem ipsum', 
-      to: 'mail@domain.com', 
-      bodyContents: 'Lorem ipsum' } } as any), new CommandError(`Specify a upn or user id in the 'sender' option when using app only authentication.`));
+    await assert.rejects(command.action(logger, {
+      options: {
+        subject: 'Lorem ipsum',
+        to: 'mail@domain.com',
+        bodyContents: 'Lorem ipsum'
+      }
+    } as any), new CommandError(`Specify a upn or user id in the 'sender' option when using app only authentication.`));
   });
 });

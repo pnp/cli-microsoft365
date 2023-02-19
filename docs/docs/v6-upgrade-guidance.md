@@ -41,6 +41,9 @@ Alias | Command | Reason
 `teams conversationmember add` | [teams channel member add](./cmd/teams/channel/channel-member-add.md) | Renamed to better match intention and naming convention.
 `teams conversationmember list` | [teams channel member list](./cmd/teams/channel/channel-member-list.md) | Renamed to better match intention and naming convention.
 `teams conversationmember remove` | [teams channel member remove](./cmd/teams/channel/channel-member-remove.md) | Renamed to better match intention and naming convention.
+`spo hubsite theme sync` | [spo site hubsite theme sync](./cmd/spo/site/site-hubsite-theme-sync.md) | Renamed to better match intention and naming convention.
+`spo hubsite connect` | [spo site hubsite connect](./cmd/spo/site/site-hubsite-connect.md) | Renamed to better match intention and naming convention.
+`spo hubsite disconnect` | [spo site hubsite disconnect](./cmd/spo/site/site-hubsite-disconnect.md) | Renamed to better match intention and naming convention.
 
 ### What action do I need to take?
 
@@ -55,6 +58,7 @@ In several planner commands we renamed the `planName` option to `planTitle` to a
 - [planner bucket list](./cmd/planner/bucket/bucket-list.md)
 - [planner bucket remove](./cmd/planner/bucket/bucket-remove.md)
 - [planner bucket set](./cmd/planner/bucket/bucket-set.md)
+- [planner plan get](./cmd/planner/plan/plan-get.md)
 - [planner task add](./cmd/planner/task/task-add.md)
 - [planner task get](./cmd/planner/task/task-get.md)
 - [planner task list](./cmd/planner/task/task-list.md)
@@ -75,6 +79,159 @@ If you have configured the `autoOpenBrowserOnLogin` key, you'll now need to conf
 ```sh
 m365 cli config set --key autoOpenLinksInBrowser --value true
 ```
+
+## Updated `spo file copy` options
+
+We updated the [spo file copy](./cmd/spo/file/file-copy.md) command. The improved functionality support copying files larger than 2GB and specify the name for the copied file. To support these changes, we had to do several changes to the command's options. When you specify an URL for options `webUrl`, `sourceUrl` and `targetUrl`, make sure that you specify a decoded URL. Specifying an encoded URL will result in a `File Not Found` error. For example, `/sites/IT/Shared%20Documents/Document.pdf` will not work while `/sites/IT/Shared Documents/Document.pdf` will work just fine.
+
+Because of this rework, we were able to add new options, but we also removed existing ones.
+
+**Removed options:**
+
+- `--deleteIfAlreadyExists`
+- `--allowSchemaMismatch`
+
+**New options:**
+
+Option | Description
+--- | ---
+`--nameConflictBehavior [nameConflictBehavior]` | Behavior when a document with the same name is already present at the destination. Possible values: `fail`, `replace`, `rename`. Default is `fail`.
+`--newName [newName]` | New name of the destination file.
+`--bypassSharedLock` | This indicates whether a file with a share lock can still be copied. Use this option to copy a file that is locked.
+
+### What action do I need to take?
+
+Update your scripts with the following:
+
+- Ensure all the URLs you provide are **decoded**.
+- Remove the option `--allowSchemaMismatch`.
+- Replace option `--deleteIfAlreadyExists` with `--nameConflictBehavior replace`.
+
+## In `teams channel` commands, changed short options
+
+In the following commands we've changed some shorts:
+
+- [teams channel get](./cmd/teams/channel/channel-get.md)
+- [teams channel set](./cmd/teams/channel/channel-set.md)
+- [teams channel remove](./cmd/teams/channel/channel-remove.md)
+
+The following shorts where changed:
+
+- Where we used `-c, --id`, we changed it to `-i, --id`.
+- Where we used `-i, --teamId`, we changed it to `--teamId`.
+
+### What action do I need to take?
+
+Update the reference to the short options in your scripts.
+
+## Updated `teams app publish` command output
+
+In the past versions, `teams app publish` returned just the app ID of the published app, or nothing at all. This has been adjusted, now the command will return the entire result object.
+
+v5 JSON command output:
+
+```json
+"fbdfd207-83ee-45d8-9c98-5039a1a01207"
+```
+
+v6 JSON command output:
+
+```json
+{
+    "id": "fbdfd207-83ee-45d8-9c98-5039a1a01207",
+    "externalId": "b5561ec9-8cab-4aa3-8aa2-d8d7172e4311",
+    "displayName": "Test App",
+    "distributionMethod": "organization"
+}
+```
+
+### What action do I need to take?
+
+Update your scripts to read the `id` property of the command output.
+
+## Updated `spo eventreceiver get` command output
+
+In the past versions, `spo eventreceiver get` returned an array with a single object. This has been adjusted, now the command will only return the object.
+
+v5 JSON command output:
+
+```json
+[
+  {
+    "ReceiverAssembly": "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
+    "ReceiverClass": "Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver",
+    "ReceiverId": "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec",
+    "ReceiverName": "PnP Test Receiver",
+    "SequenceNumber": 10000,
+    "Synchronization": 2,
+    "EventType": 10204,
+    "ReceiverUrl": "https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b"
+  }
+]
+```
+
+v6 JSON command output:
+
+```json
+{
+  "ReceiverAssembly": "Microsoft.Office.Server.UserProfiles, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
+  "ReceiverClass": "Microsoft.Office.Server.UserProfiles.ContentFollowingWebEventReceiver",
+  "ReceiverId": "c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec",
+  "ReceiverName": "PnP Test Receiver",
+  "SequenceNumber": 10000,
+  "Synchronization": 2,
+  "EventType": 10204,
+  "ReceiverUrl": "https://northeurope1-0.pushnp.svc.ms/notifications?token=b4c0def2-a5ea-490a-bb85-c2e423b1384b"
+}
+```
+
+### What action do I need to take?
+
+Update your scripts to expect a single object instead of an array.
+
+## Updated `spo group user <verb>` commands
+
+We've renamed the `spo group user <verb>` commands to `spo group member <verb>` to better cover all possible scenarios. In the near future we'll be adding support to add Azure AD Groups as group member. Using `spo group member` better fits the intended situation of adding either users or Azure AD groups.
+
+As a side issue, we've also updated the response output of the `spo group member list` command in JSON output mode. This returned a member array within a parent `value` object. In the new situation, the command returns the array without the parent `value` object.
+
+### What action do I need to take?
+
+Update your scripts to use the new `member` noun instead of `user`. If you are using the output of `spo group member list` in JSON output mode, update your scripts and remove the `value` object.
+
+## Removed short notation for option asAdmin in pp commands
+
+We've decided to remove all short notations for option `--asAdmin` in pp commands. In previous versions, many commands had the notation `-a, --asAdmin`. This has been changed to `--adAdmin`, we removed the short notation to align it with our naming convention.
+
+Affected commands:
+
+- [pp card clone](./cmd/pp/card/card-clone.md)
+- [pp card get](./cmd/pp/card/card-get.md)
+- [pp card list](./cmd/pp/card/card-list.md)
+- [pp card remove](./cmd/pp/card/card-remove.md)
+- [pp dataverse table get](./cmd/pp/dataverse/dataverse-table-get.md)
+- [pp dataverse table list](./cmd/pp/dataverse/dataverse-table-list.md)
+- [pp dataverse table remove](./cmd/pp/dataverse/dataverse-table-remove.md)
+- [pp environment get](./cmd/pp/environment/environment-get.md)
+- [pp environment list](./cmd/pp/environment/environment-list.md)
+- [pp solution get](./cmd/pp/solution/solution-get.md)
+- [pp solution list](./cmd/pp/solution/solution-list.md)
+- [pp solution remove](./cmd/pp/solution/solution-remove.md)
+- [pp solution publisher get](./cmd/pp/solution/solution-publisher-get.md)
+- [pp solution publisher list](./cmd/pp/solution/solution-publisher-list.md)
+- [pp solution publisher remove](./cmd/pp/solution/solution-publisher-remove.md)
+
+### What action do I need to take?
+
+Update your scripts to use `--asAdmin` instead of `-a`.
+
+## Updated `teams app list` command
+
+The logic to list the installed apps in a specified team is moved to a new command [teams team app list](./cmd/teams/team/team-app-list.md). As a result, the command [teams app list](./cmd/teams/app/app-list.md) only displays the installed apps from the Microsoft Teams app catalog. The command [teams app list](./cmd/teams/app/app-list.md) does no longer contain the options `all`, `teamId` and `teamName`. In addition, there is a new option for this command that allows you to indicate which installed apps from the Microsoft Teams app catalog you want to list according to the distribution method.
+
+### What action do I need to take?
+
+Update your scripts to use the [teams app list](./cmd/teams/app/app-list.md) command if you want to list the installed apps in the Microsoft Teams app catalog. If you want to list the installed apps in a specified team, use the [teams team app list](./cmd/teams/team/team-app-list.md) command instead.
 
 ## Aligned options with naming convention
 
@@ -145,11 +302,12 @@ Command|Old option|New option
 [spo file checkin](./cmd/spo/file/file-checkin.md)|`fileUrl`|`url`
 [spo file checkout](./cmd/spo/file/file-checkout.md)|`fileUrl`|`url`
 [spo file sharinginfo get](./cmd/spo/file/file-sharinginfo-get.md)|`url`|`fileUrl`
+[spo file sharinginfo get](./cmd/spo/file/file-sharinginfo-get.md)|`id`|`fileId`
 [spo folder get](./cmd/spo/folder/folder-get.md)|`folderUrl`|`url`
 [spo folder remove](./cmd/spo/folder/folder-remove.md)|`folderUrl`|`url`
 [spo folder rename](./cmd/spo/folder/folder-rename.md)|`folderUrl`|`url`
-[spo hubsite connect](./cmd/spo/hubsite/hubsite-connect.md)|`url`|`siteUrl`
-[spo hubsite disconnect](./cmd/spo/hubsite/hubsite-disconnect.md)|`url`|`siteUrl`
+[spo site hubsite connect](./cmd/spo/site/site-hubsite-connect.md)|`url`|`siteUrl`
+[spo site hubsite disconnect](./cmd/spo/site/site-hubsite-disconnect.md)|`url`|`siteUrl`
 [spo hubsite register](./cmd/spo/hubsite/hubsite-register.md)|`url`|`siteUrl`
 [spo hubsite rights grant](./cmd/spo/hubsite/hubsite-rights-grant.md)|`url`|`hubSiteUrl`
 [spo hubsite rights revoke](./cmd/spo/hubsite/hubsite-rights-revoke.md)|`url`|`hubSiteUrl`

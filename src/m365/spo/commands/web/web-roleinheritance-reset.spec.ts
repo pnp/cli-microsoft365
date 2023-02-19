@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -55,7 +55,7 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -67,17 +67,6 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {
@@ -129,10 +118,13 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      confirm: true } } as any), new CommandError(err));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        confirm: true
+      }
+    } as any), new CommandError(err));
   });
 
   it('aborts resetting role inheritance when prompt not confirmed', async () => {
@@ -143,7 +135,7 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
 
   it('prompts before resetting role inheritance when confirmation argument not passed', async () => {
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com' } });
-  	let promptIssued = false;
+    let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;

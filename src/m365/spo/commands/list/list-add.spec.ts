@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.LIST_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -51,7 +51,7 @@ describe(commands.LIST_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -77,7 +77,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -93,7 +93,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -109,7 +109,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', description: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', description: expected, baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -125,7 +125,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -141,7 +141,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', schemaXml: expected, templateFeatureId: '00bfea71-de22-43b2-a848-c05709900100', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', schemaXml: expected, templateFeatureId: '00bfea71-de22-43b2-a848-c05709900100', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -157,7 +157,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -173,7 +173,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -189,7 +189,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -205,7 +205,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -221,7 +221,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -237,7 +237,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -253,7 +253,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -269,7 +269,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -285,7 +285,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -301,7 +301,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -317,7 +317,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -333,7 +333,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -349,7 +349,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -365,7 +365,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -381,7 +381,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -397,7 +397,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -413,7 +413,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -429,7 +429,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -445,7 +445,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -461,7 +461,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -477,7 +477,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -493,7 +493,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -509,7 +509,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -525,7 +525,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -541,7 +541,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -557,7 +557,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -573,7 +573,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -589,7 +589,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -605,7 +605,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -621,7 +621,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -637,7 +637,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -653,7 +653,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -669,7 +669,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -685,7 +685,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -701,7 +701,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -717,7 +717,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -733,7 +733,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -749,7 +749,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -765,7 +765,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -781,7 +781,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -797,7 +797,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -813,7 +813,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -829,7 +829,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -845,7 +845,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -861,7 +861,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -877,7 +877,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -893,7 +893,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -909,7 +909,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -925,7 +925,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -941,7 +941,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -957,7 +957,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -973,7 +973,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -989,7 +989,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1005,7 +1005,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1021,7 +1021,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1037,7 +1037,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1053,7 +1053,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -1062,19 +1062,8 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any),
+    await assert.rejects(command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {
@@ -1147,426 +1136,6 @@ describe(commands.LIST_ADD, () => {
     assert(actual);
   });
 
-  it('fails validation if the allowDeletion option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowDeletion: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the allowDeletion option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowDeletion: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the allowEveryoneViewItems option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the allowEveryoneViewItems option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the allowMultiResponses option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the allowMultiResponses option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the contentTypesEnabled option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the contentTypesEnabled option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the crawlNonDefaultViews option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the crawlNonDefaultViews option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the disableGridEditing option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the disableGridEditing option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enableAssignToEmail option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enableAssignToEmail option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enableAttachments option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAttachments: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enableAttachments option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAttachments: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enableDeployWithDependentList option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enableDeployWithDependentList option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enableFolderCreation option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enableFolderCreation option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enableMinorVersions option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enableMinorVersions option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enableModeration option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableModeration: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enableModeration option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableModeration: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enablePeopleSelector option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enablePeopleSelector option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enableResourceSelector option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enableResourceSelector option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enableSchemaCaching option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enableSchemaCaching option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enableSyndication option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSyndication: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enableSyndication option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSyndication: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enableThrottling option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableThrottling: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enableThrottling option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableThrottling: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enableVersioning option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableVersioning: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enableVersioning option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableVersioning: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the enforceDataValidation option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the enforceDataValidation option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the excludeFromOfflineClient option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the excludeFromOfflineClient option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the fetchPropertyBagForListView option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the fetchPropertyBagForListView option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the followable option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', followable: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the followable option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', followable: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the forceCheckout option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceCheckout: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the forceCheckout option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceCheckout: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the forceDefaultContentType option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the forceDefaultContentType option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the hidden option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', hidden: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the hidden option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', hidden: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the includedInMyFilesScope option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the includedInMyFilesScope option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the irmEnabled option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmEnabled: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the irmEnabled option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmEnabled: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the irmExpire option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmExpire: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the irmExpire option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmExpire: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the irmReject option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmReject: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the irmReject option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmReject: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the isApplicationList option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', isApplicationList: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the isApplicationList option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', isApplicationList: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the multipleDataList option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', multipleDataList: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the multipleDataList option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', multipleDataList: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the navigateForFormsPages option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the navigateForFormsPages option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the needUpdateSiteClientTag option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the needUpdateSiteClientTag option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the noCrawl option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', noCrawl: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the noCrawl option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', noCrawl: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the onQuickLaunch option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the onQuickLaunch option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the ordered option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', ordered: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the ordered option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', ordered: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the parserDisabled option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', parserDisabled: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the parserDisabled option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', parserDisabled: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the readOnlyUI option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the readOnlyUI option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the requestAccessEnabled option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the requestAccessEnabled option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the restrictUserUpdates option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the restrictUserUpdates option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the showUser option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', showUser: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the showUser option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', showUser: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
-  it('fails validation if the useFormsForDisplay option is not a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the useFormsForDisplay option is a valid Boolean', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: 'true' } }, commandInfo);
-    assert(actual);
-  });
-
   it('fails validation if the defaultContentApprovalWorkflowId option is not a valid GUID', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -1597,7 +1166,7 @@ describe(commands.LIST_ADD, () => {
 
   it('has correct emailAlias and enableAssignToEmail values specified', async () => {
     const emailAliasValue = 'yourname@contoso.onmicrosoft.com';
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue, enableAssignToEmail: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue, enableAssignToEmail: true } }, commandInfo);
     assert(actual === true);
   });
 
@@ -1621,7 +1190,7 @@ describe(commands.LIST_ADD, () => {
 
   it('has correct majorVersionLimit and enableVersioning values specified', async () => {
     const majorVersionLimitValue = 20;
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue, enableVersioning: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue, enableVersioning: true } }, commandInfo);
     assert(actual === true);
   });
 

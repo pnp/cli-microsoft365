@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -17,7 +17,7 @@ describe(commands.STORAGEENTITY_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
 
@@ -86,7 +86,7 @@ describe(commands.STORAGEENTITY_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       request.get,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -122,7 +122,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('retrieves the details of an existing tenant property without a comment', async () => {
-    await command.action(logger, { options: { debug: false, key: 'propertywithoutcomments', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: { key: 'propertywithoutcomments', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
     assert(loggerLogSpy.calledWith({
       Key: 'propertywithoutcomments',
       Value: 'dolor',
@@ -132,7 +132,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('handles a non-existent tenant property', async () => {
-    await command.action(logger, { options: { debug: false, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: { key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
   });
 
   it('handles a non-existent tenant property (debug)', async () => {
@@ -156,17 +156,6 @@ describe(commands.STORAGEENTITY_GET, () => {
       Description: 'ipsum',
       Comment: undefined
     }));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 
   it('requires tenant property name', () => {

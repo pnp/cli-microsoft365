@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -19,7 +19,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -57,7 +57,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       request.post,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       spo.getRequestDigest
     ]);
@@ -91,7 +91,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -151,7 +151,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -194,18 +194,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }),
+    await assert.rejects(command.action(logger, { options: {} }),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 });

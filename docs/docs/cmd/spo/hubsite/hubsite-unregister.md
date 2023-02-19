@@ -20,8 +20,8 @@ m365 spo hubsite unregister [options]
 
 ## Remarks
 
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
+!!! important
+    To use this command you must be a Global or SharePoint administrator.
 
 If the specified site collection is not registered as a hub site, you will get a `hubSiteId` error.
 
@@ -38,6 +38,10 @@ Unregister the site collection with URL _https://contoso.sharepoint.com/sites/sa
 ```sh
 m365 spo hubsite unregister --url https://contoso.sharepoint.com/sites/sales --confirm
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -47,7 +47,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -77,7 +77,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -136,7 +136,6 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/dummy',
         id: '0x0120'
@@ -190,7 +189,6 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/dummy',
         id: '0x0120'
@@ -230,7 +228,6 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com',
         id: '0x0120'
@@ -250,7 +247,6 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0120'
@@ -270,7 +266,6 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         listUrl: 'sites/documents',
         id: '0x0120'
@@ -352,17 +347,6 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
   it('fails validation neither listTitle nor listId or listUrl is specified', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('configures command types', () => {

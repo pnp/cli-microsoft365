@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.TASK_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     sinon.stub(Cli, 'prompt').callsFake(async (options) => {
@@ -55,7 +55,7 @@ describe(commands.TASK_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       Cli.prompt
     ]);
@@ -101,7 +101,6 @@ describe(commands.TASK_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "Tasks"
       }
@@ -139,7 +138,6 @@ describe(commands.TASK_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "Tasks",
         confirm: true
@@ -174,7 +172,6 @@ describe(commands.TASK_REMOVE, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listId: "BBMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhBBB="
       }
@@ -206,10 +203,12 @@ describe(commands.TASK_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
-      listName: "FooList" } } as any), new CommandError('The list FooList cannot be found'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
+        listName: "FooList"
+      }
+    } as any), new CommandError('The list FooList cannot be found'));
 
   });
 
@@ -248,7 +247,6 @@ describe(commands.TASK_REMOVE, () => {
     });
     await command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "Tasks"
       }
@@ -265,7 +263,6 @@ describe(commands.TASK_REMOVE, () => {
   it('passes validation when all parameters are valid with listId', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listId: 'BBMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhBBB='
       }
@@ -277,7 +274,6 @@ describe(commands.TASK_REMOVE, () => {
   it('passes validation when all parameters are valid with listName', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listName: 'Tasks'
       }
@@ -289,7 +285,6 @@ describe(commands.TASK_REMOVE, () => {
   it('fails validation if both listName and listId are not set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listName: null,
         listId: null
@@ -301,23 +296,11 @@ describe(commands.TASK_REMOVE, () => {
   it('fails validation if both listName and listId are set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listName: 'Tasks',
         listId: 'BBMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhBBB='
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

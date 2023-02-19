@@ -45,6 +45,7 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -113,26 +114,15 @@ class SpoListItemRoleAssignmentRemoveCommand extends SpoCommand {
           return `Specified principalId ${args.options.principalId} is not a number`;
         }
 
-        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
-        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either list id or title or list url`;
-        }
-
-        if (listOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least list id or title or list url`;
-        }
-
-        const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
-        if (principalOptions.some(item => item !== undefined) && principalOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either principalId id or upn or groupName`;
-        }
-
-        if (principalOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least principalId id or upn or groupName`;
-        }
-
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['principalId', 'upn', 'groupName'] }
     );
   }
 

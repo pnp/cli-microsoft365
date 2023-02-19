@@ -1,4 +1,4 @@
-# aad app open
+# app open
 
 Returns deep link of the current AD app to open the Azure portal on the Azure AD app registration management page.
 
@@ -43,3 +43,23 @@ Prints the URL to the Azure AD application registration management page on the A
 ```sh
 m365 app open --appId d75be2e1-0204-4f95-857d-51a37cf40be8 
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    "Use a web browser to open the page https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/02f9ff8c-b79e-4552-bdda-4facd74d6df2/isMSAApp/"
+    ```
+
+=== "Text"
+
+    ```text
+    Use a web browser to open the page https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/02f9ff8c-b79e-4552-bdda-4facd74d6df2/isMSAApp/
+    ```
+
+=== "CSV"
+
+    ```csv
+    Use a web browser to open the page https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/02f9ff8c-b79e-4552-bdda-4facd74d6df2/isMSAApp/
+    ```

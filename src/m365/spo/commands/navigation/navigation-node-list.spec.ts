@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -17,10 +17,32 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  const navigationNodeResponse = {
+    value: [
+      {
+        "Id": 2003,
+        "IsDocLib": true,
+        "IsExternal": false,
+        "IsVisible": true,
+        "ListTemplateType": 0,
+        "Title": "Node 1",
+        "Url": "/sites/team-a/SitePages/page1.aspx"
+      },
+      {
+        "Id": 2004,
+        "IsDocLib": true,
+        "IsExternal": false,
+        "IsVisible": true,
+        "ListTemplateType": 0,
+        "Title": "Node 2",
+        "Url": "/sites/team-a/SitePages/page2.aspx"
+      }
+    ]
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -50,7 +72,7 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -65,65 +87,54 @@ describe(commands.NAVIGATION_NODE_LIST, () => {
   });
 
   it('gets nodes from the top navigation', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
-        return Promise.resolve({ value: [{ "Id": 2003, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 1", "Url": "/sites/team-a/SitePages/page1.aspx" }, { "Id": 2004, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 2", "Url": "/sites/team-a/SitePages/page2.aspx" }] });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar') {
+        return navigationNodeResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } });
-    assert(loggerLogSpy.calledWith([{ "Id": 2003, "Title": "Node 1", "Url": "/sites/team-a/SitePages/page1.aspx" }, { "Id": 2004, "Title": "Node 2", "Url": "/sites/team-a/SitePages/page2.aspx" }]));
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } });
+    assert(loggerLogSpy.calledWith(navigationNodeResponse.value));
   });
 
   it('gets nodes from the quick launch', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/quicklaunch`) > -1) {
-        return Promise.resolve({ value: [{ "Id": 2003, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 1", "Url": "/sites/team-a/SitePages/page1.aspx" }, { "Id": 2004, "IsDocLib": true, "IsExternal": false, "IsVisible": true, "ListTemplateType": 0, "Title": "Node 2", "Url": "/sites/team-a/SitePages/page2.aspx" }] });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/quicklaunch') {
+        return navigationNodeResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch' } });
-    assert(loggerLogSpy.calledWith([{ "Id": 2003, "Title": "Node 1", "Url": "/sites/team-a/SitePages/page1.aspx" }, { "Id": 2004, "Title": "Node 2", "Url": "/sites/team-a/SitePages/page2.aspx" }]));
+    assert(loggerLogSpy.calledWith(navigationNodeResponse.value));
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
-        return Promise.reject({ error: 'An error has occurred' });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar') {
+        throw 'An error has occurred';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } } as any),
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } } as any),
       new CommandError('An error has occurred'));
   });
 
   it('correctly handles random API error (string error)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
-        return Promise.reject('An error has occurred');
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web/navigation/topnavigationbar') {
+        throw 'An error has occurred';
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
+    await assert.rejects(command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar' } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', async () => {

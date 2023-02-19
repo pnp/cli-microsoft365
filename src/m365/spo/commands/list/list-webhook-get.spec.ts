@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -29,7 +29,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -59,7 +59,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -88,7 +88,6 @@ describe(commands.LIST_WEBHOOK_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'
@@ -135,7 +134,6 @@ describe(commands.LIST_WEBHOOK_GET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
@@ -201,8 +199,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
-        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
-        debug: false
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e85'
       }
     });
   });
@@ -240,16 +237,5 @@ describe(commands.LIST_WEBHOOK_GET, () => {
   it('passes validation if the listid option is a valid GUID', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
     assert(actual);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

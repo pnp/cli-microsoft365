@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,7 +19,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -49,7 +49,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -67,7 +67,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        allowAddRemoveApps: 'true'
+        allowAddRemoveApps: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -88,7 +88,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowAddRemoveApps: 'true' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowAddRemoveApps: true }
     } as any);
   });
 
@@ -109,7 +109,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: 'true', allowCreateUpdateRemoveConnectors: 'true', allowDeleteChannels: 'true' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: true, allowCreateUpdateRemoveConnectors: true, allowDeleteChannels: true }
     } as any);
   });
 
@@ -130,7 +130,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: 'false', allowCreateUpdateRemoveTabs: 'false', allowDeleteChannels: 'false' }
+      options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: false, allowCreateUpdateRemoveTabs: false, allowDeleteChannels: false }
     } as any);
   });
 
@@ -139,7 +139,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowAddRemoveApps: 'true' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowAddRemoveApps: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the teamId is not a valid GUID', async () => {
@@ -152,61 +152,11 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if allowAddRemoveApps is not a valid boolean', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowAddRemoveApps: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if allowCreateUpdateChannels is not a valid boolean', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateChannels: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if allowCreateUpdateRemoveConnectors is not a valid boolean', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateRemoveConnectors: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if allowCreateUpdateRemoveTabs is not a valid boolean', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateRemoveTabs: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if allowDeleteChannels is not a valid boolean', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowDeleteChannels: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if allowAddRemoveApps is false', async () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowAddRemoveApps: 'false'
+        allowAddRemoveApps: false
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -216,7 +166,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowAddRemoveApps: 'true'
+        allowAddRemoveApps: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -226,7 +176,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateChannels: 'false'
+        allowCreateUpdateChannels: false
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -236,7 +186,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateChannels: 'true'
+        allowCreateUpdateChannels: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -246,7 +196,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateRemoveConnectors: 'false'
+        allowCreateUpdateRemoveConnectors: false
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -256,7 +206,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateRemoveConnectors: 'true'
+        allowCreateUpdateRemoveConnectors: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -266,7 +216,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateRemoveTabs: 'false'
+        allowCreateUpdateRemoveTabs: false
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -276,7 +226,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowCreateUpdateRemoveTabs: 'true'
+        allowCreateUpdateRemoveTabs: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -286,7 +236,7 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowDeleteChannels: 'false'
+        allowDeleteChannels: false
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -296,20 +246,9 @@ describe(commands.MEMBERSETTINGS_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
-        allowDeleteChannels: 'true'
+        allowDeleteChannels: true
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

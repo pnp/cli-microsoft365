@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { fsUtil } from '../../../../utils/fsUtil';
 import { spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -138,19 +139,19 @@ class SpoFileAddCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (args.options.path && !fs.existsSync(args.options.path)) {
           return 'Specified path of the file to add does not exist';
         }
-    
+
         if (args.options.publishComment && !args.options.publish) {
           return '--publishComment cannot be used without --publish';
         }
-    
+
         if (args.options.approveComment && !args.options.approve) {
           return '--approveComment cannot be used without --approve';
         }
-    
+
         return true;
       }
     );
@@ -180,7 +181,7 @@ class SpoFileAddCommand extends SpoCommand {
     try {
       try {
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')`,
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderPath)}')`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           }
@@ -219,7 +220,7 @@ class SpoFileAddCommand extends SpoCommand {
         // initiate chunked upload session
         const uploadId: string = v4();
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files/GetByPathOrAddStub(DecodedUrl='${encodeURIComponent(fileName)}')/StartUpload(uploadId=guid'${uploadId}')`,
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderPath)}')/Files/GetByPathOrAddStub(DecodedUrl='${formatting.encodeQueryParameter(fileName)}')/StartUpload(uploadId=guid'${uploadId}')`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           }
@@ -252,7 +253,7 @@ class SpoFileAddCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/cancelupload(uploadId=guid'${uploadId}')`,
+            url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderPath)}')/Files('${formatting.encodeQueryParameter(fileName)}')/cancelupload(uploadId=guid'${uploadId}')`,
             headers: {
               'accept': 'application/json;odata=nometadata'
             }
@@ -276,7 +277,7 @@ class SpoFileAddCommand extends SpoCommand {
         const bodyLength: number = fileBody.byteLength;
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files/Add(url='${encodeURIComponent(fileName)}', overwrite=true)`,
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderPath)}')/Files/Add(url='${formatting.encodeQueryParameter(fileName)}', overwrite=true)`,
           data: fileBody,
           headers: {
             'accept': 'application/json;odata=nometadata',
@@ -290,7 +291,7 @@ class SpoFileAddCommand extends SpoCommand {
 
       if (args.options.contentType || args.options.publish || args.options.approve) {
         listSettings = await this.getFileParentList(fileName, args.options.webUrl, folderPath, logger);
-        
+
         if (args.options.contentType) {
           await this.listHasContentType(args.options.contentType, args.options.webUrl, listSettings, logger);
         }
@@ -326,7 +327,7 @@ class SpoFileAddCommand extends SpoCommand {
 
         // approve the existing file with given comment
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/approve(comment='${encodeURIComponent(args.options.approveComment || '')}')`,
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderPath)}')/Files('${formatting.encodeQueryParameter(fileName)}')/approve(comment='${formatting.encodeQueryParameter(args.options.approveComment || '')}')`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -346,7 +347,7 @@ class SpoFileAddCommand extends SpoCommand {
 
         // publish the existing file with given comment
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/publish(comment='${encodeURIComponent(args.options.publishComment || '')}')`,
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderPath)}')/Files('${formatting.encodeQueryParameter(fileName)}')/publish(comment='${formatting.encodeQueryParameter(args.options.publishComment || '')}')`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -362,7 +363,7 @@ class SpoFileAddCommand extends SpoCommand {
         // then have to rollback the checkout
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/UndoCheckOut()`
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderPath)}')/Files('${formatting.encodeQueryParameter(fileName)}')/UndoCheckOut()`
         };
 
         try {
@@ -409,7 +410,7 @@ class SpoFileAddCommand extends SpoCommand {
   private fileCheckOut(fileName: string, webUrl: string, folder: string): Promise<void> {
     // check if file already exists, otherwise it can't be checked out
     const requestOptions: any = {
-      url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folder)}')/Files('${encodeURIComponent(fileName)}')`,
+      url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files('${formatting.encodeQueryParameter(fileName)}')`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       }
@@ -419,7 +420,7 @@ class SpoFileAddCommand extends SpoCommand {
       .then(() => {
         // checkout the existing file
         const requestOptions: any = {
-          url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folder)}')/Files('${encodeURIComponent(fileName)}')/CheckOut()`,
+          url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files('${formatting.encodeQueryParameter(fileName)}')/CheckOut()`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -448,7 +449,7 @@ class SpoFileAddCommand extends SpoCommand {
       }
 
       const requestOptions: any = {
-        url: `${info.WebUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(info.FolderPath)}')/Files('${encodeURIComponent(info.Name)}')/${isLastChunk ? 'Finish' : 'Continue'}Upload(uploadId=guid'${info.Id}',fileOffset=${offset})`,
+        url: `${info.WebUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(info.FolderPath)}')/Files('${formatting.encodeQueryParameter(info.Name)}')/${isLastChunk ? 'Finish' : 'Continue'}Upload(uploadId=guid'${info.Id}',fileOffset=${offset})`,
         data: fileBuffer,
         headers: {
           'accept': 'application/json;odata=nometadata',
@@ -511,7 +512,7 @@ class SpoFileAddCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folder)}')/Files('${encodeURIComponent(fileName)}')/ListItemAllFields/ParentList?$Select=Id,EnableModeration,EnableVersioning,EnableMinorVersions`,
+      url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files('${formatting.encodeQueryParameter(fileName)}')/ListItemAllFields/ParentList?$Select=Id,EnableModeration,EnableVersioning,EnableMinorVersions`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -539,7 +540,7 @@ class SpoFileAddCommand extends SpoCommand {
 
     // update the existing file list item fields
     const requestOptions: any = {
-      url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/ListItemAllFields/ValidateUpdateListItem()`,
+      url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderPath)}')/Files('${formatting.encodeQueryParameter(fileName)}')/ListItemAllFields/ValidateUpdateListItem()`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -565,7 +566,7 @@ class SpoFileAddCommand extends SpoCommand {
 
   private fileCheckIn(args: any, fileName: string): Promise<void> {
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(args.options.folder)}')/Files('${encodeURIComponent(fileName)}')/CheckIn(comment='${encodeURIComponent(args.options.checkInComment || '')}',checkintype=0)`,
+      url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.folder)}')/Files('${formatting.encodeQueryParameter(fileName)}')/CheckIn(comment='${formatting.encodeQueryParameter(args.options.checkInComment || '')}',checkintype=0)`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },

@@ -1,17 +1,16 @@
 import { Logger } from '../../../../cli/Logger';
-import { AxiosRequestConfig } from 'axios';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import { Environment } from '../Environment';
 import commands from '../../commands';
+import request, { CliRequestOptions } from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 
 interface CommandArgs {
   options: Options;
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  name?: string;
   asAdmin?: boolean;
 }
 
@@ -38,6 +37,7 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        name: typeof args.options.name !== 'undefined',
         asAdmin: !!args.options.asAdmin
       });
     });
@@ -46,38 +46,37 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-n, --name <name>'
+        option: '-n, --name [name]'
       },
       {
-        option: '-a, --asAdmin'
+        option: '--asAdmin'
       }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let url: string = `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments`;
-    if (args.options.asAdmin) {
-      url = `${this.resource}/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments`;
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving environment: ${args.options.name || 'default'}`);
     }
 
-    const requestOptions: AxiosRequestConfig = {
-      url: `${url}?api-version=2020-10-01`,
+    let url: string = `${this.resource}/providers/Microsoft.BusinessAppPlatform`;
+    if (args.options.asAdmin) {
+      url += '/scopes/admin';
+    }
+
+    const envName = args.options.name ? formatting.encodeQueryParameter(args.options.name) : '~Default';
+    url += `/environments/${envName}?api-version=2020-10-01`;
+
+    const requestOptions: CliRequestOptions = {
+      url: url,
       headers: {
-        accept: 'application/json'
+        accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
 
-    const res: { value: Environment[] } = await request.get<{ value: Environment[] }>(requestOptions);
-    const environmentItem: Environment | undefined = res.value.filter((env: Environment) => {
-      return env.name === args.options.name;
-    })[0];
-
-    if (!environmentItem) {
-      throw `The specified Power Platform environment does not exist`;
-    }
-
-    logger.log(environmentItem);
+    const response = await request.get<any>(requestOptions);
+    logger.log(response);
   }
 }
 

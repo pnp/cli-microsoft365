@@ -3,15 +3,14 @@ import { v4 } from 'uuid';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { StandardWebPart, StandardWebPartUtils } from '../../StandardWebPartTypes';
 import { Control } from './canvasContent';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
-import {
-  ClientSidePageComponent, ClientSideWebpart
-} from './clientsidepages';
+import { ClientSidePageComponent, ClientSideWebpart } from './clientsidepages';
 
 interface CommandArgs {
   options: Options;
@@ -44,6 +43,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -95,14 +95,6 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.standardWebPart && !args.options.webPartId) {
-          return 'Specify either the standardWebPart or the webPartId option';
-        }
-
-        if (args.options.standardWebPart && args.options.webPartId) {
-          return 'Specify either the standardWebPart or the webPartId option but not both';
-        }
-
         if (args.options.webPartId && !validation.isValidGuid(args.options.webPartId)) {
           return `The webPartId '${args.options.webPartId}' is not a valid GUID`;
         }
@@ -148,6 +140,12 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['standardWebPart', 'webPartId'] }
+    );
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let canvasContent: Control[];
 
@@ -170,7 +168,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
     try {
       let requestOptions: any = {
-        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')`,
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')`,
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
@@ -180,13 +178,13 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       let page = await request.get<ClientSidePageProperties>(requestOptions);
       if (!page.IsPageCheckedOutToCurrentUser) {
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')/checkoutpage`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
-  
+
         page = await request.post<ClientSidePageProperties>(requestOptions);
       }
 
@@ -353,7 +351,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       }
 
       requestOptions = {
-        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/SavePageAsDraft`,
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${formatting.encodeQueryParameter(pageFullName)}')/SavePageAsDraft`,
         headers: {
           'X-HTTP-Method': 'MERGE',
           'IF-MATCH': '*',

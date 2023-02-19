@@ -1,13 +1,13 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -90,7 +90,7 @@ describe(commands.BUCKET_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -101,7 +101,6 @@ describe(commands.BUCKET_GET, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     log = [];
     logger = {
       log: (msg: string) => {
@@ -120,15 +119,14 @@ describe(commands.BUCKET_GET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.patch,
-      accessToken.isAppOnlyAccessToken
+      request.patch
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -146,16 +144,6 @@ describe(commands.BUCKET_GET, () => {
   it('fails validation when no option is specified', async () => {
     const actual = await command.validate({
       options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when id and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validBucketId,
-        name: validBucketName
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -268,7 +256,7 @@ describe(commands.BUCKET_GET, () => {
 
   it('fails validation when no groups found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return Promise.resolve({ "value": [] });
       }
 
@@ -286,7 +274,7 @@ describe(commands.BUCKET_GET, () => {
 
   it('fails validation when multiple groups found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return Promise.resolve(multipleGroupResponse);
       }
 
@@ -336,17 +324,6 @@ describe(commands.BUCKET_GET, () => {
     }), new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`));
   });
 
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        id: validBucketId
-      }
-    }), new CommandError('This command does not support application permissions.'));
-  });
-
   it('Correctly gets bucket by id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
@@ -365,7 +342,7 @@ describe(commands.BUCKET_GET, () => {
 
   it('Correctly gets bucket by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return Promise.resolve(singleGroupResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
@@ -412,16 +389,5 @@ describe(commands.BUCKET_GET, () => {
         ownerGroupId: validOwnerGroupId
       }
     }));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

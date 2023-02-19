@@ -1,11 +1,8 @@
 import { PlannerPlan } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
-import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
@@ -100,20 +97,15 @@ class PlannerPlanRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'title']);
+    this.optionSets.push({ options: ['id', 'title'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.');
-      return;
-    }
-
     const removePlan: () => Promise<void> = async (): Promise<void> => {
       try {
         const plan = await this.getPlan(args);
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/plans/${plan.id}`,
           headers: {
             accept: 'application/json;odata.metadata=none',
@@ -153,7 +145,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
     }
 
     const groupId = await this.getGroupId(args);
-    return await planner.getPlanByTitle(title!, groupId);
+    return await planner.getPlanByTitle(title!, groupId, 'minimal');
   }
 
   private async getGroupId(args: CommandArgs): Promise<string> {

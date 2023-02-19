@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-search-flows-for-connection",
+    "source": "pnp",
+    "title": "Search flows for connections",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/search-flows-for-connection",
+    "creationDateTime": "2021-05-23",
+    "updateDateTime": "2021-05-23",
+    "shortDescription": "This sample allows you to get a report of all flows that are connected to a specific site or list.",
+    "longDescription": [
+      "Search all flows as, an administrator, for a specific search string and report results. This sample allows you to get a report of all flows that are connected to a specific site or list. The `$searchString` can be any value but results are the best when using a GUID or site collection URL."
+    ],
+    "products": [
+      "Power Automate"
+    ],
+    "categories": [],
+    "tags": [
+      "flows",
+      "reports"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/flow/search-flows-for-connection/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "appieschot",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/15227781?v=4",
+        "name": "Albert-Jan Schot"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

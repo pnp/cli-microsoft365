@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc',
@@ -77,7 +77,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       request.post,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       spo.getRequestDigest
     ]);
@@ -123,7 +123,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('sets CDN origin on the public CDN when no type specified', async () => {
-    await command.action(logger, { options: { debug: false, origin: '*/cdn' } });
+    await command.action(logger, { options: { origin: '*/cdn' } });
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -176,7 +176,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
-    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any), 
+    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -221,17 +221,6 @@ describe(commands.CDN_ORIGIN_ADD, () => {
     });
 
     assert(isDone);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 
   it('requires CDN origin name', () => {

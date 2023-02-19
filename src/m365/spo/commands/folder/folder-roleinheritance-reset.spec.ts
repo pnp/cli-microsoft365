@@ -1,189 +1,112 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
-import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { sinonUtil } from '../../../../utils/sinonUtil';
+import { formatting } from '../../../../utils/formatting';
+import GlobalOptions from '../../../../GlobalOptions';
+import request, { CliRequestOptions } from '../../../../request';
+import { validation } from '../../../../utils/validation';
+import SpoCommand from '../../../base/SpoCommand';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
-const command: Command = require('./folder-roleinheritance-reset');
 
-describe(commands.FOLDER_ROLEINHERITANCE_RESET, () => {
-  const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
-  const folderUrl = 'Shared Documents/TestFolder';
+interface CommandArgs {
+  options: Options;
+}
 
-  let log: any[];
-  let logger: Logger;
-  let commandInfo: CommandInfo;
-  let promptOptions: any;
+interface Options extends GlobalOptions {
+  webUrl: string;
+  folderUrl: string;
+  confirm?: boolean;
+}
 
-  before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    auth.service.connected = true;
-    commandInfo = Cli.getCommandInfo(command);
-  });
+class SpoFolderRoleInheritanceResetCommand extends SpoCommand {
+  public get name(): string {
+    return commands.FOLDER_ROLEINHERITANCE_RESET;
+  }
 
-  beforeEach(() => {
-    log = [];
-    logger = {
-      log: (msg: string) => {
-        log.push(msg);
+  public get description(): string {
+    return 'Restores the role inheritance of a folder';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: !!args.options.confirm
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
       },
-      logRaw: (msg: string) => {
-        log.push(msg);
+      {
+        option: '-f, --folderUrl <folderUrl>'
       },
-      logToStderr: (msg: string) => {
-        log.push(msg);
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+    );
+  }
+
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
+    const roleFolderUrl: string = urlUtil.getWebRelativePath(args.options.webUrl, args.options.folderUrl);
+    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
+
+    const resetFolderRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+      try {
+        if (roleFolderUrl.split('/').length === 2) {
+          requestUrl += `GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+        }
+        else {
+          requestUrl += `GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
+        }
+        const requestOptions: CliRequestOptions = {
+          url: `${requestUrl}/resetroleinheritance`,
+          headers: {
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
-      promptOptions = options;
-      return { continue: false };
-    });
-    promptOptions = undefined;
-  });
 
-  afterEach(() => {
-    sinonUtil.restore([
-      Cli.prompt,
-      request.post
-    ]);
-  });
-
-  after(() => {
-    sinonUtil.restore([
-      auth.restoreAuth,
-      appInsights.trackEvent
-    ]);
-    auth.service.connected = false;
-  });
-
-  it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FOLDER_ROLEINHERITANCE_RESET), true);
-  });
-
-  it('has a description', () => {
-    assert.notStrictEqual(command.description, null);
-  });
-
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
-  });
-
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: folderUrl, confirm: true } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if webUrl and folderUrl are valid', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, folderUrl: folderUrl, confirm: true } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('prompts before resetting role inheritance for the folder when confirm option not passed', async () => {
-    await command.action(logger, {
-      options: {
-        webUrl: webUrl,
-        folderUrl: folderUrl
-      }
-    });
-
-    let promptIssued = false;
-
-    if (promptOptions && promptOptions.type === 'confirm') {
-      promptIssued = true;
+    if (args.options.confirm) {
+      await resetFolderRoleInheritance();
     }
+    else {
+      const result = await Cli.prompt<{ continue: boolean }>({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to reset the role inheritance of folder ${args.options.folderUrl} located in site ${args.options.webUrl}?`
+      });
 
-    assert(promptIssued);
-  });
-
-  it('aborts resetting role inheritance for the folder when confirm option is not passed and prompt not confirmed', async () => {
-    const postSpy = sinon.spy(request, 'post');
-
-    await command.action(logger, {
-      options: {
-        webUrl: webUrl,
-        folderUrl: folderUrl
+      if (result.continue) {
+        await resetFolderRoleInheritance();
       }
-    });
+    }
+  }
+}
 
-    assert(postSpy.notCalled);
-  });
-
-  it('reset role inheritance on folder by site-relative URL (debug)', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${folderUrl}')/ListItemAllFields/resetroleinheritance`) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: webUrl,
-        folderUrl: folderUrl,
-        confirm: true
-      }
-    });
-  });
-
-  it('reset role inheritance on folder by site-relative URL when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${folderUrl}')/ListItemAllFields/resetroleinheritance`) {
-        return;
-      }
-
-      throw 'Invalid request';
-    });
-
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
-
-    await command.action(logger, {
-      options: {
-        webUrl: webUrl,
-        folderUrl: folderUrl
-      }
-    });
-  });
-
-  it('correctly handles error when resetting folder role inheritance', async () => {
-    const errorMessage = 'request rejected';
-    sinon.stub(request, 'post').callsFake(async () => { throw errorMessage; });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: webUrl,
-        folderUrl: folderUrl,
-        confirm: true
-      }
-    }), new CommandError(errorMessage));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-});
+module.exports = new SpoFolderRoleInheritanceResetCommand();

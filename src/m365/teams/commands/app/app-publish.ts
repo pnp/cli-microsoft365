@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -57,28 +57,25 @@ class TeamsAppPublishCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const fullPath: string = path.resolve(args.options.filePath);
-    if (this.verbose) {
-      logger.logToStderr(`Adding app '${fullPath}' to app catalog...`);
-    }
-
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/appCatalogs/teamsApps`,
-      headers: {
-        "content-type": "application/zip",
-        accept: 'application/json;odata.metadata=none'
-      },
-      data: fs.readFileSync(fullPath)
-    };
-    
     try {
-      const res: { id: string; } = await request.post<{ id: string; }>(requestOptions);
-
-      if (res && res.id) {
-        logger.log(res.id);
+      const fullPath: string = path.resolve(args.options.filePath);
+      if (this.verbose) {
+        logger.logToStderr(`Adding app '${fullPath}' to app catalog...`);
       }
 
-    } 
+      const requestOptions: CliRequestOptions = {
+        url: `${this.resource}/v1.0/appCatalogs/teamsApps`,
+        headers: {
+          'content-type': 'application/zip',
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: fs.readFileSync(fullPath)
+      };
+
+      const res = await request.post<any>(requestOptions);
+      logger.log(res);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

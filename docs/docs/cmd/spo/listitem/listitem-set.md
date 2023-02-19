@@ -70,3 +70,62 @@ Update the field _Title_ and _CustomHyperlink_ of an item with a specific id in 
 ```sh
 m365 spo listitem set --listUrl '/sites/project-x/lists/Demo List' --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
 ```
+
+Update an item with a specific Title and multi-choice value
+
+```sh
+m365 spo listitem set --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --MultiChoiceField "Choice 1;#Choice 2;#Choice 3"
+```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "FileSystemObjectType": 0,
+      "Id": 236,
+      "ServerRedirectedEmbedUri": null,
+      "ServerRedirectedEmbedUrl": "",
+      "ID": 236,
+      "ContentTypeId": "0x01003CDBEB7138618C47A98D56499135D6EE0004C0F5794DEBCC4BAC981AC4AE1BD803",
+      "Title": "Updated Title",
+      "Modified": "2022-11-16T21:10:06Z",
+      "Created": "2022-11-16T20:56:31Z",
+      "AuthorId": 10,
+      "EditorId": 10,
+      "OData__UIVersionString": "7.0",
+      "Attachments": true,
+      "GUID": "cac57513-e870-4e7a-9f23-f4ea10e14f4e",
+      "ComplianceAssetId": null,
+      "OData__vti_ItemDeclaredRecord": null
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    Attachments                  : true
+    AuthorId                     : 10
+    ComplianceAssetId            : null
+    ContentTypeId                : 0x01003CDBEB7138618C47A98D56499135D6EE0004C0F5794DEBCC4BAC981AC4AE1BD803
+    Created                      : 2022-11-16T20:56:31Z
+    EditorId                     : 10
+    FileSystemObjectType         : 0
+    GUID                         : cac57513-e870-4e7a-9f23-f4ea10e14f4e
+    ID                           : 236
+    Id                           : 236
+    Modified                     : 2022-11-16T21:10:37Z
+    OData__UIVersionString       : 8.0
+    OData__vti_ItemDeclaredRecord: null
+    ServerRedirectedEmbedUri     : null
+    ServerRedirectedEmbedUrl     :
+    Title                        : Updated Title
+    ```
+
+=== "CSV"
+
+    ```csv
+    FileSystemObjectType,Id,ServerRedirectedEmbedUri,ServerRedirectedEmbedUrl,ID,ContentTypeId,Title,Modified,Created,AuthorId,EditorId,OData__UIVersionString,Attachments,GUID,ComplianceAssetId,OData__vti_ItemDeclaredRecord
+    0,236,,,236,0x01003CDBEB7138618C47A98D56499135D6EE0004C0F5794DEBCC4BAC981AC4AE1BD803,Updated Title,2022-11-16T21:10:55Z,2022-11-16T20:56:31Z,10,10,9.0,1,cac57513-e870-4e7a-9f23-f4ea10e14f4e,,
+    ```

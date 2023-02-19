@@ -6,6 +6,7 @@ import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 
 interface CommandArgs {
   options: Options;
@@ -64,14 +65,14 @@ class AadO365GroupConversationPostListCommand extends GraphCommand {
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
           return `${args.options.groupId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['groupId', 'groupDisplayName']);
+    this.optionSets.push({ options: ['groupId', 'groupDisplayName'] });
   }
 
   public defaultProperties(): string[] | undefined {
@@ -91,7 +92,7 @@ class AadO365GroupConversationPostListCommand extends GraphCommand {
 
   private getGroupId(args: CommandArgs): Promise<string> {
     if (args.options.groupId) {
-      return Promise.resolve(encodeURIComponent(args.options.groupId));
+      return Promise.resolve(formatting.encodeQueryParameter(args.options.groupId));
     }
 
     return aadGroup

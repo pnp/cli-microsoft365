@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.SITEDESIGN_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -60,7 +60,7 @@ describe(commands.SITEDESIGN_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -75,24 +75,6 @@ describe(commands.SITEDESIGN_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both id and title options are not passed', async () => {
-    const actual = await command.validate({
-      options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both id and title options are passed', async () => {
-    const actual = await command.validate({
-      options: {
-        id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a',
-        title: 'Contoso Site Design'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails to get site design when it does not exists', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
@@ -101,9 +83,12 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('The specified site design does not exist');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      title: 'Contoso Site Design' } } as any), new CommandError('The specified site design does not exist'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        title: 'Contoso Site Design'
+      }
+    } as any), new CommandError('The specified site design does not exist'));
   });
 
   it('fails when multiple site designs with same title exists', async () => {
@@ -166,9 +151,12 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      title: 'Contoso Site Design' } } as any), new CommandError('Multiple site designs with title Contoso Site Design found: ca360b7e-1946-4292-b854-e0ad904f1055, 88ff1405-35d0-4880-909a-97693822d261'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        title: 'Contoso Site Design'
+      }
+    } as any), new CommandError('Multiple site designs with title Contoso Site Design found: ca360b7e-1946-4292-b854-e0ad904f1055, 88ff1405-35d0-4880-909a-97693822d261'));
   });
 
   it('gets information about the specified site design by id', async () => {
@@ -195,7 +183,7 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } });
+    await command.action(logger, { options: { id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "IsDefault": false,
@@ -265,7 +253,7 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso Site Design' } });
+    await command.action(logger, { options: { title: 'Contoso Site Design' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "IsDefault": false,
@@ -326,18 +314,7 @@ describe(commands.SITEDESIGN_GET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } } as any), new CommandError('File Not Found.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { id: 'ca360b7e-1946-4292-b854-e0ad904f1055' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports specifying id', () => {

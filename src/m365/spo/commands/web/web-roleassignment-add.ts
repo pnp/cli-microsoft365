@@ -43,6 +43,7 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -96,26 +97,15 @@ class SpoWebRoleAssignmentAddCommand extends SpoCommand {
           return `Specified roleDefinitionId ${args.options.roleDefinitionId} is not a number`;
         }
 
-        const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
-        if (principalOptions.some(item => item !== undefined) && principalOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either principalId id or upn or groupName`;
-        }
-
-        if (principalOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least principalId id or upn or groupName`;
-        }
-
-        const roleDefinitionOptions: any[] = [args.options.roleDefinitionId, args.options.roleDefinitionName];
-        if (roleDefinitionOptions.some(item => item !== undefined) && roleDefinitionOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either roleDefinitionId id or roleDefinitionName`;
-        }
-
-        if (roleDefinitionOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least roleDefinitionId id or roleDefinitionName`;
-        }
-
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['principalId', 'upn', 'groupName'] },
+      { options: ['roleDefinitionId', 'roleDefinitionName'] }
     );
   }
 

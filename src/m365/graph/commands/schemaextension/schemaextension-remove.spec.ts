@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
@@ -20,7 +20,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -56,7 +56,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -79,7 +79,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false,id:'exttyee4dv5_MySchemaExtension', confirm: true } });
+    await command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', confirm: true } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -92,12 +92,12 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, id:'exttyee4dv5_MySchemaExtension', confirm: true } });
+    await command.action(logger, { options: { debug: true, id: 'exttyee4dv5_MySchemaExtension', confirm: true } });
     assert(loggerLogToStderrSpy.called);
   });
 
   it('prompts before removing schema extension when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { debug: false, id: 'exttyee4dv5_MySchemaExtension' } });
+    await command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -115,7 +115,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { debug: false, id:'exttyee4dv5_MySchemaExtension' } });
+    await command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension' } });
   });
 
   it('removes schema extension when prompt confirmed', async () => {
@@ -131,7 +131,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: false, id:'exttyee4dv5_MySchemaExtension' } });
+    await command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -140,7 +140,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject({ error: 'An error has occurred' });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id:'exttyee4dv5_MySchemaExtension', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', confirm: true } } as any),
       new CommandError('An error has occurred'));
   });
 
@@ -149,19 +149,8 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'exttyee4dv5_MySchemaExtension', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'exttyee4dv5_MySchemaExtension', confirm: true } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying id', () => {

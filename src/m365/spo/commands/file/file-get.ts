@@ -3,6 +3,7 @@ import * as path from 'path';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -20,6 +21,7 @@ export interface Options extends GlobalOptions {
   asListItem?: boolean;
   asFile?: boolean;
   path?: string;
+  withPermissions?: boolean;
 }
 
 class SpoFileGetCommand extends SpoCommand {
@@ -48,7 +50,8 @@ class SpoFileGetCommand extends SpoCommand {
         asString: args.options.asString || false,
         asListItem: args.options.asListItem || false,
         asFile: args.options.asFile || false,
-        path: (!(!args.options.path)).toString()
+        path: (!(!args.options.path)).toString(),
+        withPermissions: !!args.options.withPermissions
       });
     });
   }
@@ -75,6 +78,9 @@ class SpoFileGetCommand extends SpoCommand {
       },
       {
         option: '-p, --path [path]'
+      },
+      {
+        option: '--withPermissions'
       }
     );
   }
@@ -86,40 +92,40 @@ class SpoFileGetCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (args.options.id) {
           if (!validation.isValidGuid(args.options.id)) {
             return `${args.options.id} is not a valid GUID`;
           }
         }
-    
+
         if (args.options.asFile && !args.options.path) {
           return 'The path should be specified when the --asFile option is used';
         }
-    
+
         if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
           return 'Specified path where to save the file does not exits';
         }
-    
+
         if (args.options.asFile) {
           if (args.options.asListItem || args.options.asString) {
             return 'Specify to retrieve the file either as file, list item or string but not multiple';
           }
         }
-    
+
         if (args.options.asListItem) {
           if (args.options.asFile || args.options.asString) {
             return 'Specify to retrieve the file either as file, list item or string but not multiple';
           }
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'url']);
+    this.optionSets.push({ options: ['id', 'url'] });
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -135,7 +141,7 @@ class SpoFileGetCommand extends SpoCommand {
     let options: string = '';
 
     if (args.options.id) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${encodeURIComponent(args.options.id)}')`;
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
     else if (args.options.url) {
       requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl=@f)`;
@@ -156,7 +162,7 @@ class SpoFileGetCommand extends SpoCommand {
         options += '&';
       }
 
-      options += `@f='${encodeURIComponent(args.options.url)}'`;
+      options += `@f='${formatting.encodeQueryParameter(args.options.url)}'`;
     }
 
     const requestOptions: any = {
@@ -171,12 +177,11 @@ class SpoFileGetCommand extends SpoCommand {
 
     try {
       const file = await request.get<any>(requestOptions);
-      
+
       if (args.options.asFile && args.options.path) {
         // Not possible to use async/await for this promise
         await new Promise<void>((resolve, reject) => {
           const writer = fs.createWriteStream(args.options.path as string);
-
           file.data.pipe(writer);
 
           writer.on('error', err => {
@@ -197,6 +202,17 @@ class SpoFileGetCommand extends SpoCommand {
         }
         else {
           const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
+          if (args.options.withPermissions) {
+            requestOptions.url = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(DecodedUrl='${file.ServerRelativeUrl}')/ListItemAllFields/RoleAssignments?$expand=Member,RoleDefinitionBindings`;
+            const response = await request.get<{ value: any[] }>(requestOptions);
+            response.value.forEach((r: any) => {
+              r.RoleDefinitionBindings = formatting.setFriendlyPermissions(r.RoleDefinitionBindings);
+            });
+            fileProperties.RoleAssignments = response.value;
+            if (args.options.asListItem) {
+              fileProperties.ListItemAllFields.RoleAssignments = response.value;
+            }
+          }
           logger.log(args.options.asListItem ? fileProperties.ListItemAllFields : fileProperties);
         }
       }

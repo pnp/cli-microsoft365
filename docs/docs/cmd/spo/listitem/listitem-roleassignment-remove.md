@@ -11,31 +11,31 @@ m365 spo listitem roleassignment remove [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the listitem is located
+: URL of the site where the listitem is located.
 
 `-i, --listId [listId]`
-: ID of the list. Specify either listId, listTitle or listUrl but not multiple.
+: ID of the list. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `-t, --listTitle [listTitle]`
-: Title of the list. Specify either listId, listTitle or listUrl but not multiple.
+: Title of the list. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `--listUrl [listUrl]`
-: Relative URL of the list. Specify either listId, listTitle or listUrl but not multiple.
+: Relative URL of the list. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `--listItemId <listItemId>`
 : Id of the listitem to remove the role from.
 
 `--principalId [principalId]`
-: SharePoint ID of principal it may be either user id or group id we want to remove permissions Specify principalId only when upn or groupName are not used.
+: SharePoint ID of principal it may be either user id or group id we want to remove permissions. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--upn [upn]`
-: upn/email of user. Specify either upn or principalId.
+: upn/email of user. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--groupName [groupName]`
-: enter group name of Azure AD or SharePoint group. Specify either groupName or principalId.
+: enter group name of Azure AD or SharePoint group. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--confirm`
-: Don't prompt for confirming removing the role assignment
+: Don't prompt for confirming removing the role assignment.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -65,3 +65,7 @@ Remove roleassignment from listitem getting list by url based on principal Id wi
 ```sh
 m365 spo listitem roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --listUrl '/sites/contoso-sales/lists/Events' --listItemId 1 --principalId 2 --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

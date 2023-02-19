@@ -98,7 +98,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -122,7 +122,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
       }
 
       const requestOptions: any = {
-        url: `${requestUrl}/ContentTypes('${encodeURIComponent(args.options.id)}')`,
+        url: `${requestUrl}/ContentTypes('${formatting.encodeQueryParameter(args.options.id)}')`,
         headers: {
           'X-HTTP-Method': 'DELETE',
           'If-Match': '*',

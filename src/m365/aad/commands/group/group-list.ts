@@ -1,4 +1,5 @@
 import { Group } from '@microsoft/microsoft-graph-types';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils/odata';
@@ -57,7 +58,7 @@ class AadGroupListCommand extends GraphCommand {
     try {
       const groups = await odata.getAllItems<Group>(`${this.resource}/v1.0/${endpoint}`);
 
-      if (args.options.output === 'text') {
+      if (Cli.shouldTrimOutput(args.options.output)) {
         groups.forEach((group: ExtendedGroup) => {
           if (group.groupTypes && group.groupTypes.length > 0 && group.groupTypes[0] === 'Unified') {
             group.groupType = 'Microsoft 365';

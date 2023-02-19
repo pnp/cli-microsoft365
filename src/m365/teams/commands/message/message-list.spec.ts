@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.MESSAGE_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -51,7 +51,7 @@ describe(commands.MESSAGE_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -72,7 +72,6 @@ describe(commands.MESSAGE_LIST, () => {
   it('fails validation if teamId and channelId are not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -130,17 +129,6 @@ describe(commands.MESSAGE_LIST, () => {
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('validates for a correct input', async () => {
@@ -446,7 +434,6 @@ describe(commands.MESSAGE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
       }
@@ -586,7 +573,6 @@ describe(commands.MESSAGE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
         since: dt
@@ -726,7 +712,6 @@ describe(commands.MESSAGE_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
@@ -803,9 +788,11 @@ describe(commands.MESSAGE_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
-      channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 });

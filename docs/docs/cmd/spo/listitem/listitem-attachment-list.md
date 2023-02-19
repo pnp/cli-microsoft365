@@ -14,10 +14,10 @@ m365 spo listitem attachment list [options]
 URL of the site from which the item should be retrieved
 
 `--listId [listId]`
-: ID of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+: ID of the list where the item should be retrieved. Specify either `listTitle`, `listId` or `listUrl`
 
 `--listTitle [listTitle]`
-: Title of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+: Title of the list where the item should be retrieved. Specify either `listTitle`, `listId` or `listUrl`
 
 `--listUrl [listUrl]`
 : Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`
@@ -46,3 +46,37 @@ Gets the attachments from a specific list item in a specific list obtained by se
 ```sh
 m365 spo listitem attachment list --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/Documents --itemId 147
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "FileName": "DummyDocument.docx",
+        "FileNameAsPath": {
+          "DecodedUrl": "DummyDocument.docx"
+        },
+        "ServerRelativePath": {
+          "DecodedUrl": "/Lists/Test/Attachments/236/DummyDocument.docx"
+        },
+        "ServerRelativeUrl": "/Lists/Test/Attachments/236/DummyDocument.docx"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```text
+    FileName            ServerRelativeUrl  
+    ------------------  ----------------------------------------------
+    DummyDocument.docx  /Lists/Test/Attachments/236/DummyDocument.docx
+    ```
+
+=== "CSV"
+
+    ```csv
+    FileName,ServerRelativeUrl
+    DummyDocument.docx,/Lists/Test/Attachments/236/DummyDocument.docx
+    ```

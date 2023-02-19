@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -150,7 +150,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
@@ -180,7 +180,7 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -271,22 +271,11 @@ describe(commands.DATAVERSE_TABLE_LIST, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: false, environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
+      await command.action(logger, { options: { environment: '4be50206-9576-4237-8b17-38d8aadfaa36' } });
       assert.fail('No error message thrown.');
     }
     catch (ex) {
       assert(ex, (new CommandError("Resource '' does not exist or one of its queried reference-property objects are not present")).message);
     }
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

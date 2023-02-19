@@ -1,13 +1,12 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -22,6 +21,7 @@ describe(commands.PLAN_GET, () => {
   const validTitle = 'Plan name';
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
+  const validRosterId = 'FeMZFDoK8k2oWmuGE-XFHZcAEwtn';
   const invalidOwnerGroupId = 'Invalid GUID';
 
   const singleGroupResponse = {
@@ -50,7 +50,7 @@ describe(commands.PLAN_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -61,7 +61,6 @@ describe(commands.PLAN_GET, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     log = [];
     logger = {
       log: (msg: string) => {
@@ -80,15 +79,14 @@ describe(commands.PLAN_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      accessToken.isAppOnlyAccessToken
+      request.get
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -105,41 +103,6 @@ describe(commands.PLAN_GET, () => {
 
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner', '@odata.etag']);
-  });
-
-  it('fails validation if neither id nor title are provided.', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both id and title are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        id: validId,
-        title: validTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both ownerGroupId and ownerGroupName are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        title: validTitle,
-        ownerGroupId: validOwnerGroupId,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the ownerGroupId is not a valid guid.', async () => {
@@ -181,22 +144,30 @@ describe(commands.PLAN_GET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation when rosterId specified', async () => {
+    const actual = await command.validate({
+      options: {
+        rosterId: validRosterId
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('correctly get planner plan with given id', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}`) {
-        return Promise.resolve(planResponse);
+        return planResponse;
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
-        return Promise.resolve(planDetailsResponse);
+        return planDetailsResponse;
       }
 
-      return Promise.reject(`Invalid request ${opts.url}`);
+      throw `Invalid request ${opts.url}`;
     });
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: validId
       }
     });
@@ -205,24 +176,19 @@ describe(commands.PLAN_GET, () => {
   });
 
   it('correctly get planner plan with given title and ownerGroupId', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
-        return Promise.resolve({
-          "value": [
-            planResponse
-          ]
-        });
+        return { "value": [planResponse] };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
-        return Promise.resolve(planDetailsResponse);
+        return planDetailsResponse;
       }
 
-      return Promise.reject(`Invalid request ${opts.url}`);
+      throw `Invalid request ${opts.url}`;
     });
 
     const options: any = {
-      debug: false,
       title: validTitle,
       ownerGroupId: validOwnerGroupId
     };
@@ -231,40 +197,24 @@ describe(commands.PLAN_GET, () => {
     assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        id: validId
-      }
-    }), new CommandError('This command does not support application permissions.'));
-  });
-
   it('correctly get planner plan with given title and ownerGroupName', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve(singleGroupResponse);
+        return singleGroupResponse;
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
-        return Promise.resolve({
-          "value": [
-            planResponse
-          ]
-        });
+        return { "value": [planResponse] };
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
-        return Promise.resolve(planDetailsResponse);
+        return planDetailsResponse;
       }
 
-      return Promise.reject(`Invalid request ${opts.url}`);
+      throw `Invalid request ${opts.url}`;
     });
 
     const options: any = {
-      debug: false,
       title: validTitle,
       ownerGroupName: validOwnerGroupName
     };
@@ -273,17 +223,38 @@ describe(commands.PLAN_GET, () => {
     assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('correctly handles no plan found with given ownerGroupId', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
-        return Promise.resolve({ "value": [] });
+  it('correctly get planner plan with given rosterId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/rosters/${validRosterId}/plans`) {
+        return { "value": [planResponse] };
       }
 
-      return Promise.reject(`Invalid request ${opts.url}`);
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
+        return planDetailsResponse;
+      }
+
+      throw `Invalid request ${opts.url}`;
     });
 
     const options: any = {
-      debug: false,
+      rosterId: validRosterId
+    };
+
+    await command.action(logger, { options: options });
+    assert(loggerLogSpy.calledWith(outputResponse));
+  });
+
+
+  it('correctly handles no plan found with given ownerGroupId', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return { "value": [] };
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    const options: any = {
       title: validTitle,
       ownerGroupId: validOwnerGroupId
     };
@@ -293,22 +264,11 @@ describe(commands.PLAN_GET, () => {
   });
 
   it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject('An error has occurred.');
+    sinon.stub(request, 'get').callsFake(async () => {
+      throw Error(`Planner plan with id '${validId}' was not found.`);
     });
 
 
-    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError('An error has occurred.'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { id: validId } }), new CommandError(`Planner plan with id '${validId}' was not found.`));
   });
 });

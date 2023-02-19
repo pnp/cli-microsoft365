@@ -1,7 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { ToDoTask } from '../../ToDoTask';
@@ -61,7 +61,7 @@ class TodoTaskGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listName']);
+    this.optionSets.push({ options: ['listId', 'listName'] });
   }
 
   private async getTodoListId(args: CommandArgs): Promise<string> {
@@ -69,7 +69,7 @@ class TodoTaskGetCommand extends GraphCommand {
       return args.options.listId;
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(args.options.listName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -100,7 +100,7 @@ class TodoTaskGetCommand extends GraphCommand {
 
       const item: ToDoTask = await request.get(requestOptions);
 
-      if (args.options.output === 'json') {
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(item);
       }
       else {

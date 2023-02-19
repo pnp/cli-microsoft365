@@ -11,16 +11,16 @@ m365 aad app remove [options]
 ## Options
 
 `--appId [appId]`
-: Application (client) ID of the Azure AD application registration to remove. Specify either `appId`, `objectId` or `name`
+: Application (client) ID of the Azure AD application registration to remove. Specify either `appId`, `objectId` or `name` but not multiple.
 
 `--objectId [objectId]`
-: Object ID of the Azure AD application registration to remove. Specify either `appId`, `objectId` or `name`
+: Object ID of the Azure AD application registration to remove. Specify either `appId`, `objectId` or `name` but not multiple.
 
 `--name [name]`
-: Name of the Azure AD application registration to remove. Specify either `appId`, `objectId` or `name`
+: Name of the Azure AD application registration to remove. Specify either `appId`, `objectId` or `name` but not multiple.
 
-`--confirm`:
-: Don't prompt for confirmation to remove the app
+`--confirm`
+: Don't prompt for confirmation to remove the app.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -32,13 +32,13 @@ If the command finds multiple Azure AD application registrations with the specif
 
 ## Examples
 
-Remove the Azure AD application registration by its app (client) ID
+Remove the Azure AD application registration by its app (client) ID.
 
 ```sh
 m365 aad app remove --appId d75be2e1-0204-4f95-857d-51a37cf40be8
 ```
 
-Remove the Azure AD application registration by its object ID
+Remove the Azure AD application registration by its object ID.
 
 ```sh
 m365 aad app remove --objectId d75be2e1-0204-4f95-857d-51a37cf40be8
@@ -49,3 +49,7 @@ Remove the Azure AD application registration by its name. Will NOT prompt for co
 ```sh
 m365 aad app remove --name "My app" --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

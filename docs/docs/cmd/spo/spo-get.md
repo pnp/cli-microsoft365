@@ -23,3 +23,26 @@ Get the context URL for the root SharePoint site collection and SharePoint tenan
 ```sh
 m365 spo get --output json
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "SpoUrl": "https://contoso.sharepoint.com"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    SpoUrl: https://contoso.sharepoint.com
+    ```
+
+=== "CSV"
+
+    ```csv
+    SpoUrl
+    https://contoso.sharepoint.com
+    ```

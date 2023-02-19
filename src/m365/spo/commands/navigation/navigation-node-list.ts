@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -22,6 +22,10 @@ class SpoNavigationNodeListCommand extends SpoCommand {
 
   public get description(): string {
     return 'Lists nodes from the specified site navigation';
+  }
+
+  public defaultProperties(): string[] | undefined {
+    return ['Id', 'Title', 'Url'];
   }
 
   constructor() {
@@ -75,23 +79,9 @@ class SpoNavigationNodeListCommand extends SpoCommand {
       logger.logToStderr(`Retrieving navigation nodes...`);
     }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const res = await request.get<{ value: NavigationNode[] }>(requestOptions);
-      logger.log(res.value.map(n => {
-        return {
-          Id: n.Id,
-          Title: n.Title,
-          Url: n.Url
-        };
-      }));
+      const res = await odata.getAllItems<NavigationNode>(`${args.options.webUrl}/_api/web/navigation/${args.options.location.toLowerCase()}`);
+      logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

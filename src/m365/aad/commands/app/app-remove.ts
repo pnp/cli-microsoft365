@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -72,7 +73,7 @@ class AadAppRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'objectId', 'name']);
+    this.optionSets.push({ options: ['appId', 'objectId', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -109,7 +110,7 @@ class AadAppRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the app?`
       });
-        
+
       if (result.continue) {
         await deleteApp();
       }
@@ -128,8 +129,8 @@ class AadAppRemoveCommand extends GraphCommand {
     }
 
     const filter: string = appId ?
-      `appId eq '${encodeURIComponent(appId)}'` :
-      `displayName eq '${encodeURIComponent(name as string)}'`;
+      `appId eq '${formatting.encodeQueryParameter(appId)}'` :
+      `displayName eq '${formatting.encodeQueryParameter(name as string)}'`;
 
     const requestOptions: any = {
       url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=id`,

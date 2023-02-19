@@ -20,60 +20,60 @@ interface Options extends GlobalOptions {
   description?: string;
   templateFeatureId?: string;
   schemaXml?: string;
-  allowDeletion?: string;
-  allowEveryoneViewItems?: string;
-  allowMultiResponses?: string;
-  contentTypesEnabled?: string;
-  crawlNonDefaultViews?: string;
+  allowDeletion?: boolean;
+  allowEveryoneViewItems?: boolean;
+  allowMultiResponses?: boolean;
+  contentTypesEnabled?: boolean;
+  crawlNonDefaultViews?: boolean;
   defaultContentApprovalWorkflowId?: string;
   defaultDisplayFormUrl?: string;
   defaultEditFormUrl?: string;
   direction?: string;
-  disableGridEditing?: string;
+  disableGridEditing?: boolean;
   draftVersionVisibility?: string;
   emailAlias?: string;
-  enableAssignToEmail?: string;
-  enableAttachments?: string;
-  enableDeployWithDependentList?: string;
-  enableFolderCreation?: string;
-  enableMinorVersions?: string;
-  enableModeration?: string;
-  enablePeopleSelector?: string;
-  enableResourceSelector?: string;
-  enableSchemaCaching?: string;
-  enableSyndication?: string;
-  enableThrottling?: string;
-  enableVersioning?: string;
-  enforceDataValidation?: string;
-  excludeFromOfflineClient?: string;
-  fetchPropertyBagForListView?: string;
-  followable?: string;
-  forceCheckout?: string;
-  forceDefaultContentType?: string;
-  hidden?: string;
-  includedInMyFilesScope?: string;
-  irmEnabled?: string;
-  irmExpire?: string;
-  irmReject?: string;
-  isApplicationList?: string;
+  enableAssignToEmail?: boolean;
+  enableAttachments?: boolean;
+  enableDeployWithDependentList?: boolean;
+  enableFolderCreation?: boolean;
+  enableMinorVersions?: boolean;
+  enableModeration?: boolean;
+  enablePeopleSelector?: boolean;
+  enableResourceSelector?: boolean;
+  enableSchemaCaching?: boolean;
+  enableSyndication?: boolean;
+  enableThrottling?: boolean;
+  enableVersioning?: boolean;
+  enforceDataValidation?: boolean;
+  excludeFromOfflineClient?: boolean;
+  fetchPropertyBagForListView?: boolean;
+  followable?: boolean;
+  forceCheckout?: boolean;
+  forceDefaultContentType?: boolean;
+  hidden?: boolean;
+  includedInMyFilesScope?: boolean;
+  irmEnabled?: boolean;
+  irmExpire?: boolean;
+  irmReject?: boolean;
+  isApplicationList?: boolean;
   listExperienceOptions?: string;
   majorVersionLimit?: number;
   majorWithMinorVersionsLimit?: number;
-  multipleDataList?: string;
-  navigateForFormsPages?: string;
-  needUpdateSiteClientTag?: string;
-  noCrawl?: string;
-  onQuickLaunch?: string;
-  ordered?: string;
-  parserDisabled?: string;
-  readOnlyUI?: string;
+  multipleDataList?: boolean;
+  navigateForFormsPages?: boolean;
+  needUpdateSiteClientTag?: boolean;
+  noCrawl?: boolean;
+  onQuickLaunch?: boolean;
+  ordered?: boolean;
+  parserDisabled?: boolean;
+  readOnlyUI?: boolean;
   readSecurity?: number;
-  requestAccessEnabled?: string;
-  restrictUserUpdates?: string;
+  requestAccessEnabled?: boolean;
+  restrictUserUpdates?: boolean;
   sendToLocationName?: string;
   sendToLocationUrl?: string;
-  showUser?: string;
-  useFormsForDisplay?: string;
+  showUser?: boolean;
+  useFormsForDisplay?: boolean;
   validationFormula?: string;
   validationMessage?: string;
   writeSecurity?: number;
@@ -212,9 +212,9 @@ class SpoListAddCommand extends SpoCommand {
 
       // add boolean values
       SpoListAddCommand.booleanOptions.forEach(o => {
-        const value: any = (args.options as any)[o];
-        if (value) {
-          telemetryProps[o] = (value === 'true').toString();
+        const value: boolean = (args.options as any)[o];
+        if (value !== undefined) {
+          telemetryProps[o] = value.toString();
         }
       });
 
@@ -231,7 +231,7 @@ class SpoListAddCommand extends SpoCommand {
       ].forEach(o => {
         const value: any = (args.options as any)[o];
         if (value) {
-          telemetryProps[o] = value.toString();
+          telemetryProps[o] = value;
         }
       });
 
@@ -435,7 +435,7 @@ class SpoListAddCommand extends SpoCommand {
         autocomplete: ['true', 'false']
       },
       {
-        option: '-parserDisabled [parserDisabled]',
+        option: '--parserDisabled [parserDisabled]',
         autocomplete: ['true', 'false']
       },
       {
@@ -494,14 +494,6 @@ class SpoListAddCommand extends SpoCommand {
           return `${args.options.baseTemplate} is not a valid baseTemplate value`;
         }
 
-        for (let i = 0; i < SpoListAddCommand.booleanOptions.length; i++) {
-          const option: string = SpoListAddCommand.booleanOptions[i];
-          const value: string | undefined = (args.options as any)[option];
-          if (value && !validation.isValidBoolean(value)) {
-            return `${value} in option ${option} is not a valid boolean value`;
-          }
-        }
-
         if (args.options.templateFeatureId &&
           !validation.isValidGuid(args.options.templateFeatureId)) {
           return `${args.options.templateFeatureId} in option templateFeatureId is not a valid GUID`;
@@ -525,7 +517,7 @@ class SpoListAddCommand extends SpoCommand {
           }
         }
 
-        if (args.options.emailAlias && args.options.enableAssignToEmail !== 'true') {
+        if (args.options.emailAlias && args.options.enableAssignToEmail !== true) {
           return `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`;
         }
 
@@ -537,13 +529,13 @@ class SpoListAddCommand extends SpoCommand {
           }
         }
 
-        if (args.options.majorVersionLimit && args.options.enableVersioning !== 'true') {
+        if (args.options.majorVersionLimit && args.options.enableVersioning !== true) {
           return `majorVersionLimit option is only valid in combination with enableVersioning.`;
         }
 
         if (args.options.majorWithMinorVersionsLimit &&
-          args.options.enableMinorVersions !== 'true' &&
-          args.options.enableModeration !== 'true') {
+          args.options.enableMinorVersions !== true &&
+          args.options.enableModeration !== true) {
           return `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`;
         }
 
@@ -566,17 +558,23 @@ class SpoListAddCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push(...SpoListAddCommand.booleanOptions.concat([
+    this.types.string.push(
       'baseTemplate',
       'webUrl',
       'templateFeatureId',
       'defaultContentApprovalWorkflowId',
       'draftVersionVisibility',
       'listExperienceOptions'
-    ]));
+    );
+
+    this.types.boolean.push(...SpoListAddCommand.booleanOptions);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (args.options.schemaXml) {
+      this.warn(logger, `Option 'schemaXml' is deprecated.`);
+    }
+
     if (this.verbose) {
       logger.logToStderr(`Creating list in site at ${args.options.webUrl}...`);
     }
@@ -620,23 +618,23 @@ class SpoListAddCommand extends SpoCommand {
       requestBody.SchemaXml = options.schemaXml.replace('\\', '\\\\').replace('"', '\\"');
     }
 
-    if (options.allowDeletion) {
+    if (options.allowDeletion !== undefined) {
       requestBody.AllowDeletion = options.allowDeletion;
     }
 
-    if (options.allowEveryoneViewItems) {
+    if (options.allowEveryoneViewItems !== undefined) {
       requestBody.AllowEveryoneViewItems = options.allowEveryoneViewItems;
     }
 
-    if (options.allowMultiResponses) {
+    if (options.allowMultiResponses !== undefined) {
       requestBody.AllowMultiResponses = options.allowMultiResponses;
     }
 
-    if (options.contentTypesEnabled) {
+    if (options.contentTypesEnabled !== undefined) {
       requestBody.ContentTypesEnabled = options.contentTypesEnabled;
     }
 
-    if (options.crawlNonDefaultViews) {
+    if (options.crawlNonDefaultViews !== undefined) {
       requestBody.CrawlNonDefaultViews = options.crawlNonDefaultViews;
     }
 
@@ -656,7 +654,7 @@ class SpoListAddCommand extends SpoCommand {
       requestBody.Direction = options.direction;
     }
 
-    if (options.disableGridEditing) {
+    if (options.disableGridEditing !== undefined) {
       requestBody.DisableGridEditing = options.disableGridEditing;
     }
 
@@ -668,99 +666,99 @@ class SpoListAddCommand extends SpoCommand {
       requestBody.EmailAlias = options.emailAlias;
     }
 
-    if (options.enableAssignToEmail) {
+    if (options.enableAssignToEmail !== undefined) {
       requestBody.EnableAssignToEmail = options.enableAssignToEmail;
     }
 
-    if (options.enableAttachments) {
+    if (options.enableAttachments !== undefined) {
       requestBody.EnableAttachments = options.enableAttachments;
     }
 
-    if (options.enableDeployWithDependentList) {
+    if (options.enableDeployWithDependentList !== undefined) {
       requestBody.EnableDeployWithDependentList = options.enableDeployWithDependentList;
     }
 
-    if (options.enableFolderCreation) {
+    if (options.enableFolderCreation !== undefined) {
       requestBody.EnableFolderCreation = options.enableFolderCreation;
     }
 
-    if (options.enableMinorVersions) {
+    if (options.enableMinorVersions !== undefined) {
       requestBody.EnableMinorVersions = options.enableMinorVersions;
     }
 
-    if (options.enableModeration) {
+    if (options.enableModeration !== undefined) {
       requestBody.EnableModeration = options.enableModeration;
     }
 
-    if (options.enablePeopleSelector) {
+    if (options.enablePeopleSelector !== undefined) {
       requestBody.EnablePeopleSelector = options.enablePeopleSelector;
     }
 
-    if (options.enableResourceSelector) {
+    if (options.enableResourceSelector !== undefined) {
       requestBody.EnableResourceSelector = options.enableResourceSelector;
     }
 
-    if (options.enableSchemaCaching) {
+    if (options.enableSchemaCaching !== undefined) {
       requestBody.EnableSchemaCaching = options.enableSchemaCaching;
     }
 
-    if (options.enableSyndication) {
+    if (options.enableSyndication !== undefined) {
       requestBody.EnableSyndication = options.enableSyndication;
     }
 
-    if (options.enableThrottling) {
+    if (options.enableThrottling !== undefined) {
       requestBody.EnableThrottling = options.enableThrottling;
     }
 
-    if (options.enableVersioning) {
+    if (options.enableVersioning !== undefined) {
       requestBody.EnableVersioning = options.enableVersioning;
     }
 
-    if (options.enforceDataValidation) {
+    if (options.enforceDataValidation !== undefined) {
       requestBody.EnforceDataValidation = options.enforceDataValidation;
     }
 
-    if (options.excludeFromOfflineClient) {
+    if (options.excludeFromOfflineClient !== undefined) {
       requestBody.ExcludeFromOfflineClient = options.excludeFromOfflineClient;
     }
 
-    if (options.fetchPropertyBagForListView) {
+    if (options.fetchPropertyBagForListView !== undefined) {
       requestBody.FetchPropertyBagForListView = options.fetchPropertyBagForListView;
     }
 
-    if (options.followable) {
+    if (options.followable !== undefined) {
       requestBody.Followable = options.followable;
     }
 
-    if (options.forceCheckout) {
+    if (options.forceCheckout !== undefined) {
       requestBody.ForceCheckout = options.forceCheckout;
     }
 
-    if (options.forceDefaultContentType) {
+    if (options.forceDefaultContentType !== undefined) {
       requestBody.ForceDefaultContentType = options.forceDefaultContentType;
     }
 
-    if (options.hidden) {
+    if (options.hidden !== undefined) {
       requestBody.Hidden = options.hidden;
     }
 
-    if (options.includedInMyFilesScope) {
+    if (options.includedInMyFilesScope !== undefined) {
       requestBody.IncludedInMyFilesScope = options.includedInMyFilesScope;
     }
 
-    if (options.irmEnabled) {
+    if (options.irmEnabled !== undefined) {
       requestBody.IrmEnabled = options.irmEnabled;
     }
 
-    if (options.irmExpire) {
+    if (options.irmExpire !== undefined) {
       requestBody.IrmExpire = options.irmExpire;
     }
 
-    if (options.irmReject) {
+    if (options.irmReject !== undefined) {
       requestBody.IrmReject = options.irmReject;
     }
 
-    if (options.isApplicationList) {
+    if (options.isApplicationList !== undefined) {
       requestBody.IsApplicationList = options.isApplicationList;
     }
 
@@ -776,35 +774,35 @@ class SpoListAddCommand extends SpoCommand {
       requestBody.MajorWithMinorVersionsLimit = options.majorWithMinorVersionsLimit;
     }
 
-    if (options.multipleDataList) {
+    if (options.multipleDataList !== undefined) {
       requestBody.MultipleDataList = options.multipleDataList;
     }
 
-    if (options.navigateForFormsPages) {
+    if (options.navigateForFormsPages !== undefined) {
       requestBody.NavigateForFormsPages = options.navigateForFormsPages;
     }
 
-    if (options.needUpdateSiteClientTag) {
+    if (options.needUpdateSiteClientTag !== undefined) {
       requestBody.NeedUpdateSiteClientTag = options.needUpdateSiteClientTag;
     }
 
-    if (options.noCrawl) {
+    if (options.noCrawl !== undefined) {
       requestBody.NoCrawl = options.noCrawl;
     }
 
-    if (options.onQuickLaunch) {
+    if (options.onQuickLaunch !== undefined) {
       requestBody.OnQuickLaunch = options.onQuickLaunch;
     }
 
-    if (options.ordered) {
+    if (options.ordered !== undefined) {
       requestBody.Ordered = options.ordered;
     }
 
-    if (options.parserDisabled) {
+    if (options.parserDisabled !== undefined) {
       requestBody.ParserDisabled = options.parserDisabled;
     }
 
-    if (options.readOnlyUI) {
+    if (options.readOnlyUI !== undefined) {
       requestBody.ReadOnlyUI = options.readOnlyUI;
     }
 
@@ -812,11 +810,11 @@ class SpoListAddCommand extends SpoCommand {
       requestBody.ReadSecurity = options.readSecurity;
     }
 
-    if (options.requestAccessEnabled) {
+    if (options.requestAccessEnabled !== undefined) {
       requestBody.RequestAccessEnabled = options.requestAccessEnabled;
     }
 
-    if (options.restrictUserUpdates) {
+    if (options.restrictUserUpdates !== undefined) {
       requestBody.RestrictUserUpdates = options.restrictUserUpdates;
     }
 
@@ -828,11 +826,11 @@ class SpoListAddCommand extends SpoCommand {
       requestBody.SendToLocationUrl = options.sendToLocationUrl;
     }
 
-    if (options.showUser) {
+    if (options.showUser !== undefined) {
       requestBody.ShowUser = options.showUser;
     }
 
-    if (options.useFormsForDisplay) {
+    if (options.useFormsForDisplay !== undefined) {
       requestBody.UseFormsForDisplay = options.useFormsForDisplay;
     }
 

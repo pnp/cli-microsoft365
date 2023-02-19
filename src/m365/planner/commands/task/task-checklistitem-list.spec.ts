@@ -1,11 +1,10 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -15,7 +14,7 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  
+
   const jsonOutput = {
     "checklist": {
       "33224": {
@@ -76,7 +75,7 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -86,7 +85,6 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     log = [];
     logger = {
       log: (msg: string) => {
@@ -105,14 +103,13 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      accessToken.isAppOnlyAccessToken
+      request.get
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       auth.restoreAuth
     ]);
@@ -130,17 +127,6 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
 
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'isChecked']);
-  });
-
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        taskId: 'vzCcZoOv-U27PwydxHB8opcADJo-'
-      }
-    }), new CommandError('This command does not support application permissions.'));
   });
 
   it('successfully handles item found(JSON)', async () => {
@@ -183,24 +169,13 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('The requested item is not found.'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('The requested item is not found.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('The requested item is not found.'));
   });
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

@@ -1,10 +1,9 @@
 import { AadUserConversationMember, Chat, ConversationMember } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import * as os from 'os';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -87,14 +86,14 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['chatId', 'userEmails', 'chatName']);
+    this.optionSets.push({ options: ['chatId', 'userEmails', 'chatName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const chatId = await this.getChatId(logger, args);
       await this.sendChatMessage(chatId as string, args);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -168,7 +167,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
         })
       };
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/chats`,
         headers: {
           accept: 'application/json;odata.metadata=none',
@@ -190,7 +189,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   }
 
   private async sendChatMessage(chatId: string, args: CommandArgs): Promise<void> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/chats/${chatId}/messages`,
       headers: {
         accept: 'application/json;odata.metadata=none',

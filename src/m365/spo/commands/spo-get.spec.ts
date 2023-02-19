@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../appInsights';
+import { telemetry } from '../../../telemetry';
 import auth from '../../../Auth';
 import { Cli } from '../../../cli/Cli';
 import { CommandInfo } from '../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -50,7 +50,7 @@ describe(commands.GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       auth.storeConnectionInfo,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -95,7 +95,7 @@ describe(commands.GET, () => {
   it('throws error when trying to get SPO URL when not logged in to O365', async () => {
     auth.service.connected = false;
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Log in to Microsoft 365 first'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Log in to Microsoft 365 first'));
     assert.strictEqual(auth.service.spoUrl, undefined);
   });
 

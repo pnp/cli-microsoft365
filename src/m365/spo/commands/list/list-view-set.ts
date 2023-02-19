@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -15,6 +16,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   id?: string;
   title?: string;
 }
@@ -46,6 +48,7 @@ class SpoListViewSetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined'
       });
@@ -62,6 +65,9 @@ class SpoListViewSetCommand extends SpoCommand {
       },
       {
         option: '--listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       },
       {
         option: '--id [id]'
@@ -97,23 +103,30 @@ class SpoListViewSetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['listId', 'listTitle'],
-      ['id', 'title']
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['id', 'title'] }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const baseRestUrl: string = `${args.options.webUrl}/_api/web/lists`;
-    const listRestUrl: string = args.options.listId ?
-      `(guid'${formatting.encodeQueryParameter(args.options.listId)}')`
-      : `/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
-    const viewRestUrl: string = `/views/${(args.options.id ? `getById('${formatting.encodeQueryParameter(args.options.id)}')` : `getByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`)}`;
+    let listRestUrl: string = '';
+    if (args.options.listId) {
+      listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+    }
+    else if (args.options.listTitle) {
+      listRestUrl = `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      listRestUrl = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
+
+    const viewRestUrl: string = `/views/${(args.options.id ? `GetById('${formatting.encodeQueryParameter(args.options.id)}')` : `GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`)}`;
 
     try {
       const res = await spo.getRequestDigest(args.options.webUrl);
-
       const requestOptions: any = {
-        url: `${baseRestUrl}${listRestUrl}${viewRestUrl}`,
+        url: `${args.options.webUrl}/_api/web/${listRestUrl}${viewRestUrl}`,
         headers: {
           'X-RequestDigest': res.FormDigestValue,
           'content-type': 'application/json;odata=nometadata',
@@ -136,6 +149,7 @@ class SpoListViewSetCommand extends SpoCommand {
       'webUrl',
       'listId',
       'listTitle',
+      'listUrl',
       'id',
       'title',
       'debug',

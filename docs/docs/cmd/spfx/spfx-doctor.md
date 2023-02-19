@@ -68,3 +68,41 @@ Verify if your environment meets the requirements to work with SharePoint Framew
 ```sh
 m365 spfx doctor --spfxVersion 1.11.0 --output text
 ```
+
+## Response
+
+### Response with no issues
+
+=== "Text"
+
+    ```text
+    CLI for Microsoft 365 SharePoint Framework doctor
+    Verifying configuration of your system for working with the SharePoint Framework
+
+    √ SharePoint Framework v1.15.0
+    √ Node v16.13.0    
+    √ yo v4.3.0
+    √ gulp-cli v2.3.0
+    √ bundled typescript used
+    ```
+
+### Response with issues reported
+
+When the installed version of Yeoman is lower than expected to run SharePoint Framework v1.15.0
+
+=== "Text"
+
+    ```text
+    CLI for Microsoft 365 SharePoint Framework doctor
+    Verifying configuration of your system for working with the SharePoint Framework
+
+    √ SharePoint Framework v1.15.0
+    √ Node v16.16.0
+    × yo v3.1.1 found, v^4 required
+    √ gulp-cli v2.3.0
+    √ bundled typescript used
+
+    Recommended fixes:
+
+    - npm i -g yo@4
+    ```

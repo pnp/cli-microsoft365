@@ -11,22 +11,22 @@ m365 spo web roleassignment add [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site
+: URL of the site.
 
 `--principalId [principalId]`
-: SharePoint ID of principal it may be either user id or group id we want to add permissions to. Specify principalId only when upn or groupName are not used.
+: SharePoint ID of principal it may be either user id or group id we want to add permissions to. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--upn [upn]`
-: upn/email of user to assign role to. Specify either upn or principalId
+: upn/email of user to assign role to. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--groupName [groupName]`
-: enter group name of Azure AD or SharePoint group.. Specify either groupName or principalId
+: enter group name of Azure AD or SharePoint group. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--roleDefinitionId [roleDefinitionId]`
-: ID of role definition. Specify either roleDefinitionId or roleDefinitionName but not both
+: ID of role definition. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.
 
 `--roleDefinitionName [roleDefinitionName]`
-: enter the name of a role definition, like 'Contribute', 'Read', etc. Specify either roleDefinitionId or roleDefinitionName but not both
+: enter the name of a role definition, like 'Contribute', 'Read', etc. Specify either `roleDefinitionId` or `roleDefinitionName` but not both.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -55,3 +55,7 @@ add role assignment to site _https://contoso.sharepoint.com/sites/project-x_for 
 ```sh
 m365 spo web roleassignment add --webUrl "https://contoso.sharepoint.com/sites/project-x" --principalId 11 --roleDefinitionName "Full Control"
 ```
+
+## Response
+
+The command won't return a response on success.

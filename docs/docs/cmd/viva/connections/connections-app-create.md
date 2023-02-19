@@ -66,6 +66,10 @@ Create a Viva Connections desktop app package
 m365 viva connections app create --portalUrl https://contoso.sharepoint.com --name Contoso --description "Contoso company app" --longDescription "Stay on top of what's happening at Contoso" --companyName Contoso --companyWebsiteUrl https://contoso.com --coloredIconPath icon-color.png --outlineIconPath icon-outline.png
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## More information
 
 - Add Viva Connections for Microsoft Teams desktop: [https://docs.microsoft.com/sharepoint/viva-connections](https://docs.microsoft.com/sharepoint/viva-connections?WT.mc_id=m365-15896-cxa)

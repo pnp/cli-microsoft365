@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../appInsights';
+import { telemetry } from '../../telemetry';
 import auth from '../../Auth';
 import { Logger } from '../../cli/Logger';
 import { CommandError } from '../../Command';
@@ -49,7 +49,7 @@ describe('SpoCommand', () => {
 
   before(() => {
     auth.service.connected = true;
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
   });
 
@@ -82,7 +82,7 @@ describe('SpoCommand', () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -137,23 +137,24 @@ describe('SpoCommand', () => {
   it('returns default list of names of options with URLs if no names to exclude defined', () => {
     const expected = [
       'appCatalogUrl',
-      'siteUrl',
-      'webUrl',
-      'origin',
-      'url',
-      'imageUrl',
       'actionUrl',
-      'logoUrl',
+      'imageUrl',
       'libraryUrl',
-      'thumbnailUrl',
-      'targetUrl',
+      'logoUrl',
       'newSiteUrl',
-      'previewImageUrl',
       'NoAccessRedirectUrl',
-      'StartASiteFormUrl',
       'OrgNewsSiteUrl',
+      'origin',
+      'parentUrl',
       'parentWebUrl',
-      'siteLogoUrl'
+      'previewImageUrl',
+      'siteLogoUrl',
+      'siteUrl',
+      'StartASiteFormUrl',
+      'targetUrl',
+      'thumbnailUrl',
+      'url',
+      'webUrl'
     ];
     const command = new MockCommand();
     const actual = command.getNamesOfOptionsWithUrlsPublic();
@@ -163,22 +164,23 @@ describe('SpoCommand', () => {
   it('returns filtered list of names of options with URLs when names to exclude defined', () => {
     const expected = [
       'appCatalogUrl',
-      'siteUrl',
-      'webUrl',
-      'origin',
-      'imageUrl',
       'actionUrl',
-      'logoUrl',
+      'imageUrl',
       'libraryUrl',
-      'thumbnailUrl',
-      'targetUrl',
+      'logoUrl',
       'newSiteUrl',
-      'previewImageUrl',
       'NoAccessRedirectUrl',
-      'StartASiteFormUrl',
       'OrgNewsSiteUrl',
+      'origin',
+      'parentUrl',
       'parentWebUrl',
-      'siteLogoUrl'
+      'previewImageUrl',
+      'siteLogoUrl',
+      'siteUrl',
+      'StartASiteFormUrl',
+      'targetUrl',
+      'thumbnailUrl',
+      'webUrl'
     ];
     const command = new MockCommand();
     sinon.stub(command as any, 'getExcludedOptionsWithUrls').callsFake(() => ['url']);

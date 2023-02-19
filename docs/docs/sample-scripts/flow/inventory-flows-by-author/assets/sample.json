@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-inventory-flows-by-author",
+    "source": "pnp",
+    "title": "Inventory Flows By Creator",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/inventory-flows-by-author",
+    "creationDateTime": "2020-05-05",
+    "updateDateTime": "2020-05-05",
+    "shortDescription": "This script retrieves Flows from the Default Environment and maps creator information from Azure AD to list Flows by owner.",
+    "longDescription": [
+      "The [Power Automate Admin Center](https://admin.flow.microsoft.com) provides a list of the Flows in your tenant, but there is no way to easily export Flows from the Flow admin center for governance activities. This script retrieves Flows from the Default Environment and maps creator information from Azure AD to list Flows by owner, state and trigger type."
+    ],
+    "products": [
+      "Power Automate"
+    ],
+    "categories": [],
+    "tags": [
+      "users",
+      "flows",
+      "reports"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/flow/inventory-flows-by-author/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "pkskelly",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/5527235?v=4",
+        "name": "Pete Skelly"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

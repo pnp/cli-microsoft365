@@ -3,15 +3,14 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
-import { AxiosRequestConfig } from 'axios';
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   environment: string;
   id?: string;
   name?: string;
@@ -63,14 +62,14 @@ class PpCardGetCommand extends PowerPlatformCommand {
         option: '-n, --name [name]'
       },
       {
-        option: '-a, --asAdmin'
+        option: '--asAdmin'
       }
     );
   }
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'name']
+      { options: ['id', 'name'] }
     );
   }
 
@@ -86,7 +85,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving a card '${args.options.id || args.options.name}'...`);
     }
@@ -103,7 +102,7 @@ class PpCardGetCommand extends PowerPlatformCommand {
   }
 
   private async getCard(dynamicsApiUrl: string, options: Options): Promise<any> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

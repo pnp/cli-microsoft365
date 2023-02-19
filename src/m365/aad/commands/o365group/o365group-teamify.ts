@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -65,7 +66,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'mailNickname']);
+    this.optionSets.push({ options: ['id', 'mailNickname'] });
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {
@@ -74,7 +75,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=mailNickname eq '${encodeURIComponent(args.options.mailNickname as string)}'`,
+      url: `${this.resource}/v1.0/groups?$filter=mailNickname eq '${formatting.encodeQueryParameter(args.options.mailNickname as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -117,7 +118,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
 
       const groupId = await this.getGroupId(args);
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/groups/${encodeURIComponent(groupId)}/team`,
+        url: `${this.resource}/v1.0/groups/${formatting.encodeQueryParameter(groupId)}/team`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

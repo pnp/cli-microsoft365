@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
@@ -15,7 +15,7 @@ describe(commands.COMPLETION_CLINK_UPDATE, () => {
   let generateClinkCompletionStub: sinon.SinonStub;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     generateClinkCompletionStub = sinon.stub(autocomplete, 'getClinkCompletion').callsFake(() => '');
   });
@@ -41,7 +41,7 @@ describe(commands.COMPLETION_CLINK_UPDATE, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       autocomplete.getClinkCompletion
     ]);
@@ -56,7 +56,7 @@ describe(commands.COMPLETION_CLINK_UPDATE, () => {
   });
 
   it('builds command completion', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(generateClinkCompletionStub.called);
   });
 });

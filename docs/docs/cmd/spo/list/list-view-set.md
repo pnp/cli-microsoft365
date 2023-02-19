@@ -14,10 +14,13 @@ m365 spo list view set [options]
 : URL of the site where the list is located
 
 `--listId [listId]`
-: ID of the list where the view is located. Specify `listTitle` or `listId` but not both
+: ID of the list where the view is located. Specify either `listId`, `listTitle`, or `listUrl`.
 
 `--listTitle [listTitle]`
-: Title of the list where the view is located. Specify `listTitle` or `listId` but not both
+: Title of the list where the view is located. Specify either `listId`, `listTitle`, or `listUrl`.
+
+ `--listUrl [listUrl]`
+: Server- or site-relative URL of the list. Specify either `listId` , `listTitle` or `listUrl`.
 
 `--id [id]`
 : ID of the view to update. Specify `title` or `id` but not both
@@ -33,6 +36,9 @@ Specify properties to update using their names, eg. `--Title 'New Title' --JSLin
 
 When updating list formatting, the value of the CustomFormatter property must be XML-escaped, eg. `&lt;` instead of `<`.
 
+!!! warning "Escaping JSON in PowerShell"
+    When updating list view formatting for a view with the `--CustomFormatter` option, it's possible to enter a JSON string. In PowerShell 5 to 7.2 [specific escaping rules](./../../../user-guide/using-cli.md#escaping-double-quotes-in-powershell) apply due to an issue. Remember that you can also use [file tokens](./../../../user-guide/using-cli.md#passing-complex-content-into-cli-options) instead.
+
 ## Examples
 
 Update the title of the list view specified by its name
@@ -44,11 +50,23 @@ m365 spo list view set --webUrl https://contoso.sharepoint.com/sites/project-x -
 Update the title of the list view specified by its ID
 
 ```sh
-m365 spo list view set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --id 330f29c5-5c4c-465f-9f4b-7903020ae1ce --Title 'All events'
+m365 spo list view set --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl '/sites/project-x/lists/Events' --id 330f29c5-5c4c-465f-9f4b-7903020ae1ce --Title 'All events'
 ```
 
 Update view formatting of the specified list view
 
-```sh
-m365 spo list view set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --title 'All items' --CustomFormatter '`{"schema":"https://developer.microsoft.com/json-schemas/sp/view-formatting.schema.json","additionalRowClass": "=if([$DueDate] &lt;= @now, 'sp-field-severity--severeWarning', '')"}`'
-```
+=== "PowerShell"
+
+    ```sh
+    m365 spo list view set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --viewTitle 'All items' --CustomFormatter '{\"schema\":\"https://developer.microsoft.com/json-schemas/sp/view-formatting.schema.json\",\"additionalRowClass\": \"=if([$DueDate] &lt;= @now, ''sp-field-severity--severeWarning'', '''')\"}'
+    ```
+
+=== "Bash"
+
+    ```sh
+    m365 spo list view set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --viewTitle 'All items' --CustomFormatter "{\"schema\":\"https://developer.microsoft.com/json-schemas/sp/view-formatting.schema.json\",\"additionalRowClass\": \"=if([$DueDate] &lt;= @now, 'sp-field-severity--severeWarning', '')\"}"
+    ```
+
+## Response
+
+The command won't return a response on success.

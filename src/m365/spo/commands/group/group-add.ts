@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -35,6 +34,7 @@ class SpoGroupAddCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
     this.#initOptionSets();
   }
@@ -43,10 +43,10 @@ class SpoGroupAddCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         description: typeof args.options.description !== 'undefined',
-        allowMembersEditMembership: typeof args.options.allowMembersEditMembership !== 'undefined',
-        onlyAllowMembersViewMembership: typeof args.options.onlyAllowMembersViewMembership !== 'undefined',
-        allowRequestToJoinLeave: typeof args.options.allowRequestToJoinLeave !== 'undefined',
-        autoAcceptRequestToJoinLeave: typeof args.options.autoAcceptRequestToJoinLeave !== 'undefined',
+        allowMembersEditMembership: args.options.allowMembersEditMembership,
+        onlyAllowMembersViewMembership: args.options.onlyAllowMembersViewMembership,
+        allowRequestToJoinLeave: args.options.allowRequestToJoinLeave,
+        autoAcceptRequestToJoinLeave: args.options.autoAcceptRequestToJoinLeave,
         requestToJoinLeaveEmailSetting: typeof args.options.requestToJoinLeaveEmailSetting !== 'undefined'
       });
     });
@@ -64,21 +64,29 @@ class SpoGroupAddCommand extends SpoCommand {
         option: '--description [description]'
       },
       {
-        option: '--allowMembersEditMembership [allowMembersEditMembership]'
+        option: '--allowMembersEditMembership [allowMembersEditMembership]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--onlyAllowMembersViewMembership [onlyAllowMembersViewMembership]'
+        option: '--onlyAllowMembersViewMembership [onlyAllowMembersViewMembership]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--allowRequestToJoinLeave [allowRequestToJoinLeave]'
+        option: '--allowRequestToJoinLeave [allowRequestToJoinLeave]',
+        autocomplete: ['true', 'false']
       },
       {
-        option: '--autoAcceptRequestToJoinLeave [autoAcceptRequestToJoinLeave]'
+        option: '--autoAcceptRequestToJoinLeave [autoAcceptRequestToJoinLeave]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--requestToJoinLeaveEmailSetting [requestToJoinLeaveEmailSetting]'
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('allowMembersEditMembership', 'onlyAllowMembersViewMembership', 'allowRequestToJoinLeave', 'autoAcceptRequestToJoinLeave');
   }
 
   #initValidators(): void {
@@ -89,27 +97,17 @@ class SpoGroupAddCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        const booleanOptions = [
-          args.options.allowMembersEditMembership, args.options.onlyAllowMembersViewMembership,
-          args.options.allowRequestToJoinLeave, args.options.autoAcceptRequestToJoinLeave
-        ];
-        for (const option of booleanOptions) {
-          if (typeof option !== 'undefined' && !validation.isValidBoolean(option as any)) {
-            return `Value '${option}' is not a valid boolean`;
-          }
-        }
-
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${args.options.webUrl}/_api/web/sitegroups`,
       headers: {
         accept: 'application/json;odata=nometadata'

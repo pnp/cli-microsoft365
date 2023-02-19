@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -23,7 +23,7 @@ describe(commands.THEME_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -63,7 +63,7 @@ describe(commands.THEME_SET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -89,7 +89,6 @@ describe(commands.THEME_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'Contoso',
         theme: '123',
         isInverted: false
@@ -131,11 +130,14 @@ describe(commands.THEME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Contoso',
-      theme: '{"isInverted":true,"name":"Contoso","palette":123}',
-      inverted: false } } as any), new CommandError('requestObjectIdentity ClientSvc error'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Contoso',
+        theme: '{"isInverted":true,"name":"Contoso","palette":123}',
+        inverted: false
+      }
+    } as any), new CommandError('requestObjectIdentity ClientSvc error'));
   });
 
   it('handles unknown error command error correctly', async () => {
@@ -146,11 +148,14 @@ describe(commands.THEME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Contoso',
-      theme: '{"isInverted":true,"name":"Contoso","palette":123}',
-      inverted: false } } as any), new CommandError('ClientSvc unknown error'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Contoso',
+        theme: '{"isInverted":true,"name":"Contoso","palette":123}',
+        inverted: false
+      }
+    } as any), new CommandError('ClientSvc unknown error'));
   });
 
   it('fails validation if the specified theme is invalid', async () => {
@@ -187,16 +192,5 @@ describe(commands.THEME_SET, () => {
     const actual = await command.validate({ options: { name: 'contoso-blue', theme, isInverted: false } }, commandInfo);
 
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

@@ -1,10 +1,9 @@
 import { PlannerBucket, PlannerTask } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import * as os from 'os';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { aadGroup } from '../../../../utils/aadGroup';
 import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
@@ -84,26 +83,26 @@ class PlannerTaskRemoveCommand extends GraphCommand {
             return 'Don\'t specify bucketId,bucketName, planId, planTitle, ownerGroupId or ownerGroupName when using id';
           }
         }
-    
+
         if (args.options.title) {
           if (!args.options.bucketId && !args.options.bucketName) {
             return 'Specify either bucketId or bucketName when using title';
           }
-    
+
           if (args.options.bucketId && args.options.bucketName) {
             return 'Specify either bucketId or bucketName when using title but not both';
           }
-    
+
           if (args.options.bucketName) {
             if (!args.options.planId && !args.options.planTitle) {
               return 'Specify either planId or planTitle when using bucketName';
             }
-    
+
             if (args.options.planId && args.options.planTitle) {
               return 'Specify either planId or planTitle when using bucketName but not both';
             }
           }
-    
+
           if (args.options.planTitle) {
             if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
               return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
@@ -112,7 +111,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
               return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
             }
           }
-    
+
           if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
             return `${args.options.ownerGroupId} is not a valid GUID`;
           }
@@ -124,7 +123,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'title']
+      { options: ['id', 'title'] }
     );
   }
 
@@ -133,7 +132,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
       try {
         const task = await this.getTask(args.options);
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/tasks/${task.id}`,
           headers: {
             accept: 'application/json;odata.metadata=none',
@@ -170,7 +169,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     const { id, title } = options;
 
     if (id) {
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/planner/tasks/${id}`,
         headers: {
           accept: 'application/json'
@@ -212,7 +211,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     return this
       .getPlanId(options)
       .then(planId => {
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/planner/plans/${planId}/buckets?$select=id,name`,
           headers: {
             accept: 'application/json;odata.metadata=none'
@@ -256,7 +255,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     if (ownerGroupId) {
       return Promise.resolve(ownerGroupId);
     }
-    
+
     return aadGroup
       .getGroupByDisplayName(ownerGroupName!)
       .then(group => group.id!);

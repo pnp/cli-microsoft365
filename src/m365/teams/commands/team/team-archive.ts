@@ -6,6 +6,7 @@ import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -36,6 +37,7 @@ class TeamsTeamArchiveCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -65,20 +67,18 @@ class TeamsTeamArchiveCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.id && !args.options.name) {
-          return 'Specify either id or name';
-        }
-
-        if (args.options.name && args.options.id) {
-          return 'Specify either id or name but not both';
-        }
-
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
 
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['id', 'name'] }
     );
   }
 
@@ -104,7 +104,7 @@ class TeamsTeamArchiveCommand extends GraphCommand {
     try {
       const teamId: string = await this.getTeamId(args);
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/archive`,
+        url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/archive`,
         headers: {
           'content-type': 'application/json;odata=nometadata',
           'accept': 'application/json;odata.metadata=none'
@@ -116,7 +116,7 @@ class TeamsTeamArchiveCommand extends GraphCommand {
       };
 
       await request.post(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

@@ -13,12 +13,13 @@ interface Options extends GlobalOptions {
   description?: string;
   headerEmphasis?: number;
   headerLayout?: string;
-  megaMenuEnabled?: string;
-  quickLaunchEnabled?: string;
+  megaMenuEnabled?: boolean;
+  quickLaunchEnabled?: boolean;
   siteLogoUrl?: string;
   title?: string;
   url: string;
-  footerEnabled?: string;
+  footerEnabled?: boolean;
+  navAudienceTargetingEnabled?: boolean;
   searchScope?: string;
 }
 
@@ -38,6 +39,7 @@ class SpoWebSetCommand extends SpoCommand {
 
     this.#initTelemetry();
     this.#initOptions();
+    this.#initTypes();
     this.#initValidators();
   }
 
@@ -52,6 +54,7 @@ class SpoWebSetCommand extends SpoCommand {
         title: typeof args.options.title !== 'undefined',
         quickLaunchEnabled: typeof args.options.quickLaunchEnabled !== 'undefined',
         footerEnabled: typeof args.options.footerEnabled !== 'undefined',
+        navAudienceTargetingEnabled: typeof args.options.navAudienceTargetingEnabled !== 'undefined',
         searchScope: args.options.searchScope !== 'undefined'
       });
       this.trackUnknownOptions(this.telemetryProperties, args.options);
@@ -73,7 +76,8 @@ class SpoWebSetCommand extends SpoCommand {
         option: '--siteLogoUrl [siteLogoUrl]'
       },
       {
-        option: '--quickLaunchEnabled [quickLaunchEnabled]'
+        option: '--quickLaunchEnabled [quickLaunchEnabled]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--headerLayout [headerLayout]',
@@ -92,10 +96,18 @@ class SpoWebSetCommand extends SpoCommand {
         autocomplete: ['true', 'false']
       },
       {
+        option: '--navAudienceTargetingEnabled [navAudienceTargetingEnabled]',
+        autocomplete: ['true', 'false']
+      },
+      {
         option: '--searchScope [searchScope]',
         autocomplete: SpoWebSetCommand.searchScopeOptions
       }
     );
+  }
+
+  #initTypes(): void {
+    this.types.boolean.push('megaMenuEnabled', 'footerEnabled', 'quickLaunchEnabled', 'navAudienceTargetingEnabled');
   }
 
   #initValidators(): void {
@@ -104,13 +116,6 @@ class SpoWebSetCommand extends SpoCommand {
         const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
-        }
-
-        if (typeof args.options.quickLaunchEnabled !== 'undefined') {
-          if (args.options.quickLaunchEnabled !== 'true' &&
-            args.options.quickLaunchEnabled !== 'false') {
-            return `${args.options.quickLaunchEnabled} is not a valid boolean value`;
-          }
         }
 
         if (typeof args.options.headerEmphasis !== 'undefined') {
@@ -126,19 +131,6 @@ class SpoWebSetCommand extends SpoCommand {
         if (typeof args.options.headerLayout !== 'undefined') {
           if (['standard', 'compact'].indexOf(args.options.headerLayout) < 0) {
             return `${args.options.headerLayout} is not a valid value for headerLayout. Allowed values are standard|compact`;
-          }
-        }
-
-        if (typeof args.options.megaMenuEnabled !== 'undefined') {
-          if (['true', 'false'].indexOf(args.options.megaMenuEnabled) < 0) {
-            return `${args.options.megaMenuEnabled} is not a valid boolean value`;
-          }
-        }
-
-        if (typeof args.options.footerEnabled !== 'undefined') {
-          if (args.options.footerEnabled !== 'true' &&
-            args.options.footerEnabled !== 'false') {
-            return `${args.options.footerEnabled} is not a valid boolean value`;
           }
         }
 
@@ -169,7 +161,7 @@ class SpoWebSetCommand extends SpoCommand {
       payload.SiteLogoUrl = args.options.siteLogoUrl;
     }
     if (typeof args.options.quickLaunchEnabled !== 'undefined') {
-      payload.QuickLaunchEnabled = args.options.quickLaunchEnabled === 'true';
+      payload.QuickLaunchEnabled = args.options.quickLaunchEnabled;
     }
     if (typeof args.options.headerEmphasis !== 'undefined') {
       payload.HeaderEmphasis = args.options.headerEmphasis;
@@ -178,10 +170,13 @@ class SpoWebSetCommand extends SpoCommand {
       payload.HeaderLayout = args.options.headerLayout === 'standard' ? 1 : 2;
     }
     if (typeof args.options.megaMenuEnabled !== 'undefined') {
-      payload.MegaMenuEnabled = args.options.megaMenuEnabled === 'true';
+      payload.MegaMenuEnabled = args.options.megaMenuEnabled;
     }
     if (typeof args.options.footerEnabled !== 'undefined') {
-      payload.FooterEnabled = args.options.footerEnabled === 'true';
+      payload.FooterEnabled = args.options.footerEnabled;
+    }
+    if (typeof args.options.navAudienceTargetingEnabled !== 'undefined') {
+      payload.NavAudienceTargetingEnabled = args.options.navAudienceTargetingEnabled;
     }
     if (typeof args.options.searchScope !== 'undefined') {
       const searchScope = args.options.searchScope.toLowerCase();
@@ -201,10 +196,10 @@ class SpoWebSetCommand extends SpoCommand {
     if (this.verbose) {
       logger.logToStderr(`Updating properties of subsite ${args.options.url}...`);
     }
-    
+
     try {
       await request.patch(requestOptions);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

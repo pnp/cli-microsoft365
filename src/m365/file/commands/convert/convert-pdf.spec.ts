@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import { PassThrough } from 'stream';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -25,7 +25,7 @@ describe(commands.CONVERT_PDF, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     unlinkSyncStub = sinon.stub(fs, 'unlinkSync').callsFake(_ => { });
@@ -75,7 +75,7 @@ describe(commands.CONVERT_PDF, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       fs.unlinkSync
     ]);
@@ -94,7 +94,7 @@ describe(commands.CONVERT_PDF, () => {
     before(() => {
       auth.service.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
-        accessToken: '123.e30=.456' // {} simulating app-only auth
+        accessToken: 'eyJ0eXAiOiJKV1QiLCJub25jZSI6IlFQaVN1ck1VX3gtT2YzdzA1YV9XZzZzNFBZRFUwU2NneHlOeDE0eVctRWciLCJhbGciOiJSUzI1NiIsIng1dCI6Ik1yNS1BVWliZkJpaTdOZDFqQmViYXhib1hXMCIsImtpZCI6Ik1yNS1BVWliZkJpaTdOZDFqQmViYXhib1hXMCJ9.eyJhdWQiOiJodHRwczovL2dyYXBoLm1pY3Jvc29mdC5jb20iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9iNjYyMzEzZi0xNGZjLTQzYTItOWE3YS1kMmUyN2Y0ZjM0NzgvIiwiaWF0IjoxNjQ0ODQ1MDc3LCJuYmYiOjE2NDQ4NDUwNzcsImV4cCI6MTY0NDg0ODk3NywiYWlvIjoiRTJaZ1lEaW1McEgwTSt5QTk5NmczbWZUUXlYN0FBPT0iLCJhcHBfZGlzcGxheW5hbWUiOiJHZXRUZWFtc0xpc3QiLCJhcHBpZCI6IjgyYTIzMzFhLTExYjItNDY3MC1iMDYxLTg3YTg2MDgxMjhhNiIsImFwcGlkYWNyIjoiMSIsImlkcCI6Imh0dHBzOi8vc3RzLndpbmRvd3MubmV0L2I2NjIzMTNmLTE0ZmMtNDNhMi05YTdhLWQyZTI3ZjRmMzQ3OC8iLCJpZHR5cCI6ImFwcCIsIm9pZCI6IjM4NTRiYjA4LTNjMmMtNGI1Ny05NWZjLTI0ZTA3OGQzODY4NSIsInJoIjoiMC5BVndBUHpGaXR2d1Vva09hZXRMaWYwODBlQU1BQUFBQUFBQUF3QUFBQUFBQUFBQmNBQUEuIiwicm9sZXMiOlsiVGVhbVNldHRpbmdzLlJlYWRXcml0ZS5BbGwiLCJUZWFtTWVtYmVyLlJlYWQuQWxsIiwiR3JvdXAuUmVhZC5BbGwiLCJEaXJlY3RvcnkuUmVhZC5BbGwiLCJUZWFtLlJlYWRCYXNpYy5BbGwiLCJUZWFtU2V0dGluZ3MuUmVhZC5BbGwiLCJPcmdhbml6YXRpb24uUmVhZC5BbGwiLCJBdWRpdExvZy5SZWFkLkFsbCJdLCJzdWIiOiIzODU0YmIwOC0zYzJjLTRiNTctOTVmYy0yNGUwNzhkMzg2ODUiLCJ0ZW5hbnRfcmVnaW9uX3Njb3BlIjoiRVUiLCJ0aWQiOiJiNjYyMzEzZi0xNGZjLTQzYTItOWE3YS1kMmUyN2Y0ZjM0NzgiLCJ1dGkiOiI3RVkyWnVXV2JFYVF0T3piVVlwOUFBIiwidmVyIjoiMS4wIiwid2lkcyI6WyIwOTk3YTFkMC0wZDFkLTRhY2ItYjQwOC1kNWNhNzMxMjFlOTAiXSwieG1zX3RjZHQiOjEzMDI1NDMzMTB9.N9yvmkCedti2fzT44VfBkN7GvuCInrIgiMgNxdyZeAyxnbdZjEhxHmNdU6HLLHQ3J-GonpPdt28dKwYxgLcrSibGzSPVHddh6MDPYutSwfIxh2oRanxhgFOWVJADfbFoCxsRFDhKJNT39bsauIUiRNzGzbb6dvWuZQ8LrgWjZzjae2qxVxj9jvYgjXEypeYZgLvPOzJiBCuluAMH3TjPuS-CuglFK_edn4CS-ztCwM0hmDFD5BLNZqng5P2KqGTEgjkMKoyIJ8yTGBJpASfdqqEFqWzQwcQ9ese924qNC3hJR_5TWHp2Fl73bpdhwBHRL5UwGTPi9_ysYdndKhXwgA' // {} simulating app-only auth
       };
     });
 
@@ -158,7 +158,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'file.pdf'
         }
@@ -296,7 +295,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/Shared%20Documents/Demo%20Files/file.docx',
           targetFile: 'file.pdf'
         }
@@ -365,7 +363,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/DemoDocs/file.docx',
           targetFile: 'file.pdf'
         }
@@ -426,7 +423,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/subsite/Shared%20Documents/file.docx',
           targetFile: 'file.pdf'
         }
@@ -487,7 +483,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/subsite/Shared%20Documents/Folder/file.docx',
           targetFile: 'file.pdf'
         }
@@ -548,7 +543,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/subsite/DocLib/file.docx',
           targetFile: 'file.pdf'
         }
@@ -605,7 +599,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso-my.sharepoint.com/personal/steve_contoso_com/Documents/file.docx',
           targetFile: 'file.pdf'
         }
@@ -662,7 +655,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso-my.sharepoint.com/personal/steve_contoso_com/Documents/Folder/file.docx',
           targetFile: 'file.pdf'
         }
@@ -719,7 +711,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/sites/Contoso/Shared%20Documents/file.docx',
           targetFile: 'file.pdf'
         }
@@ -776,7 +767,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/sites/Contoso/Shared%20Documents/Folder/file.docx',
           targetFile: 'file.pdf'
         }
@@ -837,7 +827,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/sites/Contoso/site/Shared%20Documents/file.docx',
           targetFile: 'file.pdf'
         }
@@ -1308,7 +1297,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await assert.rejects(command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
         }
@@ -1382,7 +1370,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await assert.rejects(command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
         }
@@ -1481,7 +1468,6 @@ describe(commands.CONVERT_PDF, () => {
 
       await assert.rejects(command.action(logger, {
         options: {
-          debug: false,
           sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
         }
@@ -1759,7 +1745,6 @@ describe(commands.CONVERT_PDF, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         sourceFile: 'file.docx',
         targetFile: 'file.pdf'
       }
@@ -1788,16 +1773,5 @@ describe(commands.CONVERT_PDF, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = await command.validate({ options: { sourceFile: 'file.docx', targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

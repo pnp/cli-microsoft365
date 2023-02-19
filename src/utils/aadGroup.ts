@@ -1,6 +1,6 @@
 import { Group } from "@microsoft/microsoft-graph-types";
-import { AxiosRequestConfig } from "axios";
-import request from "../request";
+import request, { CliRequestOptions } from "../request";
+import { formatting } from "./formatting";
 import { odata } from "./odata";
 
 const graphResource = 'https://graph.microsoft.com';
@@ -11,7 +11,7 @@ export const aadGroup = {
    * @param id Group ID.
    */
   getGroupById(id: string): Promise<Group> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${graphResource}/v1.0/groups/${id}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -27,7 +27,7 @@ export const aadGroup = {
    * @param displayName Group display name.
    */
   getGroupsByDisplayName(displayName: string): Promise<Group[]> {
-    return odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(displayName)}'`);
+    return odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`);
   },
 
   /**

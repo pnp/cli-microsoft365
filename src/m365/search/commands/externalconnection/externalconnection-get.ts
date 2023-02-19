@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -51,16 +52,16 @@ class SearchExternalConnectionGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let url: string = `${this.resource}/v1.0/external/connections`;
     if (args.options.id) {
-      url += `/${encodeURIComponent(args.options.id as string)}`;
+      url += `/${formatting.encodeQueryParameter(args.options.id as string)}`;
     }
     else {
-      url += `?$filter=name eq '${encodeURIComponent(args.options.name as string)}'`;
+      url += `?$filter=name eq '${formatting.encodeQueryParameter(args.options.name as string)}'`;
     }
 
     const requestOptions: any = {

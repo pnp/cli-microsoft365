@@ -11,16 +11,16 @@ m365 spo web roleassignment remove [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site
+: URL of the site.
 
 `--principalId [principalId]`
-: SharePoint ID of principal it may be either user id or group id we want to add permissions to. Specify principalId only when upn or groupName are not used.
+: SharePoint ID of principal it may be either user id or group id we want to add permissions to. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--upn [upn]`
-: Upn/email of user to assign role to. Specify upn only when principalId or groupName are not used.
+: Upn/email of user to assign role to. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--groupName [groupName]`
-: Enter group name of Azure AD or SharePoint group. Specify groupName only when principalId or upn are not used.
+: Enter group name of Azure AD or SharePoint group. Specify either `principalId`, `upn`, or `groupName` but not multiple.
 
 `--confirm [confirm]`
 : Don't prompt for confirming removing the roleassignment.
@@ -52,3 +52,7 @@ Remove roleassignment from web based on principal Id without prompting for confi
 ```sh
 m365 spo web roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales"  --principalId 2 --confirm
 ```
+
+## Response
+
+The command won't return a response on success.

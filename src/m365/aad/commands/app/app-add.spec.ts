@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -68,10 +68,10 @@ describe(commands.APP_ADD, () => {
   };
 
   const manifest = {
-    ...basicManifest,  
+    ...basicManifest,
     "identifierUris": [
       "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
-    ],  
+    ],
     "oauth2Permissions": [
       {
         "adminConsentDescription": "Access as a user",
@@ -85,7 +85,7 @@ describe(commands.APP_ADD, () => {
         "userConsentDisplayName": null,
         "value": "access_as_user"
       }
-    ],  
+    ],
     "preAuthorizedApplications": [
       {
         "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
@@ -120,11 +120,11 @@ describe(commands.APP_ADD, () => {
           }
         ]
       }
-    ] 
+    ]
   };
 
   const manifestWithSecret = {
-    ...basicManifest,  
+    ...basicManifest,
     "passwordCredentials": [
       {
         "customKeyIdentifier": null,
@@ -148,7 +148,7 @@ describe(commands.APP_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.tenantId = '48526e9f-60c5-3000-31d7-aa1dc75ecf3c|908bel80-a04a-4422-b4a0-883d9847d110:c8e761e2-d528-34d1-8776-dc51157d619a&#xA;Tenant';
@@ -192,7 +192,7 @@ describe(commands.APP_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -285,7 +285,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app'
       }
     });
@@ -375,7 +374,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         multitenant: true
       }
@@ -475,7 +473,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         redirectUris: 'https://myapp.azurewebsites.net,http://localhost:4000',
         platform: 'web'
@@ -574,7 +571,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         redirectUris: 'https://login.microsoftonline.com/common/oauth2/nativeclient',
         platform: 'publicClient'
@@ -679,7 +675,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         withSecret: true
       }
@@ -796,7 +791,7 @@ describe(commands.APP_ADD, () => {
       appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
       objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
       secrets: [{
-        displayName: 'Default', 
+        displayName: 'Default',
         value: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5'
       }],
       tenantId: ''
@@ -941,7 +936,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         withSecret: true,
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
@@ -1104,7 +1098,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         withSecret: true,
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All',
@@ -1262,7 +1255,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         platform: 'spa',
         redirectUris: 'https://myspa.azurewebsites.net,http://localhost:8080',
@@ -1522,7 +1514,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         uri: 'https://contoso.onmicrosoft.com/myapp'
       }
@@ -1740,7 +1731,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         uri: 'api://caf406b91cd4.ngrok.io/_appId_',
         scopeName: 'access_as_user',
@@ -1860,7 +1850,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         uri: 'api://caf406b91cd4.ngrok.io/_appId_',
         scopeName: 'access_as_user',
@@ -1963,7 +1952,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         certificateDisplayName: 'some certificate',
         certificateFile: 'C:\\temp\\some-certificate.cer'
@@ -2061,7 +2049,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         certificateDisplayName: 'some certificate',
         certificateBase64Encoded: 'somecertificatebase64string'
@@ -2244,11 +2231,13 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(_ => Promise.reject('Issued POST request'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app',
-      withSecret: true,
-      apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'My AAD app',
+        withSecret: true,
+        apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('returns error when non-existent service principal specified in the APIs', async () => {
@@ -2389,12 +2378,14 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app',
-      platform: 'spa',
-      apisDelegated: 'https://myapi.onmicrosoft.com/access_as_user',
-      implicitFlow: true } } as any), new CommandError('Service principal https://myapi.onmicrosoft.com not found'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'My AAD app',
+        platform: 'spa',
+        apisDelegated: 'https://myapi.onmicrosoft.com/access_as_user',
+        implicitFlow: true
+      }
+    } as any), new CommandError('Service principal https://myapi.onmicrosoft.com not found'));
   });
 
   it('returns error when non-existent permission scope specified in the APIs', async () => {
@@ -2535,12 +2526,14 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app',
-      platform: 'spa',
-      apisDelegated: 'https://graph.microsoft.com/Read.Everything',
-      implicitFlow: true } } as any), new CommandError('Permission Read.Everything for service principal https://graph.microsoft.com not found'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'My AAD app',
+        platform: 'spa',
+        apisDelegated: 'https://graph.microsoft.com/Read.Everything',
+        implicitFlow: true
+      }
+    } as any), new CommandError('Permission Read.Everything for service principal https://graph.microsoft.com not found'));
   });
 
   it('returns error when configuring secret failed', async () => {
@@ -2628,10 +2621,12 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app',
-      withSecret: true } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'My AAD app',
+        withSecret: true
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('returns error when creating the AAD app reg failed', async () => {
@@ -2643,9 +2638,11 @@ describe(commands.APP_ADD, () => {
       }
     }));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'My AAD app'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('returns error when setting Application ID URI failed', async () => {
@@ -2729,21 +2726,26 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My AAD app',
-      uri: 'https://contoso.onmicrosoft.com/myapp' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'My AAD app',
+        uri: 'https://contoso.onmicrosoft.com/myapp'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('returns error when certificate file cannot be read', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error("An error has occurred"); });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'My AAD app',
-      certificateDisplayName: 'some certificate',
-      certificateFile: 'C:\\temp\\some-certificate.cer' } } as any), new CommandError(`Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'My AAD app',
+        certificateDisplayName: 'some certificate',
+        certificateFile: 'C:\\temp\\some-certificate.cer'
+      }
+    } as any), new CommandError(`Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`));
   });
 
   it('creates AAD app reg for a web app with service principal name with trailing slash', async () => {
@@ -2871,7 +2873,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         platform: 'web',
         redirectUris: 'https://global.consent.azure-apim.net/redirect',
@@ -3122,7 +3123,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -3370,7 +3370,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -3605,7 +3604,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -3926,7 +3924,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -4247,7 +4244,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -4568,7 +4564,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -4878,7 +4873,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -5228,7 +5222,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest)
       }
     });
@@ -5612,7 +5605,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest),
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
       }
@@ -5704,7 +5696,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app'
       }
     });
@@ -5797,7 +5788,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
@@ -5898,7 +5888,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
@@ -6006,7 +5995,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
@@ -6220,7 +6208,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
@@ -6310,7 +6297,6 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
@@ -6399,16 +6385,10 @@ describe(commands.APP_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         save: true
       }
     });
-  });
-
-  it('fails validation if neither name nor manifest specified', async () => {
-    const actual = await command.validate({ options: {} }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if specified platform value is not valid', async () => {
@@ -6517,27 +6497,10 @@ describe(commands.APP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if manifest is valid JSON with name and name not specified', async () => {
+  it('passes validation if manifest is valid JSON', async () => {
     const manifest = '{"name": "My app"}';
     const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if manifest is valid JSON without name and name specified', async () => {
-    const manifest = '{}';
-    const actual = await command.validate({ options: { manifest: manifest, name: 'My app' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('creates AAD app reg for a web app from a manifest with redirectUris and options overriding them', async () => {
@@ -6777,12 +6740,11 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest),
         platform: "spa",
         redirectUris: "http://localhost/auth,https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
       }
-    }); 
+    });
 
     assert(loggerLogSpy.calledWith({
       appId: '19180b97-8f30-43ac-8a22-19565de0b064',
@@ -7034,7 +6996,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifest;
     await command.action(logger, {
       options: {
-        debug: false,
         manifest: JSON.stringify(manifest),
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
       }
@@ -7104,7 +7065,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Issued PATCH request: ${JSON.stringify(opts, null, 2)}`);
     });
     sinon.stub(request, 'post').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' && 
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My AAD app",
           "signInAudience": "AzureADMyOrg"
@@ -7176,7 +7137,7 @@ describe(commands.APP_ADD, () => {
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/addPassword') {
         return Promise.resolve({
-          "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5" 
+          "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5"
         });
       }
 
@@ -7186,7 +7147,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = manifestWithSecret;
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         manifest: JSON.stringify(manifestWithSecret),
         withSecret: true
@@ -7214,7 +7174,7 @@ describe(commands.APP_ADD, () => {
           "addIns": [],
           "appRoles": [],
           "createdDateTime":
-          "2022-02-07T08:51:18Z",
+            "2022-02-07T08:51:18Z",
           "description": null,
           "certification": null,
           "groupMembershipClaims": null,
@@ -7346,7 +7306,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         manifest: JSON.stringify(basicManifest),
         certificateDisplayName: 'some certificate',
@@ -7498,7 +7457,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         manifest: JSON.stringify(basicManifest),
         platform: 'publicClient',
@@ -7512,7 +7470,7 @@ describe(commands.APP_ADD, () => {
       tenantId: ''
     }));
   });
-  
+
   it('creates AAD app reg with implicit flow enabled, overriding manifest', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(opts => {
@@ -7574,8 +7532,8 @@ describe(commands.APP_ADD, () => {
           "signInAudience": "AzureADMultipleOrgs",
           "web": {
             "implicitGrantSettings": {
-              "enableAccessTokenIssuance":true,
-              "enableIdTokenIssuance":true
+              "enableAccessTokenIssuance": true,
+              "enableIdTokenIssuance": true
             }
           }
         })) {
@@ -7650,7 +7608,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         manifest: JSON.stringify(basicManifest),
         implicitFlow: true,
@@ -7820,7 +7777,6 @@ describe(commands.APP_ADD, () => {
     (command as any).manifest = basicManifest;
     await command.action(logger, {
       options: {
-        debug: false,
         name: 'My AAD app',
         manifest: JSON.stringify(basicManifest),
         uri: 'api://caf406b91cd4.ngrok.io/_appId_',

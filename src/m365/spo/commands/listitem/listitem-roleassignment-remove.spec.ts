@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -23,7 +23,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -60,7 +60,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -72,17 +72,6 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
@@ -123,46 +112,6 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
   it('passes validation if the principalId option is a number', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: 1, principalId: 11 } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if listId and listTitle are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', listItemId: 1, principalId: 11 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listId and listUrl are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: '/sites/Documents', listItemId: 1, principalId: 11 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listTitle and listUrl are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listUrl: '/sites/Documents', listItemId: 1, principalId: 11 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if principalId and upn are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listItemId: 1, principalId: 11, upn: 'someaccount@tenant.onmicrosoft.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if principalId and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listItemId: 1, principalId: 11, groupName: 'someGroup' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if upn and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listItemId: 1, upn: 'someaccount@tenant.onmicrosoft.com', groupName: 'someGroup' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither upn nor principalId or groupName is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listItemId: 1 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither listId nor listTitle or listUrl is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 1, upn: 'someaccount@tenant.onmicrosoft.com' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('remove role assignment from list item get list by title', async () => {
@@ -277,13 +226,16 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-      listItemId: 1,
-      upn: 'someaccount@tenant.onmicrosoft.com',
-      confirm: true } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+        listItemId: 1,
+        upn: 'someaccount@tenant.onmicrosoft.com',
+        confirm: true
+      }
+    } as any), new CommandError(error));
   });
 
   it('remove role assignment from list item get principal id by group name', async () => {
@@ -335,13 +287,16 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_REMOVE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-      listItemId: 1,
-      groupName: 'someGroup',
-      confirm: true } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+        listItemId: 1,
+        groupName: 'someGroup',
+        confirm: true
+      }
+    } as any), new CommandError(error));
   });
 
   it('aborts removing role assignment when prompt not confirmed', async () => {

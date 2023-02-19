@@ -2,6 +2,7 @@ import { Application } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
@@ -54,22 +55,22 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {    
+      async (args: CommandArgs) => {
         if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
           return `${args.options.appId} is not a valid GUID`;
         }
-    
+
         if (args.options.objectId && !validation.isValidGuid(args.options.objectId as string)) {
           return `${args.options.objectId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'objectId', 'name']);
+    this.optionSets.push({ options: ['appId', 'objectId', 'name'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -101,8 +102,8 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
     const { objectId, name } = args.options;
 
     const filter: string = objectId ?
-      `id eq '${encodeURIComponent(objectId)}'` :
-      `displayName eq '${encodeURIComponent(name as string)}'`;
+      `id eq '${formatting.encodeQueryParameter(objectId)}'` :
+      `displayName eq '${formatting.encodeQueryParameter(name as string)}'`;
 
     const requestOptions: any = {
       url: `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=${filter}&$select=appId`,

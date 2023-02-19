@@ -1,13 +1,14 @@
 import * as assert from 'assert';
 import * as os from 'os';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -184,7 +185,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -192,26 +193,26 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
 
   beforeEach(() => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${formatting.encodeQueryParameter('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}/members`) {
         return Promise.resolve(conversationMembersOwnerResponse);
       }
 
       return Promise.reject('Invalid Request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${formatting.encodeQueryParameter('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}`) {
         return Promise.resolve(channelIdResponse);
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=displayName eq '${encodeURIComponent('Admin')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=displayName eq '${formatting.encodeQueryParameter('Admin')}'`) {
         return Promise.resolve(singleUserResponse);
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels?$filter=displayName eq '${encodeURIComponent('Private Channel')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels?$filter=displayName eq '${formatting.encodeQueryParameter('Private Channel')}'`) {
         return Promise.resolve(singleChannelResponse);
       }
 
@@ -242,7 +243,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -254,11 +255,6 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [[ 'teamId', 'teamName' ], [ 'channelId', 'channelName' ], [ 'userId', 'userDisplayName' ]]);
   });
 
   it('fails validation if the teamId is not a valid guid', async () => {
@@ -360,17 +356,6 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('adds conversation members using teamName, channelId, and userId', async () => {
     await command.action(logger, {
       options: {
@@ -434,7 +419,7 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   it('adds conversation members using teamName, channelName, and userDisplayName', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${formatting.encodeQueryParameter('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}/members`) {
         return Promise.resolve(conversationMembersResponse);
       }
 
@@ -454,11 +439,11 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   it('fails adding conversation members with invalid channelName', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels?$filter=displayName eq '${encodeURIComponent('Other Private Channel')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels?$filter=displayName eq '${formatting.encodeQueryParameter('Other Private Channel')}'`) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels",
           "@odata.count": 0,
@@ -469,19 +454,22 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
-      channelName: "Other Private Channel" } } as any), new CommandError(`The specified channel 'Other Private Channel' does not exist in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
+        channelName: "Other Private Channel"
+      }
+    } as any), new CommandError(`The specified channel 'Other Private Channel' does not exist in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`));
   });
 
   it('fails to get channel when channel does is not private', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels?$filter=displayName eq '${encodeURIComponent('Other Channel')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels?$filter=displayName eq '${formatting.encodeQueryParameter('Other Channel')}'`) {
         return Promise.resolve({
           "value": [
             {
@@ -495,9 +483,12 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
-      channelName: "Other Channel" } } as any), new CommandError('The specified channel is not a private channel'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
+        channelName: "Other Channel"
+      }
+    } as any), new CommandError('The specified channel is not a private channel'));
   });
 
   it('fails when group has no team', async () => {
@@ -519,29 +510,35 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamName: 'Team Name',
-      channelName: "Other Channel" } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamName: 'Team Name',
+        channelName: "Other Channel"
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('fails adding conversation members with multiple userDisplayNames', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=displayName eq '${encodeURIComponent('Admin')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=displayName eq '${formatting.encodeQueryParameter('Admin')}'`) {
         return Promise.resolve(multipleUserResponse);
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${formatting.encodeQueryParameter('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}`) {
         return Promise.resolve(channelIdResponse);
       }
 
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
-      channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
-      userDisplayName: "Admin" } } as any), new CommandError(`Multiple users with display name 'Admin' found. Please disambiguate:${os.EOL}${[
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
+        channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
+        userDisplayName: "Admin"
+      }
+    } as any), new CommandError(`Multiple users with display name 'Admin' found. Please disambiguate:${os.EOL}${[
       '- 4cb2b035-ad76-406c-bdc4-6c72ad403a22',
       '- 662c9a98-1e96-44d2-b5ef-4933004200f8'].join(os.EOL)}`));
   });
@@ -549,21 +546,24 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   it('fails adding conversation members when no users are found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=displayName eq '${encodeURIComponent('Admin')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=displayName eq '${formatting.encodeQueryParameter('Admin')}'`) {
         return Promise.resolve(noUserResponse);
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${formatting.encodeQueryParameter('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${formatting.encodeQueryParameter('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}`) {
         return Promise.resolve(channelIdResponse);
       }
 
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
-      channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
-      userDisplayName: "Admin" } } as any), new CommandError("The specified user 'Admin' does not exist"));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
+        channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
+        userDisplayName: "Admin"
+      }
+    } as any), new CommandError("The specified user 'Admin' does not exist"));
   });
 
   it('correctly handles error when adding conversation members', async () => {
@@ -572,10 +572,12 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
-      channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
-      userDisplayName: "Admin" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
+        userDisplayName: "Admin"
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 });

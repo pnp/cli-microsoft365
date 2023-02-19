@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -101,7 +100,7 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -129,7 +128,7 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
           keepExistingPermissions = !args.options.clearExistingPermissions;
         }
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${requestUrl}/items(${args.options.listItemId})/breakroleinheritance(${keepExistingPermissions})`,
           method: 'POST',
           headers: {

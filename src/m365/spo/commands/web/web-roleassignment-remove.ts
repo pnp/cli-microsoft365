@@ -39,6 +39,7 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -84,17 +85,14 @@ class SpoWebRoleAssignmentRemoveCommand extends SpoCommand {
           return `Specified principalId ${args.options.principalId} is not a number`;
         }
 
-        const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
-        if (principalOptions.some(item => item !== undefined) && principalOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either principalId id or upn or groupName`;
-        }
-
-        if (principalOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least principalId id or upn or groupName`;
-        }
-
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['principalId', 'upn', 'groupName'] }
     );
   }
 

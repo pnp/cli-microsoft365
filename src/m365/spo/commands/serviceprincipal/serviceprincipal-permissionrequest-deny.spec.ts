@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,10 +20,10 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -62,7 +62,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -123,7 +123,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
+    await command.action(logger, { options: { id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -137,25 +137,14 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
         }
       ]));
     });
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
       new CommandError('A permission request with the ID f0feaecf-24be-402b-a080-3a55738ec56a could not be found.'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    await assert.rejects(command.action(logger, { options: { debug: false, id: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: 'f0feaecf-24be-402b-a080-3a55738ec56a' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('allows specifying id', () => {

@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -109,7 +108,7 @@ class TodoTaskAddCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listName']);
+    this.optionSets.push({ options: ['listId', 'listName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -118,7 +117,7 @@ class TodoTaskAddCommand extends GraphCommand {
     try {
       const listId: string = await this.getTodoListId(args);
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${endpoint}/me/todo/lists/${listId}/tasks`,
         headers: {
           accept: 'application/json;odata.metadata=none',
@@ -139,17 +138,17 @@ class TodoTaskAddCommand extends GraphCommand {
 
       const res = await request.post<any>(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private getDateTimeTimeZone(dateTime: string | undefined) : { dateTime: string, timeZone: string } | undefined {
+  private getDateTimeTimeZone(dateTime: string | undefined): { dateTime: string, timeZone: string } | undefined {
     if (!dateTime) {
       return undefined;
     }
-    
+
     return {
       dateTime: dateTime,
       timeZone: 'Etc/GMT'

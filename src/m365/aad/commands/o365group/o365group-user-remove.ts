@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import teamsCommands from '../../../teams/commands';
@@ -73,22 +74,22 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {    
+      async (args: CommandArgs) => {
         if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
           return `${args.options.teamId} is not a valid GUID`;
         }
-    
+
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
           return `${args.options.groupId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['groupId', 'teamId']);
+    this.optionSets.push({ options: ['groupId', 'teamId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -98,7 +99,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
       try {
         // retrieve user
         const user: UserResponse = await request.get({
-          url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
+          url: `${this.resource}/v1.0/users/${formatting.encodeQueryParameter(args.options.userName)}/id`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -96,7 +96,7 @@ describe(commands.LISTITEM_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     ensureFolderStub = sinon.stub(spo, 'ensureFolder').resolves();
     auth.service.connected = true;
@@ -129,7 +129,7 @@ describe(commands.LISTITEM_ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.ensureFolder,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -141,17 +141,6 @@ describe(commands.LISTITEM_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {
@@ -207,7 +196,6 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       Title: "fail adding me"
@@ -285,7 +273,6 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       contentType: "Unexpected content type",
@@ -301,7 +288,6 @@ describe(commands.LISTITEM_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         listTitle: 'Demo List',
         webUrl: webUrl,
         Title: expectedTitle,

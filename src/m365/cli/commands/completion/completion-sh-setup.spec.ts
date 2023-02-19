@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
@@ -17,7 +17,7 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   let setupShCompletionStub: sinon.SinonStub;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     generateShCompletionStub = sinon.stub(autocomplete, 'generateShCompletion').callsFake(() => { });
     setupShCompletionStub = sinon.stub(autocomplete, 'setupShCompletion').callsFake(() => { });
@@ -46,7 +46,7 @@ describe(commands.COMPLETION_SH_SETUP, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       autocomplete.generateShCompletion,
       autocomplete.setupShCompletion
@@ -62,12 +62,12 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   });
 
   it('generates file with commands info', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(generateShCompletionStub.called);
   });
 
   it('sets up command completion in the shell', async () => {
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(setupShCompletionStub.called);
   });
 

@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -83,22 +84,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appDisplayName', 'id']);
-  }
-
-  private getSpoSiteId(args: CommandArgs): Promise<string> {
-    const url = new URL(args.options.siteUrl);
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/sites/${url.hostname}:${url.pathname}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ id: string }>(requestOptions)
-      .then((site: { id: string }) => site.id);
+    this.optionSets.push({ options: ['appId', 'appDisplayName', 'id'] });
   }
 
   private getPermissions(): Promise<{ value: SitePermission[] }> {
@@ -161,7 +147,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeSiteAppPermission: () => Promise<void> = async (): Promise<void> => {
       try {
-        this.siteId = await this.getSpoSiteId(args);
+        this.siteId = await spo.getSpoGraphSiteId(args.options.siteUrl);
         const permissionIdsToRemove: string[] = await this.getPermissionIds(args);
         const tasks: Promise<void>[] = [];
 
@@ -171,7 +157,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
 
         const res = await Promise.all(tasks);
         logger.log(res);
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -187,7 +173,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
         default: false,
         message: `Are you sure you want to remove the specified application permission from site ${args.options.siteUrl}?`
       });
-      
+
       if (result.continue) {
         await removeSiteAppPermission();
       }

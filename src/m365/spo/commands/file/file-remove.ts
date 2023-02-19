@@ -2,6 +2,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -74,19 +75,19 @@ class SpoFileRemoveCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (args.options.id &&
           !validation.isValidGuid(args.options.id as string)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'url']);
+    this.optionSets.push({ options: ['id', 'url'] });
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -102,7 +103,7 @@ class SpoFileRemoveCommand extends SpoCommand {
       let requestUrl: string = '';
 
       if (args.options.id) {
-        requestUrl = `${args.options.webUrl}/_api/web/GetFileById(guid'${encodeURIComponent(args.options.id as string)}')`;
+        requestUrl = `${args.options.webUrl}/_api/web/GetFileById(guid'${formatting.encodeQueryParameter(args.options.id as string)}')`;
       }
       else {
         // concatenate trailing '/' if not provided
@@ -117,7 +118,7 @@ class SpoFileRemoveCommand extends SpoCommand {
         if (!fileUrl.startsWith(serverRelativeSiteUrl)) {
           fileUrl = `${serverRelativeSiteUrl}${fileUrl}`;
         }
-        requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`;
+        requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${formatting.encodeQueryParameter(fileUrl)}')`;
       }
 
       if (args.options.recycle) {

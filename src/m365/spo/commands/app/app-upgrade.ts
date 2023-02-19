@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -26,12 +27,12 @@ class SpoAppUpgradeCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -39,7 +40,7 @@ class SpoAppUpgradeCommand extends SpoCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -54,7 +55,7 @@ class SpoAppUpgradeCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -64,11 +65,11 @@ class SpoAppUpgradeCommand extends SpoCommand {
             return `appCatalogScope must be either 'tenant' or 'sitecollection' if specified`;
           }
         }
-    
+
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         return validation.isValidSharePointUrl(args.options.siteUrl);
       }
     );
@@ -82,7 +83,7 @@ class SpoAppUpgradeCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(args.options.id)}')/upgrade`,
+      url: `${args.options.siteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${formatting.encodeQueryParameter(args.options.id)}')/upgrade`,
       headers: {
         accept: 'application/json;odata=nometadata'
       }

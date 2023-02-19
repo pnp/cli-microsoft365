@@ -1,9 +1,8 @@
 import { Group } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
@@ -72,14 +71,14 @@ class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'displayName', 'mailNickname']);
+    this.optionSets.push({ options: ['id', 'displayName', 'mailNickname'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -87,7 +86,7 @@ class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
       try {
         const groupId = await this.getGroupId(args.options);
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/directory/deletedItems/${groupId}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
@@ -135,7 +134,7 @@ class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
       filterValue = `mailNickname eq '${formatting.encodeQueryParameter(mailNickname)}'`;
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=${filterValue}`,
       headers: {
         accept: 'application/json;odata.metadata=none'

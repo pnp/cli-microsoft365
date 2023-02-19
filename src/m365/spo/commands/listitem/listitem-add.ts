@@ -13,7 +13,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
@@ -118,7 +118,7 @@ class SpoListItemAddCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -282,7 +282,8 @@ class SpoListItemAddCommand extends SpoCommand {
       'folder',
       'debug',
       'verbose',
-      'output'
+      'output',
+      '_'
     ];
 
     Object.keys(options).forEach(key => {

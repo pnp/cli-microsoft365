@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -124,7 +125,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
       const res = await request.post<string>(requestOptions);
 
       const json: { UniqueId: string; } = JSON.parse(res);
-      if (args.options.output === 'json') {
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(json);
       }
       else {

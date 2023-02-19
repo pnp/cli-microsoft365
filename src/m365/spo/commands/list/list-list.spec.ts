@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.LIST_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -50,7 +50,7 @@ describe(commands.LIST_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -72,69 +72,73 @@ describe(commands.LIST_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
         return Promise.resolve(
-          {"value":[{
-            "AllowContentTypes": true,
-            "BaseTemplate": 109,
-            "BaseType": 1,
-            "ContentTypesEnabled": false,
-            "CrawlNonDefaultViews": false,
-            "Created": null,
-            "CurrentChangeToken": null,
-            "CustomActionElements": null,
-            "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
-            "DefaultItemOpenUseListSetting": false,
-            "Description": "",
-            "Direction": "none",
-            "DocumentTemplateUrl": null,
-            "DraftVersionVisibility": 0,
-            "EnableAttachments": false,
-            "EnableFolderCreation": true,
-            "EnableMinorVersions": false,
-            "EnableModeration": false,
-            "EnableVersioning": false,
-            "EntityTypeName": "Documents",
-            "ExemptFromBlockDownloadOfNonViewableFiles": false,
-            "FileSavePostProcessingEnabled": false,
-            "ForceCheckout": false,
-            "HasExternalDataSource": false,
-            "Hidden": false,
-            "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
-            "ImagePath": null,
-            "ImageUrl": null,
-            "IrmEnabled": false,
-            "IrmExpire": false,
-            "IrmReject": false,
-            "IsApplicationList": false,
-            "IsCatalog": false,
-            "IsPrivate": false,
-            "ItemCount": 69,
-            "LastItemDeletedDate": null,
-            "LastItemModifiedDate": null,
-            "LastItemUserModifiedDate": null,
-            "ListExperienceOptions": 0,
-            "ListItemEntityTypeFullName": null,
-            "MajorVersionLimit": 0,
-            "MajorWithMinorVersionsLimit": 0,
-            "MultipleDataList": false,
-            "NoCrawl": false,
-            "ParentWebPath": null,
-            "ParentWebUrl": null,
-            "ParserDisabled": false,
-            "ServerTemplateCanCreateFolders": true,
-            "TemplateFeatureId": null,
-            "Title": "Documents",
-            "RootFolder": {"ServerRelativeUrl":"Documents"}
-          }]}
+          {
+            "value": [{
+              "AllowContentTypes": true,
+              "BaseTemplate": 109,
+              "BaseType": 1,
+              "ContentTypesEnabled": false,
+              "CrawlNonDefaultViews": false,
+              "Created": null,
+              "CurrentChangeToken": null,
+              "CustomActionElements": null,
+              "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
+              "DefaultItemOpenUseListSetting": false,
+              "Description": "",
+              "Direction": "none",
+              "DocumentTemplateUrl": null,
+              "DraftVersionVisibility": 0,
+              "EnableAttachments": false,
+              "EnableFolderCreation": true,
+              "EnableMinorVersions": false,
+              "EnableModeration": false,
+              "EnableVersioning": false,
+              "EntityTypeName": "Documents",
+              "ExemptFromBlockDownloadOfNonViewableFiles": false,
+              "FileSavePostProcessingEnabled": false,
+              "ForceCheckout": false,
+              "HasExternalDataSource": false,
+              "Hidden": false,
+              "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
+              "ImagePath": null,
+              "ImageUrl": null,
+              "IrmEnabled": false,
+              "IrmExpire": false,
+              "IrmReject": false,
+              "IsApplicationList": false,
+              "IsCatalog": false,
+              "IsPrivate": false,
+              "ItemCount": 69,
+              "LastItemDeletedDate": null,
+              "LastItemModifiedDate": null,
+              "LastItemUserModifiedDate": null,
+              "ListExperienceOptions": 0,
+              "ListItemEntityTypeFullName": null,
+              "MajorVersionLimit": 0,
+              "MajorWithMinorVersionsLimit": 0,
+              "MultipleDataList": false,
+              "NoCrawl": false,
+              "ParentWebPath": null,
+              "ParentWebUrl": null,
+              "ParserDisabled": false,
+              "ServerTemplateCanCreateFolders": true,
+              "TemplateFeatureId": null,
+              "Title": "Documents",
+              "RootFolder": { "ServerRelativeUrl": "Documents" }
+            }]
+          }
         );
       }
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: {
-      output: 'json',
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com'
-    }});
+    await command.action(logger, {
+      options: {
+        output: 'json',
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    });
     assert(loggerLogSpy.calledWith([{
       "AllowContentTypes": true,
       "BaseTemplate": 109,
@@ -186,7 +190,7 @@ describe(commands.LIST_LIST, () => {
       "ServerTemplateCanCreateFolders": true,
       "TemplateFeatureId": null,
       "Title": "Documents",
-      "RootFolder": {"ServerRelativeUrl":"Documents"},
+      "RootFolder": { "ServerRelativeUrl": "Documents" },
       Url: "Documents"
     }]));
   });
@@ -216,62 +220,64 @@ describe(commands.LIST_LIST, () => {
       if ((opts.url as string).indexOf('select123=') > -1) {
         return Promise.resolve('Correct Url1');
       }
-      
+
       if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
         return Promise.resolve(
-          {"value":[{
-            "AllowContentTypes": true,
-            "BaseTemplate": 109,
-            "BaseType": 1,
-            "ContentTypesEnabled": false,
-            "CrawlNonDefaultViews": false,
-            "Created": null,
-            "CurrentChangeToken": null,
-            "CustomActionElements": null,
-            "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
-            "DefaultItemOpenUseListSetting": false,
-            "Description": "",
-            "Direction": "none",
-            "DocumentTemplateUrl": null,
-            "DraftVersionVisibility": 0,
-            "EnableAttachments": false,
-            "EnableFolderCreation": true,
-            "EnableMinorVersions": false,
-            "EnableModeration": false,
-            "EnableVersioning": false,
-            "EntityTypeName": "Documents",
-            "ExemptFromBlockDownloadOfNonViewableFiles": false,
-            "FileSavePostProcessingEnabled": false,
-            "ForceCheckout": false,
-            "HasExternalDataSource": false,
-            "Hidden": false,
-            "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
-            "ImagePath": null,
-            "ImageUrl": null,
-            "IrmEnabled": false,
-            "IrmExpire": false,
-            "IrmReject": false,
-            "IsApplicationList": false,
-            "IsCatalog": false,
-            "IsPrivate": false,
-            "ItemCount": 69,
-            "LastItemDeletedDate": null,
-            "LastItemModifiedDate": null,
-            "LastItemUserModifiedDate": null,
-            "ListExperienceOptions": 0,
-            "ListItemEntityTypeFullName": null,
-            "MajorVersionLimit": 0,
-            "MajorWithMinorVersionsLimit": 0,
-            "MultipleDataList": false,
-            "NoCrawl": false,
-            "ParentWebPath": null,
-            "ParentWebUrl": null,
-            "ParserDisabled": false,
-            "ServerTemplateCanCreateFolders": true,
-            "TemplateFeatureId": null,
-            "Title": "Documents",
-            "RootFolder": {"ServerRelativeUrl":"Documents"}
-          }]}
+          {
+            "value": [{
+              "AllowContentTypes": true,
+              "BaseTemplate": 109,
+              "BaseType": 1,
+              "ContentTypesEnabled": false,
+              "CrawlNonDefaultViews": false,
+              "Created": null,
+              "CurrentChangeToken": null,
+              "CustomActionElements": null,
+              "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
+              "DefaultItemOpenUseListSetting": false,
+              "Description": "",
+              "Direction": "none",
+              "DocumentTemplateUrl": null,
+              "DraftVersionVisibility": 0,
+              "EnableAttachments": false,
+              "EnableFolderCreation": true,
+              "EnableMinorVersions": false,
+              "EnableModeration": false,
+              "EnableVersioning": false,
+              "EntityTypeName": "Documents",
+              "ExemptFromBlockDownloadOfNonViewableFiles": false,
+              "FileSavePostProcessingEnabled": false,
+              "ForceCheckout": false,
+              "HasExternalDataSource": false,
+              "Hidden": false,
+              "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
+              "ImagePath": null,
+              "ImageUrl": null,
+              "IrmEnabled": false,
+              "IrmExpire": false,
+              "IrmReject": false,
+              "IsApplicationList": false,
+              "IsCatalog": false,
+              "IsPrivate": false,
+              "ItemCount": 69,
+              "LastItemDeletedDate": null,
+              "LastItemModifiedDate": null,
+              "LastItemUserModifiedDate": null,
+              "ListExperienceOptions": 0,
+              "ListItemEntityTypeFullName": null,
+              "MajorVersionLimit": 0,
+              "MajorWithMinorVersionsLimit": 0,
+              "MultipleDataList": false,
+              "NoCrawl": false,
+              "ParentWebPath": null,
+              "ParentWebUrl": null,
+              "ParserDisabled": false,
+              "ServerTemplateCanCreateFolders": true,
+              "TemplateFeatureId": null,
+              "Title": "Documents",
+              "RootFolder": { "ServerRelativeUrl": "Documents" }
+            }]
+          }
         );
       }
 
@@ -281,21 +287,9 @@ describe(commands.LIST_LIST, () => {
     await command.action(logger, {
       options: {
         output: 'json',
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {

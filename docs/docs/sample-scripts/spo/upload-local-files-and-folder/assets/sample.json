@@ -1,0 +1,55 @@
+[
+  {
+    "name": "pnp-upload-local-files-and-folder",
+    "source": "pnp",
+    "title": "Upload local files and folders to SharePoint Online",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/upload-local-files-and-folder",
+    "creationDateTime": "2021-04-13",
+    "updateDateTime": "2021-04-13",
+    "shortDescription": "This script shows how you can use the CLI to upload files located on a local folder to a SharePoint Online library.",
+    "longDescription": [
+      "This script shows how you can use the CLI to upload files located on a local folder to a SharePoint Online library or subfolder. This is a simple script that could be used for simple data migration scenarios. The given example uploads to the given site to Shared Documents library all files and sub folders of ./import local folder"
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "files",
+      "migration"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/upload-local-files-and-folder/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "Adam-it",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/58668583?v=4",
+        "name": "Adam Wójcik"
+      },
+      {
+        "gitHubAccount": "plamber",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/18241305?v=4",
+        "name": "Patrick Lamber"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

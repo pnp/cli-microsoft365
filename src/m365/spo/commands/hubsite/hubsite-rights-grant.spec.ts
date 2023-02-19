@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -23,7 +23,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -62,7 +62,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -93,7 +93,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -133,7 +133,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin,user', rights: 'Join' } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin,user', rights: 'Join' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -153,7 +153,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', rights: 'Join' } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', rights: 'Join' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -173,7 +173,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin, user', rights: 'Join' } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin, user', rights: 'Join' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -193,7 +193,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales>', principals: 'admin>', rights: 'Join' } });
+    await command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales>', principals: 'admin>', rights: 'Join' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -212,7 +212,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } } as any),
+    await assert.rejects(command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } } as any),
       new CommandError('File Not Found.'));
   });
 
@@ -221,19 +221,8 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('An error has occurred');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } } as any),
+    await assert.rejects(command.action(logger, { options: { hubSiteUrl: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } } as any),
       new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying hub site url', () => {

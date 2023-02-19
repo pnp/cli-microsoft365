@@ -11,10 +11,10 @@ m365 teams team unarchive [options]
 ## Options
 
 `-i, --id [id]`
-: The ID of the Microsoft Teams team to restore. Specify either id or name but not both
+: The ID of the Microsoft Teams team to restore. Specify either `id` or `name` but not both.
 
 `-n, --name [name]`
-: The display name of the Microsoft Teams team to restore. Specify either id or name but not both
+: The display name of the Microsoft Teams team to restore. Specify either `id` or `name` but not both.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -39,3 +39,6 @@ Restore an archived Microsoft Teams team with name _Team Name_
 ```sh
 m365 teams team unarchive --name "Team Name"
 ```
+## Response
+
+The command won't return a response on success.

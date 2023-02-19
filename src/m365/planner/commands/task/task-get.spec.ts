@@ -1,13 +1,13 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -115,7 +115,7 @@ describe(commands.TASK_GET, () => {
 
   const taskDetailsResponse = {
     "description": "Test",
-    "references": { }
+    "references": {}
   };
 
   const outputResponse = {
@@ -125,7 +125,7 @@ describe(commands.TASK_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -136,7 +136,6 @@ describe(commands.TASK_GET, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     log = [];
     logger = {
       log: (msg: string) => {
@@ -155,14 +154,13 @@ describe(commands.TASK_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      accessToken.isAppOnlyAccessToken
+      request.get
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       auth.restoreAuth
     ]);
@@ -176,11 +174,6 @@ describe(commands.TASK_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title']]);
   });
 
   it('fails validation when bucket name is used without id', async () => {
@@ -292,21 +285,10 @@ describe(commands.TASK_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        id: validTaskId
-      }
-    }), new CommandError('This command does not support application permissions.'));
-  });
-
   it('fails validation when no groups found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
-        return Promise.resolve({"value": []});
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
+        return Promise.resolve({ "value": [] });
       }
 
       return Promise.reject('Invalid Request');
@@ -321,10 +303,10 @@ describe(commands.TASK_GET, () => {
       }
     }), new CommandError(`The specified group '${validOwnerGroupName}' does not exist.`));
   });
-  
+
   it('fails validation when multiple groups found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return Promise.resolve(multipleGroupResponse);
       }
 
@@ -413,7 +395,7 @@ describe(commands.TASK_GET, () => {
 
   it('correctly gets task by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return Promise.resolve(singleGroupResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
@@ -425,10 +407,10 @@ describe(commands.TASK_GET, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
         return Promise.resolve(singleTaskByTitleResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}`) {
         return Promise.resolve(taskResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
       }
 
@@ -457,10 +439,10 @@ describe(commands.TASK_GET, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
         return Promise.resolve(singleTaskByTitleResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}`) {
         return Promise.resolve(taskResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
       }
 
@@ -480,10 +462,10 @@ describe(commands.TASK_GET, () => {
 
   it('correctly gets task by task ID', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}`) {
         return Promise.resolve(taskResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
       }
 
@@ -502,24 +484,13 @@ describe(commands.TASK_GET, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('The requested item is not found.'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('The requested item is not found.'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('The requested item is not found.'));
   });
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

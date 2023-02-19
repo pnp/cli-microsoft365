@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-deploy-teams-app",
+    "source": "pnp",
+    "title": "Deploy Microsoft Teams app from Azure DevOps",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/deploy-teams-app",
+    "creationDateTime": "2020-05-02",
+    "updateDateTime": "2020-05-02",
+    "shortDescription": "Installs or updates a Microsoft Teams app from an Azure DevOps pipeline.",
+    "longDescription": [
+      "Installs or updates a Microsoft Teams app from an Azure DevOps pipeline. Deploys the app if it hasn't been deployed yet or updates the existing package if it's been previously deployed."
+    ],
+    "products": [
+      "Teams"
+    ],
+    "categories": [],
+    "tags": [
+      "apps",
+      "pipelines",
+      "provisioning"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/deploy-teams-app/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "garrytrinder",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/11563347?v=4",
+        "name": "Garry Trinder"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

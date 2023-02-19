@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.APP_ROLE_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.APP_ROLE_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -242,7 +242,7 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
+    await command.action(logger, { options: { appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
     assert(loggerLogSpy.calledWith([
       {
         "allowedMemberTypes": [
@@ -280,7 +280,7 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
+    await command.action(logger, { options: { appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
     assert(loggerLogSpy.calledWith([]));
   });
 
@@ -305,7 +305,6 @@ describe(commands.APP_ROLE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230'
       }
     }), new CommandError(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
@@ -322,7 +321,6 @@ describe(commands.APP_ROLE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
     }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
@@ -339,7 +337,6 @@ describe(commands.APP_ROLE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'My app'
       }
     }), new CommandError(`No Azure AD application registration with name My app found`));
@@ -361,7 +358,6 @@ describe(commands.APP_ROLE_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appName: 'My app'
       }
     }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
@@ -370,17 +366,21 @@ describe(commands.APP_ROLE_LIST, () => {
   it('handles error when retrieving information about app through appId failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error when retrieving information about app through appName failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
-    
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      appName: 'My app' } } as any), new CommandError('An error has occurred'));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        appName: 'My app'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if appId and appObjectId specified', async () => {
@@ -416,16 +416,5 @@ describe(commands.APP_ROLE_LIST, () => {
   it('passes validation if appName specified', async () => {
     const actual = await command.validate({ options: { appName: 'My app' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

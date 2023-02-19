@@ -37,6 +37,9 @@ m365 spo web set [options]
 `--footerEnabled [footerEnabled]`
 : Set to `true` to enable footer and to `false` to disable it
 
+`--navAudienceTargetingEnabled [navAudienceTargetingEnabled]`
+: Enable or disable site navigation audience targeting. Allowed values: `true` or `false`.
+
 `--searchScope [searchScope]`
 : Search scope to set in the site. Allowed values `DefaultScope,Tenant,Hub,Site`
 
@@ -87,6 +90,12 @@ Hide footer in the site
 m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --footerEnabled false
 ```
 
+Enable navigation audience targetting in the site
+
+```sh
+m365 spo web set --url https://contoso.sharepoint.com/sites/team-a --navAudienceTargetingEnabled true
+```
+
 Set search scope to tenant scope
 
 ```sh
@@ -98,6 +107,10 @@ Set welcome page for the web
 ```sh
 m365 spo web set  --url https://contoso.sharepoint.com/sites/team-a --welcomePage "SitePages/new-home.aspx"
 ```
+
+## Response
+
+The command won't return a response on success.
 
 ## More information
 

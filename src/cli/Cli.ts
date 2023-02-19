@@ -7,8 +7,7 @@ import * as minimist from 'minimist';
 import * as os from 'os';
 import * as path from 'path';
 import { Logger } from './Logger';
-import appInsights from '../appInsights';
-import Command, { CommandArgs, CommandError } from '../Command';
+import Command, { CommandArgs, CommandError, CommandTypes } from '../Command';
 import config from '../config';
 import GlobalOptions from '../GlobalOptions';
 import request from '../request';
@@ -18,6 +17,9 @@ import { fsUtil } from '../utils/fsUtil';
 import { md } from '../utils/md';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
+import { validation } from '../utils/validation';
+import { telemetry } from '../telemetry';
+import { M365RcJson } from '../m365/base/M365RcJson';
 const packageJSON = require('../../package.json');
 
 export interface CommandOutput {
@@ -38,6 +40,8 @@ export class Cli {
   private optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
   public commandsFolder: string = '';
   private static instance: Cli;
+  private static defaultHelpMode = 'full';
+  public static helpModes: string[] = ['options', 'examples', 'remarks', 'response', 'full'];
 
   private _config: Configstore | undefined;
   public get config(): Configstore {
@@ -107,9 +111,17 @@ export class Cli {
       // we have found a command to execute. Parse args again taking into
       // account short and long options, option types and whether the command
       // supports known and unknown options or not
-      this.optionsFromArgs = {
-        options: this.getCommandOptionsFromArgs(rawArgs, this.commandToExecute)
-      };
+
+      try {
+        this.optionsFromArgs = {
+          options: this.getCommandOptionsFromArgs(rawArgs, this.commandToExecute)
+        };
+      }
+      catch (e: any) {
+        const optionsWithoutShorts = Cli.removeShortOptions({ options: parsedArgs });
+
+        return this.closeWithError(e.message, optionsWithoutShorts, false);
+      }
     }
     else {
       this.optionsFromArgs = {
@@ -123,7 +135,7 @@ export class Cli {
       showHelp ||
       parsedArgs.h ||
       parsedArgs.help) {
-      this.printHelp();
+      this.printHelp(this.getHelpMode(parsedArgs));
       return Promise.resolve();
     }
 
@@ -139,6 +151,8 @@ export class Cli {
 
     try {
       // process options before passing them on to validation stage
+      const contextCommandOptions = this.loadOptionsFromContext(this.commandToExecute.options, optionsWithoutShorts.options.debug);
+      optionsWithoutShorts.options = { ...contextCommandOptions, ...optionsWithoutShorts.options };
       await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
     }
     catch (e: any) {
@@ -163,7 +177,7 @@ export class Cli {
   public static async executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
     const logger: Logger = {
       log: (message: any): void => {
-        const output: any = Cli.formatOutput(message, args.options);
+        const output: any = Cli.formatOutput(command, message, args.options);
         Cli.log(output);
       },
       logRaw: (message: any): void => Cli.log(message),
@@ -202,14 +216,14 @@ export class Cli {
     const logErr: string[] = [];
     const logger: Logger = {
       log: (message: any): void => {
-        const formattedMessage = Cli.formatOutput(message, args.options);
+        const formattedMessage = Cli.formatOutput(command, message, args.options);
         if (listener && listener.stdout) {
           listener.stdout(formattedMessage);
         }
         log.push(formattedMessage);
       },
       logRaw: (message: any): void => {
-        const formattedMessage = Cli.formatOutput(message, args.options);
+        const formattedMessage = Cli.formatOutput(command, message, args.options);
         if (listener && listener.stdout) {
           listener.stdout(formattedMessage);
         }
@@ -242,12 +256,6 @@ export class Cli {
     try {
       await command.action(logger, args as any);
 
-      // restoring the command and logger is done here instead of in a 'finally' because there were issues with the code coverage tool
-      // restore the original command name
-      cli.currentCommandName = parentCommandName;
-      // restore the original logger
-      request.logger = currentLogger;
-
       return ({
         stdout: log.join(os.EOL),
         stderr: logErr.join(os.EOL)
@@ -259,11 +267,18 @@ export class Cli {
       cli.currentCommandName = parentCommandName;
       // restore the original logger
       request.logger = currentLogger;
-      
+
       throw {
         error: err,
         stderr: logErr.join(os.EOL)
       };
+    }
+    /* c8 ignore next */
+    finally {
+      // restore the original command name
+      cli.currentCommandName = parentCommandName;
+      // restore the original logger
+      request.logger = currentLogger;
     }
   }
 
@@ -321,6 +336,51 @@ export class Cli {
     }
 
     this.loadCommandFromFile(commandFilePath);
+  }
+
+  private loadOptionsFromContext(commandOptions: CommandOptionInfo[], debug: boolean | undefined): any {
+    const filePath: string = '.m365rc.json';
+    let m365rc: M365RcJson = {};
+
+    if (!fs.existsSync(filePath)) {
+      return;
+    }
+
+    if (debug!) {
+      Cli.error('found .m365rc.json file');
+    }
+
+    try {
+      const fileContents: string = fs.readFileSync(filePath, 'utf8');
+      if (fileContents) {
+        m365rc = JSON.parse(fileContents);
+      }
+    }
+    catch (e) {
+      this.closeWithError(`Error parsing ${filePath}`, { options: {} });
+    }
+
+    if (!m365rc.context) {
+      return;
+    }
+
+    if (debug!) {
+      Cli.error('found context in .m365rc.json file');
+    }
+
+    const context = m365rc.context;
+
+    const foundOptions: any = {};
+    commandOptions.forEach(option => {
+      if (context[option.name]) {
+        foundOptions[option.name] = context[option.name];
+        if (debug!) {
+          Cli.error(`returning ${option.name} option from context`);
+        }
+      }
+    });
+
+    return foundOptions;
   }
 
   /**
@@ -400,24 +460,66 @@ export class Cli {
       alias: {}
     };
 
+    let argsToParse = args;
+
     if (commandInfo) {
       const commandTypes = commandInfo.command.types;
       if (commandTypes) {
         minimistOptions.string = commandTypes.string;
-        minimistOptions.boolean = commandTypes.boolean;
+
+        // minimist will parse unused boolean options to 'false' (unused options => options that are not included in the args) 
+        // But in the CLI booleans are nullable. They can can be true, false or undefined.
+        // For this reason we only pass boolean types that are actually used as arg.
+        minimistOptions.boolean = commandTypes.boolean.filter(optionName => args.some(arg => `--${optionName}` === arg || `-${optionName}` === arg));
       }
+
       minimistOptions.alias = {};
       commandInfo.options.forEach(option => {
         if (option.short && option.long) {
           (minimistOptions.alias as any)[option.short] = option.long;
         }
       });
+
+      argsToParse = this.getRewrittenArgs(args, commandTypes);
     }
 
-    return minimist(args, minimistOptions);
+    return minimist(argsToParse, minimistOptions);
   }
 
-  private static formatOutput(logStatement: any, options: GlobalOptions): any {
+  /**
+   * Rewrites arguments (if necessary) before passing them into minimist.
+   * Currently only boolean values are checked and fixed.
+   * Args are only checked and rewritten if the option has been added to the 'types.boolean' array.
+   */
+  private getRewrittenArgs(args: string[], commandTypes: CommandTypes): string[] {
+    const booleanTypes = commandTypes.boolean;
+
+    if (booleanTypes.length === 0) {
+      return args;
+    }
+
+    return args.map((arg: string, index: number, array: string[]) => {
+      if (arg.startsWith('-') || index === 0) {
+        return arg;
+      }
+
+      // This line checks if the current arg is a value that belongs to a boolean option.
+      if (booleanTypes.some(t => `--${t}` === array[index - 1] || `-${t}` === array[index - 1])) {
+        const rewrittenBoolean = formatting.rewriteBooleanValue(arg);
+
+        if (!validation.isValidBoolean(rewrittenBoolean)) {
+          const optionName = array[index - 1];
+          throw new Error(`The value '${arg}' for option '${optionName}' is not a valid boolean`);
+        }
+
+        return rewrittenBoolean;
+      }
+
+      return arg;
+    });
+  }
+
+  private static formatOutput(command: Command, logStatement: any, options: GlobalOptions): any {
     if (logStatement instanceof Date) {
       return logStatement.toString();
     }
@@ -452,10 +554,7 @@ export class Cli {
     }
 
     if (!options.output || options.output === 'json') {
-      return JSON
-        .stringify(logStatement, null, 2)
-        // replace unescaped newlines with escaped newlines #2807
-        .replace(/([^\\])\\n/g, '$1\\\\\\n');
+      return command.getJsonOutput(logStatement);
     }
 
     if (logStatement instanceof CommandError) {
@@ -491,7 +590,7 @@ export class Cli {
     // data so that returned objects contain only default properties specified
     // on the current command. If there is no current command or the
     // command doesn't specify default properties, return original data
-    if (options.output === 'text' || options.output === 'csv') {
+    if (this.shouldTrimOutput(options.output)) {
       const cli: Cli = Cli.getInstance();
       const currentCommand: CommandInfo | undefined = cli.commandToExecute;
 
@@ -515,58 +614,13 @@ export class Cli {
       }
     }
 
-    if (options.output === 'csv') {
-      const { stringify } = require('csv-stringify/sync');
-      const cli = Cli.getInstance();
-
-      // https://csv.js.org/stringify/options/
-      return stringify(logStatement, {
-        header: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvHeader, true),
-        escape: cli.getSettingWithDefaultValue(settingsNames.csvEscape, '"'),
-        quote: cli.config.get(settingsNames.csvQuote),
-        quoted: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuoted, false),
-        quotedEmpty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false)
-      });
-    }
-
-    // display object as a list of key-value pairs
-    if (logStatement.length === 1) {
-      const obj: any = logStatement[0];
-      const propertyNames: string[] = [];
-      Object.getOwnPropertyNames(obj).forEach(p => {
-        propertyNames.push(p);
-      });
-
-      let longestPropertyLength: number = 0;
-      propertyNames.forEach(p => {
-        if (p.length > longestPropertyLength) {
-          longestPropertyLength = p.length;
-        }
-      });
-
-      const output: string[] = [];
-      propertyNames.sort().forEach(p => {
-        output.push(`${p.length < longestPropertyLength ? p + new Array(longestPropertyLength - p.length + 1).join(' ') : p}: ${Array.isArray(obj[p]) || typeof obj[p] === 'object' ? JSON.stringify(obj[p]) : obj[p]}`);
-      });
-
-      return output.join('\n') + '\n';
-    }
-    // display object as a table where each property is a column
-    else {
-      const Table = require('easy-table');
-      const t = new Table();
-      logStatement.forEach((r: any) => {
-        if (typeof r !== 'object') {
-          return;
-        }
-
-        Object.getOwnPropertyNames(r).forEach(p => {
-          t.cell(p, r[p]);
-        });
-        t.newRow();
-      });
-
-      return t.toString();
+    switch (options.output) {
+      case 'csv':
+        return command.getCsvOutput(logStatement);
+      case 'md':
+        return command.getMdOutput(logStatement, command, options);
+      default:
+        return command.getTextOutput(logStatement);
     }
   }
 
@@ -581,12 +635,12 @@ export class Cli {
     return undefined;
   }
 
-  private printHelp(exitCode: number = 0): void {
+  private printHelp(helpMode: string, exitCode: number = 0): void {
     const properties: any = {};
 
     if (this.commandToExecute) {
       properties.command = this.commandToExecute.name;
-      this.printCommandHelp();
+      this.printCommandHelp(helpMode);
     }
     else {
       Cli.log();
@@ -598,16 +652,12 @@ export class Cli {
       this.printAvailableCommands();
     }
 
-    appInsights.trackEvent({
-      name: 'help',
-      properties
-    });
-    appInsights.flush();
+    telemetry.trackEvent('help', properties);
 
     process.exit(exitCode);
   }
 
-  private printCommandHelp(): void {
+  private printCommandHelp(helpMode: string): void {
     let helpFilePath = '';
     let commandNameWords: string[] = [];
     if (this.commandToExecute) {
@@ -630,9 +680,74 @@ export class Cli {
     helpFilePath = path.join(...pathChunks);
 
     if (fs.existsSync(helpFilePath)) {
+      let helpContents = fs.readFileSync(helpFilePath, 'utf8');
+      helpContents = this.getHelpSection(helpMode, helpContents);
+      helpContents = md.md2plain(helpContents, path.join(this.commandsFolder, '..', '..', 'docs'));
       Cli.log();
-      Cli.log(md.md2plain(fs.readFileSync(helpFilePath, 'utf8'), path.join(this.commandsFolder, '..', '..', 'docs')));
+      Cli.log(helpContents);
     }
+  }
+
+  private getHelpMode(options: any): string {
+    const h = options.h;
+    const help = options.help;
+
+    // user passed -h or --help, let's see if they passed a specific mode
+    // or requested the default
+    if (h || help) {
+      const helpMode: boolean | string = h ?? help;
+
+      if (typeof helpMode === 'boolean' || typeof helpMode !== 'string') {
+        // requested default mode or passed a number, let's use default
+        return this.getSettingWithDefaultValue<string>(settingsNames.helpMode, Cli.defaultHelpMode);
+      }
+      else {
+        const lowerCaseHelpMode = helpMode.toLowerCase();
+
+        if (Cli.helpModes.indexOf(lowerCaseHelpMode) < 0) {
+          Cli.getInstance().closeWithError(`Unknown help mode ${helpMode}. Allowed values are ${Cli.helpModes.join(', ')}`, { options }, false);
+          return ''; // noop
+        }
+        else {
+          return lowerCaseHelpMode;
+        }
+      }
+    }
+    else {
+      return this.getSettingWithDefaultValue<string>(settingsNames.helpMode, Cli.defaultHelpMode);
+    }
+  }
+
+  private getHelpSection(helpMode: string, helpContents: string): string {
+    if (helpMode === 'full') {
+      return helpContents;
+    }
+
+    // options is the first section, so get help up to options
+    const titleAndUsage = helpContents.substring(0, helpContents.indexOf('## Options'));
+
+    // find the requested section
+    const sectionLines: string[] = [];
+    const sectionName = helpMode[0].toUpperCase() + helpMode.substring(1);
+    const lines: string[] = helpContents.split('\n');
+    for (let i: number = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      if (line.indexOf(`## ${sectionName}`) === 0) {
+        sectionLines.push(line);
+      }
+      else if (sectionLines.length > 0) {
+        if (line.indexOf('## ') === 0) {
+          // we've reached the next section, stop
+          break;
+        }
+        else {
+          sectionLines.push(line);
+        }
+      }
+    }
+
+    return titleAndUsage + sectionLines.join('\n');
   }
 
   private printAvailableCommands(): void {
@@ -759,7 +874,7 @@ export class Cli {
 
     if (showHelpIfEnabled &&
       this.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
-      this.printHelp(exitCode);
+      this.printHelp(this.getHelpMode(args.options), exitCode);
     }
     else {
       process.exit(exitCode);
@@ -821,5 +936,9 @@ export class Cli {
         args.options[option] = fs.readFileSync(filePath, 'utf-8');
       }
     });
+  }
+
+  public static shouldTrimOutput(output: string | undefined): boolean {
+    return output === 'text' || output === 'csv';
   }
 }

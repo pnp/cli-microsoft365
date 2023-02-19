@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -97,7 +98,7 @@ class TeamsTabAddCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const data: any = this.mapRequestBody(args.options);
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${args.options.channelId}/tabs`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(args.options.teamId)}/channels/${args.options.channelId}/tabs`,
       headers: {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata=nometadata'
@@ -105,11 +106,11 @@ class TeamsTabAddCommand extends GraphCommand {
       data: data,
       responseType: 'json'
     };
-    
+
     try {
       const res = await request.post(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

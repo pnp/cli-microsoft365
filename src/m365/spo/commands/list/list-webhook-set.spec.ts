@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -49,7 +49,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -74,7 +74,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listId: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
@@ -95,7 +94,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
@@ -181,7 +179,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
@@ -209,7 +206,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
@@ -245,6 +241,33 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     assert.strictEqual(actual, expected);
   });
 
+  it('updates clientState of the webhook by passing list url', async () => {
+    let actual: string = '';
+    const clientState = 'My client state';
+    const expected: string = JSON.stringify({
+      clientState: clientState
+    });
+    sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/ninja/_api/web/GetList('${formatting.encodeQueryParameter('/sites/ninja/lists/Documents')}')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) {
+        actual = JSON.stringify(opts.data);
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options:
+      {
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        listUrl: '/sites/ninja/lists/Documents',
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
+        clientState: clientState
+      }
+    });
+    assert.strictEqual(actual, expected);
+  });
+
   it('updates expiration date of the webhook by passing list title', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
@@ -262,7 +285,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
@@ -307,7 +329,6 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
@@ -413,7 +434,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if both notificationUrl and expirationDateTime options are not passed', async () => {
+  it('fails validation if notificationUrl, expirationDateTime or clientState options are not passed', async () => {
     const actual = await command.validate({
       options:
       {

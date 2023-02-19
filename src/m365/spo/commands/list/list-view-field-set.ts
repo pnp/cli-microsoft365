@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -16,6 +17,7 @@ interface Options extends GlobalOptions {
   position: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
   viewId?: string;
   viewTitle?: string;
   webUrl: string;
@@ -44,6 +46,7 @@ class SpoListViewFieldSetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
         viewId: typeof args.options.viewId !== 'undefined',
         viewTitle: typeof args.options.viewTitle !== 'undefined',
         id: typeof args.options.id !== 'undefined',
@@ -62,6 +65,9 @@ class SpoListViewFieldSetCommand extends SpoCommand {
       },
       {
         option: '--listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       },
       {
         option: '--viewId [viewId]'
@@ -119,14 +125,25 @@ class SpoListViewFieldSetCommand extends SpoCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['listId', 'listTitle'],
-      ['viewId', 'viewTitle'],
-      ['id', 'title']
+      { options: ['listId', 'listTitle', 'listUrl'] },
+      { options: ['viewId', 'viewTitle'] },
+      { options: ['id', 'title'] }
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const listSelector: string = args.options.listId ? `(guid'${formatting.encodeQueryParameter(args.options.listId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+    let listSelector: string = '';
+    if (args.options.listId) {
+      listSelector = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+    }
+    else if (args.options.listTitle) {
+      listSelector = `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      listSelector = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
+    }
+
     const viewSelector: string = args.options.viewId ? `('${formatting.encodeQueryParameter(args.options.viewId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`;
 
     if (this.verbose) {
@@ -140,8 +157,7 @@ class SpoListViewFieldSetCommand extends SpoCommand {
         logger.logToStderr(`Moving the field ${args.options.id || args.options.title} in view ${args.options.viewId || args.options.viewTitle} to position ${args.options.position}...`);
       }
 
-      const moveRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
-
+      const moveRequestUrl: string = `${args.options.webUrl}/_api/web/${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
       const moveRequestOptions: any = {
         url: moveRequestUrl,
         headers: {
@@ -162,8 +178,8 @@ class SpoListViewFieldSetCommand extends SpoCommand {
   }
 
   private getField(options: Options, listSelector: string): Promise<{ InternalName: string; }> {
-    const fieldSelector: string = options.id ? `/getbyid('${encodeURIComponent(options.id)}')` : `/getbyinternalnameortitle('${encodeURIComponent(options.title as string)}')`;
-    const getRequestUrl: string = `${options.webUrl}/_api/web/lists${listSelector}/fields${fieldSelector}`;
+    const fieldSelector: string = options.id ? `/getbyid('${formatting.encodeQueryParameter(options.id)}')` : `/getbyinternalnameortitle('${formatting.encodeQueryParameter(options.title as string)}')`;
+    const getRequestUrl: string = `${options.webUrl}/_api/web/${listSelector}/fields${fieldSelector}`;
 
     const requestOptions: any = {
       url: getRequestUrl,

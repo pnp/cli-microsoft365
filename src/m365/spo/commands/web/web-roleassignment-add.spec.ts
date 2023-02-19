@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -53,7 +53,7 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -65,17 +65,6 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
@@ -106,36 +95,6 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   it('passes validation if the roleDefinitionId option is a number', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if principalId and upn are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11, upn: 'someaccount@tenant.onmicrosoft.com', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if principalId and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11, groupName: 'someGroup', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if upn and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', upn: 'someaccount@tenant.onmicrosoft.com', groupName: 'someGroup', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if roleDefinitionId and roleDefinitionName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', groupName: 'someGroup', roleDefinitionId: 1073741827, roleDefinitionName: 'readers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither roleDefinitionId nor roleDefinitionName is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', groupName: 'someGroup' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither if neither principalId nor groupName or upn is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('add role assignment on web by role definition id', async () => {
@@ -204,11 +163,14 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      upn: 'someaccount@tenant.onmicrosoft.com',
-      roleDefinitionId: 1073741827 } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        upn: 'someaccount@tenant.onmicrosoft.com',
+        roleDefinitionId: 1073741827
+      }
+    } as any), new CommandError(error));
   });
 
   it('add role assignment on web get principal id by group name', async () => {
@@ -257,12 +219,15 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
 
       return Promise.reject(new CommandError('Unknown case'));
     });
-    
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      groupName: 'someGroup',
-      roleDefinitionId: 1073741827 } } as any), new CommandError(error));
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        groupName: 'someGroup',
+        roleDefinitionId: 1073741827
+      }
+    } as any), new CommandError(error));
   });
 
   it('add role assignment on web get role definition id by role definition name', async () => {
@@ -312,10 +277,13 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      webUrl: 'https://contoso.sharepoint.com',
-      principalId: 11,
-      roleDefinitionName: 'Full Control' } } as any), new CommandError(error));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        principalId: 11,
+        roleDefinitionName: 'Full Control'
+      }
+    } as any), new CommandError(error));
   });
 });

@@ -26,3 +26,7 @@ Set SPO URL to the specified URL
 ```sh
 m365 spo set --url https://contoso.sharepoint.com
 ```
+
+## Response
+
+The command won't return a response on success.

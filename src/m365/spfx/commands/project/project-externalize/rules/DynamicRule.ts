@@ -1,7 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
 import * as fs from 'fs';
 import { ExternalizeEntry } from "../";
-import request from '../../../../../../request';
+import request, { CliRequestOptions } from '../../../../../../request';
 import { Project } from '../../project-model';
 import { VisitationResult } from '../VisitationResult';
 import { BasicDependencyRule } from "./BasicDependencyRule";
@@ -102,7 +101,7 @@ export class DynamicRule extends BasicDependencyRule {
   }
 
   private getModuleType(url: string): Promise<ScriptCheckApiResponse> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: 'https://scriptcheck-weu-fn.azurewebsites.net/api/v2/script-check',
       headers: { 'content-type': 'application/json', accept: 'application/json', 'x-anonymous': 'true' },
       data: { url: url },

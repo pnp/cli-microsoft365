@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -52,7 +52,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -70,68 +70,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Name', 'Location', 'Scope', 'Id']);
   });
 
-  it('getCustomActions called once when scope is Web', async () => {
-    const getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve({ value: [] });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const getCustomActionsSpy = sinon.spy((command as any), 'getCustomActions');
-    const options = {
-      debug: false,
-      webUrl: 'https://contoso.sharepoint.com',
-      scope: 'Web'
-    };
-
-    try {
-      await command.action(logger, { options: options } as any);
-      assert(getRequestSpy.calledOnce);
-      assert(getCustomActionsSpy.calledWith({
-        debug: false,
-        webUrl: 'https://contoso.sharepoint.com',
-        scope: 'Web'
-      }));
-      assert(getCustomActionsSpy.calledOnce);
-    }
-    finally {
-      sinonUtil.restore((command as any)['getCustomActions']);
-    }
-  });
-
-  it('getCustomActions called once when scope is Site', async () => {
-    const getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve({ value: [] });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const getCustomActionsSpy = sinon.spy((command as any), 'getCustomActions');
-    const options = {
-      debug: false,
-      webUrl: 'https://contoso.sharepoint.com',
-      scope: 'Site'
-    };
-
-    try {
-      await command.action(logger, { options: options } as any);
-      assert(getRequestSpy.calledOnce);
-      assert(getCustomActionsSpy.calledWith({
-        debug: false,
-        webUrl: 'https://contoso.sharepoint.com',
-        scope: 'Site'
-      }));
-      assert(getCustomActionsSpy.calledOnce);
-    }
-    finally {
-      sinonUtil.restore((command as any)['getCustomActions']);
-    }
-  });
-
   it('returns all properties for output JSON', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
@@ -142,7 +80,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
     });
 
     const options = {
-      debug: false,
       webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site',
       output: 'json'
@@ -150,95 +87,13 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     try {
       await command.action(logger, { options: options } as any);
-      assert(loggerLogSpy.calledWith([{"ClientSideComponentId":"b41916e7-e69d-467f-b37f-ff8ecf8f99f2","ClientSideComponentProperties":"{\"testMessage\":\"Test message\"}","CommandUIExtension":null,"Description":null,"Group":null,"Id":"8b86123a-3194-49cf-b167-c044b613a48a","ImageUrl":null,"Location":"ClientSideExtension.ApplicationCustomizer","Name":"YourName","RegistrationId":null,"RegistrationType":0,"Rights":{"High":"0","Low":"0"},"Scope":3,"ScriptBlock":null,"ScriptSrc":null,"Sequence":0,"Title":"YourAppCustomizer","Url":null,"VersionOfUserCustomAction":"16.0.1.0"},{"ClientSideComponentId":"b41916e7-e69d-467f-b37f-ff8ecf8f99f2","ClientSideComponentProperties":"{\"testMessage\":\"Test message\"}","CommandUIExtension":null,"Description":null,"Group":null,"Id":"9115bb61-d9f1-4ed4-b7b7-e5d1834e60f5","ImageUrl":null,"Location":"ClientSideExtension.ApplicationCustomizer","Name":"YourName","RegistrationId":null,"RegistrationType":0,"Rights":{"High":"0","Low":"0"},"Scope":3,"ScriptBlock":null,"ScriptSrc":null,"Sequence":0,"Title":"YourAppCustomizer","Url":null,"VersionOfUserCustomAction":"16.0.1.0"}]));
+      assert(loggerLogSpy.calledWith([{ "ClientSideComponentId": "b41916e7-e69d-467f-b37f-ff8ecf8f99f2", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "8b86123a-3194-49cf-b167-c044b613a48a", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" }, { "ClientSideComponentId": "b41916e7-e69d-467f-b37f-ff8ecf8f99f2", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "9115bb61-d9f1-4ed4-b7b7-e5d1834e60f5", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" }]));
     }
     finally {
       sinonUtil.restore((command as any)['getCustomActions']);
     }
   });
 
-  it('getCustomActions called twice when scope is All', async () => {
-    const getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve({ value: [] });
-      }
-
-      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve({ value: [] });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const getCustomActionsSpy = sinon.spy((command as any), 'getCustomActions');
-
-    try {
-      await command.action(logger, {
-        options: {
-          debug: true,
-          webUrl: 'https://contoso.sharepoint.com'
-        }
-      });
-      assert(getRequestSpy.calledTwice);
-      assert(getCustomActionsSpy.calledTwice);
-    }
-    finally {
-      sinonUtil.restore((command as any)['getCustomActions']);
-    }
-  });
-
-  it('searchAllScopes called when scope is All', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
-    const options = {
-      debug: false,
-      webUrl: 'https://contoso.sharepoint.com',
-      scope: "All"
-    };
-
-    try {
-      await assert.rejects(command.action(logger, { options: options } as any));
-      assert(searchAllScopesSpy.calledWith(sinon.match(
-        {
-          webUrl: 'https://contoso.sharepoint.com'
-        })));
-      assert(searchAllScopesSpy.calledOnce);
-    }
-    finally {
-      sinonUtil.restore((command as any)['searchAllScopes']);
-    }
-  });
-
-  it('searchAllScopes correctly handles no custom actions when All scope specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve({ value: [] });
-      }
-
-      if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
-        return Promise.resolve({ value: [] });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, {
-      options: {
-        debug: false,
-        verbose: false,
-        webUrl: 'https://contoso.sharepoint.com',
-        scope: 'All'
-      }
-    });
-    assert(loggerLogSpy.notCalled);
-  });
 
   it('correctly handles no custom actions when All scope specified (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -255,7 +110,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
@@ -270,13 +124,15 @@ describe(commands.CUSTOMACTION_LIST, () => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.reject(err);
       }
+      else if ((opts.url as string).indexOf('/_api/Site/UserCustomActions') > -1) {
+        return Promise.resolve({ value: [] });
+      }
 
       return Promise.reject('Invalid request');
     });
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
@@ -299,23 +155,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     }), new CommandError(err));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsVerboseOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsVerboseOption = true;
-      }
-    });
-    assert(containsVerboseOption);
   });
 
   it('supports specifying scope', () => {
@@ -406,11 +250,12 @@ describe(commands.CUSTOMACTION_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { 
-      options: { 
+    await command.action(logger, {
+      options: {
         webUrl: 'https://contoso.sharepoint.com/sites/abc',
-        debug: true 
-      } });
+        debug: true
+      }
+    });
 
     let correctLogStatement = false;
     log.forEach(l => {
@@ -443,9 +288,9 @@ describe(commands.CUSTOMACTION_LIST, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: 'foo'
-        }
+      {
+        webUrl: 'foo'
+      }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -453,9 +298,9 @@ describe(commands.CUSTOMACTION_LIST, () => {
   it('passes validation when the url options specified', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com"
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com"
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -463,10 +308,10 @@ describe(commands.CUSTOMACTION_LIST, () => {
   it('passes validation when the url and scope options specified', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com",
-          scope: "Site"
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com",
+        scope: "Site"
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -489,10 +334,10 @@ describe(commands.CUSTOMACTION_LIST, () => {
   it('accepts scope to be All', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'All'
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'All'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -500,10 +345,10 @@ describe(commands.CUSTOMACTION_LIST, () => {
   it('accepts scope to be Site', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'Site'
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'Site'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -511,10 +356,10 @@ describe(commands.CUSTOMACTION_LIST, () => {
   it('accepts scope to be Web', async () => {
     const actual = await command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com",
-          scope: 'Web'
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com",
+        scope: 'Web'
+      }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
@@ -545,9 +390,9 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const actual = await command.validate(
       {
         options:
-          {
-            webUrl: "https://contoso.sharepoint.com"
-          }
+        {
+          webUrl: "https://contoso.sharepoint.com"
+        }
       }, commandInfo);
     assert.strictEqual(actual, true);
   });

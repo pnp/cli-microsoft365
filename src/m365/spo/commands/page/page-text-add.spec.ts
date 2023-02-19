@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon
       .stub(spo, 'getRequestDigest')
       .callsFake(() => Promise.resolve({
@@ -63,7 +63,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -152,10 +152,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -240,7 +239,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
           debug: true,
@@ -328,7 +327,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
           debug: true,
@@ -419,10 +418,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -510,10 +508,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world 1.1',
@@ -602,10 +599,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, 
+    await command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -623,10 +619,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'foo.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -705,10 +700,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -775,10 +769,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
@@ -853,10 +846,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
@@ -932,10 +924,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
@@ -1012,10 +1003,9 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, 
+    await assert.rejects(command.action(logger,
       {
         options: {
-          debug: false,
           pageName: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world',
@@ -1023,17 +1013,6 @@ describe(commands.PAGE_TEXT_ADD, () => {
           column: 1
         }
       }), new CommandError("Unexpected end of JSON input"));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach((o) => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports verbose mode', () => {

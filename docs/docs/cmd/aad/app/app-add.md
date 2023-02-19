@@ -11,61 +11,61 @@ m365 aad app add [options]
 ## Options
 
 `-n, --name [name]`
-: Name of the app
+: Name of the app. Specify either `name` or `manifest` but not both.
 
 `--multitenant`
-: Specify, to make the app available to other tenants
+: Specify, to make the app available to other tenants.
 
 `-r, --redirectUris [redirectUris]`
-: Comma-separated list of redirect URIs. Requires `platform` to be specified
+: Comma-separated list of redirect URIs. Requires `platform` to be specified.
 
 `-p, --platform [platform]`
-: Platform for which the `redirectUris` should be configured. Allowed values `spa`,`web`,`publicClient`
+: Platform for which the `redirectUris` should be configured. Allowed values `spa`, `web`, `publicClient`.
 
 `--implicitFlow`
-: Specify, to indicate that the authorization endpoint should return ID and access tokens
+: Specify, to indicate that the authorization endpoint should return ID and access tokens.
 
 `-s, --withSecret`
-: When specified, will create a secret named `Default` and set it to expire 1 year in the future
+: When specified, will create a secret named `Default` and set it to expire 1 year in the future.
 
 `--apisDelegated [apisDelegated]`
-: Comma-separated list of delegated permissions to register with the app
+: Comma-separated list of delegated permissions to register with the app.
 
 `--apisApplication [apisApplication]`
-: Comma-separated list of application permissions to register with the app
+: Comma-separated list of application permissions to register with the app.
 
 `-u, --uri [uri]`
-: Application ID URI
+: Application ID URI.
 
 `--scopeName [scopeName]`
-: Name of the scope to add. Requires `uri` to be specified
+: Name of the scope to add. Requires `uri` to be specified.
 
 `--scopeConsentBy [scopeConsentBy]`
-: Specifies if the scope can be consented only by admins or by admins and users. Allowed values `admins`, `adminsAndUsers`. Default `admins`
+: Specifies if the scope can be consented only by admins or by admins and users. Allowed values `admins`, `adminsAndUsers`. Default `admins`.
 
 `--scopeAdminConsentDisplayName [scopeAdminConsentDisplayName]`
-: Scope admin consent display name
+: Scope admin consent display name.
 
 `--scopeAdminConsentDescription [scopeAdminConsentDescription]`
-: Scope admin consent description
+: Scope admin consent description.
 
 `--certificateFile [certificateFile]`
-: Path to the file with certificate public key. Specify either `certificateFile` or `certificateBase64Encoded`
+: Path to the file with certificate public key. Specify either `certificateFile` or `certificateBase64Encoded`.
 
 `--certificateBase64Encoded [certificateBase64Encoded]`
-: Base64-encoded string with certificate public key. Specify either `certificateFile` or `certificateBase64Encoded`
+: Base64-encoded string with certificate public key. Specify either `certificateFile` or `certificateBase64Encoded`.
 
 `--certificateDisplayName [certificateDisplayName]`
-: Display name for the certificate. If not given, the displayName will be set to the certificate subject. When specified, also specify either `certificateFile` or `certificateBase64Encoded`
+: Display name for the certificate. If not given, the displayName will be set to the certificate subject. When specified, also specify either `certificateFile` or `certificateBase64Encoded`.
 
 `--grantAdminConsent`
-: When specified, grants application & delegated permissions through admin consent
+: When specified, grants application & delegated permissions through admin consent.
 
 `--manifest [manifest]`
-: Azure AD app manifest as retrieved from the Azure Portal to create the app registration from
+: Azure AD app manifest as retrieved from the Azure Portal to create the app registration from. Specify either `name` or `manifest` but not both.
 
 `--save`
-: Use to store the information about the created app in a local file
+: Use to store the information about the created app in a local file.
 
 --8<-- "docs/cmd/_global.md"
 

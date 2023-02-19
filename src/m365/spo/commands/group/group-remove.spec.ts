@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -17,12 +17,12 @@ describe(commands.GROUP_REMOVE, () => {
   let logger: Logger;
   let commandInfo: CommandInfo;
   let trackEvent: any;
-  let telemetry: any;
+  let telemetryCommandName: any;
   let promptOptions: any;
 
   before(() => {
-    trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
-      telemetry = t;
+    trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
+      telemetryCommandName = commandName;
     });
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     auth.service.connected = true;
@@ -59,7 +59,7 @@ describe(commands.GROUP_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -94,7 +94,7 @@ describe(commands.GROUP_REMOVE, () => {
     });
 
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, confirm: true } });
-    assert.strictEqual(telemetry.name, commands.GROUP_REMOVE);
+    assert.strictEqual(telemetryCommandName, commands.GROUP_REMOVE);
   });
 
   it('deletes the group when id is passed', async () => {
@@ -172,7 +172,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('prompts before removing group when confirmation argument not passed (id)', async () => {
-    await command.action(logger, { options: { debug: false, id: 7, webUrl: 'https://contoso.sharepoint.com/mysite' } });
+    await command.action(logger, { options: { id: 7, webUrl: 'https://contoso.sharepoint.com/mysite' } });
     let promptIssued = false;
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;
@@ -182,24 +182,13 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('prompts before removing group when confirmation argument not passed (name)', async () => {
-    await command.action(logger, { options: { debug: false, name: 'Team Site Owners', webUrl: 'https://contoso.sharepoint.com/mysite' } });
+    await command.action(logger, { options: { name: 'Team Site Owners', webUrl: 'https://contoso.sharepoint.com/mysite' } });
     let promptIssued = false;
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;
     }
 
     assert(promptIssued);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {

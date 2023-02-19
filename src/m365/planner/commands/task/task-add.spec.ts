@@ -1,13 +1,13 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -53,7 +53,7 @@ describe(commands.TASK_ADD, () => {
     "startDateTime": null,
     "createdDateTime": "2021-12-12T19:03:26.7408136Z",
     "dueDateTime": null,
-    "hasDescription": false,
+    "hasDescription": true,
     "previewType": "automatic",
     "completedDateTime": null,
     "completedBy": null,
@@ -168,7 +168,7 @@ describe(commands.TASK_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -179,7 +179,6 @@ describe(commands.TASK_ADD, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
         return Promise.resolve(taskAddResponse);
@@ -208,15 +207,14 @@ describe(commands.TASK_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      accessToken.isAppOnlyAccessToken
+      request.post
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -502,19 +500,6 @@ describe(commands.TASK_ADD, () => {
     assert(loggerLogSpy.calledWith(taskAddResponse));
   });
 
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
-      }
-    }), new CommandError('This command does not support application permissions.'));
-  });
-
   it('correctly adds planner bucket with title, bucketId, planTitle, and ownerGroupName', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -530,7 +515,7 @@ describe(commands.TASK_ADD, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
       }
 
@@ -640,7 +625,7 @@ describe(commands.TASK_ADD, () => {
     };
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent('user@contoso.onmicrosoft.com')}'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter('user@contoso.onmicrosoft.com')}'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -678,7 +663,7 @@ describe(commands.TASK_ADD, () => {
     };
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent('user@contoso.onmicrosoft.com')}'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter('user@contoso.onmicrosoft.com')}'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -875,7 +860,6 @@ describe(commands.TASK_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My Planner Bucket',
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
@@ -908,17 +892,6 @@ describe(commands.TASK_ADD, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

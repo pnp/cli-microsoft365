@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
@@ -18,7 +18,7 @@ describe(commands.CONFIG_SET, () => {
 
   before(() => {
     commandInfo = Cli.getCommandInfo(command);
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
   });
 
@@ -40,10 +40,10 @@ describe(commands.CONFIG_SET, () => {
   afterEach(() => {
     sinonUtil.restore(Cli.getInstance().config.set);
   });
-  
+
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
@@ -161,6 +161,17 @@ describe(commands.CONFIG_SET, () => {
     assert.strictEqual(actualValue, false, 'Invalid value');
   });
 
+  it(`sets ${settingsNames.prompt} property`, async () => {
+    const config = Cli.getInstance().config;
+    let actualKey: string = '', actualValue: any;
+    sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
+      actualKey = key;
+      actualValue = value;
+    }) as any);
+    await command.action(logger, { options: { key: settingsNames.prompt, value: false } });
+    assert.strictEqual(actualKey, settingsNames.prompt, 'Invalid key');
+    assert.strictEqual(actualValue, false, 'Invalid value');
+  });
 
   it('supports specifying key and value', () => {
     const options = command.options;
@@ -225,6 +236,36 @@ describe(commands.CONFIG_SET, () => {
 
   it('passes validation for error output stderr', async () => {
     const actual = await command.validate({ options: { key: settingsNames.errorOutput, value: 'stderr' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if specified help mode is invalid', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation for help mode options', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'options' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for help mode examples', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'examples' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for help mode remarks', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'remarks' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for help mode response', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'response' } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for help mode full', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.helpMode, value: 'full' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

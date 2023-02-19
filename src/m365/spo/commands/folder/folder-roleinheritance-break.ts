@@ -1,11 +1,11 @@
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import { AxiosRequestConfig } from 'axios';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
+import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -70,11 +70,20 @@ class SpoFolderRoleInheritanceBreakCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const keepExistingPermissions: boolean = !args.options.clearExistingPermissions;
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
+    const roleFolderUrl: string = urlUtil.getWebRelativePath(args.options.webUrl, args.options.folderUrl);
+    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
 
     const breakFolderRoleInheritance: () => Promise<void> = async (): Promise<void> => {
       try {
-        const requestOptions: AxiosRequestConfig = {
-          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(args.options.folderUrl)}')/ListItemAllFields/breakroleinheritance(${keepExistingPermissions})`,
+        if (roleFolderUrl.split('/').length === 2) {
+          requestUrl += `GetList('${formatting.encodeQueryParameter(serverRelativeUrl)}')`;
+        }
+        else {
+          requestUrl += `GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/ListItemAllFields`;
+        }
+        const requestOptions: CliRequestOptions = {
+          url: `${requestUrl}/breakroleinheritance(${keepExistingPermissions})`,
           headers: {
             accept: 'application/json'
           },

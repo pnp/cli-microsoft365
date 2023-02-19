@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -57,7 +58,7 @@ class TodoTaskListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listName']);
+    this.optionSets.push({ options: ['listId', 'listName'] });
   }
 
   private getTodoListId(args: CommandArgs): Promise<string> {
@@ -91,7 +92,7 @@ class TodoTaskListCommand extends GraphCommand {
       const endpoint: string = `${this.resource}/v1.0/me/todo/lists/${listId}/tasks`;
       const items: ToDoTask[] = await odata.getAllItems(endpoint);
 
-      if (args.options.output === 'json') {
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(items);
       }
       else {
@@ -105,7 +106,7 @@ class TodoTaskListCommand extends GraphCommand {
           };
         }));
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

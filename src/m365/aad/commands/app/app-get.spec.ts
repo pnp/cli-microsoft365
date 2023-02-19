@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.APP_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -55,7 +55,7 @@ describe(commands.APP_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -80,7 +80,6 @@ describe(commands.APP_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
     }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
@@ -97,7 +96,6 @@ describe(commands.APP_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My app'
       }
     }), new CommandError(`No Azure AD application registration with name My app found`));
@@ -119,7 +117,6 @@ describe(commands.APP_GET, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         name: 'My app'
       }
     }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
@@ -128,17 +125,21 @@ describe(commands.APP_GET, () => {
   it('handles error when retrieving information about app through appId failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error when retrieving information about app through name failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: false,
-      name: 'My app' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: 'My app'
+      }
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if appId and objectId specified', async () => {
@@ -665,16 +666,5 @@ describe(commands.APP_GET, () => {
         save: true
       }
     });
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

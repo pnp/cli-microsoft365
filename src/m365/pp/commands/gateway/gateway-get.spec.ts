@@ -1,12 +1,13 @@
 import * as assert from "assert";
 import * as sinon from "sinon";
-import appInsights from "../../../../appInsights";
+import { telemetry } from "../../../../telemetry";
 import auth from "../../../../Auth";
 import { Cli } from "../../../../cli/Cli";
 import { CommandInfo } from "../../../../cli/CommandInfo";
 import { Logger } from "../../../../cli/Logger";
 import Command, { CommandError } from "../../../../Command";
 import request from "../../../../request";
+import { formatting } from "../../../../utils/formatting";
 import { pid } from "../../../../utils/pid";
 import { sinonUtil } from "../../../../utils/sinonUtil";
 import commands from "../../commands";
@@ -30,7 +31,7 @@ describe(commands.GATEWAY_GET, () => {
 
   before(() => {
     sinon.stub(auth, "restoreAuth").callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, "trackEvent").callsFake(() => {});
+    sinon.stub(telemetry, "trackEvent").callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -58,8 +59,8 @@ describe(commands.GATEWAY_GET, () => {
 
   after(() => {
     sinonUtil.restore([
-      auth.restoreAuth, 
-      appInsights.trackEvent,
+      auth.restoreAuth,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -107,7 +108,7 @@ describe(commands.GATEWAY_GET, () => {
     await assert.rejects(
       command.action(logger, {
         options: {
-          id : 'testid'
+          id: 'testid'
         }
       }),
       new CommandError("An error has occurred")
@@ -119,7 +120,7 @@ describe(commands.GATEWAY_GET, () => {
       if (
         opts.url ===
         "https://api.powerbi.com" +
-          `/v1.0/myorg/gateways/${encodeURIComponent(gateway.id)}`
+        `/v1.0/myorg/gateways/${formatting.encodeQueryParameter(gateway.id)}`
       ) {
         return Promise.resolve(gateway);
       }

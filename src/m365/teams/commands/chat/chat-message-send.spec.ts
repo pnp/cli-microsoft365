@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as os from 'os';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -9,6 +9,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -40,7 +41,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
@@ -73,13 +74,13 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       else if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=chatType eq 'group'&$expand=members&$select=id,topic,createdDateTime,members&$skiptoken=eyJDb250aW51YXRpb25Ub2tlbiI6Ilczc2ljM1JoY25RaU9pSXlNREl5TFRBeExUSXdWREE1T2pRME9qVXhMakl5Tnlzd01Eb3dNQ0lzSW1WdVpDSTZJakl3TWpJdE1ERXRNakJVTURrNk5EUTZOVEV1TWpJM0t6QXdPakF3SWl3aWMyOXlkRTl5WkdWeUlqb3dmU3g3SW5OMFlYSjBJam9pTVRrM01DMHdNUzB3TVZRd01Eb3dNRG93TUNzd01Eb3dNQ0lzSW1WdVpDSTZJakU1TnpBdE1ERXRNREZVTURBNk1EQTZNREF1TURBeEt6QXdPakF3SWl3aWMyOXlkRTl5WkdWeUlqb3dmVjA9IiwiQ2hhdFR5cGUiOiJjaGF0fG1lZXRpbmd8c2ZiaW50ZXJvcGNoYXR8cGhvbmVjaGF0In0%3d`) {
         return Promise.resolve(findGroupChatsByMembersResponseWithNextLink);
       }
-      else if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=topic eq '${encodeURIComponent('Just a conversation')}'&$expand=members&$select=id,topic,createdDateTime,chatType`) {
+      else if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=topic eq '${formatting.encodeQueryParameter('Just a conversation')}'&$expand=members&$select=id,topic,createdDateTime,chatType`) {
         return Promise.resolve(singleChatByNameResponse);
       }
-      else if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=topic eq '${encodeURIComponent('Just a conversation with same name')}'&$expand=members&$select=id,topic,createdDateTime,chatType`) {
+      else if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=topic eq '${formatting.encodeQueryParameter('Just a conversation with same name')}'&$expand=members&$select=id,topic,createdDateTime,chatType`) {
         return Promise.resolve(multipleChatByNameResponse);
       }
-      else if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=topic eq '${encodeURIComponent('Nonexistent conversation name')}'&$expand=members&$select=id,topic,createdDateTime,chatType`) {
+      else if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=topic eq '${formatting.encodeQueryParameter('Nonexistent conversation name')}'&$expand=members&$select=id,topic,createdDateTime,chatType`) {
         return Promise.resolve(noChatByNameResponse);
       }
 
@@ -111,7 +112,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       accessToken.getUserNameFromAccessToken
     ]);
@@ -129,7 +130,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   it('fails validation if chatId and chatName and userEmails are not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         message: "Hello World"
       }
     }, commandInfo);
@@ -234,7 +234,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   it('fails validation if message is not specified', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         chatId: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces"
       }
     }, commandInfo);
@@ -279,17 +278,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('sends chat message using chatId', async () => {
@@ -367,24 +355,33 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   it('fails sending message with nonexistent chatName', async () => {
-    await assert.rejects(command.action(logger, { options: {
-      chatName: "Nonexistent conversation name",
-      message: "Hello World"} } as any), new CommandError('No chat conversation was found with this name.'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        chatName: "Nonexistent conversation name",
+        message: "Hello World"
+      }
+    } as any), new CommandError('No chat conversation was found with this name.'));
   });
 
   it('fails sending message with multiple found chat conversations by chatName', async () => {
-    await assert.rejects(command.action(logger, { options: {
-      chatName: "Just a conversation with same name",
-      message: "Hello World" } } as any), new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
+    await assert.rejects(command.action(logger, {
+      options: {
+        chatName: "Just a conversation with same name",
+        message: "Hello World"
+      }
+    } as any), new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
       `- 19:309128478c1743b19bebd08efc390efb@thread.v2 - ${new Date("2021-09-14T07:44:11.5Z").toLocaleString()} - AlexW@M365x214355.onmicrosoft.com, MeganB@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`,
       `- 19:650081f4700a4414ac15cd7993129f80@thread.v2 - ${new Date("2020-06-26T08:27:55.154Z").toLocaleString()} - MeganB@M365x214355.onmicrosoft.com, AlexW@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`
     ].join(os.EOL)}`));
   });
 
   it('fails sending message with multiple found chat conversations by userEmails', async () => {
-    await assert.rejects(command.action(logger, { options: {
-      userEmails: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com",
-      message: "Hello World" } } as any), new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
+    await assert.rejects(command.action(logger, {
+      options: {
+        userEmails: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com",
+        message: "Hello World"
+      }
+    } as any), new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
       `- 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2 - Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat - ${new Date("2021-12-22T13:13:11.023Z").toLocaleString()}`,
       `- 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2 - CC Call v3 - ${new Date("2021-10-18T16:56:30.205Z").toLocaleString()}`
     ].join(os.EOL)}`));
@@ -431,8 +428,11 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      userEmails: "AlexW@M365x214355.onmicrosoft.com",
-      message: "Hello World" } } as any), new CommandError(`Request failed with status code 404`));
+    await assert.rejects(command.action(logger, {
+      options: {
+        userEmails: "AlexW@M365x214355.onmicrosoft.com",
+        message: "Hello World"
+      }
+    } as any), new CommandError(`Request failed with status code 404`));
   });
 });

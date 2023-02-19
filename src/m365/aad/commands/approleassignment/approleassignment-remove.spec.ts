@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as os from 'os';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -77,7 +77,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -92,7 +92,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('prompts before removing the app role assignment when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scope: 'Sites.Read.All' } });
+    await command.action(logger, { options: { appId: 'dc311e81-e099-4c64-bd66-c7183465f3f2', resource: 'SharePoint', scope: 'Sites.Read.All' } });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -253,7 +253,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633', confirm: true } } as any),
+    await assert.rejects(command.action(logger, { options: { appId: '36e3a540-6f25-4483-9542-9f5fa00bb633', confirm: true } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
@@ -290,17 +290,6 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   it('passes validation when the appId option specified', async () => {
     const actual = await command.validate({ options: { appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying appId', () => {

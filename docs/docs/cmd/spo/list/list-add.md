@@ -25,9 +25,6 @@ m365 spo list add [options]
 `--templateFeatureId [templateFeatureId]`
 : The globally unique identifier (GUID) of a template feature that is associated with the list
 
-`--schemaXml [schemaXml]`
-: The schema in Collaborative Application Markup Language (CAML) schemas that defines the list
-
 `--allowDeletion [allowDeletion]`
 : Boolean value specifying whether the list can be deleted. Valid values are `true,false`
 
@@ -199,6 +196,9 @@ m365 spo list add [options]
 `--writeSecurity [writeSecurity]`
 : Gets or sets the Write security setting for the list. Valid values are 1 (All users can modify all items)|2 (Users can modify only items that they create)|4 (Users cannot modify any list item)
 
+`--schemaXml [schemaXml]`
+: (deprecated) The schema in Collaborative Application Markup Language (CAML) schemas that defines the list
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
@@ -209,17 +209,144 @@ Add a list with title _Announcements_ and baseTemplate _Announcements_ in site _
 m365 spo list add --title Announcements --baseTemplate Announcements --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
-Add a list with title _Announcements_, baseTemplate _Announcements_ in site _https://contoso.sharepoint.com/sites/project-x_ using a custom XML schema
-
-```sh
-m365 spo list add --title Announcements --baseTemplate Announcements --webUrl https://contoso.sharepoint.com/sites/project-x --schemaXml '<List xmlns:ows="Microsoft SharePoint" Title="List1" FolderCreation="FALSE" Direction="$Resources:Direction;" Url="Lists/List1" BaseType="0" xmlns="http://schemas.microsoft.com/sharepoint/"><MetaData><ContentTypes><ContentTypeRef ID="0x01"><Folder TargetName="Item" /></ContentTypeRef><ContentTypeRef ID="0x0120" /></ContentTypes><Fields><Field ID="{fa564e0f-0c70-4ab9-b863-0177e6ddd247}" Type="Text" Name="Title" DisplayName="$Resources:core,Title;" Required="TRUE" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="Title" MaxLength="255" /></Fields><Views><View BaseViewID="0" Type="HTML" MobileView="TRUE" TabularView="FALSE"><Toolbar Type="Standard" /><XslLink Default="TRUE">main.xsl</XslLink><RowLimit Paged="TRUE">30</RowLimit><ViewFields><FieldRef Name="LinkTitleNoMenu"></FieldRef></ViewFields><Query><OrderBy><FieldRef Name="Modified" Ascending="FALSE"></FieldRef></OrderBy></Query><ParameterBindings><ParameterBinding Name="AddNewAnnouncement" Location="Resource(wss,addnewitem)" /><ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" /><ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_ONET_HOME)" /></ParameterBindings></View><View BaseViewID="1" Type="HTML" WebPartZoneID="Main" DisplayName="$Resources:core,objectiv_schema_mwsidcamlidC24;" DefaultView="TRUE" MobileView="TRUE" MobileDefaultView="TRUE" SetupPath="pages\viewpage.aspx" ImageUrl="/_layouts/15/images/generic.png?rev=23" Url="AllItems.aspx"><Toolbar Type="Standard" /><XslLink Default="TRUE">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged="TRUE">30</RowLimit><ViewFields><FieldRef Name="LinkTitle"></FieldRef></ViewFields><Query><OrderBy><FieldRef Name="ID"></FieldRef></OrderBy></Query><ParameterBindings><ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" /><ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_DEFAULT)" /></ParameterBindings></View></Views><Forms><Form Type="DisplayForm" Url="DispForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" /><Form Type="EditForm" Url="EditForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" /><Form Type="NewForm" Url="NewForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" /></Forms></MetaData></List>'
-```
-
 Add a list with title _Announcements_, baseTemplate _Announcements_ in site _https://contoso.sharepoint.com/sites/project-x_ with content types and versioning enabled and major version limit set to _50_
 
 ```sh
 m365 spo list add --webUrl https://contoso.sharepoint.com/sites/project-x --title Announcements --baseTemplate Announcements --contentTypesEnabled true --enableVersioning true --majorVersionLimit 50
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "AllowContentTypes": true,
+      "BaseTemplate": 100,
+      "BaseType": 0,
+      "ContentTypesEnabled": false,
+      "CrawlNonDefaultViews": false,
+      "Created": "2022-11-16T19:51:42Z",
+      "CurrentChangeToken": {
+        "StringValue": "1;3;ea3dc19f-bc1f-4b77-afb8-14e08f4c0f6d;638042251016970000;564165920"
+      },
+      "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
+      "DefaultItemOpenUseListSetting": false,
+      "Description": "",
+      "Direction": "none",
+      "DisableCommenting": false,
+      "DisableGridEditing": false,
+      "DocumentTemplateUrl": null,
+      "DraftVersionVisibility": 0,
+      "EnableAttachments": true,
+      "EnableFolderCreation": false,
+      "EnableMinorVersions": false,
+      "EnableModeration": false,
+      "EnableRequestSignOff": true,
+      "EnableVersioning": true,
+      "EntityTypeName": "TestList",
+      "ExemptFromBlockDownloadOfNonViewableFiles": false,
+      "FileSavePostProcessingEnabled": false,
+      "ForceCheckout": false,
+      "HasExternalDataSource": false,
+      "Hidden": false,
+      "Id": "ea3dc19f-bc1f-4b77-afb8-14e08f4c0f6d",
+      "ImagePath": {
+        "DecodedUrl": "/_layouts/15/images/itgen.png?rev=47"
+      },
+      "ImageUrl": "/_layouts/15/images/itgen.png?rev=47",
+      "DefaultSensitivityLabelForLibrary": "",
+      "IrmEnabled": false,
+      "IrmExpire": false,
+      "IrmReject": false,
+      "IsApplicationList": false,
+      "IsCatalog": false,
+      "IsPrivate": false,
+      "ItemCount": 0,
+      "LastItemDeletedDate": "2022-11-16T19:51:42Z",
+      "LastItemModifiedDate": "2022-11-16T19:51:42Z",
+      "LastItemUserModifiedDate": "2022-11-16T19:51:42Z",
+      "ListExperienceOptions": 0,
+      "ListItemEntityTypeFullName": "SP.Data.TestListItem",
+      "MajorVersionLimit": 50,
+      "MajorWithMinorVersionsLimit": 0,
+      "MultipleDataList": false,
+      "NoCrawl": false,
+      "ParentWebPath": {
+        "DecodedUrl": "/"
+      },
+      "ParentWebUrl": "/",
+      "ParserDisabled": false,
+      "ServerTemplateCanCreateFolders": true,
+      "TemplateFeatureId": "00bfea71-de22-43b2-a848-c05709900100",
+      "Title": "Test"
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    AllowContentTypes                        : true
+    BaseTemplate                             : 100
+    BaseType                                 : 0
+    ContentTypesEnabled                      : false
+    CrawlNonDefaultViews                     : false
+    Created                                  : 2022-11-16T19:52:16Z
+    CurrentChangeToken                       : {"StringValue":"1;3;4d66e81a-ac73-4894-9e33-7999edaa36bc;638042251364530000;564166119"}
+    DefaultContentApprovalWorkflowId         : 00000000-0000-0000-0000-000000000000
+    DefaultItemOpenUseListSetting            : false
+    DefaultSensitivityLabelForLibrary        :
+    Description                              :
+    Direction                                : none
+    DisableCommenting                        : false
+    DisableGridEditing                       : false
+    DocumentTemplateUrl                      : null
+    DraftVersionVisibility                   : 0
+    EnableAttachments                        : true
+    EnableFolderCreation                     : false
+    EnableMinorVersions                      : false
+    EnableModeration                         : false
+    EnableRequestSignOff                     : true
+    EnableVersioning                         : true
+    EntityTypeName                           : TestList
+    ExemptFromBlockDownloadOfNonViewableFiles: false
+    FileSavePostProcessingEnabled            : false
+    ForceCheckout                            : false
+    HasExternalDataSource                    : false
+    Hidden                                   : false
+    Id                                       : 4d66e81a-ac73-4894-9e33-7999edaa36bc
+    ImagePath                                : {"DecodedUrl":"/_layouts/15/images/itgen.png?rev=47"}
+    ImageUrl                                 : /_layouts/15/images/itgen.png?rev=47
+    IrmEnabled                               : false
+    IrmExpire                                : false
+    IrmReject                                : false
+    IsApplicationList                        : false
+    IsCatalog                                : false
+    IsPrivate                                : false
+    ItemCount                                : 0
+    LastItemDeletedDate                      : 2022-11-16T19:52:16Z
+    LastItemModifiedDate                     : 2022-11-16T19:52:16Z
+    LastItemUserModifiedDate                 : 2022-11-16T19:52:16Z
+    ListExperienceOptions                    : 0
+    ListItemEntityTypeFullName               : SP.Data.TestListItem
+    MajorVersionLimit                        : 50
+    MajorWithMinorVersionsLimit              : 0
+    MultipleDataList                         : false
+    NoCrawl                                  : false
+    ParentWebPath                            : {"DecodedUrl":"/"}
+    ParentWebUrl                             : /
+    ParserDisabled                           : false
+    ServerTemplateCanCreateFolders           : true
+    TemplateFeatureId                        : 00bfea71-de22-43b2-a848-c05709900100
+    Title                                    : Test
+    ```
+
+=== "CSV"
+
+    ```csv
+    AllowContentTypes,BaseTemplate,BaseType,ContentTypesEnabled,CrawlNonDefaultViews,Created,CurrentChangeToken,DefaultContentApprovalWorkflowId,DefaultItemOpenUseListSetting,Description,Direction,DisableCommenting,DisableGridEditing,DocumentTemplateUrl,DraftVersionVisibility,EnableAttachments,EnableFolderCreation,EnableMinorVersions,EnableModeration,EnableRequestSignOff,EnableVersioning,EntityTypeName,ExemptFromBlockDownloadOfNonViewableFiles,FileSavePostProcessingEnabled,ForceCheckout,HasExternalDataSource,Hidden,Id,ImagePath,ImageUrl,DefaultSensitivityLabelForLibrary,IrmEnabled,IrmExpire,IrmReject,IsApplicationList,IsCatalog,IsPrivate,ItemCount,LastItemDeletedDate,LastItemModifiedDate,LastItemUserModifiedDate,ListExperienceOptions,ListItemEntityTypeFullName,MajorVersionLimit,MajorWithMinorVersionsLimit,MultipleDataList,NoCrawl,ParentWebPath,ParentWebUrl,ParserDisabled,ServerTemplateCanCreateFolders,TemplateFeatureId,Title
+    1,100,0,,,2022-11-16T19:52:41Z,"{""StringValue"":""1;3;3b6bd39e-1e62-4ddf-ac8e-020bf5353891;638042251616230000;564166296""}",00000000-0000-0000-0000-000000000000,,,none,,,,0,1,,,,1,1,TestList,,,,,,3b6bd39e-1e62-4ddf-ac8e-020bf5353891,"{""DecodedUrl"":""/_layouts/15/images/itgen.png?rev=47""}",/_layouts/15/images/itgen.png?rev=47,,,,,,,,0,2022-11-16T19:52:41Z,2022-11-16T19:52:42Z,2022-11-16T19:52:41Z,0,SP.Data.TestListItem,50,0,,,"{""DecodedUrl"":""/""}",/,,1,00bfea71-de22-43b2-a848-c05709900100,Test
+    ```
 
 ## More information
 

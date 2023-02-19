@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-analyze-users-haveibeenpwnd",
+    "source": "pnp",
+    "title": "Analyze users for known data breaches with have i been pwned",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/analyze-users-haveibeenpwnd",
+    "creationDateTime": "2022-02-07",
+    "updateDateTime": "2022-02-07",
+    "shortDescription": "Validate all your users against known breaches with the have i been pwned api.",
+    "longDescription": [
+      "Validate all your users against known breaches with the have i been pwned api. That way you can quickly scan if your users are part of any known breaches."
+    ],
+    "products": [
+      "AAD"
+    ],
+    "categories": [],
+    "tags": [
+      "security",
+      "users"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/aad/analyze-users-haveibeenpwnd/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "appieschot",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/15227781?v=4",
+        "name": "Albert-Jan Schot"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

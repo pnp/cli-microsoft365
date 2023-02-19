@@ -1,7 +1,9 @@
 import { isNumber } from 'util';
+import { Cli } from '../../../cli/Cli';
 import { Logger } from '../../../cli/Logger';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
+import { formatting } from '../../../utils/formatting';
 import { spo } from '../../../utils/spo';
 import { validation } from '../../../utils/validation';
 import SpoCommand from '../../base/SpoCommand';
@@ -213,8 +215,8 @@ class SpoSearchCommand extends SpoCommand {
       const startRow = args.options.startRow ? args.options.startRow : 0;
 
       const results: SearchResult[] = await this.executeSearchQuery(logger, args, webUrl, [], startRow);
-      this.printResults(logger, args, results);      
-    } 
+      this.printResults(logger, args, results);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -255,7 +257,7 @@ class SpoSearchCommand extends SpoCommand {
     const selectPropertiesArray: string[] = this.getSelectPropertiesArray(args);
 
     // transform arg data to query string parameters
-    const propertySelectRequestString: string = `&selectproperties='${encodeURIComponent(selectPropertiesArray.join(","))}'`;
+    const propertySelectRequestString: string = `&selectproperties='${formatting.encodeQueryParameter(selectPropertiesArray.join(","))}'`;
     const startRowRequestString: string = `&startrow=${startRow ? startRow : 0}`;
     const rowLimitRequestString: string = args.options.rowLimit ? `&rowlimit=${args.options.rowLimit}` : ``;
     const sourceIdRequestString: string = args.options.sourceId ? `&sourceid='${args.options.sourceId}'` : ``;
@@ -264,7 +266,7 @@ class SpoSearchCommand extends SpoCommand {
     const cultureRequestString: string = args.options.culture ? `&culture=${args.options.culture}` : ``;
     const refinementFiltersRequestString: string = args.options.refinementFilters ? `&refinementfilters='${args.options.refinementFilters}'` : ``;
     const queryTemplateRequestString: string = args.options.queryTemplate ? `&querytemplate='${args.options.queryTemplate}'` : ``;
-    const sortListRequestString: string = args.options.sortList ? `&sortList='${encodeURIComponent(args.options.sortList)}'` : ``;
+    const sortListRequestString: string = args.options.sortList ? `&sortList='${formatting.encodeQueryParameter(args.options.sortList)}'` : ``;
     const rankingModelIdRequestString: string = args.options.rankingModelId ? `&rankingmodelid='${args.options.rankingModelId}'` : ``;
     const propertiesRequestString: string = this.getPropertiesRequestString(args);
     const refinersRequestString: string = args.options.refiners ? `&refiners='${args.options.refiners}'` : ``;
@@ -333,7 +335,7 @@ class SpoSearchCommand extends SpoCommand {
       logger.log(this.getParsedOutput(args, results));
     }
 
-    if (!args.options.output || args.options.output === 'text') {
+    if (!args.options.output || Cli.shouldTrimOutput(args.options.output)) {
       logger.log("# Rows: " + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRows);
       logger.log("# Rows (Including duplicates): " + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRowsIncludingDuplicates);
       logger.log("Elapsed Time: " + this.getElapsedTime(results));

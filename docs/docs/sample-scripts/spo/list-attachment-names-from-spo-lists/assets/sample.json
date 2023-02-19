@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-list-attachment-names-from-spo-lists",
+    "source": "pnp",
+    "title": "List Attachment Names From SharePoint Lists For A Site",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-attachment-names-from-spo-lists",
+    "creationDateTime": "2022-07-29",
+    "updateDateTime": "2022-07-29",
+    "shortDescription": "Lists Attachment Names From SharePoint Lists For A Site.",
+    "longDescription": [
+      "Lists Attachment Names From SharePoint Lists For A Site."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "files",
+      "lists",
+      "reports"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/list-attachment-names-from-spo-lists/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "veronicageek",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/25181757?v=4",
+        "name": "Veronique Lengelle"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

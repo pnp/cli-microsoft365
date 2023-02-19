@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -23,7 +23,7 @@ describe(commands.WEB_REINDEX, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -65,7 +65,7 @@ describe(commands.WEB_REINDEX, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -115,7 +115,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } });
     assert(loggerLogSpy.notCalled, 'Something has been logged');
     assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
     assert.strictEqual(propertyValue, '1', 'Incorrect property value stored in the property bag');
@@ -231,7 +231,7 @@ describe(commands.WEB_REINDEX, () => {
           ]
         });
       }
-      
+
       if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
         return Promise.resolve({});
       }
@@ -245,7 +245,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } });
     assert(loggerLogSpy.notCalled, 'Something has been logged');
     assert.strictEqual(propertyName[0], 'vti_searchversion');
     assert.strictEqual(propertyName[1], 'vti_searchversion');
@@ -320,7 +320,7 @@ describe(commands.WEB_REINDEX, () => {
           ]
         });
       }
-      
+
       if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
         return Promise.resolve({});
       }
@@ -412,18 +412,7 @@ describe(commands.WEB_REINDEX, () => {
     sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').callsFake(() => Promise.resolve(true));
     sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake(() => Promise.reject('ClientSvc unknown error'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('ClientSvc unknown error'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('ClientSvc unknown error'));
   });
 
   it('fails validation if url is not a valid SharePoint URL', async () => {

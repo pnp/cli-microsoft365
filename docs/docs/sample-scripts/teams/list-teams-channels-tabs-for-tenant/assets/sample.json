@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-list-teams-channels-tabs-for-tenant",
+    "source": "pnp",
+    "title": "List Microsoft Teams teams, channels, and tabs in the tenant",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/list-teams-channels-tabs-for-tenant",
+    "creationDateTime": "2021-10-16",
+    "updateDateTime": "2021-10-16",
+    "shortDescription": "This script allows you to list all teams, channels and tabs.",
+    "longDescription": [
+      "This script allows you to list all teams, channels and tabs."
+    ],
+    "products": [
+      "Teams"
+    ],
+    "categories": [],
+    "tags": [
+      "reports",
+      "teams"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/teams/list-teams-channels-tabs-for-tenant/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "veronicageek",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/25181757?v=4",
+        "name": "Veronique Lengelle"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

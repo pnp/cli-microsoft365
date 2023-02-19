@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -17,6 +17,7 @@ const command: Command = require('./listitem-get');
 describe(commands.LISTITEM_GET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
   const listUrl = 'sites/project-x/documents';
+  const listTitle = 'Demo List';
   const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);
 
   let log: any[];
@@ -30,6 +31,44 @@ describe(commands.LISTITEM_GET, () => {
   let actualId = 0;
 
   const getFakes = async (opts: any) => {
+    if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items(147)/RoleAssignments?$expand=Member,RoleDefinitionBindings` || opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')/items(147)/RoleAssignments?$expand=Member,RoleDefinitionBindings`) {
+      return {
+        "value": [
+          {
+            "Member": {
+              "Id": 3,
+              "IsHiddenInUI": false,
+              "LoginName": "Communication site Owners",
+              "Title": "Communication site Owners",
+              "PrincipalType": 8,
+              "AllowMembersEditMembership": false,
+              "AllowRequestToJoinLeave": false,
+              "AutoAcceptRequestToJoinLeave": false,
+              "Description": null,
+              "OnlyAllowMembersViewMembership": false,
+              "OwnerTitle": "Communication site Owners",
+              "RequestToJoinLeaveEmailSetting": ""
+            },
+            "RoleDefinitionBindings": [
+              {
+                "BasePermissions": {
+                  "High": "2147483647",
+                  "Low": "4294967295"
+                },
+                "Description": "Has full control.",
+                "Hidden": false,
+                "Id": 1073741829,
+                "Name": "Full Control",
+                "Order": 1,
+                "RoleTypeKind": 5
+              }
+            ],
+            "PrincipalId": 3
+          }
+        ]
+      };
+    }
+
     if (opts.url.indexOf('/_api/web/lists') > -1) {
       if ((opts.url as string).indexOf('/items(') > -1) {
         actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
@@ -60,12 +99,13 @@ describe(commands.LISTITEM_GET, () => {
         "Title": expectedTitle
       };
     }
+
     throw 'Invalid request';
   };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -96,7 +136,7 @@ describe(commands.LISTITEM_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -108,17 +148,6 @@ describe(commands.LISTITEM_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {
@@ -188,13 +217,29 @@ describe(commands.LISTITEM_GET, () => {
     assert.strictEqual(actualId, expectedId);
   });
 
+  it('returns listItemInstance object when list item is requested and with permissions', async () => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+
+    command.allowUnknownOptions();
+
+    const options: any = {
+      debug: true,
+      listTitle: 'Demo List',
+      webUrl: webUrl,
+      id: expectedId,
+      withPermissions: true
+    };
+
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(actualId, expectedId);
+  });
+
   it('returns listItemInstance object when list item is requested with an output type of json, and a list of fields are specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -207,26 +252,23 @@ describe(commands.LISTITEM_GET, () => {
   });
 
   it('returns listItemInstance object when list item is requested with an output type of json, a list of fields with lookup field are specified', async () => {
-    sinon.stub(request, 'get').callsFake((opts: any) => {
+    sinon.stub(request, 'get').callsFake(async (opts: any) => {
       if ((opts.url as string).indexOf('&$expand=') > -1) {
         actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
-        return Promise.resolve(
-          {
-            "ID": actualId,
-            "Modified": "2018-03-15T10:43:10Z",
-            "Title": expectedTitle,
-            "Company": `{ "Title": "Contoso" }`
-          }
-        );
+        return {
+          "ID": actualId,
+          "Modified": "2018-03-15T10:43:10Z",
+          "Title": expectedTitle,
+          "Company": `{ "Title": "Contoso" }`
+        };
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -248,7 +290,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       webUrl: webUrl,
       id: expectedId,
@@ -265,7 +306,6 @@ describe(commands.LISTITEM_GET, () => {
     command.allowUnknownOptions();
 
     const options: any = {
-      debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       webUrl: webUrl,
       id: expectedId,
@@ -298,7 +338,6 @@ describe(commands.LISTITEM_GET, () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     const options: any = {
-      debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       webUrl: webUrl,
       id: expectedId,

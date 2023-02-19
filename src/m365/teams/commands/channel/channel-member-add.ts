@@ -7,6 +7,7 @@ import { validation } from '../../../../utils/validation';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -102,9 +103,9 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['teamId', 'teamName'],
-      ['channelId', 'channelName'],
-      ['userId', 'userDisplayName']
+      { options: ['teamId', 'teamName'] },
+      { options: ['channelId', 'channelName'] },
+      { options: ['userId', 'userDisplayName'] }
     );
   }
 
@@ -113,7 +114,7 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
       const teamId: string = await this.getTeamId(args);
       const channelId: string = await this.getChannelId(teamId, args);
       const userIds: string[] = await this.getUserId(args);
-      const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}/members`;
+      const endpoint: string = `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels/${formatting.encodeQueryParameter(channelId)}/members`;
       const roles: string[] = args.options.owner ? ["owner"] : [];
       const tasks: Promise<void>[] = [];
 
@@ -122,7 +123,7 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
       }
 
       await Promise.all(tasks);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -168,7 +169,7 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     }
 
     const channelRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.channelName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -209,7 +210,7 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
 
   private getSingleUser(userDisplayName: string): Promise<string> {
     const userRequestOptions: any = {
-      url: `${this.resource}/v1.0/users?$filter=displayName eq '${encodeURIComponent(userDisplayName as string)}'`,
+      url: `${this.resource}/v1.0/users?$filter=displayName eq '${formatting.encodeQueryParameter(userDisplayName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

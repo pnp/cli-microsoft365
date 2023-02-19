@@ -1,10 +1,9 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { CustomAction } from './customaction';
 
 interface CommandArgs {
   options: Options;
@@ -86,13 +85,7 @@ class SpoCustomActionListCommand extends SpoCommand {
         logger.logToStderr('');
       }
 
-      let customActions: CustomAction[];
-      if (scope && scope.toLowerCase() !== "all") {
-        customActions = await this.getCustomActions(args.options);
-      }
-      else {
-        customActions = await this.searchAllScopes(args.options);
-      }
+      const customActions = await spo.getCustomActions(args.options.webUrl, args.options.scope);
 
       if (customActions.length === 0) {
         if (this.verbose) {
@@ -110,53 +103,6 @@ class SpoCustomActionListCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedPromise(err);
     }
-  }
-
-  private getCustomActions(options: Options): Promise<CustomAction[]> {
-    const requestOptions: any = {
-      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    return new Promise<CustomAction[]>((resolve: (list: CustomAction[]) => void, reject: (error: any) => void): void => {
-      request
-        .get<{ value: CustomAction[]; }>(requestOptions)
-        .then((response: { value: CustomAction[] }) => {
-          resolve(response.value);
-        })
-        .catch((error: any) => {
-          reject(error);
-        });
-    });
-  }
-
-  /**
-   * Two REST GET requests with `web` and `site` scope are sent.
-   * The results are combined in one array.
-   */
-  private searchAllScopes(options: Options): Promise<CustomAction[]> {
-    return new Promise<CustomAction[]>((resolve: (list: CustomAction[]) => void, reject: (error: any) => void): void => {
-      options.scope = "Web";
-      let webCustomActions: CustomAction[] = [];
-
-      this
-        .getCustomActions(options)
-        .then((customActions: CustomAction[]): Promise<CustomAction[]> => {
-          webCustomActions = customActions;
-
-          options.scope = "Site";
-
-          return this.getCustomActions(options);
-        })
-        .then((siteCustomActions: CustomAction[]): void => {
-          resolve(siteCustomActions.concat(webCustomActions));
-        }, (err: any): void => {
-          reject(err);
-        });
-    });
   }
 
   private humanizeScope(scope: number): string {

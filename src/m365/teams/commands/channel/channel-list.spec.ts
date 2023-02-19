@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.CHANNEL_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.CHANNEL_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
   });
@@ -158,7 +158,6 @@ describe(commands.CHANNEL_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000'
       }
     });
@@ -244,7 +243,6 @@ describe(commands.CHANNEL_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
         type: 'private'
       }
@@ -366,7 +364,6 @@ describe(commands.CHANNEL_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         teamName: 'Team Name'
       }
     });
@@ -451,7 +448,6 @@ describe(commands.CHANNEL_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000'
       }
@@ -493,20 +489,8 @@ describe(commands.CHANNEL_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         teamId: '00000000-0000-0000-0000-000000000000'
       }
     } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

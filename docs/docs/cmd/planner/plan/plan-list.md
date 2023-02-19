@@ -11,12 +11,20 @@ m365 planner plan list [options]
 ## Options
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` but not both.
+: ID of the Group that owns the plan. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` but not both.
+: Name of the Group that owns the plan. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId`.
+
+`--rosterId [rosterId]`
+: ID of the Planner Roster. Specify either `ownerGroupId`, `ownerGroupName` or `rosterId`.
 
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+!!! attention
+When using rosterId, the command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
 ## Examples
 
@@ -30,6 +38,12 @@ Returns a list of Microsoft Planner plans for Group _My Planner Group_
 
 ```sh
 m365 planner plan list --ownerGroupName "My Planner Group"
+```
+
+Returns a list of Microsoft Planner plans for Roster _FeMZFDoK8k2oWmuGE-XFHZcAEwtn_
+
+```sh
+m365 planner plan list --rosterId "FeMZFDoK8k2oWmuGE-XFHZcAEwtn"
 ```
 
 ## Response
@@ -75,4 +89,23 @@ m365 planner plan list --ownerGroupName "My Planner Group"
     ```csv
     id,title,createdDateTime,owner
     xqQg5FS2LkCp935s-FIFm2QAFkHM,My Planner Plan,2015-03-30T18:36:49.2407981Z,ebf3b108-5234-4e22-b93d-656d7dae5874
+    ```
+
+=== "Markdown"
+
+    ```md
+    # planner plan list --ownerGroupId "ebf3b108-5234-4e22-b93d-656d7dae5874"
+
+    Date: 27/12/2022
+
+    ## My Planner Plan (xqQg5FS2LkCp935s-FIFm2QAFkHM)
+
+    Property | Value
+    ---------|-------
+    createdDateTime | 2021-12-12T14:00:50.4522129Z
+    owner | ebf3b108-5234-4e22-b93d-656d7dae5874
+    title | My Planner Plan
+    id | xqQg5FS2LkCp935s-FIFm2QAFkHM
+    createdBy | {"user":{"displayName":null,"id":"dd8b99a7-77c6-4238-a609-396d27844921"},"application":{"displayName":null,"id":"09abbdfd-ed23-44ee-a2d9-a627aa1c90f3"}}
+    container | {"containerId":"ebf3b108-5234-4e22-b93d-656d7dae5874","type":"group","url":"https://graph.microsoft.com/v1.0/groups/ebf3b108-5234-4e22-b93d-656d7dae5874"}
     ```

@@ -1,0 +1,50 @@
+[
+  {
+    "name": "pnp-list-tenant-wide-extensions",
+    "source": "pnp",
+    "title": "CLI - List all tenant-wide extensions",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-tenant-wide-extensions",
+    "creationDateTime": "2020-04-12",
+    "updateDateTime": "2020-04-12",
+    "shortDescription": "This script lists all tenant-wide extensions deployed in the tenant.",
+    "longDescription": [
+      "The following script lists all tenant-wide extensions deployed in the tenant. The sample returns the Id, Title, Extension Location and Extension Disabled status of each extension."
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "customizations",
+      "reports"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/list-tenant-wide-extensions/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "ktskumar",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/34408892?v=4",
+        "name": "Shantha Kumar T"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

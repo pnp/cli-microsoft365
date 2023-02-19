@@ -18,11 +18,6 @@ m365 spo site hubsite disconnect [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Remarks
-
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
-
 ## Examples
 
 Disconnect a specific site collection from its hub site. Will prompt for confirmation before disconnecting from the hub site.

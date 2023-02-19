@@ -10,6 +10,8 @@ describe('utils/md', () => {
   let mdMixedLineEndings: string;
   let loginHelp: string;
   let loginHelpPlain: string;
+  let plannerPlanAddHelp: string;
+  let plannerPlanAddHelpPlain: string;
 
   before(() => {
     cliCompletionClinkUpdateHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8');
@@ -17,6 +19,9 @@ describe('utils/md', () => {
     mdMixedLineEndings = '\n```sh\nnix\n```\n\r\n```sh\r\nWindows\r\n```\r\n';
     loginHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'login.md'), 'utf8');
     loginHelpPlain = md.md2plain(loginHelp, path.join(__dirname, '..', '..', 'docs'));
+    plannerPlanAddHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'planner', 'plan', 'plan-add.md'), 'utf8');
+    plannerPlanAddHelpPlain = md.md2plain(plannerPlanAddHelp, path.join(__dirname, '..', '..', 'docs'));
+
   });
 
   it('converts title to uppercase', () => {
@@ -76,5 +81,52 @@ describe('utils/md', () => {
 
   it('includes content', () => {
     assert(cliCompletionClinkUpdateHelpPlain.includes('--verbose'));
+  });
+
+  it('converts content tabs with code blocks', () => {
+    assert(plannerPlanAddHelpPlain.includes(`  JSON${EOL}${EOL}  {`), `Doesn't include upper-case JSON`);
+    assert(!plannerPlanAddHelpPlain.includes(`=== "JSON"`), 'Includes the original tab definition');
+    assert(!plannerPlanAddHelpPlain.includes(`\` json`), 'Includes language escape code');
+  });
+
+  it('escapes underscores in an md string', () => {
+    const src = 'This is _italic_';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is \\_italic\\_');
+  });
+
+  it('escapes asterisks in an md string', () => {
+    const src = 'This is **bold**';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is \\*\\*bold\\*\\*');
+  });
+
+  it('escapes backticks in an md string', () => {
+    const src = 'This is `code`';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is \\`code\\`');
+  });
+
+  it('escapes tilde in an md string', () => {
+    const src = 'This is ~strikethrough~';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is \\~strikethrough\\~');
+  });
+
+  it('escapes pipe in an md string', () => {
+    const src = 'This is | pipe';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is \\| pipe');
+  });
+
+  it('escapes new line in an md string', () => {
+    const src = 'This is\nnew\nline';
+    const actual = md.escapeMd(src);
+    assert.strictEqual(actual, 'This is<br>new<br>line');
+  });
+
+  it(`doesn't fail escaping special md characters if the specified arg is undefined`, () => {
+    const actual = md.escapeMd(undefined);
+    assert.strictEqual(actual, undefined);
   });
 });

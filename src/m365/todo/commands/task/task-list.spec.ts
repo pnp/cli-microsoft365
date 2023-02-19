@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.TASK_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.TASK_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -95,8 +95,8 @@ describe(commands.TASK_LIST, () => {
       }
       return Promise.reject('The specified task list does not exist');
     });
-    
-    await assert.rejects(command.action(logger, { options: { debug: false, listName: 'Tasks List' } } as any), new CommandError('The specified task list does not exist'));
+
+    await assert.rejects(command.action(logger, { options: { listName: 'Tasks List' } } as any), new CommandError('The specified task list does not exist'));
   });
 
   it('passes validation if only listId is passed', async () => {
@@ -157,7 +157,6 @@ describe(commands.TASK_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         output: 'json',
         listId: "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA=="
       }
@@ -239,8 +238,8 @@ describe(commands.TASK_LIST, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
-        listName: 'Tasks List'
+        listName: 'Tasks List',
+        output: 'text'
       }
     });
     const actual = JSON.stringify(log[log.length - 1]);
@@ -261,16 +260,5 @@ describe(commands.TASK_LIST, () => {
       }
     ]);
     assert.strictEqual(actual, expected);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

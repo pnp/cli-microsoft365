@@ -24,34 +24,42 @@ m365 spo propertybag set [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+SharePoint Online supports setting property bag values only in classic sites. On modern sites you will get a _Site has NoScript enabled, and setting property bag values is not supported_ error.
+
 ## Examples
 
-Sets the value of the _key1_ property in the property bag of site _https://contoso.sharepoint.com/sites/test_
+Sets the value of the property in the property bag of the given site
 
 ```sh
 m365 spo propertybag set --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1
 ```
 
-Sets the value of the _key1_ property in the property bag of the root folder of site _https://contoso.sharepoint.com/sites/test_
+Sets the value of the property in the property bag of the root folder of the given site
 
 ```sh
 m365 spo propertybag set --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /
 ```
 
-Sets the value of the _key1_ property in the property bag of a document library located in site _https://contoso.sharepoint.com/sites/test_
+Sets the value of the property in the property bag of a document library located in the given site
 
 ```sh
 m365 spo propertybag set --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents'
 ```
 
-Sets the value of the _key1_ property in the property bag of a folder in a document library located in site _https://contoso.sharepoint.com/sites/test_
+Sets the value of the property in the property bag of a folder in a document library located in the given site
 
 ```sh
 m365 spo propertybag set --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents/MyFolder'
 ```
 
-Sets the value of the _key1_ property in the property bag of a list in site _https://contoso.sharepoint.com/sites/test_
+Sets the value of the property in the property bag of a list in the given site
 
 ```sh
 m365 spo propertybag set --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /Lists/MyList
 ```
+
+## Response
+
+The command won't return a response on success.

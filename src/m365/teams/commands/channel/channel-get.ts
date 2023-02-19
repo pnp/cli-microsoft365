@@ -7,6 +7,7 @@ import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -59,13 +60,13 @@ class TeamsChannelGetCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --teamId [teamId]'
+        option: '--teamId [teamId]'
       },
       {
         option: '--teamName [teamName]'
       },
       {
-        option: '-c, --id [id]'
+        option: '-i, --id [id]'
       },
       {
         option: '--name [name]'
@@ -94,8 +95,8 @@ class TeamsChannelGetCommand extends GraphCommand {
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['teamId', 'teamName'],
-      ['id', 'name', 'primary']
+      { options: ['teamId', 'teamName'] },
+      { options: ['id', 'name', 'primary'] }
     );
   }
 
@@ -125,7 +126,7 @@ class TeamsChannelGetCommand extends GraphCommand {
     }
 
     const channelRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.name as string)}'`,
+      url: `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels?$filter=displayName eq '${formatting.encodeQueryParameter(args.options.name as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -151,10 +152,10 @@ class TeamsChannelGetCommand extends GraphCommand {
       const channelId: string = await this.getChannelId(args);
       let url: string = '';
       if (args.options.primary) {
-        url = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/primaryChannel`;
+        url = `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/primaryChannel`;
       }
       else {
-        url = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(channelId)}`;
+        url = `${this.resource}/v1.0/teams/${formatting.encodeQueryParameter(this.teamId)}/channels/${formatting.encodeQueryParameter(channelId)}`;
       }
 
       const requestOptions: any = {
@@ -167,7 +168,7 @@ class TeamsChannelGetCommand extends GraphCommand {
 
       const res: Channel = await request.get<Channel>(requestOptions);
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

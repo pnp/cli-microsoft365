@@ -1,7 +1,7 @@
 import { Group } from '@microsoft/microsoft-graph-types';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.O365GROUP_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.O365GROUP_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -99,7 +99,7 @@ describe(commands.O365GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,
@@ -227,7 +227,7 @@ describe(commands.O365GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
+    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,
@@ -363,7 +363,7 @@ describe(commands.O365GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
+    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "deletedDateTime": null,
@@ -407,17 +407,6 @@ describe(commands.O365GROUP_GET, () => {
   it('passes validation if the id is a valid GUID', async () => {
     const actual = await command.validate({ options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying id', () => {

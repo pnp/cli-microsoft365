@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -146,7 +146,7 @@ describe(commands.LISTITEM_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -183,7 +183,7 @@ describe(commands.LISTITEM_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       spo.getRequestDigest
     ]);
@@ -196,17 +196,6 @@ describe(commands.LISTITEM_SET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 
   it('supports specifying URL', () => {
@@ -262,7 +251,6 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
@@ -316,7 +304,6 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-y',
@@ -350,7 +337,6 @@ describe(commands.LISTITEM_SET, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     const options: any = {
-      debug: false,
       listTitle: 'Demo List',
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-y',
@@ -424,7 +410,6 @@ describe(commands.LISTITEM_SET, () => {
     actualId = 0;
 
     const options: any = {
-      debug: false,
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
       id: 147,
       webUrl: 'https://returnerror.com/sites/project-y',

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -28,7 +28,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -59,7 +59,7 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -71,11 +71,6 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['fileId', 'fileUrl']]);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
@@ -95,21 +90,6 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
 
   it('fails validation if the roleDefinitionId option is not a valid number', async () => {
     const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, groupName: 'Group name A', roleDefinitionId: 'NaN' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if no principalId, upn or groupname is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, roleDefinitionId: 10 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the principalId, groupname and upn option is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 1, groupName: 'Group name A', upn: 'user@devtenant.com', roleDefinitionName: 'Read' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the roleDefinitionId and roleDefinitionName is filled in', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, fileId: fileId, principalId: 1, roleDefinitionId: 10, roleDefinitionName: 'Read' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -317,16 +297,5 @@ describe(commands.FILE_ROLEASSIGNMENT_ADD, () => {
         roleDefinitionId: 1073741827
       }
     }), new CommandError('no group found'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
   });
 });

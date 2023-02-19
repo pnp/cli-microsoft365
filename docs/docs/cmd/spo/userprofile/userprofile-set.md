@@ -38,3 +38,7 @@ Updates the multi-value _SPS-Skills_ property
 ```sh
 m365 spo userprofile set --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'SPS-Skills' --propertyValue 'CSS, HTML'
 ```
+
+## Response
+
+The command won't return a response on success.

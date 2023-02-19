@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -77,7 +77,6 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listId: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
@@ -97,7 +96,6 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
@@ -226,7 +224,6 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
@@ -261,7 +258,6 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     await command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
@@ -286,7 +282,6 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',

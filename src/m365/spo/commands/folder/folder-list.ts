@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
+import { odata } from '../../../../utils/odata';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -14,6 +15,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   parentFolderUrl: string;
+  recursive?: boolean;
 }
 
 class SpoFolderListCommand extends SpoCommand {
@@ -31,11 +33,20 @@ class SpoFolderListCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
-  
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        recursive: !!args.options.recursive
+      });
+    });
+  }
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -43,10 +54,13 @@ class SpoFolderListCommand extends SpoCommand {
       },
       {
         option: '-p, --parentFolderUrl <parentFolderUrl>'
+      },
+      {
+        option: '--recursive [recursive]'
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
@@ -55,26 +69,33 @@ class SpoFolderListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl}...`);
+      logger.logToStderr(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl} ${args.options.recursive ? '(recursive)' : ''}...`);
     }
 
-    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
-    const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/folders`;
-    const requestOptions: any = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
     try {
-      const resp = await request.get<{ value: FolderProperties[] }>(requestOptions);
-      logger.log(resp.value);
+      const resp = await this.getFolderList(args.options.webUrl, args.options.parentFolderUrl, args.options.recursive);
+      logger.log(resp);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async getFolderList(webUrl: string, parentFolderUrl: string, recursive?: boolean, folders: FolderProperties[] = []): Promise<FolderProperties[]> {
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, parentFolderUrl);
+
+
+    const resp = await odata.getAllItems<FolderProperties>(`${webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(serverRelativeUrl)}')/folders`);
+    if (resp.length > 0) {
+      for (const folder of resp) {
+        folders.push(folder);
+        if (recursive) {
+          await this.getFolderList(webUrl, folder.ServerRelativeUrl, recursive, folders);
+        }
+      }
+    }
+
+    return folders;
   }
 }
 

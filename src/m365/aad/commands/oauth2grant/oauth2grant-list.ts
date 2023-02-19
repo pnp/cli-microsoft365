@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -28,11 +29,11 @@ class AadOAuth2GrantListCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -40,14 +41,14 @@ class AadOAuth2GrantListCommand extends GraphCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.spObjectId)) {
           return `${args.options.spObjectId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -60,7 +61,7 @@ class AadOAuth2GrantListCommand extends GraphCommand {
 
     try {
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/oauth2PermissionGrants?$filter=clientId eq '${encodeURIComponent(args.options.spObjectId)}'`,
+        url: `${this.resource}/v1.0/oauth2PermissionGrants?$filter=clientId eq '${formatting.encodeQueryParameter(args.options.spObjectId)}'`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },

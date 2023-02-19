@@ -38,6 +38,10 @@ Removes a tab from the specified channel without prompting for confirmation
 m365 teams tab remove --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --id 06805b9e-77e3-4b93-ac81-525eb87513b8 --confirm
 ```
 
+## Response
+
+The command won't return a response on success.
+
 ## Additional information
 
 - Delete tab from channel: [https://docs.microsoft.com/en-us/graph/api/teamstab-delete?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/teamstab-delete?view=graph-rest-1.0)

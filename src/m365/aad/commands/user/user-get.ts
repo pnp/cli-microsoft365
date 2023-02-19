@@ -2,6 +2,7 @@ import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -40,6 +41,7 @@ class AadUserGetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
         userName: typeof args.options.userName !== 'undefined',
+        email: typeof args.options.email !== 'undefined',
         properties: args.options.properties
       });
     });
@@ -76,24 +78,24 @@ class AadUserGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'userName', 'email']);
+    this.optionSets.push({ options: ['id', 'userName', 'email'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const properties: string = args.options.properties ?
-      `&$select=${args.options.properties.split(',').map(p => encodeURIComponent(p.trim())).join(',')}` :
+      `&$select=${args.options.properties.split(',').map(p => formatting.encodeQueryParameter(p.trim())).join(',')}` :
       '';
 
     let requestUrl: string = `${this.resource}/v1.0/users`;
 
     if (args.options.id) {
-      requestUrl += `?$filter=id eq '${encodeURIComponent(args.options.id as string)}'${properties}`;
+      requestUrl += `?$filter=id eq '${formatting.encodeQueryParameter(args.options.id as string)}'${properties}`;
     }
     else if (args.options.userName) {
-      requestUrl += `?$filter=userPrincipalName eq '${encodeURIComponent(args.options.userName as string)}'${properties}`;
+      requestUrl += `?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(args.options.userName as string)}'${properties}`;
     }
     else if (args.options.email) {
-      requestUrl += `?$filter=mail eq '${encodeURIComponent(args.options.email as string)}'${properties}`;
+      requestUrl += `?$filter=mail eq '${formatting.encodeQueryParameter(args.options.email as string)}'${properties}`;
     }
 
     const requestOptions: any = {

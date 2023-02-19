@@ -1,5 +1,5 @@
 import sinon = require("sinon");
-import appInsights from "../../../appInsights";
+import { telemetry } from "../../../telemetry";
 import auth from "../../../Auth";
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from "../../../Command";
@@ -50,7 +50,7 @@ describe(commands.LIST, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.ensureFormDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -106,7 +106,7 @@ describe(commands.LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([
       {
         "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "2d63d39f-3016-0000-a532-30514e76ae73|908bed80-a04a-4433-b4a0-883d9847d110:d23a1d52-e19a-4bc5-be17-463a24e17fa2\nSiteProperties\nhttps%3a%2f%2fdev365-my.sharepoint.com%2fpersonal%2flidiah_dev365_onmicrosoft_com", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AnonymousLinkExpirationInDays": 0, "AuthContextStrength": null, "AverageResourceUsage": 0, "BlockDownloadLinksFileType": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DefaultLinkPermission": 0, "DefaultLinkToExistingAccess": false, "DefaultLinkToExistingAccessReset": false, "DefaultSharingLinkType": 0, "DenyAddAndCustomizePages": 2, "Description": null, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "ExternalUserExpirationInDays": 0, "GroupId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "GroupOwnerLoginName": null, "HasHolds": false, "HubSiteId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "IBMode": null, "IBSegments": [], "IBSegmentsToAdd": null, "IBSegmentsToRemove": null, "IsGroupOwnerSiteAdmin": false, "IsHubSite": false, "LastContentModifiedDate": "\/Date(2021,3,1,16,45,15,517)\/", "Lcid": 1033, "LimitedAccessFileType": 0, "LockIssue": null, "LockState": "Unlock", "OverrideBlockUserInfoVisibility": 0, "OverrideTenantAnonymousLinkExpirationPolicy": false, "OverrideTenantExternalUserExpirationPolicy": false, "Owner": "lidiah@dev365.onmicrosoft.com", "OwnerEmail": null, "OwnerLoginName": null, "OwnerName": null, "PWAEnabled": 1, "RelatedGroupId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SensitivityLabel": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "SensitivityLabel2": null, "SetOwnerWithoutUpdatingSecondaryAdmin": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 2, "SocialBarOnSitePagesDisabled": false, "Status": "Active", "StorageMaximumLevel": 1048576, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 943718, "Template": "SPSPERS#10", "TimeZoneId": 13, "Title": "Lidia Holloway", "Url": "https:\u002f\u002fdev365-my.sharepoint.com\u002fpersonal\u002flidiah_dev365_onmicrosoft_com", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0
@@ -214,7 +214,7 @@ describe(commands.LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith([
       {
         "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "2d63d39f-3016-0000-a532-30514e76ae73|908bed80-a04a-4433-b4a0-883d9847d110:d23a1d52-e19a-4bc5-be17-463a24e17fa2\nSiteProperties\nhttps%3a%2f%2fdev365-my.sharepoint.com%2fpersonal%2flidiah_dev365_onmicrosoft_com", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AnonymousLinkExpirationInDays": 0, "AuthContextStrength": null, "AverageResourceUsage": 0, "BlockDownloadLinksFileType": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DefaultLinkPermission": 0, "DefaultLinkToExistingAccess": false, "DefaultLinkToExistingAccessReset": false, "DefaultSharingLinkType": 0, "DenyAddAndCustomizePages": 2, "Description": null, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "ExternalUserExpirationInDays": 0, "GroupId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "GroupOwnerLoginName": null, "HasHolds": false, "HubSiteId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "IBMode": null, "IBSegments": [], "IBSegmentsToAdd": null, "IBSegmentsToRemove": null, "IsGroupOwnerSiteAdmin": false, "IsHubSite": false, "LastContentModifiedDate": "\/Date(2021,3,1,16,45,15,517)\/", "Lcid": 1033, "LimitedAccessFileType": 0, "LockIssue": null, "LockState": "Unlock", "OverrideBlockUserInfoVisibility": 0, "OverrideTenantAnonymousLinkExpirationPolicy": false, "OverrideTenantExternalUserExpirationPolicy": false, "Owner": "lidiah@dev365.onmicrosoft.com", "OwnerEmail": null, "OwnerLoginName": null, "OwnerName": null, "PWAEnabled": 1, "RelatedGroupId": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SensitivityLabel": "\/Guid(00000000-0000-0000-0000-000000000000)\/", "SensitivityLabel2": null, "SetOwnerWithoutUpdatingSecondaryAdmin": false, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 2, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 2, "SocialBarOnSitePagesDisabled": false, "Status": "Active", "StorageMaximumLevel": 1048576, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 943718, "Template": "SPSPERS#10", "TimeZoneId": 13, "Title": "Lidia Holloway", "Url": "https:\u002f\u002fdev365-my.sharepoint.com\u002fpersonal\u002flidiah_dev365_onmicrosoft_com", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0

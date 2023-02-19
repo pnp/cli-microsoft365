@@ -17,10 +17,10 @@ m365 spo listitem isrecord [options]
 : The ID of the list item to check if it is a record
 
 `-l, --listId [listId]`
-: ID of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+: ID of the list where the item should be checked. Specify either `listTitle`, `listId` or `listUrl`
 
 `-t, --listTitle [listTitle]`
-: Title of the list where the item should be added. Specify either `listTitle`, `listId` or `listUrl`
+: Title of the list where the item should be checked. Specify either `listTitle`, `listId` or `listUrl`
 
 `--listUrl [listUrl]`
 : Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`
@@ -47,3 +47,22 @@ Check whether a document with a specific id in a list retrieved by server-relati
 m365 spo listitem isrecord --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/documents --id 1
 ```
 
+## Response
+
+=== "JSON"
+
+    ```json
+    false
+    ```
+
+=== "Text"
+
+    ```text
+    false
+    ```
+
+=== "CSV"
+
+    ```csv
+    false
+    ```

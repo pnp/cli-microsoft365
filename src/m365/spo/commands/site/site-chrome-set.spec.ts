@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,7 +19,7 @@ describe(commands.SITE_CHROME_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -49,7 +49,7 @@ describe(commands.SITE_CHROME_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -72,7 +72,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } });
   });
 
   it(`sends a request without any data when no options were specified`, async () => {
@@ -101,7 +101,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: "true" } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: true } });
     assert.strictEqual(data.megaMenuEnabled, false);
   });
 
@@ -116,7 +116,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', disableFooter: "true" } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', disableFooter: true } });
     assert.strictEqual(data.footerEnabled, false);
   });
 
@@ -131,7 +131,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: "true" } });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: true } });
     assert.strictEqual(data.hideTitleInHeader, true);
   });
 
@@ -159,18 +159,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', footerEmphasis: 'Light' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales', footerEmphasis: 'Light' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying URL', () => {

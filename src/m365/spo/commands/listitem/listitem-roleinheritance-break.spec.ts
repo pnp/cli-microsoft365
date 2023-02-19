@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -57,7 +57,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -71,17 +71,6 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('supports specifying URL', () => {
     const options = command.options;
     let containsTypeOption = false;
@@ -91,11 +80,6 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       }
     });
     assert(containsTypeOption);
-  });
-
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['listId', 'listTitle', 'listUrl']]);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
@@ -309,7 +293,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
     assert(promptIssued);
   });
 
-  it('break role inheritance of list item with id 1 on list by list url', async () => {
+  it('break role inheritance of list item with id 1 on list by list url without confirmation prompt', async () => {
     const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
     const listUrl = '/sites/project-x/lists/TestList';
     const listServerRelativeUrl: string = urlUtil.getServerRelativePath(webUrl, listUrl);

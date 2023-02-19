@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -17,7 +17,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
@@ -47,7 +47,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -381,7 +381,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.calledWith(env.value));
   });
 
@@ -541,7 +541,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: {asAdmin:true, debug: false } });
+    await command.action(logger, { options: { asAdmin: true } });
     assert(loggerLogSpy.calledWith(env.value));
   });
   it('correctly handles no environments', async () => {
@@ -559,7 +559,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } });
+    await command.action(logger, { options: {} });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -577,18 +577,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+    await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

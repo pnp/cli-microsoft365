@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -15,7 +15,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     auth.service.connected = true;
@@ -47,7 +47,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       auth.restoreAuth
     ]);
@@ -69,7 +69,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
       accessToken: 'ABC'
     };
 
-    await command.action(logger, { options: { debug: false, resource: 'https://graph.microsoft.com' } });
+    await command.action(logger, { options: { resource: 'https://graph.microsoft.com' } });
     assert(loggerLogSpy.calledWith('ABC'));
   });
 
@@ -82,14 +82,14 @@ describe(commands.ACCESSTOKEN_GET, () => {
       accessToken: 'ABC'
     };
 
-    await command.action(logger, { options: { debug: false, resource: 'sharepoint' } });
+    await command.action(logger, { options: { resource: 'sharepoint' } });
     assert(loggerLogSpy.calledWith('ABC'));
   });
 
   it('correctly handles error when retrieving access token', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'https://graph.microsoft.com' } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { resource: 'https://graph.microsoft.com' } } as any), new CommandError('An error has occurred'));
   });
 
   it('returns error when sharepoint specified as resource and SPO URL not available', async () => {
@@ -100,17 +100,6 @@ describe(commands.ACCESSTOKEN_GET, () => {
       accessToken: 'ABC'
     };
 
-    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'sharepoint' } } as any), new CommandError(`SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: { resource: 'sharepoint' } } as any), new CommandError(`SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`));
   });
 });

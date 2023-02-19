@@ -1,7 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { odata } from '../../../../utils/odata';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
@@ -50,35 +50,27 @@ class PpSolutionListCommand extends PowerPlatformCommand {
         option: '-e, --environment <environment>'
       },
       {
-        option: '-a, --asAdmin'
+        option: '--asAdmin'
       }
     );
   }
 
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving list of solutions for which the user is an admin...`);
     }
 
     try {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
+      const requestUrl = `${dynamicsApiUrl}/api/data/v9.0/solutions?$filter=isvisible eq true&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`;
+      const res = await odata.getAllItems<Solution>(requestUrl);
 
-      const requestOptions: AxiosRequestConfig = {
-        url: `${dynamicsApiUrl}/api/data/v9.0/solutions?$filter=isvisible eq true&$expand=publisherid($select=friendlyname)&$select=solutionid,uniquename,version,publisherid,installedon,solutionpackageversion,friendlyname,versionnumber&api-version=9.1`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      const res = await request.get<{ value: Solution[] }>(requestOptions);
-
-      if (!args.options.output || args.options.output === 'json') {
-        logger.log(res.value);
+      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
+        logger.log(res);
       }
       else {
         //converted to text friendly output
-        logger.log(res.value.map(i => {
+        logger.log(res.map(i => {
           return {
             uniquename: i.uniquename,
             version: i.version,

@@ -1,12 +1,13 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -50,7 +51,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -94,7 +95,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       Cli.getInstance().config.all
     ]);
@@ -140,11 +141,6 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['url', 'alias']]);
-  });
-
   it('prompts before removal when confirm option not passed', async () => {
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
@@ -180,7 +176,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('correctly removes reference', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve({
           references: null
         });
@@ -190,7 +186,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -213,7 +209,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('correctly removes reference by alias with prompting', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details`) {
         return Promise.resolve({
           references: null
         });
@@ -223,7 +219,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -246,7 +242,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('fails validation when no references found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -269,7 +265,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('fails validation when reference does not contain alias', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -292,7 +288,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
 
   it('fails validation when multiple references found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter(validTaskId)}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {
@@ -317,17 +313,6 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -61,7 +61,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -92,7 +92,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -104,11 +104,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'displayName', 'mailNickname']]);
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
@@ -191,7 +186,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'Group Not Found.' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
+    await assert.rejects(command.action(logger, { options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any),
       new CommandError('Group Not Found.'));
   });
 
@@ -212,17 +207,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
     }), new CommandError(`The specified group '${validGroupMailNickname}' does not exist.`));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('throws error message when multiple groups were found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
@@ -240,17 +224,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
     }), new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`));
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
   it('supports specifying id', () => {
     const options = command.options;
     let containsOption = false;
@@ -260,15 +233,5 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
-    assert.strictEqual(actual, true);
   });
 });

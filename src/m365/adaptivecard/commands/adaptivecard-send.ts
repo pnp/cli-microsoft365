@@ -34,6 +34,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -78,10 +79,6 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.card && !args.options.title) {
-          return 'Specify either the title or the card to send';
-        }
-    
         if (args.options.card) {
           try {
             JSON.parse(args.options.card);
@@ -90,7 +87,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
             return `Error while parsing the card: ${e}`;
           }
         }
-    
+
         if (args.options.cardData) {
           try {
             JSON.parse(args.options.cardData);
@@ -99,9 +96,15 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
             return `Error while parsing card data: ${e}`;
           }
         }
-    
+
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['title', 'card'] }
     );
   }
 

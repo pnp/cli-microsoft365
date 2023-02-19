@@ -13,7 +13,7 @@ m365 spo list contenttype default set [options]
 `-u, --webUrl <webUrl>`
 : URL of the site where the list is located.
 
-`-i, --listId [listId]`
+`-l, --listId [listId]`
 : ID of the list. Specify either `listTitle`, `listId` or `listUrl`.
 
 `-t, --listTitle [listTitle]`
@@ -46,3 +46,7 @@ Set a content type with a specific id as default a list retrieved by server rela
 ```sh
 m365 spo list contenttype default set --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'sites/project-x/Documents' --contentTypeId 0x0120
 ```
+
+## Response
+
+The command won't return a response on success.

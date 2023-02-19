@@ -2,6 +2,7 @@ import { BookingBusiness } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -52,23 +53,23 @@ class BookingBusinessGetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-  	this.optionSets.push(['id', 'name']);
+    this.optionSets.push({ options: ['id', 'name'] });
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> { 
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const businessId = await this.getBusinessId(args.options);
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/solutions/bookingBusinesses/${encodeURIComponent(businessId)}`,
+        url: `${this.resource}/v1.0/solutions/bookingBusinesses/${formatting.encodeQueryParameter(businessId)}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
         responseType: 'json'
-      }; 
-  
+      };
+
       const business = await request.get<BookingBusiness>(requestOptions);
       logger.log(business);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -85,7 +86,7 @@ class BookingBusinessGetCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
-    }; 
+    };
 
     return request
       .get<{ value: BookingBusiness[] }>(requestOptions)

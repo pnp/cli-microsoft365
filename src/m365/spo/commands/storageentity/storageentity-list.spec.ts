@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -50,7 +50,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -116,7 +116,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
   });
 
   it('doesn\'t fail if tenant properties web property value is empty', async () => {
@@ -157,7 +157,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    await command.action(logger, { options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
   });
 
   it('doesn\'t fail if tenant properties web property value is empty JSON object (debug)', async () => {
@@ -198,19 +198,8 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    
-    await assert.rejects(command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any), new CommandError('Unexpected token a in JSON at position 0'));
-  });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
+    await assert.rejects(command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any), new CommandError('Unexpected token a in JSON at position 0'));
   });
 
   it('requires app catalog URL', () => {

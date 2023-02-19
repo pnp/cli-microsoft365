@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -75,7 +76,7 @@ class SpoUserGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'email', 'loginName']);
+    this.optionSets.push({ options: ['id', 'email', 'loginName'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -86,13 +87,13 @@ class SpoUserGetCommand extends SpoCommand {
     let requestUrl: string = '';
 
     if (args.options.id) {
-      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetById('${encodeURIComponent(args.options.id as string)}')`;
+      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetById('${formatting.encodeQueryParameter(args.options.id as string)}')`;
     }
     else if (args.options.email) {
-      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByEmail('${encodeURIComponent(args.options.email as string)}')`;
+      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(args.options.email as string)}')`;
     }
     else if (args.options.loginName) {
-      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByLoginName('${encodeURIComponent(args.options.loginName as string)}')`;
+      requestUrl = `${args.options.webUrl}/_api/web/siteusers/GetByLoginName('${formatting.encodeQueryParameter(args.options.loginName as string)}')`;
     }
 
     const requestOptions: any = {
@@ -107,7 +108,7 @@ class SpoUserGetCommand extends SpoCommand {
     try {
       const userInstance = await request.get(requestOptions);
       logger.log(userInstance);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

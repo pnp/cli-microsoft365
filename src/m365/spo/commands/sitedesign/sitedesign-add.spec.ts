@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -59,7 +59,7 @@ describe(commands.SITEDESIGN_ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -90,6 +90,7 @@ describe(commands.SITEDESIGN_ADD, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Contoso",
           "Version": 1,
@@ -100,13 +101,14 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
       "IsDefault": false,
       "PreviewImageAltText": null,
       "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
       "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
       "Title": "Contoso",
       "Version": 1,
@@ -130,6 +132,7 @@ describe(commands.SITEDESIGN_ADD, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Contoso",
           "Version": 1,
@@ -147,6 +150,7 @@ describe(commands.SITEDESIGN_ADD, () => {
       "IsDefault": false,
       "PreviewImageAltText": null,
       "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
       "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
       "Title": "Contoso",
       "Version": 1,
@@ -154,7 +158,7 @@ describe(commands.SITEDESIGN_ADD, () => {
     }));
   });
 
-  it('adds new team site site design wilt multiple site script IDs', async () => {
+  it('adds new team site site design with multiple site script IDs', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -170,6 +174,7 @@ describe(commands.SITEDESIGN_ADD, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24", "449c0c6d-5380-4df2-b84b-622e0ac8ec25"],
           "Title": "Contoso",
           "Version": 1,
@@ -180,7 +185,7 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25" } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25" } });
     assert(loggerLogSpy.calledOnce);
   });
 
@@ -200,6 +205,7 @@ describe(commands.SITEDESIGN_ADD, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Contoso",
           "Version": 1,
@@ -210,13 +216,14 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'CommunicationSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'CommunicationSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
       "IsDefault": false,
       "PreviewImageAltText": null,
       "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
       "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
       "Title": "Contoso",
       "Version": 1,
@@ -241,6 +248,7 @@ describe(commands.SITEDESIGN_ADD, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Contoso",
           "Version": 1,
@@ -251,13 +259,14 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site' } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site' } });
     assert(loggerLogSpy.calledWith({
       "Description": "Contoso team site",
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
       "IsDefault": false,
       "PreviewImageAltText": null,
       "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
       "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
       "Title": "Contoso",
       "Version": 1,
@@ -292,13 +301,56 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageUrl: 'https://contoso.com/assets/team-site-preview.png' } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageUrl: 'https://contoso.com/assets/team-site-preview.png' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
       "IsDefault": false,
       "PreviewImageAltText": null,
       "PreviewImageUrl": 'https://contoso.com/assets/team-site-preview.png',
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Contoso",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
+  });
+
+  it('adds new team site site design with ThumbnailUrl', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.CreateSiteDesign`) > -1 &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          info: {
+            Title: 'Contoso',
+            WebTemplate: '64',
+            SiteScriptIds: ['449c0c6d-5380-4df2-b84b-622e0ac8ec24'],
+            ThumbnailUrl: 'https://contoso.com/assets/team-site-thumbnail.png'
+          }
+        })) {
+        return Promise.resolve({
+          "Description": null,
+          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+          "IsDefault": false,
+          "PreviewImageAltText": null,
+          "PreviewImageUrl": null,
+          "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
+          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+          "Title": "Contoso",
+          "Version": 1,
+          "WebTemplate": 64
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", thumbnailUrl: 'https://contoso.com/assets/team-site-thumbnail.png' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
       "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
       "Title": "Contoso",
       "Version": 1,
@@ -323,6 +375,7 @@ describe(commands.SITEDESIGN_ADD, () => {
           "IsDefault": false,
           "PreviewImageAltText": 'Contoso team site preview',
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Contoso",
           "Version": 1,
@@ -333,13 +386,14 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageAltText: 'Contoso team site preview' } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageAltText: 'Contoso team site preview' } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
       "IsDefault": false,
       "PreviewImageAltText": 'Contoso team site preview',
       "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
       "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
       "Title": "Contoso",
       "Version": 1,
@@ -364,6 +418,7 @@ describe(commands.SITEDESIGN_ADD, () => {
           "IsDefault": true,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Contoso",
           "Version": 1,
@@ -374,13 +429,14 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", isDefault: true } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", isDefault: true } });
     assert(loggerLogSpy.calledWith({
       "Description": null,
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
       "IsDefault": true,
       "PreviewImageAltText": null,
       "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
       "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
       "Title": "Contoso",
       "Version": 1,
@@ -399,6 +455,7 @@ describe(commands.SITEDESIGN_ADD, () => {
             Description: 'Contoso team site',
             PreviewImageUrl: 'https://contoso.com/assets/team-site-preview.png',
             PreviewImageAltText: 'Contoso team site preview',
+            ThumbnailUrl: 'https://contoso.com/assets/team-site-thumbnail.png',
             IsDefault: true
           }
         })) {
@@ -409,6 +466,7 @@ describe(commands.SITEDESIGN_ADD, () => {
           "PreviewImageAltText": 'Contoso team site preview',
           "PreviewImageUrl": 'https://contoso.com/assets/team-site-preview.png',
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+          "ThumbnailUrl": 'https://contoso.com/assets/team-site-thumbnail.png',
           "Title": "Contoso",
           "Version": 1,
           "WebTemplate": 64
@@ -418,13 +476,14 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', previewImageAltText: 'Contoso team site preview', isDefault: true } });
+    await command.action(logger, { options: { title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', thumbnailUrl: 'https://contoso.com/assets/team-site-thumbnail.png', previewImageAltText: 'Contoso team site preview', isDefault: true } });
     assert(loggerLogSpy.calledWith({
       "Description": 'Contoso team site',
       "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
       "IsDefault": true,
-      "PreviewImageAltText": 'Contoso team site preview',
-      "PreviewImageUrl": 'https://contoso.com/assets/team-site-preview.png',
+      "PreviewImageAltText": "Contoso team site preview",
+      "PreviewImageUrl": "https://contoso.com/assets/team-site-preview.png",
+      "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
       "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
       "Title": "Contoso",
       "Version": 1,
@@ -437,22 +496,13 @@ describe(commands.SITEDESIGN_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      title: 'Contoso', 
-      webTemplate: 'TeamSite', 
-      siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
+    await assert.rejects(command.action(logger, {
+      options: {
+        title: 'Contoso',
+        webTemplate: 'TeamSite',
+        siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24'
       }
-    });
-    assert(containsOption);
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying title', () => {
@@ -504,6 +554,17 @@ describe(commands.SITEDESIGN_ADD, () => {
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--previewImageUrl') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying thumbnailUrl', () => {
+    const options = command.options;
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--thumbnailUrl') > -1) {
         containsOption = true;
       }
     });

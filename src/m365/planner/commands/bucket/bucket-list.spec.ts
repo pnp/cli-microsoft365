@@ -1,13 +1,13 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -129,9 +129,8 @@ describe(commands.BUCKET_LIST, () => {
   let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -143,7 +142,7 @@ describe(commands.BUCKET_LIST, () => {
 
   beforeEach(() => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
@@ -172,15 +171,14 @@ describe(commands.BUCKET_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      accessToken.isAppOnlyAccessToken
+      request.get
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -279,7 +277,6 @@ describe(commands.BUCKET_LIST, () => {
 
   it('correctly lists planner buckets with planId', async () => {
     const options: any = {
-      debug: false,
       planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
     };
 
@@ -289,7 +286,6 @@ describe(commands.BUCKET_LIST, () => {
 
   it('correctly lists planner buckets with planTitle and ownerGroupName', async () => {
     const options: any = {
-      debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
     };
@@ -300,7 +296,6 @@ describe(commands.BUCKET_LIST, () => {
 
   it('correctly lists planner buckets with planTitle and ownerGroupId', async () => {
     const options: any = {
-      debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
@@ -320,22 +315,10 @@ describe(commands.BUCKET_LIST, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        debug: false,
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
       }
     }), new CommandError(`The specified group 'foo' does not exist.`));
-  });
-
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
-      }
-    }), new CommandError('This command does not support application permissions.'));
   });
 
   it('correctly handles API OData error', async () => {
@@ -344,17 +327,6 @@ describe(commands.BUCKET_LIST, () => {
       return Promise.reject("An error has occurred.");
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError("An error has occurred."));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError("An error has occurred."));
   });
 });

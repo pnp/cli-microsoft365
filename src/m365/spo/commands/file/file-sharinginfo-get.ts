@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -46,7 +47,7 @@ interface FileSharingInformation {
   SharedWith: string;
 }
 
-class SpoFileSharinginfoGetCommand extends SpoCommand {
+class SpoFileSharingInfoGetCommand extends SpoCommand {
   public get name(): string {
     return commands.FILE_SHARINGINFO_GET;
   }
@@ -94,20 +95,20 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
+
         if (args.options.fileId) {
           if (!validation.isValidGuid(args.options.fileId)) {
             return `${args.options.fileId} is not a valid GUID`;
           }
         }
-    
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['fileId', 'fileUrl']);
+    this.optionSets.push({ options: ['fileId', 'fileUrl'] });
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -137,7 +138,7 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
       // typically, we don't do this, but in this case, we need to due to
       // the complexity of the retrieved object and the fact that we can't
       // use the generic way of simplifying the output
-      if (args.options.output === 'json') {
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(res);
       }
       else {
@@ -176,7 +177,7 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
       requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${escape(args.options.fileId as string)}')/?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
     }
     else {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${encodeURIComponent(args.options.fileUrl as string)}')?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativePath(decodedUrl='${formatting.encodeQueryParameter(args.options.fileUrl as string)}')?$select=ListItemAllFields/Id,ListItemAllFields/ParentList/Title&$expand=ListItemAllFields/ParentList`;
     }
 
     const requestOptions: any = {
@@ -195,4 +196,4 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFileSharinginfoGetCommand();
+module.exports = new SpoFileSharingInfoGetCommand();

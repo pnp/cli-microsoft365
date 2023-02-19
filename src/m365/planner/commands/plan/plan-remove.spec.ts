@@ -1,13 +1,13 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -53,7 +53,7 @@ describe(commands.PLAN_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -77,7 +77,6 @@ describe(commands.PLAN_REMOVE, () => {
       }
     };
     promptOptions = undefined;
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
       return { continue: false };
@@ -88,7 +87,6 @@ describe(commands.PLAN_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
-      accessToken.isAppOnlyAccessToken,
       Cli.prompt
     ]);
   });
@@ -96,7 +94,7 @@ describe(commands.PLAN_REMOVE, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -109,11 +107,6 @@ describe(commands.PLAN_REMOVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'title']]);
   });
 
   it('fails validation when id and ownerGroupId is specified', async () => {
@@ -187,7 +180,7 @@ describe(commands.PLAN_REMOVE, () => {
     if (promptOptions && promptOptions.type === 'confirm') {
       promptIssued = true;
     }
-    
+
     assert(promptIssued);
   });
 
@@ -199,17 +192,6 @@ describe(commands.PLAN_REMOVE, () => {
       }
     });
     assert(deleteSpy.notCalled);
-  });
-
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        id: validPlanId
-      }
-    }), new CommandError('This command does not support application permissions.'));
   });
 
   it('Correctly deletes plan by id', async () => {
@@ -238,7 +220,7 @@ describe(commands.PLAN_REMOVE, () => {
 
   it('Correctly deletes plan by title', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validOwnerGroupName)}'`) {
         return Promise.resolve(singleGroupsResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
@@ -305,16 +287,5 @@ describe(commands.PLAN_REMOVE, () => {
         confirm: true
       }
     }), new CommandError("An error has occurred"));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

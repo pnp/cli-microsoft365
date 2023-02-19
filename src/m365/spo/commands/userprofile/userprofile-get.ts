@@ -1,6 +1,8 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
@@ -55,21 +57,20 @@ class SpoUserProfileGetCommand extends SpoCommand {
       const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
       const userName: string = `i:0#.f|membership|${args.options.userName}`;
       const requestOptions: any = {
-        url: `${spoUrl}/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor(accountName=@v)?@v='${encodeURIComponent(`${userName}`)}'`,
+        url: `${spoUrl}/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor(accountName=@v)?@v='${formatting.encodeQueryParameter(`${userName}`)}'`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
       };
 
-      const res: { UserProfileProperties: { Key: string; Value: string }[]} = await request.get<{ UserProfileProperties: { Key: string; Value: string }[] }>(requestOptions);
-      if (!args.options.output ||
-        args.options.output === 'text') {
+      const res: { UserProfileProperties: { Key: string; Value: string }[] } = await request.get<{ UserProfileProperties: { Key: string; Value: string }[] }>(requestOptions);
+      if (!args.options.output || Cli.shouldTrimOutput(args.options.output)) {
         res.UserProfileProperties = JSON.stringify(res.UserProfileProperties) as any;
       }
 
       logger.log(res);
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

@@ -73,3 +73,62 @@ Add an item with a specific title to a list retrieved by server-relative URL in 
 ```sh
 m365 spo listitem add --contentType Item --listUrl /sites/project-x/Documents --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Item"
 ```
+
+Add an item with a specific Title and multi-choice value
+
+```sh
+m365 spo listitem add --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --MultiChoiceField "Choice 1;#Choice 2;#Choice 3"
+```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    {
+      "FileSystemObjectType": 0,
+      "Id": 234,
+      "ServerRedirectedEmbedUri": null,
+      "ServerRedirectedEmbedUrl": "",
+      "ID": 234,
+      "ContentTypeId": "0x01003CDBEB7138618C47A98D56499135D6EE0004C0F5794DEBCC4BAC981AC4AE1BD803",
+      "Title": "Test",
+      "Modified": "2022-11-16T20:55:45Z",
+      "Created": "2022-11-16T20:55:45Z",
+      "AuthorId": 10,
+      "EditorId": 10,
+      "OData__UIVersionString": "1.0",
+      "Attachments": false,
+      "GUID": "352e3855-56fa-4b68-b6be-4644d6adf204",
+      "ComplianceAssetId": null,
+      "OData__vti_ItemDeclaredRecord": null,
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    Attachments                  : false
+    AuthorId                     : 10
+    ComplianceAssetId            : null
+    ContentTypeId                : 0x01003CDBEB7138618C47A98D56499135D6EE0004C0F5794DEBCC4BAC981AC4AE1BD803
+    Created                      : 2022-11-16T20:56:31Z
+    EditorId                     : 10
+    FileSystemObjectType         : 0
+    GUID                         : cac57513-e870-4e7a-9f23-f4ea10e14f4e
+    ID                           : 236
+    Id                           : 236
+    Modified                     : 2022-11-16T20:56:31Z
+    OData__UIVersionString       : 1.0
+    OData__vti_ItemDeclaredRecord: null
+    ServerRedirectedEmbedUri     : null
+    ServerRedirectedEmbedUrl     :
+    Title                        : Test
+    ```
+
+=== "CSV"
+
+    ```csv
+    FileSystemObjectType,Id,ServerRedirectedEmbedUri,ServerRedirectedEmbedUrl,ID,ContentTypeId,Title,Modified,Created,AuthorId,EditorId,OData__UIVersionString,Attachments,GUID,ComplianceAssetId,OData__vti_ItemDeclaredRecord
+    0,235,,,235,0x01003CDBEB7138618C47A98D56499135D6EE0004C0F5794DEBCC4BAC981AC4AE1BD803,Test,2022-11-16T20:56:09Z,2022-11-16T20:56:09Z,10,10,1.0,,7aa8f3bd-a0a2-4974-81c8-2ac7ddc8e2d8,,
+    ```

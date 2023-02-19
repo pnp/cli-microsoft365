@@ -175,6 +175,12 @@ const contributors = [{
     twitter: 'casvaniersel'
   },
   {
+    name: 'Chinu Anand',
+    company: '',
+    github: 'chinu-anand',
+    twitter: 'anand_chinu'
+  },
+  {
     name: 'Christian Bewernitz',
     company: '',
     github: 'karfau',
@@ -191,6 +197,12 @@ const contributors = [{
     company: '',
     github: 'cyrilckurian',
     twitter: 'chirackalcyril'
+  },
+  {
+    name: 'Dan Greuel',
+    company: '',
+    github: 'dgreuel',
+    twitter: ''
   },
   {
     name: 'Daniaal Nadir',
@@ -275,6 +287,12 @@ const contributors = [{
     company: 'Flybondi',
     github: 'gaston-flores',
     twitter: ''
+  },
+  {
+    name: 'Geoffrey Hunt',
+    company: '',
+    github: 'runningdeveloper',
+    twitter: 'geoff4l'
   },
   {
     name: 'Hugo Bernier',
@@ -430,7 +448,7 @@ const contributors = [{
     name: 'Nico De Cleyre',
     company: 'Ordina Belgium',
     github: 'nicodecleyre',
-    twitter: ''
+    twitter: 'NicoDeCleyre'
   },
   {
     name: 'Otto',
@@ -610,7 +628,7 @@ const contributors = [{
     name: 'Smita Nachan',
     company: '',
     github: 'SmitaNachan',
-    twitter: 'mitanachan'
+    twitter: 'smitanachan'
   },
   {
     name: 'Stefan Bauer',
@@ -631,10 +649,22 @@ const contributors = [{
     twitter: 'stijnbrouwers85'
   },
   {
+    name: 'Stijn Haerkens',
+    company: 'VanRoey.be',
+    github: 'stijnhaerkenss',
+    twitter: ''
+  },
+  {
     name: 'Sudharsan Kesavanarayanan',
     company: 'NTT Ltd',
     github: 'sudharsank',
     twitter: 'sudharsank'
+  },
+  {
+    name: 'Taaqif Peck',
+    company: '',
+    github: 'Taaqif',
+    twitter: ''
   },
   {
     name: 'Tanmay Rathi',
@@ -647,6 +677,12 @@ const contributors = [{
     company: 'Solvion',
     github: 'thomyg',
     twitter: 'thomyg'
+  },
+  {
+    name: 'Tim Van de Voorde',
+    company: 'IW',
+    github: 'timdelavoorde',
+    twitter: ''
   },
   {
     name: 'Vardhaman Deshpande',

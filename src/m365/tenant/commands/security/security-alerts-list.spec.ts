@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -179,7 +179,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
     "uriClickSecurityStates": [],
     "vulnerabilityStates": []
   };
-  
+
   const alertIPC = {
     "id": "33aed7062fce896e48e2f63fe3971153b0bb959a3ac25fd3b282c469b2cb54a7",
     "azureTenantId": "b8e1599d-b418-4be9-8f39-df03c3abe27a",
@@ -534,7 +534,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
   });
@@ -564,7 +564,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -695,24 +695,13 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Error fetching security alerts'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Error fetching security alerts'));
   });
 
   it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
-    
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
-  });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 });

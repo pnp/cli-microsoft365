@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
@@ -18,7 +18,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
@@ -56,7 +56,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       spo.getRequestDigest,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -71,17 +71,6 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsDebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsDebugOption = true;
-      }
-    });
-    assert(containsDebugOption);
-  });
-
   it('handles client.svc promise error', async () => {
     // get tenant app catalog
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -91,7 +80,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error while getting tenant appcatalog', async () => {
@@ -109,7 +98,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('lists the tenant settings (debug)', async () => {
@@ -177,6 +166,6 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Timed out'));
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Timed out'));
   });
 });

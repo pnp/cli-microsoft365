@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -79,7 +79,7 @@ describe(commands.CARD_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -111,7 +111,7 @@ describe(commands.CARD_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -152,7 +152,28 @@ describe(commands.CARD_GET, () => {
   it('throws error when no card found', async () => {
     sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
 
-    const multipleCardsResponse = { 
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards?$filter=name eq '${validName}'`)) {
+        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
+          return ({ "value": [] });
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        environment: validEnvironment,
+        name: validName
+      }
+    }), new CommandError(`The specified card '${validName}' does not exist.`));
+  });
+
+  it('throws error when multiple cards with same name were found', async () => {
+    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
+
+    const multipleCardsResponse = {
       value: [
         { cardid: '69703efe-4149-ed11-bba2-000d3adf7537' },
         { cardid: '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893' }
@@ -174,27 +195,6 @@ describe(commands.CARD_GET, () => {
         name: validName
       }
     }), new CommandError(`Multiple cards with name '${validName}' found: ${multipleCardsResponse.value.map(x => x.cardid).join(',')}`));
-  });
-
-  it('throws error when multiple cards with same name were found', async () => {
-    sinon.stub(powerPlatform, 'getDynamicsInstanceApiUrl').callsFake(async () => envUrl);
-
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://contoso-dev.api.crm4.dynamics.com/api/data/v9.1/cards?$filter=name eq '${validName}'`)) {
-        if ((opts.headers?.accept as string)?.indexOf('application/json') === 0) {
-          return ({ "value": [] });
-        }
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        environment: validEnvironment,
-        name: validName
-      }
-    }), new CommandError(`The specified card '${validName}' does not exist.`));
   });
 
   it('retrieves a specific card with the name parameter', async () => {
@@ -251,18 +251,7 @@ describe(commands.CARD_GET, () => {
       }
     });
 
-    await assert.rejects(command.action(logger, { options: { debug: false, environment: validEnvironment, name: validName } } as any),
+    await assert.rejects(command.action(logger, { options: { environment: validEnvironment, name: validName } } as any),
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

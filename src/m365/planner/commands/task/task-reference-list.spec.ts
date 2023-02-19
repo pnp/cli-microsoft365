@@ -1,11 +1,11 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken } from '../../../../utils/accessToken';
+import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -38,21 +38,20 @@ describe(commands.TASK_REFERENCE_LIST, () => {
       }
     }
   };
-  
+
   const references = {
     references: [
       referenceListResponse
     ]
   };
-  
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  
+
   before(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[(command as any).resource] = {
@@ -80,14 +79,13 @@ describe(commands.TASK_REFERENCE_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      accessToken.isAppOnlyAccessToken
+      request.get
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       auth.restoreAuth
     ]);
@@ -103,20 +101,9 @@ describe(commands.TASK_REFERENCE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when using app only access token', async () => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        taskId: "uBk5fK_MHkeyuPYlCo4OFpcAMowf"
-      }
-    }), new CommandError('This command does not support application permissions.'));
-  });
-
   it('successfully handles item found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent("uBk5fK_MHkeyuPYlCo4OFpcAMowf")}/details?$select=references`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${formatting.encodeQueryParameter("uBk5fK_MHkeyuPYlCo4OFpcAMowf")}/details?$select=references`) {
         return Promise.resolve(references);
       }
 
@@ -137,17 +124,5 @@ describe(commands.TASK_REFERENCE_LIST, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { taskId: 'uBk5fK_MHkeyuPYlCo4OFpcAMowf' } } as any), new CommandError('An error has occurred'));
-  });
-
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

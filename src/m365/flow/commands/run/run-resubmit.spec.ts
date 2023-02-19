@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -21,7 +21,7 @@ describe(commands.RUN_RESUBMIT, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -59,7 +59,7 @@ describe(commands.RUN_RESUBMIT, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -98,7 +98,6 @@ describe(commands.RUN_RESUBMIT, () => {
   it('prompts before resubmitting the specified Microsoft Flow when confirm option not passed', async () => {
     await command.action(logger, {
       options: {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
@@ -123,7 +122,6 @@ describe(commands.RUN_RESUBMIT, () => {
     ));
     await command.action(logger, {
       options: {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
@@ -151,7 +149,6 @@ describe(commands.RUN_RESUBMIT, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
@@ -177,7 +174,6 @@ describe(commands.RUN_RESUBMIT, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161'
@@ -228,7 +224,6 @@ describe(commands.RUN_RESUBMIT, () => {
     await assert.rejects(command.action(logger, {
       options:
       {
-        debug: false,
         environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762688CP233'
@@ -333,17 +328,6 @@ describe(commands.RUN_RESUBMIT, () => {
     });
     assert.strictEqual(getStub.lastCall.args[0].url, 'https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers?api-version=2016-11-01');
     assert.strictEqual(postStub.lastCall.args[0].url, 'https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers/manual/histories/08585981115186985105550762687CU161/resubmit?api-version=2016-11-01');
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 
   it('supports specifying name', () => {

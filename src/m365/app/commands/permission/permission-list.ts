@@ -1,9 +1,8 @@
 import { Application, AppRole, AppRoleAssignment, OAuth2PermissionGrant, PermissionScope, RequiredResourceAccess, ResourceAccess, ServicePrincipal } from '@microsoft/microsoft-graph-types';
-import { AxiosRequestConfig } from 'axios';
 import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import * as appGetCommand from '../../../aad/commands/app/app-get';
 import { Options as AppGetCommandOptions } from '../../../aad/commands/app/app-get';
 import AppCommand from '../../../base/AppCommand';
@@ -62,7 +61,7 @@ class AppPermissionListCommand extends AppCommand {
 
     const lookupUrl: string = servicePrincipalInfo.appId ? `?$filter=appId eq '${servicePrincipalInfo.appId}'&` : `/${servicePrincipalInfo.id}?`;
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/v1.0/servicePrincipals${lookupUrl}$select=appId,id,displayName`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -89,14 +88,14 @@ class AppPermissionListCommand extends AppCommand {
 
     switch (mode) {
       case GetServicePrincipal.withPermissions:
-        const appRoleAssignmentsRequestOptions: AxiosRequestConfig = {
+        const appRoleAssignmentsRequestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/servicePrincipals/${servicePrincipal.id}/appRoleAssignments`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
         };
-        const oauth2PermissionGrantsRequestOptions: AxiosRequestConfig = {
+        const oauth2PermissionGrantsRequestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/servicePrincipals/${servicePrincipal.id}/oauth2PermissionGrants`,
           headers: {
             accept: 'application/json;odata.metadata=none'
@@ -109,14 +108,14 @@ class AppPermissionListCommand extends AppCommand {
         ]);
         break;
       case GetServicePrincipal.withPermissionDefinitions:
-        const oauth2PermissionScopesRequestOptions: AxiosRequestConfig = {
+        const oauth2PermissionScopesRequestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/servicePrincipals/${servicePrincipal.id}/oauth2PermissionScopes`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
         };
-        const appRolesRequestOptions: AxiosRequestConfig = {
+        const appRolesRequestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/servicePrincipals/${servicePrincipal.id}/appRoles`,
           headers: {
             accept: 'application/json;odata.metadata=none'

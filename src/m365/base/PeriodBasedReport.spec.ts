@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import appInsights from '../../appInsights';
+import { telemetry } from '../../telemetry';
 import auth from '../../Auth';
 import { Cli } from '../../cli/Cli';
 import { CommandInfo } from '../../cli/CommandInfo';
@@ -37,7 +37,7 @@ describe('PeriodBasedReport', () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(mockCommand);
@@ -68,7 +68,7 @@ describe('PeriodBasedReport', () => {
 
   after(() => {
     sinonUtil.restore([
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName,
       auth.restoreAuth
     ]);
@@ -136,7 +136,7 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    await mockCommand.action(logger, { options: { debug: false, period: 'D7' } });
+    await mockCommand.action(logger, { options: { period: 'D7' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -153,7 +153,7 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    await mockCommand.action(logger, { options: { debug: false, period: 'D7' } });
+    await mockCommand.action(logger, { options: { period: 'D7' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -169,7 +169,7 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    await mockCommand.action(logger, { options: { debug: false, period: 'D7', output: 'json' } });
+    await mockCommand.action(logger, { options: { period: 'D7', output: 'json' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -186,7 +186,7 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    await mockCommand.action(logger, { options: { debug: false, period: 'D7',  output: 'text' } });
+    await mockCommand.action(logger, { options: { period: 'D7', output: 'text' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -203,7 +203,7 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    await mockCommand.action(logger, { options: { debug: false, period: 'D7' } });
+    await mockCommand.action(logger, { options: { period: 'D7' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -217,7 +217,7 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    await mockCommand.action(logger, { options: { debug: true, period: 'D7',  output: 'json' } });
+    await mockCommand.action(logger, { options: { debug: true, period: 'D7', output: 'json' } });
     assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
     assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
@@ -225,17 +225,6 @@ describe('PeriodBasedReport', () => {
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    await assert.rejects(mockCommand.action(logger, { options: { debug: false, period: 'D7' } } as any), new CommandError('An error has occurred'));
-  });
-  
-  it('supports debug mode', () => {
-    const options = mockCommand.options;
-    let containsOption = false;
-    options.forEach((o: any) => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+    await assert.rejects(mockCommand.action(logger, { options: { period: 'D7' } } as any), new CommandError('An error has occurred'));
   });
 });

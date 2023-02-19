@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.TEAM_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -51,7 +51,7 @@ describe(commands.TEAM_GET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -114,9 +114,11 @@ describe(commands.TEAM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false, 
-      id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843' } } as any), new CommandError('No team found with Group Id 1caf7dcd-7e83-4c3a-94f7-932a1299c843'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843'
+      }
+    } as any), new CommandError('No team found with Group Id 1caf7dcd-7e83-4c3a-94f7-932a1299c843'));
   });
 
   it('fails when team name does not exist', async () => {
@@ -137,9 +139,12 @@ describe(commands.TEAM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {
-      debug: true,
-      name: 'Finance' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Finance'
+      }
+    } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
   it('retrieves information about the specified Microsoft Team', async () => {
@@ -191,7 +196,7 @@ describe(commands.TEAM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    await command.action(logger, { options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "createdDateTime": "2017-11-29T03:27:05Z",
@@ -295,7 +300,7 @@ describe(commands.TEAM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, name: 'Finance' } });
+    await command.action(logger, { options: { name: 'Finance' } });
     assert(loggerLogSpy.calledWith({
       "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
       "createdDateTime": "2017-11-29T03:27:05Z",
@@ -337,20 +342,4 @@ describe(commands.TEAM_GET, () => {
       }
     }));
   });
-
-
-
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-
 });

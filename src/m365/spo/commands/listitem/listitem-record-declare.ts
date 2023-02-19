@@ -1,8 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli/Logger';
 import config from "../../../../config";
 import GlobalOptions from "../../../../GlobalOptions";
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from "../../../../utils/formatting";
 import { ClientSvcResponse, ClientSvcResponseContents, spo } from "../../../../utils/spo";
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -107,7 +106,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
+    this.optionSets.push({ options: ['listId', 'listTitle', 'listUrl'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -128,7 +127,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
           requestUrl += `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
         }
 
-        const requestOptions: AxiosRequestConfig = {
+        const requestOptions: CliRequestOptions = {
           url: `${requestUrl}?$select=Id`,
           headers: {
             accept: 'application/json;odata=nometadata'
@@ -147,7 +146,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
       const webIdentity = webIdentityResp.objectIdentity;
       const requestBody: string = this.getDeclareRecordRequestBody(webIdentity, listId, args.options.listItemId, args.options.date || '');
 
-      const requestOptions: AxiosRequestConfig = {
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
           'Content-Type': 'text/xml',

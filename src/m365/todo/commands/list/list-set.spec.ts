@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -19,7 +19,7 @@ describe(commands.LIST_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -51,7 +51,7 @@ describe(commands.LIST_SET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -89,7 +89,6 @@ describe(commands.LIST_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=",
         newName: "Bar"
       }
@@ -141,7 +140,6 @@ describe(commands.LIST_SET, () => {
 
     await command.action(logger, {
       options: {
-        debug: false,
         name: "FooList",
         newName: "Bar"
       }
@@ -165,10 +163,12 @@ describe(commands.LIST_SET, () => {
       return Promise.resolve();
     });
 
-    await assert.rejects(command.action(logger, { options: { 
-      debug: false,
-      name: "InvalidFooList",
-      newName: "foo" } } as any), new CommandError('The list InvalidFooList cannot be found'));
+    await assert.rejects(command.action(logger, {
+      options: {
+        name: "InvalidFooList",
+        newName: "foo"
+      }
+    } as any), new CommandError('The list InvalidFooList cannot be found'));
   });
 
   it('handles error correctly', async () => {
@@ -180,13 +180,12 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: {  debug: false, id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=", newName: "Foo" } } as any), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=", newName: "Foo" } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if new name is not set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA="
       }
     }, commandInfo);
@@ -196,7 +195,6 @@ describe(commands.LIST_SET, () => {
   it('fails validation if neither id nor name is not set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         newName: "Foo"
       }
     }, commandInfo);
@@ -206,7 +204,6 @@ describe(commands.LIST_SET, () => {
   it('fails validation if both id and name are set', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=",
         name: "FooList",
         newName: "Foo"
@@ -218,23 +215,11 @@ describe(commands.LIST_SET, () => {
   it('passes validation when all parameters are valid', async () => {
     const actual = await command.validate({
       options: {
-        debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=",
         newName: 'Foo'
       }
     }, commandInfo);
 
     assert.equal(actual, true);
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

@@ -1,7 +1,7 @@
-import { AxiosRequestConfig } from 'axios';
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import { validation } from '../../../../utils/validation';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
@@ -12,7 +12,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   environment: string;
   id?: string;
   name?: string;
@@ -63,14 +63,14 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
         option: '-n, --name [name]'
       },
       {
-        option: '-a, --asAdmin'
+        option: '--asAdmin'
       }
     );
   }
 
   #initOptionSets(): void {
     this.optionSets.push(
-      ['id', 'name']
+      { options: ['id', 'name'] }
     );
   }
 
@@ -86,7 +86,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
     );
   }
 
-  public async commandAction(logger: Logger, args: any): Promise<void> {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving a specific solution '${args.options.id || args.options.name}'...`);
     }
@@ -95,7 +95,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
       const dynamicsApiUrl = await powerPlatform.getDynamicsInstanceApiUrl(args.options.environment, args.options.asAdmin);
       const res = await this.getSolution(dynamicsApiUrl, args.options);
 
-      if (!args.options.output || args.options.output === 'json') {
+      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
         logger.log(res);
       }
       else {
@@ -113,7 +113,7 @@ class PpSolutionGetCommand extends PowerPlatformCommand {
   }
 
   private async getSolution(dynamicsApiUrl: string, options: Options): Promise<Solution> {
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

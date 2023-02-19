@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -20,7 +20,7 @@ describe(commands.NOTEBOOK_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -52,7 +52,7 @@ describe(commands.NOTEBOOK_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -66,26 +66,18 @@ describe(commands.NOTEBOOK_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both userId and userName options are passed', async () => {
-    const actual = await command.validate({
-      options:
-      {
-        userId: '2609af39-7775-4f94-a3dc-0dd67657e900',
-        userName: 'Documents'
-      }
-    }, commandInfo);
-    assert.strictEqual(actual, 'Specify either userId or userName, but not both');
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['createdDateTime', 'displayName', 'id']);
   });
 
-  it('fails validation if both groupId and groupName options are passed', async () => {
+  it('fails validation if webUrl is not a valid webUrl', async () => {
     const actual = await command.validate({
       options:
       {
-        groupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4',
-        groupName: 'MyGroup'
+        webUrl: 'invalid'
       }
     }, commandInfo);
-    assert.strictEqual(actual, 'Specify either groupId or groupName, but not both');
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the userId is not a valid GUID', async () => {
@@ -342,7 +334,7 @@ describe(commands.NOTEBOOK_LIST, () => {
         return Promise.reject('Invalid request');
       });
 
-    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite', debug: true } });
     assert(loggerLogSpy.calledWith([
       {
         "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
@@ -398,16 +390,5 @@ describe(commands.NOTEBOOK_LIST, () => {
         "lastModifiedDateTime": "2020-01-13T17:52:03Z"
       }
     ]));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
   });
 });

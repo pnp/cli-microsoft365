@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
+import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
@@ -22,7 +22,7 @@ describe(commands.APP_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
@@ -58,7 +58,7 @@ describe(commands.APP_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent,
+      telemetry.trackEvent,
       pid.getProcessName
     ]);
     auth.service.connected = false;
@@ -90,7 +90,7 @@ describe(commands.APP_ADD, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    await command.action(logger, { options: { debug: false, filePath: 'spfx.sppkg' } });
+    await command.action(logger, { options: { filePath: 'spfx.sppkg', output: 'text' } });
     assert(loggerLogSpy.calledWith("bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"));
   });
 
@@ -194,7 +194,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
     try {
-      await command.action(logger, { options: { debug: false, filePath: 'spfx.sppkg', output: 'json' } });
+      await command.action(logger, { options: { filePath: 'spfx.sppkg', output: 'json' } });
       assert(loggerLogSpy.calledWith(JSON.parse('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}')));
     }
     finally {
@@ -258,7 +258,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
     try {
-      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any), 
+      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
         new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.'));
     }
     finally {
@@ -429,17 +429,6 @@ describe(commands.APP_ADD, () => {
         debug: true, filePath: 'spfx.sppkg'
       }
     } as any), new CommandError('An error has occurred'));
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options;
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 
   it('fails validation on invalid scope', async () => {
