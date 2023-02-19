@@ -17,7 +17,7 @@ describe(commands.USER_GET, () => {
   const userName = 'john@contoso.com';
   const displayName = 'John';
   const accountEnabled = true;
-  const mailNickName = 'john';
+  const mailNickname = 'john';
   const password = 'R@ndom1!';
   const firstName = 'John';
   const lastName = 'Doe';
@@ -137,6 +137,19 @@ describe(commands.USER_GET, () => {
     assert(loggerLogSpy.calledWith(userResponseWithPassword));
   });
 
+  it('creates Azure AD user and set custom mailNickname', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === graphBaseUrl) {
+        return userResponseWithoutPassword;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { userName: userName, displayName: displayName, password: password, mailNickname: mailNickname } });
+    assert(loggerLogSpy.calledWith(userResponseWithPassword));
+  });
+
   it('creates Azure AD user and set its manager by id', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === graphBaseUrl) {
@@ -253,7 +266,7 @@ describe(commands.USER_GET, () => {
   });
 
   it('passes validation if all options (excluding managerUserName and forceChangePasswordNextSignInWithMfa) are specified', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, userName: userName, accountEnabled: accountEnabled, mailNickname: mailNickName, password: password, firstName: firstName, lastName: lastName, forceChangePasswordNextSignIn: true, usageLocation: usageLocation, officeLocation: officeLocation, jobTitle: jobTitle, companyName: companyName, department: department, preferredLanguage: preferredLanguage, managerUserId: managerUserId } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: displayName, userName: userName, accountEnabled: accountEnabled, mailNickname: mailNickname, password: password, firstName: firstName, lastName: lastName, forceChangePasswordNextSignIn: true, usageLocation: usageLocation, officeLocation: officeLocation, jobTitle: jobTitle, companyName: companyName, department: department, preferredLanguage: preferredLanguage, managerUserId: managerUserId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
