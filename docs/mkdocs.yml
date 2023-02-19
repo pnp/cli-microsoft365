@@ -99,6 +99,7 @@ nav:
         - user remove: cmd/aad/user/user-remove.md
         - user set: cmd/aad/user/user-set.md        
         - user guest add: cmd/aad/user/user-guest-add.md
+        - user license list: cmd/aad/user/user-license-list.md
         - user password validate: cmd/aad/user/user-password-validate.md
         - user recyclebinitem clear: cmd/aad/user/user-recyclebinitem-clear.md
         - user recyclebinitem list: cmd/aad/user/user-recyclebinitem-list.md
