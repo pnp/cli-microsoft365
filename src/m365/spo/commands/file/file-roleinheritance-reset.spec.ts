@@ -12,6 +12,8 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./file-roleinheritance-reset');
 import * as SpoFileGetCommand from './file-get';
+import { session } from '../../../../utils/session';
+import { pid } from '../../../../utils/pid';
 
 describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-x';
@@ -26,6 +28,8 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -60,7 +64,9 @@ describe(commands.FILE_ROLEINHERITANCE_RESET, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      telemetry.trackEvent
+      telemetry.trackEvent,
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });

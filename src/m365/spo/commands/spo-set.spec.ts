@@ -7,6 +7,7 @@ import { CommandInfo } from '../../../cli/CommandInfo';
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
 import { pid } from '../../../utils/pid';
+import { session } from '../../../utils/session';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./spo-set');
@@ -19,7 +20,9 @@ describe(commands.SET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
-    sinon.stub(telemetry, 'trackEvent').callsFake(() => {});
+    sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -48,7 +51,8 @@ describe(commands.SET, () => {
       auth.restoreAuth,
       auth.storeConnectionInfo,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });
@@ -61,7 +65,7 @@ describe(commands.SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('sets SPO URL when no URL was set previously', async ()  => {
+  it('sets SPO URL when no URL was set previously', async () => {
     auth.service.spoUrl = undefined;
 
     await command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } });
@@ -75,7 +79,7 @@ describe(commands.SET, () => {
     assert.strictEqual(auth.service.spoUrl, 'https://contoso.sharepoint.com');
   });
 
-  it('throws error when trying to set SPO URL when not logged in to O365', async ()  => {
+  it('throws error when trying to set SPO URL when not logged in to O365', async () => {
     auth.service.connected = false;
 
     await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any), new CommandError('Log in to Microsoft 365 first'));

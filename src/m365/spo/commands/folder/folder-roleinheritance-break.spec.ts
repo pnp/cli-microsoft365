@@ -12,6 +12,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 const command: Command = require('./folder-roleinheritance-break');
 
 describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
@@ -28,6 +29,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -63,6 +65,7 @@ describe(commands.FOLDER_ROLEINHERITANCE_BREAK, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       pid.getProcessName,
+      session.getId,
       telemetry.trackEvent
     ]);
     auth.service.connected = false;

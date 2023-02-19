@@ -9,6 +9,7 @@ import Command, {
 } from './Command';
 import { telemetry } from './telemetry';
 import { pid } from './utils/pid';
+import { session } from './utils/session';
 import { sinonUtil } from './utils/sinonUtil';
 
 class MockCommand1 extends Command {
@@ -135,6 +136,8 @@ describe('Command', () => {
     sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
       telemetryCommandName = commandName;
     });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     logger = {
       log: () => { },
       logRaw: () => { },
@@ -160,6 +163,7 @@ describe('Command', () => {
   after(() => {
     sinonUtil.restore([
       pid.getProcessName,
+      session.getId,
       auth.restoreAuth,
       telemetry.trackEvent
     ]);

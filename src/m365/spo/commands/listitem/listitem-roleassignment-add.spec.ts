@@ -13,6 +13,7 @@ import * as SpoRoleDefinitionListCommand from '../roledefinition/roledefinition-
 import { Logger } from '../../../../cli/Logger';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 const command: Command = require('./listitem-roleassignment-add');
 
 describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
@@ -24,6 +25,7 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -54,7 +56,8 @@ describe(commands.LISTITEM_ROLEASSIGNMENT_ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });
