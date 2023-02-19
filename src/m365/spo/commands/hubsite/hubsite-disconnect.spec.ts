@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request, { CliRequestOptions } from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
@@ -49,6 +50,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
 
@@ -94,6 +96,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       auth.restoreAuth,
       telemetry.trackEvent,
       pid.getProcessName,
+      session.getId,
       spo.getSpoAdminUrl,
       request.patch
     ]);

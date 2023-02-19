@@ -9,6 +9,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
@@ -183,6 +184,7 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     sinon.stub(Buffer, 'alloc').returns(Buffer.from('abc'));
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
@@ -229,6 +231,7 @@ describe(commands.FILE_ADD, () => {
       spo.ensureFolder,
       telemetry.trackEvent,
       pid.getProcessName,
+      session.getId,
       Buffer.alloc
     ]);
     auth.service.connected = false;

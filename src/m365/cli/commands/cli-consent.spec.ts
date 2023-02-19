@@ -7,6 +7,7 @@ import { Logger } from '../../../cli/Logger';
 import Command from '../../../Command';
 import config from '../../../config';
 import { pid } from '../../../utils/pid';
+import { session } from '../../../utils/session';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./cli-consent');
@@ -22,6 +23,7 @@ describe(commands.CONSENT, () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     originalTenant = config.tenant;
     originalAadAppId = config.cliAadAppId;
     commandInfo = Cli.getCommandInfo(command);
@@ -51,7 +53,8 @@ describe(commands.CONSENT, () => {
   after(() => {
     sinonUtil.restore([
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
   });
 
