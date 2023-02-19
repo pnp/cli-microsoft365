@@ -247,8 +247,8 @@ describe(commands.USER_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if all options (excluding managerUserName) are specified', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, userName: userName, accountEnabled: accountEnabled, mailNickname: mailNickName, password: password, firstName: firstName, lastName: lastName, forceChangePasswordNextSignIn: true, forceChangePasswordNextSignInWithMfa: true, usageLocation: usageLocation, officeLocation: officeLocation, jobTitle: jobTitle, companyName: companyName, department: department, preferredLanguage: preferredLanguage, managerUserId: managerUserId } }, commandInfo);
+  it('passes validation if all options (excluding managerUserName and forceChangePasswordNextSignInWithMfa) are specified', async () => {
+    const actual = await command.validate({ options: { displayName: displayName, userName: userName, accountEnabled: accountEnabled, mailNickname: mailNickName, password: password, firstName: firstName, lastName: lastName, forceChangePasswordNextSignIn: true, usageLocation: usageLocation, officeLocation: officeLocation, jobTitle: jobTitle, companyName: companyName, department: department, preferredLanguage: preferredLanguage, managerUserId: managerUserId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
