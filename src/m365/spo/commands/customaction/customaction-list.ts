@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -81,15 +81,15 @@ class SpoCustomActionListCommand extends SpoCommand {
       const scope: string = args.options.scope ? args.options.scope : 'All';
 
       if (this.debug) {
-        logger.logToStderr(`Attempt to get custom actions list with scope: ${scope}`);
-        logger.logToStderr('');
+        await logger.logToStderr(`Attempt to get custom actions list with scope: ${scope}`);
+        await logger.logToStderr('');
       }
 
       const customActions = await spo.getCustomActions(args.options.webUrl, args.options.scope);
 
       if (customActions.length === 0) {
         if (this.verbose) {
-          logger.logToStderr(`Custom actions not found`);
+          await logger.logToStderr(`Custom actions not found`);
         }
       }
       else {
@@ -97,7 +97,7 @@ class SpoCustomActionListCommand extends SpoCommand {
           customActions.forEach(a => a.Scope = this.humanizeScope(a.Scope) as any);
         }
 
-        logger.log(customActions);
+        await logger.log(customActions);
       }
     }
     catch (err: any) {
@@ -117,4 +117,4 @@ class SpoCustomActionListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoCustomActionListCommand();
+export default new SpoCustomActionListCommand();

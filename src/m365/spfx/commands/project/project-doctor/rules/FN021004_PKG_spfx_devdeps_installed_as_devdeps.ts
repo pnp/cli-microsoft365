@@ -1,7 +1,7 @@
-import { JsonRule } from '../../JsonRule';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
-import * as spfxDeps from '../spfx-deps';
+import { JsonRule } from '../../JsonRule.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import * as spfxDeps from '../spfx-deps.js';
 
 export class FN021004_PKG_spfx_devdeps_installed_as_devdeps extends JsonRule {
   get id(): string {

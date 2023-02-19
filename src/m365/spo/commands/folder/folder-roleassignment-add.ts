@@ -1,20 +1,17 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import request, { CliRequestOptions } from '../../../../request';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import * as SpoUserGetCommand from '../user/user-get';
-import { Options as SpoUserGetCommandOptions } from '../user/user-get';
-import * as SpoGroupGetCommand from '../group/group-get';
-import { Options as SpoGroupGetCommandOptions } from '../group/group-get';
-import * as SpoRoleDefinitionFolderCommand from '../roledefinition/roledefinition-list';
-import { Options as SpoRoleDefinitionFolderCommandOptions } from '../roledefinition/roledefinition-list';
-import { RoleDefinition } from '../roledefinition/RoleDefinition';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoGroupGetCommand, { Options as SpoGroupGetCommandOptions } from '../group/group-get.js';
+import spoRoleDefinitionFolderCommand, { Options as SpoRoleDefinitionFolderCommandOptions } from '../roledefinition/roledefinition-list.js';
+import { RoleDefinition } from '../roledefinition/RoleDefinition.js';
+import spoUserGetCommand, { Options as SpoUserGetCommandOptions } from '../user/user-get.js';
 
 interface CommandArgs {
   options: Options;
@@ -126,7 +123,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Adding role assignment to folder in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Adding role assignment to folder in site at ${args.options.webUrl}...`);
     }
 
     const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
@@ -203,7 +200,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(SpoRoleDefinitionFolderCommand as Command, { options: { ...roleDefinitionFolderCommandOptions, _: [] } });
+    const output = await Cli.executeCommandWithOutput(spoRoleDefinitionFolderCommand as Command, { options: { ...roleDefinitionFolderCommandOptions, _: [] } });
     const getRoleDefinitionFolderOutput = JSON.parse(output.stdout);
     const roleDefinition = getRoleDefinitionFolderOutput.find((role: RoleDefinition) => role.Name === options.roleDefinitionName);
     if (roleDefinition) {
@@ -224,7 +221,7 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
+    const output = await Cli.executeCommandWithOutput(spoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } });
     const getGroupOutput = JSON.parse(output.stdout);
     return getGroupOutput.Id as number;
   }
@@ -239,10 +236,10 @@ class SpoFolderRoleAssignmentAddCommand extends SpoCommand {
       verbose: this.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
+    const output = await Cli.executeCommandWithOutput(spoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } });
     const getUserOutput = JSON.parse(output.stdout);
     return getUserOutput.Id as number;
   }
 }
 
-module.exports = new SpoFolderRoleAssignmentAddCommand();
+export default new SpoFolderRoleAssignmentAddCommand();

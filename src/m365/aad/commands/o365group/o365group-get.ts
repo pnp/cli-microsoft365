@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { GroupExtended } from './GroupExtended';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
+import { GroupExtended } from './GroupExtended.js';
 
 interface CommandArgs {
   options: Options;
@@ -27,11 +27,11 @@ class AadO365GroupGetCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -42,14 +42,14 @@ class AadO365GroupGetCommand extends GraphCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -74,7 +74,7 @@ class AadO365GroupGetCommand extends GraphCommand {
         group.siteUrl = res.webUrl ? res.webUrl.substr(0, res.webUrl.lastIndexOf('/')) : '';
       }
 
-      logger.log(group);
+      await logger.log(group);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -82,4 +82,4 @@ class AadO365GroupGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadO365GroupGetCommand();
+export default new AadO365GroupGetCommand();

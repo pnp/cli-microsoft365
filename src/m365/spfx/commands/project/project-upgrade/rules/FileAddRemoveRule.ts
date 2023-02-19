@@ -1,8 +1,8 @@
-import * as fs from "fs";
-import * as path from "path";
-import { Project } from '../../project-model';
-import { Finding } from "../../report-model/Finding";
-import { Rule } from '../../Rule';
+import fs from 'fs';
+import path from 'path';
+import { Project } from '../../project-model/index.js';
+import { Finding } from "../../report-model/Finding.js";
+import { Rule } from '../../Rule.js';
 
 export abstract class FileAddRemoveRule extends Rule {
   constructor(protected filePath: string, protected add: boolean, protected contents?: string) {

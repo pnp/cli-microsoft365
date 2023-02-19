@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN014001_CODE_settings_jsonSchemas } from './FN014001_CODE_settings_jsonSchemas';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN014001_CODE_settings_jsonSchemas } from './FN014001_CODE_settings_jsonSchemas.js';
 
 describe('FN014001_CODE_settings_jsonSchemas', () => {
   let findings: Finding[];

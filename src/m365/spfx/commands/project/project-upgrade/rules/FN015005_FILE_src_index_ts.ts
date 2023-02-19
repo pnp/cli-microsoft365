@@ -1,4 +1,4 @@
-import { FileAddRemoveRule } from "./FileAddRemoveRule";
+import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015005_FILE_src_index_ts extends FileAddRemoveRule {
   constructor(add: boolean, contents: string) {

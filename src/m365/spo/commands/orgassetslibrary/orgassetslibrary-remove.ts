@@ -1,11 +1,11 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import config from '../../../../config.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -81,7 +81,7 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
         throw response.ErrorInfo.ErrorMessage;
       }
       else {
-        logger.log(json[json.length - 1]);
+        await logger.log(json[json.length - 1]);
       }
     }
     catch (err: any) {
@@ -90,4 +90,4 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoOrgAssetsLibraryRemoveCommand();
+export default new SpoOrgAssetsLibraryRemoveCommand();

@@ -1,9 +1,9 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import { sinonUtil } from '../../../../../../utils/sinonUtil';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN014008_CODE_launch_hostedWorkbench_type } from './FN014008_CODE_launch_hostedWorkbench_type';
+import assert from 'assert';
+import fs from 'fs';
+import { sinonUtil } from '../../../../../../utils/sinonUtil.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN014008_CODE_launch_hostedWorkbench_type } from './FN014008_CODE_launch_hostedWorkbench_type.js';
 
 describe('FN014008_CODE_launch_hostedWorkbench_type', () => {
   let findings: Finding[];

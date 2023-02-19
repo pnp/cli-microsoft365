@@ -1,8 +1,8 @@
 import { BookingBusiness } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import { odata } from '../../../../utils/odata';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import { odata } from '../../../../utils/odata.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 class BookingBusinessListCommand extends GraphCommand {
   public get name(): string {
@@ -22,12 +22,12 @@ class BookingBusinessListCommand extends GraphCommand {
 
     try {
       const items = await odata.getAllItems<BookingBusiness>(endpoint);
-      logger.log(items);
-    } 
+      await logger.log(items);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new BookingBusinessListCommand();
+export default new BookingBusinessListCommand();

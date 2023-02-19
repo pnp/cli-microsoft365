@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { TenantProperty } from './TenantProperty';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { TenantProperty } from './TenantProperty.js';
 
 interface CommandArgs {
   options: Options;
@@ -25,11 +25,11 @@ class SpoStorageEntityListCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -37,7 +37,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.appCatalogUrl)
@@ -46,7 +46,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
+      await logger.logToStderr(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
     }
 
     const requestOptions: any = {
@@ -62,7 +62,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
       if (!web.storageentitiesindex ||
         web.storageentitiesindex.trim().length === 0) {
         if (this.verbose) {
-          logger.logToStderr('No tenant properties found');
+          await logger.logToStderr('No tenant properties found');
         }
       }
       else {
@@ -70,11 +70,11 @@ class SpoStorageEntityListCommand extends SpoCommand {
         const keys: string[] = Object.keys(properties);
         if (keys.length === 0) {
           if (this.verbose) {
-            logger.logToStderr('No tenant properties found');
+            await logger.logToStderr('No tenant properties found');
           }
         }
         else {
-          logger.log(keys.map((key: string): any => {
+          await logger.log(keys.map((key: string): any => {
             const property: TenantProperty = properties[key];
             return {
               Key: key,
@@ -85,11 +85,11 @@ class SpoStorageEntityListCommand extends SpoCommand {
           }));
         }
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
 
-module.exports = new SpoStorageEntityListCommand();
+export default new SpoStorageEntityListCommand();

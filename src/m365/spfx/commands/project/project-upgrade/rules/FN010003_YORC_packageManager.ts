@@ -1,6 +1,6 @@
-import { JsonRule } from '../../JsonRule';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
+import { JsonRule } from '../../JsonRule.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
 
 export class FN010003_YORC_packageManager extends JsonRule {
   constructor(private packageManager: string) {

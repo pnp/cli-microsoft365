@@ -1,20 +1,19 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { formatting } from '../../../../utils/formatting';
-import { odata } from '../../../../utils/odata';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import * as os from 'os';
-import Command from '../../../../Command';
-import { ListItemInstance } from '../listitem/ListItemInstance';
-import { Cli } from '../../../../cli/Cli';
-import { Options as spoListItemListCommandOptions } from '../listitem/listitem-list';
-import * as spoListItemListCommand from '../listitem/listitem-list';
-import request, { CliRequestOptions } from '../../../../request';
-import { Solution } from './Solution';
+import os from 'os';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { odata } from '../../../../utils/odata.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ListItemInstance } from '../listitem/ListItemInstance.js';
+import spoListItemListCommand, { Options as spoListItemListCommandOptions } from '../listitem/listitem-list.js';
+import { Solution } from './Solution.js';
 
 interface CommandArgs {
   options: Options;
@@ -161,7 +160,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
     const filter = title ? `Title eq '${title}'` : id ? `Id eq '${id}'` : `TenantWideExtensionComponentId eq '${clientSideComponentId}'`;
 
     if (this.verbose) {
-      logger.logToStderr(`Getting tenant-wide application customizer: "${title || id || clientSideComponentId}"...`);
+      await logger.logToStderr(`Getting tenant-wide application customizer: "${title || id || clientSideComponentId}"...`);
     }
 
     const listItemInstances = await odata.getAllItems<ListItemInstance>(`${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionLocation eq 'ClientSideExtension.ApplicationCustomizer' and ${filter}`);
@@ -241,7 +240,7 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
     const { title, id, clientSideComponentId, newTitle, newClientSideComponentId, clientSideComponentProperties, webTemplate } = options;
 
     if (this.verbose) {
-      logger.logToStderr(`Updating tenant-wide application customizer: "${title || id || clientSideComponentId}"...`);
+      await logger.logToStderr(`Updating tenant-wide application customizer: "${title || id || clientSideComponentId}"...`);
     }
 
     const formValues: FormValue[] = [];
@@ -290,4 +289,4 @@ class SpoTenantApplicationCustomizerSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTenantApplicationCustomizerSetCommand();
+export default new SpoTenantApplicationCustomizerSetCommand();

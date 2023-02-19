@@ -1,11 +1,11 @@
-import { Logger } from '../../../cli/Logger';
-import config from "../../../config";
-import request, { CliRequestOptions } from "../../../request";
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from "../../../utils/spo";
-import SpoCommand from "../../base/SpoCommand";
-import { SiteProperties } from "../../spo/commands/site/SiteProperties";
-import { SPOSitePropertiesEnumerable } from "../../spo/commands/site/SPOSitePropertiesEnumerable";
-import commands from "../commands";
+import { Logger } from '../../../cli/Logger.js';
+import config from "../../../config.js";
+import request, { CliRequestOptions } from "../../../request.js";
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from "../../../utils/spo.js";
+import SpoCommand from "../../base/SpoCommand.js";
+import { SiteProperties } from "../../spo/commands/site/SiteProperties.js";
+import { SPOSitePropertiesEnumerable } from "../../spo/commands/site/SPOSitePropertiesEnumerable.js";
+import commands from "../commands.js";
 
 class OneDriveListCommand extends SpoCommand {
   private allSites?: SiteProperties[];
@@ -27,14 +27,14 @@ class OneDriveListCommand extends SpoCommand {
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
 
       if (this.verbose) {
-        logger.logToStderr(`Retrieving list of OneDrive sites...`);
+        await logger.logToStderr(`Retrieving list of OneDrive sites...`);
       }
 
       this.allSites = [];
 
       await this.getAllSites(spoAdminUrl, '0', undefined, logger);
 
-      logger.log(this.allSites);
+      await logger.log(this.allSites);
     }
     catch (err: any) {
       this.handleRejectedPromise(err);
@@ -70,4 +70,4 @@ class OneDriveListCommand extends SpoCommand {
   }
 }
 
-module.exports = new OneDriveListCommand();
+export default new OneDriveListCommand();

@@ -1,9 +1,9 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -80,7 +80,7 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving all items from recycle bin at ${args.options.siteUrl}...`);
+      await logger.logToStderr(`Retrieving all items from recycle bin at ${args.options.siteUrl}...`);
     }
 
     const state: string = args.options.secondary ? '2' : '1';
@@ -104,8 +104,8 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
 
     try {
       const response = await request.get<{ value: any[] }>(requestOptions);
-      logger.log(response.value);
-    } 
+      await logger.log(response.value);
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -118,4 +118,4 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
   ];
 }
 
-module.exports = new SpoSiteRecycleBinItemListCommand();
+export default new SpoSiteRecycleBinItemListCommand();

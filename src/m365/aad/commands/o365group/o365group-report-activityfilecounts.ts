@@ -1,5 +1,5 @@
-import PeriodBasedReport from '../../../base/PeriodBasedReport';
-import commands from '../../commands';
+import PeriodBasedReport from '../../../base/PeriodBasedReport.js';
+import commands from '../../commands.js';
 
 class O365GroupReportActivityFileCountsCommand extends PeriodBasedReport {
   public get name(): string {
@@ -15,4 +15,4 @@ class O365GroupReportActivityFileCountsCommand extends PeriodBasedReport {
   }
 }
 
-module.exports = new O365GroupReportActivityFileCountsCommand();
+export default new O365GroupReportActivityFileCountsCommand();

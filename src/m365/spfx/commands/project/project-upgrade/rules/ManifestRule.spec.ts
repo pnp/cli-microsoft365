@@ -1,5 +1,5 @@
-import * as assert from 'assert';
-import { ManifestRule } from './ManifestRule';
+import assert from 'assert';
+import { ManifestRule } from './ManifestRule.js';
 
 class MockManifestRule extends ManifestRule {
   get id(): string {

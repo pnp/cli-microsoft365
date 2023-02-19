@@ -1,13 +1,13 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import { telemetry } from '../../../../telemetry';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-const command: Command = require('./option-remove');
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import { telemetry } from '../../../../telemetry.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './option-remove.js';
 
 describe(commands.OPTION_REMOVE, () => {
   let log: any[];
@@ -21,13 +21,13 @@ describe(commands.OPTION_REMOVE, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -120,6 +120,24 @@ describe(commands.OPTION_REMOVE, () => {
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
 
     await assert.doesNotReject(command.action(logger, { options: { debug: true, name: 'listName' } }));
+  });
+
+  it(`removes a context info option from the existing .m365rc.json file without prompt`, async () => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+      "apps": [
+        {
+          "appId": "e23d235c-fcdf-45d1-ac5f-24ab2ee0695d",
+          "name": "CLI app"
+        }
+      ],
+      "context": {
+        "listName": "listNameValue"
+      }
+    }));
+    sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
+
+    await assert.doesNotReject(command.action(logger, { options: { debug: true, name: 'listName', force: true } }));
   });
 
   it('handles an error when option is not present in the context', async () => {

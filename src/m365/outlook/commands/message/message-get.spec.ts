@@ -1,18 +1,18 @@
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
-import auth from '../../../../Auth';
-import { Cli } from '../../../../cli/Cli';
-import { CommandInfo } from '../../../../cli/CommandInfo';
-import { Logger } from '../../../../cli/Logger';
-import Command, { CommandError } from '../../../../Command';
-import request from '../../../../request';
-import { pid } from '../../../../utils/pid';
-import { session } from '../../../../utils/session';
-import { sinonUtil } from '../../../../utils/sinonUtil';
-import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
-const command: Command = require('./message-get');
+import assert from 'assert';
+import sinon from 'sinon';
+import auth from '../../../../Auth.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { CommandInfo } from '../../../../cli/CommandInfo.js';
+import { Logger } from '../../../../cli/Logger.js';
+import { CommandError } from '../../../../Command.js';
+import request from '../../../../request.js';
+import { telemetry } from '../../../../telemetry.js';
+import { accessToken } from '../../../../utils/accessToken.js';
+import { pid } from '../../../../utils/pid.js';
+import { session } from '../../../../utils/session.js';
+import { sinonUtil } from '../../../../utils/sinonUtil.js';
+import commands from '../../commands.js';
+import command from './message-get.js';
 
 describe(commands.MESSAGE_GET, () => {
   const messageId = 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA=';
@@ -95,13 +95,13 @@ describe(commands.MESSAGE_GET, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: string) => {
+      log: async (msg: string) => {
         log.push(msg);
       },
-      logRaw: (msg: string) => {
+      logRaw: async (msg: string) => {
         log.push(msg);
       },
-      logToStderr: (msg: string) => {
+      logToStderr: async (msg: string) => {
         log.push(msg);
       }
     };
@@ -175,14 +175,14 @@ describe(commands.MESSAGE_GET, () => {
   it('throws error if something fails using delegated permissions', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/messages/${messageId}`) {
-        throw `Graph error occured`;
+        throw `Graph error occurred`;
       }
 
       throw `Invalid request`;
     });
 
     await assert.rejects(command.action(logger, { options: { id: messageId } } as any),
-      new CommandError(`Graph error occured`));
+      new CommandError(`Graph error occurred`));
   });
 
   it('retrieves specific message using application permissions and using userPrincipalName as option', async () => {
@@ -220,14 +220,14 @@ describe(commands.MESSAGE_GET, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userId}/messages/${messageId}`) {
-        throw `Graph error occured`;
+        throw `Graph error occurred`;
       }
 
       throw `Invalid request`;
     });
 
     await assert.rejects(command.action(logger, { options: { id: messageId, userId: userId } } as any),
-      new CommandError(`Graph error occured`));
+      new CommandError(`Graph error occurred`));
   });
 
   it('throws error if something fails using application permissions and userPrincipalName as option', async () => {
@@ -235,14 +235,14 @@ describe(commands.MESSAGE_GET, () => {
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${userPrincipalName}/messages/${messageId}`) {
-        throw `Graph error occured`;
+        throw `Graph error occurred`;
       }
 
       throw `Invalid request`;
     });
 
     await assert.rejects(command.action(logger, { options: { id: messageId, userPrincipalName: userPrincipalName } } as any),
-      new CommandError(`Graph error occured`));
+      new CommandError(`Graph error occurred`));
   });
 
   it('fails validation if id is empty', async () => {

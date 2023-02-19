@@ -1,10 +1,10 @@
 import { Conversation } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -29,11 +29,11 @@ class AadO365GroupConversationListCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initOptions();
     this.#initValidators();
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -41,14 +41,14 @@ class AadO365GroupConversationListCommand extends GraphCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.groupId as string)) {
           return `${args.options.groupId} is not a valid GUID`;
         }
-    
+
         return true;
       }
     );
@@ -57,7 +57,7 @@ class AadO365GroupConversationListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const conversations = await odata.getAllItems<Conversation>(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`);
-      logger.log(conversations);
+      await logger.log(conversations);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -65,4 +65,4 @@ class AadO365GroupConversationListCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadO365GroupConversationListCommand();
+export default new AadO365GroupConversationListCommand();

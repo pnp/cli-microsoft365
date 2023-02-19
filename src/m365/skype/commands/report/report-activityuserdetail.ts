@@ -1,5 +1,5 @@
-import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport';
-import commands from '../../commands';
+import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport.js';
+import commands from '../../commands.js';
 
 class SkypeReportActivityUserDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {
@@ -15,4 +15,4 @@ class SkypeReportActivityUserDetailCommand extends DateAndPeriodBasedReport {
   }
 }
 
-module.exports = new SkypeReportActivityUserDetailCommand();
+export default new SkypeReportActivityUserDetailCommand();

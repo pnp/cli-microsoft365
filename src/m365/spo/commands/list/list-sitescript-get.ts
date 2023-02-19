@@ -1,12 +1,12 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { ListInstance } from './ListInstance';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ListInstance } from './ListInstance.js';
 
 interface CommandArgs {
   options: Options;
@@ -90,14 +90,14 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Extracting Site Script from list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
+        await logger.logToStderr(`Extracting Site Script from list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site at ${args.options.webUrl}...`);
       }
 
       let listServerRelativeUrl: string = '';
 
       if (args.options.listUrl) {
         if (this.debug) {
-          logger.logToStderr(`Retrieving List from URL '${args.options.listUrl}'...`);
+          await logger.logToStderr(`Retrieving List from URL '${args.options.listUrl}'...`);
         }
 
         listServerRelativeUrl = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
@@ -107,13 +107,13 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
 
         if (args.options.listId) {
           if (this.debug) {
-            logger.logToStderr(`Retrieving List from Id '${args.options.listId}'...`);
+            await logger.logToStderr(`Retrieving List from Id '${args.options.listId}'...`);
           }
           requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')?$expand=RootFolder`;
         }
         else if (args.options.listTitle) {
           if (this.debug) {
-            logger.logToStderr(`Retrieving List from Title '${args.options.listTitle}'...`);
+            await logger.logToStderr(`Retrieving List from Title '${args.options.listTitle}'...`);
           }
           requestUrl += `lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder`;
         }
@@ -149,7 +149,7 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
         throw `An error has occurred, the site script could not be extracted from list '${args.options.listId || args.options.listTitle}'`;
       }
 
-      logger.log(siteScript);
+      await logger.log(siteScript);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -157,4 +157,4 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListSiteScriptGetCommand();
+export default new SpoListSiteScriptGetCommand();

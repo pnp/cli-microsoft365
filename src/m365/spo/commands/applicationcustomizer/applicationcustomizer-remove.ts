@@ -1,14 +1,14 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { spo } from '../../../../utils/spo';
-import { formatting } from '../../../../utils/formatting';
-import { CustomAction } from '../../commands/customaction/customaction';
-import * as os from 'os';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { spo } from '../../../../utils/spo.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { CustomAction } from '../../commands/customaction/customaction.js';
+import os from 'os';
 
 interface CommandArgs {
   options: Options;
@@ -130,7 +130,7 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
     const applicationCustomizer = await this.getApplicationCustomizer(options);
 
     if (this.verbose) {
-      logger.logToStderr(`Removing application customizer '${options.clientSideComponentId || options.title || options.id}' from the site '${options.webUrl}'...`);
+      await logger.logToStderr(`Removing application customizer '${options.clientSideComponentId || options.title || options.id}' from the site '${options.webUrl}'...`);
     }
 
     const requestOptions: CliRequestOptions = {
@@ -174,4 +174,4 @@ class SpoApplicationCustomizerRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoApplicationCustomizerRemoveCommand();
+export default new SpoApplicationCustomizerRemoveCommand();

@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { DraftVisibilityType } from './DraftVisibilityType';
-import { ListExperience } from './ListExperience';
-import { ListInstance } from "./ListInstance";
-import { ListTemplateType } from './ListTemplateType';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { DraftVisibilityType } from './DraftVisibilityType.js';
+import { ListExperience } from './ListExperience.js';
+import { ListInstance } from "./ListInstance.js";
+import { ListTemplateType } from './ListTemplateType.js';
 
 interface CommandArgs {
   options: Options;
@@ -577,7 +577,7 @@ class SpoListAddCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Creating list in site at ${args.options.webUrl}...`);
+      await logger.logToStderr(`Creating list in site at ${args.options.webUrl}...`);
     }
 
     const requestBody: any = this.mapRequestBody(args.options);
@@ -594,7 +594,7 @@ class SpoListAddCommand extends SpoCommand {
 
     try {
       const listInstance = await request.post<ListInstance>(requestOptions);
-      logger.log(listInstance);
+      await logger.log(listInstance);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -851,4 +851,4 @@ class SpoListAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListAddCommand();
+export default new SpoListAddCommand();

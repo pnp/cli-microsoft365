@@ -1,12 +1,12 @@
-import { Cli } from '../../../../cli/Cli';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import commands from '../../commands';
-import { SpoAppBaseCommand } from './SpoAppBaseCommand';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import commands from '../../commands.js';
+import { SpoAppBaseCommand } from './SpoAppBaseCommand.js';
 
 interface CommandArgs {
   options: Options;
@@ -100,7 +100,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
         const appCatalogSiteUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
 
         if (this.verbose) {
-          logger.logToStderr(`Retracting app...`);
+          await logger.logToStderr(`Retracting app...`);
         }
 
         const requestOptions: CliRequestOptions = {
@@ -135,4 +135,4 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
   }
 }
 
-module.exports = new SpoAppRetractCommand();
+export default new SpoAppRetractCommand();

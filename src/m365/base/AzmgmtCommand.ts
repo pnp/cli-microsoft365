@@ -1,6 +1,6 @@
-import auth, { CloudType } from '../../Auth';
-import { Logger } from '../../cli/Logger';
-import Command, { CommandArgs, CommandError } from '../../Command';
+import auth, { CloudType } from '../../Auth.js';
+import { Logger } from '../../cli/Logger.js';
+import Command, { CommandArgs, CommandError } from '../../Command.js';
 
 export default abstract class AzmgmtCommand extends Command {
   protected get resource(): string {

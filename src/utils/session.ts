@@ -1,5 +1,5 @@
 import * as crypto from 'crypto';
-import { cache } from "./cache";
+import { cache } from './cache.js';
 
 export const session = {
   getId(pid: number): string {

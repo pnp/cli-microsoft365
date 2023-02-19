@@ -1,8 +1,8 @@
 import { lt, valid, validRange } from 'semver';
-import { Hash } from '../../../../../../utils/types';
-import { JsonRule } from '../../JsonRule';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
+import { Hash } from '../../../../../../utils/types.js';
+import { JsonRule } from '../../JsonRule.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
 
 export abstract class DependencyRule extends JsonRule {
   constructor(protected packageName: string, protected packageVersion: string, protected isDevDep: boolean = false, protected isOptional: boolean = false, protected add: boolean = true) {

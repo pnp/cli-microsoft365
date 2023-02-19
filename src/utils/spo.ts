@@ -1,17 +1,17 @@
-import * as url from 'url';
-import { urlUtil } from "./urlUtil";
-import { validation } from "./validation";
-import auth from '../Auth';
-import { Logger } from "../cli/Logger";
-import config from "../config";
-import { BasePermissions } from '../m365/spo/base-permissions';
-import request, { CliRequestOptions } from "../request";
-import { formatting } from './formatting';
-import { CustomAction } from '../m365/spo/commands/customaction/customaction';
-import { odata } from './odata';
-import { MenuState } from '../m365/spo/commands/navigation/NavigationNode';
-import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition';
-import { RoleType } from '../m365/spo/commands/roledefinition/RoleType';
+import url from 'url';
+import { urlUtil } from "./urlUtil.js";
+import { validation } from "./validation.js";
+import auth from '../Auth.js';
+import { Logger } from "../cli/Logger.js";
+import config from "../config.js";
+import { BasePermissions } from '../m365/spo/base-permissions.js';
+import request, { CliRequestOptions } from "../request.js";
+import { formatting } from './formatting.js';
+import { CustomAction } from '../m365/spo/commands/customaction/customaction.js';
+import { MenuState } from '../m365/spo/commands/navigation/NavigationNode.js';
+import { odata } from './odata.js';
+import { RoleDefinition } from '../m365/spo/commands/roledefinition/RoleDefinition.js';
+import { RoleType } from '../m365/spo/commands/roledefinition/RoleType.js';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -86,10 +86,10 @@ export const spo = {
   },
 
   ensureFormDigest(siteUrl: string, logger: Logger, context: FormDigestInfo | undefined, debug: boolean): Promise<FormDigestInfo> {
-    return new Promise<FormDigestInfo>((resolve: (context: FormDigestInfo) => void, reject: (error: any) => void): void => {
+    return new Promise<FormDigestInfo>(async (resolve: (context: FormDigestInfo) => void, reject: (error: any) => void): Promise<void> => {
       if (validation.isValidFormDigest(context)) {
         if (debug) {
-          logger.logToStderr('Existing form digest still valid');
+          await logger.logToStderr('Existing form digest still valid');
         }
 
         resolve(context as FormDigestInfo);
@@ -118,11 +118,11 @@ export const spo = {
   waitUntilFinished({ operationId, siteUrl, resolve, reject, logger, currentContext, debug, verbose }: { operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, logger: Logger, currentContext: FormDigestInfo, debug: boolean, verbose: boolean }): void {
     spo
       .ensureFormDigest(siteUrl, logger, currentContext, debug)
-      .then((res: FormDigestInfo): Promise<string> => {
+      .then(async (res: FormDigestInfo): Promise<string> => {
         currentContext = res;
 
         if (debug) {
-          logger.logToStderr(`Checking if operation ${operationId} completed...`);
+          await logger.logToStderr(`Checking if operation ${operationId} completed...`);
         }
 
         const requestOptions: any = {
@@ -182,10 +182,10 @@ export const spo = {
 
     request
       .post<{ JobState?: number, Logs: string[] }>(requestOptions)
-      .then((resp: { JobState?: number, Logs: string[] }): void => {
+      .then(async (resp: { JobState?: number, Logs: string[] }): Promise<void> => {
         if (debug) {
-          logger.logToStderr('getCopyJobProgress response...');
-          logger.logToStderr(resp);
+          await logger.logToStderr('getCopyJobProgress response...');
+          await logger.logToStderr(resp);
         }
 
         for (const item of resp.Logs) {
@@ -216,18 +216,18 @@ export const spo = {
       });
   },
 
-  getSpoUrl(logger: Logger, debug: boolean): Promise<string> {
+  async getSpoUrl(logger: Logger, debug: boolean): Promise<string> {
     if (auth.service.spoUrl) {
       if (debug) {
-        logger.logToStderr(`SPO URL previously retrieved ${auth.service.spoUrl}. Returning...`);
+        await logger.logToStderr(`SPO URL previously retrieved ${auth.service.spoUrl}. Returning...`);
       }
 
       return Promise.resolve(auth.service.spoUrl);
     }
 
-    return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
+    return new Promise<string>(async (resolve: (spoUrl: string) => void, reject: (error: any) => void): Promise<void> => {
       if (debug) {
-        logger.logToStderr(`No SPO URL available. Retrieving from MS Graph...`);
+        await logger.logToStderr(`No SPO URL available. Retrieving from MS Graph...`);
       }
 
       const requestOptions: any = {
@@ -269,18 +269,18 @@ export const spo = {
     });
   },
 
-  getTenantId(logger: Logger, debug: boolean): Promise<string> {
+  async getTenantId(logger: Logger, debug: boolean): Promise<string> {
     if (auth.service.tenantId) {
       if (debug) {
-        logger.logToStderr(`SPO Tenant ID previously retrieved ${auth.service.tenantId}. Returning...`);
+        await logger.logToStderr(`SPO Tenant ID previously retrieved ${auth.service.tenantId}. Returning...`);
       }
 
       return Promise.resolve(auth.service.tenantId);
     }
 
-    return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
+    return new Promise<string>(async (resolve: (spoUrl: string) => void, reject: (error: any) => void): Promise<void> => {
       if (debug) {
-        logger.logToStderr(`No SPO Tenant ID available. Retrieving...`);
+        await logger.logToStderr(`No SPO Tenant ID available. Retrieving...`);
       }
 
       let spoAdminUrl: string = '';
@@ -346,7 +346,7 @@ export const spo = {
    * @param folderToEnsure web relative or server relative folder path e.g. /Documents/MyFolder or /sites/site1/Documents/MyFolder
    * @param siteAccessToken a valid access token for the site specified in the webFullUrl param
    */
-  ensureFolder(webFullUrl: string, folderToEnsure: string, logger: Logger, debug: boolean): Promise<void> {
+  async ensureFolder(webFullUrl: string, folderToEnsure: string, logger: Logger, debug: boolean): Promise<void> {
     const webUrl = url.parse(webFullUrl);
     if (!webUrl.protocol || !webUrl.hostname) {
       return Promise.reject('webFullUrl is not a valid URL');
@@ -367,9 +367,9 @@ export const spo = {
     folderToEnsure = urlUtil.getWebRelativePath(webFullUrl, folderToEnsure);
 
     if (debug) {
-      logger.log(`folderToEnsure`);
-      logger.log(folderToEnsure);
-      logger.log('');
+      await logger.log(`folderToEnsure`);
+      await logger.log(folderToEnsure);
+      await logger.log('');
     }
 
     let nextFolder: string = '';
@@ -380,16 +380,16 @@ export const spo = {
     const folders: string[] = folderToEnsure.substring(1).split('/');
 
     if (debug) {
-      logger.log('folders to process');
-      logger.log(JSON.stringify(folders));
-      logger.log('');
+      await logger.log('folders to process');
+      await logger.log(JSON.stringify(folders));
+      await logger.log('');
     }
 
     // recursive function
-    const checkOrAddFolder = (resolve: () => void, reject: (error: any) => void): void => {
+    const checkOrAddFolder = async (resolve: () => void, reject: (error: any) => void): Promise<void> => {
       if (folderIndex === folders.length) {
         if (debug) {
-          logger.log(`All sub-folders exist`);
+          await logger.log(`All sub-folders exist`);
         }
 
         return resolve();
@@ -428,9 +428,9 @@ export const spo = {
               folderIndex++;
               checkOrAddFolder(resolve, reject);
             })
-            .catch((err: any) => {
+            .catch(async (err: any) => {
               if (debug) {
-                logger.log(`Could not create sub-folder ${folderServerRelativeUrl}`);
+                await logger.log(`Could not create sub-folder ${folderServerRelativeUrl}`);
               }
 
               reject(err);
@@ -500,9 +500,9 @@ export const spo = {
     };
 
     return new Promise<BasePermissions>((resolve: (permissions: BasePermissions) => void, reject: (error: any) => void): void => {
-      request.post<string>(requestOptions).then((res: string): void => {
+      request.post<string>(requestOptions).then(async (res: string): Promise<void> => {
         if (debug) {
-          logger.log('Attempt to get the web EffectiveBasePermissions');
+          await logger.log('Attempt to get the web EffectiveBasePermissions');
         }
 
         const json: ClientSvcResponse = JSON.parse(res);
@@ -708,7 +708,7 @@ export const spo = {
  */
   async getUserByEmail(webUrl: string, email: string, logger: Logger, debug?: boolean): Promise<any> {
     if (debug) {
-      logger.logToStderr(`Retrieving the spo user by email ${email}`);
+      await logger.logToStderr(`Retrieving the spo user by email ${email}`);
     }
     const requestUrl = `${webUrl}/_api/web/siteusers/GetByEmail('${formatting.encodeQueryParameter(email)}')`;
 
@@ -784,15 +784,15 @@ export const spo = {
   },
 
   /**
-* Retrieves the spo group by name.
-* @param webUrl Web url
-* @param name The name of the group
-* @param logger the Logger object
-* @param debug set if debug logging should be logged 
-*/
+	* Retrieves the spo group by name.
+	* @param webUrl Web url
+	* @param name The name of the group
+	* @param logger the Logger object
+	* @param debug set if debug logging should be logged 
+	*/
   async getGroupByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<any> {
     if (debug) {
-      logger.logToStderr(`Retrieving the group by name ${name}`);
+      await logger.logToStderr(`Retrieving the group by name ${name}`);
     }
     const requestUrl = `${webUrl}/_api/web/sitegroups/GetByName('${formatting.encodeQueryParameter(name)}')`;
 
@@ -810,15 +810,15 @@ export const spo = {
   },
 
   /**
-* Retrieves the role definition by name.
-* @param webUrl Web url
-* @param name the name of the role definition
-* @param logger the Logger object
-* @param debug set if debug logging should be logged 
-*/
+	* Retrieves the role definition by name.
+	* @param webUrl Web url
+	* @param name the name of the role definition
+	* @param logger the Logger object
+	* @param debug set if debug logging should be logged 
+	*/
   async getRoleDefinitionByName(webUrl: string, name: string, logger: Logger, debug?: boolean): Promise<RoleDefinition> {
     if (debug) {
-      logger.logToStderr(`Retrieving the role definitions for ${name}`);
+      await logger.logToStderr(`Retrieving the role definitions for ${name}`);
     }
 
     const roledefinitions = await odata.getAllItems<RoleDefinition>(`${webUrl}/_api/web/roledefinitions`);

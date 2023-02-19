@@ -1,17 +1,15 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import Command from '../../../../Command';
-import { Cli, CommandOutput } from '../../../../cli/Cli';
-import { Options as spoListItemAddCommandOptions } from '../listitem/listitem-add';
-import { Options as spoListItemListCommandOptions } from '../listitem/listitem-list';
-import * as spoTenantAppCatalogUrlGetCommand from '../tenant/tenant-appcatalogurl-get';
-import * as spoListItemAddCommand from '../listitem/listitem-add';
-import * as spoListItemListCommand from '../listitem/listitem-list';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { Solution } from './Solution';
+import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoListItemAddCommand, { Options as spoListItemAddCommandOptions } from '../listitem/listitem-add.js';
+import spoListItemListCommand, { Options as spoListItemListCommandOptions } from '../listitem/listitem-list.js';
+import spoTenantAppCatalogUrlGetCommand from '../tenant/tenant-appcatalogurl-get.js';
+import { Solution } from './Solution.js';
 
 interface CommandArgs {
   options: Options;
@@ -108,7 +106,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
   private async getAppCatalogUrl(logger: Logger): Promise<string> {
     const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } });
     if (this.verbose) {
-      logger.logToStderr(spoTenantAppCatalogUrlGetCommandOutput.stderr);
+      await logger.logToStderr(spoTenantAppCatalogUrlGetCommandOutput.stderr);
     }
 
     const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
@@ -116,7 +114,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       throw 'Cannot add tenant-wide application customizer as app catalog cannot be found';
     }
     if (this.verbose) {
-      logger.logToStderr(`Got tenant app catalog url: ${appCatalogUrl}`);
+      await logger.logToStderr(`Got tenant app catalog url: ${appCatalogUrl}`);
     }
 
     return appCatalogUrl;
@@ -124,7 +122,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
 
   private async getComponentManifest(appCatalogUrl: string, clientSideComponentId: string, logger: Logger): Promise<any> {
     if (this.verbose) {
-      logger.logToStderr('Retrieving component manifest item from the ComponentManifests list on the app catalog site so that we get the solution id');
+      await logger.logToStderr('Retrieving component manifest item from the ComponentManifests list on the app catalog site so that we get the solution id');
     }
 
     const camlQuery = `<View><ViewFields><FieldRef Name='ClientComponentId'></FieldRef><FieldRef Name='SolutionId'></FieldRef><FieldRef Name='ClientComponentManifest'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='ClientComponentId' /><Value Type='Guid'>${clientSideComponentId}</Value></Eq></Where></Query></View>`;
@@ -139,7 +137,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
 
     const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
     if (this.verbose) {
-      logger.logToStderr(output.stderr);
+      await logger.logToStderr(output.stderr);
     }
 
     const outputParsed = JSON.parse(output.stdout);
@@ -152,7 +150,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
 
   private async getSolutionFromAppCatalog(appCatalogUrl: string, solutionId: string, logger: Logger): Promise<Solution> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving solution with id ${solutionId} from the application catalog`);
+      await logger.logToStderr(`Retrieving solution with id ${solutionId} from the application catalog`);
     }
 
     const camlQuery = `<View><ViewFields><FieldRef Name='SkipFeatureDeployment'></FieldRef><FieldRef Name='ContainsTenantWideExtension'></FieldRef></ViewFields><Query><Where><Eq><FieldRef Name='AppProductID' /><Value Type='Guid'>${solutionId}</Value></Eq></Where></Query></View>`;
@@ -167,7 +165,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
 
     const output = await Cli.executeCommandWithOutput(spoListItemListCommand as Command, { options: { ...commandOptions, _: [] } });
     if (this.verbose) {
-      logger.logToStderr(output.stderr);
+      await logger.logToStderr(output.stderr);
     }
 
     const outputParsed = JSON.parse(output.stdout);
@@ -180,7 +178,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
 
   private async addTenantWideExtension(appCatalogUrl: string, options: Options, logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr('Pre-checks finished. Adding tenant wide extension to the TenantWideExtensions list');
+      await logger.logToStderr('Pre-checks finished. Adding tenant wide extension to the TenantWideExtensions list');
     }
 
     const commandOptions: spoListItemAddCommandOptions = {
@@ -203,4 +201,4 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoTenantApplicationCustomizerAddCommand();
+export default new SpoTenantApplicationCustomizerAddCommand();

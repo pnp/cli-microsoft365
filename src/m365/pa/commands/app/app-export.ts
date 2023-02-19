@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils/validation';
-import commands from '../../commands';
-import * as fs from 'fs';
-import * as path from 'path';
-import { formatting } from '../../../../utils/formatting';
-import request, { CliRequestOptions } from '../../../../request';
-import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
+import fs from 'fs';
+import path from 'path';
 import { setTimeout } from 'timers/promises';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -126,7 +126,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
       fs.writeFileSync(path, file, 'binary');
 
       if (this.verbose) {
-        logger.logToStderr(`File saved to path '${path}'`);
+        await logger.logToStderr(`File saved to path '${path}'`);
       }
     }
     catch (err: any) {
@@ -136,7 +136,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
 
   private async getPackageResources(args: CommandArgs, logger: Logger): Promise<any> {
     if (this.verbose) {
-      logger.logToStderr('Getting the Microsoft Power App resources...');
+      await logger.logToStderr('Getting the Microsoft Power App resources...');
     }
 
     const requestOptions: CliRequestOptions = {
@@ -161,7 +161,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
 
   private async exportPackage(args: CommandArgs, logger: Logger): Promise<string> {
     if (this.verbose) {
-      logger.logToStderr(`Initiating package export for Microsoft Power App ${args.options.id}...`);
+      await logger.logToStderr(`Initiating package export for Microsoft Power App ${args.options.id}...`);
     }
 
     const resources = await this.getPackageResources(args, logger);
@@ -194,7 +194,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
 
   private async getPackageLink(args: CommandArgs, logger: Logger, location: string): Promise<string> {
     if (this.verbose) {
-      logger.logToStderr('Retrieving the package link and waiting on the exported package.');
+      await logger.logToStderr('Retrieving the package link and waiting on the exported package.');
     }
 
     let status;
@@ -219,7 +219,7 @@ class PaAppExportCommand extends PowerPlatformCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Current status of the get package link: ${status}`);
+        await logger.logToStderr(`Current status of the get package link: ${status}`);
       }
 
     } while (status === 'Running');
@@ -228,4 +228,4 @@ class PaAppExportCommand extends PowerPlatformCommand {
   }
 }
 
-module.exports = new PaAppExportCommand();
+export default new PaAppExportCommand();

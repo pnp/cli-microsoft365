@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { Control } from './canvasContent';
-import { ClientSidePageProperties } from './ClientSidePageProperties';
-import { getControlTypeDisplayName } from './pageMethods';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { Control } from './canvasContent.js';
+import { ClientSidePageProperties } from './ClientSidePageProperties.js';
+import { getControlTypeDisplayName } from './pageMethods.js';
 
 interface CommandArgs {
   options: Options;
@@ -95,11 +95,11 @@ class SpoPageControlGetCommand extends SpoCommand {
           }
         };
 
-        logger.log(controlData);
+        await logger.log(controlData);
       }
       else {
         if (this.verbose) {
-          logger.logToStderr(`Control with ID ${args.options.id} not found on page ${args.options.pageName}`);
+          await logger.logToStderr(`Control with ID ${args.options.id} not found on page ${args.options.pageName}`);
         }
       }
     }
@@ -109,4 +109,4 @@ class SpoPageControlGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoPageControlGetCommand();
+export default new SpoPageControlGetCommand();

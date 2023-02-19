@@ -1,6 +1,6 @@
-import { JsonRule } from '../../JsonRule';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model';
+import { JsonRule } from '../../JsonRule.js';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
 
 export abstract class PackageRule extends JsonRule {
   constructor(protected propertyName: string, protected add: boolean, protected propertyValue?: string) {
@@ -37,10 +37,10 @@ export abstract class PackageRule extends JsonRule {
     if (!project.packageJson) {
       return;
     }
-    
-    if (!project.packageJson || 
-        (this.add && !(project.packageJson as any)[this.propertyName]) ||
-        (!this.add && (project.packageJson as any)[this.propertyName])) {
+
+    if (!project.packageJson ||
+      (this.add && !(project.packageJson as any)[this.propertyName]) ||
+      (!this.add && (project.packageJson as any)[this.propertyName])) {
       const node = this.getAstNodeFromFile(project.packageJson, this.propertyName);
       this.addFindingWithPosition(findings, node);
     }

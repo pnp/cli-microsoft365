@@ -1,7 +1,7 @@
-import { Logger } from '../../cli/Logger';
-import GlobalOptions from '../../GlobalOptions';
-import { formatting } from '../../utils/formatting';
-import PeriodBasedReport from './PeriodBasedReport';
+import { Logger } from '../../cli/Logger.js';
+import GlobalOptions from '../../GlobalOptions.js';
+import { formatting } from '../../utils/formatting.js';
+import PeriodBasedReport from './PeriodBasedReport.js';
 
 interface CommandArgs {
   options: DateAndPeriodBasedOptions;

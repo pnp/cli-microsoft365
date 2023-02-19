@@ -1,13 +1,13 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { md } from '../../../../utils/md';
-import { validation } from '../../../../utils/validation';
-import AnonymousCommand from '../../../base/AnonymousCommand';
-import { Changelog, ChangelogItem } from '../../Changelog';
-import commands from '../../commands';
-import request, { CliRequestOptions } from '../../../../request';
 import { DOMParser } from '@xmldom/xmldom';
-import { Cli } from '../../../../cli/Cli';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Cli } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { md } from '../../../../utils/md.js';
+import { validation } from '../../../../utils/validation.js';
+import AnonymousCommand from '../../../base/AnonymousCommand.js';
+import { Changelog, ChangelogItem } from '../../Changelog.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -133,7 +133,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
 
       const changelog = this.filterThroughOptions(args.options, this.mapChangelog(xmlDoc, args));
 
-      logger.log(changelog.items);
+      await logger.log(changelog.items);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -206,4 +206,4 @@ class GraphChangelogListCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new GraphChangelogListCommand();
+export default new GraphChangelogListCommand();

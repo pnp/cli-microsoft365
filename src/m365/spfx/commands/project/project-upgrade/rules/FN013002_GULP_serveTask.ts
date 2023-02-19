@@ -1,6 +1,6 @@
-import { Finding } from '../../report-model';
-import { Project } from '../../project-model';
-import { Rule } from '../../Rule';
+import { Finding } from '../../report-model/index.js';
+import { Project } from '../../project-model/index.js';
+import { Rule } from '../../Rule.js';
 
 export class FN013002_GULP_serveTask extends Rule {
   constructor() {

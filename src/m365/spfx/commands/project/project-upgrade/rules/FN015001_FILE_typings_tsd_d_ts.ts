@@ -1,4 +1,4 @@
-import { FileAddRemoveRule } from "./FileAddRemoveRule";
+import { FileAddRemoveRule } from "./FileAddRemoveRule.js";
 
 export class FN015001_FILE_typings_tsd_d_ts extends FileAddRemoveRule {
   constructor(add: boolean) {

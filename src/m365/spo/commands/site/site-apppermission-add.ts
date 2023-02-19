@@ -1,12 +1,12 @@
 import { Permission } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface AppInfo {
   appId: string;
@@ -199,7 +199,7 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
         permission = await this.elevatePermissions(args, permission);
       }
 
-      logger.log(permission);
+      await logger.log(permission);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -207,4 +207,4 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new SpoSiteAppPermissionAddCommand();
+export default new SpoSiteAppPermissionAddCommand();

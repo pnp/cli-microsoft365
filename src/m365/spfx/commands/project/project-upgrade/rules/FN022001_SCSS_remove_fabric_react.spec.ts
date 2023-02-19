@@ -1,10 +1,10 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
-import { spfx } from '../../../../../../utils/spfx';
-import { Project, ScssFile } from '../../project-model';
-import { Finding } from '../../report-model';
-import { FN022001_SCSS_remove_fabric_react } from './FN022001_SCSS_remove_fabric_react';
+import assert from 'assert';
+import fs from 'fs';
+import sinon from 'sinon';
+import { spfx } from '../../../../../../utils/spfx.js';
+import { Project, ScssFile } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import { FN022001_SCSS_remove_fabric_react } from './FN022001_SCSS_remove_fabric_react.js';
 
 describe('FN022001_SCSS_remove_fabric_react', () => {
   let findings: Finding[];
@@ -24,7 +24,7 @@ describe('FN022001_SCSS_remove_fabric_react', () => {
 
   it('doesn\'t return notifications if import is already removed', () => {
     rule = new FN022001_SCSS_remove_fabric_react('~fabric-ui/react');
-    
+
     fileStub = sinon.stub(fs, 'readFileSync').returns('');
     const project: Project = {
       path: '/usr/tmp',

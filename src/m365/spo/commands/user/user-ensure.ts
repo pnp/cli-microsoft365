@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { aadUser } from '../../../../utils/aadUser';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { aadUser } from '../../../../utils/aadUser.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -84,7 +84,7 @@ class SpoUserEnsureCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Ensuring user ${args.options.aadId || args.options.userName} at site ${args.options.webUrl}`);
+      await logger.logToStderr(`Ensuring user ${args.options.aadId || args.options.userName} at site ${args.options.webUrl}`);
     }
 
     try {
@@ -102,7 +102,7 @@ class SpoUserEnsureCommand extends SpoCommand {
       };
 
       const response = await request.post(requestOptions);
-      logger.log(response);
+      await logger.log(response);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -111,11 +111,11 @@ class SpoUserEnsureCommand extends SpoCommand {
 
   private async getUpnByUserId(aadId: string, logger: Logger): Promise<string> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving user principal name for user with id ${aadId}`);
+      await logger.logToStderr(`Retrieving user principal name for user with id ${aadId}`);
     }
 
     return await aadUser.getUpnByUserId(aadId);
   }
 }
 
-module.exports = new SpoUserEnsureCommand();
+export default new SpoUserEnsureCommand();

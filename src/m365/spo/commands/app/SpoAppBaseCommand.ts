@@ -1,7 +1,7 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import SpoCommand from '../../../base/SpoCommand';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request from '../../../../request.js';
+import SpoCommand from '../../../base/SpoCommand.js';
 
 interface CommandArgs {
   options: Options;

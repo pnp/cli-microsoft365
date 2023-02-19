@@ -1,7 +1,7 @@
-import { JsonRule } from '../../JsonRule';
-import { PackageJson, Project } from '../../project-model';
-import { Finding } from '../../report-model';
-import * as spfxDeps from '../spfx-deps';
+import { JsonRule } from '../../JsonRule.js';
+import { PackageJson, Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/index.js';
+import * as spfxDeps from '../spfx-deps.js';
 
 export class FN021008_PKG_no_duplicate_deps extends JsonRule {
   get id(): string {

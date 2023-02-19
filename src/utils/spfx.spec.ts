@@ -1,5 +1,5 @@
-import * as assert from 'assert';
-import { spfx } from '../utils/spfx';
+import assert from 'assert';
+import { spfx } from '../utils/spfx.js';
 
 describe('utils/spfx', () => {
   it('returns false for isReactProject when .yo-rc.json and package.json not collected', () => {

@@ -1,9 +1,9 @@
 import { Room } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { odata } from '../../../../utils/odata.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -28,11 +28,11 @@ class OutlookRoomListCommand extends GraphCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -40,7 +40,7 @@ class OutlookRoomListCommand extends GraphCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -58,7 +58,7 @@ class OutlookRoomListCommand extends GraphCommand {
 
     try {
       const rooms = await odata.getAllItems<Room>(endpoint);
-      logger.log(rooms);
+      await logger.log(rooms);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -66,4 +66,4 @@ class OutlookRoomListCommand extends GraphCommand {
   }
 }
 
-module.exports = new OutlookRoomListCommand();
+export default new OutlookRoomListCommand();

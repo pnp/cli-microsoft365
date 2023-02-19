@@ -1,15 +1,17 @@
-import * as os from 'os';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { ListItemFieldValueResult } from './ListItemFieldValueResult';
-import { ListItemInstance } from './ListItemInstance';
+import os from 'os';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { Logger } from '../../../../cli/Logger.js';
+import request from '../../../../request.js';
+import { basic } from '../../../../utils/basic.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { ODataResponse } from '../../../../utils/odata.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { ListItemFieldValueResult } from './ListItemFieldValueResult.js';
+import { ListItemInstance } from './ListItemInstance.js';
 
 interface CommandArgs {
   options: Options;
@@ -22,6 +24,13 @@ export interface Options extends GlobalOptions {
   listUrl?: string;
   contentType?: string;
   folder?: string;
+}
+
+interface ContentType {
+  Id: {
+    StringValue: string;
+  };
+  Name: string;
 }
 
 class SpoListItemAddCommand extends SpoCommand {
@@ -135,7 +144,7 @@ class SpoListItemAddCommand extends SpoCommand {
       let targetFolderServerRelativeUrl: string = '';
 
       if (this.verbose) {
-        logger.logToStderr(`Getting content types for list ${args.options.listId || args.options.listTitle || args.options.listUrl}...`);
+        await logger.logToStderr(`Getting content types for list ${args.options.listId || args.options.listTitle || args.options.listUrl}...`);
       }
 
       let requestOptions: any = {
@@ -146,21 +155,21 @@ class SpoListItemAddCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      const ctypes = await request.get<any>(requestOptions);
+      const ctypes = await request.get<ODataResponse<ContentType>>(requestOptions);
       if (args.options.contentType) {
-        const foundContentType = ctypes.value.filter((ct: any) => {
+        const foundContentType = await basic.asyncFilter<ContentType>(ctypes.value, async (ct: ContentType) => {
           const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
 
           if (this.debug) {
-            logger.logToStderr(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
+            await logger.logToStderr(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
           }
 
           return contentTypeMatch;
         });
 
         if (this.debug) {
-          logger.logToStderr('content type filter output...');
-          logger.logToStderr(foundContentType);
+          await logger.logToStderr('content type filter output...');
+          await logger.logToStderr(foundContentType);
         }
 
         if (foundContentType.length > 0) {
@@ -173,13 +182,13 @@ class SpoListItemAddCommand extends SpoCommand {
         }
 
         if (this.debug) {
-          logger.logToStderr(`using content type name: ${contentTypeName}`);
+          await logger.logToStderr(`using content type name: ${contentTypeName}`);
         }
       }
 
       if (args.options.folder) {
         if (this.debug) {
-          logger.logToStderr('setting up folder lookup response ...');
+          await logger.logToStderr('setting up folder lookup response ...');
         }
 
         requestOptions = {
@@ -196,7 +205,7 @@ class SpoListItemAddCommand extends SpoCommand {
       }
 
       if (this.verbose) {
-        logger.logToStderr(`Creating item in list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}...`);
+        await logger.logToStderr(`Creating item in list ${args.options.listId || args.options.listTitle || args.options.listUrl} in site ${args.options.webUrl}...`);
       }
 
       const requestBody: any = {
@@ -213,7 +222,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
       if (args.options.contentType && contentTypeName !== '') {
         if (this.debug) {
-          logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
+          await logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
         }
 
         requestBody.formValues.push({
@@ -244,9 +253,9 @@ class SpoListItemAddCommand extends SpoCommand {
       });
 
       if (this.debug) {
-        logger.logToStderr(`Field values returned:`);
-        logger.logToStderr(fieldValues);
-        logger.logToStderr(`Id returned by AddValidateUpdateItemUsingPath: ${idField[0].FieldValue}`);
+        await logger.logToStderr(`Field values returned:`);
+        await logger.logToStderr(fieldValues);
+        await logger.logToStderr(`Id returned by AddValidateUpdateItemUsingPath: ${idField[0].FieldValue}`);
       }
 
       requestOptions = {
@@ -258,7 +267,7 @@ class SpoListItemAddCommand extends SpoCommand {
       };
 
       const item = await request.get(requestOptions);
-      logger.log(<ListItemInstance>item);
+      await logger.log(<ListItemInstance>item);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -289,4 +298,4 @@ class SpoListItemAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListItemAddCommand();
+export default new SpoListItemAddCommand();

@@ -1,8 +1,8 @@
 import { User } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import { odata } from '../../../../utils/odata';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import { odata } from '../../../../utils/odata.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 class AadUserRecycleBinItemListCommand extends GraphCommand {
   public get name(): string {
@@ -19,15 +19,15 @@ class AadUserRecycleBinItemListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr('Retrieving users from the recycle bin...');
+      await logger.logToStderr('Retrieving users from the recycle bin...');
     }
     try {
       const users = await odata.getAllItems<User>(`${this.resource}/v1.0/directory/deletedItems/microsoft.graph.user`);
-      logger.log(users);
+      await logger.log(users);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 }
-module.exports = new AadUserRecycleBinItemListCommand();
+export default new AadUserRecycleBinItemListCommand();

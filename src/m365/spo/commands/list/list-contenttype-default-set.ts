@@ -1,11 +1,11 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -120,7 +120,7 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr('Retrieving content type order...');
+      await logger.logToStderr('Retrieving content type order...');
     }
 
     try {
@@ -132,18 +132,18 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
 
       if (contentTypeIndex > -1) {
         if (this.debug) {
-          logger.logToStderr(`Content type ${args.options.contentTypeId} is visible in the list`);
+          await logger.logToStderr(`Content type ${args.options.contentTypeId} is visible in the list`);
         }
         // content type is in the list and is visible in the menu
 
         if (contentTypeIndex === 0) {
           if (this.verbose) {
-            logger.logToStderr(`Content type ${args.options.contentTypeId} is already set as default`);
+            await logger.logToStderr(`Content type ${args.options.contentTypeId} is already set as default`);
           }
         }
         else {
           if (this.verbose) {
-            logger.logToStderr(`Setting content type ${args.options.contentTypeId} as default...`);
+            await logger.logToStderr(`Setting content type ${args.options.contentTypeId} as default...`);
           }
 
           // remove content type from the order array so that we can put it at
@@ -158,11 +158,11 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
       }
       else {
         if (this.debug) {
-          logger.logToStderr(`Content type ${args.options.contentTypeId} is not visible in the list`);
+          await logger.logToStderr(`Content type ${args.options.contentTypeId} is not visible in the list`);
         }
 
         if (this.verbose) {
-          logger.logToStderr('Retrieving list content types...');
+          await logger.logToStderr('Retrieving list content types...');
         }
 
         const contentTypes: string[] = await this.getListContentTypes(baseUrl);
@@ -171,7 +171,7 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.logToStderr(`Setting content type ${args.options.contentTypeId} as default...`);
+          await logger.logToStderr(`Setting content type ${args.options.contentTypeId} as default...`);
         }
 
         contentTypeOrder.unshift({
@@ -199,13 +199,13 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
     let uniqueContentTypeOrder = response.ContentTypeOrder;
     if (response.UniqueContentTypeOrder !== null) {
       if (this.debug) {
-        logger.logToStderr('Using unique content type order');
+        await logger.logToStderr('Using unique content type order');
       }
       uniqueContentTypeOrder = response.UniqueContentTypeOrder as StringValue[];
     }
     else {
       if (this.debug) {
-        logger.logToStderr('Unique content type order not defined. Using content type order');
+        await logger.logToStderr('Unique content type order not defined. Using content type order');
       }
     }
     return uniqueContentTypeOrder;
@@ -241,4 +241,4 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListContentTypeDefaultSetCommand();
+export default new SpoListContentTypeDefaultSetCommand();

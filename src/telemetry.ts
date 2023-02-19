@@ -1,6 +1,6 @@
-import appInsights from "./appInsights";
-import { Cli } from "./cli/Cli";
-import { settingsNames } from "./settingsNames";
+import appInsights from "./appInsights.js";
+import { Cli } from "./cli/Cli.js";
+import { settingsNames } from "./settingsNames.js";
 
 class Telemetry {
   public trackEvent(commandName: string, properties: any): void {

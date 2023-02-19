@@ -1,10 +1,10 @@
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { spo } from '../../../../utils/spo';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -65,8 +65,8 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Setting the SharePoint home site to: ${args.options.siteUrl}...`);
-        logger.logToStderr('Attempting to retrieve the SharePoint admin URL.');
+        await logger.logToStderr(`Setting the SharePoint home site to: ${args.options.siteUrl}...`);
+        await logger.logToStderr('Attempting to retrieve the SharePoint admin URL.');
       }
 
       const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
@@ -91,7 +91,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
       }
 
       const res = await request.post<{ value: string; }>(requestOptions);
-      logger.log(res.value);
+      await logger.log(res.value);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -99,4 +99,4 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoHomeSiteSetCommand();
+export default new SpoHomeSiteSetCommand();

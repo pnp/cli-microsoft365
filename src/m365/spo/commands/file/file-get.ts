@@ -1,14 +1,14 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { FileProperties } from './FileProperties';
+import fs from 'fs';
+import path from 'path';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import { FileProperties } from './FileProperties.js';
 
 interface CommandArgs {
   options: Options;
@@ -135,7 +135,7 @@ class SpoFileGetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving file from site ${args.options.webUrl}...`);
+      await logger.logToStderr(`Retrieving file from site ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -189,10 +189,10 @@ class SpoFileGetCommand extends SpoCommand {
           writer.on('error', err => {
             reject(err);
           });
-          writer.on('close', () => {
+          writer.on('close', async () => {
             const filePath = args.options.path as string;
             if (this.verbose) {
-              logger.logToStderr(`File saved to path ${filePath}`);
+              await logger.logToStderr(`File saved to path ${filePath}`);
             }
             return resolve();
           });
@@ -200,7 +200,7 @@ class SpoFileGetCommand extends SpoCommand {
       }
       else {
         if (args.options.asString) {
-          logger.log(file.toString());
+          await logger.log(file.toString());
         }
         else {
           const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
@@ -215,7 +215,7 @@ class SpoFileGetCommand extends SpoCommand {
               fileProperties.ListItemAllFields.RoleAssignments = response.value;
             }
           }
-          logger.log(args.options.asListItem ? fileProperties.ListItemAllFields : fileProperties);
+          await logger.log(args.options.asListItem ? fileProperties.ListItemAllFields : fileProperties);
         }
       }
     }
@@ -225,4 +225,4 @@ class SpoFileGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoFileGetCommand();
+export default new SpoFileGetCommand();

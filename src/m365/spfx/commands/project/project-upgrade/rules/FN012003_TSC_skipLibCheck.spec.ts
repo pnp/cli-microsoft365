@@ -1,7 +1,7 @@
-import * as assert from 'assert';
-import { Project } from '../../project-model';
-import { Finding } from '../../report-model/Finding';
-import { FN012003_TSC_skipLibCheck } from './FN012003_TSC_skipLibCheck';
+import assert from 'assert';
+import { Project } from '../../project-model/index.js';
+import { Finding } from '../../report-model/Finding.js';
+import { FN012003_TSC_skipLibCheck } from './FN012003_TSC_skipLibCheck.js';
 
 describe('FN012003_TSC_skipLibCheck', () => {
   let findings: Finding[];

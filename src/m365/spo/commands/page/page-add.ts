@@ -1,20 +1,18 @@
-import { Auth } from '../../../../Auth';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import request, { CliRequestOptions } from '../../../../request';
-import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
-import { urlUtil } from '../../../../utils/urlUtil';
-import { validation } from '../../../../utils/validation';
-import SpoCommand from '../../../base/SpoCommand';
-import commands from '../../commands';
-import { Page, supportedPageLayouts, supportedPromoteAs } from './Page';
-import { Options as spoFileGetOptions } from '../file/file-get';
-import { Options as spoListItemSetOptions } from '../listitem/listitem-set';
-import * as spoFileGetCommand from '../file/file-get';
-import * as spoListItemSetCommand from '../listitem/listitem-set';
-import { Cli, CommandOutput } from '../../../../cli/Cli';
-import Command from '../../../../Command';
+import { Auth } from '../../../../Auth.js';
+import { Cli, CommandOutput } from '../../../../cli/Cli.js';
+import { Logger } from '../../../../cli/Logger.js';
+import Command from '../../../../Command.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import request, { CliRequestOptions } from '../../../../request.js';
+import { formatting } from '../../../../utils/formatting.js';
+import { spo } from '../../../../utils/spo.js';
+import { urlUtil } from '../../../../utils/urlUtil.js';
+import { validation } from '../../../../utils/validation.js';
+import SpoCommand from '../../../base/SpoCommand.js';
+import commands from '../../commands.js';
+import spoFileGetCommand, { Options as spoFileGetOptions } from '../file/file-get.js';
+import spoListItemSetCommand, { Options as spoListItemSetOptions } from '../listitem/listitem-set.js';
+import { Page, supportedPageLayouts, supportedPromoteAs } from './Page.js';
 
 interface CommandArgs {
   options: Options;
@@ -365,4 +363,4 @@ class SpoPageAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoPageAddCommand();
+export default new SpoPageAddCommand();

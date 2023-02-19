@@ -1,12 +1,12 @@
 import { OnenotePage } from '@microsoft/microsoft-graph-types';
-import { Logger } from '../../../../cli/Logger';
-import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
-import { validation } from '../../../../utils/validation';
-import { aadGroup } from '../../../../utils/aadGroup';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { spo } from '../../../../utils/spo';
+import { Logger } from '../../../../cli/Logger.js';
+import GlobalOptions from '../../../../GlobalOptions.js';
+import { aadGroup } from '../../../../utils/aadGroup.js';
+import { odata } from '../../../../utils/odata.js';
+import { spo } from '../../../../utils/spo.js';
+import { validation } from '../../../../utils/validation.js';
+import GraphCommand from '../../../base/GraphCommand.js';
+import commands from '../../commands.js';
 
 interface CommandArgs {
   options: Options;
@@ -130,7 +130,7 @@ class OneNotePageListCommand extends GraphCommand {
     try {
       const endpoint = await this.getEndpointUrl(args);
       const items = await odata.getAllItems<OnenotePage>(endpoint);
-      logger.log(items);
+      await logger.log(items);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
@@ -138,4 +138,4 @@ class OneNotePageListCommand extends GraphCommand {
   }
 }
 
-module.exports = new OneNotePageListCommand();
+export default new OneNotePageListCommand();
