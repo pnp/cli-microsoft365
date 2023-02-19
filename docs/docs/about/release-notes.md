@@ -450,7 +450,6 @@
 
 **OneNote:**
 
-- [onenote notebook add](../cmd/onenote/notebook/notebook-add.md) - create a new OneNote notebook [#3100](https://github.com/pnp/cli-microsoft365/issues/3100)
 - [onenote notebook list](../cmd/onenote/notebook/notebook-list.md) - retrieves a list of notebooks [#3097](https://github.com/pnp/cli-microsoft365/issues/3097)
 
 **Microsoft Graph:**
