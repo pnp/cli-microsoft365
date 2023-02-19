@@ -63,24 +63,32 @@ m365 aad user add [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+!!! important
+    To use this command you must be a Global administrator, User administrator or Privileged Authentication administrator
+
+!!! note
+    After running this command, it may take a minute before the user is effectively created in the tenant.
+
 ## Examples
 
 Create a user and let him/her update the password at first login
 
 ```sh
-m365 aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --password "$@feP@$$w0rd" --forceChangePasswordNextSignIn
+m365 aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --password "SomePassw0rd" --forceChangePasswordNextSignIn
 ```
 
 Create a user with job information
 
 ```sh
-m365 aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --password "$@feP@$$w0rd" --firstName John --lastName Doe --jobTitle "Sales Manager" --companyName Contoso --department Sales --officeLocation Vosselaar
+m365 aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --password "SomePassw0rd" --firstName John --lastName Doe --jobTitle "Sales Manager" --companyName Contoso --department Sales --officeLocation Vosselaar
 ```
 
 Create a user with language information
 
 ```sh
-m365 aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --password "$@feP@$$w0rd" --preferredLanguage "nl-BE" --usageLocation BE
+m365 aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --password "SomePassw0rd" --preferredLanguage "nl-BE" --usageLocation BE
 ```
 
 Create a user with a manager
@@ -106,7 +114,7 @@ m365 aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --m
       "preferredLanguage": "nl-BE",
       "surname": "Doe",
       "userPrincipalName": "john.doe@contoso.com",
-      "password": "$@feP@$$w0rd"
+      "password": "SomePassw0rd"
     }
     ```
 
@@ -121,7 +129,7 @@ m365 aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --m
     mail             : null
     mobilePhone      : null
     officeLocation   : Vosselaar
-    password         : $@feP@$$w0rd
+    password         : SomePassw0rd
     preferredLanguage: nl-BE
     surname          : Doe
     userPrincipalName: john.doe@contoso.com
@@ -131,13 +139,13 @@ m365 aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --m
 
     ```csv
     id,businessPhones,displayName,givenName,jobTitle,mail,mobilePhone,officeLocation,preferredLanguage,surname,userPrincipalName,password
-    990e2425-f595-43bc-85ed-b89a44093793,[],John Doe,John,Sales Manager,,,Vosselaar,nl-BE,Doe,john.doe@contoso.com,$@feP@$$w0rd
+    990e2425-f595-43bc-85ed-b89a44093793,[],John Doe,John,Sales Manager,,,Vosselaar,nl-BE,Doe,john.doe@contoso.com,SomePassw0rd
     ```
 
 === "Markdown"
 
     ```md
-    # aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --password "$@feP@$$w0rd" --firstName John --lastName Doe --jobTitle "Sales Manager"
+    # aad user add --displayName "John Doe" --userName "john.doe@contoso.com" --password "SomePassw0rd" --firstName John --lastName Doe --jobTitle "Sales Manager" --officeLocation Vosselaar --preferredLanguage nl-BE
 
     Date: 16/02/2023
 

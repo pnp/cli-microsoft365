@@ -100,10 +100,10 @@ class AadUserAddCommand extends GraphCommand {
         option: '--lastName [lastName]'
       },
       {
-        option: '--forceChangePasswordNextSignIn'
+        option: '--forceChangePasswordNextSignIn [forceChangePasswordNextSignIn]'
       },
       {
-        option: '--forceChangePasswordNextSignInWithMfa'
+        option: '--forceChangePasswordNextSignInWithMfa [forceChangePasswordNextSignInWithMfa]'
       },
       {
         option: '--usageLocation [usageLocation]'
@@ -187,21 +187,17 @@ class AadUserAddCommand extends GraphCommand {
     this.optionSets.push(
       {
         options: ['managerUserId', 'managerUserName'],
-        runsWhen: (args) => {
-          return args.options.managerId || args.options.managerUserName;
-        }
+        runsWhen: (args) => args.options.managerId || args.options.managerUserName
       },
       {
         options: ['forceChangePasswordNextSignIn', 'forceChangePasswordNextSignInWithMfa'],
-        runsWhen: (args) => {
-          return args.options.forceChangePasswordNextSignIn || args.options.forceChangePasswordNextSignInWithMfa;
-        }
+        runsWhen: (args) => args.options.forceChangePasswordNextSignIn || args.options.forceChangePasswordNextSignInWithMfa
       }
     );
   }
 
   #initTypes(): void {
-    this.types.boolean.push('accountEnabled');
+    this.types.boolean.push('accountEnabled', 'forceChangePasswordNextSignIn', 'forceChangePasswordNextSignInWithMfa');
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -217,7 +213,7 @@ class AadUserAddCommand extends GraphCommand {
         },
         responseType: 'json',
         data: {
-          accountEnabled: args.options.accountEnabled || true,
+          accountEnabled: args.options.accountEnabled ?? true,
           displayName: args.options.displayName,
           userPrincipalName: args.options.userName,
           mailNickName: args.options.mailNickname ?? args.options.userName.split('@')[0],
@@ -243,7 +239,9 @@ class AadUserAddCommand extends GraphCommand {
       if (args.options.managerUserId || args.options.managerUserName) {
         const managerRequestOptions: CliRequestOptions = {
           url: `${this.resource}/v1.0/users/${user.id}/manager/$ref`,
-          headers: {},
+          headers: {
+            'accept': 'application/json;odata.metadata=none'
+          },
           data: {
             '@odata.id': `${this.resource}/v1.0/users/${args.options.managerUserId || args.options.managerUserName}`
           }
@@ -259,13 +257,31 @@ class AadUserAddCommand extends GraphCommand {
   }
 
   private generatePassword(): string {
-    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_@%$#*&';
-    let password = '';
-    for (let i = 0; i < 10; i++) {
-      const randomIndex = Math.floor(Math.random() * charset.length);
-      password += charset[randomIndex];
+    const numberChars = '0123456789';
+    const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
+    const specialChars = '-_@%$#*&';
+    const allChars = numberChars + upperChars + lowerChars + specialChars;
+    let randPasswordArray = Array(10);
+
+    randPasswordArray[0] = numberChars;
+    randPasswordArray[1] = upperChars;
+    randPasswordArray[2] = lowerChars;
+    randPasswordArray[3] = specialChars;
+    randPasswordArray = randPasswordArray.fill(allChars, 4);
+
+    const randomCharacterArray = randPasswordArray.map((charSet: string) => charSet[Math.floor(Math.random() * charSet.length)]);
+    return this.shuffleArrayToString(randomCharacterArray);
+  }
+
+  private shuffleArrayToString(characterArray: string[]): string {
+    for (let i = characterArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = characterArray[i];
+      characterArray[i] = characterArray[j];
+      characterArray[j] = temp;
     }
-    return password;
+    return characterArray.join('');
   }
 }
 

@@ -137,7 +137,7 @@ describe(commands.USER_GET, () => {
     assert(loggerLogSpy.calledWith(userResponseWithPassword));
   });
 
-  it('creates Azure AD user and set custom mailNickname', async () => {
+  it('creates a disabled Azure AD user and set custom mailNickname', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === graphBaseUrl) {
         return userResponseWithoutPassword;
@@ -146,7 +146,7 @@ describe(commands.USER_GET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { userName: userName, displayName: displayName, password: password, mailNickname: mailNickname } });
+    await command.action(logger, { options: { userName: userName, displayName: displayName, password: password, mailNickname: mailNickname, accountEnabled: false } });
     assert(loggerLogSpy.calledWith(userResponseWithPassword));
   });
 
