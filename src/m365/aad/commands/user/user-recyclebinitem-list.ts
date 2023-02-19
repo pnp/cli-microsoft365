@@ -19,14 +19,14 @@ class AadUserRecycleBinItemListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving users from the recycle bin...`);
+      logger.logToStderr('Retrieving users from the recycle bin...');
     }
     try {
       const users = await odata.getAllItems<User>(`${this.resource}/v1.0/directory/deletedItems/microsoft.graph.user`);
       logger.log(users);
     }
     catch (err: any) {
-      this.handleRejectedODataPromise(err);
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

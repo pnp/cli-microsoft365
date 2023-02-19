@@ -84,19 +84,17 @@ describe(commands.USER_RECYCLEBINITEM_LIST, () => {
     sinon.stub(odata, 'getAllItems').callsFake(async () => {
       throw {
         "error": {
-          "error": {
-            "code": "Invalid_Request",
-            "message": "An error has occured while processing this request.",
-            "innerError": {
-              "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
-              "date": "2018-04-24T18:56:48"
-            }
+          "code": "Invalid_Request",
+          "message": "An error has occured while processing this request.",
+          "innerError": {
+            "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
+            "date": "2018-04-24T18:56:48"
           }
         }
       };
     });
 
     await assert.rejects(command.action(logger, { options: { confirm: true } } as any),
-      new CommandError(`Invalid_Request - An error has occured while processing this request.`));
+      new CommandError(`An error has occured while processing this request.`));
   });
 });
