@@ -22,9 +22,10 @@ export interface Options extends GlobalOptions {
   password?: string;
   firstName?: string;
   lastName?: string;
-  forceChangePasswordNextSignIn: boolean;
-  forceChangePasswordNextSignInWithMfa: boolean;
+  forceChangePasswordNextSignIn?: boolean;
+  forceChangePasswordNextSignInWithMfa?: boolean;
   usageLocation?: string;
+  officeLocation?: string;
   jobTitle?: string;
   companyName?: string;
   department?: string;
@@ -48,6 +49,7 @@ class AadUserAddCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
     this.#initTypes();
   }
 
@@ -62,6 +64,7 @@ class AadUserAddCommand extends GraphCommand {
         forceChangePasswordNextSignIn: !!args.options.forceChangePasswordNextSignIn,
         forceChangePasswordNextSignInWithMfa: !!args.options.forceChangePasswordNextSignInWithMfa,
         usageLocation: typeof args.options.usageLocation !== 'undefined',
+        officeLocation: typeof args.options.officeLocation !== 'undefined',
         jobTitle: typeof args.options.jobTitle !== 'undefined',
         companyName: typeof args.options.companyName !== 'undefined',
         department: typeof args.options.department !== 'undefined',
@@ -81,7 +84,8 @@ class AadUserAddCommand extends GraphCommand {
         option: '--userName <userName>'
       },
       {
-        option: '--accountEnabled [accountEnabled]'
+        option: '--accountEnabled [accountEnabled]',
+        autocomplete: ['true', 'false']
       },
       {
         option: '--mailNickname [mailNickname]'
@@ -103,6 +107,9 @@ class AadUserAddCommand extends GraphCommand {
       },
       {
         option: '--usageLocation [usageLocation]'
+      },
+      {
+        option: '--officeLocation [officeLocation]'
       },
       {
         option: '--jobTitle [jobTitle]'
@@ -133,10 +140,14 @@ class AadUserAddCommand extends GraphCommand {
         }
 
         if (args.options.usageLocation) {
-          const regex = new RegExp('^[A-Z]{2}$');
+          const regex = new RegExp('^[a-zA-Z]{2}$');
           if (!regex.test(args.options.usageLocation)) {
             return `'${args.options.usageLocation}' is not a valid usageLocation.`;
           }
+        }
+
+        if (args.options.preferredLanguage && args.options.preferredLanguage.length < 2) {
+          return `'${args.options.preferredLanguage}' is not a valid preferredLanguage`;
         }
 
         if (args.options.firstName && args.options.firstName.length > 64) {
@@ -159,10 +170,6 @@ class AadUserAddCommand extends GraphCommand {
           return `The maximum amount of characters for 'department' is 64.`;
         }
 
-        if (args.options.managerUserId && args.options.managerUserName) {
-          return `Specify either 'managerUserId' or 'managerUserName', but not both.`;
-        }
-
         if (args.options.managerUserName && !validation.isValidUserPrincipalName(args.options.managerUserName)) {
           return `'${args.options.managerUserName}' is not a valid user principal name.`;
         }
@@ -172,6 +179,23 @@ class AadUserAddCommand extends GraphCommand {
         }
 
         return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      {
+        options: ['managerUserId', 'managerUserName'],
+        runsWhen: (args) => {
+          return args.options.managerId || args.options.managerUserName;
+        }
+      },
+      {
+        options: ['forceChangePasswordNextSignIn', 'forceChangePasswordNextSignInWithMfa'],
+        runsWhen: (args) => {
+          return args.options.forceChangePasswordNextSignIn || args.options.forceChangePasswordNextSignInWithMfa;
+        }
       }
     );
   }
@@ -186,42 +210,45 @@ class AadUserAddCommand extends GraphCommand {
     }
 
     try {
-      const requestBody = {
-        accountEnabled: args.options.accountEnabled || true,
-        displayName: args.options.displayName,
-        userPrincipalName: args.options.userName,
-        mailNickName: args.options.mailNickname || args.options.userName.split('@')[0],
-        passwordProfile: {
-          forceChangePasswordNextSignIn: args.options.forceChangePasswordNextSignIn,
-          forceChangePasswordNextSignInWithMfa: args.options.forceChangePasswordNextSignInWithMfa,
-          password: args.options.password || this.generatePassword()
-        },
-        givenName: args.options.firstName,
-        surName: args.options.lastName,
-        usageLocation: args.options.usageLocation,
-        jobTitle: args.options.jobTitle,
-        companyName: args.options.companyName,
-        department: args.options.department,
-        preferredLanguage: args.options.preferredLanguage
-      };
-
       const requestOptions: CliRequestOptions = {
         url: `${this.resource}/v1.0/users`,
         headers: {
           'accept': 'application/json;odata.metadata=none'
         },
         responseType: 'json',
-        data: requestBody
+        data: {
+          accountEnabled: args.options.accountEnabled || true,
+          displayName: args.options.displayName,
+          userPrincipalName: args.options.userName,
+          mailNickName: args.options.mailNickname ?? args.options.userName.split('@')[0],
+          passwordProfile: {
+            forceChangePasswordNextSignIn: args.options.forceChangePasswordNextSignIn,
+            forceChangePasswordNextSignInWithMfa: args.options.forceChangePasswordNextSignInWithMfa,
+            password: args.options.password ?? this.generatePassword()
+          },
+          givenName: args.options.firstName,
+          surName: args.options.lastName,
+          usageLocation: args.options.usageLocation,
+          officeLocation: args.options.officeLocation,
+          jobTitle: args.options.jobTitle,
+          companyName: args.options.companyName,
+          department: args.options.department,
+          preferredLanguage: args.options.preferredLanguage
+        }
       };
+
       const user = await request.post<ExtendedUser>(requestOptions);
-      user.password = requestBody.passwordProfile.password;
+      user.password = requestOptions.data.passwordProfile.password;
 
       if (args.options.managerUserId || args.options.managerUserName) {
-        requestOptions.url = `${this.resource}/v1.0/users/${user.id}/manager/$ref`;
-        requestOptions.data = {
-          '@odata.id': `${this.resource}/v1.0/users/${args.options.managerUserId || args.options.managerUserName}`
+        const managerRequestOptions: CliRequestOptions = {
+          url: `${this.resource}/v1.0/users/${user.id}/manager/$ref`,
+          headers: {},
+          data: {
+            '@odata.id': `${this.resource}/v1.0/users/${args.options.managerUserId || args.options.managerUserName}`
+          }
         };
-        await request.put(requestOptions);
+        await request.put(managerRequestOptions);
       }
 
       logger.log(user);
@@ -232,7 +259,13 @@ class AadUserAddCommand extends GraphCommand {
   }
 
   private generatePassword(): string {
-    return Math.random().toString(36).slice(-12);
+    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_@%$#*&';
+    let password = '';
+    for (let i = 0; i < 10; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
+    }
+    return password;
   }
 }
 

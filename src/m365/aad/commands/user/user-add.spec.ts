@@ -22,6 +22,7 @@ describe(commands.USER_GET, () => {
   const firstName = 'John';
   const lastName = 'Doe';
   const usageLocation = 'BE';
+  const officeLocation = 'Vosselaar';
   const jobTitle = 'Developer';
   const companyName = 'Microsoft';
   const department = 'IT';
@@ -38,7 +39,7 @@ describe(commands.USER_GET, () => {
     jobTitle: jobTitle,
     mail: null,
     mobilePhone: null,
-    officeLocation: null,
+    officeLocation: officeLocation,
     preferredLanguage: preferredLanguage,
     surname: lastName,
     userPrincipalName: userName
@@ -51,21 +52,19 @@ describe(commands.USER_GET, () => {
 
   const graphError = {
     error: {
-      error: {
-        code: "Request_BadRequest",
-        message: "Another object with the same value for property userPrincipalName already exists.",
-        details: [
-          {
-            code: "ObjectConflict",
-            message: "Another object with the same value for property userPrincipalName already exists.",
-            target: "userPrincipalName"
-          }
-        ],
-        innerError: {
-          date: "2023-02-16T17:22:25",
-          'request-id': "2726a9e1-2909-4277-ba89-144558eb9431",
-          'client-request-id': "2726a9e1-2909-4277-ba89-144558eb9431"
+      code: "Request_BadRequest",
+      message: "Another object with the same value for property userPrincipalName already exists.",
+      details: [
+        {
+          code: "ObjectConflict",
+          message: "Another object with the same value for property userPrincipalName already exists.",
+          target: "userPrincipalName"
         }
+      ],
+      innerError: {
+        date: "2023-02-16T17:22:25",
+        'request-id': "2726a9e1-2909-4277-ba89-144558eb9431",
+        'client-request-id': "2726a9e1-2909-4277-ba89-144558eb9431"
       }
     }
   };
@@ -190,7 +189,7 @@ describe(commands.USER_GET, () => {
     });
 
     await assert.rejects(command.action(logger, { options: { userName: userName, displayName: displayName } }),
-      new CommandError(graphError.error.error.message));
+      new CommandError(graphError.error.message));
   });
 
   it('fails validation if userName is not a valid userPrincipalName', async () => {
@@ -249,7 +248,7 @@ describe(commands.USER_GET, () => {
   });
 
   it('passes validation if all options (excluding managerUserName) are specified', async () => {
-    const actual = await command.validate({ options: { displayName: displayName, userName: userName, accountEnabled: accountEnabled, mailNickname: mailNickName, password: password, firstName: firstName, lastName: lastName, forceChangePasswordNextSignIn: true, forceChangePasswordNextSignInWithMfa: true, usageLocation: usageLocation, jobTitle: jobTitle, companyName: companyName, department: department, preferredLanguage: preferredLanguage, managerUserId: managerUserId } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: displayName, userName: userName, accountEnabled: accountEnabled, mailNickname: mailNickName, password: password, firstName: firstName, lastName: lastName, forceChangePasswordNextSignIn: true, forceChangePasswordNextSignInWithMfa: true, usageLocation: usageLocation, officeLocation: officeLocation, jobTitle: jobTitle, companyName: companyName, department: department, preferredLanguage: preferredLanguage, managerUserId: managerUserId } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
