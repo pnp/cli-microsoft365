@@ -29,19 +29,19 @@ m365 spo list retentionlabel remove [options]
 
 ## Examples
 
-Clears the retention label on a given list by URL
+Clears the retention label on a given list by URL.
 
 ```sh
 m365 spo list retentionlabel remove --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents'
 ```
 
-Clears the retention label on a given list by title
+Clears the retention label on a given list by title.
 
 ```sh
 m365 spo list retentionlabel remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents'
 ```
 
-Clears the retention label on a given list by ID without confirmation
+Clears the retention label on a given list by ID without confirmation.
 
 ```sh
 m365 spo list retentionlabel remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 'Documents' --confirm

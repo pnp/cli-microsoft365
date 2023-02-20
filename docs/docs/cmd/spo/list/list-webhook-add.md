@@ -86,3 +86,22 @@ m365 spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --
     clientState,expirationDateTime,id,notificationUrl,resource,resourceData
     random client state,2019-05-29T23:00:00.000Z,ef69c37d-cb0e-46d9-9758-5ebdeffd6959,https://contoso-funcions.azurewebsites.net/webhook,0987cfd9-f02c-479b-9fb4-3f0550462848,
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo list webhook add --webUrl "https://contoso.sharepoint.com/sites/ninja" --listUrl "/sites/ninja/Documents" --notificationUrl "https://contoso-funcions.azurewebsites.net/webhook" --expirationDateTime "2019-01-21"
+
+    Date: 2/20/2023
+
+    ## ef69c37d-cb0e-46d9-9758-5ebdeffd6959
+
+    Property | Value
+    ---------|-------
+    clientState | random client state
+    expirationDateTime | 2019-05-29T23:00:00.000Z
+    id | ef69c37d-cb0e-46d9-9758-5ebdeffd6959
+    notificationUrl | https://contoso-funcions.azurewebsites.net/webhook
+    resource | 0987cfd9-f02c-479b-9fb4-3f0550462848
+    resourceData | null
+    ```

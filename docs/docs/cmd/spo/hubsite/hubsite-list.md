@@ -11,7 +11,7 @@ m365 spo hubsite list [options]
 ## Options
 
 `-i, --includeAssociatedSites`
-: Include the associated sites in the result (only in JSON output)
+: Include the associated sites in the result (only in JSON output).
 
 --8<-- "docs/cmd/_global.md"
 
@@ -77,6 +77,35 @@ m365 spo hubsite list --includeAssociatedSites --output json
     af80c11f-0138-4d72-bb37-514542c3aabb,https://contoso.sharepoint.com/sites/intra,Intranet
     ```
 
+=== "Markdown"
+
+    ```md
+    # spo hubsite list
+
+    Date: 2/20/2023
+
+    ## Intranet (af80c11f-0138-4d72-bb37-514542c3aabb)
+
+    Property | Value
+    ---------|-------
+    Description | Intranet Hub Site
+    EnablePermissionsSync | false
+    EnforcedECTs | null
+    EnforcedECTsVersion | 0
+    HideNameInNavigation | false
+    ID | af80c11f-0138-4d72-bb37-514542c3aabb
+    LogoUrl | https://contoso.sharepoint.com/sites/intra/SiteAssets/work.png
+    ParentHubSiteId | ec78f3aa-5a74-4f16-be49-3396df045f34
+    PermissionsSyncTag | 0
+    RequiresJoinApproval | false
+    SiteDesignId | 184644fb-90ed-4841-a7ad-6930cf819060
+    SiteId | af80c11f-0138-4d72-bb37-514542c3aabb
+    SiteUrl | https://contoso.sharepoint.com/sites/intra
+    Targets | null
+    TenantInstanceId | 5d128b52-7228-46b5-8765-5b338476054d
+    Title | Intranet
+    ```
+
 ### `includeAssociatedSites` response
 
 When we make use of the option `includeAssociatedSites` the response will differ. 
@@ -125,6 +154,35 @@ When we make use of the option `includeAssociatedSites` the response will differ
     ```csv
     ID,SiteUrl,Title
     af80c11f-0138-4d72-bb37-514542c3aabb,https://contoso.sharepoint.com/sites/intra,Intranet
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo hubsite list --includeAssociatedSites "true"
+
+    Date: 2/20/2023
+
+    ## Intranet (af80c11f-0138-4d72-bb37-514542c3aabb)
+
+    Property | Value
+    ---------|-------
+    Description | Intranet Hub Site
+    EnablePermissionsSync | false
+    EnforcedECTs | null
+    EnforcedECTsVersion | 0
+    HideNameInNavigation | false
+    ID | af80c11f-0138-4d72-bb37-514542c3aabb
+    LogoUrl | https://contoso.sharepoint.com/sites/intra/SiteAssets/work.png
+    ParentHubSiteId | ec78f3aa-5a74-4f16-be49-3396df045f34
+    PermissionsSyncTag | 0
+    RequiresJoinApproval | false
+    SiteDesignId | 184644fb-90ed-4841-a7ad-6930cf819060
+    SiteId | af80c11f-0138-4d72-bb37-514542c3aabb
+    SiteUrl | https://contoso.sharepoint.com/sites/intra
+    Targets | null
+    TenantInstanceId | 5d128b52-7228-46b5-8765-5b338476054d
+    Title | Intranet
     ```
 
 ## More information

@@ -80,3 +80,18 @@ m365 spo listitem attachment list --webUrl https://contoso.sharepoint.com/sites/
     FileName,ServerRelativeUrl
     DummyDocument.docx,/Lists/Test/Attachments/236/DummyDocument.docx
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo listitem attachment list --webUrl "https://contoso.sharepoint.com" --listTitle "Test" --itemId "236"
+
+    Date: 2/20/2023
+
+    Property | Value
+    ---------|-------
+    FileName | DummyDocument.docx
+    FileNameAsPath | {"DecodedUrl":"DummyDocument.docx"}
+    ServerRelativePath | {"DecodedUrl":"/Lists/Test/Attachments/236/DummyDocument.docx"}
+    ServerRelativeUrl | /Lists/Test/Attachments/236/DummyDocument.docx
+    ```

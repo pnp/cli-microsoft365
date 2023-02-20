@@ -14,13 +14,13 @@ m365 spo list sitescript get [options]
 : URL of the site where the list to extract the site script from is located.
 
 `-l, --listId [listId]`
-: ID of the list to extract the site script from. Specify either `listId`, `listTitle` or `listUrl` but not multiple.
+: ID of the list to extract the site script from. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `-t, --listTitle [listTitle]`
-: Title of the list to extract the site script from. Specify either `listId`, `listTitle` or `listUrl` but not multiple.
+: Title of the list to extract the site script from. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `--listUrl [listUrl]`
-: Server- or site-relative URL of the list. Specify either `listId`, `listTitle` or `listUrl` but not multiple.
+: Server- or site-relative URL of the list. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -93,6 +93,38 @@ m365 spo list sitescript get --listUrl 'Shared Documents' --webUrl https://conto
 === "CSV"
 
     ```csv
+    {
+      "$schema": "https://developer.microsoft.com/json-schemas/sp/site-design-script-actions.schema.json",
+      "actions": [
+        {
+          "verb": "createSPList",
+          "listName": "Test",
+          "templateType": 100,
+          "color": "0",
+          "icon": "3",
+          "subactions": [
+            {
+              "verb": "addSPView",
+              "name": "Alle items",
+              "viewFields": [
+                "ID"
+              ],
+              "query": "",
+              "rowLimit": 30,
+              "isPaged": true,
+              "makeDefault": true,
+              "formatterJSON": "",
+              "replaceViewFields": true
+            }
+          ]
+        }
+      ]
+    }
+    ```
+
+=== "Markdown"
+
+    ```md
     {
       "$schema": "https://developer.microsoft.com/json-schemas/sp/site-design-script-actions.schema.json",
       "actions": [

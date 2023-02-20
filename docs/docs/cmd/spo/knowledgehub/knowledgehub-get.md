@@ -17,7 +17,7 @@ m365 spo knowledgehub get [options]
 
 ## Examples
 
-Gets the Knowledge Hub Site URL for your tenant
+Gets the Knowledge Hub Site URL for your tenant.
 
 ```sh
 m365 spo knowledgehub get
@@ -40,5 +40,11 @@ m365 spo knowledgehub get
 === "CSV"
 
     ```csv
+    https://contoso.sharepoint.com
+    ```
+
+=== "Markdown"
+
+    ```md
     https://contoso.sharepoint.com
     ```

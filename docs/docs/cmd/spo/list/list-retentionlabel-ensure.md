@@ -51,13 +51,13 @@ A list retention label is a default label that will be applied to all new items 
 
 ## Examples
 
-Sets a retention label by name on a given list
+Sets a retention label by name on a given list.
 
 ```sh
 m365 spo list retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --name 'Some label'
 ```
 
-Sets a retention label by name and disables editing and deleting items on the list and all existing items for a given list
+Sets a retention label by name and disables editing and deleting items on the list and all existing items for a given list.
 
 ```sh
 m365 spo list retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --name 'Some label' --blockEdit --blockDelete --syncToItems
