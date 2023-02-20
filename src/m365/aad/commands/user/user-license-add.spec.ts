@@ -16,6 +16,7 @@ describe(commands.USER_LICENSE_ADD, () => {
   let commandInfo: CommandInfo;
   //#region Mocked Responses
   const validIds = '45715bb8-13f9-4bf6-927f-ef96c102d394,0118A350-71FC-4EC3-8F0C-6A1CB8867561';
+  const validIdsSingle = '45715bb8-13f9-4bf6-927f-ef96c102d394';
   const validUserId = 'eb77fbcf-6fe8-458b-985d-1747284793bc';
   const validUserName = 'John@contos.onmicrosoft.com';
   const userLicenseResponse = {
@@ -120,6 +121,19 @@ describe(commands.USER_LICENSE_ADD, () => {
     assert(loggerLogSpy.calledWith(userLicenseResponse));
   });
 
+  it('adds single license to a user by userId', async () => {
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${validUserId}/assignLicense`)) {
+        return userLicenseResponse;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await command.action(logger, { options: { verbose: true, userId: validUserId, ids: validIdsSingle } });
+    assert(loggerLogSpy.calledWith(userLicenseResponse));
+  });
+
   it('adds licenses to a user by userName', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if ((opts.url === `https://graph.microsoft.com/v1.0/users/${validUserName}/assignLicense`)) {
@@ -131,6 +145,28 @@ describe(commands.USER_LICENSE_ADD, () => {
 
     await command.action(logger, { options: { verbose: true, userName: validUserName, ids: validIds } });
     assert(loggerLogSpy.calledWith(userLicenseResponse));
+  });
+
+  it('fails when one license is not a valid company license', async () => {
+    const error = {
+      error: {
+        message: 'License 0118a350-71fc-4ec3-8f0c-6a1cb8867561 does not correspond to a valid company License.'
+      }
+    };
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${validUserId}/assignLicense`)) {
+        throw error;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true, userId: validUserId, ids: validIdsSingle
+      }
+    }), new CommandError(error.error.message));
   });
 
   it('correctly handles random API error', async () => {
