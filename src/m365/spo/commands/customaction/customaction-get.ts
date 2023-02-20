@@ -146,7 +146,6 @@ class SpoCustomActionGetCommand extends SpoCommand {
       return customAction;
     }
     else if (options.title) {
-
       const customActions: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `Title eq '${formatting.encodeQueryParameter(options.title as string)}'`);
 
       if (customActions.length === 1) {
