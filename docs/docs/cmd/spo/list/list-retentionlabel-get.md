@@ -20,13 +20,13 @@ m365 spo list label get [options]
 : URL of the site where the list to get the label from is located.
 
 `-l, --listId [listId]`
-: ID of the list to get the label from. Specify either `listId`, `listTitle` or `listUrl` but not multiple.
+: ID of the list to get the label from. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `-t, --listTitle [listTitle]`
-: Title of the list to get the label from. Specify either `listId`, `listTitle` or `listUrl` but not multiple.
+: Title of the list to get the label from. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `--listUrl [listUrl]`
-: Server- or site-relative URL of the list. Specify either `listId`, `listTitle` or `listUrl` but not multiple.
+: Server- or site-relative URL of the list. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -115,4 +115,37 @@ m365 spo list retentionlabel get --listUrl 'Shared Documents' --webUrl https://c
     ```csv
     AcceptMessagesOnlyFromSendersOrMembers,AccessType,AllowAccessFromUnmanagedDevice,AutoDelete,BlockDelete,BlockEdit,ContainsSiteLabel,DisplayName,EncryptionRMSTemplateId,HasRetentionAction,IsEventTag,Notes,RequireSenderAuthenticationEnabled,ReviewerEmail,SharingCapabilities,SuperLock,TagDuration,TagId,TagName,TagRetentionBasedOn
     false,,,false,false,false,false,Label A,,false,false,,false,,,false,0,4d535433-2a7b-40b0-9dad-8f0f8f3b3841,Sensitive,
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo list retentionlabel get --listUrl "Shared Documents" --webUrl https://contoso.sharepoint.com/sites/project-x
+
+    Date: 2/20/2023
+
+    ## Label A (4d535433-2a7b-40b0-9dad-8f0f8f3b3841)
+
+    Property | Value
+    ---------|-------
+    AcceptMessagesOnlyFromSendersOrMembers | false
+    AccessType | null
+    AllowAccessFromUnmanagedDevice | null
+    AutoDelete | false
+    BlockDelete | false
+    BlockEdit | false
+    ContainsSiteLabel | false
+    DisplayName | Label A
+    EncryptionRMSTemplateId | null
+    HasRetentionAction | false
+    IsEventTag | false
+    Notes | null
+    RequireSenderAuthenticationEnabled | false
+    ReviewerEmail | null
+    SharingCapabilities | null
+    SuperLock | false
+    TagDuration | 0
+    TagId | 4d535433-2a7b-40b0-9dad-8f0f8f3b3841
+    TagName | Sensitive
+    TagRetentionBasedOn | null
     ```

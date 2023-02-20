@@ -14,13 +14,13 @@ m365 spo list view add [options]
 : URL of the site where the list is located.
 
 `--listId [listId]`
-: ID of the list to which the view should be added. Specify either `listId`, `listTitle` or `listUrl` but not multiple.
+: ID of the list to which the view should be added. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `--listTitle [listTitle]`
-: Title of the list to which the view should be added. Specify either `listId`, `listTitle` or `listUrl` but not multiple.
+: Title of the list to which the view should be added. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `--listUrl [listUrl]`
-: Relative URL of the list to which the view should be added. Specify either `listId`, `listTitle` or `listUrl` but not multiple.
+: Relative URL of the list to which the view should be added. Specify either `listId`, `listTitle`, or `listUrl` but not multiple.
 
 `--title <title>`
 : Title of the view to be created for the list.
@@ -54,7 +54,7 @@ We recommend using the `paged` option. When specified, the view supports display
 Add a view called _All events_ to a list with specific title.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "My List" --title "All events" --fields "FieldName1,FieldName2,Created,Author,Modified,Editor" --paged
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Test" --title "All events" --fields "FieldName1,FieldName2,Created,Author,Modified,Editor" --paged
 ```
 
 Add a view as default view with title _All events_ to a list with a specific URL.
@@ -72,7 +72,7 @@ m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x -
 Add a view called _All events_ with defined filter and sorting.
 
 ```sh
-m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "My List" --title "All events" --fields "FieldName1" --viewQuery "<OrderBy><FieldRef Name='Created' Ascending='FALSE' /></OrderBy><Where><Eq><FieldRef Name='TextFieldName' /><Value Type='Text'>Field value</Value></Eq></Where>" --paged
+m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Test" --title "All events" --fields "FieldName1" --viewQuery "<OrderBy><FieldRef Name='Created' Ascending='FALSE' /></OrderBy><Where><Eq><FieldRef Name='TextFieldName' /><Value Type='Text'>Field value</Value></Eq></Where>" --paged
 ```
 
 ## Response
@@ -194,4 +194,65 @@ m365 spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x -
     ```csv
     Aggregations,AggregationsStatus,AssociatedContentTypeId,BaseViewId,CalendarViewStyles,ColumnWidth,ContentTypeId,CustomFormatter,CustomOrder,DefaultView,DefaultViewForContentType,EditorModified,Formats,GridLayout,Hidden,HtmlSchemaXml,Id,ImageUrl,IncludeRootFolder,ViewJoins,JSLink,ListViewXml,Method,MobileDefaultView,MobileView,ModerationType,NewDocumentTemplates,OrderedView,Paged,PersonalView,ViewProjectedFields,ViewQuery,ReadOnlyView,RequiresClientIntegration,RowLimit,Scope,ServerRelativePath,ServerRelativeUrl,StyleId,TabularView,Threaded,Title,Toolbar,ToolbarTemplateName,ViewType,ViewData,ViewType2,VisualizationInfo
     ,,,,,,"{""StringValue"":""0x""}",,,,,,,,,"<View Type=""HTML"" Url=""/Lists/Test/All events2.aspx"" Personal=""FALSE"" DisplayName=""All events"" DefaultView=""FALSE"" Name=""{0F11C3F1-E174-4A85-93A9-B4AFB7BD41B6}""><ViewFields><FieldRef Name=""Title"" /></ViewFields><Query><OrderBy><FieldRef Name=""Created"" Ascending=""FALSE"" /></OrderBy><Where><Eq><FieldRef Name=""TextFieldName"" /><Value Type=""Text"">Field value</Value></Eq></Where></Query><RowLimit Paged=""TRUE"">30</RowLimit></View>",0f11c3f1-e174-4a85-93a9-b4afb7bd41b6,,,,,"<View Type=""HTML"" Url=""/Lists/Test/All events2.aspx"" Personal=""FALSE"" DisplayName=""All events"" DefaultView=""FALSE"" Name=""{0F11C3F1-E174-4A85-93A9-B4AFB7BD41B6}"" ><Query><OrderBy><FieldRef Name=""Created"" Ascending=""FALSE"" /></OrderBy><Where><Eq><FieldRef Name=""TextFieldName"" /><Value Type=""Text"">Field value</Value></Eq></Where></Query><ViewFields><FieldRef Name=""Title"" /></ViewFields><RowLimit Paged=""TRUE"">30</RowLimit><Toolbar Type=""None""/></View>",,,,,,,1,,,"<OrderBy><FieldRef Name=""Created"" Ascending=""FALSE"" /></OrderBy><Where><Eq><FieldRef Name=""TextFieldName"" /><Value Type=""Text"">Field value</Value></Eq></Where>",,,30,0,"{""DecodedUrl"":""/Lists/Test/All events2.aspx""}",/Lists/Test/All events2.aspx,,1,,All events,,,HTML,,,
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo list view add --webUrl "https://contoso.sharepoint.com" --listTitle "Test" --title "All events" --fields "FieldName1" --viewQuery "<OrderBy><FieldRef Name='Created' Ascending='FALSE' /></OrderBy><Where><Eq><FieldRef Name='TextFieldName' /><Value Type='Text'>Field value</Value></Eq></Where>" --paged "true"
+
+    Date: 2/20/2023
+
+    ## All events (f3cade4a-d8c4-43b3-971c-9a4acc2510b8)
+
+    Property | Value
+    ---------|-------
+    Aggregations | null
+    AggregationsStatus | null
+    AssociatedContentTypeId | null
+    BaseViewId | null
+    CalendarViewStyles | null
+    ColumnWidth | null
+    ContentTypeId | {"StringValue":"0x"}
+    CustomFormatter | null
+    CustomOrder | null
+    DefaultView | false
+    DefaultViewForContentType | false
+    EditorModified | false
+    Formats | null
+    GridLayout | null
+    Hidden | false
+    HtmlSchemaXml | <View Type="HTML" Url="/Lists/Test/All events.aspx" Personal="FALSE" DisplayName="All events" DefaultView="FALSE" Name="{F3CADE4A-D8C4-43B3-971C-9A4ACC2510B8}"><ViewFields><FieldRef Name="FieldName1" /></ViewFields><Query><OrderBy><FieldRef Name="Created" Ascending="FALSE" /></OrderBy><Where><Eq><FieldRef Name="TextFieldName" /><Value Type="Text">Field value</Value></Eq></Where></Query><RowLimit Paged="TRUE">30</RowLimit></View>
+    Id | f3cade4a-d8c4-43b3-971c-9a4acc2510b8
+    ImageUrl | null
+    IncludeRootFolder | false
+    ViewJoins | null
+    JSLink | null
+    ListViewXml | <View Type="HTML" Url="/Lists/Test/All events.aspx" Personal="FALSE" DisplayName="All events" DefaultView="FALSE" Name="{F3CADE4A-D8C4-43B3-971C-9A4ACC2510B8}" ><Query><OrderBy><FieldRef Name="Created" Ascending="FALSE" /></OrderBy><Where><Eq><FieldRef Name="TextFieldName" /><Value Type="Text">Field value</Value></Eq></Where></Query><ViewFields><FieldRef Name="FieldName1" /></ViewFields><RowLimit Paged="TRUE">30</RowLimit><Toolbar Type="None"/></View>
+    Method | null
+    MobileDefaultView | false
+    MobileView | false
+    ModerationType | null
+    NewDocumentTemplates | null
+    OrderedView | false
+    Paged | true
+    PersonalView | false
+    ViewProjectedFields | null
+    ViewQuery | <OrderBy><FieldRef Name="Created" Ascending="FALSE" /></OrderBy><Where><Eq><FieldRef Name="TextFieldName" /><Value Type="Text">Field value</Value></Eq></Where>
+    ReadOnlyView | false
+    RequiresClientIntegration | false
+    RowLimit | 30
+    Scope | 0
+    ServerRelativePath | {"DecodedUrl":"/Lists/Test/All events.aspx"}
+    ServerRelativeUrl | /Lists/Test/All events.aspx
+    StyleId | null
+    TabularView | true
+    Threaded | false
+    Title | All events
+    Toolbar | null
+    ToolbarTemplateName | null
+    ViewType | HTML
+    ViewData | null
+    ViewType2 | null
+    VisualizationInfo | null
     ```
