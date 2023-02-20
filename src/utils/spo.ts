@@ -673,7 +673,7 @@ export const spo = {
     return customActionOnSite;
   },
 
-  async getTenantAppCatalogUrl(logger: Logger, debug: boolean): Promise<string | undefined> {
+  async getTenantAppCatalogUrl(logger: Logger, debug: boolean): Promise<string | null> {
     const spoUrl = await spo.getSpoUrl(logger, debug);
 
     const requestOptions: any = {

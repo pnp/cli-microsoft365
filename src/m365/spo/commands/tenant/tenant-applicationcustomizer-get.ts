@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli/Logger';
 import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { spo } from '../../../../utils/spo';
+import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
@@ -82,48 +83,51 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
+    if (!appCatalogUrl) {
+      throw new CommandError('No app catalog URL found');
+    }
+
+    let filter: string = '';
+    if (args.options.title) {
+      filter = `Title eq '${args.options.title}'`;
+    }
+    else if (args.options.id) {
+      filter = `GUID eq '${args.options.id}'`;
+    }
+    else if (args.options.clientSideComponentId) {
+      filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
+    }
+
+    const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
+    const reqOptions: CliRequestOptions = {
+      url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=${filter}`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    let listItemInstances: ListItemInstanceCollection | undefined;
     try {
-      const appCatalogUrl = await spo.getTenantAppCatalogUrl(logger, this.debug);
-      if (!appCatalogUrl) {
-        throw 'No app catalog URL found';
-      }
+      listItemInstances = await request.get<ListItemInstanceCollection>(reqOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
 
-      let filter: string = '';
-      if (args.options.title) {
-        filter = `Title eq '${args.options.title}'`;
-      }
-      else if (args.options.id) {
-        filter = `GUID eq '${args.options.id}'`;
-      }
-      else if (args.options.clientSideComponentId) {
-        filter = `TenantWideExtensionComponentId eq '${args.options.clientSideComponentId}'`;
-      }
-
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, '/lists/TenantWideExtensions');
-      const reqOptions: CliRequestOptions = {
-        url: `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=${filter}`,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      const listItemInstances = await request.get<ListItemInstanceCollection>(reqOptions);
-
+    if (listItemInstances) {
       if (listItemInstances.value.length === 0) {
-        throw 'The specified application customizer was not found';
+        throw new CommandError('The specified application customizer was not found');
       }
 
       if (listItemInstances.value.length > 1) {
-        throw `Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.GUID).join(', ')}`;
+        throw new CommandError(`Multiple application customizers with ${args.options.title || args.options.clientSideComponentId} were found. Please disambiguate (IDs): ${listItemInstances.value.map(item => item.GUID).join(', ')}`);
       }
 
       listItemInstances.value.forEach(v => delete v['ID']);
 
       logger.log(listItemInstances.value[0]);
-    }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
     }
   }
 }

@@ -263,12 +263,8 @@ describe('utils/spo', () => {
   });
 
   it('retrieves tenant app catalog url', async () => {
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/sites/root?$select=webUrl') {
-        return Promise.resolve({ webUrl: 'https://contoso.sharepoint.com' });
-      }
-
       if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
         return Promise.resolve({ CorporateCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' });
       }
@@ -276,10 +272,24 @@ describe('utils/spo', () => {
       return Promise.reject('Invalid request');
     });
 
-    const spoUrl = await spo.getSpoUrl(logger, false);
+
     const tenantAppCatalogUrl = await spo.getTenantAppCatalogUrl(logger, false);
-    assert.deepEqual(spoUrl, 'https://contoso.sharepoint.com');
     assert.deepEqual(tenantAppCatalogUrl, 'https://contoso.sharepoint.com/sites/appcatalog');
+  });
+
+  it('retrieves tenant app catalog url when not set', async () => {
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
+        return Promise.resolve({ CorporateCatalogUrl: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+
+    const tenantAppCatalogUrl = await spo.getTenantAppCatalogUrl(logger, false);
+    assert.deepEqual(tenantAppCatalogUrl, null);
   });
 
   it('retrieves SPO URL from MS Graph when not retrieved previously', (done) => {

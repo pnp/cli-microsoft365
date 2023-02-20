@@ -338,4 +338,27 @@ describe(commands.TENANT_APPLICATIONCUSTOMIZER_GET, () => {
       }
     }), new CommandError(errorMessage));
   });
+
+  it('handles error when retrieving application customizer', async () => {
+    const errorMessage = 'An error has occurred';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `${spoUrl}/_api/SP_TenantSettings_Current`) {
+        return { CorporateCatalogUrl: appCatalogUrl };
+      }
+
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(appCatalogUrl, listUrl);
+      if (opts.url === `${appCatalogUrl}/_api/web/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/items?$filter=TenantWideExtensionComponentId eq '${clientSideComponentId}'`) {
+        throw errorMessage;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        clientSideComponentId: clientSideComponentId
+      }
+    }), new CommandError(errorMessage));
+  });
 });
