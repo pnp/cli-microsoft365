@@ -10,7 +10,7 @@ import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
-const command: Command = require('./commandset -list');
+const command: Command = require('./commandset-list');
 
 describe(commands.COMMANDSET_LIST, () => {
   let log: string[];
