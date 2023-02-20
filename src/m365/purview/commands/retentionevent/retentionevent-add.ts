@@ -32,6 +32,7 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
   }
@@ -66,9 +67,24 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
           return 'The triggerDateTime is not a valid ISO date string';
         }
 
+        if (!args.options.assetIds && !args.options.keywords) {
+          return 'Specify assetIds and/or keywords, but at least one.';
+        }
+
         return true;
       }
     );
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        description: typeof args.options.description !== 'undefined',
+        triggerDateTime: typeof args.options.triggerDateTime !== 'undefined',
+        assetIds: typeof args.options.assetIds !== 'undefined',
+        keywords: typeof args.options.keywords !== 'undefined'
+      });
+    });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -82,11 +98,15 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
 
     const eventQueries: any[] = [];
 
-    args.options.assetIds?.split(',').forEach(x => { eventQueries.push({ queryType: "files", query: x }); });
-    args.options.keywords?.split(',').forEach(x => { eventQueries.push({ queryType: "messages", query: x }); });
+    if (args.options.assetIds) {
+      args.options.assetIds.split(',').forEach(x => { eventQueries.push({ queryType: "files", query: x }); });
+    }
+    if (args.options.keywords) {
+      args.options.keywords && args.options.keywords.split(',').forEach(x => { eventQueries.push({ queryType: "messages", query: x }); });
+    }
 
     const data = {
-      retentionEventType: args.options.eventType,
+      'retentionEventType@odata.bind': `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${args.options.eventType}`,
       displayName: args.options.displayName,
       description: args.options.description,
       eventQueries: eventQueries,
@@ -95,7 +115,7 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
 
     try {
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}/beta/security/triggers/retentionEvents/${args.options.id}`,
+        url: `${this.resource}/beta/security/triggers/retentionEvents`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
