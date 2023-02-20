@@ -287,9 +287,35 @@ describe('utils/spo', () => {
       return Promise.reject('Invalid request');
     });
 
-
     const tenantAppCatalogUrl = await spo.getTenantAppCatalogUrl(logger, false);
     assert.deepEqual(tenantAppCatalogUrl, null);
+  });
+
+  it('handles error when retrieving SPO URL failed while retrieving application customizer', (done) => {
+    const errorMessage = 'An error has occurred';
+    auth.service.spoUrl = undefined;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
+        return Promise.reject(errorMessage);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    spo
+      .getTenantAppCatalogUrl(logger, false)
+      .then(() => {
+        done('Expected error');
+      }, (err: string) => {
+        try {
+          assert.strictEqual(err, 'Invalid request');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
   });
 
   it('retrieves SPO URL from MS Graph when not retrieved previously', (done) => {
