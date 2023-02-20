@@ -18,12 +18,12 @@ describe(commands.USER_LICENSE_REMOVE, () => {
   const validUserId = '3a081d91-5ea8-40a7-8ac9-abbaa3fcb893';
   const validUserName = 'John.Doe@contoso.com';
   const validIds = "45715bb8-13f9-4bf6-927f-ef96c102d394,0118A350-71FC-4EC3-8F0C-6A1CB8867561";
+  const validIdsSingle = '45715bb8-13f9-4bf6-927f-ef96c102d394';
   //#endregion
 
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -46,7 +46,6 @@ describe(commands.USER_LICENSE_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
       return { continue: false };
@@ -146,8 +145,21 @@ describe(commands.USER_LICENSE_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
+  it('removes a single user license by userId without confirmation prompt', async () => {
+    const postSpy = sinon.stub(request, 'post').callsFake(async opts => {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${validUserId}/assignLicense`)) {
+        return;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await command.action(logger, { options: { userId: validUserId, ids: validIdsSingle, confirm: true } });
+    assert(postSpy.called);
+  });
+
   it('removes the specified user licenses by userName when prompt confirmed', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${validUserName}/assignLicense`) {
         return;
       }
@@ -164,11 +176,11 @@ describe(commands.USER_LICENSE_REMOVE, () => {
         verbose: true, userName: validUserName, ids: validIds
       }
     });
-    assert(loggerLogToStderrSpy.called);
+    assert(postSpy.called);
   });
 
   it('removes the specified user licenses by userId without confirmation prompt', async () => {
-    sinon.stub(request, 'post').callsFake(async (opts) => {
+    const postSpy = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/${validUserId}/assignLicense`) {
         return;
       }
@@ -181,7 +193,29 @@ describe(commands.USER_LICENSE_REMOVE, () => {
         verbose: true, userId: validUserId, ids: validIds, confirm: true
       }
     });
-    assert(loggerLogToStderrSpy.called);
+    assert(postSpy.called);
+  });
+
+  it('fails when removing one license is not a valid company license', async () => {
+    const error = {
+      error: {
+        message: 'License 0118a350-71fc-4ec3-8f0c-6a1cb8867561 does not correspond to a valid company License.'
+      }
+    };
+
+    sinon.stub(request, 'post').callsFake(async opts => {
+      if ((opts.url === `https://graph.microsoft.com/v1.0/users/${validUserId}/assignLicense`)) {
+        throw error;
+      }
+
+      throw `Invalid request ${opts.url}`;
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        verbose: true, userId: validUserId, ids: validIdsSingle, confirm: true
+      }
+    }), new CommandError(error.error.message));
   });
 
   it('correctly handles random API error', async () => {
