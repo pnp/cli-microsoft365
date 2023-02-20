@@ -99,10 +99,10 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
     const eventQueries: any[] = [];
 
     if (args.options.assetIds) {
-      args.options.assetIds.split(',').forEach(x => { eventQueries.push({ queryType: "files", query: x }); });
+      eventQueries.push({ queryType: "files", query: args.options.assetIds });
     }
     if (args.options.keywords) {
-      args.options.keywords && args.options.keywords.split(',').forEach(x => { eventQueries.push({ queryType: "messages", query: x }); });
+      eventQueries.push({ queryType: "messages", query: args.options.keywords });
     }
 
     const data = {
