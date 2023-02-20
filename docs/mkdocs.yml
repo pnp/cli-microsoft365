@@ -391,6 +391,8 @@ nav:
         - cdn origin remove: cmd/spo/cdn/cdn-origin-remove.md
         - cdn policy list: cmd/spo/cdn/cdn-policy-list.md
         - cdn policy set: cmd/spo/cdn/cdn-policy-set.md
+      - commandset:
+        - commandset list: cmd/spo/commandset/commandset-list.md
       - contenttype:
         - contenttype add: cmd/spo/contenttype/contenttype-add.md
         - contenttype get: cmd/spo/contenttype/contenttype-get.md
