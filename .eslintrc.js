@@ -77,7 +77,6 @@ const dictionary = [
   'setup',
   'setting',
   'settings',
-  'setup',
   'sharing',
   'side',
   'site',
