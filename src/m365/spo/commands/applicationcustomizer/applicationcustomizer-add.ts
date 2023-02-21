@@ -1,12 +1,10 @@
-import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
-import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import * as spoCustomActionAddCommand from '../customaction/customaction-add';
-import { Options as spoCustomActionAddCommandOptions } from '../customaction/customaction-add';
+import { CustomAction } from '../customaction/customaction';
 
 interface CommandArgs {
   options: Options;
@@ -17,9 +15,12 @@ interface Options extends GlobalOptions {
   webUrl: string;
   clientSideComponentId: string;
   clientSideComponentProperties?: string;
+  scope?: string;
 }
 
 class SpoApplicationCustomizerAddCommand extends SpoCommand {
+  private static readonly scopes: string[] = ['Site', 'Web'];
+
   public get name(): string {
     return commands.APPLICATIONCUSTOMIZER_ADD;
   }
@@ -50,13 +51,17 @@ class SpoApplicationCustomizerAddCommand extends SpoCommand {
       {
         option: '--clientSideComponentProperties [clientSideComponentProperties]'
       },
+      {
+        option: '-s, --scope [scope]', autocomplete: SpoApplicationCustomizerAddCommand.scopes
+      }
     );
   }
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined'
+        clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
+        scope: typeof args.options.scope !== 'undefined'
       });
     });
   }
@@ -84,6 +89,10 @@ class SpoApplicationCustomizerAddCommand extends SpoCommand {
           }
         }
 
+        if (args.options.scope && SpoApplicationCustomizerAddCommand.scopes.indexOf(args.options.scope) < 0) {
+          return `${args.options.scope} is not a valid value for allowedMembers. Valid values are ${SpoApplicationCustomizerAddCommand.scopes.join(', ')}`;
+        }
+
         return true;
       }
     );
@@ -94,17 +103,32 @@ class SpoApplicationCustomizerAddCommand extends SpoCommand {
       logger.logToStderr(`Adding application customizer with title '${args.options.title}' and clientSideComponentId '${args.options.clientSideComponentId}' to the site`);
     }
 
-    const options: spoCustomActionAddCommandOptions = {
-      webUrl: args.options.webUrl,
-      name: args.options.title,
-      title: args.options.title,
-      clientSideComponentId: args.options.clientSideComponentId,
-      clientSideComponentProperties: args.options.clientSideComponentProperties || '',
-      location: 'ClientSideExtension.ApplicationCustomizer',
-      debug: this.debug,
-      verbose: this.verbose
+    const requestBody: any = {
+      Title: args.options.title,
+      Name: args.options.title,
+      Location: 'ClientSideExtension.ApplicationCustomizer',
+      ClientSideComponentId: args.options.clientSideComponentId
     };
-    await Cli.executeCommand(spoCustomActionAddCommand as Command, { options: { ...options, _: [] } });
+
+    if (args.options.clientSideComponentProperties) {
+      requestBody.ClientSideComponentProperties = args.options.clientSideComponentProperties;
+    }
+
+    let scope = args.options.scope;
+    if (!scope) {
+      scope = 'Site';
+    }
+
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/${scope}/UserCustomActions`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      data: requestBody,
+      responseType: 'json'
+    };
+
+    await request.post<CustomAction>(requestOptions);
   }
 }
 
