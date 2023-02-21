@@ -291,7 +291,7 @@ describe('utils/spo', () => {
     assert.deepEqual(tenantAppCatalogUrl, null);
   });
 
-  it('handles error when retrieving SPO URL failed while retrieving application customizer', (done) => {
+  it('handles error when retrieving SPO URL failed while retrieving tenant app catalog url', (done) => {
     const errorMessage = 'An error has occurred';
     auth.service.spoUrl = undefined;
 
