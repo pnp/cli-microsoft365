@@ -100,6 +100,21 @@ describe(commands.LIST_ADD, () => {
     assert.strictEqual(actual, expected);
   });
 
+  it('sets default baseTemplate for list', async () => {
+    let actual = '';
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/lists`) {
+        actual = opts.data.BaseTemplate;
+        return;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { title: 'List 1', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, 100);
+  });
+
   it('sets specified description for list', async () => {
     const expected = 'List 1 description';
     let actual = '';
