@@ -1,4 +1,4 @@
-# spo commandset  add
+# spo commandset add
 
 Add a ListView Command Set to a site.
 
@@ -17,19 +17,19 @@ m365 spo commandset add [options]
 : The site to add the ListView Command Set.
 
 `-l, --listType <listType>`
-: 	The list or library type to register the Command Set on. Allowed values `List` or `Library`.
+:	The list or library type to register the Command Set on. Allowed values `List` or `Library`.
 
-`-i, --clientSideComponentId  <clientSideComponentId>`
+`-i, --clientSideComponentId <clientSideComponentId>`
 : The Client Side Component Id (GUID) of the ListView Command Set.
 
-`--clientSideComponentProperties  [clientSideComponentProperties]`
+`--clientSideComponentProperties [clientSideComponentProperties]`
 : The Client Side Component properties of the ListView Command Set.
 
 `-s, --scope [scope]`
 : Scope of the ListView Command Set. Allowed values: `Site`, `Web`. Defaults to `Site`.
 
 `--location [location]`
-: 	The location of the ListView Command Set. Allowed values `ContextMenu`, `CommandBar` or `Both`. Defaults to `CommandBar`.
+: The location of the ListView Command Set. Allowed values `ContextMenu`, `CommandBar` or `Both`. Defaults to `CommandBar`.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -51,13 +51,13 @@ Note, how the clientSideComponentProperties option (-p) has escaped double quote
 Adds a ListView Command Set to lists on the sales site.
 
 ```sh
-m365 spo commandset  add --title "Some customizer" --clientSideComponentId  799883f5-7962-4384-a10a-105adaec6ffc --listType List --webUrl https://contoso.sharepoint.com/sites/sales
+m365 spo commandset add --title "Some customizer" --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --listType List --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
 Adds a ListView Command Set to lists on the sales site with some properties.
 
 ```sh
-m365 spo commandset add --title "Some customizer" --clientSideComponentId  799883f5-7962-4384-a10a-105adaec6ffc --clientSideComponentProperties '{ "someProperty": "Some value" }' --listType List --webUrl https://contoso.sharepoint.com/sites/sales
+m365 spo commandset add --title "Some customizer" --clientSideComponentId 799883f5-7962-4384-a10a-105adaec6ffc --clientSideComponentProperties '{ "someProperty": "Some value" }' --listType List --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
 ## Response
