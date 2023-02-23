@@ -306,7 +306,7 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('sets specified draftVersionVisibility for list', async () => {
-    const expected = true;
+    const expected = 1;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
@@ -317,7 +317,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: 'Author', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -722,7 +722,7 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('sets specified listExperienceOptions for list', async () => {
-    const expected = 'NewExperience';
+    const expected = 1;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
@@ -733,7 +733,7 @@ describe(commands.LIST_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: 'NewExperience', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 

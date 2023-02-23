@@ -658,9 +658,7 @@ class SpoListAddCommand extends SpoCommand {
       requestBody.DisableGridEditing = options.disableGridEditing;
     }
 
-    if (options.draftVersionVisibility) {
-      requestBody.DraftVersionVisibility = options.draftVersionVisibility;
-    }
+    requestBody.DraftVersionVisibility = options.draftVersionVisibility ? DraftVisibilityType[(options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)] : DraftVisibilityType.Reader;
 
     if (options.emailAlias) {
       requestBody.EmailAlias = options.emailAlias;
@@ -762,9 +760,7 @@ class SpoListAddCommand extends SpoCommand {
       requestBody.IsApplicationList = options.isApplicationList;
     }
 
-    if (options.listExperienceOptions) {
-      requestBody.ListExperienceOptions = options.listExperienceOptions;
-    }
+    requestBody.ListExperienceOptions = options.listExperienceOptions ? ListExperience[(options.listExperienceOptions.trim() as keyof typeof ListExperience)] : ListExperience.Auto;
 
     if (options.majorVersionLimit) {
       requestBody.MajorVersionLimit = options.majorVersionLimit;
