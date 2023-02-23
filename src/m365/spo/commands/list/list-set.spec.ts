@@ -324,7 +324,7 @@ describe(commands.LIST_SET, () => {
   });
 
   it('sets specified draftVersionVisibility for list', async () => {
-    const expected = true;
+    const expected = 1;
     let actual = '';
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
@@ -335,7 +335,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: 'Author', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
@@ -740,7 +740,7 @@ describe(commands.LIST_SET, () => {
   });
 
   it('sets specified listExperienceOptions for list', async () => {
-    const expected = 'NewExperience';
+    const expected = 1;
     let actual = '';
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
@@ -751,7 +751,7 @@ describe(commands.LIST_SET, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    await command.action(logger, { options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: 'NewExperience', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
     assert.strictEqual(actual, expected);
   });
 
