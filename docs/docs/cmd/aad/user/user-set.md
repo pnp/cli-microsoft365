@@ -74,7 +74,7 @@ m365 aad user set --objectId 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --accountEnabl
 Reset password of a given user by userPrincipalName and require the user to change the password on the next sign in
 
 ```sh
-m365 aad user set --userPrincipalName steve@contoso.onmicrosoft.com --resetPassword --password 6NLUId79Lc24 --forceChangePasswordNextSignIn
+m365 aad user set --userPrincipalName steve@contoso.onmicrosoft.com --resetPassword --newPassword 6NLUId79Lc24 --forceChangePasswordNextSignIn
 ```
 
 Change password of the currently logged in user
