@@ -157,6 +157,7 @@ export default {
   LISTITEM_ADD: `${prefix} listitem add`,
   LISTITEM_ATTACHMENT_LIST: `${prefix} listitem attachment list`,
   LISTITEM_BATCH_ADD: `${prefix} listitem batch add`,
+  LISTITEM_BATCH_SET: `${prefix} listitem batch set`,
   LISTITEM_GET: `${prefix} listitem get`,
   LISTITEM_ISRECORD: `${prefix} listitem isrecord`,
   LISTITEM_LIST: `${prefix} listitem list`,
