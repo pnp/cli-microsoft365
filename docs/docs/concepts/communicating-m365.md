@@ -1,3 +1,7 @@
+---
+sidebar_position: 3
+---
+
 # Communication with Microsoft 365
 
 To manage settings of the different Microsoft 365 services, the CLI for Microsoft 365 uses REST APIs exposed by the corresponding services. Using the REST APIs is meant to promote consistency and reusability of code and tests across the CLI no matter which Microsoft 365 service the CLI is communicating with.

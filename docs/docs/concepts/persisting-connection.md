@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 # Persisting connection information
 
 After logging in to Microsoft 365, the CLI for Microsoft 365 will persist the information about the connection until you explicitly log out from Microsoft 365.
