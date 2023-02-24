@@ -1,3 +1,8 @@
+---
+title: Caveats when working with the CLI and certificate login
+sidebar_position: 10
+---
+
 # Caveats when working with the CLI and certificate login
 
 ## I get error "AADSTS700027 Client assertion contains an invalid signature" when I login the CLI with certificate, what am I doing wrong
