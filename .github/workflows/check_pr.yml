@@ -112,7 +112,7 @@ jobs:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
           path: coverage.tar
   test_docs:
-    if: github.repository_owner == 'pnp'
+    if: github.repository_owner == 'pnp' && github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
 
     steps:
