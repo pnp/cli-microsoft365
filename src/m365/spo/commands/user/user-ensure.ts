@@ -89,7 +89,7 @@ class SpoUserEnsureCommand extends SpoCommand {
 
     try {
       const requestBody = {
-        logonName: args.options.userName || await aadUser.getUpnByUserId(args.options.aadId!)
+        logonName: args.options.userName || await this.getUpnByUserId(args.options.aadId!, logger)
       };
 
       const requestOptions: CliRequestOptions = {
@@ -107,6 +107,13 @@ class SpoUserEnsureCommand extends SpoCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async getUpnByUserId(aadId: string, logger: Logger): Promise<string> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving user principal name for user with id ${aadId}`);
+    }
+    return await aadUser.getUpnByUserId(aadId);
   }
 }
 

@@ -13,8 +13,8 @@ m365 spo user ensure [options]
 `-u, --webUrl <webUrl>`
 : Absolute URL of the site.
 
-`-i, --id [id]`
-: Azure AD ID of the user. Specify either `aadId` or `userName` but not both.
+`--aadId [--aadId]`
+: Id of the user in Azure AD. Specify either `aadId` or `userName` but not both.
 
 `--userName [userName]`
 : User's UPN (user principal name, e.g. john@contoso.com). Specify either `aadId` or `userName` but not both.
@@ -23,7 +23,7 @@ m365 spo user ensure [options]
 
 ## Examples
 
-Ensures a user by its Azure AD ID
+Ensures a user by its Azure AD Id
 
 ```sh
 m365 spo user ensure --webUrl https://contoso.sharepoint.com/sites/project --aadId e254750a-eaa4-44f6-9517-b74f65cdb747
