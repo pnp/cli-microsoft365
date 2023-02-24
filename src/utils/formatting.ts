@@ -62,19 +62,26 @@ export const formatting = {
     const lines: string[] = s.split('\n');
 
     const match = (line: string): string[] => [...line.matchAll(regex)]
-      .map(m => m[2])  // we only want the second capture group
-      .slice(0, -1);   // cut off blank match at the end
+      .map(m => m[2]);  // we only want the second capture group
 
-    const heads = match(lines[0]);
+    const heads = match(lines[0]).slice(0, -1);
 
-    return lines.slice(1).map(line => {
-      return match(line).reduce((acc, cur, i) => {
-        const val = cur;
-        const numValue = parseInt(val);
-        const key = heads[i];
-        return { ...acc, [key]: isNaN(numValue) || numValue.toString() !== val ? val : numValue };
-      }, {});
-    });
+    return lines.slice(1)
+      .filter(text => text !== '')
+      .map(line => {
+        const lineMatch: string[] = match(line);
+        const obj: any = {};
+        heads.forEach((key, index) => {
+          const value = parseInt(lineMatch[index]);
+          if (isNaN(value) || value.toString() !== lineMatch[index]) {
+            obj[key] = lineMatch[index];
+          }
+          else {
+            obj[key] = parseInt(lineMatch[index]);
+          }
+        });
+        return obj;
+      });
   },
 
   encodeQueryParameter(value: string): string {
