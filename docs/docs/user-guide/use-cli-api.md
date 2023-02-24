@@ -1,3 +1,8 @@
+---
+title: Use CLI programmatically
+sidebar_position: 13
+---
+
 # Use CLI for Microsoft 365 programmatically
 
 Typically, you'll work with CLI for Microsoft 365 in a command line. You'll either call specific commands or build automation scripts to combine multiple tasks. But if  you're building software, you might want to use CLI for Microsoft 365 from your code.

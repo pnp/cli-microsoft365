@@ -1,3 +1,8 @@
+---
+title: Automate your CI/CD workflow using CLI for Microsoft 365 GitHub Actions
+sidebar_position: 11
+---
+
 # Automate your CI/CD workflow using CLI for Microsoft 365 GitHub Actions
 
 [GitHub Actions](https://github.com/features/actions) help you automate your software development workflows in the same place you store code and collaborate on pull requests and issues. You can write individual tasks, called actions, and combine them to create a custom workflow.
