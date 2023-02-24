@@ -1,3 +1,7 @@
+---
+sidebar_position: 0
+---
+
 # logout
 
 Log out from Microsoft 365
