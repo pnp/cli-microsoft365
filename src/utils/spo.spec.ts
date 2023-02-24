@@ -292,15 +292,15 @@ describe('utils/spo', () => {
   });
 
   it('handles error when retrieving SPO URL failed while retrieving tenant app catalog url', (done) => {
-    const errorMessage = 'An error has occurred';
+    const errorMessage = 'Couldn\'t retrieve SharePoint URL';
     auth.service.spoUrl = undefined;
 
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
-        return Promise.reject(errorMessage);
+        return Promise.reject('An error has occurred');
       }
 
-      return Promise.reject('Invalid request');
+      return Promise.reject(errorMessage);
     });
 
     spo
@@ -309,7 +309,7 @@ describe('utils/spo', () => {
         done('Expected error');
       }, (err: string) => {
         try {
-          assert.strictEqual(err, 'Invalid request');
+          assert.strictEqual(err, errorMessage);
           done();
         }
         catch (e) {
