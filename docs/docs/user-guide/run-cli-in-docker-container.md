@@ -1,3 +1,8 @@
+---
+title: Run CLI in a Docker Container
+sidebar_position: 3
+---
+
 # Run CLI for Microsoft 365 in a Docker Container
 
 You can use Docker to run a standalone Linux container with CLI for Microsoft 365 and PowerShell pre-installed, with command completion (tab) automatically configured for you in both `bash` and `pwsh`, without having to install any of the required dependencies on your host machine. We've also included some useful utilities in the container for you such as `curl`, `jq` and `jmespath-terminal`.
