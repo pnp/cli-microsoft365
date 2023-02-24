@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+---
+
 # Authorization and access tokens
 
 Commands provided with the CLI for Microsoft 365 manipulate different settings of Microsoft 365. Before you can execute any of the commands in the CLI, you have to log in to Microsoft 365. CLI for Microsoft 365 will then automatically retrieve the access token necessary to execute the particular command.

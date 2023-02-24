@@ -1,3 +1,7 @@
+---
+sidebar_position: 4
+---
+
 # Release notes
 
 ## [v6.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.8.0)
@@ -574,7 +578,7 @@
 - included response output for yammer commands [#3928](https://github.com/pnp/cli-microsoft365/issues/3928)
 - updated GitHub actions to Node@16 [#3870](https://github.com/pnp/cli-microsoft365/issues/3870)
 - updated docs for 'spo eventreceiver remove' command [#4050](https://github.com/pnp/cli-microsoft365/issues/4050)
-- updated 'spo group user <verb>' to 'spo group member <verb>' [#4087](https://github.com/pnp/cli-microsoft365/issues/4087)
+- updated 'spo group user (verb)' to 'spo group member (verb)' [#4087](https://github.com/pnp/cli-microsoft365/issues/4087)
 - updated 'login' command with auth authType validation [#3724](https://github.com/pnp/cli-microsoft365/issues/3724)
 - updated 'spo eventreceiver get' command output structure [#4035](https://github.com/pnp/cli-microsoft365/issues/4035)
 - updated required permission set for 'spo serviceprincipal' command docs [#4076](https://github.com/pnp/cli-microsoft365/issues/4076)
