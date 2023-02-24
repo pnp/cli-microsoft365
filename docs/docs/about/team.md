@@ -1,3 +1,7 @@
+---
+sidebar_position: 5
+---
+
 # Meet the Team
 
 <script id="cli-cards-generator" src="../generate-team-cards.js" defer></script>

@@ -1,3 +1,8 @@
+---
+title: CLI output mode
+sidebar_position: 5
+---
+
 # CLI for Microsoft 365 output mode
 
 CLI for Microsoft 365 commands can present their output either as plain-text, JSON, or as CSV. Following is information on these three output modes along with information when to use which.

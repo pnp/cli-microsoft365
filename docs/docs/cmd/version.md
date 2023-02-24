@@ -1,3 +1,7 @@
+---
+sidebar_position: 0
+---
+
 # version
 
 Shows CLI for Microsoft 365 version

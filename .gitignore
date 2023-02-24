@@ -64,3 +64,21 @@ commands.json
 
 # VS env folder
 .vs/
+
+# Docs
+docs/node_modules
+
+docs/build
+
+docs/.docusaurus
+docs/.cache-loader
+
+docs/.DS_Store
+docs/.env.local
+docs/.env.development.local
+docs/.env.test.local
+docs/.env.production.local
+
+docs/npm-debug.log*
+docs/yarn-debug.log*
+docs/yarn-error.log*

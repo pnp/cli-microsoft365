@@ -1,3 +1,8 @@
+---
+title: Use your own Azure AD identity
+sidebar_position: 9
+---
+
 # Use your own Azure AD identity
 
 When you use the CLI for Microsoft 365 to connect to your tenant for the first time, you are presented with a `Permissions requested` prompt from Azure, by accepting this prompt you are consenting to using the `PnP Microsoft 365 Management Shell` Azure AD application with your tenant as well as the permissions that it requires.
