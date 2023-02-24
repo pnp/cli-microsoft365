@@ -1,6 +1,6 @@
 # purview threatassessment list
 
-Get a list of threat assessment
+Get a list of threat assessments
 
 ## Usage
 
@@ -17,13 +17,13 @@ m365 purview threatassessment list [options]
 
 ## Examples
 
-Get a list of threat assessment
+Get a list of threat assessments
 
 ```sh
 m365 purview threatassessment list
 ```
 
-Get a list of threat assessment by type
+Get a list of threat assessments of type _mail_
 
 ```sh
 m365 purview threatassessment list --type mail

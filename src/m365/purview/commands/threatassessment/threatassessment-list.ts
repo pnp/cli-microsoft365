@@ -20,7 +20,7 @@ class PurviewThreatassessmentListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a list of threat assessment';
+    return 'Get a list of threat assessments';
   }
 
   public defaultProperties(): string[] | undefined {
@@ -46,7 +46,8 @@ class PurviewThreatassessmentListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-t, --type [type]', autocomplete: PurviewThreatassessmentListCommand.allowedTypes
+        option: '-t, --type [type]',
+        autocomplete: PurviewThreatassessmentListCommand.allowedTypes
       }
     );
   }
@@ -65,16 +66,11 @@ class PurviewThreatassessmentListCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of threat assessment`);
-    }
-
-    let url = `${this.resource}/v1.0/informationProtection/threatAssessmentRequests`;
-    if (args.options.type) {
-      url += '';
+      logger.logToStderr(`Retrieving a list of threat assessments`);
     }
 
     try {
-      const items = await odata.getAllItems<any>(url, 'minimal');
+      const items = await odata.getAllItems<any>(`${this.resource}/v1.0/informationProtection/threatAssessmentRequests`, 'minimal');
       if (args.options.type) {
         let type: string;
         switch (args.options.type) {
