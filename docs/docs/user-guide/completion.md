@@ -1,3 +1,8 @@
+---
+title: Command completion
+sidebar_position: 8
+---
+
 # Command completion
 
 To help you use its commands, CLI for Microsoft 365 offers you the ability to autocomplete commands and options that you're typing in the prompt. Some additional setup, specific for the shell and terminal that you use, is required to enable command completion for CLI for Microsoft 365.

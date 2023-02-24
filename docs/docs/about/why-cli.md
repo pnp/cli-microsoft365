@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 # Why this CLI
 
 CLI for Microsoft 365 is a cross-platform CLI that allows users on any platform to manage various configuration settings of Microsoft 365.
