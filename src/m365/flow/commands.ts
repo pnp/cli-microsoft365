@@ -11,6 +11,7 @@ export default {
   GET: `${prefix} get`,
   LIST: `${prefix} list`,
   OWNER_LIST: `${prefix} owner list`,
+  OWNER_REMOVE: `${prefix} owner remove`,
   REMOVE: `${prefix} remove`,
   RUN_CANCEL: `${prefix} run cancel`,
   RUN_GET: `${prefix} run get`,
