@@ -33,13 +33,6 @@ m365 flow owner remove [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Remarks
-
-!!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
-
-If the environment with the name you specified doesn't exist, you will get the `Access to the environment 'xyz' is denied.` error.
-
 ## Examples
 
 Remove owner permissions from a specific Power Automate flow for a user by ID
@@ -48,10 +41,10 @@ Remove owner permissions from a specific Power Automate flow for a user by ID
 m365 flow owner remove --userId "5c241023-2ba5-4ea8-a516-a2481a3e6c51" --environmentName Default-c5a5d746-3520-453f-8a69-780f8e44917e --name 72f2be4a-78c1-4220-a048-dbf557296a72
 ```
 
-Remove owner permissions from a specific Power Automate flow for a user by UPN
+Remove owner permissions from a specific Power Automate flow for a user by UPN as admin
 
 ```sh
-m365 flow owner remove --userName john.doe@contoso.com --environmentName Default-c5a5d746-3520-453f-8a69-780f8e44917e --name 72f2be4a-78c1-4220-a048-dbf557296a72
+m365 flow owner remove --userName john.doe@contoso.com --environmentName Default-c5a5d746-3520-453f-8a69-780f8e44917e --name 72f2be4a-78c1-4220-a048-dbf557296a72 --asAdmin
 ```
 
 Remove owner permissions from a specific Power Automate flow for a group by ID
@@ -60,4 +53,12 @@ Remove owner permissions from a specific Power Automate flow for a group by ID
 m365 flow owner remove --groupId "5c241023-2ba5-4ea8-a516-a2481a3e6c51" --environmentName Default-c5a5d746-3520-453f-8a69-780f8e44917e --name 72f2be4a-78c1-4220-a048-dbf557296a72
 ```
 
+Remove owner permissions from a specific Power Automate flow for a group by name as admin
+
+```sh
+m365 flow owner remove --groupName 'Test group' --environmentName Default-c5a5d746-3520-453f-8a69-780f8e44917e --name 72f2be4a-78c1-4220-a048-dbf557296a72 --asAdmin
+```
+
 ## Response
+
+The command won't return a response on success.
