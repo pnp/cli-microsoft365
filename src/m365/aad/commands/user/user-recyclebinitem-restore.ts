@@ -26,17 +26,8 @@ class AadUserRecycleBinItemRestoreCommand extends GraphCommand {
   constructor() {
     super();
 
-    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        confirm: !!args.options.confirm
-      });
-    });
   }
 
   #initOptions(): void {
