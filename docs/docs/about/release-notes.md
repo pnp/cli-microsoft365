@@ -80,6 +80,7 @@
 - added sample script to download attachments from SPO [#2660](https://github.com/pnp/cli-microsoft365/issues/2660)
 - modified command execution of 'm365 context' [#4047](https://github.com/pnp/cli-microsoft365/issues/4047)
 - enhanced 'flow environment get' [#4445](https://github.com/pnp/cli-microsoft365/issues/4445)
+- included response output in md for spo homesite, hubsite, knowledgehub, list, listitem, navigation commands [#4301](https://github.com/pnp/cli-microsoft365/issues/4301)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
