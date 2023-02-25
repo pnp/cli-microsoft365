@@ -90,4 +90,22 @@ describe('utils/aadGroup', () => {
     const actual = await aadGroup.getGroupByDisplayName(validGroupName);
     assert.deepStrictEqual(actual, singleGroupResponse);
   });
+
+  it('correctly get single group by name using getGroupByDisplayName with select fields', async () => {
+    const selectFields = ['id', 'displayName'];
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupName)}'&$select=${selectFields.join(',')}`) {
+        return {
+          value: [
+            singleGroupResponse
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await aadGroup.getGroupByDisplayName(validGroupName, selectFields);
+    assert.deepStrictEqual(actual, singleGroupResponse);
+  });
 }); 
