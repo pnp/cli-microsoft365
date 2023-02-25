@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import { formatting } from '../../../../utils/formatting';
@@ -5,6 +6,24 @@ import { odata } from '../../../../utils/odata';
 import { validation } from '../../../../utils/validation';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
+
+interface FlowPermissionResponse {
+  name: string;
+  id: string;
+  type: string;
+  properties: FlowPermissionProperties;
+}
+
+interface FlowPermissionProperties {
+  roleName: string;
+  permissionType: string;
+  principal: FlowPermissionPrincipal;
+}
+
+interface FlowPermissionPrincipal {
+  id: string;
+  type: string;
+}
 
 interface CommandArgs {
   options: Options;
@@ -23,6 +42,10 @@ class FlowOwnerListCommand extends AzmgmtCommand {
 
   public get description(): string {
     return 'Lists all owners of a Power Automate flow';
+  }
+
+  public defaultProperties(): string[] | undefined {
+    return ['roleName', 'id', 'type'];
   }
 
   constructor() {
@@ -73,8 +96,20 @@ class FlowOwnerListCommand extends AzmgmtCommand {
         logger.logToStderr(`Listing owners for flow ${args.options.name} in environment ${args.options.environmentName}`);
       }
 
-      const response = await odata.getAllItems(`${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`);
-      logger.log(response);
+      const response = await odata.getAllItems<FlowPermissionResponse>(`${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}/permissions?api-version=2016-11-01`);
+      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
+        logger.log(response);
+      }
+      else {
+        //converted to text friendly output
+        logger.log(response.map(res => {
+          return {
+            roleName: res.properties.roleName,
+            id: res.properties.principal.id,
+            type: res.properties.principal.type
+          };
+        }));
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
