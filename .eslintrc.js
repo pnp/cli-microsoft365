@@ -60,6 +60,7 @@ const dictionary = [
   'office365',
   'one',
   'org',
+  'owner',
   'o365',
   'permission',
   'place',
