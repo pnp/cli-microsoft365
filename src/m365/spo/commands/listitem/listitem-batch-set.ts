@@ -4,12 +4,17 @@ import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
-import { spo } from '../../../../utils/spo';
+import { odata } from '../../../../utils/odata';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils/spo';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ListInstance } from '../list/ListInstance';
+
+interface FieldDetails {
+  InternalName: string;
+  TypeAsString: string;
+}
 
 interface CommandArgs {
   options: Options;
@@ -17,11 +22,12 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   filePath: string;
+  systemUpdate?: boolean;
   webUrl: string;
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  systemUpdate?: boolean;
+  idColumn?: string;
 }
 
 class SpoListItemBatchSetCommand extends SpoCommand {
@@ -46,6 +52,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        idColumn: typeof args.options.idColumn !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         listUrl: typeof args.options.listUrl !== 'undefined',
@@ -60,6 +67,9 @@ class SpoListItemBatchSetCommand extends SpoCommand {
         option: '-p, --filePath <filePath>'
       },
       {
+        option: '-s, --systemUpdate'
+      },
+      {
         option: '-u, --webUrl <webUrl>'
       },
       {
@@ -72,7 +82,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
         option: '--listUrl [listUrl]'
       },
       {
-        option: '--systemUpdate'
+        option: '--idColumn [idColumn]'
       }
     );
   }
@@ -103,6 +113,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
     this.types.string.push(
       'webUrl',
       'filePath',
+      'idColumn',
       'listId',
       'listTitle',
       'listUrl'
@@ -118,27 +129,25 @@ class SpoListItemBatchSetCommand extends SpoCommand {
       if (this.verbose) {
         logger.logToStderr(`Starting to create batch items from csv at path ${args.options.filePath}`);
       }
+
       const csvContent = fs.readFileSync(args.options.filePath, 'utf8');
       const jsonContent: any[] = formatting.parseCsvToJson(csvContent);
-      // check if ID Column exists
-      if ('ID' in jsonContent[0] === false && 'id' in jsonContent[0] === false && 'Id' in jsonContent[0] === false) {
-        throw 'Please make sure that the CSV has a column with the name ID';
+      const idColumn = args.options.idColumn || "ID";
+
+      if (!jsonContent[0].hasOwnProperty(idColumn)) {
+        throw `The specified value for idColumn does not exist in the array. Specified idColumn is '${args.options.idColumn || 'ID'}'. Please specify the correct value.`;
       }
 
-      const idColumn = 'ID' in jsonContent[0] ? "ID" : 'Id' in jsonContent[0] ? "Id" : "id";
-
+      const listId = await this.getListId(args.options, logger);
+      const fields = await this.getListFields(args.options, listId, jsonContent, idColumn, logger);
       const formDigestValue = (await spo.getRequestDigest(args.options.webUrl)).FormDigestValue;
       const objectIdentity = (await spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue)).objectIdentity;
-      const listId = await this.getListId(args.options);
-
-      let objectPaths = [];
-      let actions = [];
-      let index = 1;
+      let objectPaths = [], actions = [], index = 1;
 
       for await (const [batchIndex, row] of jsonContent.entries()) {
         objectPaths.push(`<Identity Id="${index}" Name="${objectIdentity}:list:${listId}:item:${row[idColumn]},1" />`);
 
-        const [actionString, updatedIndex] = this.mapActions(index, row, args.options.systemUpdate);
+        const [actionString, updatedIndex] = this.mapActions(index, row, fields, args.options.systemUpdate);
         index = updatedIndex;
         actions.push(actionString);
 
@@ -148,8 +157,7 @@ class SpoListItemBatchSetCommand extends SpoCommand {
           }
 
           await this.sendBatchRequest(args.options.webUrl, this.getRequestBody(objectPaths, actions));
-          objectPaths = [];
-          actions = [];
+          objectPaths = [], actions = [];
         }
       }
 
@@ -178,26 +186,81 @@ class SpoListItemBatchSetCommand extends SpoCommand {
       },
       data: requestBody
     };
-
-    await request.post(requestOptions);
+    const res: any = await request.post(requestOptions);
+    const json: ClientSvcResponse = JSON.parse(res);
+    const response: ClientSvcResponseContents = json[0];
+    if (response.ErrorInfo) {
+      throw response.ErrorInfo.ErrorMessage + " - " + response.ErrorInfo.ErrorValue;
+    }
   }
 
-  private mapActions(index: number, row: any, systemUpdate?: boolean): [string, number] {
+  private mapActions(index: number, row: any, fields: FieldDetails[], systemUpdate?: boolean): [string, number] {
     const objectPathId = index;
     let actionString = '';
-    const excludeOptions = ['ID', 'id', 'Id'];
 
-    Object.keys(row).forEach(key => {
-      if (excludeOptions.indexOf(key) === -1) {
-        actionString += `<Method Name="ParseAndSetFieldValue" Id="${index++}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${key}</Parameter><Parameter Type="String">${(<any>row)[key].toString()}</Parameter></Parameters></Method>`;
+    fields.forEach((field: FieldDetails) => {
+      switch (field.TypeAsString) {
+        case 'UserMulti':
+          const userMultiString: string[] = row[field.InternalName].split(';').map((element: string) => {
+            return `<Object TypeId="{c956ab54-16bd-4c18-89d2-996f57282a6f}"><Property Name="Email" Type="Null" /><Property Name="LookupId" Type="Int32">${element}</Property><Property Name="LookupValue" Type="Null" /></Object>`;
+          });
+          actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="Array">${userMultiString.join('')}</Parameter></Parameters></Method>`;
+          break;
+        case 'Lookup':
+          actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter TypeId="{f1d34cc0-9b50-4a78-be78-d5facfcccfb7}"><Property Name="LookupId" Type="Int32">${row[field.InternalName]}</Property><Property Name="LookupValue" Type="Null"/></Parameter></Parameters></Method>`;
+          break;
+        case 'LookupMulti':
+          const lookupMultiString: string[] = row[field.InternalName].split(';').map((element: string) => {
+            return `<Object TypeId="{f1d34cc0-9b50-4a78-be78-d5facfcccfb7}"><Property Name="LookupId" Type="Int32">${element}</Property><Property Name="LookupValue" Type="Null" /></Object>`;
+          });
+          actionString += `<Method Name="SetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="Array">${lookupMultiString.join('')}</Parameter></Parameters></Method>`;
+          break;
+        default:
+          actionString += `<Method Name="ParseAndSetFieldValue" Id="${index += 1}" ObjectPathId="${objectPathId}"><Parameters><Parameter Type="String">${field.InternalName}</Parameter><Parameter Type="String">${(<any>row)[field.InternalName].toString()}</Parameter></Parameters></Method>`;
+          break;
       }
     });
 
-    actionString += `<Method Name="${systemUpdate ? 'System' : ''}Update" Id="${index++}" ObjectPathId="${objectPathId}"/>`;
+    actionString += `<Method Name="${systemUpdate ? 'System' : ''}Update" Id="${index += 1}" ObjectPathId="${objectPathId}"/>`;
     return [actionString, index];
   }
 
-  private async getListId(options: Options): Promise<string> {
+  private async getListFields(options: Options, listId: string, jsonContent: any, idColumn: string, logger: Logger): Promise<FieldDetails[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving fields for list with id ${listId}`);
+    }
+
+    const filterFields: string[] = [];
+    const objectKeys = Object.keys(jsonContent[0]);
+
+    const index = objectKeys.indexOf(idColumn, 0);
+    if (index > -1) {
+      objectKeys.splice(index, 1);
+    }
+
+    objectKeys.map(objectKey => {
+      filterFields.push(`InternalName eq '${objectKey}'`);
+    });
+
+    const fields = await odata.getAllItems<FieldDetails>(`${options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/fields?$select=InternalName,TypeAsString&$filter=${filterFields.join(' or ')}`);
+    if (fields.length !== objectKeys.length) {
+      const fieldsThatDontExist: string[] = [];
+      objectKeys.forEach(key => {
+        const field = fields.find(field => field.InternalName === key);
+        if (!field) {
+          fieldsThatDontExist.push(key);
+        }
+      });
+      throw `Following fields specified in the csv do not exist on the list: ${fieldsThatDontExist.join(', ')}`;
+    }
+    return fields;
+  }
+
+  private async getListId(options: Options, logger: Logger): Promise<string> {
+    if (this.verbose) {
+      logger.logToStderr('Retrieving list id');
+    }
+
     let listUrl = `${options.webUrl}/_api/web`;
     if (options.listId) {
       return options.listId;
@@ -219,8 +282,8 @@ class SpoListItemBatchSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    const listInstance = await request.get<ListInstance>(requestOptions);
-    return listInstance.Id;
+    const listResult = await request.get<{ Id: string }>(requestOptions);
+    return listResult.Id;
   }
 }
 
