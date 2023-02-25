@@ -137,7 +137,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       "Unified"
     ],
     isAssignableToRole: null,
-    mail: "azuregroupname@ordidev.onmicrosoft.com",
+    mail: "azuregroupname@contoso.onmicrosoft.com",
     mailEnabled: true,
     mailNickname: "azuregroupname",
     membershipRule: null,
@@ -152,7 +152,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
     preferredLanguage: null,
     proxyAddresses: [
       "SPO:SPO_0cfa47ca-d4f4-44d6-ac7d-b83e815b3184@SPO_0cac6cda-2e04-4a3d-9c16-9c91470d7022",
-      "SMTP:chipolata@ordidev.onmicrosoft.com"
+      "SMTP:john.doe@contoso.onmicrosoft.com"
     ],
     renewedDateTime: "2022-12-08T09:17:53Z",
     resourceBehaviorOptions: [

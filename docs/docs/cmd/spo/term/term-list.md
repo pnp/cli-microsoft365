@@ -145,7 +145,7 @@ When we make use of the option `includeChildTerms` the response will differ.
           "CustomProperties": {},
           "CustomSortOrder": null,
           "IsAvailableForTagging": true,
-          "Owner": "i:0#.f|membership|admin@mathijsdev2.onmicrosoft.com",
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
           "Description": "",
           "IsDeprecated": false,
           "IsKeyword": false,

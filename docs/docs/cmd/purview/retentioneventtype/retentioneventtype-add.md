@@ -53,13 +53,13 @@ This command is part of a series of commands that have to do with event-based re
         "createdBy": {
           "user": {
             "id": null,
-            "displayName": "Mathijs Verbeeck"
+            "displayName": "John Doe"
           }
         },
         "lastModifiedBy": {
           "user": {
             "id": null,
-            "displayName": "Mathijs Verbeeck"
+            "displayName": "John Doe"
           }
         }
       }
@@ -69,12 +69,12 @@ This command is part of a series of commands that have to do with event-based re
 === "Text"
 
     ```text
-    createdBy           : {"user":{"id":null,"displayName":"Mathijs Verbeeck"}}
+    createdBy           : {"user":{"id":null,"displayName":"John Doe"}}
     createdDateTime     : 2023-01-31T20:40:40Z
     description         : A retention event type to start a retention period based on the date that a contract expired.
     displayName         : Contract Expiry
     id                  : 806cb481-4cc6-47c3-af26-26d64f6e7aab
-    lastModifiedBy      : {"user":{"id":null,"displayName":"Mathijs Verbeeck"}}
+    lastModifiedBy      : {"user":{"id":null,"displayName":"John Doe"}}
     lastModifiedDateTime: 2023-01-31T20:40:40Z
     ```
 
@@ -82,7 +82,7 @@ This command is part of a series of commands that have to do with event-based re
 
     ```csv
     displayName,description,createdDateTime,lastModifiedDateTime,id,createdBy,lastModifiedBy
-    Contract Expiry,A retention event type to start a retention period based on the date that a contract expired.,2023-01-31T20:53:23Z,2023-01-31T20:53:23Z,b430ae4c-1e26-422f-9544-67df3abfb200,"{""user"":{""id"":null,""displayName"":""Mathijs Verbeeck""}}","{""user"":{""id"":null,""displayName"":""Mathijs Verbeeck""}}"
+    Contract Expiry,A retention event type to start a retention period based on the date that a contract expired.,2023-01-31T20:53:23Z,2023-01-31T20:53:23Z,b430ae4c-1e26-422f-9544-67df3abfb200,"{""user"":{""id"":null,""displayName"":""John Doe""}}","{""user"":{""id"":null,""displayName"":""John Doe""}}"
     ```
 
 === "Markdown"
@@ -101,6 +101,6 @@ This command is part of a series of commands that have to do with event-based re
     createdDateTime | 2023-01-31T20:55:35Z
     lastModifiedDateTime | 2023-01-31T20:55:35Z
     id | ca0e1f8d-4e42-4a81-be85-022502d70c4e
-    createdBy | {"user":{"id":null,"displayName":"Mathijs Verbeeck"}}
-    lastModifiedBy | {"user":{"id":null,"displayName":"Mathijs Verbeeck"}}
+    createdBy | {"user":{"id":null,"displayName":"John Doe"}}
+    lastModifiedBy | {"user":{"id":null,"displayName":"John Doe"}}
     ```

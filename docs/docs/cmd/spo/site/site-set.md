@@ -159,13 +159,13 @@ m365 spo site set --url https://contoso.sharepoint.com/sites/sales --sharingCapa
 Set the logo on the site
 
 ```sh
-m365 spo site set --url https://estruyfdev2.sharepoint.com/sites/sales --siteLogoUrl "/sites/sales/SiteAssets/parker-ms-1200.png"
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --siteLogoUrl "/sites/sales/SiteAssets/parker-ms-1200.png"
 ```
 
 Unset the logo on the site
 
 ```sh
-m365 spo site set --url https://estruyfdev2.sharepoint.com/sites/sales --siteLogoUrl ""
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --siteLogoUrl ""
 ```
 
 Lock the site preventing users from accessing it. Wait for the configuration to complete

@@ -99,7 +99,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
             "IsNull": false
           }, 21, {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipal", "AccountEnabled": true, "AppId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "ReplyUrls": [
-              "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+              "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fcontoso.sharepoint.com\u002f"
             ]
           }
         ]));
@@ -112,7 +112,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
       AccountEnabled: true,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
       ReplyUrls: [
-        "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+        "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fcontoso.sharepoint.com\u002f"
       ]
     }));
   });
@@ -130,7 +130,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
             "IsNull": false
           }, 21, {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipal", "AccountEnabled": true, "AppId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "ReplyUrls": [
-              "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+              "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fcontoso.sharepoint.com\u002f"
             ]
           }
         ]));
@@ -143,7 +143,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
       AccountEnabled: true,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
       ReplyUrls: [
-        "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+        "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fcontoso.sharepoint.com\u002f"
       ]
     }));
   });
@@ -161,7 +161,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
             "IsNull": false
           }, 21, {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipal", "AccountEnabled": false, "AppId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "ReplyUrls": [
-              "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+              "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fcontoso.sharepoint.com\u002f"
             ]
           }
         ]));
@@ -174,7 +174,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
       AccountEnabled: false,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
       ReplyUrls: [
-        "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+        "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fcontoso.sharepoint.com\u002f"
       ]
     }));
   });
@@ -233,7 +233,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
         "IsNull": false
       }, 21, {
         "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Internal.SPOWebAppServicePrincipal", "AccountEnabled": true, "AppId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "ReplyUrls": [
-          "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+          "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fcontoso.sharepoint.com\u002f"
         ]
       }
     ])));
@@ -247,7 +247,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
       AccountEnabled: true,
       AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
       ReplyUrls: [
-        "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fa830edad9050849554e17113007.sharepoint.com\u002f"
+        "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx?redirect", "https:\u002f\u002fcontoso.sharepoint.com\u002f_forms\u002fsinglesignon.aspx", "https:\u002f\u002fcontoso.sharepoint.com\u002f"
       ]
     }));
   });
