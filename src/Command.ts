@@ -619,14 +619,16 @@ export default abstract class Command {
           `Property | Value`, os.EOL,
           `---------|-------`, os.EOL
         );
-        output.push(Object.keys(l).map(k => {
-          const value = l[k];
-          let stringValue = value;
-          if (typeof value === 'object') {
-            stringValue = JSON.stringify(value);
+        output.push(Object.keys(l).filter(x => {
+          if (!options.query && typeof l[x] === 'object') {
+            return;
           }
 
-          return `${md.escapeMd(k)} | ${md.escapeMd(stringValue)}`;
+          return x;
+        }).map(k => {
+          const value = l[k];
+
+          return `${md.escapeMd(k)} | ${md.escapeMd(value)}`;
         }).join(os.EOL), os.EOL);
         output.push(os.EOL);
       });

@@ -507,7 +507,7 @@ describe('Command', () => {
     assert(actual.indexOf('\\_\\*\\~\\`\\|') > -1);
   });
 
-  it('serializes objects that are values to JSON', () => {
+  it('excludes objects in md output', () => {
     const command = new MockCommand1();
     const commandOutput = [
       {
@@ -517,7 +517,7 @@ describe('Command', () => {
       }
     ];
     const actual = command.getMdOutput(commandOutput, command, { options: { output: 'md' } });
-    assert(actual.indexOf(JSON.stringify(commandOutput[0].property)) > -1);
+    assert(actual.indexOf(JSON.stringify(commandOutput[0].property)) === -1);
   });
 
   it('passes validation when csv output specified', async () => {
