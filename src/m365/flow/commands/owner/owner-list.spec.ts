@@ -18,6 +18,7 @@ describe(commands.OWNER_LIST, () => {
   const environmentName = 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6';
   const flowName = '1c6ee23a-a835-44bc-a4f5-462b658efc12';
   const requestUrl = `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/permissions?api-version=2016-11-01`;
+  const requestUrlAdmin = `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(environmentName)}/flows/${formatting.encodeQueryParameter(flowName)}/permissions?api-version=2016-11-01`;
   const ownerResponseJson = [{ 'name': '8323f7fe-e8a4-46c4-b5ea-f4864887d160', 'id': '/providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/d2642355-a6b8-4662-a418-ce3741584031/permissions/8323f7fe-e8a4-46c4-b5ea-f4864887d160', 'type': '/providers/Microsoft.ProcessSimple/environments/flows/permissions', 'properties': { 'roleName': 'CanEdit', 'permissionType': 'Principal', 'principal': { 'id': '8323f7fe-e8a4-46c4-b5ea-f4864887d160', 'type': 'User' } } }, { 'name': 'fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'id': '/providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/d2642355-a6b8-4662-a418-ce3741584031/permissions/fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'type': '/providers/Microsoft.ProcessSimple/environments/flows/permissions', 'properties': { 'roleName': 'Owner', 'permissionType': 'Principal', 'principal': { 'id': 'fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'type': 'User' } } }];
   const ownerResponse = { value: ownerResponseJson };
   const ownerResponseText = [{ 'roleName': 'CanEdit', 'id': '8323f7fe-e8a4-46c4-b5ea-f4864887d160', 'type': 'User' }, { 'roleName': 'Owner', 'id': 'fe36f75e-c103-410b-a18a-2bf6df06ac3a', 'type': 'User' }];
@@ -89,20 +90,20 @@ describe(commands.OWNER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, name: flowName, output: 'json' } });
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, name: flowName, output: 'json' } });
     assert(loggerLogSpy.calledWith(ownerResponseJson));
   });
 
   it('retrieves owners from a specific flow with output text as admin', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === requestUrl) {
+      if (opts.url === requestUrlAdmin) {
         return ownerResponse;
       }
 
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { environmentName: environmentName, name: flowName, asAdmin: true, output: 'text' } });
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, name: flowName, asAdmin: true, output: 'text' } });
     assert(loggerLogSpy.calledWith(ownerResponseText));
   });
 
