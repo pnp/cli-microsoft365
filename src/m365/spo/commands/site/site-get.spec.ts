@@ -97,9 +97,9 @@ describe(commands.SITE_GET, () => {
       "MaxItemsPerThrottledOperation": 5000,
       "NeedsB2BUpgrade": false,
       "ResourcePath": {
-        "DecodedUrl": "https://m365x324230.sharepoint.com/sites/sales"
+        "DecodedUrl": "https://contoso.sharepoint.com/sites/sales"
       },
-      "PrimaryUri": "https://m365x324230.sharepoint.com/sites/sales",
+      "PrimaryUri": "https://contoso.sharepoint.com/sites/sales",
       "ReadOnly": false,
       "RequiredDesignerVersion": "15.0.0.0",
       "SandboxedCodeActivationCapability": 2,
@@ -113,7 +113,7 @@ describe(commands.SITE_GET, () => {
       "UpgradeScheduled": false,
       "UpgradeScheduledDate": "1753-01-01T00:00:00",
       "Upgrading": false,
-      "Url": "https://m365x324230.sharepoint.com/sites/project-x"
+      "Url": "https://contoso.sharepoint.com/sites/project-x"
     };
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/site`) > -1) {
@@ -156,9 +156,9 @@ describe(commands.SITE_GET, () => {
       "MaxItemsPerThrottledOperation": 5000,
       "NeedsB2BUpgrade": false,
       "ResourcePath": {
-        "DecodedUrl": "https://m365x324230.sharepoint.com/sites/sales"
+        "DecodedUrl": "https://contoso.sharepoint.com/sites/sales"
       },
-      "PrimaryUri": "https://m365x324230.sharepoint.com/sites/sales",
+      "PrimaryUri": "https://contoso.sharepoint.com/sites/sales",
       "ReadOnly": false,
       "RequiredDesignerVersion": "15.0.0.0",
       "SandboxedCodeActivationCapability": 2,
@@ -172,7 +172,7 @@ describe(commands.SITE_GET, () => {
       "UpgradeScheduled": false,
       "UpgradeScheduledDate": "1753-01-01T00:00:00",
       "Upgrading": false,
-      "Url": "https://m365x324230.sharepoint.com/sites/project-x"
+      "Url": "https://contoso.sharepoint.com/sites/project-x"
     };
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/site`) > -1) {
