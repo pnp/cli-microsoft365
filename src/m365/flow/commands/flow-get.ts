@@ -56,7 +56,16 @@ class FlowGetCommand extends AzmgmtCommand {
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        asAdmin: !!args.options.asAdmin
+      });
+    });
   }
 
   #initOptions(): void {

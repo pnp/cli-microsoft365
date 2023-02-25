@@ -39,8 +39,8 @@ class FlowRemoveCommand extends AzmgmtCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        asAdmin: typeof args.options.asAdmin !== 'undefined',
-        confirm: typeof args.options.confirm !== 'undefined'
+        asAdmin: !!args.options.asAdmin,
+        confirm: !!args.options.confirm
       });
     });
   }
