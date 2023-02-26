@@ -522,6 +522,19 @@ describe('Command', () => {
     assert(actual.indexOf(JSON.stringify(commandOutput[0].property)) > -1);
   });
 
+  it('excludes objects that are values to JSON', () => {
+    const command = new MockCommand1();
+    const commandOutput = [
+      {
+        'property': {
+          'property': 'value'
+        }
+      }
+    ];
+    const actual = command.getCsvOutput(commandOutput, { options: { output: 'csv' } });
+    assert(actual.indexOf(JSON.stringify(commandOutput[0].property)) === -1);
+  });
+
   it('passes validation when csv output specified', async () => {
     const cmd = new MockCommand2();
     assert.strictEqual(await cmd.validate({ options: { output: 'csv' } }, Cli.getCommandInfo(cmd)), true);
