@@ -628,7 +628,7 @@ export class Cli {
 
     switch (options.output) {
       case 'csv':
-        return command.getCsvOutput(logStatement);
+        return command.getCsvOutput(logStatement, options);
       case 'md':
         return command.getMdOutput(logStatement, command, options);
       default:
@@ -961,6 +961,6 @@ export class Cli {
   }
 
   public static shouldTrimOutput(output: string | undefined): boolean {
-    return output === 'text' || output === 'csv';
+    return output === 'text';
   }
 }

@@ -574,9 +574,19 @@ export default abstract class Command {
       .replace(/([^\\])\\n/g, '$1\\\\\\n');
   }
 
-  public getCsvOutput(logStatement: any[]): string {
+  public getCsvOutput(logStatement: any[], options: GlobalOptions): string {
     const { stringify } = require('csv-stringify/sync');
     const cli = Cli.getInstance();
+
+    if (logStatement && logStatement.length > 0 && !options.query) {
+      logStatement.map(l => {
+        for (const x of Object.keys(l)) {
+          if (typeof l[x] === 'object') {
+            delete l[x];
+          }
+        }
+      });
+    }
 
     // https://csv.js.org/stringify/options/
     return stringify(logStatement, {

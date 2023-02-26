@@ -128,7 +128,7 @@ describe(commands.TEAM_APP_LIST, () => {
       throw 'Invalid response';
     });
 
-    await command.action(logger, { options: { teamId: teamId, verbose: true, output: 'csv' } });
+    await command.action(logger, { options: { teamId: teamId, verbose: true, output: 'text' } });
     assert(loggerLogSpy.calledWith(friendlyResponse));
   });
 });
