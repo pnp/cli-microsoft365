@@ -21,7 +21,7 @@ m365 aad user recyclebinitem remove [options]
 ## Remarks
 
 !!! important
-    To use this command you must be a Global administrator, User administrator or Privileged Authentication administrator
+    To use this command you must be a Global administrator, User administrator or Privileged Authentication administrator.
 
 !!! note
     After running this command, it may take a minute before the deleted user is effectively removed from the tenant.

@@ -14,13 +14,13 @@ m365 spo list contenttype default set [options]
 : URL of the site where the list is located.
 
 `-l, --listId [listId]`
-: ID of the list. Specify either `listTitle`, `listId` or `listUrl`.
+: ID of the list. Specify either `listTitle`, `listId`, or `listUrl`.
 
 `-t, --listTitle [listTitle]`
-: Title of the list. Specify either `listTitle`, `listId` or `listUrl`.
+: Title of the list. Specify either `listTitle`, `listId`, or `listUrl`.
 
 `--listUrl [listUrl]`
-: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`.
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId`, or `listUrl`.
 
 `-c, --contentTypeId <contentTypeId>`
 : ID of the content type

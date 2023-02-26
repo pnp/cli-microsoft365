@@ -121,3 +121,64 @@ m365 spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x 
     Id,Title,DefaultView,Hidden,BaseViewId
     3cd2e934-f482-4d4a-a9b8-a13b49b3d226,All events,,,1
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo list view list --webUrl "https://contoso.sharepoint.com" --listTitle "My List"
+
+    Date: 2/20/2023
+
+    ## All Items (6275ed5c-8e4f-4e81-8060-2d9162b29952)
+
+    Property | Value
+    ---------|-------
+    Aggregations | null
+    AggregationsStatus | null
+    AssociatedContentTypeId | null
+    BaseViewId | 1
+    CalendarViewStyles | null
+    ColumnWidth | null
+    ContentTypeId | {"StringValue":"0x"}
+    CustomFormatter |
+    CustomOrder | null
+    DefaultView | true
+    DefaultViewForContentType | false
+    EditorModified | false
+    Formats | null
+    GridLayout | null
+    Hidden | false
+    HtmlSchemaXml | <View Name="{6275ED5C-8E4F-4E81-8060-2D9162B29952}" DefaultView="TRUE" MobileView="TRUE" MobileDefaultView="TRUE" Type="HTML" DisplayName="All Items" Url="/teams/AllStars/Lists/My List/AllItems.aspx" Level="1" BaseViewID="1" ContentTypeID="0x" ImageUrl="/\_layouts/15/images/generic.png?rev=47"><Query /><ViewFields><FieldRef Name="LinkTitle" /><FieldRef Name="FieldName1" /></ViewFields><Toolbar Type="Standard" /><CustomFormatter /><XslLink Default="TRUE">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink><RowLimit Paged="TRUE">30</RowLimit><ParameterBindings><ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY\_LIST)" /><ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY\_DEFAULT)" /></ParameterBindings></View>
+    Id | 6275ed5c-8e4f-4e81-8060-2d9162b29952
+    ImageUrl | /\_layouts/15/images/generic.png?rev=47
+    IncludeRootFolder | false
+    ViewJoins | null
+    JSLink | clienttemplates.js
+    ListViewXml | <View Name="{6275ED5C-8E4F-4E81-8060-2D9162B29952}" DefaultView="TRUE" MobileView="TRUE" MobileDefaultView="TRUE" Type="HTML" DisplayName="All Items" Url="/teams/AllStars/Lists/My List/AllItems.aspx" Level="1" BaseViewID="1" ContentTypeID="0x" ImageUrl="/\_layouts/15/images/generic.png?rev=47" ><Query /><ViewFields><FieldRef Name="LinkTitle" /><FieldRef Name="FieldName1" /></ViewFields><RowLimit Paged="TRUE">30</RowLimit><JSLink>clienttemplates.js</JSLink><XslLink Default="TRUE">main.xsl</XslLink><CustomFormatter /><Toolbar Type="Standard"/></View>
+    Method | null
+    MobileDefaultView | true
+    MobileView | true
+    ModerationType | null
+    NewDocumentTemplates | null
+    OrderedView | false
+    Paged | true
+    PersonalView | false
+    ViewProjectedFields | null
+    ViewQuery |
+    ReadOnlyView | false
+    RequiresClientIntegration | false
+    RowLimit | 30
+    Scope | 0
+    ServerRelativePath | {"DecodedUrl":"/teams/AllStars/Lists/My List/AllItems.aspx"}
+    ServerRelativeUrl | /teams/AllStars/Lists/My List/AllItems.aspx
+    StyleId | null
+    TabularView | true
+    Threaded | false
+    Title | All Items
+    Toolbar |
+    ToolbarTemplateName | null
+    ViewType | HTML
+    ViewData | null
+    ViewType2 | null
+    VisualizationInfo | null
+    ```

@@ -8,6 +8,7 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { telemetry } from '../../../../telemetry';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { powerPlatform } from '../../../../utils/powerPlatform';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
@@ -46,6 +47,7 @@ describe(commands.SOLUTION_PUBLISH, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -80,7 +82,8 @@ describe(commands.SOLUTION_PUBLISH, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });

@@ -6,8 +6,16 @@
 
 **Azure Active Directory:**
 
+- [aad user add](../cmd/aad/user/user-add.md) - creates a new user [#4495](https://github.com/pnp/cli-microsoft365/issues/4495)
+- [aad user remove](../cmd/aad/user/user-remove.md) - removes a specific user [#4494](https://github.com/pnp/cli-microsoft365/issues/4494)
+- [aad license list](../cmd/aad/license/license-list.md) - lists commercial subscriptions that an organization has acquired [#4503](https://github.com/pnp/cli-microsoft365/issues/4503)
+- [aad user license add](../cmd/aad/user/user-license-add.md) - assigns a license to a user [#4504](https://github.com/pnp/cli-microsoft365/issues/4504)
+- [aad user license list](../cmd/aad/user/user-license-list.md) - lists the license details for a given user [#4502](https://github.com/pnp/cli-microsoft365/issues/4502)
+- [aad user license remove](../cmd/aad/user/user-license-remove.md) - removes a license from a user [#4510](https://github.com/pnp/cli-microsoft365/issues/4510)
 - [aad user recyclebinitem clear](../cmd/aad/user/user-recyclebinitem-clear.md) - removes all users from the tenant recycle bin [#4501](https://github.com/pnp/cli-microsoft365/issues/4501)
+- [aad user recyclebinitem list](../cmd/aad/user/user-recyclebinitem-list.md) - lists users from the recycle bin in the current tenant [#4498](https://github.com/pnp/cli-microsoft365/issues/4498)
 - [aad user recyclebinitem remove](../cmd/aad/user/user-recyclebinitem-remove.md) - removes a user from the tenant recycle bin [#4499](https://github.com/pnp/cli-microsoft365/issues/4499)
+- [aad user recyclebinitem restore](../cmd/aad/user/user-recyclebinitem-restore.md) - restores a user from the tenant recycle bin [#4500](https://github.com/pnp/cli-microsoft365/issues/4500)
 
 **Context:**
 
@@ -76,6 +84,7 @@
 - added sample script to download attachments from SPO [#2660](https://github.com/pnp/cli-microsoft365/issues/2660)
 - modified command execution of 'm365 context' [#4047](https://github.com/pnp/cli-microsoft365/issues/4047)
 - enhanced 'flow environment get' [#4445](https://github.com/pnp/cli-microsoft365/issues/4445)
+- included response output in md for spo homesite, hubsite, knowledgehub, list, listitem, navigation commands [#4301](https://github.com/pnp/cli-microsoft365/issues/4301)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 

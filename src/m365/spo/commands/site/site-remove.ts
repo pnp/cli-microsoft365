@@ -26,7 +26,6 @@ interface Options extends GlobalOptions {
 class SpoSiteRemoveCommand extends SpoCommand {
   private context?: FormDigestInfo;
   private spoAdminUrl?: string;
-  private dots?: string;
 
   public get name(): string {
     return commands.SITE_REMOVE;
@@ -84,7 +83,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeSite: () => Promise<void> = async (): Promise<void> => {
       try {
-        this.dots = '';
         if (args.options.fromRecycleBin) {
           await this.deleteSiteWithoutGroup(logger, args);
         }
@@ -265,7 +263,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
                 reject,
                 logger,
                 currentContext: this.context as FormDigestInfo,
-                dots: this.dots,
                 debug: this.debug,
                 verbose: this.verbose
               });
@@ -314,7 +311,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
                 reject,
                 logger,
                 currentContext: this.context as FormDigestInfo,
-                dots: this.dots,
                 debug: this.debug,
                 verbose: this.verbose
               });

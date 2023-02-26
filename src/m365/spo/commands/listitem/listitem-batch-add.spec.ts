@@ -4,6 +4,7 @@ import * as sinon from 'sinon';
 import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import request from '../../../../request';
 import { Cli } from '../../../../cli/Cli';
@@ -31,6 +32,7 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -62,7 +64,8 @@ describe(commands.LISTITEM_BATCH_ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });

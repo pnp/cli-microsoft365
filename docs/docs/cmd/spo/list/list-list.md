@@ -11,13 +11,13 @@ m365 spo list list [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the lists to retrieve are located
+: URL of the site where the lists to retrieve are located.
 
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
 
-Return all lists located in site _https://contoso.sharepoint.com/sites/project-x_
+Return all lists located in in a specific site.
 
 ```sh
 m365 spo list list --webUrl https://contoso.sharepoint.com/sites/project-x
@@ -114,4 +114,72 @@ m365 spo list list --webUrl https://contoso.sharepoint.com/sites/project-x
     ```csv
     Id,Url
     Theme Gallery,/_catalogs/theme,66e5148c-7060-4479-88e7-636d79579148
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo list list --webUrl "https://contoso.sharepoint.com"
+
+    Date: 2/20/2023
+
+    ## _catalogs/theme (66e5148c-7060-4479-88e7-636d79579148)
+
+    Property | Value
+    ---------|-------
+    AllowContentTypes | true
+    BaseTemplate | 123
+    BaseType | 1
+    ContentTypesEnabled | false
+    CrawlNonDefaultViews | false
+    Created | 2020-01-12T01:03:13Z
+    CurrentChangeToken | {"StringValue":"1;3;66e5148c-7060-4479-88e7-636d79579148;638042267256930000;564174226"}
+    DefaultContentApprovalWorkflowId | 00000000-0000-0000-0000-000000000000
+    DefaultItemOpenUseListSetting | false
+    Description | Use the theme gallery to store themes. The themes in this gallery can be used by this site or any of its subsites.
+    Direction | none
+    DisableCommenting | false
+    DisableGridEditing | false
+    DocumentTemplateUrl | null
+    DraftVersionVisibility | 0
+    EnableAttachments | false
+    EnableFolderCreation | false
+    EnableMinorVersions | false
+    EnableModeration | false
+    EnableRequestSignOff | true
+    EnableVersioning | false
+    EntityTypeName | OData\_\_x005f\_catalogs\_x002f\_theme
+    ExemptFromBlockDownloadOfNonViewableFiles | false
+    FileSavePostProcessingEnabled | false
+    ForceCheckout | false
+    HasExternalDataSource | false
+    Hidden | true
+    Id | 66e5148c-7060-4479-88e7-636d79579148
+    ImagePath | {"DecodedUrl":"/\_layouts/15/images/itdl.png?rev=47"}
+    ImageUrl | /\_layouts/15/images/itdl.png?rev=47
+    DefaultSensitivityLabelForLibrary |
+    IrmEnabled | false
+    IrmExpire | false
+    IrmReject | false
+    IsApplicationList | false
+    IsCatalog | true
+    IsPrivate | false
+    ItemCount | 41
+    LastItemDeletedDate | 2020-01-12T01:03:13Z
+    LastItemModifiedDate | 2020-01-12T01:03:18Z
+    LastItemUserModifiedDate | 2020-01-12T01:03:18Z
+    ListExperienceOptions | 0
+    ListItemEntityTypeFullName | SP.Data.OData\_\_x005f\_catalogs\_x002f\_themeItem
+    MajorVersionLimit | 0
+    MajorWithMinorVersionsLimit | 0
+    MultipleDataList | false
+    NoCrawl | false
+    ParentWebPath | {"DecodedUrl":"/"}
+    ParentWebUrl | /
+    ParserDisabled | false
+    ServerTemplateCanCreateFolders | true
+    TemplateFeatureId | 00000000-0000-0000-0000-000000000000
+    Title | Theme Gallery
+    RootFolder | {"ServerRelativeUrl":"//\_catalogs/theme"}
+    Url | //\_catalogs/theme
     ```

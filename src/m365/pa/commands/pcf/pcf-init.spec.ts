@@ -8,6 +8,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import TemplateInstantiator from '../../template-instantiator';
@@ -24,6 +25,8 @@ describe(commands.PCF_INIT, () => {
     trackEvent = sinon.stub(telemetry, 'trackEvent').callsFake((commandName) => {
       telemetryCommandName = commandName;
     });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -55,7 +58,8 @@ describe(commands.PCF_INIT, () => {
   after(() => {
     sinonUtil.restore([
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
   });
 

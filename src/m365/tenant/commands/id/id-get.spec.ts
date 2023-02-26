@@ -7,6 +7,7 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./id-get');
@@ -19,6 +20,7 @@ describe(commands.ID_GET, () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     auth.service.connected = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
@@ -55,6 +57,7 @@ describe(commands.ID_GET, () => {
     sinonUtil.restore([
       telemetry.trackEvent,
       pid.getProcessName,
+      session.getId,
       auth.restoreAuth,
       accessToken.getUserNameFromAccessToken
     ]);

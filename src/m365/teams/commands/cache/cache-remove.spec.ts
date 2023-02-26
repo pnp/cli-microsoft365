@@ -8,6 +8,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./cache-remove');
@@ -26,6 +27,7 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     sinon.stub(Cli.getInstance().config, 'all').value({});
     commandInfo = Cli.getCommandInfo(command);
@@ -67,6 +69,7 @@ describe(commands.CACHE_REMOVE, () => {
       auth.restoreAuth,
       telemetry.trackEvent,
       pid.getProcessName,
+      session.getId,
       Cli.getInstance().config.all
     ]);
     auth.service.connected = false;

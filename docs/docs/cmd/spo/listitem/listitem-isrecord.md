@@ -66,3 +66,9 @@ m365 spo listitem isrecord --webUrl https://contoso.sharepoint.com/sites/project
     ```csv
     false
     ```
+
+=== "Markdown"
+
+    ```md
+    false
+    ```

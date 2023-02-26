@@ -8,6 +8,7 @@ import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
 import { pid } from '../../../utils/pid';
+import { session } from '../../../utils/session';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./adaptivecard-send');
@@ -23,6 +24,7 @@ describe(commands.SEND, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -51,7 +53,8 @@ describe(commands.SEND, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
   });
 

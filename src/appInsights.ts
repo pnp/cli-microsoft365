@@ -9,6 +9,7 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { pid } from './utils/pid';
+import { session } from './utils/session';
 
 const config = appInsights.setup('6b908c80-d09f-4cf6-8274-e54349a0149a');
 config.setInternalLogging(false, false);
@@ -25,7 +26,7 @@ appInsights.defaultClient.commonProperties = {
   ci: Boolean(process.env.CI).toString()
 };
 
-appInsights.defaultClient.context.tags['ai.session.id'] = crypto.randomBytes(24).toString('base64');
+appInsights.defaultClient.context.tags['ai.session.id'] = session.getId(process.ppid);
 appInsights.defaultClient.context.tags['ai.cloud.roleInstance'] = crypto.createHash('sha256').update(appInsights.defaultClient.context.tags['ai.cloud.roleInstance']).digest('hex');
 delete appInsights.defaultClient.context.tags['ai.cloud.role'];
 

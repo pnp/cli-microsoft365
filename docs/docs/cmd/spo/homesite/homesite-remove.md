@@ -11,7 +11,7 @@ m365 spo homesite remove [options]
 ## Options
 
 `--confirm`
-: Do not prompt for confirmation before removing the Home Site
+: Do not prompt for confirmation before removing the Home Site.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -20,7 +20,7 @@ m365 spo homesite remove [options]
 
 ## Examples
 
-Removes the current Home Site without confirmation
+Removes the current Home Site without confirmation.
 
 ```sh
 m365 spo homesite remove --confirm
@@ -43,6 +43,12 @@ m365 spo homesite remove --confirm
 === "CSV"
 
     ```csv
+    https://contoso.sharepoint.com has been removed as a Home site. It may take some time for the change to apply. Check aka.ms/homesites for details.
+    ```
+
+=== "Markdown"
+
+    ```md
     https://contoso.sharepoint.com has been removed as a Home site. It may take some time for the change to apply. Check aka.ms/homesites for details.
     ```
 

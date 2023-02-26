@@ -26,8 +26,6 @@ interface Options extends GlobalOptions {
 }
 
 class SpoFileMoveCommand extends SpoCommand {
-  private dots?: string;
-
   public get name(): string {
     return commands.FILE_MOVE;
   }
@@ -126,8 +124,6 @@ class SpoFileMoveCommand extends SpoCommand {
       };
 
       const jobInfo = await request.post<any>(requestOptions);
-      this.dots = '';
-
       const copyJobInfo: any = jobInfo.value[0];
       const progressPollInterval: number = 1800; // 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
@@ -140,7 +136,6 @@ class SpoFileMoveCommand extends SpoCommand {
             resolve,
             reject,
             logger,
-            dots: this.dots,
             debug: this.debug,
             verbose: this.verbose
           });

@@ -1,13 +1,15 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { telemetry } from '../../../../telemetry';
+import { formatting } from '../../../../utils/formatting';
+import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
-import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./environment-get');
 
 describe(commands.ENVIRONMENT_GET, () => {
@@ -30,6 +32,8 @@ describe(commands.ENVIRONMENT_GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
   });
 
@@ -51,7 +55,9 @@ describe(commands.ENVIRONMENT_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      pid.getProcessName,
+      session.getId
     ]);
   });
 

@@ -12,6 +12,7 @@ import * as cliCompletionUpdateCommand from '../m365/cli/commands/completion/com
 import { settingsNames } from '../settingsNames';
 import { md } from '../utils/md';
 import { pid } from '../utils/pid';
+import { session } from '../utils/session';
 import { sinonUtil } from '../utils/sinonUtil';
 import { Cli, CommandOutput } from './Cli';
 import { Logger } from './Logger';
@@ -217,6 +218,7 @@ describe('Cli', () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
 
     cliLogStub = sinon.stub((Cli as any), 'log').callsFake(message => {
       log.push(message ?? '');
@@ -287,6 +289,7 @@ describe('Cli', () => {
       md.md2plain,
       telemetry.trackEvent,
       pid.getProcessName,
+      session.getId,
       cli.getSettingWithDefaultValue,
       mockCommand.action
     ]);
