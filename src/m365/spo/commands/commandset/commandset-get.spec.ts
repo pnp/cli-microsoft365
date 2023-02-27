@@ -18,11 +18,11 @@ const command: Command = require('./commandset-get');
 
 describe(commands.COMMANDSET_GET, () => {
   const webUrl = 'https://contoso.sharepoint.com/sites/project-z';
-  const customActionId = '0a8e82b5-651f-400b-b537-9a739f92d6b4';
+  const commandSetId = '0a8e82b5-651f-400b-b537-9a739f92d6b4';
   const clientSideComponentId = '2397e6ef-4b89-4508-aea2-e375e312c76d';
-  const customActionTitle = 'Alerts';
-  const customActionObject = { 'ClientSideComponentId': clientSideComponentId, 'ClientSideComponentProperties': '', 'CommandUIExtension': null, 'Description': null, 'Group': null, 'HostProperties': '', 'Id': customActionId, 'ImageUrl': null, 'Location': 'ClientSideExtension.ListViewCommandSet.CommandBar', 'Name': '{0a8e82b5-651f-400b-b537-9a739f92d6b4}', 'RegistrationId': '119', 'RegistrationType': 1, 'Rights': { 'High': 0, 'Low': 0 }, 'Scope': 3, 'ScriptBlock': null, 'ScriptSrc': null, 'Sequence': 65536, 'Title': customActionTitle, 'Url': null, 'VersionOfUserCustomAction': '1.0.1.0' };
-  const customActionResponse: any[] = [customActionObject];
+  const commandSetTitle = 'Alerts';
+  const commandSetObject = { 'ClientSideComponentId': clientSideComponentId, 'ClientSideComponentProperties': '', 'CommandUIExtension': null, 'Description': null, 'Group': null, 'HostProperties': '', 'Id': commandSetId, 'ImageUrl': null, 'Location': 'ClientSideExtension.ListViewCommandSet.CommandBar', 'Name': '{0a8e82b5-651f-400b-b537-9a739f92d6b4}', 'RegistrationId': '119', 'RegistrationType': 1, 'Rights': { 'High': 0, 'Low': 0 }, 'Scope': 3, 'ScriptBlock': null, 'ScriptSrc': null, 'Sequence': 65536, 'Title': commandSetTitle, 'Url': null, 'VersionOfUserCustomAction': '1.0.1.0' };
+  const commandSetResponse: any[] = [commandSetObject];
 
   let log: string[];
   let logger: Logger;
@@ -79,36 +79,36 @@ describe(commands.COMMANDSET_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets custom action from specific site by id with scope "Web"', async () => {
+  it('gets command set from specific site by id with scope "Web"', async () => {
     const scope = 'Web';
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/${scope}/UserCustomActions(guid'${customActionId}')`) {
-        return customActionObject;
+      if (opts.url === `${webUrl}/_api/${scope}/UserCustomActions(guid'${commandSetId}')`) {
+        return commandSetObject;
       }
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, id: customActionId, scope: scope, verbose: true } });
-    assert(loggerLogSpy.calledWith(customActionObject));
+    await command.action(logger, { options: { webUrl: webUrl, id: commandSetId, scope: scope, verbose: true } });
+    assert(loggerLogSpy.calledWith(commandSetObject));
   });
 
-  it('gets custom action from specific site by title with scope "Site"', async () => {
+  it('gets command set from specific site by title with scope "Site"', async () => {
     const scope = 'Site';
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === `${webUrl}/_api/${scope}/UserCustomActions?$filter=startswith(Location,'ClientSideExtension.ListViewCommandSet') and Title eq '${customActionTitle}'`) {
-        return customActionResponse;
+      if (url === `${webUrl}/_api/${scope}/UserCustomActions?$filter=startswith(Location,'ClientSideExtension.ListViewCommandSet') and Title eq '${commandSetTitle}'`) {
+        return commandSetResponse;
       }
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, title: customActionTitle, scope: scope, verbose: true } });
-    assert(loggerLogSpy.calledWith(customActionObject));
+    await command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } });
+    assert(loggerLogSpy.calledWith(commandSetObject));
   });
 
-  it('gets custom action from specific site by clientSideComponentId without specifying scope', async () => {
+  it('gets command set from specific site by clientSideComponentId without specifying scope', async () => {
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
       if (url === `${webUrl}/_api/Site/UserCustomActions?$filter=startswith(Location,'ClientSideExtension.ListViewCommandSet') and ClientSideComponentId eq guid'${clientSideComponentId}'`) {
-        return customActionResponse;
+        return commandSetResponse;
       }
       if (url === `${webUrl}/_api/Web/UserCustomActions?$filter=startswith(Location,'ClientSideExtension.ListViewCommandSet') and ClientSideComponentId eq guid'${clientSideComponentId}'`) {
         return [];
@@ -117,43 +117,43 @@ describe(commands.COMMANDSET_GET, () => {
     });
 
     await command.action(logger, { options: { webUrl: webUrl, clientSideComponentId: clientSideComponentId, verbose: true } });
-    assert(loggerLogSpy.calledWith(customActionObject));
+    assert(loggerLogSpy.calledWith(commandSetObject));
   });
 
   it('throws error when command set not found by id', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/Site/UserCustomActions(guid'${customActionId}')`) {
+      if (opts.url === `${webUrl}/_api/Site/UserCustomActions(guid'${commandSetId}')`) {
         return { 'odata.null': true };
       }
 
-      if (opts.url === `${webUrl}/_api/Web/UserCustomActions(guid'${customActionId}')`) {
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions(guid'${commandSetId}')`) {
         return { 'odata.null': true };
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: customActionId, verbose: true } })
-      , new CommandError(`Command set with id ${customActionId} can't be found.`));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: commandSetId, verbose: true } })
+      , new CommandError(`Command set with id ${commandSetId} can't be found.`));
   });
 
   it('throws error when command set is found by id but is not of type command set', async () => {
-    const customActionObjectClone = { ...customActionObject };
-    customActionObjectClone.Location = 'ClientSideExtension.ApplicationCustomizer';
+    const commandSetObjectClone = { ...commandSetObject };
+    commandSetObjectClone.Location = 'ClientSideExtension.ApplicationCustomizer';
     sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `${webUrl}/_api/Site/UserCustomActions(guid'${customActionId}')`) {
-        return customActionObjectClone;
+      if (opts.url === `${webUrl}/_api/Site/UserCustomActions(guid'${commandSetId}')`) {
+        return commandSetObjectClone;
       }
 
-      if (opts.url === `${webUrl}/_api/Web/UserCustomActions(guid'${customActionId}')`) {
+      if (opts.url === `${webUrl}/_api/Web/UserCustomActions(guid'${commandSetId}')`) {
         return { 'odata.null': true };
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: customActionId, verbose: true } })
-      , new CommandError(`Custom action with id ${customActionId} is not a command set.`));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, id: commandSetId, verbose: true } })
+      , new CommandError(`Custom action with id ${commandSetId} is not a command set.`));
   });
 
   it('throws error when command set is not found by clientSideComponentId', async () => {
@@ -173,38 +173,38 @@ describe(commands.COMMANDSET_GET, () => {
   it('throws error when command set is not found by title', async () => {
     const scope = 'Web';
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === `${webUrl}/_api/${scope}/UserCustomActions?$filter=startswith(Location,'ClientSideExtension.ListViewCommandSet') and Title eq '${customActionTitle}'`) {
+      if (url === `${webUrl}/_api/${scope}/UserCustomActions?$filter=startswith(Location,'ClientSideExtension.ListViewCommandSet') and Title eq '${commandSetTitle}'`) {
         return [];
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, title: customActionTitle, scope: scope, verbose: true } })
-      , new CommandError(`No command set with title '${customActionTitle}' found.`));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } })
+      , new CommandError(`No command set with title '${commandSetTitle}' found.`));
   });
 
   it('throws error when multiple command sets are found by title', async () => {
-    const commandSetResponseClone = [...customActionResponse];
-    const customActionObjectClone = { ...customActionObject };
-    const customActionCloneId = v4();
-    customActionObjectClone.Id = customActionCloneId;
-    commandSetResponseClone.push(customActionObjectClone);
+    const commandSetResponseClone = [...commandSetResponse];
+    const commandSetObjectClone = { ...commandSetObject };
+    const commandSetCloneId = v4();
+    commandSetObjectClone.Id = commandSetCloneId;
+    commandSetResponseClone.push(commandSetObjectClone);
     const scope = 'Web';
     sinon.stub(odata, 'getAllItems').callsFake(async (url) => {
-      if (url === `${webUrl}/_api/${scope}/UserCustomActions?$filter=startswith(Location,'ClientSideExtension.ListViewCommandSet') and Title eq '${customActionTitle}'`) {
+      if (url === `${webUrl}/_api/${scope}/UserCustomActions?$filter=startswith(Location,'ClientSideExtension.ListViewCommandSet') and Title eq '${commandSetTitle}'`) {
         return commandSetResponseClone;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, title: customActionTitle, scope: scope, verbose: true } })
-      , new CommandError(`Multiple command sets with title '${customActionTitle}' found. Please disambiguate using IDs: ${os.EOL}${commandSetResponseClone.map(commandSet => `- ${commandSet.Id}`).join(os.EOL)}.`));
+    await assert.rejects(command.action(logger, { options: { webUrl: webUrl, title: commandSetTitle, scope: scope, verbose: true } })
+      , new CommandError(`Multiple command sets with title '${commandSetTitle}' found. Please disambiguate using IDs: ${os.EOL}${commandSetResponseClone.map(commandSet => `- ${commandSet.Id}`).join(os.EOL)}.`));
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid', id: customActionId } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'invalid', id: commandSetId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -229,7 +229,7 @@ describe(commands.COMMANDSET_GET, () => {
   });
 
   it('passes validation if options are specified properly with title', async () => {
-    const actual = await command.validate({ options: { webUrl: webUrl, title: customActionTitle, scope: 'Web' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: webUrl, title: commandSetTitle, scope: 'Web' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
