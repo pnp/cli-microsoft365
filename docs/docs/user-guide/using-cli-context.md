@@ -1,31 +1,8 @@
 # Use CLI for Microsoft 365 context
 
-CLI for Microsoft 365 context may store any kind of option and its value. 
+CLI for Microsoft 365 context provides unique functionality to save any kind of option and its value you might use for any command. The options saved in the context may be used in any kind of command execution, that way you may provide less or no options. It may be especially useful in scenarios where you many times use the same option in multiple commands or you would like to group all commands parameters in a single file that are used in the a script file.
 
-## How does it work
-
-When a command is executed CLI will first check for the `.m365rc.json` file in the current directory (this is where the context is saved once you set any option). If present, CLI will parse the context object and check if any of the options defined in it may be used for the currently executed command. If yes CLI will execute this command with the option and its value taken from the context. 
-
-For example if we have the following context defined in the `.m365rc.json` file
-```json
-{
-  "context": {
-    "groupName": "test group",
-    "listTitle": "test list"
-  }
-}
-```
-
-And we will execute the following command: 
-```powershell
-m365 spo listitem list --webUrl "https://contoso.sharepoint.com/sites/sample"
-```
-
-The command is missing the `listTitle` required option but instead of failing it will be executed as this option is present in the current context. The `groupName` option will not be used from the context as the `spo listitem list` command does not have it.
-
-When the same option is defined in the context and also in the command itself then the value defined in the command will be used.
-
-## Guidance
+## How to get started
 
 In order to create an empty context we may execute the following command:
 ```powershell
@@ -49,9 +26,11 @@ In order to remove the full context we may execute the following command:
 m365 context remove
 ```
 
-## Example
+## How does it work
 
-Considering the below context:
+When a command is executed CLI will first check for the `.m365rc.json` file in the current directory (this is where the context is saved once you set any option). If present, CLI will parse the context object and check if any of the options defined in it may be used for the currently executed command. If yes CLI will execute this command with the option and its value taken from the context.
+
+For example if we have the following context defined in the `.m365rc.json` file
 ```json
 {
   "context": {
@@ -61,18 +40,39 @@ Considering the below context:
 }
 ```
 
+And we will execute the following command:
+```powershell
+m365 spo listitem list --webUrl "https://contoso.sharepoint.com/sites/sample"
+```
+
+The command is missing the `listTitle` required option but instead of failing it will be executed as this option is present in the current context. The `groupName` option will not be used from the context as the `spo listitem list` command does not have it.
+
+When the same option is defined in the context and also in the command itself then the value defined in the command will be used.
+
+## Example
+
+Considering the below context:
+```json
+{
+  "context": {
+    "groupName": "Sales group",
+    "listTitle": "Expense tracker"
+  }
+}
+```
+
 When we execute:
 ```powershell
-m365 context option set --name "webUrl" --value "https://contoso.sharepoint.com/sites/sample"
+m365 context option set --name "webUrl" --value "https://contoso.sharepoint.com/sites/sales"
 ```
 
 The result of the above will be a new option added to the context:
 ```json
 {
   "context": {
-    "groupName": "test group",
-    "listTitle": "test list",
-    "webUrl": "https://contoso.sharepoint.com/sites/sample"
+    "groupName": "Sales group",
+    "listTitle": "Expense tracker",
+    "webUrl": "https://contoso.sharepoint.com/sites/sales"
   }
 }
 ```
@@ -82,14 +82,14 @@ Next, if we execute the following:
 m365 spo listitem list
 ```
 
-As a result, we will get a list of items from list `test list` from `https://contoso.sharepoint.com/sites/sample` even though we did not specify any of the required options, those were taken from the context. 
+As a result, we will get a list of items from `Expense tracker` list from `https://contoso.sharepoint.com/sites/sales` even though we did not specify any of the required options, those were taken from the context.
 
 Now when we execute:
 ```powershell
-m365 spo listitem list --listTitle "second list"
+m365 spo listitem list --listTitle "Issue tracker"
 ```
 
-We will get all items from list `second list` from `https://contoso.sharepoint.com/sites/sample` site.
+We will get all items from list `Issue tracker` from `https://contoso.sharepoint.com/sites/sales` site.
 
 If we execute:
 ```powershell
