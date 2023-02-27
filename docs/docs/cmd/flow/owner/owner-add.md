@@ -1,6 +1,6 @@
 # flow owner add
 
-Removes owner permissions to a Power Automate flow
+Assigns permissions to a Power Automate flow
 
 ## Usage
 

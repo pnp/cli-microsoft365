@@ -96,6 +96,11 @@ describe(commands.OWNER_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if roleName is not a valid user principal name', async () => {
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validName, userName: validUserName, roleName: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if the username passed', async () => {
     const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validName, userName: validUserName, roleName: validRoleName } }, commandInfo);
     assert.strictEqual(actual, true);

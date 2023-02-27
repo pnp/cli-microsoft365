@@ -109,6 +109,10 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
           return `${args.options.groupId} is not a valid GUID.`;
         }
 
+        if (FlowOwnerAddCommand.allowedRoleNames.indexOf(args.options.roleName) < 0) {
+          return `${args.options.roleName} is not a valid role name. Valid role names are ${FlowOwnerAddCommand.allowedRoleNames.join(', ')}`;
+        }
+
         return true;
       }
     );
