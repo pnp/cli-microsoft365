@@ -281,6 +281,8 @@ nav:
       - environment:
         - environment get: cmd/flow/environment/environment-get.md
         - environment list: cmd/flow/environment/environment-list.md
+      - owner:
+        - owner add: cmd/flow/owner/owner-add.md
       - run:
         - run cancel: cmd/flow/run/run-cancel.md
         - run get: cmd/flow/run/run-get.md

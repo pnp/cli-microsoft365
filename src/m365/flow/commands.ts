@@ -10,6 +10,7 @@ export default {
   EXPORT: `${prefix} export`,
   GET: `${prefix} get`,
   LIST: `${prefix} list`,
+  OWNER_ADD: `${prefix} owner add`,
   REMOVE: `${prefix} remove`,
   RUN_CANCEL: `${prefix} run cancel`,
   RUN_GET: `${prefix} run get`,
