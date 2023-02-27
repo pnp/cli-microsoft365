@@ -95,7 +95,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
       AudienceIds: [],
       IsExternal: undefined,
       Title: undefined,
-      Url: undefined
+      Url: 'http://linkless.header/'
     };
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
@@ -105,6 +105,23 @@ describe(commands.NAVIGATION_NODE_SET, () => {
       throw 'Invalid request';
     });
     await command.action(logger, { options: { webUrl: webUrl, id: id, audienceIds: "" } } as any);
+    assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
+  });
+
+  it('correctly clears url from existing navigation node', async () => {
+    const requestBody = {
+      IsExternal: undefined,
+      Title: undefined,
+      Url: 'http://linkless.header/'
+    };
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
+        return '';
+      }
+
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: { webUrl: webUrl, id: id, url: "" } } as any);
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
   });
 

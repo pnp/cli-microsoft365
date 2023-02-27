@@ -189,6 +189,30 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     assert(loggerLogSpy.calledWith(nodeAddResponse));
   });
 
+  it('adds new navigation node to the top navigation with empty url', async () => {
+    const nodeAddResponse = {
+      "AudienceIds": audienceIds.split(','),
+      "CurrentLCID": 1033,
+      "Id": 2001,
+      "IsDocLib": true,
+      "IsExternal": false,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "About",
+      "Url": "http://linkless.header/"
+    };
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/topnavigationbar`) {
+        return nodeAddResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: "", audienceIds: audienceIds, verbose: true } });
+    assert(loggerLogSpy.calledWith(nodeAddResponse));
+  });
+
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/topnavigationbar`) {
