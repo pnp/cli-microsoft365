@@ -22,6 +22,7 @@ export default {
   CDN_POLICY_LIST: `${prefix} cdn policy list`,
   CDN_POLICY_SET: `${prefix} cdn policy set`,
   CDN_SET: `${prefix} cdn set`,
+  COMMANDSET_GET: `${prefix} commandset get`,
   COMMANDSET_REMOVE: `${prefix} commandset remove`,
   COMMANDSET_SET: `${prefix} commandset set`,
   CONTENTTYPE_ADD: `${prefix} contenttype add`,

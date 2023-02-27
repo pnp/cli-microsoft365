@@ -74,6 +74,7 @@ const dictionary = [
   'schema',
   'service',
   'set',
+  'setup',
   'setting',
   'settings',
   'setup',
