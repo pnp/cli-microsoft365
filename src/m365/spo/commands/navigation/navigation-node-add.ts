@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   location?: string;
   parentNodeId?: number;
   title: string;
-  url: string;
+  url?: string;
   webUrl: string;
 }
 
@@ -43,7 +43,8 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         isExternal: args.options.isExternal,
         location: typeof args.options.location !== 'undefined',
         parentNodeId: typeof args.options.parentNodeId !== 'undefined',
-        audienceIds: typeof args.options.audienceIds !== 'undefined'
+        audienceIds: typeof args.options.audienceIds !== 'undefined',
+        url: typeof args.options.url !== 'undefined'
       });
     });
   }
@@ -61,7 +62,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         option: '-t, --title <title>'
       },
       {
-        option: '--url <url>'
+        option: '--url [url]'
       },
       {
         option: '--parentNodeId [parentNodeId]'
@@ -126,6 +127,11 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       logger.logToStderr(`Adding navigation node...`);
     }
 
+    let url = args.options.url;
+    if (typeof url === 'boolean' || !url) {
+      url = 'http://linkless.header/';
+    }
+
     const nodesCollection: string = args.options.parentNodeId ?
       `GetNodeById(${args.options.parentNodeId})/Children` :
       (args.options.location as string).toLowerCase();
@@ -140,7 +146,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       data: {
         AudienceIds: args.options.audienceIds?.split(','),
         Title: args.options.title,
-        Url: args.options.url,
+        Url: url,
         IsExternal: args.options.isExternal === true
       }
     };

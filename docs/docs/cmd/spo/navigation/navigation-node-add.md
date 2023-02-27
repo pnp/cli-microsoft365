@@ -19,8 +19,8 @@ m365 spo navigation node add [options]
 `-t, --title <title>`
 : Navigation node title.
 
-`--url <url>`
-: Navigation node URL.
+`--url [url]`
+: Navigation node URL. Default is empty string
 
 `--parentNodeId [parentNodeId]`
 : ID of the node below which the node should be added. Specify either `location` or `parentNodeId` but not both.

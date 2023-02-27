@@ -20,7 +20,7 @@ m365 spo navigation node set [options]
 : New title of the navigation node.
 
 `--url [url]`
-: New URL of the navigation node.
+: New URL of the navigation node. Default is empty string
 
 `--audienceIds [audienceIds]`
 : Comma separated list of group IDs that will be used for audience targeting. Speficy an empty string `""` to clear this value. The limit is 10 ids per navigation node.
