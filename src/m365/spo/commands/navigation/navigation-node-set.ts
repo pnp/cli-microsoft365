@@ -107,10 +107,16 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
       if (this.verbose) {
         logger.logToStderr(`Setting navigation node...`);
       }
+
+      let url = args.options.url;
+      if (url === '') {
+        url = 'http://linkless.header/';
+      }
+
       const requestBody: any = {
         Title: args.options.title,
         IsExternal: args.options.isExternal,
-        Url: args.options.url
+        Url: url
       };
 
       if (args.options.audienceIds !== undefined) {
