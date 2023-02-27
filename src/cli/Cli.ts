@@ -928,8 +928,19 @@ export class Cli {
   }
 
   public static async prompt<T>(options: any): Promise<T> {
+    /* c8 ignore next 3 */
+    if (Cli.getInstance().spinner.isSpinning) {
+      Cli.getInstance().spinner.stop();
+    }
     const inquirer: Inquirer = require('inquirer');
-    return await inquirer.prompt(options) as T;
+    const response = await inquirer.prompt(options) as T;
+    const cli = Cli.getInstance();
+    // don't show spinner if running tests
+    /* c8 ignore next 3 */
+    if (typeof global.it === 'undefined') {
+      cli.spinner.start();
+    }
+    return response;
   }
 
   private static removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {
