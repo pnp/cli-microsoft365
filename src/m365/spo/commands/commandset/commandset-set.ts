@@ -49,6 +49,10 @@ class SpoCommandsetSetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        title: typeof args.options.title !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
+        listType: typeof args.options.listType !== 'undefined',
         clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
         scope: typeof args.options.scope !== 'undefined',
         location: typeof args.options.location !== 'undefined'
