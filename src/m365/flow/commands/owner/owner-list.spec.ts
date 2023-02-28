@@ -90,7 +90,7 @@ describe(commands.OWNER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, name: flowName, output: 'json' } });
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, output: 'json' } });
     assert(loggerLogSpy.calledWith(ownerResponseJson));
   });
 
@@ -103,7 +103,7 @@ describe(commands.OWNER_LIST, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, name: flowName, asAdmin: true, output: 'text' } });
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, asAdmin: true, output: 'text' } });
     assert(loggerLogSpy.calledWith(ownerResponseText));
   });
 
@@ -118,32 +118,17 @@ describe(commands.OWNER_LIST, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, name: flowName } } as any),
-      new CommandError(error.error.message));
-  });
-
-  it('throws error when Flow not found', async () => {
-    const error = {
-      'error': {
-        'code': 'FlowNotFound',
-        'message': `Could not find flow '${flowName}'.`
-      }
-    };
-    sinon.stub(request, 'get').callsFake(async () => {
-      throw error;
-    });
-
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, name: flowName } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName } } as any),
       new CommandError(error.error.message));
   });
 
   it('fails validation if flowName is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, name: 'invalid' } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: environmentName, flowName: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if flowName a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, name: flowName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -30,7 +30,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  flowName: string;
   environmentName: string;
   asAdmin?: boolean;
 }
@@ -70,7 +70,7 @@ class FlowOwnerListCommand extends AzmgmtCommand {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '-n, --name <name>'
+        option: '-f, --flowName <flowName>'
       },
       {
         option: '--asAdmin'
@@ -81,8 +81,8 @@ class FlowOwnerListCommand extends AzmgmtCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.name)) {
-          return `${args.options.name} is not a valid GUID.`;
+        if (!validation.isValidGuid(args.options.flowName)) {
+          return `${args.options.flowName} is not a valid GUID.`;
         }
 
         return true;
@@ -93,11 +93,11 @@ class FlowOwnerListCommand extends AzmgmtCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Listing owners for flow ${args.options.name} in environment ${args.options.environmentName}`);
+        logger.logToStderr(`Listing owners for flow ${args.options.flowName} in environment ${args.options.environmentName}`);
       }
 
-      const response = await odata.getAllItems<FlowPermissionResponse>(`${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}/permissions?api-version=2016-11-01`);
-      if (!args.options.output || !Cli.shouldTrimOutput(args.options.output)) {
+      const response = await odata.getAllItems<FlowPermissionResponse>(`${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/permissions?api-version=2016-11-01`);
+      if (!Cli.shouldTrimOutput(args.options.output)) {
         logger.log(response);
       }
       else {
