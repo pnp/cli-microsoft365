@@ -385,6 +385,7 @@ nav:
         - app teamspackage download: cmd/spo/app/app-teamspackage-download.md
       - applicationcustomizer:
         - applicationcustomizer add: cmd/spo/applicationcustomizer/applicationcustomizer-add.md
+        - applicationcustomizer list: cmd/spo/applicationcustomizer/applicationcustomizer-list.md
       - apppage:
         - apppage add: cmd/spo/apppage/apppage-add.md
         - apppage set: cmd/spo/apppage/apppage-set.md
