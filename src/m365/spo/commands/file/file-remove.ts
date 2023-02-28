@@ -28,6 +28,10 @@ class SpoFileRemoveCommand extends SpoCommand {
     return 'Removes the specified file';
   }
 
+  public alias(): string[] | undefined {
+    return [commands.PAGE_TEMPLATE_REMOVE];
+  }
+
   constructor() {
     super();
 
