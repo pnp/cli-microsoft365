@@ -1,6 +1,6 @@
 # Release notes
 
-## [v6.3.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
+## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
 ### New commands
 
