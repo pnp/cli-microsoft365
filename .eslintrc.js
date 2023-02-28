@@ -18,6 +18,7 @@ const dictionary = [
   'checklist',
   'client',
   'comm',
+  'commandset',
   'content',
   'conversation',
   'custom',
