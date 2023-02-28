@@ -13,7 +13,7 @@ m365 flow owner list [options]
 `-e, --environmentName <environmentName>`
 : The name of the environment.
 
-`-n, --name <name>`
+`-f, --flowName <flowName>`
 : The name of the Power Automate flow.
 
 `--asAdmin`
@@ -26,13 +26,13 @@ m365 flow owner list [options]
 Gets the owners by the name of the Power Automate flow within a specified environment
 
 ```sh
-m365 flow owner list --environmentName Default-c5a5d746-3520-453f-8a69-780f8e44917e --name 72f2be4a-78c1-4220-a048-dbf557296a72
+m365 flow owner list --environmentName Default-c5a5d746-3520-453f-8a69-780f8e44917e --flowName 72f2be4a-78c1-4220-a048-dbf557296a72
 ```
 
 Gets the owners by the name of the Power Automate flow within a specified environment with admin permissions
 
 ```sh
-m365 flow owner list --environmentName Default-c5a5d746-3520-453f-8a69-780f8e44917e --name 72f2be4a-78c1-4220-a048-dbf557296a72 --asAdmin
+m365 flow owner list --environmentName Default-c5a5d746-3520-453f-8a69-780f8e44917e --flowName 72f2be4a-78c1-4220-a048-dbf557296a72 --asAdmin
 ```
 
 ## Response
@@ -75,7 +75,7 @@ m365 flow owner list --environmentName Default-c5a5d746-3520-453f-8a69-780f8e449
 === "Markdown"
 
     ```md
-    # flow owner list --environmentName "Default-c5a5d746-3520-453f-8a69-780f8e44917e" --name "72f2be4a-78c1-4220-a048-dbf557296a72" --debug "true"
+    # flow owner list --environmentName "Default-c5a5d746-3520-453f-8a69-780f8e44917e" --flowName "72f2be4a-78c1-4220-a048-dbf557296a72"
 
     Date: 25/02/2023
 
