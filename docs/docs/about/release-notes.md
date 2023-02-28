@@ -1,5 +1,11 @@
 # Release notes
 
+## [v6.4.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.4.0)
+
+**Power Automate:**
+
+- [flow owner list](../cmd/flow/owner/owner-list.md) - lists all owners of a Power Automate flow [#4558](https://github.com/pnp/cli-microsoft365/issues/4558)
+
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
 ### New commands
