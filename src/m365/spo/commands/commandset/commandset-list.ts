@@ -76,7 +76,7 @@ class SpoCommandsetListCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Attempt to get comaandsets...`);
+        logger.logToStderr(`Attempt to get commandsets...`);
       }
 
       const commandsets = await spo.getCustomActions(args.options.webUrl, args.options.scope, `startswith(Location,'ClientSideExtension.ListViewCommandSet')`);
