@@ -47,6 +47,7 @@ describe('Lazy loading commands', () => {
       'flow connector list',
       'spo list label get',
       'spo list label set',
+      'spo page template remove',
       'spo sp grant add',
       'spo sp grant list',
       'spo sp grant revoke',
