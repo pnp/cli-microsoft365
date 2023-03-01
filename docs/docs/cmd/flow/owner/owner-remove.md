@@ -31,14 +31,17 @@ m365 flow owner remove [options]
 `--asAdmin`
 : Run the command as admin.
 
+`--confirm`
+: Don't prompt for confirmation.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
 
-Remove owner permissions from a specific Power Automate flow for a user by ID
+Remove owner permissions from a specific Power Automate flow for a user by ID without prompting for confirmation
 
 ```sh
-m365 flow owner remove --userId "5c241023-2ba5-4ea8-a516-a2481a3e6c51" --environmentName Default-c5a5d746-3520-453f-8a69-780f8e44917e --flowName 72f2be4a-78c1-4220-a048-dbf557296a72
+m365 flow owner remove --userId "5c241023-2ba5-4ea8-a516-a2481a3e6c51" --environmentName Default-c5a5d746-3520-453f-8a69-780f8e44917e --flowName 72f2be4a-78c1-4220-a048-dbf557296a72 --confirm
 ```
 
 Remove owner permissions from a specific Power Automate flow for a user by UPN as admin
