@@ -15,6 +15,7 @@ interface Options extends GlobalOptions {
   status?: string;
   triggerStartTime?: string;
   triggerEndTime?: string;
+  asAdmin?: boolean;
 }
 
 class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTime: string, status: string, properties: { startTime: string, status: string } }> {
@@ -45,7 +46,8 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
       Object.assign(this.telemetryProperties, {
         status: typeof args.options.status !== 'undefined',
         triggerStartTime: typeof args.options.triggerStartTime !== 'undefined',
-        triggerEndTime: typeof args.options.triggerEndTime !== 'undefined'
+        triggerEndTime: typeof args.options.triggerEndTime !== 'undefined',
+        asAdmin: !!args.options.asAdmin
       });
     });
   }
@@ -67,6 +69,9 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
       },
       {
         option: '--triggerEndTime [triggerEndTime]'
+      },
+      {
+        option: '--asAdmin'
       }
     );
   }
@@ -100,7 +105,7 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
       logger.logToStderr(`Retrieving list of runs for Microsoft Flow ${args.options.flowName}...`);
     }
 
-    let url: string = `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs?api-version=2016-11-01`;
+    let url: string = `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/runs?api-version=2016-11-01`;
     const filters = this.getFilters(args.options);
     if (filters.length > 0) {
       url += `&$filter=${filters.join(' and ')}`;
