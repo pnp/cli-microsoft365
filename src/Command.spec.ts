@@ -11,6 +11,7 @@ import { telemetry } from './telemetry';
 import { pid } from './utils/pid';
 import { session } from './utils/session';
 import { sinonUtil } from './utils/sinonUtil';
+import { accessToken } from './utils/accessToken';
 
 class MockCommand1 extends Command {
   public get name(): string {
@@ -167,6 +168,7 @@ describe('Command', () => {
       auth.restoreAuth,
       telemetry.trackEvent
     ]);
+    auth.service.accessTokens = {};
   });
 
   it('returns true by default', async () => {
@@ -543,5 +545,31 @@ describe('Command', () => {
   it('fails validation when invalid output specified', async () => {
     const cmd = new MockCommand2();
     assert.notStrictEqual(await cmd.validate({ options: { output: 'invalid' } }, Cli.getCommandInfo(cmd)), true);
+  });
+
+  it('handles option with @meid token and spaces', async () => {
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: '',
+      accessToken: ''
+    };
+    const command = new MockCommand3();
+    const commandCommandActionSpy: sinon.SinonSpy = sinon.spy(command, 'commandAction');
+    sinon.stub(accessToken, 'getUserIdFromAccessToken').returns('f3e59491-fc1a-47cc-a1f0-95ed45983717');
+
+    await command.action(logger, { options: { option1: '@Meid ' } });
+    assert.deepStrictEqual(commandCommandActionSpy.lastCall.args[1].options.option1, 'f3e59491-fc1a-47cc-a1f0-95ed45983717');
+  });
+
+  it('handles option with @meusername token and spaces', async () => {
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: '',
+      accessToken: ''
+    };
+    const command = new MockCommand3();
+    const commandCommandActionSpy: sinon.SinonSpy = sinon.spy(command, 'commandAction');
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').returns('admin@contoso.onmicrosoft.com');
+
+    await command.action(logger, { options: { option1: '@MeUsername ' } });
+    assert.deepStrictEqual(commandCommandActionSpy.lastCall.args[1].options.option1, 'admin@contoso.onmicrosoft.com');
   });
 });

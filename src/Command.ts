@@ -472,7 +472,7 @@ export default abstract class Command {
         return;
       }
 
-      const lowerCaseValue = value.toLowerCase();
+      const lowerCaseValue = value.toLowerCase().trim();
       if (lowerCaseValue === '@meid') {
         args.options[option] = accessToken.getUserIdFromAccessToken(token);
       }
