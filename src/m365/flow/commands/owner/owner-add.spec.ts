@@ -117,9 +117,9 @@ describe(commands.OWNER_ADD, () => {
             principal: {
               id: validUserId
             },
-            roleName: 'CanView',
-            type: 'User'
-          }
+            roleName: 'CanView'
+          },
+          type: 'User'
         }
       ]
     };
@@ -144,9 +144,9 @@ describe(commands.OWNER_ADD, () => {
             principal: {
               id: validUserId
             },
-            roleName: 'CanEdit',
-            type: 'User'
-          }
+            roleName: 'CanEdit'
+          },
+          type: 'User'
         }
       ]
     };
@@ -175,9 +175,9 @@ describe(commands.OWNER_ADD, () => {
             principal: {
               id: validGroupId
             },
-            roleName: 'CanEdit',
-            type: 'Group'
-          }
+            roleName: 'CanEdit'
+          },
+          type: 'Group'
         }
       ]
     };
@@ -202,9 +202,9 @@ describe(commands.OWNER_ADD, () => {
             principal: {
               id: validGroupId
             },
-            roleName: 'CanEdit',
-            type: 'Group'
-          }
+            roleName: 'CanEdit'
+          },
+          type: 'Group'
         }
       ]
     };

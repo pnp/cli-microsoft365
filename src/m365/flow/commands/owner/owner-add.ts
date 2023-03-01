@@ -110,7 +110,7 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
         }
 
         if (FlowOwnerAddCommand.allowedRoleNames.indexOf(args.options.roleName) < 0) {
-          return `${args.options.roleName} is not a valid roleName. Valid role names are ${FlowOwnerAddCommand.allowedRoleNames.join(', ')}`;
+          return `${args.options.roleName} is not a valid roleName. Valid values are ${FlowOwnerAddCommand.allowedRoleNames.join(', ')}`;
         }
 
         return true;
@@ -121,7 +121,7 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Assigning permissions for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName} with the permissions ${args.options.roleName} to a Power Automate flow ${args.options.flowName}`);
+        logger.logToStderr(`Assigning permissions for ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName} with permissions ${args.options.roleName} to Power Automate flow ${args.options.flowName}`);
       }
 
       let id = '';
@@ -159,9 +159,9 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
                 principal: {
                   id: id
                 },
-                roleName: args.options.roleName,
-                type: type
-              }
+                roleName: args.options.roleName
+              },
+              type: type
             }
           ]
         },
