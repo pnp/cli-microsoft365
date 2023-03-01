@@ -17,7 +17,7 @@ const command: Command = require('./owner-add');
 
 describe(commands.OWNER_ADD, () => {
   const validEnvironmentName = 'Default-6a2903af-9c03-4c02-a50b-e7419599925b';
-  const validName = '784670e6-199a-4993-ae13-4b6747a0cd5d';
+  const validFlowName = '784670e6-199a-4993-ae13-4b6747a0cd5d';
   const validUserId = 'd2481133-e3ed-4add-836d-6e200969dd03';
   const validUserName = 'john.doe@contoso.com';
   const validGroupId = 'c6c4b4e0-cd72-4d64-8ec2-cfbd0388ec16';
@@ -82,100 +82,146 @@ describe(commands.OWNER_ADD, () => {
   });
 
   it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validName, userId: 'invalid', roleName: validRoleName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validFlowName, userId: 'invalid', roleName: validRoleName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validName, groupId: 'invalid', roleName: validRoleName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validFlowName, groupId: 'invalid', roleName: validRoleName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if username is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validName, userName: 'invalid', roleName: validRoleName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validFlowName, userName: 'invalid', roleName: validRoleName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if roleName is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validName, userName: validUserName, roleName: 'invalid' } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validFlowName, userName: validUserName, roleName: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the username passed', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validName, userName: validUserName, roleName: validRoleName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validFlowName, userName: validUserName, roleName: validRoleName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('adds owner to the flow with userId', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validName)}/modifyPermissions?api-version=2016-11-01`) {
+    const requestBody = {
+      put: [
+        {
+          properties: {
+            principal: {
+              id: validUserId
+            },
+            roleName: 'CanView'
+          },
+          type: 'User'
+        }
+      ]
+    };
+
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
         return;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, name: validName, userId: validUserId, roleName: 'CanView' } }));
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, userId: validUserId, roleName: 'CanView' } });
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
   it('adds owner to the flow with userName', async () => {
+    const requestBody = {
+      put: [
+        {
+          properties: {
+            principal: {
+              id: validUserId
+            },
+            roleName: 'CanEdit'
+          },
+          type: 'User'
+        }
+      ]
+    };
+
     sinon.stub(aadUser, 'getUserIdByUpn').callsFake(async () => {
       return validUserId;
     });
 
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validName)}/modifyPermissions?api-version=2016-11-01`) {
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
         return;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, name: validName, userName: validUserName, roleName: validRoleName } }));
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, userName: validUserName, roleName: validRoleName } });
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
   it('adds owner to the flow with groupId as admin', async () => {
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validName)}/modifyPermissions?api-version=2016-11-01`) {
+    const requestBody = {
+      put: [
+        {
+          properties: {
+            principal: {
+              id: validGroupId
+            },
+            roleName: 'CanEdit'
+          },
+          type: 'Group'
+        }
+      ]
+    };
+
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
         return;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, name: validName, groupId: validGroupId, roleName: validRoleName, asAdmin: true } }));
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true } });
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
   it('adds owner to the flow with groupName as admin', async () => {
+    const requestBody = {
+      put: [
+        {
+          properties: {
+            principal: {
+              id: validGroupId
+            },
+            roleName: 'CanEdit'
+          },
+          type: 'Group'
+        }
+      ]
+    };
+
     sinon.stub(aadGroup, 'getGroupByDisplayName').callsFake(async () => {
       return { id: validGroupId };
     });
 
-    sinon.stub(request, 'post').callsFake(async opts => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validName)}/modifyPermissions?api-version=2016-11-01`) {
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async opts => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${formatting.encodeQueryParameter(validEnvironmentName)}/flows/${formatting.encodeQueryParameter(validFlowName)}/modifyPermissions?api-version=2016-11-01`) {
         return;
       }
 
       throw 'Invalid request';
     });
 
-    await assert.doesNotReject(command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, name: validName, groupName: validGroupName, roleName: validRoleName, asAdmin: true } }));
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true } });
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
-  // it('throws error when no environment found', async () => {
-  //   const error = {
-  //     'error': {
-  //       'code': 'EnvironmentAccessDenied',
-  //       'message': `Access to the environment '${environmentName}' is denied.`
-  //     }
-  //   };
-  //   sinon.stub(request, 'post').callsFake(async () => {
-  //     throw error;
-  //   });
-
-  //   await assert.rejects(command.action(logger, { options: { environmentName: environmentName, name: name, userId: userId } } as any),
-  //     new CommandError(error.error.message));
-  // });
 
   it('correctly handles API OData error', async () => {
     const error = {
@@ -187,7 +233,7 @@ describe(commands.OWNER_ADD, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironmentName, name: validName, roleName: validRoleName, userId: validUserId } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironmentName, name: validFlowName, roleName: validRoleName, userId: validUserId } } as any),
       new CommandError(error.error.message));
   });
 });
