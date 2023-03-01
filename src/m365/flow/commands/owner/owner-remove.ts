@@ -48,7 +48,8 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         userName: typeof args.options.userName !== 'undefined',
         groupId: typeof args.options.groupId !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
-        asAdmin: !!args.options.asAdmin
+        asAdmin: !!args.options.asAdmin,
+        confirm: !!args.options.confirm
       });
     });
   }
