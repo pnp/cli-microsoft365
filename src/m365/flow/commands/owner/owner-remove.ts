@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
@@ -13,7 +14,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  flowName: string;
   environmentName: string;
   userId?: string;
   userName?: string;
@@ -58,7 +59,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '-n, --name <name>'
+        option: '-n, --flowName <flowName>'
       },
       {
         option: '--userId [userId]'
@@ -74,6 +75,9 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
       },
       {
         option: '--asAdmin'
+      },
+      {
+        option: '--confirm'
       }
     );
   }
@@ -81,8 +85,8 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.name)) {
-          return `${args.options.name} is not a valid GUID.`;
+        if (!validation.isValidGuid(args.options.flowName)) {
+          return `${args.options.flowName} is not a valid GUID.`;
         }
 
         if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
@@ -90,7 +94,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         }
 
         if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid user name.`;
+          return `${args.options.userName} is not a valid userName.`;
         }
 
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
@@ -106,42 +110,59 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
     this.optionSets.push({ options: ['userId', 'userName', 'groupId', 'groupName'] });
   }
 
-
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       if (this.verbose) {
-        logger.logToStderr(`Removing owner ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName} from flow ${args.options.name} in environment ${args.options.environmentName}`);
+        logger.logToStderr(`Removing owner ${args.options.userId || args.options.userName || args.options.groupId || args.options.groupName} from flow ${args.options.flowName} in environment ${args.options.environmentName}`);
       }
 
-      let idToRemove = '';
-      if (args.options.userId) {
-        idToRemove = args.options.userId;
-      }
-      else if (args.options.userName) {
-        idToRemove = await aadUser.getUserIdByUpn(args.options.userName);
-      }
-      else if (args.options.groupId) {
-        idToRemove = args.options.groupId;
+      const removeFlowOwner: () => Promise<void> = async (): Promise<void> => {
+        let idToRemove = '';
+        if (args.options.userId) {
+          idToRemove = args.options.userId;
+        }
+        else if (args.options.userName) {
+          idToRemove = await aadUser.getUserIdByUpn(args.options.userName);
+        }
+        else if (args.options.groupId) {
+          idToRemove = args.options.groupId;
+        }
+        else {
+          idToRemove = await aadGroup.getGroupIdByDisplayName(args.options.groupName!);
+        }
+
+        const requestOptions: CliRequestOptions = {
+          url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/modifyPermissions?api-version=2016-11-01`,
+          headers: {
+            accept: 'application/json'
+          },
+          data: {
+            delete: [
+              {
+                id: idToRemove
+              }
+            ]
+          },
+          responseType: 'json'
+        };
+        await request.post(requestOptions);
+      };
+
+      if (args.options.confirm) {
+        await removeFlowOwner();
       }
       else {
-        idToRemove = (await aadGroup.getGroupByDisplayName(args.options.groupName!, ['id'])).id!;
-      }
+        const result = await Cli.prompt<{ continue: boolean }>({
+          type: 'confirm',
+          name: 'continue',
+          default: false,
+          message: `Are you sure you want to remove the Flow owner from the specified flow?`
+        });
 
-      const requestOptions: CliRequestOptions = {
-        url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}/modifyPermissions?api-version=2016-11-01`,
-        headers: {
-          accept: 'application/json'
-        },
-        data: {
-          'delete': [
-            {
-              'id': idToRemove
-            }
-          ]
-        },
-        responseType: 'json'
-      };
-      await request.post(requestOptions);
+        if (result.continue) {
+          await removeFlowOwner();
+        }
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

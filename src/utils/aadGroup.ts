@@ -27,8 +27,8 @@ export const aadGroup = {
    * @param displayName Group display name.
    * @param selectProperties Properties to select if specified.
    */
-  getGroupsByDisplayName(displayName: string, selectProperties?: string[]): Promise<Group[]> {
-    return odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'${(selectProperties && selectProperties.length > 0) ? `&$select=${selectProperties.join(',')}` : ''}`);
+  getGroupsByDisplayName(displayName: string): Promise<Group[]> {
+    return odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`);
   },
 
   /**
@@ -38,8 +38,8 @@ export const aadGroup = {
    * @throws Error when group was not found.
    * @throws Error when multiple groups with the same name were found.
    */
-  async getGroupByDisplayName(displayName: string, selectProperties?: string[]): Promise<Group> {
-    const groups = await this.getGroupsByDisplayName(displayName, selectProperties);
+  async getGroupByDisplayName(displayName: string): Promise<Group> {
+    const groups = await this.getGroupsByDisplayName(displayName);
 
     if (!groups.length) {
       throw Error(`The specified group '${displayName}' does not exist.`);
@@ -50,5 +50,25 @@ export const aadGroup = {
     }
 
     return groups[0];
+  },
+
+  /**
+   * Get a single group id by its display name.
+   * @param displayName Group display name.
+   * @throws Error when group was not found.
+   * @throws Error when multiple groups with the same name were found.
+   */
+  async getGroupIdByDisplayName(displayName: string): Promise<string> {
+    const groups = await odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'?$select=id`);
+
+    if (!groups.length) {
+      throw Error(`The specified group '${displayName}' does not exist.`);
+    }
+
+    if (groups.length > 1) {
+      throw Error(`Multiple groups with name '${displayName}' found: ${groups.map(x => x.id).join(',')}.`);
+    }
+
+    return groups[0].id!;
   }
 };

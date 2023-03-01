@@ -13,6 +13,7 @@ import { aadGroup } from '../../../../utils/aadGroup';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
 import { formatting } from '../../../../utils/formatting';
+import { session } from '../../../../utils/session';
 const command: Command = require('./owner-remove');
 
 describe(commands.OWNER_REMOVE, () => {
@@ -30,11 +31,13 @@ describe(commands.OWNER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -52,12 +55,18 @@ describe(commands.OWNER_REMOVE, () => {
         log.push(msg);
       }
     };
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
+      promptOptions = options;
+      return { continue: false };
+    });
+    promptOptions = undefined;
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      aadGroup.getGroupByDisplayName,
+      aadGroup.getGroupIdByDisplayName,
       aadUser.getUserIdByUpn,
+      Cli.prompt,
       request.post
     ]);
   });
@@ -66,7 +75,8 @@ describe(commands.OWNER_REMOVE, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });
@@ -88,7 +98,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, name: flowName, userId: userId } });
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, userId: userId, confirm: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyUser);
   });
 
@@ -104,11 +114,15 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, name: flowName, userName: userName } });
-    assert.deepStrictEqual(JSON.stringify(postStub.lastCall.args[0].data), JSON.stringify(requestBodyUser));
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, userName: userName, confirm: true } });
+    assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyUser);
   });
 
-  it('deletes owner from flow by groupId as admin', async () => {
+  it('deletes owner from flow by groupId as admin when prompt confirmed', async () => {
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
         return;
@@ -117,13 +131,13 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, name: flowName, groupId: groupId, asAdmin: true } });
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupId: groupId, asAdmin: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyGroup);
   });
 
   it('deletes owner from flow by groupName as admin', async () => {
-    sinon.stub(aadGroup, 'getGroupByDisplayName').callsFake(async () => {
-      return { id: groupId };
+    sinon.stub(aadGroup, 'getGroupIdByDisplayName').callsFake(async () => {
+      return groupId;
     });
     const postStub = sinon.stub(request, 'post').callsFake(async opts => {
       if (opts.url === requestUrlAdmin) {
@@ -133,7 +147,7 @@ describe(commands.OWNER_REMOVE, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: environmentName, name: flowName, groupName: groupName, asAdmin: true } });
+    await command.action(logger, { options: { verbose: true, environmentName: environmentName, flowName: flowName, groupName: groupName, asAdmin: true, confirm: true } });
     assert.deepStrictEqual(postStub.lastCall.args[0].data, requestBodyGroup);
   });
 
@@ -148,47 +162,53 @@ describe(commands.OWNER_REMOVE, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, name: flowName, userId: userId } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, flowName: flowName, userId: userId, confirm: true } } as any),
       new CommandError(error.error.message));
   });
 
-  it('throws error when Flow not found', async () => {
-    const error = {
-      'error': {
-        'code': 'FlowNotFound',
-        'message': `Could not find flow '${flowName}'.`
-      }
-    };
-    sinon.stub(request, 'post').callsFake(async () => {
-      throw error;
-    });
+  it('prompts before removing the specified owner from a flow when confirm option not passed', async () => {
+    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
+    let promptIssued = false;
 
-    await assert.rejects(command.action(logger, { options: { environmentName: environmentName, name: flowName, userId: userId } } as any),
-      new CommandError(error.error.message));
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
+  });
+
+  it('aborts removing the specified owner from a flow when option not passed and prompt not confirmed', async () => {
+    const postSpy = sinon.spy(request, 'post');
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, useName: userName } });
+    assert(postSpy.notCalled);
   });
 
   it('fails validation if flowName is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, name: 'invalid', userId: userId } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: environmentName, flowName: 'invalid', userId: userId } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, name: flowName, userId: 'invalid' } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, userId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, name: flowName, groupId: 'invalid' } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, groupId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if username is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, name: flowName, userName: 'invalid' } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, userName: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if groupName passed', async () => {
-    const actual = await command.validate({ options: { environmentName: environmentName, name: flowName, groupName: groupName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, groupName: groupName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
