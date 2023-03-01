@@ -5,6 +5,7 @@ import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./completion-sh-update');
@@ -18,6 +19,7 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     generateShCompletionStub = sinon.stub(autocomplete, 'generateShCompletion').callsFake(() => { });
   });
 
@@ -45,6 +47,7 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
     sinonUtil.restore([
       telemetry.trackEvent,
       pid.getProcessName,
+      session.getId,
       autocomplete.generateShCompletion
     ]);
   });

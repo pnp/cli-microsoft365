@@ -38,19 +38,19 @@ m365 spo list roleassignment remove [options]
 
 ## Examples
 
-Remove roleassignment from list by title based on group name
+Remove roleassignment from list by title based on group name.
 
 ```sh
 m365 spo list roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --listTitle "someList" --groupName "saleGroup"
 ```
 
-Remove roleassignment from list by title based on principal Id
+Remove roleassignment from list by title based on principal Id.
 
 ```sh
 m365 spo list roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --listTitle "Events" --principalId 2
 ```
 
-Remove roleassignment from list by url based on principal Id
+Remove roleassignment from list by url based on principal Id.
 
 ```sh
 m365 spo list roleassignment remove --webUrl "https://contoso.sharepoint.com/sites/contoso-sales" --listUrl '/sites/contoso-sales/lists/Events' --principalId 2

@@ -1,10 +1,11 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { telemetry } from '../../telemetry';
 import auth from '../../Auth';
 import { Logger } from '../../cli/Logger';
 import { CommandError } from '../../Command';
+import { telemetry } from '../../telemetry';
 import { pid } from '../../utils/pid';
+import { session } from '../../utils/session';
 import { sinonUtil } from '../../utils/sinonUtil';
 import GraphCommand from './GraphCommand';
 
@@ -28,6 +29,7 @@ describe('GraphCommand', () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
   });
 
   afterEach(() => {
@@ -37,7 +39,8 @@ describe('GraphCommand', () => {
   after(() => {
     sinonUtil.restore([
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
   });
 

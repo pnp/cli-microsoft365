@@ -5,6 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./accesstoken-get');
@@ -17,6 +18,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     auth.service.connected = true;
   });
@@ -49,6 +51,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
     sinonUtil.restore([
       telemetry.trackEvent,
       pid.getProcessName,
+      session.getId,
       auth.restoreAuth
     ]);
   });

@@ -11,6 +11,7 @@ import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./chat-message-send');
@@ -43,6 +44,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
@@ -114,6 +116,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       auth.restoreAuth,
       telemetry.trackEvent,
       pid.getProcessName,
+      session.getId,
       accessToken.getUserNameFromAccessToken
     ]);
     auth.service.connected = false;

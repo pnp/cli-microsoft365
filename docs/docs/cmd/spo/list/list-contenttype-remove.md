@@ -14,19 +14,19 @@ m365 spo list contenttype remove [options]
 : URL of the site where the list is located.
 
 `-l, --listId [listId]`
-: ID of the list. Specify either `listTitle`, `listId` or `listUrl`.
+: ID of the list. Specify either `listTitle`, `listId`, or `listUrl`.
 
 `-t, --listTitle [listTitle]`
-: Title of the list. Specify either `listTitle`, `listId` or `listUrl`.
+: Title of the list. Specify either `listTitle`, `listId`, or `listUrl`.
 
 `--listUrl [listUrl]`
-: Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`.
+: Server- or site-relative URL of the list. Specify either `listTitle`, `listId`, or `listUrl`.
 
 `-i, --id <id>`
-: ID of the content type to remove from the list
+: ID of the content type to remove from the list.
 
 `--confirm`
-: Don't prompt for confirmation
+: Don't prompt for confirmation.
 
 --8<-- "docs/cmd/_global.md"
 

@@ -11,7 +11,7 @@ m365 spo homesite set [options]
 ## Options
 
 `-u, --siteUrl <siteUrl>`
-: The URL of the site to set as Home Site
+: The URL of the site to set as Home Site.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -20,7 +20,7 @@ m365 spo homesite set [options]
 
 ## Examples
 
-Set the specified site as the Home Site
+Set the specified site as the Home Site.
 
 ```sh
 m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms
@@ -43,6 +43,12 @@ m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms
 === "CSV"
 
     ```csv
+    The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
+    ```
+
+=== "Markdown"
+
+    ```md
     The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
     ```
 

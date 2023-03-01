@@ -129,3 +129,33 @@ m365 spo listitem set --listTitle "Demo List" --id 147 --webUrl https://contoso.
     FileSystemObjectType,Id,ServerRedirectedEmbedUri,ServerRedirectedEmbedUrl,ID,ContentTypeId,Title,Modified,Created,AuthorId,EditorId,OData__UIVersionString,Attachments,GUID,ComplianceAssetId,OData__vti_ItemDeclaredRecord
     0,236,,,236,0x01003CDBEB7138618C47A98D56499135D6EE0004C0F5794DEBCC4BAC981AC4AE1BD803,Updated Title,2022-11-16T21:10:55Z,2022-11-16T20:56:31Z,10,10,9.0,1,cac57513-e870-4e7a-9f23-f4ea10e14f4e,,
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo listitem set --listTitle "My List" --id "236" --webUrl "https://contoso.sharepoint.com" --Title "Updated Title"
+
+    Date: 2/20/2023
+
+    ## Updated Title (236)
+
+    Property | Value
+    ---------|-------
+    FileSystemObjectType | 0
+    Id | 236
+    ServerRedirectedEmbedUri | null
+    ServerRedirectedEmbedUrl |
+    ContentTypeId | 0x01003CDBEB7138618C47A98D56499135D6EE0004C0F5794DEBCC4BAC981AC4AE1BD803
+    Title | Updated Title
+    ComplianceAssetId | null
+    FieldName1 | null
+    ID | 236
+    Modified | 2022-11-16T21:10:06Z
+    Created | 2022-11-16T20:56:31Z
+    AuthorId | 10
+    EditorId | 10
+    OData\_\_UIVersionString | 7.0
+    Attachments | true
+    GUID | cac57513-e870-4e7a-9f23-f4ea10e14f4e
+    OData__vti_ItemDeclaredRecord | null
+    ```

@@ -7,6 +7,8 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { session } from '../../../../utils/session';
+import { pid } from '../../../../utils/pid';
 const command: Command = require('./tenant-settings-list');
 
 describe(commands.TENANT_SETTINGS_LIST, () => {
@@ -53,6 +55,8 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
   });
 
@@ -81,7 +85,9 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      telemetry.trackEvent
+      telemetry.trackEvent,
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });

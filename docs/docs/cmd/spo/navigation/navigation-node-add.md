@@ -103,3 +103,25 @@ m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-
     AudienceIds,CurrentLCID,Id,IsDocLib,IsExternal,IsVisible,ListTemplateType,Title,Url
     "[""7aa4a1ca-4035-4f2f-bac7-7beada59b5ba""]",1033,2032,1,1,1,0,Navigation Link,https://contoso.sharepoint.com
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo navigation node get --webUrl "https://contoso.sharepoint.com/sites/team-a" --location "TopNavigationBar" --title "Navigation Link" --url "https://contoso.sharepoint.com"
+
+    Date: 2/20/2023
+
+    ## Navigation Link (2030)
+
+    Property | Value
+    ---------|-------
+    AudienceIds | ["7aa4a1ca-4035-4f2f-bac7-7beada59b5ba"]
+    CurrentLCID | 1033
+    Id | 2030
+    IsDocLib | true
+    IsExternal | false
+    IsVisible | true
+    ListTemplateType | 0
+    Title | Navigation Link
+    Url | https://contoso.sharepoint.com
+    ```

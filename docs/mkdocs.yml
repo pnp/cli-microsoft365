@@ -53,6 +53,8 @@ nav:
       - groupsettingtemplate:
         - groupsettingtemplate get: cmd/aad/groupsettingtemplate/groupsettingtemplate-get.md
         - groupsettingtemplate list: cmd/aad/groupsettingtemplate/groupsettingtemplate-list.md
+      - license:
+        - license list: cmd/aad/license/license-list.md
       - o365group:
         - o365group add: cmd/aad/o365group/o365group-add.md
         - o365group get: cmd/aad/o365group/o365group-get.md
@@ -100,11 +102,14 @@ nav:
         - user remove: cmd/aad/user/user-remove.md
         - user set: cmd/aad/user/user-set.md        
         - user guest add: cmd/aad/user/user-guest-add.md
+        - user license add: cmd/aad/user/user-license-add.md
         - user license list: cmd/aad/user/user-license-list.md
+        - user license remove: cmd/aad/user/user-license-remove.md
         - user password validate: cmd/aad/user/user-password-validate.md
         - user recyclebinitem clear: cmd/aad/user/user-recyclebinitem-clear.md
         - user recyclebinitem list: cmd/aad/user/user-recyclebinitem-list.md
         - user recyclebinitem remove: cmd/aad/user/user-recyclebinitem-remove.md
+        - user recyclebinitem restore: cmd/aad/user/user-recyclebinitem-restore.md
         - user signin list: cmd/aad/user/user-signin-list.md
     - Adaptive Card (adaptivecard):
       - send: cmd/adaptivecard/adaptivecard-send.md
@@ -277,6 +282,7 @@ nav:
         - environment get: cmd/flow/environment/environment-get.md
         - environment list: cmd/flow/environment/environment-list.md
       - owner:
+        - owner list: cmd/flow/owner/owner-list.md
         - owner remove: cmd/flow/owner/owner-remove.md
       - run:
         - run cancel: cmd/flow/run/run-cancel.md

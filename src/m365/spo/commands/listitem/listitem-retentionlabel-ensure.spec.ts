@@ -9,6 +9,7 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as SpoWebRetentionLabelListCommand from '../web/web-retentionlabel-list';
@@ -63,6 +64,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -102,7 +104,8 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });

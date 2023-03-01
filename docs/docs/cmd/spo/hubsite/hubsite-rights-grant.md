@@ -11,13 +11,13 @@ m365 spo hubsite rights grant [options]
 ## Options
 
 `-u, --hubSiteUrl <hubSiteUrl>`
-: The URL of the hub site to grant rights on
+: The URL of the hub site to grant rights on.
 
 `-p, --principals <principals>`
-: Comma-separated list of principals to grant join rights. Principals can be users or mail-enabled security groups in the form of `alias` or `alias@<domain name>.com`
+: Comma-separated list of principals to grant join rights. Principals can be users or mail-enabled security groups in the form of `alias` or `alias@<domain name>.com`.
 
 `-r, --rights <rights>`
-: Rights to grant to principals. Available values `Join`
+: Rights to grant to principals. Available values `Join`.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -28,19 +28,19 @@ m365 spo hubsite rights grant [options]
 
 ## Examples
 
-Grant user with alias _PattiF_ permission to join sites to the hub site with URL _https://contoso.sharepoint.com/sites/sales_
+Grant user with specific alias, permission to join sites to the hub site with specific URL.
 
 ```sh
 m365 spo hubsite rights grant --hubSiteUrl https://contoso.sharepoint.com/sites/sales --principals PattiF --rights Join
 ```
 
-Grant users with aliases _PattiF_ and _AdeleV_ permission to join sites to the hub site with URL _https://contoso.sharepoint.com/sites/sales_
+Grant users with specific aliases, permission to join sites to the hub site with specific URL.
 
 ```sh
 m365 spo hubsite rights grant --hubSiteUrl https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --rights Join
 ```
 
-Grant user with email _PattiF@contoso.com_ permission to join sites to the hub site with URL _https://contoso.sharepoint.com/sites/sales_
+Grant user with specific email, permission to join sites to the hub site with specific URL.
 
 ```sh
 m365 spo hubsite rights grant --hubSiteUrl https://contoso.sharepoint.com/sites/sales --principals PattiF@contoso.com --rights Join

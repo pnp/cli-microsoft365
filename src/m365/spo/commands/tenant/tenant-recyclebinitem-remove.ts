@@ -22,7 +22,6 @@ interface Options extends GlobalOptions {
 class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
   private context?: FormDigestInfo;
   private spoAdminUrl?: string;
-  private dots?: string;
 
   public get name(): string {
     return commands.TENANT_RECYCLEBINITEM_REMOVE;
@@ -108,14 +107,13 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
                 reject,
                 logger,
                 currentContext: this.context as FormDigestInfo,
-                dots: this.dots,
                 debug: this.debug,
                 verbose: this.verbose
               });
             }, operation.PollingInterval);
           });
         }
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }
@@ -131,7 +129,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
         default: false,
         message: `Are you sure you want to remove the deleted site collection ${args.options.siteUrl} from tenant recycle bin?`
       });
-      
+
       if (result.continue) {
         await removeDeletedSite();
       }

@@ -11,6 +11,7 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import commands from '../../commands';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 const command: Command = require('./app-teamspackage-download');
 
@@ -23,6 +24,7 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -56,7 +58,8 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
     auth.service.spoUrl = undefined;

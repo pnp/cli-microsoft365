@@ -11,7 +11,7 @@ m365 spo knowledgehub remove [options]
 ## Options
 
 `--confirm`
-: Do not prompt for confirmation before removing the Knowledge Hub Site setting for your tenant
+: Do not prompt for confirmation before removing the Knowledge Hub Site setting for your tenant.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -20,13 +20,13 @@ m365 spo knowledgehub remove [options]
 
 ## Examples
 
-Removes the Knowledge Hub Site setting for your tenant
+Removes the Knowledge Hub Site setting for your tenant.
 
 ```sh
 m365 spo knowledgehub remove
 ```
 
-Removes the Knowledge Hub Site setting for your tenant without confirmation
+Removes the Knowledge Hub Site setting for your tenant without confirmation.
 
 ```sh
 m365 spo knowledgehub remove --confirm
@@ -49,5 +49,11 @@ m365 spo knowledgehub remove --confirm
 === "CSV"
 
     ```csv
+    The knowledge hub site setting was removed.
+    ```
+
+=== "Markdown"
+
+    ```md
     The knowledge hub site setting was removed.
     ```
