@@ -1,9 +1,11 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request, { CliRequestOptions } from '../../../../request';
+import { spo } from '../../../../utils/spo';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { MenuStateNode, NavigationNode } from './NavigationNode';
 
 interface CommandArgs {
   options: Options;
@@ -17,6 +19,7 @@ interface Options extends GlobalOptions {
   title: string;
   url?: string;
   webUrl: string;
+  openInNewWindow?: boolean
 }
 
 class SpoNavigationNodeAddCommand extends SpoCommand {
@@ -72,6 +75,9 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       },
       {
         option: '--audienceIds [audienceIds]'
+      },
+      {
+        option: '--openInNewWindow'
       }
     );
   }
@@ -147,12 +153,37 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     };
 
     try {
-      const res = await request.post<any>(requestOptions);
+      const res = await request.post<NavigationNode>(requestOptions);
+
+      if (args.options.openInNewWindow) {
+        const menuState = await spo.getMenuState(args.options.webUrl);
+        let menuStateItem: MenuStateNode | undefined;
+        if (args.options.parentNodeId) {
+          const parentNode = this.getParentNode(menuState.Nodes, args.options.parentNodeId!, res.Id);
+          menuStateItem = parentNode!.Nodes.find((node: MenuStateNode) => node.Key === res.Id.toString());
+        }
+        else {
+          menuStateItem = menuState.Nodes.find((node: MenuStateNode) => node.Key === res.Id.toString());
+        }
+        menuStateItem!.OpenInNewWindow = true;
+        await spo.saveMenuState(args.options.webUrl, menuState);
+      }
+
       logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private getParentNode(nodes: MenuStateNode[], parentNodeId: number, id: number): MenuStateNode {
+    let parentNode = nodes.find((node: MenuStateNode) => node.Key === parentNodeId.toString());
+    if (parentNode === undefined) {
+      nodes.filter(node => node.Nodes.length > 0).forEach(node => {
+        parentNode = this.getParentNode(node.Nodes, parentNodeId, id);
+      });
+    }
+    return parentNode!;
   }
 }
 

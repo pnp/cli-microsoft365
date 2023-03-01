@@ -9,6 +9,7 @@ import request, { CliRequestOptions } from "../request";
 import { formatting } from './formatting';
 import { CustomAction } from '../m365/spo/commands/customaction/customaction';
 import { odata } from './odata';
+import { MenuState } from '../m365/spo/commands/navigation/NavigationNode';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -694,5 +695,38 @@ export const spo = {
     const res = await request.get<{ AadObjectId: { NameId: string, NameIdIssuer: string } }>(requestOptions);
 
     return res.AadObjectId.NameId;
+  },
+
+  /**
+   * Retrieves the menu state.
+   * @param webUrl Web url
+   */
+  async getMenuState(webUrl: string): Promise<MenuState> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/Navigation/MenuState`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    return await request.get(requestOptions);
+  },
+  /**
+  * Saves the menu state.
+  * @param webUrl Web url
+  * @param menuState Updated menu state
+  */
+  async saveMenuState(webUrl: string, menuState: MenuState): Promise<void> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/Navigation/SaveMenuState`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      data: { menuState: menuState },
+      responseType: 'json'
+    };
+
+    return await request.post(requestOptions);
   }
 };
