@@ -10,8 +10,6 @@ m365 spo tenant settings set [options]
 
 ## Options
 
---8<-- "docs/cmd/_global.md"
-
 `--MinCompatibilityLevel [MinCompatibilityLevel]`
 : Specifies the lower bound on the compatibility level for new sites
 
@@ -263,6 +261,8 @@ m365 spo tenant settings set [options]
 
 `--SyncAadB2BManagementPolicy [SyncAadB2BManagementPolicy]`
 : Syncs Azure B2B Management Policies. Allowed values `true,false`. For more information, see [SharePoint and OneDrive integration with Azure AD B2B](https://aka.ms/spo-b2b-integration).
+
+--8<-- "docs/cmd/_global.md"
 
 !!! important
     To use this command you have to have permission to access the tenant admin site.
