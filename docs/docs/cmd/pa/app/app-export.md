@@ -1,11 +1,11 @@
-# app export
+# pa app export
 
 Exports the specified Power App
 
 ## Usage
 
 ```sh
-m365 app export [options]
+m365 pa app export [options]
 ```
 
 ## Options
@@ -38,7 +38,7 @@ m365 app export [options]
 Export the specified Power App as a ZIP file
 
 ```sh
-m365 app export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --packageDisplayName "PowerApp" --packageDescription "Power App Description" --packageCreatedBy "John Doe" --packageSourceEnvironment "Contoso" --path "C:/Users/John/Documents"
+m365 pa app export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --packageDisplayName "PowerApp" --packageDescription "Power App Description" --packageCreatedBy "John Doe" --packageSourceEnvironment "Contoso" --path "C:/Users/John/Documents"
 ```
 
 ## Response
