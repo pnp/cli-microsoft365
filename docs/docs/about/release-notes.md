@@ -2,9 +2,18 @@
 
 ## [v6.4.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.4.0)
 
+### New commands
+
 **Power Automate:**
 
 - [flow owner list](../cmd/flow/owner/owner-list.md) - lists all owners of a Power Automate flow [#4558](https://github.com/pnp/cli-microsoft365/issues/4558)
+
+### Changes
+
+- enhanced 'spo term get' command [#4346](https://github.com/pnp/cli-microsoft365/issues/4346)
+- aligned script sample command options with v6.3 release [#4441](https://github.com/pnp/cli-microsoft365/issues/4441)
+- fixed prompt behavior when passing url option [#4530](https://github.com/pnp/cli-microsoft365/issues/4530)
+- documentation improvements
 
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
