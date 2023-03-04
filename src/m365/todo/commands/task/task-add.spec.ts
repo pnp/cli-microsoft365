@@ -33,16 +33,9 @@ describe(commands.TASK_ADD, () => {
     ]
   };
   const postRequestData = {
-    "importance": "low",
-    "isReminderOn": false,
-    "status": "notStarted",
-    "title": "New task",
-    "createdDateTime": "2020-10-28T10:30:20.9783659Z",
-    "lastModifiedDateTime": "2020-10-28T10:30:21.3616801Z",
-    "id": "AAMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwBGAAAAAAAq-A2AAw08T7MU1EldWtTXBwCEcpBkci0MQ5UKfxTfG4DYAAGZB5U-AACEcpBkci0MQ5UKfxTfG4DYAAGhnfKPAAA=",
+    title: "New task",
     "body": {
-      "content": "",
-      "contentType": "text"
+      contentType: "text"
     }
   };
 
@@ -184,6 +177,56 @@ describe(commands.TASK_ADD, () => {
     assert.deepStrictEqual(postStub.lastCall.args[0].data.reminderDateTime, { dateTime: dateTime, timeZone: 'Etc/GMT' });
   });
 
+  it('adds To Do task with categories ', async () => {
+    await command.action(logger, {
+      options: {
+        title: 'New task',
+        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
+        categories: 'None,Preset24'
+      }
+    } as any);
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.categories, ['None', 'Preset24']);
+  });
+
+  it('adds To Do task with completedDateTime', async () => {
+    const dateTime = '2023-01-01';
+    await command.action(logger, {
+      options: {
+        title: 'New task',
+        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
+        completedDateTime: dateTime
+      }
+    } as any);
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.completedDateTime, { dateTime: dateTime, timeZone: 'Etc/GMT' });
+  });
+
+  it('adds To Do task with startDateTime', async () => {
+    const dateTime = '2023-01-01';
+    await command.action(logger, {
+      options: {
+        title: 'New task',
+        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
+        startDateTime: dateTime
+      }
+    } as any);
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.startDateTime, { dateTime: dateTime, timeZone: 'Etc/GMT' });
+  });
+
+  it('adds To Do task with status', async () => {
+    await command.action(logger, {
+      options: {
+        title: 'New task',
+        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
+        status: 'notStarted'
+      }
+    } as any);
+
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.status, 'notStarted');
+  });
+
   it('rejects if no tasks list is found with the specified list name', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any) => {
@@ -255,6 +298,50 @@ describe(commands.TASK_ADD, () => {
         title: 'New task',
         listName: 'Tasks List',
         reminderDateTime: '01/01/2022'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when invalid categories is passed', async () => {
+    const actual = await command.validate({
+      options: {
+        title: 'New task',
+        listName: 'Tasks List',
+        categories: 'None,Preset25'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when invalid completedDateTime is passed', async () => {
+    const actual = await command.validate({
+      options: {
+        title: 'New task',
+        listName: 'Tasks List',
+        completedDateTime: '01/01/2022'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when invalid startDateTime is passed', async () => {
+    const actual = await command.validate({
+      options: {
+        title: 'New task',
+        listName: 'Tasks List',
+        startDateTime: '01/01/2022'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when invalid status is passed', async () => {
+    const actual = await command.validate({
+      options: {
+        title: 'New task',
+        listName: 'Tasks List',
+        status: 'foo'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

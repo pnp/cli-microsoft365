@@ -34,6 +34,18 @@ m365 todo task add [options]
 `--reminderDateTime [reminderDateTime]`
 : The date and time for a reminder alert of the task to occur. This should be defined as a valid ISO 8601 string in the UTC time zone.
 
+`--categories [categories]`
+: Comma-separated list of categories associated with the task.
+
+`--completedDateTime [completedDateTime]`
+: The date and time when the task was finished. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
+
+`--startDateTime [startDateTime]`
+: The date and time when the task is scheduled to start. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
+
+`--status [status]`
+: Indicates the state or progress of the task. The possible values are: `notStarted`, `inProgress`, `completed`, `waitingOnOthers`, `deferred`.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
@@ -62,9 +74,13 @@ Create a new task with a specific due date
 m365 todo task add --title "New task" --listId "AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==" --dueDateTime 2023-01-01
 ```
 
-## Response
+Create a new task with categories, a completedDateTime, a startDateTime and a status
 
-### Standard response
+```sh
+m365 todo task add --title "New task" --listName "My task list" --categories "None,Preset24" --completedDateTime 2023-12-01 --startDateTime 2023-12-01 --status "notStarted"
+```
+
+## Response
 
 === "JSON"
 
@@ -116,4 +132,29 @@ m365 todo task add --title "New task" --listId "AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04
     ```csv
     importance,isReminderOn,status,title,createdDateTime,lastModifiedDateTime,hasAttachments,categories,id,body,dueDateTime,reminderDateTime
     high,1,notStarted,New task,2022-10-29T10:54:06.3672421Z,2022-10-29T10:54:06.5078837Z,,[],AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=,"{""content"":""I should not forget this"",""contentType"":""text""}","{""dateTime"":""2023-01-01T00:00:00.0000000"",""timeZone"":""UTC""}","{""dateTime"":""2023-01-01T12:00:00.0000000"",""timeZone"":""UTC""}"
+    ```
+
+=== "Markdown"
+
+    ```md
+    # todo task add --title "New task" --listName "My task list" --categostatusries "notStarted"
+
+    Date: 4/3/2023
+
+    ## New task (AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=)
+
+    Property | Value
+    ---------|-------
+    importance | high
+    isReminderOn | true
+    status | notStarted
+    title | New task
+    createdDateTime | 2022-10-29T10:54:06.3672421Z
+    lastModifiedDateTime | 2022-10-29T10:54:06.5078837Z
+    hasAttachments | false
+    categories | []
+    id | AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=
+    body | {"content": "I should not forget this","contentType": "text"}
+    dueDateTime | {"dateTime": "2023-01-01T00:00:00.0000000","timeZone": "UTC"}
+    reminderDateTime |  {"dateTime": "2023-01-01T12:00:00.0000000","timeZone": "UTC"}
     ```
