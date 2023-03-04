@@ -18,9 +18,15 @@ interface Options extends GlobalOptions {
   dueDateTime?: string;
   importance?: string;
   reminderDateTime?: string;
+  categories?: string;
+  completedDateTime?: string;
+  startDateTime?: string;
+  status?: string;
 }
 
 class TodoTaskAddCommand extends GraphCommand {
+  private static readonly allowedStatuses: string[] = ['notStarted', 'inProgress', 'completed', 'waitingOnOthers', 'deferred'];
+
   public get name(): string {
     return commands.TASK_ADD;
   }
@@ -47,7 +53,11 @@ class TodoTaskAddCommand extends GraphCommand {
         bodyContentType: args.options.bodyContentType,
         dueDateTime: typeof args.options.dueDateTime !== 'undefined',
         importance: args.options.importance,
-        reminderDateTime: typeof args.options.reminderDateTime !== 'undefined'
+        reminderDateTime: typeof args.options.reminderDateTime !== 'undefined',
+        categories: typeof args.options.categories !== 'undefined',
+        completedDateTime: typeof args.options.completedDateTime !== 'undefined',
+        startDateTime: typeof args.options.startDateTime !== 'undefined',
+        status: typeof args.options.status !== 'undefined'
       });
     });
   }
@@ -79,6 +89,19 @@ class TodoTaskAddCommand extends GraphCommand {
       },
       {
         option: '--reminderDateTime [reminderDateTime]'
+      },
+      {
+        option: '--categories [categories]'
+      },
+      {
+        option: '--completedDateTime [completedDateTime]'
+      },
+      {
+        option: '--startDateTime [startDateTime]'
+      },
+      {
+        option: '--status [status]',
+        autocomplete: TodoTaskAddCommand.allowedStatuses
       }
     );
   }
@@ -102,6 +125,22 @@ class TodoTaskAddCommand extends GraphCommand {
           return `'${args.options.reminderDateTime}' is not a valid ISO date string`;
         }
 
+        if (args.options.completedDateTime && !validation.isValidISODateTime(args.options.completedDateTime)) {
+          return `'${args.options.completedDateTime}' is not a valid datetime.`;
+        }
+
+        if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
+          return `'${args.options.startDateTime}' is not a valid datetime.`;
+        }
+
+        if (args.options.status && TodoTaskAddCommand.allowedStatuses.map(x => x.toLowerCase()).indexOf(args.options.status.toLowerCase()) === -1) {
+          return `${args.options.status} is not a valid value for status. Valid values are ${TodoTaskAddCommand.allowedStatuses.join(', ')}`;
+        }
+
+        if (args.options.completedDateTime && args.options.status?.toLowerCase() !== 'completed') {
+          return `The completedDateTime option can only be used when the status option is set to completed`;
+        }
+
         return true;
       }
     );
@@ -117,6 +156,8 @@ class TodoTaskAddCommand extends GraphCommand {
     try {
       const listId: string = await this.getTodoListId(args);
 
+      const status = args.options.status && TodoTaskAddCommand.allowedStatuses.filter(x => x.toLowerCase() === args.options.status!.toLowerCase())[0];
+
       const requestOptions: CliRequestOptions = {
         url: `${endpoint}/me/todo/lists/${listId}/tasks`,
         headers: {
@@ -131,7 +172,11 @@ class TodoTaskAddCommand extends GraphCommand {
           },
           importance: args.options.importance?.toLowerCase(),
           dueDateTime: this.getDateTimeTimeZone(args.options.dueDateTime),
-          reminderDateTime: this.getDateTimeTimeZone(args.options.reminderDateTime)
+          reminderDateTime: this.getDateTimeTimeZone(args.options.reminderDateTime),
+          categories: args.options.categories?.split(','),
+          completedDateTime: this.getDateTimeTimeZone(args.options.completedDateTime),
+          startDateTime: this.getDateTimeTimeZone(args.options.startDateTime),
+          status: status
         },
         responseType: 'json'
       };
