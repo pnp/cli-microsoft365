@@ -20,7 +20,7 @@ export interface MenuStateNode {
   Key: string;
   Nodes: MenuStateNode[];
   NodeType: number;
-  OpenInNewWindow?: boolean;
+  OpenInNewWindow?: boolean | null;
   SimpleUrl: string;
   Title: string;
   Translations: any[];
@@ -36,5 +36,5 @@ export interface MenuState {
   SPWebPrefix: string;
   StartingNodeKey: string;
   StartingNodeTitle: string;
-  Version: Date;
+  Version: string;
 }
