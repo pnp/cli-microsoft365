@@ -19,6 +19,9 @@ m365 flow run get [options]
 `-e, --environmentName <environmentName>`
 : The name of the environment where the flow is located
 
+`--includeTriggerInformation`
+: If specified, include information about the trigger details
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -32,6 +35,8 @@ If the Microsoft Flow with the name you specified doesn't exist, you will get th
 
 If the run with the name you specified doesn't exist, you will get the `The provided workflow run name is not valid.` error.
 
+If the option `includeTriggerInformation` is specified, but the trigger does not contain an outputsLink such as for example with a `Recurrence` trigger, this option will be ignored.
+
 ## Examples
 
 Get information about the given run of the specified Power Automate flow
@@ -40,6 +45,11 @@ Get information about the given run of the specified Power Automate flow
 m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
 ```
 
+Get information about the given run of the specified Power Automate flow including trigger information
+
+```sh
+m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62 --includeTriggerInformation
+```
 
 ## Response
 
@@ -61,7 +71,7 @@ m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
         "trigger": {
           "name": "When_a_new_response_is_submitted",
           "inputsLink": {
-            "uri": "https://prod-08.centralindia.logic.azure.com:443/workflows/f7bf8f6b5c494e63bfc21b54087a596e/runs/08585329112602833828909892130CU17/contents/TriggerInputs?api-version=2016-06-01&se=2022-11-17T18%3A00%3A00.0000000Z&sp=%2Fruns%2F08585329112602833828909892130CU17%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=jmdMRWvY7uGoxTmqd3_a2bJtegXuVyuKTKKUVLiwh38",
+            "uri": "https://prod-08.centralindia.logic.azure.com:443/workflows/f7bf8f6b5c494e63bfc21b54087a596e/runs/08585329112602833828909892130CU17/contents/TriggerInputs?api-version=2016-06-01&se=2022-11-17T18%3A00%3A00.0000000Z&sp=%2Fruns%2F08585329112602833828909892130CU17%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=",
             "contentVersion": "6ZrBBE+MJg7IvhMgyJLMmA==",
             "contentSize": 349,
             "contentHash": {
@@ -70,7 +80,7 @@ m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
             }
           },
           "outputsLink": {
-            "uri": "https://prod-08.centralindia.logic.azure.com:443/workflows/f7bf8f6b5c494e63bfc21b54087a596e/runs/08585329112602833828909892130CU17/contents/TriggerOutputs?api-version=2016-06-01&se=2022-11-17T18%3A00%3A00.0000000Z&sp=%2Fruns%2F08585329112602833828909892130CU17%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=Y3qqjuWrrcQJrmF7uvm6LVzQy5w-dNOFWJ8Yt8khXvA",
+            "uri": "https://prod-08.centralindia.logic.azure.com:443/workflows/f7bf8f6b5c494e63bfc21b54087a596e/runs/08585329112602833828909892130CU17/contents/TriggerOutputs?api-version=2016-06-01&se=2022-11-17T18%3A00%3A00.0000000Z&sp=%2Fruns%2F08585329112602833828909892130CU17%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=",
             "contentVersion": "Z/4a8tfYygNAR1xpc44iww==",
             "contentSize": 493,
             "contentHash": {
@@ -97,17 +107,155 @@ m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 === "Text"
 
     ```text
-    endTime    :
-    name       : 08585329112602833828909892130CU17
-    startTime  : 2022-11-17T14:33:45.2763872Z
-    status     : Running
-    triggerName: When_a_new_response_is_submitted
+    endTime    : 2023-03-04T09:05:22.5880202Z
+    id         : /providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/24335774-daf6-4183-acb7-f5155c2cd2fe/runs/08585236861638480597867166179CU104
+    name       : 08585236861638480597867166179CU104
+    properties : {"startTime":"2023-03-04T09:05:21.8066368Z","endTime":"2023-03-04T09:05:22.5880202Z","status":"Succeeded","correlation":{"clientTrackingId":"08585236861638480598867166179CU131"},"trigger":{"name":"When_an_email_is_flagged_(V4)","inputsLink":{"uri":"https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerInputs?api-version=2016-06-01&se=2023-03-04T15%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=","contentVersion":"2v/VLXFrKV6JvwSdcN7aHg==","contentSize":343,"contentHash":{"algorithm":"md5","value":"2v/VLXFrKV6JvwSdcN7aHg=="}},"outputsLink":{"uri":"https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerOutputs?api-version=2016-06-01&se=2023-03-04T15%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=","contentVersion":"AHZEeWNlQ0bLe48yDmpzrQ==","contentSize":3478,"contentHash":{"algorithm":"md5","value":"AHZEeWNlQ0bLe48yDmpzrQ=="}},"startTime":"2023-03-04T09:05:21.6192576Z","endTime":"2023-03-04T09:05:21.7442626Z","scheduledTime":"2023-03-04T09:05:21.573561Z","originHistoryName":"08585236861638480598867166179CU131","correlation":{"clientTrackingId":"08585236861638480598867166179CU131"},"code":"OK","status":"Succeeded"}}
+    startTime  : 2023-03-04T09:05:21.8066368Z
+    status     : Succeeded
+    triggerName: When_an_email_is_flagged_(V4)
+    type       : Microsoft.ProcessSimple/environments/flows/runs
     ```
 
 === "CSV"
 
     ```csv
-    name,startTime,endTime,status,triggerName
-    08585329112602833828909892130CU17,2022-11-17T14:33:45.2763872Z,,Running,When_a_new_response_is_submitted
+    name,id,type,properties,startTime,endTime,status,triggerName
+    08585236861638480597867166179CU104,/providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/24335774-daf6-4183-acb7-f5155c2cd2fe/runs/08585236861638480597867166179CU104,Microsoft.ProcessSimple/environments/flows/runs,"{""startTime"":""2023-03-04T09:05:21.8066368Z"",""endTime"":""2023-03-04T09:05:22.5880202Z"",""status"":""Succeeded"",""correlation"":{""clientTrackingId"":""08585236861638480598867166179CU131""},""trigger"":{""name"":""When_an_email_is_flagged_(V4)"",""inputsLink"":{""uri"":""https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerInputs?api-version=2016-06-01&se=2023-03-04T15%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig="",""contentVersion"":""2v/VLXFrKV6JvwSdcN7aHg=="",""contentSize"":343,""contentHash"":{""algorithm"":""md5"",""value"":""2v/VLXFrKV6JvwSdcN7aHg==""}},""outputsLink"":{""uri"":""https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerOutputs?api-version=2016-06-01&se=2023-03-04T15%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig="",""contentVersion"":""AHZEeWNlQ0bLe48yDmpzrQ=="",""contentSize"":3478,""contentHash"":{""algorithm"":""md5"",""value"":""AHZEeWNlQ0bLe48yDmpzrQ==""}},""startTime"":""2023-03-04T09:05:21.6192576Z"",""endTime"":""2023-03-04T09:05:21.7442626Z"",""scheduledTime"":""2023-03-04T09:05:21.573561Z"",""originHistoryName"":""08585236861638480598867166179CU131"",""correlation"":{""clientTrackingId"":""08585236861638480598867166179CU131""},""code"":""OK"",""status"":""Succeeded""}}",2023-03-04T09:05:21.8066368Z,2023-03-04T09:05:22.5880202Z,Succeeded,When_an_email_is_flagged_(V4)
     ```
-	
+
+=== "Markdown"
+
+    ```md
+    # flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
+
+    Date: 04/03/2023
+
+    ## 08586653536760200319026785874CU62 (/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/5923cb07-ce1a-4a5c-ab81-257ce820109a/runs/08586653536760200319026785874CU62)
+
+    Property | Value
+    ---------|-------
+    name | 08586653536760200319026785874CU62
+    id | /providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/5923cb07-ce1a-4a5c-ab81-257ce820109a/runs/08586653536760200319026785874CU62
+    type | Microsoft.ProcessSimple/environments/flows/runs
+    properties | {"startTime":"2023-03-04T09:05:21.8066368Z","endTime":"2023-03-04T09:05:22.5880202Z","status":"Succeeded","correlation":{"clientTrackingId":"08585236861638480598867166179CU131"},"trigger":{"name":"When\_an\_email\_is\_flagged\_(V4)","inputsLink":{"uri":"https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerInputs?api-version=2016-06-01&se=2023-03-04T14%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=","contentVersion":"2v/VLXFrKV6JvwSdcN7aHg==","contentSize":343,"contentHash":{"algorithm":"md5","value":"2v/VLXFrKV6JvwSdcN7aHg=="}},"outputsLink":{"uri":"https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerOutputs?api-version=2016-06-01&se=2023-03-04T14%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=","contentVersion":"AHZEeWNlQ0bLe48yDmpzrQ==","contentSize":3478,"contentHash":{"algorithm":"md5","value":"AHZEeWNlQ0bLe48yDmpzrQ=="}},"startTime":"2023-03-04T09:05:21.6192576Z","endTime":"2023-03-04T09:05:21.7442626Z","scheduledTime":"2023-03-04T09:05:21.573561Z","originHistoryName":"08585236861638480598867166179CU131","correlation":{"clientTrackingId":"08585236861638480598867166179CU131"},"code":"OK","status":"Succeeded"}}
+    startTime | 2023-03-04T09:05:21.8066368Z
+    endTime | 2023-03-04T09:05:22.5880202Z
+    status | Succeeded
+    triggerName | When\_an\_email\_is\_flagged\_(V4)
+    ```
+
+### `includeTriggerInformation` response
+
+When using the option `includeTriggerInformation`, the response will differ.
+
+=== "JSON"
+
+    ```json
+    {
+      "name": "08585236861638480597867166179CU104",
+      "id": "/providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/24335774-daf6-4183-acb7-f5155c2cd2fe/runs/08585236861638480597867166179CU104",
+      "type": "Microsoft.ProcessSimple/environments/flows/runs",
+      "properties": {
+        "startTime": "2023-03-04T09:05:21.8066368Z",
+        "endTime": "2023-03-04T09:05:22.5880202Z",
+        "status": "Succeeded",
+        "correlation": {
+          "clientTrackingId": "08585236861638480598867166179CU131"
+        },
+        "trigger": {
+          "name": "When_an_email_is_flagged_(V4)",
+          "inputsLink": {
+            "uri": "https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerInputs?api-version=2016-06-01&se=2023-03-04T14%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=",
+            "contentVersion": "2v/VLXFrKV6JvwSdcN7aHg==",
+            "contentSize": 343,
+            "contentHash": {
+              "algorithm": "md5",
+              "value": "2v/VLXFrKV6JvwSdcN7aHg=="
+            }
+          },
+          "outputsLink": {
+            "uri": "https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerOutputs?api-version=2016-06-01&se=2023-03-04T14%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=",
+            "contentVersion": "AHZEeWNlQ0bLe48yDmpzrQ==",
+            "contentSize": 3478,
+            "contentHash": {
+              "algorithm": "md5",
+              "value": "AHZEeWNlQ0bLe48yDmpzrQ=="
+            }
+          },
+          "startTime": "2023-03-04T09:05:21.6192576Z",
+          "endTime": "2023-03-04T09:05:21.7442626Z",
+          "scheduledTime": "2023-03-04T09:05:21.573561Z",
+          "originHistoryName": "08585236861638480598867166179CU131",
+          "correlation": {
+            "clientTrackingId": "08585236861638480598867166179CU131"
+          },
+          "code": "OK",
+          "status": "Succeeded"
+        }
+      },
+      "startTime": "2023-03-04T09:05:21.8066368Z",
+      "endTime": "2023-03-04T09:05:22.5880202Z",
+      "status": "Succeeded",
+      "triggerName": "When_an_email_is_flagged_(V4)",
+      "triggerInformation": {
+        "from": "john@contoso.com",
+        "toRecipients": "doe@contoso.com",
+        "subject": "Dummy email",
+        "body": "<html><head>\r\\\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>This is dummy content</p></body></html>",
+        "importance": "normal",
+        "bodyPreview": "This is dummy content",
+        "hasAttachments": false,
+        "id": "AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E_hLMK5kAAAAAAEMAABiOC8xvYmdT6G2E_hLMK5kAALUqy81AAA=",
+        "internetMessageId": "<DB7PR03MB5018879914324FC65695809FE1AD9@DB7PR03MB5018.eurprd03.prod.outlook.com>",
+        "conversationId": "AAQkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgAQAMqP9zsK8a1CnIYEgHclLTk=",
+        "receivedDateTime": "2023-03-01T15:06:57+00:00",
+        "isRead": false,
+        "attachments": [],
+        "isHtml": true
+      }
+    }
+    ```
+
+=== "Text"
+
+    ```text
+    endTime           : 2023-03-04T09:05:22.5880202Z
+    id                : /providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/24335774-daf6-4183-acb7-f5155c2cd2fe/runs/08585236861638480597867166179CU104
+    name              : 08585236861638480597867166179CU104
+    properties        : {"startTime":"2023-03-04T09:05:21.8066368Z","endTime":"2023-03-04T09:05:22.5880202Z","status":"Succeeded","correlation":{"clientTrackingId":"08585236861638480598867166179CU131"},"trigger":{"name":"When_an_email_is_flagged_(V4)","inputsLink":{"uri":"https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerInputs?api-version=2016-06-01&se=2023-03-04T14%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=","contentVersion":"2v/VLXFrKV6JvwSdcN7aHg==","contentSize":343,"contentHash":{"algorithm":"md5","value":"2v/VLXFrKV6JvwSdcN7aHg=="}},"outputsLink":{"uri":"https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerOutputs?api-version=2016-06-01&se=2023-03-04T14%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=","contentVersion":"AHZEeWNlQ0bLe48yDmpzrQ==","contentSize":3478,"contentHash":{"algorithm":"md5","value":"AHZEeWNlQ0bLe48yDmpzrQ=="}},"startTime":"2023-03-04T09:05:21.6192576Z","endTime":"2023-03-04T09:05:21.7442626Z","scheduledTime":"2023-03-04T09:05:21.573561Z","originHistoryName":"08585236861638480598867166179CU131","correlation":{"clientTrackingId":"08585236861638480598867166179CU131"},"code":"OK","status":"Succeeded"}}
+    startTime         : 2023-03-04T09:05:21.8066368Z
+    status            : Succeeded
+    triggerInformation: {"from":"john@contoso.com","toRecipients":"doe@contoso.com","subject":"Dummy email","body":"<html><head>\r\\\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>This is dummy content</p></body></html>","importance":"normal","bodyPreview":"This is dummy content","hasAttachments":false,"id":"AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E_hLMK5kAAAAAAEMAABiOC8xvYmdT6G2E_hLMK5kAALUqy81AAA=","internetMessageId":"<DB7PR03MB5018879914324FC65695809FE1AD9@DB7PR03MB5018.eurprd03.prod.outlook.com>","conversationId":"AAQkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgAQAMqP9zsK8a1CnIYEgHclLTk=","receivedDateTime":"2023-03-01T15:06:57+00:00","isRead":false,"attachments":[],"isHtml":true}
+    triggerName       : When_an_email_is_flagged_(V4)
+    type              : Microsoft.ProcessSimple/environments/flows/runs
+    ```
+
+=== "CSV"
+
+    ```csv
+    name,id,type,properties,startTime,endTime,status,triggerName,triggerInformation
+    08585236861638480597867166179CU104,/providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/24335774-daf6-4183-acb7-f5155c2cd2fe/runs/08585236861638480597867166179CU104,Microsoft.ProcessSimple/environments/flows/runs,"{""startTime"":""2023-03-04T09:05:21.8066368Z"",""endTime"":""2023-03-04T09:05:22.5880202Z"",""status"":""Succeeded"",""correlation"":{""clientTrackingId"":""08585236861638480598867166179CU131""},""trigger"":{""name"":""When_an_email_is_flagged_(V4)"",""inputsLink"":{""uri"":""https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerInputs?api-version=2016-06-01&se=2023-03-04T14%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig="",""contentVersion"":""2v/VLXFrKV6JvwSdcN7aHg=="",""contentSize"":343,""contentHash"":{""algorithm"":""md5"",""value"":""2v/VLXFrKV6JvwSdcN7aHg==""}},""outputsLink"":{""uri"":""https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerOutputs?api-version=2016-06-01&se=2023-03-04T14%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig="",""contentVersion"":""AHZEeWNlQ0bLe48yDmpzrQ=="",""contentSize"":3478,""contentHash"":{""algorithm"":""md5"",""value"":""AHZEeWNlQ0bLe48yDmpzrQ==""}},""startTime"":""2023-03-04T09:05:21.6192576Z"",""endTime"":""2023-03-04T09:05:21.7442626Z"",""scheduledTime"":""2023-03-04T09:05:21.573561Z"",""originHistoryName"":""08585236861638480598867166179CU131"",""correlation"":{""clientTrackingId"":""08585236861638480598867166179CU131""},""code"":""OK"",""status"":""Succeeded""}}",2023-03-04T09:05:21.8066368Z,2023-03-04T09:05:22.5880202Z,Succeeded,When_an_email_is_flagged_(V4),"{""from"":""john@contoso.com"",""toRecipients"":""doe@contoso.com"",""subject"":""Dummy email"",""body"":""<html><head>\r\n<meta http-equiv=\""Content-Type\"" content=\""text/html; charset=utf-8\""></head><body><p>This is dummy content</p></body></html>"",""importance"":""normal"",""bodyPreview"":""This is dummy content"",""hasAttachments"":false,""id"":""AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E_hLMK5kAAAAAAEMAABiOC8xvYmdT6G2E_hLMK5kAALUqy81AAA="",""internetMessageId"":""<DB7PR03MB5018879914324FC65695809FE1AD9@DB7PR03MB5018.eurprd03.prod.outlook.com>"",""conversationId"":""AAQkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgAQAMqP9zsK8a1CnIYEgHclLTk="",""receivedDateTime"":""2023-03-01T15:06:57+00:00"",""isRead"":false,""attachments"":[],""isHtml"":true}"
+    ```
+
+=== "Markdown"
+
+    ```md
+    # flow run get --environmentName "Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d" --flowName "24335774-daf6-4183-acb7-f5155c2cd2fe" --name "08585236861638480597867166179CU104" --includeTriggerInformation "true"
+
+    Date: 04/03/2023
+
+    ## 08585236861638480597867166179CU104 (/providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/24335774-daf6-4183-acb7-f5155c2cd2fe/runs/08585236861638480597867166179CU104)
+
+    Property | Value
+    ---------|-------
+    name | 08585236861638480597867166179CU104
+    id | /providers/Microsoft.ProcessSimple/environments/Default-e1dd4023-a656-480a-8a0e-c1b1eec51e1d/flows/24335774-daf6-4183-acb7-f5155c2cd2fe/runs/08585236861638480597867166179CU104
+    type | Microsoft.ProcessSimple/environments/flows/runs
+    properties | {"startTime":"2023-03-04T09:05:21.8066368Z","endTime":"2023-03-04T09:05:22.5880202Z","status":"Succeeded","correlation":{"clientTrackingId":"08585236861638480598867166179CU131"},"trigger":{"name":"When\_an\_email\_is\_flagged\_(V4)","inputsLink":{"uri":"https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerInputs?api-version=2016-06-01&se=2023-03-04T14%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=","contentVersion":"2v/VLXFrKV6JvwSdcN7aHg==","contentSize":343,"contentHash":{"algorithm":"md5","value":"2v/VLXFrKV6JvwSdcN7aHg=="}},"outputsLink":{"uri":"https://prod-130.westeurope.logic.azure.com:443/workflows/3ebadb794f6641e0b7f4fda131cdfb0b/runs/08585236861638480597867166179CU104/contents/TriggerOutputs?api-version=2016-06-01&se=2023-03-04T14%3A00%3A00.0000000Z&sp=%2Fruns%2F08585236861638480597867166179CU104%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=","contentVersion":"AHZEeWNlQ0bLe48yDmpzrQ==","contentSize":3478,"contentHash":{"algorithm":"md5","value":"AHZEeWNlQ0bLe48yDmpzrQ=="}},"startTime":"2023-03-04T09:05:21.6192576Z","endTime":"2023-03-04T09:05:21.7442626Z","scheduledTime":"2023-03-04T09:05:21.573561Z","originHistoryName":"08585236861638480598867166179CU131","correlation":{"clientTrackingId":"08585236861638480598867166179CU131"},"code":"OK","status":"Succeeded"}}
+    startTime | 2023-03-04T09:05:21.8066368Z
+    endTime | 2023-03-04T09:05:22.5880202Z
+    status | Succeeded
+    triggerName | When\_an\_email\_is\_flagged\_(V4)
+    triggerInformation | {"from":"john@contoso.Com","toRecipients":"doe@contoso.com","subject":"Dummy email","body":"<html><head>\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><p>This is a dummy mail</p></body></html>","importance":"normal","bodyPreview":"This is a dummy mail","hasAttachments":false,"id":"AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E\_hLMK5kAAAAAAEMAABiOC8xvYmdT6G2E\_hLMK5kAALUqy81AAA=","internetMessageId":"<DB7PR03MB5018879914324FC65695809FE1AD9@DB7PR03MB5018.eurprd03.prod.outlook.com>","conversationId":"AAQkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgAQAMqP9zsK8a1CnIYEgHclLTk=","receivedDateTime":"2023-03-01T15:06:57+00:00","isRead":false,"attachments":[],"isHtml":true}
+    ```

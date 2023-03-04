@@ -9,12 +9,29 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { CommandInfo } from '../../../../cli/CommandInfo';
+import { Cli } from '../../../../cli/Cli';
 const command: Command = require('./run-get');
 
 describe(commands.RUN_GET, () => {
+  const flowName = '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30';
+  const environmentName = 'Default-48595cc3-adce-4267-8e99-0c838923dbb9';
+  const runName = '08586653536760200319026785874CU62';
+
+  //#region Mocked Responses flow run get
+  const flowResponse = { 'name': runName, 'id': '/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/edf73e7e-9928-4cb9-8eb2-fc263f375ada/runs/08586652586741142222645090602CU35', 'type': 'Microsoft.ProcessSimple/environments/flows/runs', 'properties': { 'startTime': '2018-09-07T19:23:31.3640166Z', 'endTime': '2018-09-07T19:33:31.3640166Z', 'status': 'Running', 'correlation': { 'clientTrackingId': '08586652586741142222645090602CU35', 'clientKeywords': ['testFlow'] }, 'trigger': { 'name': 'manual', 'inputsLink': { 'uri': 'https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerInputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=yjCLU5P9pqCoDPHmRFq-oLKGhcFNnGUXH6ojpQz9z6Q', 'contentVersion': '1UI/8pYQdWDVSsijF+0l2Q==', 'contentSize': 58, 'contentHash': { 'algorithm': 'md5', 'value': '1UI/8pYQdWDVSsijF+0l2Q==' } }, 'outputsLink': { 'uri': 'https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerOutputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=SLd0zBScyF6F6eMTBIROalK32e2t0od2SDETe9X9SMM', 'contentVersion': 'YgV2ecynizFKxzT8yiNtpA==', 'contentSize': 4244, 'contentHash': { 'algorithm': 'md5', 'value': 'YgV2ecynizFKxzT8yiNtpA==' } }, 'startTime': '2018-09-07T19:23:31.3482269Z', 'endTime': '2018-09-07T19:23:31.3482269Z', 'correlation': { 'clientTrackingId': '08586652586741142222645090602CU35', 'clientKeywords': ['testFlow'] }, 'status': 'Succeeded' } } };
+  const flowResponseNoEndTime = { 'name': runName, 'id': '/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/edf73e7e-9928-4cb9-8eb2-fc263f375ada/runs/08586652586741142222645090602CU35', 'type': 'Microsoft.ProcessSimple/environments/flows/runs', 'properties': { 'startTime': '2018-09-07T19:23:31.3640166Z', 'endTime': '', 'status': 'Running', 'correlation': { 'clientTrackingId': '08586652586741142222645090602CU35', 'clientKeywords': ['testFlow'] }, 'trigger': { 'name': 'manual', 'inputsLink': { 'uri': 'https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerInputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=yjCLU5P9pqCoDPHmRFq-oLKGhcFNnGUXH6ojpQz9z6Q', 'contentVersion': '1UI/8pYQdWDVSsijF+0l2Q==', 'contentSize': 58, 'contentHash': { 'algorithm': 'md5', 'value': '1UI/8pYQdWDVSsijF+0l2Q==' } }, 'outputsLink': { 'uri': 'https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerOutputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=SLd0zBScyF6F6eMTBIROalK32e2t0od2SDETe9X9SMM', 'contentVersion': 'YgV2ecynizFKxzT8yiNtpA==', 'contentSize': 4244, 'contentHash': { 'algorithm': 'md5', 'value': 'YgV2ecynizFKxzT8yiNtpA==' } }, 'startTime': '2018-09-07T19:23:31.3482269Z', 'endTime': '', 'correlation': { 'clientTrackingId': '08586652586741142222645090602CU35', 'clientKeywords': ['testFlow'] }, 'status': 'Succeeded' } } };
+  const triggerInformationResponse = { 'headers': { 'Pragma': 'no-cache', 'Transfer-Encoding': 'chunked', 'Retry-After': '3600', 'Vary': 'Accept-Encoding', 'Cache-Control': 'no-store, no-cache', 'Location': 'https://flow-apim-europe-002-westeurope-01.azure-apim.net/apim/office365/shared-office365-13750b71-ac69-403f-ad09-23e056037806/v4/Mail/OnFlaggedEmail?folderPath=Inbox&importance=Any&fetchOnlyWithAttachment=false&includeAttachments=false&LastPollInformation=eyJMYXN0UmVjZWl2ZWRNYWlsVGltZSI6IjIwMjItMTEtMTVUMTA6MTM6NTUuMDYyNjQ0MyswMDowMCIsIkxhc3RDcmVhdGVkTWFpbFRpbWUiOiIyMDIzLTAzLTA0VDA5OjA1OjIxKzAwOjAwIiwiTGFzdE1lc3NhZ2VJZCI6IkFBTWtBRGd6TjJRMU5UaGlMVEkwTmpZdE5HSXhZUzA1TURkakxUZzFPV1F4Tnpnd1pHTTJaZ0JHQUFBQUFBQzZqUWZVemFjVFNJSHFNdzJ5YWNuVUJ3QmlPQzh4dlltZFQ2RzJFX2hMTUs1a0FBQUFBQUVNQUFCaU9DOHh2WW1kVDZHMkVfaExNSzVrQUFMVXF5ODFBQUE9IiwiTGFzdEludGVybmV0TWVzc2FnZUlkIjoiPERCN1BSMDNNQjUwMTg4Nzk5MTQzMjRGQzY1Njk1ODA5RkUxQUQ5QERCN1BSMDNNQjUwMTguZXVycHJkMDMucHJvZC5vdXRsb29rLmNvbT4ifQ%3d%3d', 'Set-Cookie': '', 'x-ms-request-id': 'ca65b907-e292-41ff-b76e-f3fe60e87c8c;2192534a-f34f-4920-88c9-72b1b1bcf4b4', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Timing-Allow-Origin': '*', 'x-ms-apihub-cached-response': 'true', 'x-ms-apihub-obo': 'false', 'Date': 'Sat, 04 Mar 2023 09:05:21 GMT', 'Content-Type': 'application/json', 'Expires': '-1', 'Content-Length': '1831' }, 'body': { 'from': 'john@contoso.com', 'toRecipients': 'doe@contoso.com', 'subject': 'This is a test mail', 'body': '<html><head>\r\n<meta http-equiv=\'Content- Type\' content=\'text / html; charset=utf - 8\'></head><body><p>This is dummy content</p></body></html>', 'importance': 'normal', 'bodyPreview': 'This is dummy content', 'hasAttachments': false, 'id': 'AAMkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgBGAAAAAAC6jQfUzacTSIHqMw2yacnUBwBiOC8xvYmdT6G2E_hLMK5kAAAAAAEMAABiOC8xvYmdT6G2E_hLMK5kAALUqy81AAA=', 'internetMessageId': '<DB7PR03MB5018879914324FC65695809FE1AD9@DB7PR03MB5018.eurprd03.prod.outlook.com>', 'conversationId': 'AAQkADgzN2Q1NThiLTI0NjYtNGIxYS05MDdjLTg1OWQxNzgwZGM2ZgAQAMqP9zsK8a1CnIYEgHclLTk=', 'receivedDateTime': '2023-03-01T15:06:57+00:00', 'isRead': false, 'attachments': [], 'isHtml': true } };
+
+  const flowResponseFormatted = { 'name': runName, 'id': '/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/edf73e7e-9928-4cb9-8eb2-fc263f375ada/runs/08586652586741142222645090602CU35', 'type': 'Microsoft.ProcessSimple/environments/flows/runs', 'properties': { 'startTime': '2018-09-07T19:23:31.3640166Z', 'endTime': '2018-09-07T19:33:31.3640166Z', 'status': 'Running', 'correlation': { 'clientTrackingId': '08586652586741142222645090602CU35', 'clientKeywords': ['testFlow'] }, 'trigger': { 'name': 'manual', 'inputsLink': { 'uri': 'https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerInputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=yjCLU5P9pqCoDPHmRFq-oLKGhcFNnGUXH6ojpQz9z6Q', 'contentVersion': '1UI/8pYQdWDVSsijF+0l2Q==', 'contentSize': 58, 'contentHash': { 'algorithm': 'md5', 'value': '1UI/8pYQdWDVSsijF+0l2Q==' } }, 'outputsLink': { 'uri': 'https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerOutputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=SLd0zBScyF6F6eMTBIROalK32e2t0od2SDETe9X9SMM', 'contentVersion': 'YgV2ecynizFKxzT8yiNtpA==', 'contentSize': 4244, 'contentHash': { 'algorithm': 'md5', 'value': 'YgV2ecynizFKxzT8yiNtpA==' } }, 'startTime': '2018-09-07T19:23:31.3482269Z', 'endTime': '2018-09-07T19:23:31.3482269Z', 'correlation': { 'clientTrackingId': '08586652586741142222645090602CU35', 'clientKeywords': ['testFlow'] }, 'status': 'Succeeded' } }, startTime: '2018-09-07T19:23:31.3640166Z', endTime: '2018-09-07T19:33:31.3640166Z', status: 'Running', triggerName: 'manual' };
+  const flowResponseFormattedNoEndTime = { 'name': runName, 'id': '/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/edf73e7e-9928-4cb9-8eb2-fc263f375ada/runs/08586652586741142222645090602CU35', 'type': 'Microsoft.ProcessSimple/environments/flows/runs', 'properties': { 'startTime': '2018-09-07T19:23:31.3640166Z', 'endTime': '', 'status': 'Running', 'correlation': { 'clientTrackingId': '08586652586741142222645090602CU35', 'clientKeywords': ['testFlow'] }, 'trigger': { 'name': 'manual', 'inputsLink': { 'uri': 'https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerInputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=yjCLU5P9pqCoDPHmRFq-oLKGhcFNnGUXH6ojpQz9z6Q', 'contentVersion': '1UI/8pYQdWDVSsijF+0l2Q==', 'contentSize': 58, 'contentHash': { 'algorithm': 'md5', 'value': '1UI/8pYQdWDVSsijF+0l2Q==' } }, 'outputsLink': { 'uri': 'https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerOutputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=SLd0zBScyF6F6eMTBIROalK32e2t0od2SDETe9X9SMM', 'contentVersion': 'YgV2ecynizFKxzT8yiNtpA==', 'contentSize': 4244, 'contentHash': { 'algorithm': 'md5', 'value': 'YgV2ecynizFKxzT8yiNtpA==' } }, 'startTime': '2018-09-07T19:23:31.3482269Z', 'endTime': '', 'correlation': { 'clientTrackingId': '08586652586741142222645090602CU35', 'clientKeywords': ['testFlow'] }, 'status': 'Succeeded' } }, startTime: '2018-09-07T19:23:31.3640166Z', endTime: '', status: 'Running', triggerName: 'manual' };
+  const flowResponseFormattedIncludingInformation = { 'name': runName, 'id': '/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/edf73e7e-9928-4cb9-8eb2-fc263f375ada/runs/08586652586741142222645090602CU35', 'type': 'Microsoft.ProcessSimple/environments/flows/runs', 'properties': { 'startTime': '2018-09-07T19:23:31.3640166Z', 'endTime': '2018-09-07T19:33:31.3640166Z', 'status': 'Running', 'correlation': { 'clientTrackingId': '08586652586741142222645090602CU35', 'clientKeywords': ['testFlow'] }, 'trigger': { 'name': 'manual', 'inputsLink': { 'uri': 'https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerInputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=yjCLU5P9pqCoDPHmRFq-oLKGhcFNnGUXH6ojpQz9z6Q', 'contentVersion': '1UI/8pYQdWDVSsijF+0l2Q==', 'contentSize': 58, 'contentHash': { 'algorithm': 'md5', 'value': '1UI/8pYQdWDVSsijF+0l2Q==' } }, 'outputsLink': { 'uri': 'https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerOutputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=SLd0zBScyF6F6eMTBIROalK32e2t0od2SDETe9X9SMM', 'contentVersion': 'YgV2ecynizFKxzT8yiNtpA==', 'contentSize': 4244, 'contentHash': { 'algorithm': 'md5', 'value': 'YgV2ecynizFKxzT8yiNtpA==' } }, 'startTime': '2018-09-07T19:23:31.3482269Z', 'endTime': '2018-09-07T19:23:31.3482269Z', 'correlation': { 'clientTrackingId': '08586652586741142222645090602CU35', 'clientKeywords': ['testFlow'] }, 'status': 'Succeeded' } }, startTime: '2018-09-07T19:23:31.3640166Z', endTime: '2018-09-07T19:33:31.3640166Z', status: 'Running', triggerName: 'manual', triggerInformation: triggerInformationResponse.body };
+  //#endregion
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,6 +39,7 @@ describe(commands.RUN_GET, () => {
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
     sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -57,410 +75,77 @@ describe(commands.RUN_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.RUN_GET), true);
+    assert.strictEqual(command.name, commands.RUN_GET);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['name', 'startTime', 'endTime', 'status', 'triggerName']);
-  });
-
-  it('retrieves information about the specified run (debug)', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/396d5ec9-ae2d-4a84-967d-cd7f56cd8f30/runs/08586653536760200319026785874CU62?api-version=2016-11-01`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
-            "name": "08586653536760200319026785874CU62",
-            "id": "/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/396d5ec9-ae2d-4a84-967d-cd7f56cd8f30/runs/08586653536760200319026785874CU62",
-            "type": "Microsoft.ProcessSimple/environments/flows/runs",
-            "properties": {
-              "startTime": "2018-09-06T17:00:09.9484194Z",
-              "endTime": "2018-09-06T17:00:10.3406851Z",
-              "status": "Succeeded",
-              "correlation": {
-                "clientTrackingId": "08586653536760200320026785874CU62"
-              },
-              "trigger": {
-                "name": "When_a_file_is_created_or_modified_(properties_only)",
-                "inputsLink": {
-                  "uri": "https://prod-59.westeurope.logic.azure.com:443/workflows/2d8d4d3c94604eeeadc68464ea5fb361/runs/08586653536760200319026785874CU62/contents/TriggerInputs?api-version=2016-06-01&se=2018-09-07T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08586653536760200319026785874CU62%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=K2gG1YUOzIL2XCAiW0m8UDnbF6ECKmDy5sEsdw8EXC0",
-                  "contentVersion": "98GuGIhrxUoG/lKXcXUgaA==",
-                  "contentSize": 515,
-                  "contentHash": {
-                    "algorithm": "md5",
-                    "value": "98GuGIhrxUoG/lKXcXUgaA=="
-                  }
-                },
-                "outputsLink": {
-                  "uri": "https://prod-59.westeurope.logic.azure.com:443/workflows/2d8d4d3c94604eeeadc68464ea5fb361/runs/08586653536760200319026785874CU62/contents/TriggerOutputs?api-version=2016-06-01&se=2018-09-07T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08586653536760200319026785874CU62%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=khJc2zfPe4bHnGU2BnuulbKt2c9FdYF2ZDizn3s8mF8",
-                  "contentVersion": "KNpZY3gib8WXg6/bxuIsSA==",
-                  "contentSize": 3661,
-                  "contentHash": {
-                    "algorithm": "md5",
-                    "value": "KNpZY3gib8WXg6/bxuIsSA=="
-                  }
-                },
-                "startTime": "2018-09-06T17:00:09.4562613Z",
-                "endTime": "2018-09-06T17:00:09.7844035Z",
-                "scheduledTime": "2018-09-06T17:00:09.8558878Z",
-                "correlation": {
-                  "clientTrackingId": "08586653536760200320026785874CU62"
-                },
-                "code": "OK",
-                "status": "Succeeded"
-              }
-            }
-          });
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, { options: { debug: true, flowName: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } });
-    assert(loggerLogSpy.calledWith({
-      "name": "08586653536760200319026785874CU62",
-      "id": "/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/396d5ec9-ae2d-4a84-967d-cd7f56cd8f30/runs/08586653536760200319026785874CU62",
-      "type": "Microsoft.ProcessSimple/environments/flows/runs",
-      "properties": {
-        "startTime": "2018-09-06T17:00:09.9484194Z",
-        "endTime": "2018-09-06T17:00:10.3406851Z",
-        "status": "Succeeded",
-        "correlation": {
-          "clientTrackingId": "08586653536760200320026785874CU62"
-        },
-        "trigger": {
-          "name": "When_a_file_is_created_or_modified_(properties_only)",
-          "inputsLink": {
-            "uri": "https://prod-59.westeurope.logic.azure.com:443/workflows/2d8d4d3c94604eeeadc68464ea5fb361/runs/08586653536760200319026785874CU62/contents/TriggerInputs?api-version=2016-06-01&se=2018-09-07T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08586653536760200319026785874CU62%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=K2gG1YUOzIL2XCAiW0m8UDnbF6ECKmDy5sEsdw8EXC0",
-            "contentVersion": "98GuGIhrxUoG/lKXcXUgaA==",
-            "contentSize": 515,
-            "contentHash": {
-              "algorithm": "md5",
-              "value": "98GuGIhrxUoG/lKXcXUgaA=="
-            }
-          },
-          "outputsLink": {
-            "uri": "https://prod-59.westeurope.logic.azure.com:443/workflows/2d8d4d3c94604eeeadc68464ea5fb361/runs/08586653536760200319026785874CU62/contents/TriggerOutputs?api-version=2016-06-01&se=2018-09-07T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08586653536760200319026785874CU62%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=khJc2zfPe4bHnGU2BnuulbKt2c9FdYF2ZDizn3s8mF8",
-            "contentVersion": "KNpZY3gib8WXg6/bxuIsSA==",
-            "contentSize": 3661,
-            "contentHash": {
-              "algorithm": "md5",
-              "value": "KNpZY3gib8WXg6/bxuIsSA=="
-            }
-          },
-          "startTime": "2018-09-06T17:00:09.4562613Z",
-          "endTime": "2018-09-06T17:00:09.7844035Z",
-          "scheduledTime": "2018-09-06T17:00:09.8558878Z",
-          "correlation": {
-            "clientTrackingId": "08586653536760200320026785874CU62"
-          },
-          "code": "OK",
-          "status": "Succeeded"
-        }
-      },
-      startTime: '2018-09-06T17:00:09.9484194Z',
-      endTime: '2018-09-06T17:00:10.3406851Z',
-      status: 'Succeeded',
-      triggerName: 'When_a_file_is_created_or_modified_(properties_only)'
-    }));
-  });
-
   it('retrieves information about the specified run', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/396d5ec9-ae2d-4a84-967d-cd7f56cd8f30/runs/08586653536760200319026785874CU62?api-version=2016-11-01`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
-            "name": "08586653536760200319026785874CU62",
-            "id": "/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/396d5ec9-ae2d-4a84-967d-cd7f56cd8f30/runs/08586653536760200319026785874CU62",
-            "type": "Microsoft.ProcessSimple/environments/flows/runs",
-            "properties": {
-              "startTime": "2018-09-06T17:00:09.9484194Z",
-              "endTime": "2018-09-06T17:00:10.3406851Z",
-              "status": "Succeeded",
-              "correlation": {
-                "clientTrackingId": "08586653536760200320026785874CU62"
-              },
-              "trigger": {
-                "name": "When_a_file_is_created_or_modified_(properties_only)",
-                "inputsLink": {
-                  "uri": "https://prod-59.westeurope.logic.azure.com:443/workflows/2d8d4d3c94604eeeadc68464ea5fb361/runs/08586653536760200319026785874CU62/contents/TriggerInputs?api-version=2016-06-01&se=2018-09-07T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08586653536760200319026785874CU62%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=K2gG1YUOzIL2XCAiW0m8UDnbF6ECKmDy5sEsdw8EXC0",
-                  "contentVersion": "98GuGIhrxUoG/lKXcXUgaA==",
-                  "contentSize": 515,
-                  "contentHash": {
-                    "algorithm": "md5",
-                    "value": "98GuGIhrxUoG/lKXcXUgaA=="
-                  }
-                },
-                "outputsLink": {
-                  "uri": "https://prod-59.westeurope.logic.azure.com:443/workflows/2d8d4d3c94604eeeadc68464ea5fb361/runs/08586653536760200319026785874CU62/contents/TriggerOutputs?api-version=2016-06-01&se=2018-09-07T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08586653536760200319026785874CU62%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=khJc2zfPe4bHnGU2BnuulbKt2c9FdYF2ZDizn3s8mF8",
-                  "contentVersion": "KNpZY3gib8WXg6/bxuIsSA==",
-                  "contentSize": 3661,
-                  "contentHash": {
-                    "algorithm": "md5",
-                    "value": "KNpZY3gib8WXg6/bxuIsSA=="
-                  }
-                },
-                "startTime": "2018-09-06T17:00:09.4562613Z",
-                "endTime": "2018-09-06T17:00:09.7844035Z",
-                "scheduledTime": "2018-09-06T17:00:09.8558878Z",
-                "correlation": {
-                  "clientTrackingId": "08586653536760200320026785874CU62"
-                },
-                "code": "OK",
-                "status": "Succeeded"
-              }
-            }
-          });
-        }
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs/${runName}?api-version=2016-11-01`) {
+        return flowResponse;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { flowName: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } });
-    assert(loggerLogSpy.calledWith({
-      "name": "08586653536760200319026785874CU62",
-      "id": "/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/396d5ec9-ae2d-4a84-967d-cd7f56cd8f30/runs/08586653536760200319026785874CU62",
-      "type": "Microsoft.ProcessSimple/environments/flows/runs",
-      "properties": {
-        "startTime": "2018-09-06T17:00:09.9484194Z",
-        "endTime": "2018-09-06T17:00:10.3406851Z",
-        "status": "Succeeded",
-        "correlation": {
-          "clientTrackingId": "08586653536760200320026785874CU62"
-        },
-        "trigger": {
-          "name": "When_a_file_is_created_or_modified_(properties_only)",
-          "inputsLink": {
-            "uri": "https://prod-59.westeurope.logic.azure.com:443/workflows/2d8d4d3c94604eeeadc68464ea5fb361/runs/08586653536760200319026785874CU62/contents/TriggerInputs?api-version=2016-06-01&se=2018-09-07T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08586653536760200319026785874CU62%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=K2gG1YUOzIL2XCAiW0m8UDnbF6ECKmDy5sEsdw8EXC0",
-            "contentVersion": "98GuGIhrxUoG/lKXcXUgaA==",
-            "contentSize": 515,
-            "contentHash": {
-              "algorithm": "md5",
-              "value": "98GuGIhrxUoG/lKXcXUgaA=="
-            }
-          },
-          "outputsLink": {
-            "uri": "https://prod-59.westeurope.logic.azure.com:443/workflows/2d8d4d3c94604eeeadc68464ea5fb361/runs/08586653536760200319026785874CU62/contents/TriggerOutputs?api-version=2016-06-01&se=2018-09-07T22%3A00%3A00.0000000Z&sp=%2Fruns%2F08586653536760200319026785874CU62%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=khJc2zfPe4bHnGU2BnuulbKt2c9FdYF2ZDizn3s8mF8",
-            "contentVersion": "KNpZY3gib8WXg6/bxuIsSA==",
-            "contentSize": 3661,
-            "contentHash": {
-              "algorithm": "md5",
-              "value": "KNpZY3gib8WXg6/bxuIsSA=="
-            }
-          },
-          "startTime": "2018-09-06T17:00:09.4562613Z",
-          "endTime": "2018-09-06T17:00:09.7844035Z",
-          "scheduledTime": "2018-09-06T17:00:09.8558878Z",
-          "correlation": {
-            "clientTrackingId": "08586653536760200320026785874CU62"
-          },
-          "code": "OK",
-          "status": "Succeeded"
-        }
-      },
-      startTime: '2018-09-06T17:00:09.9484194Z',
-      endTime: '2018-09-06T17:00:10.3406851Z',
-      status: 'Succeeded',
-      triggerName: 'When_a_file_is_created_or_modified_(properties_only)'
-    }));
+    await command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName, verbose: true } });
+    assert(loggerLogSpy.calledWith(flowResponseFormatted));
   });
 
   it('renders empty string for endTime, if the run specified is still running', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/edf73e7e-9928-4cb9-8eb2-fc263f375ada/runs/08586652586741142222645090602CU35?api-version=2016-11-01`) > -1) {
-        return Promise.resolve({
-          "name": "08586652586741142222645090602CU35",
-          "id": "/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/edf73e7e-9928-4cb9-8eb2-fc263f375ada/runs/08586652586741142222645090602CU35",
-          "type": "Microsoft.ProcessSimple/environments/flows/runs",
-          "properties": {
-            "startTime": "2018-09-07T19:23:31.3640166Z",
-            "status": "Running",
-            "correlation": {
-              "clientTrackingId": "08586652586741142222645090602CU35",
-              "clientKeywords": ["testFlow"]
-            },
-            "trigger": {
-              "name": "manual",
-              "inputsLink": {
-                "uri": "https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerInputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=yjCLU5P9pqCoDPHmRFq-oLKGhcFNnGUXH6ojpQz9z6Q",
-                "contentVersion": "1UI/8pYQdWDVSsijF+0l2Q==",
-                "contentSize": 58,
-                "contentHash": {
-                  "algorithm": "md5",
-                  "value": "1UI/8pYQdWDVSsijF+0l2Q=="
-                }
-              },
-              "outputsLink": {
-                "uri": "https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerOutputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=SLd0zBScyF6F6eMTBIROalK32e2t0od2SDETe9X9SMM",
-                "contentVersion": "YgV2ecynizFKxzT8yiNtpA==",
-                "contentSize": 4244,
-                "contentHash": {
-                  "algorithm": "md5",
-                  "value": "YgV2ecynizFKxzT8yiNtpA=="
-                }
-              },
-              "startTime": "2018-09-07T19:23:31.3482269Z",
-              "endTime": "2018-09-07T19:23:31.3482269Z",
-              "correlation": {
-                "clientTrackingId": "08586652586741142222645090602CU35",
-                "clientKeywords": ["testFlow"]
-              },
-              "status": "Succeeded"
-            }
-          }
-        });
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs/${runName}?api-version=2016-11-01`) {
+        return flowResponseNoEndTime;
       }
 
-      return Promise.reject('Invalid request');
+      throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { flowName: 'edf73e7e-9928-4cb9-8eb2-fc263f375ada', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586652586741142222645090602CU35' } });
-    assert(loggerLogSpy.calledWith({
-      "name": "08586652586741142222645090602CU35",
-      "id": "/providers/Microsoft.ProcessSimple/environments/Default-48595cc3-adce-4267-8e99-0c838923dbb9/flows/edf73e7e-9928-4cb9-8eb2-fc263f375ada/runs/08586652586741142222645090602CU35",
-      "type": "Microsoft.ProcessSimple/environments/flows/runs",
-      "properties": {
-        "startTime": "2018-09-07T19:23:31.3640166Z",
-        "status": "Running",
-        "correlation": {
-          "clientTrackingId": "08586652586741142222645090602CU35",
-          "clientKeywords": ["testFlow"]
-        },
-        "trigger": {
-          "name": "manual",
-          "inputsLink": {
-            "uri": "https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerInputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=yjCLU5P9pqCoDPHmRFq-oLKGhcFNnGUXH6ojpQz9z6Q",
-            "contentVersion": "1UI/8pYQdWDVSsijF+0l2Q==",
-            "contentSize": 58,
-            "contentHash": {
-              "algorithm": "md5",
-              "value": "1UI/8pYQdWDVSsijF+0l2Q=="
-            }
-          },
-          "outputsLink": {
-            "uri": "https://prod-09.westeurope.logic.azure.com:443/workflows/8c76aebc46484a29889c426f55a52f55/runs/08586652586741142222645090602CU35/contents/TriggerOutputs?api-version=2016-06-01&se=2018-09-07T23%3A00%3A00.0000000Z&sp=%2Fruns%2F08586652586741142222645090602CU35%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=SLd0zBScyF6F6eMTBIROalK32e2t0od2SDETe9X9SMM",
-            "contentVersion": "YgV2ecynizFKxzT8yiNtpA==",
-            "contentSize": 4244,
-            "contentHash": {
-              "algorithm": "md5",
-              "value": "YgV2ecynizFKxzT8yiNtpA=="
-            }
-          },
-          "startTime": "2018-09-07T19:23:31.3482269Z",
-          "endTime": "2018-09-07T19:23:31.3482269Z",
-          "correlation": {
-            "clientTrackingId": "08586652586741142222645090602CU35",
-            "clientKeywords": ["testFlow"]
-          },
-          "status": "Succeeded"
-        }
-      },
-      startTime: '2018-09-07T19:23:31.3640166Z',
-      endTime: '',
-      status: 'Running',
-      triggerName: 'manual'
-    }));
+    await command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName } });
+    assert(loggerLogSpy.calledWith(flowResponseFormattedNoEndTime));
   });
 
-  it('correctly handles environment not found', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": "Access to the environment 'Default-48595cc3-adce-4267-8e99-0c838923dbbx' is denied."
-        }
-      });
+  it('retrieves information about the specified run including trigger information', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/${environmentName}/flows/${flowName}/runs/${runName}?api-version=2016-11-01`) {
+        return flowResponse;
+      }
+
+      if (opts.url === flowResponse.properties.trigger.outputsLink.uri) {
+        return triggerInformationResponse;
+      }
+
+      throw 'Invalid request';
     });
 
-    await assert.rejects(command.action(logger, { options: { flowName: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbbx', name: '08586653536760200319026785874CU62' } } as any),
-      new CommandError(`Access to the environment 'Default-48595cc3-adce-4267-8e99-0c838923dbbx' is denied.`));
+    await command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName, includeTriggerInformation: true, verbose: true } });
+    assert(loggerLogSpy.calledWith(flowResponseFormattedIncludingInformation));
   });
 
   it('correctly handles Flow not found', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "ConnectionAuthorizationFailed",
-          "message": "The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '1c6ee23a-a835-44bc-a4f5-462b658efc12' under Api 'shared_logicflows'."
+    sinon.stub(request, 'get').callsFake(async () => {
+      throw {
+        'error': {
+          'code': 'FlowNotFound',
+          'message': `Could not find flow '${flowName}'.`
         }
-      });
+      };
     });
 
-    await assert.rejects(command.action(logger, { options: { flowName: '1c6ee23a-a835-44bc-a4f5-462b658efc12', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } } as any),
-      new CommandError(`The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '1c6ee23a-a835-44bc-a4f5-462b658efc12' under Api 'shared_logicflows'.`));
+    await assert.rejects(command.action(logger, { options: { flowName: flowName, environmentName: environmentName, name: runName } } as any),
+      new CommandError(`Could not find flow '${flowName}'.`));
   });
 
-  it('correctly handles run not found', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "BadRequest",
-          "message": "The provided workflow run name is not valid."
-        }
-      });
-    });
-
-    await assert.rejects(command.action(logger, { options: { flowName: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environmentName: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: 'ABC' } } as any),
-      new CommandError(`The provided workflow run name is not valid.`));
+  it('fails validation if the flowName is not valid GUID', async () => {
+    const actual = await command.validate({ options: { environmentName: environmentName, flowName: 'invalid', name: runName } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
-  it('correctly handles API OData error', async () => {
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        error: {
-          'odata.error': {
-            code: '-1, InvalidOperationException',
-            message: {
-              value: 'An error has occurred'
-            }
-          }
-        }
-      });
-    });
-
-    await assert.rejects(command.action(logger, { options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } } as any),
-      new CommandError('An error has occurred'));
-  });
-
-  it('supports specifying environment', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--environment') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying flow', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--flow') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
-
-  it('supports specifying name', () => {
-    const options = command.options;
-    let containsOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('--name') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
+  it('passes validation if the flowName is not valid GUID', async () => {
+    const actual = await command.validate({ options: { environmentName: environmentName, flowName: flowName, name: runName } }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 });
