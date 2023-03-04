@@ -115,11 +115,11 @@ describe(commands.OWNER_ADD, () => {
         {
           properties: {
             principal: {
-              id: validUserId
+              id: validUserId,
+              type: 'User'
             },
             roleName: 'CanView'
-          },
-          type: 'User'
+          }
         }
       ]
     };
@@ -142,11 +142,11 @@ describe(commands.OWNER_ADD, () => {
         {
           properties: {
             principal: {
-              id: validUserId
+              id: validUserId,
+              type: 'User'
             },
             roleName: 'CanEdit'
-          },
-          type: 'User'
+          }
         }
       ]
     };
@@ -173,11 +173,11 @@ describe(commands.OWNER_ADD, () => {
         {
           properties: {
             principal: {
-              id: validGroupId
+              id: validGroupId,
+              type: 'Group'
             },
             roleName: 'CanEdit'
-          },
-          type: 'Group'
+          }
         }
       ]
     };
@@ -200,11 +200,11 @@ describe(commands.OWNER_ADD, () => {
         {
           properties: {
             principal: {
-              id: validGroupId
+              id: validGroupId,
+              type: 'Group'
             },
             roleName: 'CanEdit'
-          },
-          type: 'Group'
+          }
         }
       ]
     };

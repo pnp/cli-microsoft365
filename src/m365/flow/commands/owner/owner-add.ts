@@ -157,11 +157,11 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
             {
               properties: {
                 principal: {
-                  id: id
+                  id: id,
+                  type: type
                 },
                 roleName: args.options.roleName
-              },
-              type: type
+              }
             }
           ]
         },
