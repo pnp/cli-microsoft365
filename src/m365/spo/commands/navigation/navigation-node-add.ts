@@ -23,6 +23,8 @@ interface Options extends GlobalOptions {
 }
 
 class SpoNavigationNodeAddCommand extends SpoCommand {
+  private static readonly allowedLocations: string[] = ['QuickLaunch', 'TopNavigationBar'];
+
   public get name(): string {
     return commands.NAVIGATION_NODE_ADD;
   }
@@ -59,7 +61,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       },
       {
         option: '-l, --location [location]',
-        autocomplete: ['QuickLaunch', 'TopNavigationBar']
+        autocomplete: SpoNavigationNodeAddCommand.allowedLocations
       },
       {
         option: '-t, --title <title>'
@@ -96,9 +98,11 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
           }
         }
         else {
-          if (args.options.location !== 'QuickLaunch' &&
-            args.options.location !== 'TopNavigationBar') {
-            return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
+          if (!SpoNavigationNodeAddCommand.allowedLocations.some(allowedLocation => allowedLocation === args.options.location)) {
+            return `${args.options.location} is not a valid value for the location option. Allowed values are ${SpoNavigationNodeAddCommand.allowedLocations.join('|')}`;
+          }
+          if (args.options.location === 'TopNavigationBar' && args.options.openInNewWindow) {
+            return `Option openInNewWindow cannot be specified when the location is set to 'TopNavigationBar'`;
           }
         }
 
@@ -156,7 +160,11 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       const res = await request.post<NavigationNode>(requestOptions);
 
       if (args.options.openInNewWindow) {
+        if (this.verbose) {
+          logger.logToStderr(`Making sure that the newly added navigation node opens in a new window.`);
+        }
         const menuState = await spo.getMenuState(args.options.webUrl);
+        logger.log(menuState);
         let menuStateItem: MenuStateNode | undefined;
         if (args.options.parentNodeId) {
           const parentNode = this.getParentNode(menuState.Nodes, args.options.parentNodeId!, res.Id);
@@ -168,7 +176,6 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         menuStateItem!.OpenInNewWindow = true;
         await spo.saveMenuState(args.options.webUrl, menuState);
       }
-
       logger.log(res);
     }
     catch (err: any) {
@@ -179,9 +186,12 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
   private getParentNode(nodes: MenuStateNode[], parentNodeId: number, id: number): MenuStateNode {
     let parentNode = nodes.find((node: MenuStateNode) => node.Key === parentNodeId.toString());
     if (parentNode === undefined) {
-      nodes.filter(node => node.Nodes.length > 0).forEach(node => {
+      for (const node of nodes.filter(node => node.Nodes.length > 0)) {
         parentNode = this.getParentNode(node.Nodes, parentNodeId, id);
-      });
+        if (parentNode) {
+          break;
+        }
+      }
     }
     return parentNode!;
   }
