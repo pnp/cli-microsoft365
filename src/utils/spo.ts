@@ -10,6 +10,7 @@ import { formatting } from './formatting';
 import { CustomAction } from '../m365/spo/commands/customaction/customaction';
 import { odata } from './odata';
 import { MenuState } from '../m365/spo/commands/navigation/NavigationNode';
+import { Cli } from '../cli/Cli';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -701,11 +702,17 @@ export const spo = {
    * Retrieves the menu state.
    * @param webUrl Web url
    */
-  async getMenuState(webUrl: string): Promise<MenuState> {
+  async getMenuState(webUrl: string, location?: string): Promise<MenuState> {
     const requestOptions: CliRequestOptions = {
       url: `${webUrl}/_api/Navigation/MenuState`,
       headers: {
-        accept: 'application/json;odata=nometadata'
+        accept: 'application/json;odata=minimalmetadata'
+      },
+      data: {
+        customProperties: null,
+        depth: 10,
+        mapProviderName: null,
+        menuNodeKey: '1002'
       },
       responseType: 'json'
     };

@@ -101,9 +101,6 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
           if (!SpoNavigationNodeAddCommand.allowedLocations.some(allowedLocation => allowedLocation === args.options.location)) {
             return `${args.options.location} is not a valid value for the location option. Allowed values are ${SpoNavigationNodeAddCommand.allowedLocations.join('|')}`;
           }
-          if (args.options.location === 'TopNavigationBar' && args.options.openInNewWindow) {
-            return `Option openInNewWindow cannot be specified when the location is set to 'TopNavigationBar'`;
-          }
         }
 
         if (args.options.audienceIds) {
@@ -157,15 +154,15 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     };
 
     try {
-      const res = await request.post<NavigationNode>(requestOptions);
+      //const res = await request.post<NavigationNode>(requestOptions);
 
       if (args.options.openInNewWindow) {
         if (this.verbose) {
           logger.logToStderr(`Making sure that the newly added navigation node opens in a new window.`);
         }
-        const menuState = await spo.getMenuState(args.options.webUrl);
-        logger.log(menuState);
-        let menuStateItem: MenuStateNode | undefined;
+        const menuState = await spo.getMenuState(args.options.webUrl, args.options.location);
+        //logger.log(menuState);
+        /*let menuStateItem: MenuStateNode | undefined;
         if (args.options.parentNodeId) {
           const parentNode = this.getParentNode(menuState.Nodes, args.options.parentNodeId!, res.Id);
           menuStateItem = parentNode!.Nodes.find((node: MenuStateNode) => node.Key === res.Id.toString());
@@ -174,9 +171,9 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
           menuStateItem = menuState.Nodes.find((node: MenuStateNode) => node.Key === res.Id.toString());
         }
         menuStateItem!.OpenInNewWindow = true;
-        await spo.saveMenuState(args.options.webUrl, menuState);
+        await spo.saveMenuState(args.options.webUrl, menuState);*/
       }
-      logger.log(res);
+      //logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
