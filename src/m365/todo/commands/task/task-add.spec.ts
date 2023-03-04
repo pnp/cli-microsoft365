@@ -303,17 +303,6 @@ describe(commands.TASK_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when invalid categories is passed', async () => {
-    const actual = await command.validate({
-      options: {
-        title: 'New task',
-        listName: 'Tasks List',
-        categories: 'None,Preset25'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation when invalid completedDateTime is passed', async () => {
     const actual = await command.validate({
       options: {

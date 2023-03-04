@@ -53,7 +53,11 @@ class TodoTaskAddCommand extends GraphCommand {
         bodyContentType: args.options.bodyContentType,
         dueDateTime: typeof args.options.dueDateTime !== 'undefined',
         importance: args.options.importance,
-        reminderDateTime: typeof args.options.reminderDateTime !== 'undefined'
+        reminderDateTime: typeof args.options.reminderDateTime !== 'undefined',
+        categories: typeof args.options.categories !== 'undefined',
+        completedDateTime: typeof args.options.completedDateTime !== 'undefined',
+        startDateTime: typeof args.options.startDateTime !== 'undefined',
+        status: typeof args.options.status !== 'undefined'
       });
     });
   }
@@ -119,20 +123,6 @@ class TodoTaskAddCommand extends GraphCommand {
 
         if (args.options.reminderDateTime && !validation.isValidISODateTime(args.options.reminderDateTime)) {
           return `'${args.options.reminderDateTime}' is not a valid ISO date string`;
-        }
-
-        const regexCategory = new RegExp('^(?:None|Preset(?:[01]?[0-9]|2[0-4]))$');
-        if (args.options.categories) {
-          let testCategoriesResult = true;
-          args.options.categories.split(',').map(category => {
-            if (testCategoriesResult) {
-              testCategoriesResult = regexCategory.test(category);
-            }
-          });
-
-          if (!testCategoriesResult) {
-            return `categories can only containe the option 'None' or 'Preset0' to 'Preset24'`;
-          }
         }
 
         if (args.options.completedDateTime && !validation.isValidISODateTime(args.options.completedDateTime)) {
