@@ -21,6 +21,9 @@ interface Options extends GlobalOptions {
   dueDateTime?: string;
   importance?: string;
   reminderDateTime?: string;
+  categories?: string;
+  completedDateTime?: string;
+  startDateTime?: string;
 }
 
 class TodoTaskSetCommand extends GraphCommand {
@@ -52,7 +55,10 @@ class TodoTaskSetCommand extends GraphCommand {
         bodyContentType: args.options.bodyContentType,
         dueDateTime: typeof args.options.dueDateTime !== 'undefined',
         importance: args.options.importance,
-        reminderDateTime: typeof args.options.reminderDateTime !== 'undefined'
+        reminderDateTime: typeof args.options.reminderDateTime !== 'undefined',
+        categories: typeof args.options.categories !== 'undefined',
+        completedDateTime: typeof args.options.completedDateTime !== 'undefined',
+        startDateTime: typeof args.options.startDateTime !== 'undefined'
       });
     });
   }
@@ -91,6 +97,15 @@ class TodoTaskSetCommand extends GraphCommand {
       },
       {
         option: '--reminderDateTime [reminderDateTime]'
+      },
+      {
+        option: '--categories [categories]'
+      },
+      {
+        option: '--completedDateTime [completedDateTime]'
+      },
+      {
+        option: '--startDateTime [startDateTime]'
       }
     );
   }
@@ -121,6 +136,14 @@ class TodoTaskSetCommand extends GraphCommand {
 
         if (args.options.reminderDateTime && !validation.isValidISODateTime(args.options.reminderDateTime)) {
           return `'${args.options.reminderDateTime}' is not a valid ISO date string`;
+        }
+
+        if (args.options.completedDateTime && !validation.isValidISODateTime(args.options.completedDateTime)) {
+          return `'${args.options.completedDateTime}' is not a valid datetime.`;
+        }
+
+        if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
+          return `'${args.options.startDateTime}' is not a valid datetime.`;
         }
 
         return true;
@@ -216,6 +239,18 @@ class TodoTaskSetCommand extends GraphCommand {
 
     if (options.reminderDateTime) {
       requestBody.reminderDateTime = this.getDateTimeTimeZone(options.reminderDateTime);
+    }
+
+    if (options.categories) {
+      requestBody.categories = options.categories.split(',');
+    }
+
+    if (options.completedDateTime) {
+      requestBody.completedDateTime = this.getDateTimeTimeZone(options.completedDateTime);
+    }
+
+    if (options.startDateTime) {
+      requestBody.startDateTime = this.getDateTimeTimeZone(options.startDateTime);
     }
 
     return requestBody;
