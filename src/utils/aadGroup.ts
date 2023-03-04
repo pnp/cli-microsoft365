@@ -25,7 +25,6 @@ export const aadGroup = {
   /**
    * Get a list of groups by display name.
    * @param displayName Group display name.
-   * @param selectProperties Properties to select if specified.
    */
   getGroupsByDisplayName(displayName: string): Promise<Group[]> {
     return odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'`);
@@ -34,7 +33,6 @@ export const aadGroup = {
   /**
    * Get a single group by its display name.
    * @param displayName Group display name.
-   * @param selectProperties Properties to select if specified.
    * @throws Error when group was not found.
    * @throws Error when multiple groups with the same name were found.
    */
@@ -59,7 +57,7 @@ export const aadGroup = {
    * @throws Error when multiple groups with the same name were found.
    */
   async getGroupIdByDisplayName(displayName: string): Promise<string> {
-    const groups = await odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'?$select=id`);
+    const groups = await odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${formatting.encodeQueryParameter(displayName)}'&$select=id`);
 
     if (!groups.length) {
       throw Error(`The specified group '${displayName}' does not exist.`);

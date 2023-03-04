@@ -13,7 +13,7 @@ m365 flow owner remove [options]
 `-e, --environmentName <environmentName>`
 : The name of the environment.
 
-`-n, --flowName <flowName>`
+`-f, --flowName <flowName>`
 : The name of the Power Automate flow.
 
 `--userId [userId]`

@@ -21,6 +21,7 @@ interface Options extends GlobalOptions {
   groupId?: string;
   groupName?: string;
   asAdmin?: boolean;
+  confirm?: boolean;
 }
 
 class FlowOwnerRemoveCommand extends AzmgmtCommand {
@@ -60,7 +61,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '-n, --flowName <flowName>'
+        option: '-f, --flowName <flowName>'
       },
       {
         option: '--userId [userId]'
@@ -157,7 +158,7 @@ class FlowOwnerRemoveCommand extends AzmgmtCommand {
           type: 'confirm',
           name: 'continue',
           default: false,
-          message: `Are you sure you want to remove the Flow owner from the specified flow?`
+          message: `Are you sure you want to remove the Flow owner '${args.options.groupId || args.options.groupName || args.options.userId || args.options.userName}' from the specified flow?`
         });
 
         if (result.continue) {
