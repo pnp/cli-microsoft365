@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 // uncomment to support upgrading to preview releases
-// import { prerelease } from 'semver';
+import { prerelease } from 'semver';
 import { Logger } from '../../../../cli/Logger';
 import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -70,7 +70,8 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.15.0',
     '1.15.2',
     '1.16.0',
-    '1.16.1'
+    '1.16.1',
+    '1.17.0-beta.1'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
@@ -108,9 +109,9 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         preview: args.options.preview
       });
       // uncomment to support upgrading to preview releases
-      // if (prerelease(this.telemetryProperties.toVersion) && !args.options.preview) {
-      //   this.telemetryProperties.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
-      // }
+      if (prerelease(this.telemetryProperties.toVersion) && !args.options.preview) {
+        this.telemetryProperties.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
+      }
     });
   }
 
@@ -167,15 +168,15 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
 
     this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
     // uncomment to support upgrading to preview releases
-    // if (!args.options.toVersion &&
-    //   !args.options.preview &&
-    //   prerelease(this.toVersion)) {
-    //   // no version and no preview specified while the current version to
-    //   // upgrade to is a prerelease so let's grab the first non-preview version
-    //   // since we're supporting only one preview version, it's sufficient for
-    //   // us to take second to last version
-    //   this.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
-    // }
+    if (!args.options.toVersion &&
+      !args.options.preview &&
+      prerelease(this.toVersion)) {
+      // no version and no preview specified while the current version to
+      // upgrade to is a prerelease so let's grab the first non-preview version
+      // since we're supporting only one preview version, it's sufficient for
+      // us to take second to last version
+      this.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
+    }
     this.packageManager = args.options.packageManager || 'npm';
     this.shell = args.options.shell || 'bash';
 
