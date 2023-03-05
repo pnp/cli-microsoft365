@@ -187,7 +187,7 @@ describe(commands.COMMANDSET_ADD, () => {
     assert(loggerLogSpy.calledWith(commandactionResponse));
   });
 
-  it('adds commandset with location ContextMenu', async () => {
+  it('adds commandset with location ContextMenu and listType SitePages', async () => {
     const response = commandactionResponse;
     response.Location = 'ClientSideExtension.ListViewCommandSet.ContextMenu';
 
@@ -201,7 +201,7 @@ describe(commands.COMMANDSET_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site', listType: validListType, location: 'ContextMenu' } });
+    await command.action(logger, { options: { webUrl: validWebUrl, title: validTitle, clientSideComponentId: validClientSideComponentId, clientSideComponentProperties: validClientSideComponentProperties, scope: 'Site', listType: 'SitePages', location: 'ContextMenu' } });
     assert(loggerLogSpy.calledWith(response));
   });
 

@@ -17,7 +17,7 @@ m365 spo commandset add [options]
 : The site to add the ListView Command Set.
 
 `-l, --listType <listType>`
-: The list or library type to register the Command Set on. Allowed values `List` or `Library`.
+: The list or library type to register the Command Set on. Allowed values `List`, `Library` or `SitePages`.
 
 `-i, --clientSideComponentId <clientSideComponentId>`
 : The Client Side Component Id (GUID) of the ListView Command Set.

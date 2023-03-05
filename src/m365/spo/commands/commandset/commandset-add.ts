@@ -21,7 +21,7 @@ export interface Options extends GlobalOptions {
 }
 
 class SpoCommandsetAddCommand extends SpoCommand {
-  private static readonly listTypes: string[] = ['List', 'Library'];
+  private static readonly listTypes: string[] = ['List', 'Library', 'SitePages'];
   private static readonly scopes: string[] = ['Site', 'Web'];
   private static readonly locations: string[] = ['ContextMenu', 'CommandBar', 'Both'];
 
@@ -111,13 +111,14 @@ class SpoCommandsetAddCommand extends SpoCommand {
     }
 
     const location: string = this.getLocation(args.options.location ? args.options.location : '');
+    const listType: string = this.getListTemplate(args.options.listType);
 
     try {
       const requestBody: any = {
         Title: args.options.title,
         Location: location,
         ClientSideComponentId: args.options.clientSideComponentId,
-        RegistrationId: args.options.listType === 'List' ? "100" : "101"
+        RegistrationId: listType
       };
 
       if (args.options.clientSideComponentProperties) {
@@ -149,6 +150,17 @@ class SpoCommandsetAddCommand extends SpoCommand {
         return 'ClientSideExtension.ListViewCommandSet.ContextMenu';
       default:
         return 'ClientSideExtension.ListViewCommandSet.CommandBar';
+    }
+  }
+
+  private getListTemplate(listTemplate: string): string {
+    switch (listTemplate) {
+      case 'SitePages':
+        return '119';
+      case 'Library':
+        return '101';
+      default:
+        return '100';
     }
   }
 }
