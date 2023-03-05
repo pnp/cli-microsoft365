@@ -13,7 +13,8 @@
 - enhanced 'spo term get' command [#4346](https://github.com/pnp/cli-microsoft365/issues/4346)
 - aligned script sample command options with v6.3 release [#4441](https://github.com/pnp/cli-microsoft365/issues/4441)
 - fixed prompt behavior when passing url option [#4530](https://github.com/pnp/cli-microsoft365/issues/4530)
-- documentation improvements
+- documentation improvements [#4521](https://github.com/pnp/cli-microsoft365/pull/4521)
+- added 'clientSideComponentId' option to 'spo customaction get' [#4382](https://github.com/pnp/cli-microsoft365/issues/4382)
 
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
