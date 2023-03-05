@@ -13,6 +13,7 @@ import { aadGroup } from '../../../../utils/aadGroup';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
 import { formatting } from '../../../../utils/formatting';
+import { session } from '../../../../utils/session';
 const command: Command = require('./owner-add');
 
 describe(commands.OWNER_ADD, () => {
@@ -32,6 +33,7 @@ describe(commands.OWNER_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -63,7 +65,8 @@ describe(commands.OWNER_ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });
@@ -76,33 +79,33 @@ describe(commands.OWNER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if name is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: 'invalid', userId: validUserId, roleName: validRoleName } }, commandInfo);
+  it('fails validation if flowName is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: 'invalid', userId: validUserId, roleName: validRoleName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if userId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validFlowName, userId: 'invalid', roleName: validRoleName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: validFlowName, userId: 'invalid', roleName: validRoleName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validFlowName, groupId: 'invalid', roleName: validRoleName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: validFlowName, groupId: 'invalid', roleName: validRoleName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if username is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validFlowName, userName: 'invalid', roleName: validRoleName } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: validFlowName, userName: 'invalid', roleName: validRoleName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if roleName is not a valid user principal name', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validFlowName, userName: validUserName, roleName: 'invalid' } }, commandInfo);
+  it('fails validation if roleName is not a valid role name', async () => {
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: validFlowName, userName: validUserName, roleName: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the username passed', async () => {
-    const actual = await command.validate({ options: { environmentName: validEnvironmentName, name: validFlowName, userName: validUserName, roleName: validRoleName } }, commandInfo);
+  it('passes validation when required parameters are provided', async () => {
+    const actual = await command.validate({ options: { environmentName: validEnvironmentName, flowName: validFlowName, userName: validUserName, roleName: validRoleName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -187,7 +190,7 @@ describe(commands.OWNER_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupName: validGroupName, roleName: validRoleName, asAdmin: true } });
+    await command.action(logger, { options: { verbose: true, environmentName: validEnvironmentName, flowName: validFlowName, groupId: validGroupId, roleName: validRoleName, asAdmin: true } });
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
@@ -222,7 +225,6 @@ describe(commands.OWNER_ADD, () => {
     assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
-
   it('correctly handles API OData error', async () => {
     const error = {
       error: {
@@ -233,7 +235,7 @@ describe(commands.OWNER_ADD, () => {
       throw error;
     });
 
-    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironmentName, name: validFlowName, roleName: validRoleName, userId: validUserId } } as any),
+    await assert.rejects(command.action(logger, { options: { environmentName: validEnvironmentName, flowName: validFlowName, roleName: validRoleName, userId: validUserId } } as any),
       new CommandError(error.error.message));
   });
 });

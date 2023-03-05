@@ -14,7 +14,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  flowName: string;
   environmentName: string;
   roleName: string;
   userId?: string;
@@ -62,7 +62,7 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
         option: '-e, --environmentName <environmentName>'
       },
       {
-        option: '-n, --name <name>'
+        option: '-f, --flowName <flowName>'
       },
       {
         option: '--userId [userId]'
@@ -93,8 +93,8 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.name)) {
-          return `${args.options.name} is not a valid GUID.`;
+        if (!validation.isValidGuid(args.options.flowName)) {
+          return `${args.options.flowName} is not a valid GUID.`;
         }
 
         if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
@@ -102,7 +102,7 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
         }
 
         if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-          return `${args.options.userName} is not a valid user name.`;
+          return `${args.options.userName} is not a valid userName.`;
         }
 
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
@@ -148,12 +148,12 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
       }
 
       const requestOptions: CliRequestOptions = {
-        url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.name)}/modifyPermissions?api-version=2016-11-01`,
+        url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${formatting.encodeQueryParameter(args.options.environmentName)}/flows/${formatting.encodeQueryParameter(args.options.flowName)}/modifyPermissions?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'
         },
         data: {
-          "put": [
+          put: [
             {
               properties: {
                 principal: {
