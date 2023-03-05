@@ -4,9 +4,15 @@
 
 ### New commands
 
+**Planner:**
+
+- [planner roster member get](../cmd/planner/roster/roster-member-get.md) - gets a member of the specified Microsoft Planner Roster [#4488](https://github.com/pnp/cli-microsoft365/issues/4488)
+
 **Power Automate:**
 
+- [flow owner add](../cmd/flow/owner/owner-add.md) - assigns permissions to a Power Automate flow [#4559](https://github.com/pnp/cli-microsoft365/issues/4559)
 - [flow owner list](../cmd/flow/owner/owner-list.md) - lists all owners of a Power Automate flow [#4558](https://github.com/pnp/cli-microsoft365/issues/4558)
+- [flow owner remove](../cmd/flow/owner/owner-remove.md) - removes owner permissions to a Power Automate flow [#4560](https://github.com/pnp/cli-microsoft365/issues/4560)
 
 ### Changes
 
@@ -15,6 +21,7 @@
 - fixed prompt behavior when passing url option [#4530](https://github.com/pnp/cli-microsoft365/issues/4530)
 - documentation improvements [#4521](https://github.com/pnp/cli-microsoft365/pull/4521)
 - added 'clientSideComponentId' option to 'spo customaction get' [#4382](https://github.com/pnp/cli-microsoft365/issues/4382)
+- added admin privileges to 'flow run list' command [#3709](https://github.com/pnp/cli-microsoft365/issues/3709)
 
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
