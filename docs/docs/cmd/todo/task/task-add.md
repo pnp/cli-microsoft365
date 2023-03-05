@@ -48,6 +48,10 @@ m365 todo task add [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+When you specify the values for `categories`, the possible values for color are pre-set constants such as `None`, `preset0` and `preset1` or a collor mapped property such as `Red`, `Orange` and `blue`. It is permissible to use distinct names.
+
 ## Examples
 
 Add a task to Microsoft To Do tasks list with with a specific name
