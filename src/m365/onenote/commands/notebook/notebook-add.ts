@@ -80,62 +80,44 @@ class OneNoteNotebookAddCommand extends GraphCommand {
     );
   }
 
-  private getEndpointUrl(args: CommandArgs): Promise<string> {
-    return new Promise<string>((resolve: (endpoint: string) => void, reject: (error: string) => void): void => {
-      let endpoint: string = `${this.resource}/v1.0/me/onenote/notebooks`;
+  private async getEndpointUrl(args: CommandArgs): Promise<string> {
+    let endpoint: string = `${this.resource}/v1.0/`;
 
-      if (args.options.userId) {
-        endpoint = `${this.resource}/v1.0/users/${args.options.userId}/onenote/notebooks`;
-        return resolve(endpoint);
-      }
-      else if (args.options.userName) {
-        endpoint = `${this.resource}/v1.0/users/${args.options.userName}/onenote/notebooks`;
-        return resolve(endpoint);
-      }
-      else if (args.options.groupId) {
-        endpoint = `${this.resource}/v1.0/groups/${args.options.groupId}/onenote/notebooks`;
-        return resolve(endpoint);
-      }
-      else if (args.options.groupName) {
-        this
-          .getGroupId(args)
-          .then((retrievedgroupId: string): void => {
-            endpoint = `${this.resource}/v1.0/groups/${retrievedgroupId}/onenote/notebooks`;
-            return resolve(endpoint);
-          })
-          .catch((err: any) => {
-            reject(err);
-          });
-      }
-      else if (args.options.webUrl) {
-        this
-          .getSpoSiteId(args)
-          .then((siteId: string): void => {
-            endpoint = `${this.resource}/v1.0/sites/${siteId}/onenote/notebooks`;
-            return resolve(endpoint);
-          })
-          .catch((err: any) => {
-            reject(err);
-          });
-      }
-      else {
-        return resolve(endpoint);
-      }
-    });
+    if (args.options.userId) {
+      endpoint += `users/${args.options.userId}`;
+    }
+    else if (args.options.userName) {
+      endpoint += `users/${args.options.userName}`;
+    }
+    else if (args.options.groupId) {
+      endpoint += `groups/${args.options.groupId}`;
+    }
+    else if (args.options.groupName) {
+      const groupId = await this.getGroupId(args.options.groupName);
+      endpoint += `groups/${groupId}`;
+    }
+    else if (args.options.webUrl) {
+      const siteId = await this.getSpoSiteId(args.options.webUrl);
+      endpoint += `sites/${siteId}`;
+    }
+    else {
+      endpoint += 'me';
+    }
+    endpoint += '/onenote/notebooks';
+    return endpoint;
   }
 
   public defaultProperties(): string[] | undefined {
     return ['createdDateTime', 'displayName', 'id'];
   }
 
-  private getGroupId(args: CommandArgs): Promise<string> {
-    return aadGroup
-      .getGroupByDisplayName(args.options.groupName!)
-      .then(group => group.id!);
+  private async getGroupId(groupName: string): Promise<string> {
+    const group = await aadGroup.getGroupByDisplayName(groupName);
+    return group.id!;
   }
 
-  private getSpoSiteId(args: CommandArgs): Promise<string> {
-    const url = new URL(args.options.webUrl!);
+  private async getSpoSiteId(webUrl: string): Promise<string> {
+    const url = new URL(webUrl);
     const requestOptions: any = {
       url: `${this.resource}/v1.0/sites/${url.hostname}:${url.pathname}`,
       headers: {
@@ -144,9 +126,8 @@ class OneNoteNotebookAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<{ id: string }>(requestOptions)
-      .then((site: { id: string }) => site.id);
+    const site = await request.get<{ id: string }>(requestOptions);
+    return site.id;
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
