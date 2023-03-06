@@ -22,6 +22,9 @@
 - documentation improvements [#4521](https://github.com/pnp/cli-microsoft365/pull/4521)
 - added 'clientSideComponentId' option to 'spo customaction get' [#4382](https://github.com/pnp/cli-microsoft365/issues/4382)
 - added admin privileges to 'flow run list' command [#3709](https://github.com/pnp/cli-microsoft365/issues/3709)
+- fixes unhandled exception when file doesn't exist when using 'spo file move' [#4537](https://github.com/pnp/cli-microsoft365/issues/4537)
+- fixes baseTemplate option to be optional for command 'spo list add' [#4546](https://github.com/pnp/cli-microsoft365/issues/4546)
+- fixes listExperienceOptions and draftVersionVisibility options for 'spo list add' and 'spo list set' commands [#4562](https://github.com/pnp/cli-microsoft365/issues/4562)
 
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
