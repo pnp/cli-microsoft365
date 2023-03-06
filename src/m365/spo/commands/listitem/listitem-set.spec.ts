@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import * as os from 'os';
 import { telemetry } from '../../../../telemetry';
 import auth from '../../../../Auth';
 import { Cli } from '../../../../cli/Cli';
@@ -39,7 +40,7 @@ describe(commands.LISTITEM_SET, () => {
         const bodyString = JSON.stringify(opts.data);
         const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
         actualContentType = ctMatch ? ctMatch[1] : "";
-        if (bodyString.indexOf("fail updating me") > -1) { return Promise.resolve({ value: [{ ErrorMessage: 'failed updating' }] }); }
+        if (bodyString.indexOf("fail updating me") > -1) { return Promise.resolve({ value: [{ ErrorMessage: 'failed updating', 'FieldName': 'Title', 'HasException': true }] }); }
         return { value: [{ ItemId: expectedId }] };
       }
     }
@@ -260,7 +261,7 @@ describe(commands.LISTITEM_SET, () => {
       Title: "fail updating me"
     };
 
-    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Item didn't update successfully"));
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError(`Updating the items has failed with the following errors: ${os.EOL}- Title - failed updating`));
     assert.strictEqual(actualId, 0);
   });
 
@@ -349,7 +350,6 @@ describe(commands.LISTITEM_SET, () => {
 
     await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Specified content type 'Unexpected content type' doesn't exist on the target list"));
   });
-
 
   it('successfully updates the listitem when the systemUpdate parameter is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
