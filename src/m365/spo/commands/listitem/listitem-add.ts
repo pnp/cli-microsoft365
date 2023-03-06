@@ -1,3 +1,4 @@
+import * as os from 'os';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -7,6 +8,7 @@ import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { ListItemFieldValueResult } from './ListItemFieldValueResult';
 import { ListItemInstance } from './ListItemInstance';
 
 interface CommandArgs {
@@ -20,14 +22,6 @@ export interface Options extends GlobalOptions {
   listUrl?: string;
   contentType?: string;
   folder?: string;
-}
-
-interface FieldValue {
-  ErrorMessage: string;
-  FieldName: string;
-  FieldValue: any;
-  HasException: boolean;
-  ItemId: number;
 }
 
 class SpoListItemAddCommand extends SpoCommand {
@@ -240,19 +234,19 @@ class SpoListItemAddCommand extends SpoCommand {
       const response = await request.post<any>(requestOptions);
 
       // Response is from /AddValidateUpdateItemUsingPath POST call, perform get on added item to get all field values
-      const fieldValues: FieldValue[] = response.value;
+      const fieldValues: ListItemFieldValueResult[] = response.value;
+      if (fieldValues.some(f => f.HasException)) {
+        throw `The item was not created successfully due to the following errors: ${os.EOL}${fieldValues.filter(f => f.HasException).map(f => { return `- ${f.FieldName} - ${f.ErrorMessage}`; }).join(os.EOL)}`;
+      }
+
       const idField = fieldValues.filter((thisField) => {
         return (thisField.FieldName === "Id");
       });
 
       if (this.debug) {
-        logger.logToStderr(`field values returned:`);
+        logger.logToStderr(`Field values returned:`);
         logger.logToStderr(fieldValues);
-        logger.logToStderr(`Id returned by AddValidateUpdateItemUsingPath: ${idField}`);
-      }
-
-      if (idField.length === 0) {
-        throw `Item didn't add successfully`;
+        logger.logToStderr(`Id returned by AddValidateUpdateItemUsingPath: ${idField[0].FieldValue}`);
       }
 
       requestOptions = {

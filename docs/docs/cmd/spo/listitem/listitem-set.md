@@ -33,6 +33,11 @@ m365 spo listitem set [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+!!! tip "When using DateTime fields"
+    When updating a list item with a DateTime field, use the timezone and the format that the site expects, based on its regional settings. Alternatively, a format which works on all regions is the following: `yyyy-MM-dd HH:mm:ss`. However, you should use the local timezone in all situations. UTC date/time or ISO 8601 formatted date/time is not supported.
+
 ## Examples
 
 Update an item with id _147_ with title _Demo Item_ and content type name _Item_ in list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
@@ -74,7 +79,13 @@ m365 spo listitem set --listUrl '/sites/project-x/lists/Demo List' --id 147 --we
 Update an item with a specific Title and multi-choice value
 
 ```sh
-m365 spo listitem set --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --MultiChoiceField "Choice 1;#Choice 2;#Choice 3"
+m365 spo listitem set --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo multi-choice Field" --MultiChoiceField "Choice 1;#Choice 2;#Choice 3"
+```
+
+Update an item with a specific Title and DateTime value
+
+```sh
+m365 spo listitem set --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo DateTime Field" --SomeDateTimeField "2023-01-16 15:30:00"
 ```
 
 ## Response
