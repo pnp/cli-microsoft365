@@ -50,7 +50,7 @@ m365 todo task add [options]
 
 ## Remarks
 
-When you specify the values for `categories`, the possible values for color are pre-set constants such as `None`, `preset0` and `preset1` or a collor mapped property such as `Red`, `Orange` and `blue`. It is permissible to use distinct names.
+When you specify the values for `categories`, each category can correspond to the displayName property of an [outlookCategory](https://learn.microsoft.com/en-us/graph/api/resources/outlookcategory?view=graph-rest-1.0). It is permissible to use distinct names.
 
 ## Examples
 
@@ -141,7 +141,7 @@ m365 todo task add --title "New task" --listName "My task list" --categories "No
 === "Markdown"
 
     ```md
-    # todo task add --title "New task" --listName "My task list" --categostatusries "notStarted"
+    # todo task add --title "New task" --listName "My task list" --status "notStarted"
 
     Date: 4/3/2023
 
