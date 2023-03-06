@@ -81,7 +81,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     };
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
-        return '';
+        return;
       }
 
       throw 'Invalid request';
@@ -99,7 +99,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     };
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
-        return '';
+        return;
       }
 
       throw 'Invalid request';
@@ -116,7 +116,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     };
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
-        return '';
+        return;
       }
 
       throw 'Invalid request';

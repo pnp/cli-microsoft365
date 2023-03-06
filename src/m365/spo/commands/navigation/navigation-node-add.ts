@@ -128,7 +128,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     }
 
     let url = args.options.url;
-    if (typeof url === 'boolean' || !url) {
+    if (!url) {
       url = 'http://linkless.header/';
     }
 
