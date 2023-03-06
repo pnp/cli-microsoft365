@@ -1,6 +1,29 @@
 # Release notes
 
-## [v6.3.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
+## [v6.4.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.4.0)
+
+### New commands
+
+**Planner:**
+
+- [planner roster member get](../cmd/planner/roster/roster-member-get.md) - gets a member of the specified Microsoft Planner Roster [#4488](https://github.com/pnp/cli-microsoft365/issues/4488)
+
+**Power Automate:**
+
+- [flow owner add](../cmd/flow/owner/owner-add.md) - assigns permissions to a Power Automate flow [#4559](https://github.com/pnp/cli-microsoft365/issues/4559)
+- [flow owner list](../cmd/flow/owner/owner-list.md) - lists all owners of a Power Automate flow [#4558](https://github.com/pnp/cli-microsoft365/issues/4558)
+- [flow owner remove](../cmd/flow/owner/owner-remove.md) - removes owner permissions to a Power Automate flow [#4560](https://github.com/pnp/cli-microsoft365/issues/4560)
+
+### Changes
+
+- enhanced 'spo term get' command [#4346](https://github.com/pnp/cli-microsoft365/issues/4346)
+- aligned script sample command options with v6.3 release [#4441](https://github.com/pnp/cli-microsoft365/issues/4441)
+- fixed prompt behavior when passing url option [#4530](https://github.com/pnp/cli-microsoft365/issues/4530)
+- documentation improvements [#4521](https://github.com/pnp/cli-microsoft365/pull/4521)
+- added 'clientSideComponentId' option to 'spo customaction get' [#4382](https://github.com/pnp/cli-microsoft365/issues/4382)
+- added admin privileges to 'flow run list' command [#3709](https://github.com/pnp/cli-microsoft365/issues/3709)
+
+## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
 ### New commands
 
@@ -85,6 +108,7 @@
 - modified command execution of 'm365 context' [#4047](https://github.com/pnp/cli-microsoft365/issues/4047)
 - enhanced 'flow environment get' [#4445](https://github.com/pnp/cli-microsoft365/issues/4445)
 - included response output in md for spo homesite, hubsite, knowledgehub, list, listitem, navigation commands [#4301](https://github.com/pnp/cli-microsoft365/issues/4301)
+- added spinner to communicate command running [#4536](https://github.com/pnp/cli-microsoft365/pull/4536)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 

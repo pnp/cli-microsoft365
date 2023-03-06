@@ -5,7 +5,7 @@
     "title": "Add multiple tasks in Planner",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/planner/add-multiple-tasks",
     "creationDateTime": "2022-04-30",
-    "updateDateTime": "2022-04-30",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script will create multiple tasks to a Planner plan from the information provided in your `csv` file.",
     "longDescription": [
       "This script will create multiple tasks to a Planner plan from the information provided in your `csv` file. For this particular example, the `csv` file should contain the following columns: `TaskName`, `Description`, `PlanID`, `BucketName`, `StartDateTime`, `AssignedToUserNames`."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

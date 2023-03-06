@@ -5,7 +5,7 @@
     "title": "CLI - Hide SharePoint list from Site Contents",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/hide-list-from-site-contents",
     "creationDateTime": "2020-03-28",
-    "updateDateTime": "2020-03-28",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "hides the SharePoint list from the UI.",
     "longDescription": [
       "If you need to hide the SharePoint list from the UI this simple PowerShell script will hide a specific list from the site contents. This will prevent users from easily accessing the list while, for example, you are still setting it up."
@@ -20,7 +20,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

@@ -65,6 +65,6 @@ There are so many different ways to create Microsoft 365 groups. Teams, Planner,
       displayName=$(echo $o365group | cut -d';' -f 1)
       id=$(echo $o365group | cut -d';' -f 2)
       echo "Deleting $displayName..."
-      m365 aad o365group remove --id "$id" --confirm
+      m365 aad o365group remove --id $id --confirm
     done
     ```

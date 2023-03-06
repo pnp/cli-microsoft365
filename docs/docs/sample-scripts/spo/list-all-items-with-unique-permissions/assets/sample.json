@@ -5,7 +5,7 @@
     "title": "List all items with unique permissions",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-items-with-unique-permissions",
     "creationDateTime": "2022-02-09",
-    "updateDateTime": "2022-02-09",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "List all items for a specific SharePoint list on a site.",
     "longDescription": [
       "List all items for a specific SharePoint list on a site."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

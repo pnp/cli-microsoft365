@@ -24,7 +24,7 @@ A sample script which iterates through all the teams in your tenant and lists al
     }
 
     foreach ($team in $availableTeams) {
-        $apps = m365 teams app list -i $team.Id -a    
+        $apps = m365 teams team app list -i $team.Id   
         Write-Output "All apps in team are given below: $($team.displayName) $($team.id)"
         Write-Output $apps
     }
@@ -50,7 +50,7 @@ A sample script which iterates through all the teams in your tenant and lists al
     fi
 
     for team in $(echo $availableTeams | jq -c '.[]'); do
-        apps=$(m365 teams app list -i $(echo $team | jq ''.id) -a)
+        apps=$(m365 teams team app list -i $(echo $team | jq ''.id) -a)
         echo "All apps in team are given below: " $(echo $team | jq ''.displayName) " " $(echo $team | jq ''.id)
         echo $apps
     done

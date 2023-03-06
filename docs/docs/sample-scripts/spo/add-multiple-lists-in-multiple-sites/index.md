@@ -45,7 +45,7 @@ Author: [Sudharsan Kesavanarayanan](https://twitter.com/sudharsank)
           if ($null -eq $list) {
             m365 spo list add -t $listTitle --baseTemplate DocumentLibrary -u $FinalSiteUrl --contentTypesEnabled true --enableVersioning true --listExperienceOptions 1 --onQuickLaunch false 
             $list = m365 spo list get -t $listTitle -u $FinalSiteUrl --properties "Title,Id" --output 'json' | ConvertFrom-Json
-            m365 spo list contenttype add -l $list.Id -u $FinalSiteUrl -c $ContentTypeId --output 'json' | ConvertFrom-Json
+            m365 spo list contenttype add -l $list.Id -u $FinalSiteUrl -i $ContentTypeId --output 'json' | ConvertFrom-Json
             $listContentType = m365 spo list contenttype list -l $list.Id -u $FinalSiteUrl --output 'json' | ConvertFrom-Json
             m365 spo list contenttype default set -l $list.Id -u $FinalSiteUrl -c $listContentType.StringId[2] --output 'json' | ConvertFrom-Json
             Write-Output "Successfully created list '$listTitle'"

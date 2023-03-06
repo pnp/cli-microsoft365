@@ -5,7 +5,7 @@
     "title": "CLI - Add multiple folders in libraries using a csv file",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/add-multiple-folders-in-libraries-using-csv-file",
     "creationDateTime": "2021-05-10",
-    "updateDateTime": "2021-05-10",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Adds multiple folders in libraries using a csv file.",
     "longDescription": [
       "Adds multiple folders in libraries using a csv file."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

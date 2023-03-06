@@ -59,7 +59,7 @@ Inspired By: [Salaudeen Rajack](https://www.sharepointdiary.com/2017/02/sharepoi
                         
                         #Remove the user 
                         Write-Host "User $($UserToRemove) is an Admin in $($site.Title). Removing..." -f Blue
-                        m365 spo user remove --webUrl $($site.Url) --id $userToRemoveID --confirm
+                        m365 spo user remove --webUrl "$($site.Url)" --id $userToRemoveID --confirm
                     }
                 }
             }

@@ -17,7 +17,7 @@ If you need to hide the SharePoint list from the UI this simple PowerShell scrip
 
     m365 login
     $list = m365 spo list get --webUrl $site -t $listName -o json | ConvertFrom-Json
-    m365 spo list set --webUrl $site -i $list.Id -t $listName --hidden true
+    m365 spo list set --webUrl $site --id $list.Id --hidden true
     ```
 
 === "Bash"
@@ -32,5 +32,5 @@ If you need to hide the SharePoint list from the UI this simple PowerShell scrip
 
     m365 login
     listId=$(m365 spo list get --webUrl $site -t "$listName" -o json | jq ".Id")
-    m365 spo list set --webUrl $site -i $listId -t $listName --hidden true
+    m365 spo list set --webUrl $site --id $listId --hidden true
     ```

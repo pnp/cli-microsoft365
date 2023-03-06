@@ -5,7 +5,7 @@
     "title": "Create a Microsoft Team with channels from a Microsoft 365 Group",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/create-team-from-group",
     "creationDateTime": "2021-03-10",
-    "updateDateTime": "2021-03-10",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Creates a Microsoft 365 Group, associates a logo to it and some members.",
     "longDescription": [
       "A sample script which creates a Microsoft 365 Group, associates a logo to it and some members. Afterward, it teamyfies the Group and creates two public channels."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

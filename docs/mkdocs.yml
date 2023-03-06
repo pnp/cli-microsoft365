@@ -236,6 +236,7 @@ nav:
         - roster get: cmd/planner/roster/roster-get.md
         - roster remove: cmd/planner/roster/roster-remove.md
         - roster member add: cmd/planner/roster/roster-member-add.md
+        - roster member get: cmd/planner/roster/roster-member-get.md
         - roster member list: cmd/planner/roster/roster-member-list.md
         - roster member remove: cmd/planner/roster/roster-member-remove.md
       - task:
@@ -282,6 +283,10 @@ nav:
       - environment:
         - environment get: cmd/flow/environment/environment-get.md
         - environment list: cmd/flow/environment/environment-list.md
+      - owner:
+        - owner add: cmd/flow/owner/owner-add.md
+        - owner list: cmd/flow/owner/owner-list.md
+        - owner remove: cmd/flow/owner/owner-remove.md
       - run:
         - run cancel: cmd/flow/run/run-cancel.md
         - run get: cmd/flow/run/run-get.md

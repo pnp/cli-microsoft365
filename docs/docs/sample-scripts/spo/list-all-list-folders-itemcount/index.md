@@ -30,7 +30,7 @@ List all Lists, the folders and sub folders in a given site, and output the item
       $folders = m365 spo folder list -u $webUrl --parentFolderUrl $folderUrl -o json | ConvertFrom-Json
 
       foreach ($folder in $folders) {
-        $folderStats = m365 spo folder get -u $webUrl --folderUrl $folder.ServerRelativeUrl -o json | ConvertFrom-Json
+        $folderStats = m365 spo folder get -u $webUrl --f $folder.ServerRelativeUrl -o json | ConvertFrom-Json
 
         Write-Output "Processing folder: $($folder.ServerRelativeUrl);"
         [void]$results.Add([pscustomobject]@{ Url = $folder.ServerRelativeUrl; ItemCount = $folderStats.ItemCount; Type = "Folder"; })

@@ -5,7 +5,7 @@
     "title": "Export Configurations of Tenant Wide Extensions",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/export-configs-tenant-wide-extensions",
     "creationDateTime": "2020-08-21",
-    "updateDateTime": "2020-08-21",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script retrieves Tenant Wide Extension configurations from the App Catalog and exports the same to CSV file.",
     "longDescription": [
       "The SharePoint Admin Center provides various governance features, but there is no way to easily export Configurations of Tenant Wide Extensions from the SharePoint admin center for governance activities. This script retrieves Tenant Wide Extension configurations from the App Catalog and exports the same in a comma-separated values (CSV) file."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

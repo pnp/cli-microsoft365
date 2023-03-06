@@ -50,7 +50,7 @@ Source & Target Lists:
     }
 
     $spolSiteUrl = "${spolHostName}${spolSiteRelativeUrl}"
-    $spolListItems = m365 spo listitem list --title $spolListToAuditTitle --webUrl $spolSiteUrl  --fields $spolListFields -o json | ConvertFrom-Json -AsHashtable
+    $spolListItems = m365 spo listitem list --listTitle $spolListToAuditTitle --webUrl $spolSiteUrl --fields $spolListFields -o json | ConvertFrom-Json -AsHashtable
 
     if ($spolListItems.Count -gt 0) {
         ForEach ($spolListItem in $spolListItems) {

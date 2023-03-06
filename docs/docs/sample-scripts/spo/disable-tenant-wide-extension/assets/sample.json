@@ -5,7 +5,7 @@
     "title": "Disable specified Tenant-wide Extension",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/disable-tenant-wide-extension",
     "creationDateTime": "2020-05-20",
-    "updateDateTime": "2020-05-20",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Script helps to disable the specified tenant wide extension based on the id parameter.",
     "longDescription": [
       "Tenant Wide Extensions list from the App Catalog helps to manage the activation / deactivation of the tenant wide extensions. The below sample script helps to disable the specified tenant wide extension based on the id parameter."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

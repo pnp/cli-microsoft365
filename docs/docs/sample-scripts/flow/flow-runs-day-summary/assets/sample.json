@@ -5,7 +5,7 @@
     "title": "CLI - Flow runs day summary report",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/flow-runs-day-summary",
     "creationDateTime": "2021-10-16",
-    "updateDateTime": "2021-10-16",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script creates a report of all flow runs from current day.",
     "longDescription": [
       "This script creates a report of all flow runs from current day and sends the report as an adaptive card to the provided url."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

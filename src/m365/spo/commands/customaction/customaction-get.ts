@@ -16,6 +16,7 @@ interface Options extends GlobalOptions {
   title?: string;
   webUrl: string;
   scope?: string;
+  clientSideComponentId?: string;
 }
 
 class SpoCustomActionGetCommand extends SpoCommand {
@@ -39,6 +40,9 @@ class SpoCustomActionGetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        clientSideComponentId: typeof args.options.clientSideComponentId !== 'undefined',
         scope: args.options.scope || 'All'
       });
     });
@@ -51,6 +55,9 @@ class SpoCustomActionGetCommand extends SpoCommand {
       },
       {
         option: '-t, --title [title]'
+      },
+      {
+        option: '-c, --clientSideComponentId [clientSideComponentId]'
       },
       {
         option: '-u, --webUrl <webUrl>'
@@ -82,13 +89,17 @@ class SpoCustomActionGetCommand extends SpoCommand {
           }
         }
 
+        if (args.options.clientSideComponentId && validation.isValidGuid(args.options.clientSideComponentId) === false) {
+          return `${args.options.clientSideComponentId} is not a valid GUID.`;
+        }
+
         return true;
       }
     );
   }
 
   #initOptionSets(): void {
-    this.optionSets.push({ options: ['id', 'title'] });
+    this.optionSets.push({ options: ['id', 'title', 'clientSideComponentId'] });
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -126,7 +137,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
 
   private async getCustomAction(options: Options): Promise<CustomAction | undefined> {
     if (options.id) {
-      const customAction = await spo.getCustomActionById(options.webUrl, options.id, options.scope);
+      const customAction: CustomAction | undefined = await spo.getCustomActionById(options.webUrl, options.id, options.scope);
 
       if (!customAction) {
         throw `No user custom action with id '${options.id}' found`;
@@ -134,18 +145,32 @@ class SpoCustomActionGetCommand extends SpoCommand {
 
       return customAction;
     }
+    else if (options.title) {
+      const customActions: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `Title eq '${formatting.encodeQueryParameter(options.title as string)}'`);
 
-    const customActions = await spo.getCustomActions(options.webUrl, options.scope, `Title eq '${formatting.encodeQueryParameter(options.title as string)}'`);
+      if (customActions.length === 1) {
+        return customActions[0];
+      }
 
-    if (customActions.length === 1) {
+      if (customActions.length === 0) {
+        throw `No user custom action with title '${options.title}' found`;
+      }
+
+      throw `Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${customActions.map(a => a.Id).join(', ')}`;
+    }
+    else {
+      const customActions: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `ClientSideComponentId eq guid'${options.clientSideComponentId}'`);
+
+      if (customActions.length === 0) {
+        throw `No user custom action with ClientSideComponentId '${options.clientSideComponentId}' found`;
+      }
+
+      if (customActions.length > 1) {
+        throw `Multiple user custom actions with ClientSideComponentId '${options.clientSideComponentId}' found. Please disambiguate using IDs: ${customActions.map((customAction: CustomAction) => customAction.Id).join(', ')}`;
+      }
+
       return customActions[0];
     }
-
-    if (customActions.length === 0) {
-      throw `No user custom action with title '${options.title}' found`;
-    }
-
-    throw `Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${customActions.map(a => a.Id).join(', ')}`;
   }
 
   private humanizeScope(scope: number): string {
