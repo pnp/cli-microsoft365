@@ -213,6 +213,17 @@ If you want to get involved with helping us grow the CLI, whether that is sugges
 
 Checkout our [Wiki](https://github.com/pnp/cli-microsoft365/wiki) for guides on how to contribute to this project.
 
+## Need Help?
+
+<h4 align="center">
+  Join our community
+</h4>
+<p align="center">
+  <a href="https://discord.gg/35HTFJ544b">
+    <img alt="Discord" src="./docs/docs/images/discord-logo.png" width="100"/>
+  </a>
+</p>
+
 ## Microsoft 365 Platform Community
 
 CLI for Microsoft 365 is a [Microsoft 365 Platform Community](https://pnp.github.io) (PnP) project. Microsoft 365 Platform Community is a virtual team consisting of Microsoft employees and community members focused on helping the community make the best use of Microsoft products. CLI for Microsoft 365 is an open-source project not affiliated with Microsoft and not covered by Microsoft support. If you experience any issues using the CLI, please submit an issue in the [issues list](https://github.com/pnp/cli-microsoft365/issues).
