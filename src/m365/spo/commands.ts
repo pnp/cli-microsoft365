@@ -13,6 +13,7 @@ export default {
   APP_UNINSTALL: `${prefix} app uninstall`,
   APP_UPGRADE: `${prefix} app upgrade`,
   APPLICATIONCUSTOMIZER_ADD: `${prefix} applicationcustomizer add`,
+  APPLICATIONCUSTOMIZER_GET: `${prefix} applicationcustomizer get`,
   APPLICATIONCUSTOMIZER_LIST: `${prefix} applicationcustomizer list`,
   APPPAGE_ADD: `${prefix} apppage add`,
   APPPAGE_SET: `${prefix} apppage set`,
