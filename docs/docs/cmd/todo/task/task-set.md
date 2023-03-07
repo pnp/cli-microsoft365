@@ -51,6 +51,10 @@ m365 todo task set [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+When you specify the values for `categories`, each category can correspond to the displayName property of an [outlookCategory](https://learn.microsoft.com/en-us/graph/api/resources/outlookcategory?view=graph-rest-1.0). It is permissible to use distinct names.
+
 ## Examples
 
 Update a task with title _New task_ to _Update doco_ in Microsoft To Do tasks list with a specific name
