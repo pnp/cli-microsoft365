@@ -15,13 +15,13 @@ m365 spo orgnewssite set [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
 Using the `-u, --url` option you can specify which site to add to the list of organizational news sites.
 
+!!! important
+    To use this command you have to have permissions to access the tenant admin site.
+    
 ## Examples
 
 Set a site as an organizational news site

@@ -31,9 +31,6 @@ m365 spfx doctor [options]
 `--debug`
 : Runs command with debug logging
 
-!!! important
-    Checks ran by this command are based on what is officially supported by Microsoft. It's possible that using different package managers or packages versions will work just fine.
-
 ## Remarks
 
 This commands helps you to verify if your environment meets all prerequisites for building solutions using a particular version of the SharePoint Framework.
@@ -45,6 +42,9 @@ Based on the determined version of the SharePoint Framework, the command will lo
 If you miss any required tools or use a version that doesn't meet the SharePoint Framework requirements, the command will give you a list of recommendation how to address these issues.
 
 Next to verifying the readiness of your environment to use a particular version of the SharePoint Framework, you can also check if the version of the SharePoint Framework that you use is compatible with the specific version of SharePoint. Supported versions are `sp2016`, `sp2019` and `spo`.
+
+!!! important
+    Checks ran by this command are based on what is officially supported by Microsoft. It's possible that using different package managers or packages versions will work just fine.
 
 !!! important
     This command supports only text output.

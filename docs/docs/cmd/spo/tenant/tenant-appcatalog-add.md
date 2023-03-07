@@ -27,9 +27,6 @@ m365 spo tenant appcatalog add [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
 If there is an app catalog registered in your tenant, creating a new app catalog using this command will fail, unless you use the `force` option.
@@ -38,6 +35,9 @@ If you use the `force` option, and either the app catalog or the site at the spe
 
 Creating an app catalog site might take a while. If you need to wait for the site to be created before continuing, use the `wait` option.
 
+!!! important
+    To use this command you have to have permissions to access the tenant admin site.
+    
 ## Examples
 
 Creates new app catalog. Will fail if another app catalog or site at the specified URL exists
