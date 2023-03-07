@@ -113,7 +113,7 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
       listItemInstances = await request.get<ListItemInstanceCollection>(reqOptions);
     }
     catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+      return this.handleRejectedODataJsonPromise(err);
     }
 
     if (listItemInstances) {
@@ -128,6 +128,9 @@ class SpoTenantApplicationCustomizerGetCommand extends SpoCommand {
       listItemInstances.value.forEach(v => delete v['ID']);
 
       logger.log(listItemInstances.value[0]);
+    }
+    else {
+      throw new CommandError('The specified application customizer was not found');
     }
   }
 }

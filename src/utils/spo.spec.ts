@@ -277,7 +277,7 @@ describe('utils/spo', () => {
     assert.deepEqual(tenantAppCatalogUrl, 'https://contoso.sharepoint.com/sites/appcatalog');
   });
 
-  it('retrieves tenant app catalog url when not set', async () => {
+  it('returns null when tenant app catalog not configured', async () => {
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
@@ -301,6 +301,33 @@ describe('utils/spo', () => {
       }
 
       return Promise.reject(errorMessage);
+    });
+
+    spo
+      .getTenantAppCatalogUrl(logger, false)
+      .then(() => {
+        done('Expected error');
+      }, (err: string) => {
+        try {
+          assert.strictEqual(err, errorMessage);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('handles error when retrieving the tenant app catalog URL fails', (done) => {
+    const errorMessage = 'Couldn\'t retrieve tenant app catalog URL';
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
+        return Promise.reject(errorMessage);
+      }
+
+      return Promise.reject('Invalid request');
     });
 
     spo
