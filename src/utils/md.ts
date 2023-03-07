@@ -4,13 +4,13 @@ import * as path from 'path';
 
 function convertTitle(md: string): string {
   return md.replace(/^#\s+(.*)/gm, (match, title: string) => {
-    return title.toLocaleUpperCase() + EOL + Array(title.length + 1).join('=');
+    return '\x1b[1m' + title.toLocaleUpperCase() + EOL + Array(title.length + 1).join('=') + '\x1b[0m';
   });
 }
 
 function convertHeadings(md: string): string {
   return md.replace(/^(#+)\s+(.*)/gm, (match, level, content: string) => {
-    return `${EOL}${content.toLocaleUpperCase()}`;
+    return `${EOL}\x1b[1m${content.toLocaleUpperCase()}\x1b[0m`;
   });
 }
 
@@ -34,7 +34,7 @@ function convertDd(md: string): string {
 }
 
 function convertHyperlinks(md: string): string {
-  return md.replace(/\[([^\]]+)\]\(([^\)]+)\)/gm, (match, label: string, url: string) => {
+  return md.replace(/(?!\[1m)(?!\[0m)\[([^\]]+)\]\(([^\)]+)\)/gm, (match, label: string, url: string) => {
     // if the link is the same as the content, return just the link
     if (label === url) {
       return url;
