@@ -30,13 +30,13 @@ m365 spo term get [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
 When retrieving term by its ID, it's sufficient to specify just the ID. When retrieving it by its name however, you need to specify the parent term group and term set using either their names or IDs.
 
+!!! important
+    To use this command you have to have permissions to access the tenant admin site.
+    
 ## Examples
 
 Get information about a taxonomy term using its ID
