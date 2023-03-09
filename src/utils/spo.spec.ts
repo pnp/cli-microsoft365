@@ -729,7 +729,7 @@ describe('utils/spo', () => {
       });
   });
 
-  //# region Custom Action Mock Responses
+  //#region Custom Action Mock Responses
   const customActionOnSiteResponse1 = { "ClientSideComponentId": "d1e5e0d6-109d-40c4-a53e-924073fe9bbd", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "a6c7bef2-42d5-405c-a89f-6e36b3c302b3", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 2, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" };
   const customActionOnSiteResponse2 = { "ClientSideComponentId": "230edcf5-2df5-480f-9707-ae1118726912", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "06d3eebb-6e30-4346-aecd-f84a342a9316", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 2, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" };
   const customActionOnWebResponse1 = { "ClientSideComponentId": "b41916e7-e69d-467f-b37f-ff8ecf8f99f2", "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}", "CommandUIExtension": null, "Description": null, "Group": null, "Id": "8b86123a-3194-49cf-b167-c044b613a48a", "ImageUrl": null, "Location": "ClientSideExtension.ApplicationCustomizer", "Name": "YourName", "RegistrationId": null, "RegistrationType": 0, "Rights": { "High": "0", "Low": "0" }, "Scope": 3, "ScriptBlock": null, "ScriptSrc": null, "Sequence": 0, "Title": "YourAppCustomizer", "Url": null, "VersionOfUserCustomAction": "16.0.1.0" };
@@ -737,7 +737,7 @@ describe('utils/spo', () => {
 
   const customActionsOnSiteResponse = [customActionOnSiteResponse1, customActionOnSiteResponse2];
   const customActionsOnWebResponse = [customActionOnWebResponse1, customActionOnWebResponse2];
-  //# endregion
+  //#endregion
 
   it(`returns a list of custom actions with scope 'All'`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
