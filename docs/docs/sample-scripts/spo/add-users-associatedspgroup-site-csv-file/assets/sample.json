@@ -5,7 +5,7 @@
     "title": "Add users to the Associated SharePoint Groups of a site from a CSV File",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/add-users-associatedspgroup-site-csv-file",
     "creationDateTime": "2021-10-16",
-    "updateDateTime": "2021-10-16",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Script which adds multiple users to associated SharePoint groups.",
     "longDescription": [
       "This is a script which adds multiple users to associated SharePoint groups (Owners, Members, Visitors) of a site from a CSV file."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

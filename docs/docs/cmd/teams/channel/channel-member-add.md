@@ -23,10 +23,10 @@ m365 teams channel member add [options]
 : The display name of the Microsoft Teams team channel. Specify either `channelId` or `channelName`, but not both.
 
 `--userId [userId]`
-: The user's ID or principal name. You can also pass a comma separated list of userIds.
+: The user's ID or principal name. You can also pass a comma-separated list of userIds.
 
 `--userDisplayName [userDisplayName]`
-: The display name of a user. You can also pass a comma separated list of display names.
+: The display name of a user. You can also pass a comma-separated list of display names.
 
 `--owner`
 : Assign the user the owner role. Defaults to member permissions.

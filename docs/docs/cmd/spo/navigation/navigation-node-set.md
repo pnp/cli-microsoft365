@@ -23,7 +23,7 @@ m365 spo navigation node set [options]
 : New URL of the navigation node.
 
 `--audienceIds [audienceIds]`
-: Comma separated list of group IDs that will be used for audience targeting. Speficy an empty string `""` to clear this value. The limit is 10 ids per navigation node.
+: Comma-separated list of group IDs that will be used for audience targeting. Speficy an empty string `""` to clear this value. The limit is 10 ids per navigation node.
 
 `--isExternal [isExternal]`
 : Whether the navigation node points to an external URL. Valid values: `true` or `false`.

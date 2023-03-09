@@ -33,7 +33,10 @@ So what if you could bypass all these steps for both Graph and owned API?
 === "PowerShell"
 
     ```powershell
-    m365 login # Don't execute that command if you're already logged in
+    $m365Status = m365 status --output text
+    if ($m365Status -eq "Logged Out") {
+      m365 login
+    }
 
     # Granting Microsoft Graph permissions
     $resourceName = "Microsoft Graph"
@@ -52,7 +55,7 @@ So what if you could bypass all these steps for both Graph and owned API?
         
       # If permission already granted, you'll face an OAuth permission issue
       # So you can test the presence of the scope for the requested resource to prevent the error
-      $scopeToAdd = m365 spo sp grant list --query "[?Resource == '${resourceName}' && Scope == '${permission}']"
+      $scopeToAdd = m365 spo serviceprincipal grant list --query "[?Resource == '${resourceName}' && Scope == '${permission}']"
       if ($scopeToAdd -eq "") {
         m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
         Write-Host "Permission '${permission}' for Resource '${resourceName}' granted" -ForegroundColor Green
@@ -78,7 +81,7 @@ So what if you could bypass all these steps for both Graph and owned API?
 
       # If permission already granted, you'll face an OAuth permission issue
       # So you can test the presence of the scope for the requested resource to prevent the error
-      $scopeToAdd = m365 spo sp grant list --query "[?Resource == '${resourceName}' && Scope == '${permission}']"
+      $scopeToAdd = m365 spo serviceprincipal grant list --query "[?Resource == '${resourceName}' && Scope == '${permission}']"
       if ($scopeToAdd -eq "") {
         m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
         Write-Host "Permission '${permission}' for Resource '${resourceName}' granted" -ForegroundColor Green
@@ -114,7 +117,7 @@ So what if you could bypass all these steps for both Graph and owned API?
 
       # If permission already granted, you'll face an OAuth permission issue
       # So you can test the presence of the scope for the requested resource to prevent the error
-      scopeToAdd=$( m365 spo sp grant list --query "[?Resource == '$resourceName' && Scope == '${permission}']" )
+      scopeToAdd=$( m365 spo serviceprincipal grant list --query "[?Resource == '$resourceName' && Scope == '${permission}']" )
       if [ "$( [ -z "$scopeToAdd" ] && echo "Empty" )" == "Empty" ]; then
         m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
         echo -e "${GREEN}Permission '${permission}' for Resource '${resourceName}' granted${NOCOLOR}"
@@ -136,7 +139,7 @@ So what if you could bypass all these steps for both Graph and owned API?
       
       # If permission already granted, you'll face an OAuth permission issue
       # So you can test the presence of the scope for the requested resource to prevent the error
-      scopeToAdd=$( m365 spo sp grant list --query "[?Resource == '$resourceName' && Scope == '${permission}']" )
+      scopeToAdd=$( m365 spo serviceprincipal grant list --query "[?Resource == '$resourceName' && Scope == '${permission}']" )
       if [ "$( [ -z "$scopeToAdd" ] && echo "Empty" )" == "Empty" ]; then
         m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
         echo -e "${GREEN}Permission '${permission}' for Resource '${resourceName}' granted${NOCOLOR}"

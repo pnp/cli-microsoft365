@@ -5,7 +5,7 @@
     "title": "CLI - Add App Catalog to SharePoint site",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/add-app-catalog",
     "creationDateTime": "2020-03-28",
-    "updateDateTime": "2020-03-28",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Script will create an app catalog for that site.",
     "longDescription": [
       "When you just want to deploy certain SharePoint solution to a specific site, it's required to create an app catalog for that site. The below script will create it for the site. In the article referenced above you can check where you can use App catalog for the site instead of global app catalog."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

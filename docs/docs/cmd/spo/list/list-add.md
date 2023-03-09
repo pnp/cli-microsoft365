@@ -13,8 +13,8 @@ m365 spo list add [options]
 `-t, --title <title>`
 : Title of the list to add.
 
-`--baseTemplate <baseTemplate>`
-: The list definition type on which the list is based. Allowed values `Announcements`, `Contacts`, `CustomGrid`, `DataSources`,`DiscussionBoard`, `DocumentLibrary`, `Events`, `GanttTasks`, `GenericList`, `IssuesTracking`, `Links`, `NoCodeWorkflows`,`PictureLibrary`, `Survey`, `Tasks`, `WebPageLibrary`, `WorkflowHistory`, `WorkflowProcess`, `XmlForm`. Default `GenericList`.
+`--baseTemplate [baseTemplate]`
+: The list definition type on which the list is based. Allowed values `Announcements`, `Contacts`, `CustomGrid`, `DataSources`,`DiscussionBoard`, `DocumentLibrary`, `Events`, `GanttTasks`, `GenericList`, `IssuesTracking`, `Links`, `NoCodeWorkflows`,`PictureLibrary`, `Survey`, `Tasks`, `WebPageLibrary`, `WorkflowHistory`, `WorkflowProcess`, `XmlForm`. Default value is `GenericList`.
 
 `-u, --webUrl <webUrl>`
 : URL of the site where the list should be added.

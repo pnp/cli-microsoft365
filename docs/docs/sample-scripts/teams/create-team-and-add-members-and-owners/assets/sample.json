@@ -5,7 +5,7 @@
     "title": "Create a Microsoft Teams team and bulk add members from CSV file",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/create-team-and-add-members-and-owners",
     "creationDateTime": "2021-04-10",
-    "updateDateTime": "2021-04-10",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This sample script shows you how to create a Team and add members and owners using a CSV.",
     "longDescription": [
       "This sample script shows you how to create a Team and add members and owners using a CSV."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

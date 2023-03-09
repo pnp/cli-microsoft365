@@ -5,7 +5,7 @@
     "title": "CLI - List all external users in all site collections",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-site-externalusers",
     "creationDateTime": "2021-03-15",
-    "updateDateTime": "2021-03-15",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script helps you to list all external users in all SharePoint Online sites.",
     "longDescription": [
       "This script helps you to list all external users in all SharePoint Online sites. It provides insights in who the users are, and if available who they where invited by."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

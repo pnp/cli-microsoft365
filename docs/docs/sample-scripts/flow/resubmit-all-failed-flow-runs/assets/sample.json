@@ -5,7 +5,7 @@
     "title": "Resubmit all failed flow runs for a flow in an environment",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/flow/resubmit-all-failed-flow-runs",
     "creationDateTime": "2021-06-04",
-    "updateDateTime": "2021-06-04",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script will resubmit all failed flow runs.",
     "longDescription": [
       "This script will resubmit all failed flow runs of a Power Automate flow created in an environment. Pass the Flow environment id and the flow guid as parameter while running the script."
@@ -20,7 +20,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

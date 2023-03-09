@@ -5,7 +5,7 @@
     "title": "Share social champions to Teams",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/share-socialchampions",
     "creationDateTime": "2021-08-12",
-    "updateDateTime": "2021-08-12",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Retrieves activities for SharePoint Online, Teams and Yammer and shares the top 3 contributors for each category as an adaptive card to the specified webhook url.",
     "longDescription": [
       "Retrieves activities for SharePoint Online, Teams and Yammer and shares the top 3 contributors for each category as an adaptive card to the specified webhook url."
@@ -23,7 +23,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

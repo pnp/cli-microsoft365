@@ -20,7 +20,7 @@ Note: TenantWideExtensionDisabled column denotes the extension is enabled or dis
 
     $appCatalogUrl = m365 spo tenant appcatalogurl get
     $filterQuery = "Title eq '" + $extensionName + "'"
-    $appItems = m365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields "Id,Title" --filter $filterQuery --output json
+    $appItems = m365 spo listitem list --listTitle $listName --webUrl $appCatalogUrl --fields "Id,Title" --filter $filterQuery --output json
     $extItems = $appItems.Replace("Id", "ExtId") | ConvertFrom-JSON
 
     if ($extItems.count -gt 0) {
@@ -44,7 +44,7 @@ Note: TenantWideExtensionDisabled column denotes the extension is enabled or dis
 
     appCatalogUrl=$(m365 spo tenant appcatalogurl get)
     filterQuery="Title eq '$extensionName'"
-    appItemsJson=$(m365 spo listitem list --title "$listName" --webUrl "$appCatalogUrl" --fields "Id,Title" --filter "$filterQuery" --output json)
+    appItemsJson=$(m365 spo listitem list --listTitle "$listName" --webUrl "$appCatalogUrl" --fields "Id,Title" --filter "$filterQuery" --output json)
     appItemId=( $(jq -r '.[].Id' <<< $appItemsJson))
 
     if [[ $appItemId -gt 0 ]]

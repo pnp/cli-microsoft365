@@ -5,7 +5,7 @@
     "title": "Lists active SharePoint site collection application catalogs",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-site-app-catalogs",
     "creationDateTime": "2019-11-16",
-    "updateDateTime": "2019-11-16",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Script will find all installed site collection application catalogs within a tenant.",
     "longDescription": [
       "A sample that shows how to find all installed site collection application catalogs within a tenant. IT Professionals or DevOps can benefit from it when they govern tenants or scan tenant for customizations. Pulling a list with site collection app catalogs can give them valuable information at what scale the tenant site collections are customized. The sample outputs the URL of the site collection, and this can help IT Pros or DevOps to dig deeper and find out what and how many solution packages a site collection app catalog has installed. Check for un-healthy solution packages or such that could be a security risk."
@@ -20,7 +20,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

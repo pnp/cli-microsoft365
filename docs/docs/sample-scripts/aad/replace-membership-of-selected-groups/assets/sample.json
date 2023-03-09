@@ -5,7 +5,7 @@
     "title": "CLI - Replace a user's membership in selected Microsoft 365 Groups or Teams",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/replace-membership-of-selected-groups",
     "creationDateTime": "2021-05-04",
-    "updateDateTime": "2021-05-04",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script can be used to replace the membership of a user for a selected list of Groups.",
     "longDescription": [
       "This script can be used to replace the membership of a user for a selected list of Groups. It might be useful when a person changes role in an organization or is about to leave it."
@@ -24,7 +24,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

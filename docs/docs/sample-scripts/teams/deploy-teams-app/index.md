@@ -20,7 +20,7 @@ Installs or updates a Microsoft Teams app from an Azure DevOps pipeline. Deploys
     $app = $apps | Where-Object { $_.externalId -eq $env:APPID}
     if ($app -eq $null) {
       # install app
-      m365 teams app publish -p  $(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip
+      m365 teams app publish -p $(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip
     } else {
       # update app
       m365 teams app update -i $app.id -p $(System.DefaultWorkingDirectory)/teams-app-CI/package/teams-app.zip

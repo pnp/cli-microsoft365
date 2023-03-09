@@ -5,7 +5,7 @@
     "title": "List all failed site design for all sites",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-failed-sitedesigns",
     "creationDateTime": "2021-07-05",
-    "updateDateTime": "2021-07-05",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Script iterates through all site collections and lists all site design runs with errors.",
     "longDescription": [
       "The following script iterates through all site collections and lists all site design runs with errors. By filtering on `OutcomeCode == '1'` it will return all sites and runs with explicit errors. By filtering on `OutcomeCode != '0'` you can also return any result that is not marked as successful."
@@ -20,7 +20,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

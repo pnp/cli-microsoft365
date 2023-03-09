@@ -35,7 +35,7 @@ Note: Refactor the code as per your requirement.
         If ($action -eq "add") {
 
             If ($role -eq "owner") {
-                m365 aad o365group user add --groupId $group.id --userName $user.mail --role Owner; 
+                m365 aad o365group user add --groupId $group.id --userName $user.mail --role Owner
                 Write-Host $user.mail " added as owner in " $group.mailNickname
             }
             ElseIf ($role -eq "member") {
