@@ -423,11 +423,10 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Azure%20AD%20Group%20name'&$select=id`) {
         return Promise.resolve({
           value: [{
-            id: 'Group name',
-            displayName: '00000000-0000-0000-0000-000000000000'
+            id: 'Group name'
           }]
         });
       }
@@ -507,6 +506,6 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         groupId: 32,
         userId: 9
       }
-    }), new CommandError(`Resource not added to the group because the following resources don't exist: 9`));
+    }), new CommandError(`Resource not added to the group because the following resource don't exist: 9`));
   });
 });

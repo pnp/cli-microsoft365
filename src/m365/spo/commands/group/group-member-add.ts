@@ -195,60 +195,52 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       });
   }
 
-  private getValidUsers(args: CommandArgs, logger: Logger): Promise<string[]> {
+  private async getValidUsers(args: CommandArgs, logger: Logger): Promise<string[]> {
     if (this.verbose) {
       logger.logToStderr(`Checking if the specified users exist`);
     }
 
     const validUserNames: string[] = [];
-    const invalidUserNames: string[] = [];
-    const identifiers: string = args.options.userName || args.options.email || args.options.aadGroupId! || args.options.aadGroupName! || args.options.userId!.toString();
+    const identifiers: string = args.options.userName ?? args.options.email ?? args.options.aadGroupId ?? args.options.aadGroupName ?? args.options.userId!.toString();
 
-    return Promise
-      .all(identifiers.split(',').map(async identifier => {
-        const trimmedIdentifier = identifier.trim();
-        try {
-          if (args.options.userId) {
-            if (this.verbose) {
-              logger.logToStderr(`Get UPN from SharePoint for user ${trimmedIdentifier}`);
-            }
-            const spoUser = await spo.getUserById(args.options.webUrl, trimmedIdentifier);
-            validUserNames.push(spoUser.UserPrincipalName);
+    await Promise.all(identifiers.split(',').map(async identifier => {
+      const trimmedIdentifier = identifier.trim();
+      try {
+        if (args.options.userId) {
+          if (this.verbose) {
+            logger.logToStderr(`Getting UPN of user ${trimmedIdentifier}`);
           }
-          else if (args.options.userName) {
-            validUserNames.push(trimmedIdentifier);
-          }
-          else if (args.options.aadGroupId) {
-            validUserNames.push(trimmedIdentifier);
-          }
-          else if (args.options.aadGroupName) {
-            if (this.verbose) {
-              logger.logToStderr(`Get UPN from Azure AD for group ${trimmedIdentifier}`);
-            }
-            const group = await aadGroup.getGroupByDisplayName(trimmedIdentifier);
-            validUserNames.push(group.id!);
-          }
-          else {
-            if (this.verbose) {
-              logger.logToStderr(`Get UPN from Azure AD for user ${trimmedIdentifier}`);
-            }
-            const upn = await aadUser.getUserUpnByEmail(trimmedIdentifier);
-            validUserNames.push(upn);
-          }
+          const spoUser = await spo.getUserById(args.options.webUrl, trimmedIdentifier);
+          validUserNames.push(spoUser.UserPrincipalName);
         }
-        catch (err: any) {
-          invalidUserNames.push(identifier);
+        else if (args.options.userName) {
+          validUserNames.push(trimmedIdentifier);
+        }
+        else if (args.options.aadGroupId) {
+          validUserNames.push(trimmedIdentifier);
+        }
+        else if (args.options.aadGroupName) {
+          if (this.verbose) {
+            logger.logToStderr(`Getting ID of Azure AD group ${trimmedIdentifier}`);
+          }
+          const groupId = await aadGroup.getGroupIdByDisplayName(trimmedIdentifier);
+          validUserNames.push(groupId);
+        }
+        else {
+          if (this.verbose) {
+            logger.logToStderr(`Get UPN from Azure AD for user ${trimmedIdentifier}`);
+          }
+          const upn = await aadUser.getUserUpnByEmail(trimmedIdentifier);
+          validUserNames.push(upn);
+        }
+        return null;
+      }
+      catch (err: any) {
+        throw `Resource not added to the group because the following resource don't exist: ${identifier}`;
+      }
+    }));
 
-          return err;
-        }
-      }))
-      .then((): Promise<string[]> => {
-        if (invalidUserNames.length > 0) {
-          return Promise.reject(`Resource not added to the group because the following resources don't exist: ${invalidUserNames.join(', ')}`);
-        }
-
-        return Promise.resolve(validUserNames);
-      });
+    return validUserNames;
   }
 
   private getFormattedUserList(activeUserList: string[]): any {
