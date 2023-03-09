@@ -954,6 +954,22 @@ export class Cli {
     return response;
   }
 
+  public static async interactivePrompt(interactive: boolean, promptMessage: string, errorMessage: string, values: any[]): Promise<string> {
+    if (!interactive) {
+      throw errorMessage;
+    }
+
+    const response = await Cli.prompt<{ list: string }>({
+      type: 'list',
+      name: 'list',
+      default: 0,
+      message: promptMessage,
+      choices: values
+    });
+
+    return response.list;
+  }
+
   private static removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {
     const filteredArgs = JSON.parse(JSON.stringify(args));
     const optionsToRemove: string[] = Object.getOwnPropertyNames(args.options)
