@@ -146,6 +146,10 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
       }
 
       if (args.options.openInNewWindow !== undefined) {
+        if (this.verbose) {
+          logger.logToStderr(`Making sure that the navigation node opens in a new window.`);
+        }
+
         let menuState = await spo.getQuickLaunchMenuState(args.options.webUrl);
         let menuStateItem = this.getMenuStateNode(menuState.Nodes, args.options.id);
         if (!menuStateItem) {
@@ -153,8 +157,6 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
           menuStateItem = this.getMenuStateNode(menuState.Nodes, args.options.id);
         }
         menuStateItem!.OpenInNewWindow = args.options.openInNewWindow;
-        logger.log(menuStateItem);
-        logger.log(menuState);
         await spo.saveMenuState(args.options.webUrl, menuState);
       }
     }

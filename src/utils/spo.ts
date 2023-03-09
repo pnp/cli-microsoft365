@@ -702,7 +702,7 @@ export const spo = {
    * @param webUrl Web url
    */
   async getQuickLaunchMenuState(webUrl: string): Promise<MenuState> {
-    return await this.getMenuState(webUrl);
+    return this.getMenuState(webUrl);
   },
 
   /**
@@ -710,7 +710,7 @@ export const spo = {
    * @param webUrl Web url
    */
   async getTopNavigationMenuState(webUrl: string): Promise<MenuState> {
-    return await this.getMenuState(webUrl, '1002');
+    return this.getMenuState(webUrl, '1002');
   },
 
   /**
@@ -734,7 +734,7 @@ export const spo = {
       responseType: 'json'
     };
 
-    return await request.post(requestOptions);
+    return request.post<MenuState>(requestOptions);
   },
 
   /**
@@ -744,7 +744,7 @@ export const spo = {
   */
   async saveMenuState(webUrl: string, menuState: MenuState): Promise<void> {
     const requestOptions: CliRequestOptions = {
-      url: `${webUrl}/_api/Navigation/SaveMenuState`,
+      url: `${webUrl}/_api/navigation/SaveMenuState`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -752,6 +752,6 @@ export const spo = {
       responseType: 'json'
     };
 
-    return await request.post(requestOptions);
+    return request.post(requestOptions);
   }
 };

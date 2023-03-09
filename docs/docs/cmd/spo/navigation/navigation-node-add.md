@@ -31,6 +31,9 @@ m365 spo navigation node add [options]
 `--audienceIds [audienceIds]`
 : Comma-separated list of group IDs that will be used for audience targeting. The limit is 10 ids per navigation node.
 
+`--openInNewWindow`
+: Set, if the link has to be opened in a new window.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -51,16 +54,16 @@ Add a navigation node pointing to an external page to the quick launch
 m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
 ```
 
-Add a navigation node below an existing node
+Add a navigation node below an existing node and opens it in a new window
 
 ```sh
-m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx
+m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx --openInNewWindow
 ```
 
-Add a navigation node to the top navigation which is audience targetted
+Add a navigation node to the top navigation which is audience targetted and open it in a new window
 
 ```sh
-m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx --audienceIds "7aa4a1ca-4035-4f2f-bac7-7beada59b5ba,4bbf236f-a131-4019-b4a2-315902fcfa3a"
+m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx --audienceIds "7aa4a1ca-4035-4f2f-bac7-7beada59b5ba,4bbf236f-a131-4019-b4a2-315902fcfa3a" --openInNewWindow
 ```
 
 ## Response

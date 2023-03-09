@@ -45,11 +45,12 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        isExternal: args.options.isExternal,
+        isExternal: !!args.options.isExternal,
         location: typeof args.options.location !== 'undefined',
         parentNodeId: typeof args.options.parentNodeId !== 'undefined',
         audienceIds: typeof args.options.audienceIds !== 'undefined',
-        url: typeof args.options.url !== 'undefined'
+        url: typeof args.options.url !== 'undefined',
+        openInNewWindow: !!args.options.openInNewWindow
       });
     });
   }
@@ -164,39 +165,45 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         let menuState: MenuState | undefined;
         let menuStateItem: MenuStateNode | undefined;
         if (args.options.parentNodeId) {
-          /*const parentNode = this.getParentNode(menuState.Nodes, args.options.parentNodeId, res.Id);
-          menuStateItem = parentNode!.Nodes.find((node: MenuStateNode) => node.Key === res.Id.toString());*/
+          menuState = await spo.getQuickLaunchMenuState(args.options.webUrl);
+          menuStateItem = this.getMenuStateNode(menuState.Nodes, res.Id.toString());
+          if (!menuStateItem) {
+            menuState = await spo.getTopNavigationMenuState(args.options.webUrl);
+            menuStateItem = this.getMenuStateNode(menuState.Nodes, res.Id.toString());
+          }
         }
         else {
           if (args.options.location === 'QuickLaunch') {
             menuState = await spo.getQuickLaunchMenuState(args.options.webUrl);
+            menuStateItem = this.getMenuStateNode(menuState.Nodes, res.Id.toString());
           }
           else {
             menuState = await spo.getTopNavigationMenuState(args.options.webUrl);
+            menuStateItem = this.getMenuStateNode(menuState.Nodes, res.Id.toString());
           }
-          menuStateItem = menuState.Nodes.find((node: MenuStateNode) => node.Key === res.Id.toString());
         }
         menuStateItem!.OpenInNewWindow = true;
         await spo.saveMenuState(args.options.webUrl, menuState!);
       }
-      //logger.log(res);
+
+      logger.log(res);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private getParentNode(nodes: MenuStateNode[], parentNodeId: number, id: number): MenuStateNode {
-    let parentNode = nodes.find((node: MenuStateNode) => node.Key === parentNodeId.toString());
-    if (parentNode === undefined) {
+  private getMenuStateNode(nodes: MenuStateNode[], id: string): MenuStateNode {
+    let menuNode = nodes.find((node: MenuStateNode) => node.Key !== null && node.Key === id);
+    if (menuNode === undefined) {
       for (const node of nodes.filter(node => node.Nodes.length > 0)) {
-        parentNode = this.getParentNode(node.Nodes, parentNodeId, id);
-        if (parentNode) {
+        menuNode = this.getMenuStateNode(node.Nodes, id);
+        if (menuNode) {
           break;
         }
       }
     }
-    return parentNode!;
+    return menuNode!;
   }
 }
 
