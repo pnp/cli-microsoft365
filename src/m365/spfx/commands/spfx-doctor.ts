@@ -628,22 +628,22 @@ class SpfxDoctorCommand extends BaseProjectCommand {
       });
   }
 
-  private checkSharePointFrameworkVersion(spfxVersionRequested: string, fixes: string[], logger: Logger): Promise<void> {
-    return this
-      .getPackageVersion('@microsoft/generator-sharepoint', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger)
-      .then((spfxVersionDetected: string): void => {
-        const versionCheck: VersionCheck = {
-          range: spfxVersionRequested,
-          fix: `npm i -g @microsoft/generator-sharepoint@${spfxVersionRequested}`
-        };
-        if (spfxVersionDetected) {
-          this.checkStatus(`SharePoint Framework`, spfxVersionDetected, versionCheck, OptionalOrRequired.Required, fixes, logger);
-        }
-        else {
-          logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework v${spfxVersionRequested} not found`));
-          fixes.push(versionCheck.fix);
-        }
-      });
+  private async checkSharePointFrameworkVersion(spfxVersionRequested: string, fixes: string[], logger: Logger): Promise<void> {
+    let spfxVersionDetected = this.getSPFxVersionFromYoRcFile(logger);
+    if (!spfxVersionDetected) {
+      spfxVersionDetected = await this.getPackageVersion('@microsoft/generator-sharepoint', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger);
+    }
+    const versionCheck: VersionCheck = {
+      range: spfxVersionRequested,
+      fix: `npm i -g @microsoft/generator-sharepoint@${spfxVersionRequested}`
+    };
+    if (spfxVersionDetected) {
+      this.checkStatus(`SharePoint Framework`, spfxVersionDetected, versionCheck, OptionalOrRequired.Required, fixes, logger);
+    }
+    else {
+      logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework v${spfxVersionRequested} not found`));
+      fixes.push(versionCheck.fix);
+    }
   }
 
   private checkYo(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
@@ -703,15 +703,26 @@ class SpfxDoctorCommand extends BaseProjectCommand {
     return (<any>SharePointVersion)[sp.toUpperCase()];
   }
 
-  private async getSharePointFrameworkVersion(logger: Logger): Promise<string> {
+  private getSPFxVersionFromYoRcFile(logger: Logger): string | undefined {
     if (this.projectRootPath !== null) {
       const spfxVersion = this.getProjectVersion();
       if (spfxVersion) {
+        if (this.debug) {
+          logger.logToStderr(`SPFx version retrieved from .yo-rc.json file. Retrieved version: ${spfxVersion}`);
+        }
         return spfxVersion;
       }
     }
+    return undefined;
+  }
+
+  private async getSharePointFrameworkVersion(logger: Logger): Promise<string> {
+    let spfxVersion = this.getSPFxVersionFromYoRcFile(logger);
+    if (spfxVersion) {
+      return spfxVersion;
+    }
     try {
-      const spfxVersion = await this.getPackageVersion('@microsoft/sp-core-library', PackageSearchMode.LocalOnly, HandlePromise.Fail, logger);
+      spfxVersion = await this.getPackageVersion('@microsoft/sp-core-library', PackageSearchMode.LocalOnly, HandlePromise.Fail, logger);
       if (this.debug) {
         logger.logToStderr(`Found @microsoft/sp-core-library@${spfxVersion}`);
       }
