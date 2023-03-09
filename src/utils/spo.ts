@@ -10,7 +10,6 @@ import { formatting } from './formatting';
 import { CustomAction } from '../m365/spo/commands/customaction/customaction';
 import { odata } from './odata';
 import { MenuState } from '../m365/spo/commands/navigation/NavigationNode';
-import { Cli } from '../cli/Cli';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
@@ -699,26 +698,45 @@ export const spo = {
   },
 
   /**
-   * Retrieves the menu state.
+   * Retrieves the menu state for the quick launch.
    * @param webUrl Web url
    */
-  async getMenuState(webUrl: string, location?: string): Promise<MenuState> {
+  async getQuickLaunchMenuState(webUrl: string): Promise<MenuState> {
+    return await this.getMenuState(webUrl);
+  },
+
+  /**
+   * Retrieves the menu state for the top navigation.
+   * @param webUrl Web url
+   */
+  async getTopNavigationMenuState(webUrl: string): Promise<MenuState> {
+    return await this.getMenuState(webUrl, '1002');
+  },
+
+  /**
+   * Retrieves the menu state.
+   * @param webUrl Web url
+   * @param menuNodeKey Menu node key
+   */
+  async getMenuState(webUrl: string, menuNodeKey?: string): Promise<MenuState> {
+    const requestBody = {
+      customProperties: null,
+      depth: 10,
+      mapProviderName: null,
+      menuNodeKey: menuNodeKey || null
+    };
     const requestOptions: CliRequestOptions = {
-      url: `${webUrl}/_api/Navigation/MenuState`,
+      url: `${webUrl}/_api/navigation/MenuState`,
       headers: {
-        accept: 'application/json;odata=minimalmetadata'
+        accept: 'application/json;odata=nometadata'
       },
-      data: {
-        customProperties: null,
-        depth: 10,
-        mapProviderName: null,
-        menuNodeKey: '1002'
-      },
+      data: requestBody,
       responseType: 'json'
     };
 
-    return await request.get(requestOptions);
+    return await request.post(requestOptions);
   },
+
   /**
   * Saves the menu state.
   * @param webUrl Web url

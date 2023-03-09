@@ -146,11 +146,13 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
       }
 
       if (args.options.openInNewWindow !== undefined) {
-        const menuState = await spo.getMenuState(args.options.webUrl);
-        const menuStateItem = this.getMenuStateNode(menuState.Nodes, args.options.id);
-        logger.log('False:' + args.options.openInNewWindow);
+        let menuState = await spo.getQuickLaunchMenuState(args.options.webUrl);
+        let menuStateItem = this.getMenuStateNode(menuState.Nodes, args.options.id);
+        if (!menuStateItem) {
+          menuState = await spo.getTopNavigationMenuState(args.options.webUrl);
+          menuStateItem = this.getMenuStateNode(menuState.Nodes, args.options.id);
+        }
         menuStateItem!.OpenInNewWindow = args.options.openInNewWindow;
-        menuStateItem.OpenInNewWindow;
         logger.log(menuStateItem);
         logger.log(menuState);
         await spo.saveMenuState(args.options.webUrl, menuState);
