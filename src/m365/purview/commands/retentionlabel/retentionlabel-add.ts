@@ -160,8 +160,8 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
       defaultRecordBehavior: defaultRecordBehavior
     };
 
-    if (args.options.retentionTrigger && args.options.retentionTrigger === 'dateOfEvent') {
-      const eventTypeId = await this.getEventType(args);
+    if (args.options.retentionTrigger === 'dateOfEvent') {
+      const eventTypeId = await this.getEventType(args, logger);
       requestBody['retentionEventType@odata.bind'] = `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${eventTypeId}`;
     }
 
@@ -198,8 +198,6 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    logger.log(requestOptions);
-
     try {
       const response = await request.post(requestOptions);
       logger.log(response);
@@ -209,9 +207,13 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
     }
   }
 
-  private async getEventType(args: CommandArgs): Promise<string> {
+  private async getEventType(args: CommandArgs, logger: Logger): Promise<string> {
     if (args.options.eventTypeId) {
       return args.options.eventTypeId;
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving the event type id for event type ${args.options.eventTypeName}`);
     }
 
     const eventTypes = await odata.getAllItems(`${this.resource}/beta/security/triggerTypes/retentionEventTypes`);
@@ -219,10 +221,6 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
 
     if (filteredEventTypes.length === 0) {
       throw `The specified retention event type '${args.options.eventTypeName}' does not exist.`;
-    }
-
-    if (filteredEventTypes.length > 1) {
-      throw `Multiple retention event types with name '${args.options.eventTypeName}' found: ${filteredEventTypes.map((x: any) => x.id).join(',')}`;
     }
 
     return filteredEventTypes[0].id;

@@ -82,49 +82,6 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     ]
   };
 
-  const multipleEventTypesResponse = {
-    value: [
-      {
-        displayName: "Retention Event Type",
-        description: "",
-        createdDateTime: "2023-02-02T15:47:54Z",
-        lastModifiedDateTime: "2023-02-02T15:47:54Z",
-        id: "81fa91bd-66cd-4c6c-b0cb-71f37210dc74",
-        createdBy: {
-          user: {
-            id: "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
-            displayName: null
-          }
-        },
-        lastModifiedBy: {
-          user: {
-            id: "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
-            displayName: null
-          }
-        }
-      },
-      {
-        displayName: "Retention Event Type",
-        description: "",
-        createdDateTime: "2023-02-02T15:47:54Z",
-        lastModifiedDateTime: "2023-02-02T15:47:54Z",
-        id: "feec29f2-aed0-4c5a-95f8-f10f178c0e13",
-        createdBy: {
-          user: {
-            id: "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
-            displayName: null
-          }
-        },
-        lastModifiedBy: {
-          user: {
-            id: "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
-            displayName: null
-          }
-        }
-      }
-    ]
-  };
-
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -292,27 +249,6 @@ describe(commands.RETENTIONLABEL_ADD, () => {
         eventTypeName: eventTypeName
       }
     }), new CommandError(`The specified retention event type '${eventTypeName}' does not exist.`));
-  });
-
-  it('throws error when multiple retention event types found with name', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if ((opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes`)) {
-        return (multipleEventTypesResponse);
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        displayName: displayName,
-        behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
-        actionAfterRetentionPeriod: actionAfterRetentionPeriod,
-        retentionDuration: retentionDuration,
-        retentionTrigger: "dateOfEvent",
-        eventTypeName: eventTypeName
-      }
-    }), new CommandError(`Multiple retention event types with name '${eventTypeName}' found: 81fa91bd-66cd-4c6c-b0cb-71f37210dc74,feec29f2-aed0-4c5a-95f8-f10f178c0e13`));
   });
 
   it('adds retention label with all options', async () => {
