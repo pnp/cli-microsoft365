@@ -6,6 +6,7 @@ import { accessToken } from '../../../../utils/accessToken';
 import auth from '../../../../Auth';
 import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
+import { odata } from '../../../../utils/odata';
 
 interface CommandArgs {
   options: Options;
@@ -13,7 +14,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   displayName: string;
-  eventType: string;
+  eventTypeId?: string;
+  eventTypeName?: string;
   description?: string;
   triggerDateTime?: string;
   assetIds?: string;
@@ -35,6 +37,7 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initOptions(): void {
@@ -43,7 +46,10 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
         option: '-n, --displayName <displayName>'
       },
       {
-        option: '-t, --eventType <eventType>'
+        option: '-i, --eventTypeId [eventTypeId]'
+      },
+      {
+        option: '-e, --eventTypeName [eventTypeName]'
       },
       {
         option: '-d, --description [description]'
@@ -87,6 +93,12 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
     });
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['eventTypeId', 'eventTypeName'] }
+    );
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.');
@@ -101,12 +113,15 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
     if (args.options.assetIds) {
       eventQueries.push({ queryType: "files", query: args.options.assetIds });
     }
+
     if (args.options.keywords) {
       eventQueries.push({ queryType: "messages", query: args.options.keywords });
     }
 
+    const eventTypeId = await this.getEventTypeId(logger, args);
+
     const data = {
-      'retentionEventType@odata.bind': `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${args.options.eventType}`,
+      'retentionEventType@odata.bind': `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${eventTypeId}`,
       displayName: args.options.displayName,
       description: args.options.description,
       eventQueries: eventQueries,
@@ -129,6 +144,30 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
+  }
+
+  private async getEventTypeId(logger: Logger, args: CommandArgs): Promise<string> {
+    if (args.options.eventTypeId) {
+      return args.options.eventTypeId;
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving the event type id for event type ${args.options.eventTypeName}`);
+    }
+
+    const items: any = await odata.getAllItems(`${this.resource}/beta/security/triggers/retentionEvents`);
+
+    const eventTypes = items.filter((x: any) => x.displayName === args.options.eventTypeName);
+
+    if (eventTypes.length === 0) {
+      throw `The specified event type '${args.options.eventTypeName}' does not exist.`;
+    }
+
+    if (eventTypes.length > 1) {
+      throw `Multiple event types with name '${args.options.eventTypeName}' found: ${eventTypes.map((x: any) => x.id).join(',')}`;
+    }
+
+    return eventTypes[0].id;
   }
 }
 

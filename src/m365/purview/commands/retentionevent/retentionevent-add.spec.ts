@@ -19,7 +19,8 @@ describe(commands.RETENTIONEVENT_ADD, () => {
   const validAssetIds = "filesQuery,filesQuery1";
   const validKeyswords = "messagesQuery,messagesQuery1";
   const validDate = "2023-04-02T15:47:54Z";
-  const validType = "Event type";
+  const validTypeId = "81fa91bd-66cd-4c6c-b0cb-71f37210dc74";
+  const validTypeName = "Event type";
   const EventResponse = {
     "displayName": "Event display name",
     "description": "Event description",
@@ -55,6 +56,73 @@ describe(commands.RETENTIONEVENT_ADD, () => {
         "displayName": "John Doe"
       }
     }
+  };
+
+  const eventTypeResponse = {
+    value: [
+      {
+        "displayName": validTypeName,
+        "description": "",
+        "createdDateTime": "2023-02-02T15:47:54Z",
+        "lastModifiedDateTime": "2023-02-02T15:47:54Z",
+        "id": "81fa91bd-66cd-4c6c-b0cb-71f37210dc74",
+        "createdBy": {
+          "user": {
+            "id": "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
+            "displayName": null
+          }
+        },
+        "lastModifiedBy": {
+          "user": {
+            "id": "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
+            "displayName": null
+          }
+        }
+      }
+    ]
+  };
+
+  const multipleEventTypeResponse = {
+    value: [
+      {
+        "displayName": validTypeName,
+        "description": "",
+        "createdDateTime": "2023-02-02T15:47:54Z",
+        "lastModifiedDateTime": "2023-02-02T15:47:54Z",
+        "id": validTypeId,
+        "createdBy": {
+          "user": {
+            "id": "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
+            "displayName": null
+          }
+        },
+        "lastModifiedBy": {
+          "user": {
+            "id": "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
+            "displayName": null
+          }
+        }
+      },
+      {
+        "displayName": validTypeName,
+        "description": "",
+        "createdDateTime": "2023-02-02T15:47:54Z",
+        "lastModifiedDateTime": "2023-02-02T15:47:54Z",
+        "id": "88aeab1e-e291-4744-a991-a533daab75aa",
+        "createdBy": {
+          "user": {
+            "id": "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
+            "displayName": null
+          }
+        },
+        "lastModifiedBy": {
+          "user": {
+            "id": "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
+            "displayName": null
+          }
+        }
+      }
+    ]
   };
 
   let log: string[];
@@ -95,7 +163,8 @@ describe(commands.RETENTIONEVENT_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       accessToken.isAppOnlyAccessToken,
-      request.post
+      request.post,
+      request.get
     ]);
   });
 
@@ -118,17 +187,17 @@ describe(commands.RETENTIONEVENT_ADD, () => {
   });
 
   it('fails validation if date is not a valid ISO date string', async () => {
-    const actual = await command.validate({ options: { displayName: validDisplayName, eventType: validType, description: validDescription, triggerDateTime: "Not a valid date", assetIds: validAssetIds } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: "Not a valid date", assetIds: validAssetIds } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if assetId or keywords is not provided', async () => {
-    const actual = await command.validate({ options: { displayName: validDisplayName, eventType: validType, description: validDescription, triggerDateTime: validDate } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: validDate } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if a correct ISO date string is entered', async () => {
-    const actual = await command.validate({ options: { displayName: validDisplayName, eventType: validType, description: validDescription, triggerDateTime: validDate, assetIds: validAssetIds } }, commandInfo);
+    const actual = await command.validate({ options: { displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: validDate, assetIds: validAssetIds } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -141,7 +210,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: validDisplayName, eventType: validType, assetIds: validAssetIds } });
+    await command.action(logger, { options: { displayName: validDisplayName, eventTypeId: validTypeId, assetIds: validAssetIds } });
     assert(loggerLogSpy.calledWith(EventResponse));
   });
 
@@ -154,7 +223,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { displayName: validDisplayName, eventType: validType, keywords: validKeyswords } });
+    await command.action(logger, { options: { displayName: validDisplayName, eventTypeId: validTypeId, keywords: validKeyswords } });
     assert(loggerLogSpy.calledWith(EventResponse));
   });
 
@@ -167,7 +236,28 @@ describe(commands.RETENTIONEVENT_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { verbose: true, displayName: validDisplayName, eventType: validType, description: validDescription, triggerDateTime: validDate, assetIds: validAssetIds, keywords: validKeyswords } });
+    await command.action(logger, { options: { verbose: true, displayName: validDisplayName, eventTypeId: validTypeId, description: validDescription, triggerDateTime: validDate, assetIds: validAssetIds, keywords: validKeyswords } });
+    assert(loggerLogSpy.calledWith(EventResponse));
+  });
+
+  it('adds retention event with minimal required parameters and assetIds based on event type name', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+        return EventResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+        return eventTypeResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { verbose: true, displayName: validDisplayName, eventTypeName: validTypeName, assetIds: validAssetIds } });
     assert(loggerLogSpy.calledWith(EventResponse));
   });
 
@@ -177,6 +267,34 @@ describe(commands.RETENTIONEVENT_ADD, () => {
 
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError(`This command does not support application permissions.`));
+  });
+
+  it('throws error when multiple event types with same name were found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+        return multipleEventTypeResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: { displayName: validDisplayName, eventTypeName: validTypeName, assetIds: validAssetIds }
+    }), new CommandError(`Multiple event types with name '${validTypeName}' found: ${multipleEventTypeResponse.value.map(x => x.id).join(',')}`));
+  });
+
+  it('throws error when no event type found', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
+        return ({ "value": [] });
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: { displayName: validDisplayName, eventTypeName: validTypeName, assetIds: validAssetIds }
+    }), new CommandError(`The specified event type '${validTypeName}' does not exist.`));
   });
 
   it('correctly handles random API error', async () => {
@@ -189,7 +307,7 @@ describe(commands.RETENTIONEVENT_ADD, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        displayName: validDisplayName, eventType: validType, assetIds: validAssetIds
+        displayName: validDisplayName, eventTypeId: validTypeId, assetIds: validAssetIds
       }
     }), new CommandError(error.error.message));
   });

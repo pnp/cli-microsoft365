@@ -13,8 +13,11 @@ m365 purview retentionevent add [options]
 `-n, --displayName <displayName>`
 : The display name of the event
 
-`-t, --eventType <eventType>`
-: Name of the event type associated with the event
+`-e, --eventTypeName [eventTypeName]`
+: Name of the event type associated with the event. Specify either `eventTypeId` or `eventTypeName` but not both.
+
+`-i, --eventTypeId [eventTypeId]`
+: Id of the event type associated with the event. Specify either `eventTypeId` or `eventTypeName` but not both.
 
 `-d, --description [description]`
 : A description for the event
@@ -22,7 +25,7 @@ m365 purview retentionevent add [options]
 `--triggerDateTime [triggerDateTime]`
 : Optional time when the event should be triggered.
 
-`-a, --assetIds [assetIds`
+`-a, --assetIds [assetIds]`
 : The Asset IDs for items in SharePoint and OneDrive that are related to this event. Only items that have labels associated with the event type you chose will be retained. Specify `assetIds` and/or `keywords`, but at least one.
 
 `-k, --keywords [keywords]`
