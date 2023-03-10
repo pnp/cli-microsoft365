@@ -62,21 +62,23 @@ describe(commands.GROUP_MEMBER_ADD, () => {
   };
 
   const spoUserInformation: any = {
-    Id: 9,
-    IsHiddenInUI: false,
-    LoginName: "i:0#.f|membership|Alex.Wilber@contoso.com",
-    Title: "Alex Wilber",
-    PrincipalType: 1,
-    Email: "",
-    Expiration: "",
-    IsEmailAuthenticationGuestUser: false,
-    IsShareByEmailGuestUser: false,
-    IsSiteAdmin: false,
-    UserId: {
-      NameId: "10032002529a911c",
-      NameIdIssuer: "urn:federation:microsoftonline"
-    },
-    UserPrincipalName: "Alex.Wilber@contoso.com"
+    AadObjectId: {
+      NameId: '6cc1797e-5463-45ec-bb1a-b93ec198bab6',
+      NameIdIssuer: 'urn:federation:microsoftonline'
+    }
+  };
+
+  const jsonGenericError =
+  {
+    ErrorMessage: "The selected permission level is not valid.",
+    IconUrl: null,
+    InvitedUsers: null,
+    Name: null,
+    PermissionsPageRelativeUrl: null,
+    StatusCode: -63,
+    UniquelyPermissionedUsers: null,
+    Url: null,
+    UsersAddedToGroup: null
   };
 
   before(() => {
@@ -298,7 +300,7 @@ describe(commands.GROUP_MEMBER_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/siteusers/GetById('9')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/siteusers/GetById('9')?$select=AadObjectId`) {
         return Promise.resolve(spoUserInformation);
       }
 
@@ -353,8 +355,8 @@ describe(commands.GROUP_MEMBER_ADD, () => {
 
   it('adds user to a SharePoint Group by groupName and email (DEBUG)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq 'Alex.Wilber%40contoso.com'&$select=userPrincipalName`) {
-        return Promise.resolve({ value: [{ userPrincipalName: "Alex.Wilber@contoso.com" }] });
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq 'Alex.Wilber%40contoso.com'&$select=id`) {
+        return Promise.resolve({ value: [{ id: "2056d2f6-3257-4253-8cfc-b73393e414e5" }] });
       }
 
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetByName(`) > -1) {
@@ -507,5 +509,33 @@ describe(commands.GROUP_MEMBER_ADD, () => {
         userId: 9
       }
     }), new CommandError(`Resource not added to the group because the following resource don't exist: 9`));
+  });
+
+  it('handles error when adding user to SharePoint Group group', async () => {
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
+        opts.data) {
+        return Promise.resolve(jsonGenericError);
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')`) {
+        return Promise.resolve({
+          Id: 32
+        });
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        userName: "Alex.Wilber@contoso.com"
+      }
+    }), new CommandError(`The selected permission level is not valid.`));
   });
 });

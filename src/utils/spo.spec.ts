@@ -828,35 +828,24 @@ describe('utils/spo', () => {
 
   //# region Custom Action Mock Responses
   const spoUserResponse: any = {
-    Id: 9,
-    IsHiddenInUI: false,
-    LoginName: "i:0#.f|membership|Alex.Wilber@contoso.com",
-    Title: "Alex Wilber",
-    PrincipalType: 1,
-    Email: "",
-    Expiration: "",
-    IsEmailAuthenticationGuestUser: false,
-    IsShareByEmailGuestUser: false,
-    IsSiteAdmin: false,
-    UserId: {
-      NameId: "10032002529a911c",
-      NameIdIssuer: "urn:federation:microsoftonline"
-    },
-    UserPrincipalName: "Alex.Wilber@contoso.com"
+    AadObjectId: {
+      NameId: '6cc1797e-5463-45ec-bb1a-b93ec198bab6',
+      NameIdIssuer: 'urn:federation:microsoftonline'
+    }
   };
   //# endregion
 
   it(`retrieves a user by email`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/siteusers/GetById('9')`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/siteusers/GetById('9')?$select=AadObjectId`) {
         return Promise.resolve(spoUserResponse);
       }
 
       return Promise.reject('Invalid request');
     });
 
-    const customAction = await spo.getUserById('https://contoso.sharepoint.com/sites/sales', '9');
-    assert.deepEqual(customAction, spoUserResponse);
+    const customAction = await spo.getUserAzureIdBySpoId('https://contoso.sharepoint.com/sites/sales', '9');
+    assert.deepEqual(customAction, spoUserResponse.AadObjectId.NameId);
   });
 
   it(`throws error retrieving a custom action by id with a wrong scope value`, async () => {

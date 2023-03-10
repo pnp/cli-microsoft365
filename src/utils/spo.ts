@@ -667,9 +667,9 @@ export const spo = {
    * @param webUrl Web url
    * @param id The Id of the user
    */
-  async getUserById(webUrl: string, id: string): Promise<any> {
+  async getUserAzureIdBySpoId(webUrl: string, id: string): Promise<any> {
     const requestOptions: any = {
-      url: `${webUrl}/_api/web/siteusers/GetById('${formatting.encodeQueryParameter(id)}')`,
+      url: `${webUrl}/_api/web/siteusers/GetById('${formatting.encodeQueryParameter(id)}')?$select=AadObjectId`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -677,8 +677,8 @@ export const spo = {
       responseType: 'json'
     };
 
-    const res = await request.get<any>(requestOptions);
+    const res = await request.get<{ AadObjectId: { NameId: string, NameIdIssuer: string } }>(requestOptions);
 
-    return res;
+    return res.AadObjectId.NameId;
   }
 };

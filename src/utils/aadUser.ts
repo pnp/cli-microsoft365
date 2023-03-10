@@ -27,22 +27,22 @@ export const aadUser = {
 
   /**
   * Retrieve a single user.
-  * @param mail User E - mail.
+  * @param mail User E-mail.
   */
-  async getUserUpnByEmail(email: string): Promise<string> {
+  async getUserIdByEmail(email: string): Promise<string> {
     const requestOptions: CliRequestOptions = {
-      url: `${graphResource}/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(email)}'&$select=userPrincipalName`,
+      url: `${graphResource}/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(email)}'&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
-    const res = await request.get<{ value: { userPrincipalName: string }[] }>(requestOptions);
+    const res = await request.get<{ value: { id: string }[] }>(requestOptions);
 
     if (res.value.length === 0) {
       throw `The specified user with e-mail ${email} does not exist`;
     }
 
-    return res.value[0].userPrincipalName;
+    return res.value[0].id;
   }
 };

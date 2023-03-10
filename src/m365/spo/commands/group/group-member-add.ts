@@ -157,6 +157,9 @@ class SpoGroupMemberAddCommand extends SpoCommand {
       };
 
       const sharingResult = await request.post<SharingResult>(requestOptions);
+      if (sharingResult.ErrorMessage !== null) {
+        throw sharingResult.ErrorMessage;
+      }
 
       logger.log(sharingResult.UsersAddedToGroup);
     }
@@ -210,8 +213,8 @@ class SpoGroupMemberAddCommand extends SpoCommand {
           if (this.verbose) {
             logger.logToStderr(`Getting UPN of user ${trimmedIdentifier}`);
           }
-          const spoUser = await spo.getUserById(args.options.webUrl, trimmedIdentifier);
-          validUserNames.push(spoUser.UserPrincipalName);
+          const spoUserAzureId = await spo.getUserAzureIdBySpoId(args.options.webUrl, trimmedIdentifier);
+          validUserNames.push(spoUserAzureId);
         }
         else if (args.options.userName) {
           validUserNames.push(trimmedIdentifier);
@@ -230,7 +233,7 @@ class SpoGroupMemberAddCommand extends SpoCommand {
           if (this.verbose) {
             logger.logToStderr(`Get UPN from Azure AD for user ${trimmedIdentifier}`);
           }
-          const upn = await aadUser.getUserUpnByEmail(trimmedIdentifier);
+          const upn = await aadUser.getUserIdByEmail(trimmedIdentifier);
           validUserNames.push(upn);
         }
         return null;
