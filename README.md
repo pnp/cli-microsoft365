@@ -15,7 +15,7 @@
       alt="GitHub" />
   </a>
 
-  <a href="https://discord.com/invite/7rfW4kg6B5">
+  <a href="https://discord.gg/35HTFJ544b">
     <img src="https://img.shields.io/badge/Discord-Join-7289da?style=flat-square"
       alt="Discord" />
   </a>
