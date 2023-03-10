@@ -14,6 +14,10 @@
 - [flow owner list](../cmd/flow/owner/owner-list.md) - lists all owners of a Power Automate flow [#4558](https://github.com/pnp/cli-microsoft365/issues/4558)
 - [flow owner remove](../cmd/flow/owner/owner-remove.md) - removes owner permissions to a Power Automate flow [#4560](https://github.com/pnp/cli-microsoft365/issues/4560)
 
+**SharePoint:**
+
+- [spo tenant applicationcustomizer get](../cmd/spo/tenant/tenant-applicationcustomizer-get.md) - Get an application customizer that is installed tenant wide [#4243](https://github.com/pnp/cli-microsoft365/issues/4243)
+
 ### Changes
 
 - enhanced 'spo term get' command [#4346](https://github.com/pnp/cli-microsoft365/issues/4346)
