@@ -8,7 +8,11 @@ import { FileProperties } from './FileProperties';
 import { formatting } from '../../../../utils/formatting';
 import { urlUtil } from '../../../../utils/urlUtil';
 import { spo } from '../../../../utils/spo';
+import { Options as SpoListItemRetentionLabelEnsureCommandOptions } from '../listitem/listitem-retentionlabel-ensure';
+import * as SpoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure';
 import { ListItemRetentionLabel } from '../listitem/ListItemRetentionLabel';
+import { Cli } from '../../../../cli/Cli';
+import Command from '../../../../Command';
 
 interface CommandArgs {
   options: Options;
@@ -105,21 +109,19 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
         await this.applyAssetId(args.options.webUrl, fileProperties.ListItemAllFields.ParentList.Id, fileProperties.ListItemAllFields.Id, args.options.assetId);
       }
 
-      const requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(fileProperties.ListItemAllFields.ParentList.Id)}')/items(${fileProperties.ListItemAllFields.Id})/SetComplianceTag()`;
-
-      const requestOptions: CliRequestOptions = {
-        url: requestUrl,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        data: labelInformation,
-        responseType: 'json'
+      const options: SpoListItemRetentionLabelEnsureCommandOptions = {
+        webUrl: args.options.webUrl,
+        listId: fileProperties.ListItemAllFields.ParentList.Id,
+        listItemId: fileProperties.ListItemAllFields.Id,
+        name: args.options.name,
+        output: 'json',
+        debug: this.debug,
+        verbose: this.verbose
       };
 
-      const response = await request.post(requestOptions);
-
+      const spoListItemRetentionLabelEnsureCommandOutput = await Cli.executeCommandWithOutput(SpoListItemRetentionLabelEnsureCommand as Command, { options: { ...options, _: [] } });
       if (this.verbose) {
-        logger.log(response);
+        logger.logToStderr(spoListItemRetentionLabelEnsureCommandOutput.stderr);
       }
     }
     catch (err: any) {

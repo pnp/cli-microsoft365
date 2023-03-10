@@ -60,7 +60,7 @@ Applies a retention label to a list item in a given site based on the server rel
 m365 spo listitem retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/lists/TestList --listItemId 1 --name 'Some label'
 ```
 
-Applies a retention label to a list item in a given site based on the server relative list url and with the asset id
+Applies a retention label to a list item in a given site based on the server relative list url and updates the Asset Id field
 
 ```sh
 m365 spo listitem retentionlabel ensure --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl /sites/project-x/lists/TestList --listItemId 1 --name 'Some label' --assetId 'XYZ'

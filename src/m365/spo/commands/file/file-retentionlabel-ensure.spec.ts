@@ -12,6 +12,7 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import * as SpoListItemRetentionLabelEnsureCommand from '../listitem/listitem-retentionlabel-ensure';
 const command: Command = require('./file-retentionlabel-ensure');
 
 describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
@@ -20,6 +21,7 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   const fileId = 'b2307a39-e878-458b-bc90-03bc578531d6';
   const listId = 1;
   const retentionlabelName = "retentionlabel";
+  const SpoListItemRetentionLabelEnsureCommandOutput = `{ "stdout": "", "stderr": "" }`;
   const fileResponse = {
     ListItemAllFields: {
       Id: listId,
@@ -27,10 +29,6 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
         Id: '75c4d697-bbff-40b8-a740-bf9b9294e5aa'
       }
     }
-  };
-
-  const retentionEnsureResponse = {
-    "odata.null": true
   };
 
   const retentionLabelResponse = {
@@ -122,7 +120,8 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post
+      request.post,
+      Cli.executeCommandWithOutput
     ]);
   });
 
@@ -158,11 +157,14 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
     });
 
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${fileResponse.ListItemAllFields.ParentList.Id}')/items(${listId})/SetComplianceTag()`) {
-        return retentionEnsureResponse;
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoListItemRetentionLabelEnsureCommand) {
+        return ({
+          stdout: SpoListItemRetentionLabelEnsureCommandOutput
+        });
       }
-      throw 'Invalid request';
+
+      throw new CommandError('Unknown case');
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -187,11 +189,14 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${fileResponse.ListItemAllFields.ParentList.Id}')/items(${listId})/SetComplianceTag()`) {
-        return retentionEnsureResponse;
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoListItemRetentionLabelEnsureCommand) {
+        return ({
+          stdout: SpoListItemRetentionLabelEnsureCommandOutput
+        });
       }
-      throw 'Invalid request';
+
+      throw new CommandError('Unknown case');
     });
 
     await assert.doesNotReject(command.action(logger, {
@@ -217,12 +222,18 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
       throw 'Invalid request';
     });
 
-
-    sinon.stub(request, 'post').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${fileResponse.ListItemAllFields.ParentList.Id}')/items(${listId})/SetComplianceTag()`) {
-        return retentionEnsureResponse;
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoListItemRetentionLabelEnsureCommand) {
+        return ({
+          stdout: SpoListItemRetentionLabelEnsureCommandOutput
+        });
       }
 
+      throw new CommandError('Unknown case');
+    });
+
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${fileResponse.ListItemAllFields.ParentList.Id}')/items(${listId})/ValidateUpdateListItem()`) {
         return {
           "value": [
@@ -290,6 +301,16 @@ describe(commands.FILE_RETENTIONLABEL_ENSURE, () => {
       }
 
       throw 'Invalid request';
+    });
+
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake(async (command): Promise<any> => {
+      if (command === SpoListItemRetentionLabelEnsureCommand) {
+        return ({
+          stdout: SpoListItemRetentionLabelEnsureCommandOutput
+        });
+      }
+
+      throw new CommandError('Unknown case');
     });
 
 
