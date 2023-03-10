@@ -109,7 +109,7 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
       }
 
       let url = args.options.url;
-      if (!url) {
+      if (url === '') {
         url = 'http://linkless.header/';
       }
 
@@ -134,7 +134,7 @@ class SpoNavigationNodeSetCommand extends SpoCommand {
       };
 
       const response = await request.patch<any>(requestOptions);
-      if (response && response['odata.null'] === true) {
+      if (response['odata.null'] === true) {
         throw `Navigation node does not exist.`;
       }
     }

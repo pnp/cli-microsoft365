@@ -20,7 +20,7 @@ m365 spo navigation node add [options]
 : Navigation node title.
 
 `--url [url]`
-: Navigation node URL. When not specified a linkless label will be created
+: Navigation node URL. When not specified a linkless label will be created.
 
 `--parentNodeId [parentNodeId]`
 : ID of the node below which the node should be added. Specify either `location` or `parentNodeId` but not both.

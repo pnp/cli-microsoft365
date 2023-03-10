@@ -81,7 +81,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     };
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
-        return;
+        return '';
       }
 
       throw 'Invalid request';
@@ -99,12 +99,12 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     };
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
-        return;
+        return '';
       }
 
       throw 'Invalid request';
     });
-    await command.action(logger, { options: { webUrl: webUrl, id: id, audienceIds: "" } } as any);
+    await command.action(logger, { options: { webUrl: webUrl, id: id, audienceIds: "", url: "" } } as any);
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
   });
 
@@ -116,7 +116,7 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     };
     const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
-        return;
+        return '';
       }
 
       throw 'Invalid request';

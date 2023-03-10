@@ -174,8 +174,8 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       "IsExternal": false,
       "IsVisible": true,
       "ListTemplateType": 0,
-      "Title": "About",
-      "Url": "/sites/team-a/sitepages/about.aspx"
+      "Title": title,
+      "Url": nodeUrl
     };
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/topnavigationbar`) {
@@ -198,7 +198,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       "IsExternal": false,
       "IsVisible": true,
       "ListTemplateType": 0,
-      "Title": "About",
+      "Title": title,
       "Url": "http://linkless.header/"
     };
     sinon.stub(request, 'post').callsFake(async (opts) => {
@@ -209,7 +209,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       throw 'Invalid request';
     });
 
-    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, url: "", audienceIds: audienceIds, verbose: true } });
+    await command.action(logger, { options: { webUrl: webUrl, location: 'TopNavigationBar', title: title, verbose: true } });
     assert(loggerLogSpy.calledWith(nodeAddResponse));
   });
 

@@ -20,7 +20,7 @@ m365 spo navigation node set [options]
 : New title of the navigation node.
 
 `--url [url]`
-: New URL of the navigation node. When not specified a linkless label will be created
+: New URL of the navigation node. specify an empty string `""` to update the navigation label to a linkless label.
 
 `--audienceIds [audienceIds]`
 : Comma separated list of group IDs that will be used for audience targeting. Speficy an empty string `""` to clear this value. The limit is 10 ids per navigation node.

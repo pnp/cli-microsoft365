@@ -127,10 +127,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       logger.logToStderr(`Adding navigation node...`);
     }
 
-    let url = args.options.url;
-    if (!url) {
-      url = 'http://linkless.header/';
-    }
+    const url = args.options.url ?? 'http://linkless.header/';
 
     const nodesCollection: string = args.options.parentNodeId ?
       `GetNodeById(${args.options.parentNodeId})/Children` :
