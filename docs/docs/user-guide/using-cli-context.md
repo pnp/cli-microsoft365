@@ -1,57 +1,52 @@
 # Use CLI for Microsoft 365 context
 
-CLI for Microsoft 365 context provides unique functionality to save any kind of option and its value you might use for any command. The options saved in the context may be used in any kind of command execution, that way you may provide less or no options. It may be especially useful in scenarios where you many times use the same option in multiple commands or you would like to group all commands parameters in a single file that are used in the a script file.
+CLI for Microsoft 365 context provides unique functionality to save any kind of option and its value. The options saved in the context may be used in any kind of command execution, that way you may provide less or no options at all.
+It may be especially useful in scenarios where you many times use the same option in multiple commands or you would like to group all command parameters in a single file that is used in the script file.
+A context is saved in a m365rc.json file in your working directory. It can be committed to Source Control along with your script files. It can be managed by executing commands.
 
 ## How to get started
 
 In order to create an empty context we may execute the following command:
+
 ```powershell
 m365 context init
 ```
 
-To add or update an option in the context use the `m365 context option set` command. The `name` is used to define the option name and `value` is used to define its default value. For example, if we want to set `test list` value for option `listTitle` we should execute:
+To add or update an option in the context use the `m365 context option set` command. The `name` is used to define the option name and `value` is used to define its default value. For example, if we want to set the option `listTitle` to `test list`, we should execute:
+
 ```powershell
 m365 context option set --name 'listTitle' --value 'test list'
 ```
 
-In order to check what is defined in the context we may use the `m365 context option list` command.
+To remove the entire context we can execute the following command:
 
-To remove a specific option defined in the context we may run:
+```powershell
+m365 context option list
+```
+
+To remove a specific option from the context we can run:
+
 ```powershell
 m365 context option remove
 ```
 
 In order to remove the full context we may execute the following command:
+
 ```powershell
-m365 context remove
+m365 context option remove --name "listTitle"
+
 ```
 
 ## How does it work
 
-When a command is executed CLI will first check for the `.m365rc.json` file in the current directory (this is where the context is saved once you set any option). If present, CLI will parse the context object and check if any of the options defined in it may be used for the currently executed command. If yes CLI will execute this command with the option and its value taken from the context.
+When a command is executed CLI will first check for the `.m365rc.json` file in the working directory. If present, the CLI will check if any of the options defined in it may be used for the currently executed command. If that's the case the CLI will execute this command with the option and its value taken from the context.
 
-For example if we have the following context defined in the `.m365rc.json` file
-```json
-{
-  "context": {
-    "groupName": "test group",
-    "listTitle": "test list"
-  }
-}
-```
-
-And we will execute the following command:
-```powershell
-m365 spo listitem list --webUrl "https://contoso.sharepoint.com/sites/sample"
-```
-
-The command is missing the `listTitle` required option but instead of failing it will be executed as this option is present in the current context. The `groupName` option will not be used from the context as the `spo listitem list` command does not have it.
-
-When the same option is defined in the context and also in the command itself then the value defined in the command will be used.
+When an option is available in the context and also used in the command itself, the value defined in the command will take precedence.
 
 ## Example
 
-Considering the below context:
+Consider the below context:
+
 ```json
 {
   "context": {
@@ -62,11 +57,13 @@ Considering the below context:
 ```
 
 When we execute:
+
 ```powershell
 m365 context option set --name "webUrl" --value "https://contoso.sharepoint.com/sites/sales"
 ```
 
 The result of the above will be a new option added to the context:
+
 ```json
 {
   "context": {
@@ -78,6 +75,7 @@ The result of the above will be a new option added to the context:
 ```
 
 Next, if we execute the following:
+
 ```powershell
 m365 spo listitem list
 ```
@@ -85,6 +83,7 @@ m365 spo listitem list
 As a result, we will get a list of items from `Expense tracker` list from `https://contoso.sharepoint.com/sites/sales` even though we did not specify any of the required options, those were taken from the context.
 
 Now when we execute:
+
 ```powershell
 m365 spo listitem list --listTitle "Issue tracker"
 ```
@@ -92,6 +91,7 @@ m365 spo listitem list --listTitle "Issue tracker"
 We will get all items from list `Issue tracker` from `https://contoso.sharepoint.com/sites/sales` site.
 
 If we execute:
+
 ```powershell
 m365 spo list get
 ```
