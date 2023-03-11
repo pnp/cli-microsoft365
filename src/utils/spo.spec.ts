@@ -1012,29 +1012,4 @@ describe('utils/spo', () => {
 
     await assert.rejects(spo.getWebRetentionLabelInformationByName('https://contoso.sharepoint.com/sites/sales', 'Retention Label'), `Retention label not found`);
   });
-
-  it(`retrieves the web retention labels by name`, async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter('https://contoso.sharepoint.com/sites/sales')}'`) {
-        return retentionLabelResponse;
-      }
-
-      throw 'invalid request';
-    });
-
-    const retentionLabel = await spo.getWebRetentionLabelInformationById('https://contoso.sharepoint.com/sites/sales', 'f6e20c71-7d56-414d-bb98-8ee927a308bd');
-    assert.deepEqual(retentionLabel, retentionLabelOutput);
-  });
-
-  it('throws error message when no retention label was found by id', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter('https://contoso.sharepoint.com/sites/sales')}'`) {
-        return ({ value: [] });
-      }
-
-      throw `Invalid request`;
-    });
-
-    await assert.rejects(spo.getWebRetentionLabelInformationById('https://contoso.sharepoint.com/sites/sales', 'f6e20c71-7d56-414d-bb98-8ee927a308bd'), `Retention label not found`);
-  });
 });

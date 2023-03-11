@@ -720,25 +720,18 @@ export const spo = {
     } as ListItemRetentionLabel;
   },
 
-  async getWebRetentionLabelInformationById(webUrl: string, id: string): Promise<ListItemRetentionLabel> {
+  async getTenantAppCatalogUrl(logger: Logger, debug: boolean): Promise<string | null> {
+    const spoUrl = await spo.getSpoUrl(logger, debug);
 
-    const requestUrl: string = `${webUrl}/_api/SP.CompliancePolicy.SPPolicyStoreProxy.GetAvailableTagsForSite(siteUrl=@a1)?@a1='${formatting.encodeQueryParameter(webUrl)}'`;
+    const requestOptions: any = {
+      url: `${spoUrl}/_api/SP_TenantSettings_Current`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
 
-    const labels: SiteRetentionLabel[] = await odata.getAllItems(requestUrl);
-
-    const label = labels.find(l => l.TagId === id);
-
-    if (label === undefined) {
-      throw new Error(`The specified retention label does not exist`);
-    }
-
-    return {
-      complianceTag: label.TagName,
-      isTagPolicyHold: label.BlockDelete,
-      isTagPolicyRecord: label.BlockEdit,
-      isEventBasedTag: label.IsEventTag,
-      isTagSuperLock: label.SuperLock,
-      isUnlockedAsDefault: label.UnlockedAsDefault
-    } as ListItemRetentionLabel;
+    const result = await request.get<{ CorporateCatalogUrl: string }>(requestOptions);
+    return result.CorporateCatalogUrl;
   }
 };
