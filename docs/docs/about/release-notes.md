@@ -26,9 +26,14 @@
 - documentation improvements [#4521](https://github.com/pnp/cli-microsoft365/pull/4521)
 - added 'clientSideComponentId' option to 'spo customaction get' [#4382](https://github.com/pnp/cli-microsoft365/issues/4382)
 - added admin privileges to 'flow run list' command [#3709](https://github.com/pnp/cli-microsoft365/issues/3709)
-- fixes unhandled exception when file doesn't exist when using 'spo file move' [#4537](https://github.com/pnp/cli-microsoft365/issues/4537)
-- fixes baseTemplate option to be optional for command 'spo list add' [#4546](https://github.com/pnp/cli-microsoft365/issues/4546)
-- fixes listExperienceOptions and draftVersionVisibility options for 'spo list add' and 'spo list set' commands [#4562](https://github.com/pnp/cli-microsoft365/issues/4562)
+- fixed unhandled exception when file doesn't exist when using 'spo file move' [#4537](https://github.com/pnp/cli-microsoft365/issues/4537)
+- fixed baseTemplate option to be optional for command 'spo list add' [#4546](https://github.com/pnp/cli-microsoft365/issues/4546)
+- fixed listExperienceOptions and draftVersionVisibility options for 'spo list add' and 'spo list set' commands [#4562](https://github.com/pnp/cli-microsoft365/issues/4562)
+- included md output for 'teams message' until 'teams user commands' [#4305](https://github.com/pnp/cli-microsoft365/issues/4305)
+- added response output for 'outlook', 'planner' and 'skype' commands' [#3923](https://github.com/pnp/cli-microsoft365/issues/3923)
+- enhanced 'spfx doctor' command [#4213](https://github.com/pnp/cli-microsoft365/issues/4213)
+- fixed markdown output formatting in console [#4541](https://github.com/pnp/cli-microsoft365/issues/4541)
+- sanitized codebase with fictitious data [#4557](https://github.com/pnp/cli-microsoft365/issues/4557)
 
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
