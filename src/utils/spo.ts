@@ -9,8 +9,8 @@ import request, { CliRequestOptions } from "../request";
 import { formatting } from './formatting';
 import { CustomAction } from '../m365/spo/commands/customaction/customaction';
 import { odata } from './odata';
-import { ListItemRetentionLabel } from '../m365/spo/commands/listitem/ListItemRetentionLabel';
 import { SiteRetentionLabel } from '../m365/spo/commands/listitem/SiteRetentionLabel';
+import { ListItemRetentionLabel } from '../m365/spo/commands/listitem/ListItemRetentionLabel';
 
 export interface ContextInfo {
   FormDigestTimeoutSeconds: number;
