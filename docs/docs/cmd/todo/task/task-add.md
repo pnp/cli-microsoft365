@@ -38,7 +38,7 @@ m365 todo task add [options]
 : Comma-separated list of categories associated with the task.
 
 `--completedDateTime [completedDateTime]`
-: The date and time when the task was finished. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
+: The date and time when the task was finished. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`. This option can only be used when the `status` is set to `completed`.
 
 `--startDateTime [startDateTime]`
 : The date and time when the task is scheduled to start. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
@@ -50,7 +50,7 @@ m365 todo task add [options]
 
 ## Remarks
 
-When you specify the values for `categories`, each category can correspond to the displayName property of an [outlookCategory](https://learn.microsoft.com/en-us/graph/api/resources/outlookcategory?view=graph-rest-1.0). It is permissible to use distinct names.
+When you specify the values for `categories`, each category can correspond to the displayName property of an [outlookCategory](https://learn.microsoft.com/graph/api/resources/outlookcategory?view=graph-rest-1.0). It is permissible to use distinct names.
 
 ## Examples
 
@@ -81,7 +81,7 @@ m365 todo task add --title "New task" --listId "AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04
 Create a new task with categories, a completedDateTime, a startDateTime and a status
 
 ```sh
-m365 todo task add --title "New task" --listName "My task list" --categories "None,Preset24" --completedDateTime 2023-12-01 --startDateTime 2023-12-01 --status "notStarted"
+m365 todo task add --title "New task" --listName "My task list" --categories "Red category,Important" --completedDateTime 2023-12-01 --startDateTime 2023-12-01 --status "notStarted"
 ```
 
 ## Response
