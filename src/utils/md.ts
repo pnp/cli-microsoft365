@@ -1,16 +1,17 @@
+import chalk = require('chalk');
 import * as fs from 'fs';
 import { EOL } from 'os';
 import * as path from 'path';
 
 function convertTitle(md: string): string {
   return md.replace(/^#\s+(.*)/gm, (match, title: string) => {
-    return '\x1b[1m' + title.toLocaleUpperCase() + EOL + Array(title.length + 1).join('=') + '\x1b[0m';
+    return chalk.bold(title.toLocaleUpperCase()) + EOL + Array(title.length + 1).join('=');
   });
 }
 
 function convertHeadings(md: string): string {
   return md.replace(/^(#+)\s+(.*)/gm, (match, level, content: string) => {
-    return `${EOL}\x1b[1m${content.toLocaleUpperCase()}\x1b[0m`;
+    return `${EOL}${chalk.bold(content.toLocaleUpperCase())}`;
   });
 }
 
@@ -34,7 +35,7 @@ function convertDd(md: string): string {
 }
 
 function convertHyperlinks(md: string): string {
-  return md.replace(/(?!\[1m)(?!\[0m)\[([^\]]+)\]\(([^\)]+)\)/gm, (match, label: string, url: string) => {
+  return md.replace(/(?!\[1m)(?!\[22m)\[([^\]]+)\]\(([^\)]+)\)/gm, (match, label: string, url: string) => {
     // if the link is the same as the content, return just the link
     if (label === url) {
       return url;
