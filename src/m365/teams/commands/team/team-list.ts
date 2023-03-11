@@ -6,7 +6,6 @@ import { odata } from '../../../../utils/odata';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { Team } from '../../Team';
-
 interface CommandArgs {
   options: Options;
 }
@@ -23,6 +22,11 @@ class TeamsTeamListCommand extends GraphCommand {
   public get description(): string {
     return 'Lists Microsoft Teams in the current tenant';
   }
+
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'displayName', 'isArchived', 'description'];
+  }
+
 
   constructor() {
     super();
@@ -55,7 +59,7 @@ class TeamsTeamListCommand extends GraphCommand {
 
     try {
       const items = await odata.getAllItems<Group>(endpoint);
-      
+
       if (args.options.joined) {
         logger.log(items);
       }
@@ -69,7 +73,7 @@ class TeamsTeamListCommand extends GraphCommand {
         );
         logger.log(teamItems);
       }
-    } 
+    }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }
@@ -88,12 +92,7 @@ class TeamsTeamListCommand extends GraphCommand {
       request
         .get(requestOptions)
         .then((res: any): void => {
-          resolve({
-            id: group.id as string,
-            displayName: group.displayName as string,
-            isArchived: res.isArchived,
-            description: group.description as string
-          });
+          resolve(res);
         }, (err: any): void => {
           // If the user is not member of the team he/she cannot access it
           if (err.statusCode === 403) {
