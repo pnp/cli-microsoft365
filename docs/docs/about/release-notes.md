@@ -34,6 +34,10 @@
 - enhanced 'spfx doctor' command [#4213](https://github.com/pnp/cli-microsoft365/issues/4213)
 - fixed markdown output formatting in console [#4541](https://github.com/pnp/cli-microsoft365/issues/4541)
 - sanitized codebase with fictitious data [#4557](https://github.com/pnp/cli-microsoft365/issues/4557)
+- fixed 'spo group member add' command to work with security groups [#4507](https://github.com/pnp/cli-microsoft365/issues/4507)
+- enhanced 'spo navigation node add/set' with support for linkless labels [#4586](https://github.com/pnp/cli-microsoft365/issues/4586)
+- fixed 'spo folder roleinheritance reset' code tests [#4630](https://github.com/pnp/cli-microsoft365/issues/4630)
+- moved important admonitions in docs under remarks header [#4566](https://github.com/pnp/cli-microsoft365/issues/4566)
 
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
