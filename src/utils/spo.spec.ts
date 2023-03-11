@@ -262,6 +262,89 @@ describe('utils/spo', () => {
     });
   });
 
+  it('retrieves tenant app catalog url', async () => {
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
+        return Promise.resolve({ CorporateCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+
+    const tenantAppCatalogUrl = await spo.getTenantAppCatalogUrl(logger, false);
+    assert.deepEqual(tenantAppCatalogUrl, 'https://contoso.sharepoint.com/sites/appcatalog');
+  });
+
+  it('returns null when tenant app catalog not configured', async () => {
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
+        return Promise.resolve({ CorporateCatalogUrl: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const tenantAppCatalogUrl = await spo.getTenantAppCatalogUrl(logger, false);
+    assert.deepEqual(tenantAppCatalogUrl, null);
+  });
+
+  it('handles error when retrieving SPO URL failed while retrieving tenant app catalog url', (done) => {
+    const errorMessage = 'Couldn\'t retrieve SharePoint URL';
+    auth.service.spoUrl = undefined;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
+        return Promise.reject('An error has occurred');
+      }
+
+      return Promise.reject(errorMessage);
+    });
+
+    spo
+      .getTenantAppCatalogUrl(logger, false)
+      .then(() => {
+        done('Expected error');
+      }, (err: string) => {
+        try {
+          assert.strictEqual(err, errorMessage);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('handles error when retrieving the tenant app catalog URL fails', (done) => {
+    const errorMessage = 'Couldn\'t retrieve tenant app catalog URL';
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
+        return Promise.reject(errorMessage);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    spo
+      .getTenantAppCatalogUrl(logger, false)
+      .then(() => {
+        done('Expected error');
+      }, (err: string) => {
+        try {
+          assert.strictEqual(err, errorMessage);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
   it('retrieves SPO URL from MS Graph when not retrieved previously', (done) => {
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(request, 'get').callsFake((opts) => {

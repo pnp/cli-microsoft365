@@ -660,5 +660,20 @@ export const spo = {
 
     const customActionOnSite = await getById(webUrl, id, "Site");
     return customActionOnSite;
+  },
+
+  async getTenantAppCatalogUrl(logger: Logger, debug: boolean): Promise<string | null> {
+    const spoUrl = await spo.getSpoUrl(logger, debug);
+
+    const requestOptions: any = {
+      url: `${spoUrl}/_api/SP_TenantSettings_Current`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const result = await request.get<{ CorporateCatalogUrl: string }>(requestOptions);
+    return result.CorporateCatalogUrl;
   }
 };
