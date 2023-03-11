@@ -1,7 +1,7 @@
 # Use CLI for Microsoft 365 context
 
-CLI for Microsoft 365 context provides unique functionality to save any kind of option and its value. The options saved in the context may be used in any kind of command execution, that way you may provide less or no options at all.
-It may be especially useful in scenarios where you many times use the same option in multiple commands or you would like to group all command parameters in a single file that is used in the script file.
+CLI for Microsoft 365 context provides unique functionality to save any kind of option and its value in a central place. The options saved in the context may be used in any kind of command execution, that way you may provide less or no options at all, which means using a context will help you save on keystrokes.
+It may be especially If you just want to separate and group all your parameters from your script in a single place.
 A context is saved in a m365rc.json file in your working directory. It can be committed to Source Control along with your script files. It can be managed by executing commands.
 
 ## How to get started
@@ -18,22 +18,16 @@ To add or update an option in the context use the `m365 context option set` comm
 m365 context option set --name 'listTitle' --value 'test list'
 ```
 
-To remove the entire context we can execute the following command:
-
-```powershell
-m365 context option list
-```
-
 To remove a specific option from the context we can run:
 
 ```powershell
-m365 context option remove
+m365 context option remove --name "listTitle"
 ```
 
 In order to remove the full context we may execute the following command:
 
 ```powershell
-m365 context option remove --name "listTitle"
+m365 context remove
 
 ```
 
