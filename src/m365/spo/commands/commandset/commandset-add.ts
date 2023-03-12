@@ -3,7 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { CustomAction } from '../customaction/customaction';
 
 interface CommandArgs {
@@ -107,10 +107,10 @@ class SpoCommandsetAddCommand extends SpoCommand {
     }
 
     if (!args.options.scope) {
-      args.options.scope = 'Site';
+      args.options.scope = 'Web';
     }
 
-    const location: string = this.getLocation(args.options.location ? args.options.location : '');
+    const location: string | undefined = args.options.location && this.getLocation(args.options.location);
     const listType: string = this.getListTemplate(args.options.listType);
 
     try {
@@ -125,7 +125,7 @@ class SpoCommandsetAddCommand extends SpoCommand {
         requestBody.ClientSideComponentProperties = args.options.clientSideComponentProperties;
       }
 
-      const requestOptions: any = {
+      const requestOptions: CliRequestOptions = {
         url: `${args.options.webUrl}/_api/${args.options.scope}/UserCustomActions`,
         headers: {
           accept: 'application/json;odata=nometadata'
@@ -148,8 +148,10 @@ class SpoCommandsetAddCommand extends SpoCommand {
         return 'ClientSideExtension.ListViewCommandSet';
       case 'ContextMenu':
         return 'ClientSideExtension.ListViewCommandSet.ContextMenu';
-      default:
+      case 'CommandBar':
         return 'ClientSideExtension.ListViewCommandSet.CommandBar';
+      default:
+        throw `${location} is not a valid location type`;
     }
   }
 

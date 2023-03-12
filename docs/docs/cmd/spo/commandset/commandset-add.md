@@ -26,7 +26,7 @@ m365 spo commandset add [options]
 : The Client Side Component properties of the ListView Command Set.
 
 `-s, --scope [scope]`
-: Scope of the ListView Command Set. Allowed values: `Site`, `Web`. Defaults to `Site`.
+: Scope of the ListView Command Set. Allowed values: `Site`, `Web`. Defaults to `Web`.
 
 `--location [location]`
 : The location of the ListView Command Set. Allowed values `ContextMenu`, `CommandBar` or `Both`. Defaults to `CommandBar`.
@@ -35,10 +35,10 @@ m365 spo commandset add [options]
 
 ## Remarks
 
-Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML, or JavaScript values because the command shell treats quotes differently. For example, this is how ApplicationCustomizer user custom action can be created from the Windows cmd.exe:
+Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML, or JavaScript values because the command shell treats quotes differently. For example, this is how listView command can be created from the Windows cmd.exe:
 
 ```sh
-m365 spo commandset add --webUrl https://contoso.sharepoint.com/sites/test --title "CLI Commandset" --location "ClientSideExtension.ApplicationCustomizer" --listType "List" --clientSideComponentId b41916e7-e69d-467f-b37f-ff8ecf8f99f2 --clientSideComponentProperties '{\"testMessage\":\"Test message\"}'
+m365 spo commandset add --webUrl https://contoso.sharepoint.com/sites/test --title "CLI Commandset" --location "ContextMenu" --listType "List" --clientSideComponentId b41916e7-e69d-467f-b37f-ff8ecf8f99f2 --clientSideComponentProperties '{\"testMessage\":\"Test message\"}'
 ```
 
 Note, how the clientSideComponentProperties option (-p) has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash `'{"testMessage":"Test message"}'`.

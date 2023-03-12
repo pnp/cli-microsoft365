@@ -157,6 +157,11 @@ describe(commands.COMMANDSET_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('passes validation if all required options specified', async () => {
+    const actual = await command.validate({ options: { title: validTitle, webUrl: validWebUrl, listType: validListType, clientSideComponentId: validClientSideComponentId, scope: 'Web', location: 'Both', clientSideComponentProperties: validClientSideComponentProperties } }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
   it('adds commandset with scope Web, list type list and location Both', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
       if ((opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions`)) {
@@ -172,9 +177,9 @@ describe(commands.COMMANDSET_ADD, () => {
     assert(loggerLogSpy.calledWith(commandactionResponse));
   });
 
-  it('adds commandset with scope Site and list type library', async () => {
+  it('adds commandset with scope Web and list type library', async () => {
     sinon.stub(request, 'post').callsFake(async opts => {
-      if ((opts.url === `https://contoso.sharepoint.com/_api/Site/UserCustomActions`)) {
+      if ((opts.url === `https://contoso.sharepoint.com/_api/Web/UserCustomActions`)) {
         {
           return commandactionResponse;
         }
@@ -240,4 +245,36 @@ describe(commands.COMMANDSET_ADD, () => {
       new CommandError(`Something went wrong adding the commandset`));
   });
 
+  it('offers autocomplete for the listType option', () => {
+    const options = command.options;
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].option.indexOf('--listType') > -1) {
+        assert(options[i].autocomplete);
+        return;
+      }
+    }
+    assert(false);
+  });
+
+  it('offers autocomplete for the scope option', () => {
+    const options = command.options;
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].option.indexOf('--scope') > -1) {
+        assert(options[i].autocomplete);
+        return;
+      }
+    }
+    assert(false);
+  });
+
+  it('offers autocomplete for the location option', () => {
+    const options = command.options;
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].option.indexOf('--location') > -1) {
+        assert(options[i].autocomplete);
+        return;
+      }
+    }
+    assert(false);
+  });
 });
