@@ -4,34 +4,44 @@ Typically, you'll work with CLI for Microsoft 365 in a command line. You'll eith
 
 ## Integrate CLI for Microsoft 365 in your app
 
-If you build apps in Node.js, you can integrate CLI for Microsoft 365 using its API. This API lets you call any of CLI's commands. The following example shows how you could call several CLI for Microsoft 365 commands in a Node.js app:
+If you build apps in Node.js, you can integrate CLI for Microsoft 365 using its API. This API lets you call any of the CLI's commands. We recommend to use the await operator to wait for the promise returned from the executeCommand function. The following examples show how you could call several CLI for Microsoft 365 commands in a Node.js app:
 
 ```javascript
 const { executeCommand } = require('@pnp/cli-microsoft365');
 
-executeCommand('status', { output: 'text' })
-  .then(res => {
-    if (res.stdout === 'Logged out') {
-      return executeCommand('login', { output: 'text' }, {
-        stdout: message => console.log(message)
-      });
-    }
+try {
+  // m365 status --output text
+  const status = await executeCommand('status', { output: 'text' })
 
-    return Promise.resolve();
-  })
-  .then(_ => executeCommand('spo site list', { output: 'json' }))
-  .then(res => {
-    const sites = JSON.parse(res.stdout);
+  if (status.stdout === 'Logged out') {
+    // m365 login --authType browser --output 'text'
+    return executeCommand('login', { authType: 'browser', output: 'text' }, {
+      stdout: message => console.log(message)
+    })
+  }
+} catch(error) {
+  console.error(error)
+}
 
-    if (sites.length === 0) {
-      return Promise.reject('No sites found');
-    }
 
-    const siteUrl = sites[0].Url;
-    return executeCommand('spo web get', { webUrl: siteUrl, output: 'json' });
-  })
-  .then(res => console.log(res.stdout))
-  .catch(err => console.error(err));
+try {
+  // m365 spo site list 
+  const siteList = await executeCommand('spo site list', {})
+  const sites = JSON.parse(siteList.stdout);
+
+  if (sites.length === 0) {
+    throw new Error('No sites found')
+  }
+  
+  const siteUrl = sites[0].Url
+  // m365 spo web get --webUrl <siteUrl> --withGroups true
+  const siteInfo = await executeCommand('spo web get', { webUrl: siteUrl, withGroups: true })
+
+  console.log(siteInfo)
+  
+} catch(error) {
+  console.error(error)
+}
 ```
 
 You start with importing the `executeCommand` function from CLI for Microsoft 365. CLI doesn't expose all of its logic externally, but rather just the function that allows you to run CLI's commands. This could change in the future.
