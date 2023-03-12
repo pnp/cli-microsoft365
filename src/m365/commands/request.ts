@@ -6,6 +6,7 @@ import GlobalOptions from '../../GlobalOptions';
 import request from '../../request';
 import commands from './commands';
 import path = require('path');
+import auth from '../../Auth';
 
 interface CommandArgs {
   options: Options;
@@ -114,38 +115,39 @@ class RequestCommand extends Command {
     }
 
     try {
+      const url = this.formatUrl(args.options.url);
       const method = (args.options.method || 'get').toUpperCase();
       const headers: AxiosRequestHeaders = {};
-  
+
       const unknownOptions: any = this.getUnknownOptions(args.options);
       const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
       unknownOptionsNames.forEach(o => {
         headers[o] = unknownOptions[o];
       });
-  
+
       if (!headers.accept) {
         headers.accept = 'application/json';
       }
-  
+
       if (args.options.resource) {
         headers['x-resource'] = args.options.resource;
       }
-  
+
       const config: AxiosRequestConfig<string> = {
-        url: args.options.url,
+        url: url,
         headers,
         method,
         data: args.options.body
       };
-  
+
       if (headers.accept.toString().startsWith('application/json')) {
         config.responseType = 'json';
       }
-  
+
       if (args.options.filePath) {
         config.responseType = 'stream';
       }
-  
+
       if (this.verbose) {
         logger.logToStderr(`Executing request...`);
       }
@@ -174,10 +176,31 @@ class RequestCommand extends Command {
         const res = await request.execute<string>(config);
         logger.log(res);
       }
-    } 
+    }
     catch (err: any) {
       this.handleError(err);
     }
+  }
+
+  private formatUrl(url: string): string {
+    if (url.startsWith('@graphbeta')) {
+      return url.replace('@graphbeta', 'https://graph.microsoft.com/beta');
+    }
+    else if (url.startsWith('@graph')) {
+      return url.replace('@graph', 'https://graph.microsoft.com/v1.0');
+    }
+    else if (url.startsWith('@spo')) {
+      if (auth.service.spoUrl) {
+        return url.replace('@spo', auth.service.spoUrl);
+      }
+      else {
+        throw new Error('No root SharePoint site collection available in the connection info. Please provide a URL using spo set -u <url>');
+      }
+
+    }
+
+    return url;
+
   }
 }
 
