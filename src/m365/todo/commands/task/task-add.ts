@@ -137,6 +137,10 @@ class TodoTaskAddCommand extends GraphCommand {
           return `${args.options.status} is not a valid value for status. Valid values are ${TodoTaskAddCommand.allowedStatuses.join(', ')}`;
         }
 
+        if (args.options.completedDateTime && args.options.status?.toLowerCase() !== 'completed') {
+          return `The completedDateTime option can only be used when the status option is set to completed`;
+        }
+
         return true;
       }
     );
@@ -152,7 +156,7 @@ class TodoTaskAddCommand extends GraphCommand {
     try {
       const listId: string = await this.getTodoListId(args);
 
-      //const status = TodoTaskAddCommand.allowedStatuses[].map(x => x.toLowerCase()).indexOf(args.options.status.toLowerCase())
+      const status = args.options.status && TodoTaskAddCommand.allowedStatuses.filter(x => x.toLowerCase() === args.options.status!.toLowerCase())[0];
 
       const requestOptions: CliRequestOptions = {
         url: `${endpoint}/me/todo/lists/${listId}/tasks`,
@@ -172,7 +176,7 @@ class TodoTaskAddCommand extends GraphCommand {
           categories: args.options.categories?.split(','),
           completedDateTime: this.getDateTimeTimeZone(args.options.completedDateTime),
           startDateTime: this.getDateTimeTimeZone(args.options.startDateTime),
-          status: args.options.status?.toLowerCase()
+          status: status
         },
         responseType: 'json'
       };

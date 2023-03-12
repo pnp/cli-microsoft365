@@ -220,11 +220,11 @@ describe(commands.TASK_ADD, () => {
       options: {
         title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
-        status: 'notStarted'
+        status: 'inProgress'
       }
     } as any);
 
-    assert.deepStrictEqual(postStub.lastCall.args[0].data.status, 'notStarted');
+    assert.deepStrictEqual(postStub.lastCall.args[0].data.status, 'inProgress');
   });
 
   it('rejects if no tasks list is found with the specified list name', async () => {
@@ -308,7 +308,21 @@ describe(commands.TASK_ADD, () => {
       options: {
         title: 'New task',
         listName: 'Tasks List',
-        completedDateTime: '01/01/2022'
+        completedDateTime: '01/01/2022',
+        status: 'completed'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when valid completedDateTime is passed without status completed', async () => {
+    const dateTime = '2023-01-01';
+    const actual = await command.validate({
+      options: {
+        title: 'New task',
+        listName: 'Tasks List',
+        completedDateTime: dateTime,
+        status: 'inProgress'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
