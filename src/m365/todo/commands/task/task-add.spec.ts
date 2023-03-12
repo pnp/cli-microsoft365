@@ -328,6 +328,18 @@ describe(commands.TASK_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation when valid completedDateTime is passed without status', async () => {
+    const dateTime = '2023-01-01';
+    const actual = await command.validate({
+      options: {
+        title: 'New task',
+        listName: 'Tasks List',
+        completedDateTime: dateTime
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation when invalid startDateTime is passed', async () => {
     const actual = await command.validate({
       options: {
