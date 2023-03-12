@@ -13,7 +13,7 @@ export const validation = {
     const guidRegEx: RegExp = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
     // verify if the guid is a valid guid. @meid will be replaced in a later stage with the actual user id of the logged in user
-    return guidRegEx.test(guid) || guid.toLowerCase().trim() === "@meid";
+    return guidRegEx.test(guid) || guid.toLowerCase() === "@meid";
   },
 
   isValidTeamsChannelId(guid: string): boolean {
@@ -31,7 +31,7 @@ export const validation = {
   isValidUserPrincipalName(upn: string): boolean {
     const upnRegEx = new RegExp(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i);
 
-    return upnRegEx.test(upn) || upn.toLowerCase().trim() === "@meusername";
+    return upnRegEx.test(upn) || upn.toLowerCase() === "@meusername";
   },
 
   isDateInRange(date: string, monthOffset: number): boolean {
