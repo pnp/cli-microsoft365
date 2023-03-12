@@ -25,6 +25,22 @@ describe(commands.REQUEST, () => {
   //#region 
   const mockSPOWebJSONResponse = { "AllowRssFeeds": true, "AlternateCssUrl": "", "AppInstanceId": "00000000-0000-0000-0000-000000000000", "ClassicWelcomePage": null, "Configuration": 0, "Created": "2020-10-08T07:03:47.907", "CurrentChangeToken": { "StringValue": "1;2;d5f1681e-9480-4636-ac33-094bb75c44ff;637960770683600000;495812642" }, "CustomMasterUrl": "/_catalogs/masterpage/seattle.master", "Description": "", "DesignPackageId": "00000000-0000-0000-0000-000000000000", "DocumentLibraryCalloutOfficeWebAppPreviewersDisabled": false, "EnableMinimalDownload": false, "FooterEmphasis": 0, "FooterEnabled": true, "FooterLayout": 0, "HeaderEmphasis": 0, "HeaderLayout": 0, "HideTitleInHeader": false, "HorizontalQuickLaunch": false, "Id": "d5f1681e-9480-4636-ac33-094bb75c44ff", "IsEduClass": false, "IsEduClassProvisionChecked": false, "IsEduClassProvisionPending": false, "IsHomepageModernized": false, "IsMultilingual": true, "IsRevertHomepageLinkHidden": false, "Language": 1033, "LastItemModifiedDate": "2022-08-14T11:31:56Z", "LastItemUserModifiedDate": "2022-08-14T11:31:56Z", "LogoAlignment": 0, "MasterUrl": "/_catalogs/masterpage/seattle.master", "MegaMenuEnabled": true, "NavAudienceTargetingEnabled": false, "NoCrawl": false, "ObjectCacheEnabled": false, "OverwriteTranslationsOnChange": false, "ResourcePath": { "DecodedUrl": "https://contoso.sharepoint.com" }, "QuickLaunchEnabled": true, "RecycleBinEnabled": true, "SearchScope": 0, "ServerRelativeUrl": "/", "SiteLogoUrl": "/SiteAssets/__sitelogo__logo_240x240.png", "SyndicationEnabled": true, "TenantAdminMembersCanShare": 0, "Title": "Contoso Intranet", "TreeViewEnabled": false, "UIVersion": 15, "UIVersionConfigurationEnabled": false, "Url": "https://contoso.sharepoint.com", "WebTemplate": "SITEPAGEPUBLISHING", "WelcomePage": "SitePages/Home.aspx" };
   const mockSPOWebXMLResponse = '<?xml version="1.0" encoding="utf-8"?><entry xml:base="https://contoso.sharepoint.com/_api/" xmlns="http://www.w3.org/2005/Atom" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:georss="http://www.georss.org/georss" xmlns:gml="http://www.opengis.net/gml"><id>https://contoso.sharepoint.com/_api/Web</id><category term="SP.Web" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme" /><link rel="edit" href="Web" /><title /><updated>2022-08-14T21:57:35Z</updated><author><name /></author><content type="application/xml"><m:properties><d:Title>Contoso Intranet</d:Title></m:properties></content></entry>';
+  const graphResponse = {
+    '@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#users/$entity',
+    businessPhones: [
+      "1234567"
+    ],
+    displayName: 'John Doe',
+    givenName: 'John',
+    jobTitle: null,
+    mail: 'john.doe@contoso.onmicrosoft.com',
+    mobilePhone: null,
+    officeLocation: null,
+    preferredLanguage: 'en - US',
+    surname: 'Doe',
+    userPrincipalName: 'john.doe@contoso.onmicrosoft.com',
+    id: '5935bd84-463f-4f09-b88a-3a3215b4894e'
+  };
   //#endregion
 
   before(() => {
@@ -71,6 +87,7 @@ describe(commands.REQUEST, () => {
     ]);
     auth.service.accessTokens = {};
     auth.service.connected = false;
+    auth.service.spoUrl = undefined;
   });
 
   it('has correct name', () => {
@@ -288,6 +305,72 @@ describe(commands.REQUEST, () => {
     });
     assert(loggerLogToStderrSpy.called);
     assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
+  });
+
+  it('successfully executes a GET request to a Graph API endpoint with the @graph token', async () => {
+    sinon.stub(request, 'execute').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/me') {
+        return graphResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        url: '@graph/me',
+        accept: 'application/json;odata.metadata=none'
+      }
+    });
+    assert(loggerLogSpy.calledWith(graphResponse));
+  });
+
+
+  it('successfully executes a GET request to a Graph API endpoint with the @graphbeta token', async () => {
+    sinon.stub(request, 'execute').callsFake(async (opts) => {
+      if (opts.url === 'https://graph.microsoft.com/beta/me') {
+        return graphResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        url: '@graphbeta/me',
+        accept: 'application/json;odata.metadata=none'
+      }
+    });
+    assert(loggerLogSpy.calledWith(graphResponse));
+  });
+
+  it('successfully executes a GET request to a SharePoint API endpoint with the @spo token', async () => {
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    sinon.stub(request, 'execute').callsFake(async (opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web') {
+        return mockSPOWebJSONResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        url: '@spo/_api/web',
+        accept: 'application/json;odata=nometadata'
+      }
+    });
+    assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
+  });
+
+  it('throws error when using the @spo token when there is nog spoUrl in the auth service', async () => {
+    auth.service.spoUrl = undefined;
+    await assert.rejects(command.action(logger, {
+      options: {
+        url: '@spo/_api/web',
+        accept: 'application/json;odata=nometadata'
+      }
+    }), new CommandError(`SharePoint root site URL is unknown. Please set your SharePoint URL using command 'spo set'.`));
   });
 
   it('correctly handles an API exception', async () => {
