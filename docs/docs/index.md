@@ -42,12 +42,12 @@ The project is built and managed publicly on GitHub at [https://github.com/pnp/c
 
 ### Community Discord server
 
-We also have a [community Discord server](https://discord.com/invite/7rfW4kg6B5) where you can hang out, share, collaborate, and discuss more about the CLI for Microsoft 365!
+We also have a [community Discord server](https://discord.gg/35HTFJ544b) where you can hang out, share, collaborate, and discuss more about the CLI for Microsoft 365!
 
 <br/>
 <p align="center">
-  <a href="https://discord.com/invite/7rfW4kg6B5">
-    <img src="https://img.shields.io/badge/Discord-invite/7rfW4kg6B5-7289da?style=for-the-badge"
+  <a href="https://discord.gg/35HTFJ544b">
+    <img src="https://img.shields.io/badge/Discord-invite/35HTFJ544b-7289da?style=for-the-badge"
       alt="Discord" />
   </a>
 </p>

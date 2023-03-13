@@ -98,6 +98,10 @@ class AadUserSetCommand extends GraphCommand {
           return `${args.options.objectId} is not a valid GUID`;
         }
 
+        if (args.options.userPrincipalName && !validation.isValidUserPrincipalName(args.options.userPrincipalName)) {
+          return `${args.options.userPrincipalName} is not a valid userPrincipalName`;
+        }
+
         if (!args.options.resetPassword && ((args.options.currentPassword && !args.options.newPassword) || (args.options.newPassword && !args.options.currentPassword))) {
           return `Specify both currentPassword and newPassword when you want to change your password`;
         }

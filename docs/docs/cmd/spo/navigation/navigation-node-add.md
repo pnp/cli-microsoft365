@@ -19,8 +19,8 @@ m365 spo navigation node add [options]
 `-t, --title <title>`
 : Navigation node title.
 
-`--url <url>`
-: Navigation node URL.
+`--url [url]`
+: Navigation node URL. When not specified a linkless label will be created.
 
 `--parentNodeId [parentNodeId]`
 : ID of the node below which the node should be added. Specify either `location` or `parentNodeId` but not both.
@@ -29,7 +29,7 @@ m365 spo navigation node add [options]
 : Set, if the navigation node points to an external URL.
 
 `--audienceIds [audienceIds]`
-: Comma separated list of group IDs that will be used for audience targeting. The limit is 10 ids per navigation node.
+: Comma-separated list of group IDs that will be used for audience targeting. The limit is 10 ids per navigation node.
 
 --8<-- "docs/cmd/_global.md"
 

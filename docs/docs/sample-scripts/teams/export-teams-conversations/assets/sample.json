@@ -5,7 +5,7 @@
     "title": "Export conversations from Microsoft Teams Channels",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/export-teams-conversations",
     "creationDateTime": "2021-02-19",
-    "updateDateTime": "2021-02-19",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script exports the conversations from Microsoft Teams Channels.",
     "longDescription": [
       "This script uses CLI for Microsoft 365 to export the conversations from Microsoft Teams Channels. You don't need to be a tenant admin to export conversations but you still can only export conversations of Teams of which you are member."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

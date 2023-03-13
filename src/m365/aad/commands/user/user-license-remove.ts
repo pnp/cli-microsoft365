@@ -41,7 +41,8 @@ class AadUserLicenseRemoveCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         userId: typeof args.options.userId !== 'undefined',
-        userName: typeof args.options.userName !== 'undefined'
+        userName: typeof args.options.userName !== 'undefined',
+        confirm: !!args.options.confirm
       });
     });
   }

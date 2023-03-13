@@ -5,7 +5,7 @@
     "title": "CLI - List all Microsoft Teams team's Owners and Members",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/list-teams-owners-and-members",
     "creationDateTime": "2021-03-23",
-    "updateDateTime": "2021-03-23",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script allows you to list all Teams team's owners and members and export them into a CSV file.",
     "longDescription": [
       "This script allows you to list all Teams team's owners and members and export them into a CSV file."
@@ -20,7 +20,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

@@ -5,7 +5,7 @@
     "title": "List all files with missing required metadata",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-files-with-missing-required-metadata",
     "creationDateTime": "2022-12-31",
-    "updateDateTime": "2022-12-31",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "List all files with missing required metadata.",
     "longDescription": [
       "List all files with missing required metadata."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "6.0.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

@@ -91,8 +91,8 @@ describe(commands.USERPROFILE_GET, () => {
       "IsFollowed": false,
       "LatestPost": null,
       "Peers": [],
-      "PersonalSiteHostUrl": "https://dev1802-my.sharepoint.com:443/",
-      "PersonalUrl": "https://dev1802-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
+      "PersonalSiteHostUrl": "https://contoso-my.sharepoint.com:443/",
+      "PersonalUrl": "https://contoso-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
       "PictureUrl": null,
       "Title": null,
       "UserProfileProperties": [
@@ -139,8 +139,8 @@ describe(commands.USERPROFILE_GET, () => {
           "IsFollowed": false,
           "LatestPost": null,
           "Peers": [],
-          "PersonalSiteHostUrl": "https://dev1802-my.sharepoint.com:443/",
-          "PersonalUrl": "https://dev1802-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
+          "PersonalSiteHostUrl": "https://contoso-my.sharepoint.com:443/",
+          "PersonalUrl": "https://contoso-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
           "PictureUrl": null,
           "Title": null
         });
@@ -166,8 +166,8 @@ describe(commands.USERPROFILE_GET, () => {
       "IsFollowed": false,
       "LatestPost": null,
       "Peers": [],
-      "PersonalSiteHostUrl": "https://dev1802-my.sharepoint.com:443/",
-      "PersonalUrl": "https://dev1802-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
+      "PersonalSiteHostUrl": "https://contoso-my.sharepoint.com:443/",
+      "PersonalUrl": "https://contoso-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
       "PictureUrl": null,
       "Title": null
     }));

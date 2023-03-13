@@ -15,6 +15,8 @@ m365 spo site appcatalog add [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
 !!! important
     To use this command you have to have permissions to access the tenant admin site.
 

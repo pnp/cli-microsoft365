@@ -29,7 +29,7 @@ The SharePoint Admin Center provides various governance features, but there is n
     $appCatalogUrl = m365 spo tenant appcatalogurl get
 
     if ($appCatalogUrl) {
-        $spolItems = m365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields $fields  -o json | ConvertFrom-Json
+        $spolItems = m365 spo listitem list --listTitle $listName --webUrl $appCatalogUrl --fields $fields  -o json | ConvertFrom-Json
 
         if ($spolItems.Count -gt 0) {
             $configurations = @()

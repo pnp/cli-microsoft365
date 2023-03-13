@@ -37,3 +37,43 @@ Gets the count of user mailboxes in each quota category for the last week and ex
 ```sh
 m365 outlook report mailboxusagequotastatusmailboxcounts --period D7 --output json > "mailboxusagequotastatusmailboxcounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-01-24",
+        "Under Limit": "146",
+        "Warning Issued": "0",
+        "Send Prohibited": "0",
+        "Send/Receive Prohibited": "0",
+        "Indeterminate": "0",
+        "Report Date": "2023-01-18",
+        "Report Period": "7"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```txt
+    Report Refresh Date,Under Limit,Warning Issued,Send Prohibited,Send/Receive Prohibited,Indeterminate,Report Date,Report Period
+    2023-01-24,146,0,0,0,0,2023-01-18,7
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Under Limit,Warning Issued,Send Prohibited,Send/Receive Prohibited,Indeterminate,Report Date,Report Period
+    2023-01-24,146,0,0,0,0,2023-01-18,7
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Under Limit,Warning Issued,Send Prohibited,Send/Receive Prohibited,Indeterminate,Report Date,Report Period
+    2023-01-24,146,0,0,0,0,2023-01-18,7
+    ```

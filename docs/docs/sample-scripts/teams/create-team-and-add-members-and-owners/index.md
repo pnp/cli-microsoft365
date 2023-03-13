@@ -69,7 +69,7 @@ This sample script shows you how to create a Team and add members and owners usi
         $trial++
         Write-Host "Waiting $waitingTime seconds before teamifying the group (trial $trial/$maxRetry)..."
         Start-Sleep -Seconds $waitingTime
-        m365 aad o365group teamify --groupId $($group.id) 2>$null
+        m365 aad o365group teamify --id $($group.id) 2>$null
     } while ($Error.Count -gt 0 -and $trial -lt $maxRetry)
 
     # if it still failed, output the error and stop

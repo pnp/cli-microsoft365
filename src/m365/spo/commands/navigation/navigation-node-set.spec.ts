@@ -108,6 +108,23 @@ describe(commands.NAVIGATION_NODE_SET, () => {
     assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
   });
 
+  it('correctly sets navigation node as linkless', async () => {
+    const requestBody = {
+      IsExternal: undefined,
+      Title: undefined,
+      Url: 'http://linkless.header/'
+    };
+    const patchStub = sinon.stub(request, 'patch').callsFake(async (opts) => {
+      if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {
+        return '';
+      }
+
+      throw 'Invalid request';
+    });
+    await command.action(logger, { options: { webUrl: webUrl, id: id, url: "" } } as any);
+    assert.deepStrictEqual(patchStub.lastCall.args[0].data, requestBody);
+  });
+
   it('correctly handles navigation node that does not exist', async () => {
     sinon.stub(request, 'patch').callsFake(async (opts) => {
       if (opts.url === `${webUrl}/_api/web/navigation/GetNodeById(${id})`) {

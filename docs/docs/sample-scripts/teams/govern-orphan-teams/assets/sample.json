@@ -5,7 +5,7 @@
     "title": "Govern orphaned Microsoft Teams",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/govern-orphan-teams",
     "creationDateTime": "2020-05-02",
-    "updateDateTime": "2020-05-02",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script finds teams that no longer have an owner.",
     "longDescription": [
       "Every team needs an owner, at least one. Common best practice is that you should have at least two users in owner role. Teams is not allowing the last owner to leave the team, but there might occasions when last owner is removed, example when people are leaving the organization and account gets deleted. This script finds those teams that no longer have an owner."
@@ -23,7 +23,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

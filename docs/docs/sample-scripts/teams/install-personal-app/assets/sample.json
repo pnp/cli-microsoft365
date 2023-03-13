@@ -5,7 +5,7 @@
     "title": "Deploy Microsoft Teams personal app and add it to users",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/install-personal-app",
     "creationDateTime": "2020-10-18",
-    "updateDateTime": "2020-10-18",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Installs or updates a Microsoft Teams app.",
     "longDescription": [
       "Installs or updates a Microsoft Teams app from a provided zipped manifest and then, based on the parameters, add it to the current users and / or to a set of users."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

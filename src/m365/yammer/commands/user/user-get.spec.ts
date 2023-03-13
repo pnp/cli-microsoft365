@@ -77,7 +77,7 @@ describe(commands.USER_GET, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/by_email.json?email=pl%40nubo.eu') {
         return Promise.resolve(
-          [{ "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }]
+          [{ "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }]
         );
       }
       return Promise.reject('Invalid request');
@@ -90,7 +90,7 @@ describe(commands.USER_GET, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/1496550646.json') {
         return Promise.resolve(
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }
         );
       }
       return Promise.reject('Invalid request');
@@ -103,7 +103,7 @@ describe(commands.USER_GET, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/current.json') {
         return Promise.resolve(
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "John Doe" }
         );
       }
       return Promise.reject('Invalid request');

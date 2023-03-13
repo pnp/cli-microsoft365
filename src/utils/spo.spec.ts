@@ -15,7 +15,7 @@ const stubPostResponses: any = (
         return folderAddResp;
       }
       else {
-        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "4t4", "ProgID": null, "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/4t4", "TimeCreated": "2018-10-26T22:50:27Z", "TimeLastModified": "2018-10-26T22:50:27Z", "UniqueId": "3f5428e2-b0a8-4d35-87df-89621ed5b457", "WelcomePage": "" });
+        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "4t4", "ProgID": null, "ServerRelativeUrl": "/sites/JohnDoe/Shared Documents/4t4", "TimeCreated": "2018-10-26T22:50:27Z", "TimeLastModified": "2018-10-26T22:50:27Z", "UniqueId": "3f5428e2-b0a8-4d35-87df-89621ed5b457", "WelcomePage": "" });
       }
 
     }
@@ -32,7 +32,7 @@ const stubGetResponses: any = (
         return getFolderByServerRelativeUrlResp;
       }
       else {
-        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 1, "Name": "f", "ProgID": null, "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/4t4/f", "TimeCreated": "2018-10-26T22:54:19Z", "TimeLastModified": "2018-10-26T22:54:20Z", "UniqueId": "0d680f20-53da-4516-b3f6-ed98b1d928e8", "WelcomePage": "" });
+        return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 1, "Name": "f", "ProgID": null, "ServerRelativeUrl": "/sites/JohnDoe/Shared Documents/4t4/f", "TimeCreated": "2018-10-26T22:54:19Z", "TimeLastModified": "2018-10-26T22:54:20Z", "UniqueId": "0d680f20-53da-4516-b3f6-ed98b1d928e8", "WelcomePage": "" });
       }
     }
     return Promise.reject('Invalid request');
@@ -260,6 +260,89 @@ describe('utils/spo', () => {
         done(e);
       }
     });
+  });
+
+  it('retrieves tenant app catalog url', async () => {
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
+        return Promise.resolve({ CorporateCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+
+    const tenantAppCatalogUrl = await spo.getTenantAppCatalogUrl(logger, false);
+    assert.deepEqual(tenantAppCatalogUrl, 'https://contoso.sharepoint.com/sites/appcatalog');
+  });
+
+  it('returns null when tenant app catalog not configured', async () => {
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/SP_TenantSettings_Current') {
+        return Promise.resolve({ CorporateCatalogUrl: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const tenantAppCatalogUrl = await spo.getTenantAppCatalogUrl(logger, false);
+    assert.deepEqual(tenantAppCatalogUrl, null);
+  });
+
+  it('handles error when retrieving SPO URL failed while retrieving tenant app catalog url', (done) => {
+    const errorMessage = 'Couldn\'t retrieve SharePoint URL';
+    auth.service.spoUrl = undefined;
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
+        return Promise.reject('An error has occurred');
+      }
+
+      return Promise.reject(errorMessage);
+    });
+
+    spo
+      .getTenantAppCatalogUrl(logger, false)
+      .then(() => {
+        done('Expected error');
+      }, (err: string) => {
+        try {
+          assert.strictEqual(err, errorMessage);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('handles error when retrieving the tenant app catalog URL fails', (done) => {
+    const errorMessage = 'Couldn\'t retrieve tenant app catalog URL';
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url as string).indexOf('/_api/SP_TenantSettings_Current') > -1) {
+        return Promise.reject(errorMessage);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    spo
+      .getTenantAppCatalogUrl(logger, false)
+      .then(() => {
+        done('Expected error');
+      }, (err: string) => {
+        try {
+          assert.strictEqual(err, errorMessage);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
   });
 
   it('retrieves SPO URL from MS Graph when not retrieved previously', (done) => {
@@ -824,6 +907,24 @@ describe('utils/spo', () => {
 
     const customAction = await spo.getCustomActionById('https://contoso.sharepoint.com/sites/sales', 'd1e5e0d6-109d-40c4-a53e-924073fe9bbd', 'Site');
     assert.deepEqual(customAction, customActionOnSiteResponse1);
+  });
+
+  it(`retrieves Azure AD ID by SPO user ID sucessfully`, async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/sales/_api/web/siteusers/GetById('9')?$select=AadObjectId`) {
+        return {
+          AadObjectId: {
+            NameId: '6cc1797e-5463-45ec-bb1a-b93ec198bab6',
+            NameIdIssuer: 'urn:federation:microsoftonline'
+          }
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    const customAction = await spo.getUserAzureIdBySpoId('https://contoso.sharepoint.com/sites/sales', '9');
+    assert.deepEqual(customAction, '6cc1797e-5463-45ec-bb1a-b93ec198bab6');
   });
 
   it(`throws error retrieving a custom action by id with a wrong scope value`, async () => {

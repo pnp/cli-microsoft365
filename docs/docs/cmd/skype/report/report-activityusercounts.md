@@ -37,3 +37,41 @@ Gets the trends on how many unique users organized and participated in conferenc
 ```sh
 m365 skype report activityusercounts --period D7 --output json > "activityusercounts.json"
 ```
+
+## Response
+
+=== "JSON"
+
+    ```json
+    [
+      {
+        "Report Refresh Date": "2023-01-25",
+        "Report Date": "2023-01-19",
+        "Report Period": "7",
+        "Peer-to-peer": "0",
+        "Organized": "0",
+        "Participated": "0"
+      }
+    ]
+    ```
+
+=== "Text"
+
+    ```txt
+    Report Refresh Date,Report Date,Report Period,Peer-to-peer,Organized,Participated
+    2023-01-25,2023-01-19,7,0,0,0
+    ```
+
+=== "CSV"
+
+    ```csv
+    Report Refresh Date,Report Date,Report Period,Peer-to-peer,Organized,Participated
+    2023-01-25,2023-01-19,7,0,0,0
+    ```
+
+=== "Markdown"
+
+    ```md
+    Report Refresh Date,Report Date,Report Period,Peer-to-peer,Organized,Participated
+    2023-01-25,2023-01-19,7,0,0,0
+    ```

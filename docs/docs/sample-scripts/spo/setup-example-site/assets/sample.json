@@ -5,7 +5,7 @@
     "title": "CLI - Setup example site",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/setup-example-site",
     "creationDateTime": "2021-04-10",
-    "updateDateTime": "2021-04-10",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script is a good starting point for a setup script to create site with some assets like columns, content types, lists, navigation etc.",
     "longDescription": [
       "This script is a good starting point for a setup script to create site with some assets like columns, content types, lists, navigation etc."
@@ -23,7 +23,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

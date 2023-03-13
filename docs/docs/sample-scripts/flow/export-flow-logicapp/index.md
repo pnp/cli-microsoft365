@@ -23,10 +23,10 @@ This script will export the Power Automate flow *Your sample test flow*, make su
     ```powershell
     Write-Output "Getting environment info..."
     $environmentId = $(m365 flow environment list --query "[?displayName == '(default)']" -o json | ConvertFrom-Json).Name
-    $flowId = $(m365 flow list --environment $environmentId --query "[?displayName == 'Your sample test flow']" -o json | ConvertFrom-Json)[0].Name
+    $flowId = $(m365 flow list --environmentName $environmentId --query "[?displayName == 'Your sample test flow']" -o json | ConvertFrom-Json)[0].Name
 
     Write-Output "Getting Flow info..."
-    m365 flow export --environment $environmentId --id $flowId -f 'json'
+    m365 flow export --environmentName $environmentId --id $flowId -f 'json'
 
     Write-Output "Complete"
     ```
@@ -36,7 +36,7 @@ This script will export the Power Automate flow *Your sample test flow*, make su
     ```bash
     #!/bin/bash
     ENV_NAME=m365 flow environment list --query '[?contains(displayName,`default`)] .name'
-    FLOW_NAME=m365 flow list --environment $environmentId --query '[?displayName == `Your sample test flow`] .name'
+    FLOW_NAME=m365 flow list --environmentName $environmentId --query '[?displayName == `Your sample test flow`] .name'
     echo "Exporting your flow"
-    m365 flow export --environment $ENV_NAME --id $FLOW_NAME -f 'json'
+    m365 flow export --environmentName $ENV_NAME --id $FLOW_NAME -f 'json'
     ```

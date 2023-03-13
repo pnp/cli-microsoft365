@@ -279,7 +279,7 @@ If the value of a property is an object, it will be JSON-serialized and displaye
 
 ```sh
 $ m365 spo site get --url /sites/Retail --output md
-# spo site get --url "https://2czk3g.sharepoint.com/sites/Retail"
+# spo site get --url "https://contoso.sharepoint.com/sites/Retail"
 
 Date: 04/12/2022
 
@@ -315,8 +315,8 @@ LockIssue | null
 MaxItemsPerThrottledOperation | 5000
 MediaTranscriptionDisabled | false
 NeedsB2BUpgrade | false
-ResourcePath | {"DecodedUrl":"https://2czk3g.sharepoint.com/sites/Retail"}
-PrimaryUri | https://2czk3g.sharepoint.com/sites/Retail
+ResourcePath | {"DecodedUrl":"https://contoso.sharepoint.com/sites/Retail"}
+PrimaryUri | https://contoso.sharepoint.com/sites/Retail
 ReadOnly | false
 RequiredDesignerVersion | 15.0.0.0
 SandboxedCodeActivationCapability | 2
@@ -330,7 +330,7 @@ UpgradeReminderDate | 1899-12-30T00:00:00
 UpgradeScheduled | false
 UpgradeScheduledDate | 1753-01-01T00:00:00
 Upgrading | false
-Url | https://2czk3g.sharepoint.com/sites/Retail
+Url | https://contoso.sharepoint.com/sites/Retail
 WriteLocked | false
 ```
 
@@ -344,12 +344,12 @@ $ m365 spo site list --output md
 
 Date: 04/12/2022
 
-## Retail (https://2czk3g.sharepoint.com/sites/Retail)
+## Retail (https://contoso.sharepoint.com/sites/Retail)
 
 Property | Value
 ---------|-------
 \_ObjectType\_ | Microsoft.Online.SharePoint.TenantAdministration.SiteProperties
-\_ObjectIdentity\_ | 5eed7ea0-c0ab-5000-b47b-32ee0c3bc3d5\|908bed80-a04a-4433-b4a0-883d9847d110:02b03c8c-a55c-4f23-9285-d5bd8f81979a<br>SiteProperties<br>https%3a%2f%2f2czk3g.sharepoint.com%2fsites%2fRetail
+\_ObjectIdentity\_ | 5eed7ea0-c0ab-5000-b47b-32ee0c3bc3d5\|908bed80-a04a-4433-b4a0-883d9847d110:02b03c8c-a55c-4f23-9285-d5bd8f81979a<br>SiteProperties<br>https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fRetail
 AllowDownloadingNonWebViewableFiles | false
 AllowEditing | false
 AllowSelfServiceUpgrade | true
@@ -439,17 +439,17 @@ Template | GROUP#0
 TimeZoneId | 13
 Title | Retail
 TitleTranslations | null
-Url | https://2czk3g.sharepoint.com/sites/Retail
+Url | https://contoso.sharepoint.com/sites/Retail
 UserCodeMaximumLevel | 300
 UserCodeWarningLevel | 200
 WebsCount | 0
 
-## Mark 8 Project Team (https://2czk3g.sharepoint.com/sites/Mark8ProjectTeam)
+## Mark 8 Project Team (https://contoso.sharepoint.com/sites/Mark8ProjectTeam)
 
 Property | Value
 ---------|-------
 \_ObjectType\_ | Microsoft.Online.SharePoint.TenantAdministration.SiteProperties
-\_ObjectIdentity\_ | 5eed7ea0-c0ab-5000-b47b-32ee0c3bc3d5\|908bed80-a04a-4433-b4a0-883d9847d110:02b03c8c-a55c-4f23-9285-d5bd8f81979a<br>SiteProperties<br>https%3a%2f%2f2czk3g.sharepoint.com%2fsites%2fMark8ProjectTeam
+\_ObjectIdentity\_ | 5eed7ea0-c0ab-5000-b47b-32ee0c3bc3d5\|908bed80-a04a-4433-b4a0-883d9847d110:02b03c8c-a55c-4f23-9285-d5bd8f81979a<br>SiteProperties<br>https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fMark8ProjectTeam
 AllowDownloadingNonWebViewableFiles | false
 AllowEditing | false
 AllowSelfServiceUpgrade | true
@@ -539,7 +539,7 @@ Template | GROUP#0
 TimeZoneId | 13
 Title | Mark 8 Project Team
 TitleTranslations | null
-Url | https://2czk3g.sharepoint.com/sites/Mark8ProjectTeam
+Url | https://contoso.sharepoint.com/sites/Mark8ProjectTeam
 UserCodeMaximumLevel | 300
 UserCodeWarningLevel | 200
 WebsCount | 0

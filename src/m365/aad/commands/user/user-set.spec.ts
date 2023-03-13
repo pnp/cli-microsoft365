@@ -119,6 +119,11 @@ describe(commands.USER_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation when userPrincipalName has an invalid value', async () => {
+    const actual = await command.validate({ options: { userPrincipalName: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if the objectId is a valid GUID', async () => {
     const actual = await command.validate({ options: { objectId: objectId } }, commandInfo);
     assert.strictEqual(actual, true);

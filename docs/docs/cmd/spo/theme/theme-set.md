@@ -21,9 +21,6 @@ m365 spo theme set [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
 To prevent the accidental creation of invalid themes the CLI for Microsoft 365 implements a set of checks. These checks are executed against the provided json file. A valid theme JSON file is as follows:
@@ -64,6 +61,9 @@ When executing the `m365 spo theme set` command the following checks are execute
 
 If any of these checks fails you are presented with a `The specified theme is not valid` error.
 
+!!! important
+    To use this command you have to have permissions to access the tenant admin site.
+    
 ## Examples
 
 Add or update a theme from a theme JSON file

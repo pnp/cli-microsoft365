@@ -18,7 +18,7 @@ Author: [Veronique Lengelle](https://twitter.com/veronicageek)
 
     foreach($list in $allLists){
         if ($list.Hidden -eq $false){ 
-            $allItems = m365 spo listitem list --id $list.Id --webUrl $siteUrl | ConvertFrom-Json
+            $allItems = m365 spo listitem list --listId $list.Id --webUrl $siteUrl | ConvertFrom-Json
             
             foreach($item in $allItems){
                 $allAttachments = m365 spo listitem attachment list --webUrl $siteUrl --listTitle $list.Title --itemId $item.Id | ConvertFrom-Json

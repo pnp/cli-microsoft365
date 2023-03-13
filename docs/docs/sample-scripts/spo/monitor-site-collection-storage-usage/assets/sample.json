@@ -5,7 +5,7 @@
     "title": "Monitor Site Collections Storage Usage",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/monitor-site-collection-storage-usage",
     "creationDateTime": "2021-05-04",
-    "updateDateTime": "2021-05-04",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script allows you to monitor Site Collections Storage Usage.",
     "longDescription": [
       "This script allows you to monitor Site Collections Storage Usage."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

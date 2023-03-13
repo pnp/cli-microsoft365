@@ -29,6 +29,19 @@ describe('utils/aadUser', () => {
     assert.strictEqual(actual, validUserId);
   });
 
+  it('correctly gets a single user by Email.', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(validUserName)}'&$select=id`) {
+        return userResponse;
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await aadUser.getUserIdByEmail(validUserName);
+    assert.strictEqual(actual, validUserId);
+  });
+
   it('throws error message when no user was found with a specific upn', async () => {
     sinon.stub(request, 'get').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(validUserName)}'&$select=Id`) {
@@ -40,4 +53,16 @@ describe('utils/aadUser', () => {
 
     await assert.rejects(aadUser.getUserIdByUpn(validUserName), Error(`The specified user with user name ${validUserName} does not exist.`));
   });
-}); 
+
+  it('throws error message when no user was found with a specific mail', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=mail eq '${formatting.encodeQueryParameter(validUserName)}'&$select=id`) {
+        return ({ value: [] });
+      }
+
+      throw `Invalid request`;
+    });
+
+    await assert.rejects(aadUser.getUserIdByEmail(validUserName), Error(`The specified user with email ${validUserName} does not exist`));
+  });
+});

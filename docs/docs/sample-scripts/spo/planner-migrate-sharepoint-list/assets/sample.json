@@ -5,7 +5,7 @@
     "title": "Planner migration to SharePoint list",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/planner-migrate-sharepoint-list",
     "creationDateTime": "2022-03-12",
-    "updateDateTime": "2022-03-12",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script migrates an existing plan to a SharePoint Online List with this sample.",
     "longDescription": [
       "Use the CLI for Microsoft 365 to migrate an existing plan to a SharePoint Online List with this sample. You can specify the planner plan that you want to migrate and the script will generate a new list for you with the required fields and views. The current sample does migrate all tasks however it skips the following information: Categories, Comments made on tasks, Attachments"
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

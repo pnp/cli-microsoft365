@@ -5,7 +5,7 @@
     "title": "Get all the Teams a specific user is part of",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/teams/get-all-teams-specific-user-is-part-of",
     "creationDateTime": "2021-09-14",
-    "updateDateTime": "2021-09-14",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Gets all the Teams a specific user is part of.",
     "longDescription": [
       "Gets all the Teams a specific user is part of."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

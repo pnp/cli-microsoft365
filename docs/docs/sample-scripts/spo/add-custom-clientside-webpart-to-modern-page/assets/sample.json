@@ -5,7 +5,7 @@
     "title": "Add custom client-side web part to modern page",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/add-custom-clientside-webpart-to-modern-page",
     "creationDateTime": "2020-05-20",
-    "updateDateTime": "2020-05-20",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This sample helps you add your web part to the page.",
     "longDescription": [
       "You've built an amazing new web part and now you want to programmatically add it to a modern page. This sample helps you add your web part to the page with your custom properties that might be dynamic according to your script."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

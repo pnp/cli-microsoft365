@@ -21,13 +21,13 @@ m365 teams team app list [options]
 
 ## Examples
 
-List applications installed in the specified Microsoft Teams team by id
+List applications installed in the specified Microsoft Teams team by id.
 
 ```sh
 m365 teams team app list --teamId 2eaf7dcd-7e83-4c3a-94f7-932a1299c844
 ```
 
-List applications installed in the specified Microsoft Teams team by name
+List applications installed in the specified Microsoft Teams team by name.
 
 ```sh
 m365 teams team app list --teamName "Team Name"
@@ -75,4 +75,20 @@ m365 teams team app list --teamName "Team Name"
     ```csv
     id,displayName,distributionMethod
     MGFkNTViNWQtNmE3OS00NjdiLWFkMjEtZDRiZWY3OTQ4YTc5IyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=,Activity,store
+    ```
+
+=== "Markdown"
+
+    ```md
+    # teams team app list --teamName "Team Name"
+
+    Date: 1/3/2023
+
+    ## Activity (MGFkNTViNWQtNmE3OS00NjdiLWFkMjEtZDRiZWY3OTQ4YTc5IyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY==)
+
+    Property | Value
+    ---------|-------
+    id | MGFkNTViNWQtNmE3OS00NjdiLWFkMjEtZDRiZWY3OTQ4YTc5IyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY==
+    displayName | Activity
+    distributionMethod | store
     ```

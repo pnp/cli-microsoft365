@@ -15,7 +15,7 @@
       alt="GitHub" />
   </a>
 
-  <a href="https://discord.com/invite/7rfW4kg6B5">
+  <a href="https://discord.gg/35HTFJ544b">
     <img src="https://img.shields.io/badge/Discord-Join-7289da?style=flat-square"
       alt="Discord" />
   </a>
@@ -212,6 +212,17 @@ We love to accept contributions.
 If you want to get involved with helping us grow the CLI, whether that is suggesting or adding a new command, extending an existing command or updating our documentation, we would love to hear from you.
 
 Checkout our [Wiki](https://github.com/pnp/cli-microsoft365/wiki) for guides on how to contribute to this project.
+
+## Need Help?
+
+<h4 align="center">
+  Join our community
+</h4>
+<p align="center">
+  <a href="https://discord.gg/35HTFJ544b">
+    <img alt="Discord" src="./docs/docs/images/discord-logo.png" width="100"/>
+  </a>
+</p>
 
 ## Microsoft 365 Platform Community
 

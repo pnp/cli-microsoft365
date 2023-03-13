@@ -26,46 +26,46 @@ describe(commands.PAGE_LIST, () => {
     value: [
       {
         "id": "1-a26aaec43ed348bd82edf4eb44e73d6c!14-3eb21088-b613-4698-98df-92a7d34e0678",
-        "self": "https://graph.microsoft.com/v1.0/users/mathijs@mathijsdev2.onmicrosoft.com/onenote/pages/1-a26aaec43ed348bd82edf4eb44e73d6c!14-3eb21088-b613-4698-98df-92a7d34e0678",
+        "self": "https://graph.microsoft.com/v1.0/users/john.doe@contoso.onmicrosoft.com/onenote/pages/1-a26aaec43ed348bd82edf4eb44e73d6c!14-3eb21088-b613-4698-98df-92a7d34e0678",
         "createdDateTime": "2023-01-07T10:56:45Z",
         "title": "Page A",
         "createdByAppId": "",
-        "contentUrl": "https://graph.microsoft.com/v1.0/users/mathijs@mathijsdev2.onmicrosoft.com/onenote/pages/1-a26aaec43ed348bd82edf4eb44e73d6c!14-3eb21088-b613-4698-98df-92a7d34e0678/content",
+        "contentUrl": "https://graph.microsoft.com/v1.0/users/john.doe@contoso.onmicrosoft.com/onenote/pages/1-a26aaec43ed348bd82edf4eb44e73d6c!14-3eb21088-b613-4698-98df-92a7d34e0678/content",
         "lastModifiedDateTime": "2023-01-07T10:57:24Z",
         "links": {
           "oneNoteClientUrl": {
-            "href": "onenote:https://mathijsdev2-my.sharepoint.com/personal/mathijs_mathijsdev2_onmicrosoft_com/Documents/Notitieblokken/My%20OneNote/Test.one#Page%20A&section-id=94cacaca-d6b5-428d-b967-d3cf01b95c28&page-id=8ca085ba-cad9-4cf4-824e-07e66520ac3f&end"
+            "href": "onenote:https://contoso-my.sharepoint.com/personal/john_doe_contoso_onmicrosoft_com/Documents/Notitieblokken/My%20OneNote/Test.one#Page%20A&section-id=94cacaca-d6b5-428d-b967-d3cf01b95c28&page-id=8ca085ba-cad9-4cf4-824e-07e66520ac3f&end"
           },
           "oneNoteWebUrl": {
-            "href": "https://mathijsdev2-my.sharepoint.com/personal/mathijs_mathijsdev2_onmicrosoft_com/Documents/Notitieblokken/My%20OneNote?wd=target%28Test.one%7C94cacaca-d6b5-428d-b967-d3cf01b95c28%2FPage%20A%7C8ca085ba-cad9-4cf4-824e-07e66520ac3f%2F%29"
+            "href": "https://contoso-my.sharepoint.com/personal/john_doe_contoso_onmicrosoft_com/Documents/Notitieblokken/My%20OneNote?wd=target%28Test.one%7C94cacaca-d6b5-428d-b967-d3cf01b95c28%2FPage%20A%7C8ca085ba-cad9-4cf4-824e-07e66520ac3f%2F%29"
           }
         },
         "parentSection": {
           "id": "1-3eb21088-b613-4698-98df-92a7d34e0678",
           "displayName": "Test",
-          "self": "https://graph.microsoft.com/v1.0/users/mathijs@mathijsdev2.onmicrosoft.com/onenote/sections/1-3eb21088-b613-4698-98df-92a7d34e0678"
+          "self": "https://graph.microsoft.com/v1.0/users/john.doe@contoso.onmicrosoft.com/onenote/sections/1-3eb21088-b613-4698-98df-92a7d34e0678"
         }
       },
       {
         "id": "1-a26aaec43ed348bd82edf4eb44e73d6c!68-3eb21088-b613-4698-98df-92a7d34e0678",
-        "self": "https://graph.microsoft.com/v1.0/users/mathijs@mathijsdev2.onmicrosoft.com/onenote/pages/1-a26aaec43ed348bd82edf4eb44e73d6c!68-3eb21088-b613-4698-98df-92a7d34e0678",
+        "self": "https://graph.microsoft.com/v1.0/users/john.doe@contoso.onmicrosoft.com/onenote/pages/1-a26aaec43ed348bd82edf4eb44e73d6c!68-3eb21088-b613-4698-98df-92a7d34e0678",
         "createdDateTime": "2023-01-07T10:57:15Z",
         "title": "Page B",
         "createdByAppId": "",
-        "contentUrl": "https://graph.microsoft.com/v1.0/users/mathijs@mathijsdev2.onmicrosoft.com/onenote/pages/1-a26aaec43ed348bd82edf4eb44e73d6c!68-3eb21088-b613-4698-98df-92a7d34e0678/content",
+        "contentUrl": "https://graph.microsoft.com/v1.0/users/john.doe@contoso.onmicrosoft.com/onenote/pages/1-a26aaec43ed348bd82edf4eb44e73d6c!68-3eb21088-b613-4698-98df-92a7d34e0678/content",
         "lastModifiedDateTime": "2023-01-07T10:57:17Z",
         "links": {
           "oneNoteClientUrl": {
-            "href": "onenote:https://mathijsdev2-my.sharepoint.com/personal/mathijs_mathijsdev2_onmicrosoft_com/Documents/Notitieblokken/My%20OneNote/Test.one#Page%20B&section-id=94cacaca-d6b5-428d-b967-d3cf01b95c28&page-id=46a1b220-7ffd-4512-a571-55322097c08d&end"
+            "href": "onenote:https://contoso-my.sharepoint.com/personal/john_doe_contoso_onmicrosoft_com/Documents/Notitieblokken/My%20OneNote/Test.one#Page%20B&section-id=94cacaca-d6b5-428d-b967-d3cf01b95c28&page-id=46a1b220-7ffd-4512-a571-55322097c08d&end"
           },
           "oneNoteWebUrl": {
-            "href": "https://mathijsdev2-my.sharepoint.com/personal/mathijs_mathijsdev2_onmicrosoft_com/Documents/Notitieblokken/My%20OneNote?wd=target%28Test.one%7C94cacaca-d6b5-428d-b967-d3cf01b95c28%2FPage%20B%7C46a1b220-7ffd-4512-a571-55322097c08d%2F%29"
+            "href": "https://contoso-my.sharepoint.com/personal/john_doe_contoso_onmicrosoft_com/Documents/Notitieblokken/My%20OneNote?wd=target%28Test.one%7C94cacaca-d6b5-428d-b967-d3cf01b95c28%2FPage%20B%7C46a1b220-7ffd-4512-a571-55322097c08d%2F%29"
           }
         },
         "parentSection": {
           "id": "1-3eb21088-b613-4698-98df-92a7d34e0678",
           "displayName": "Test",
-          "self": "https://graph.microsoft.com/v1.0/users/mathijs@mathijsdev2.onmicrosoft.com/onenote/sections/1-3eb21088-b613-4698-98df-92a7d34e0678"
+          "self": "https://graph.microsoft.com/v1.0/users/john.doe@contoso.onmicrosoft.com/onenote/sections/1-3eb21088-b613-4698-98df-92a7d34e0678"
         }
       }
     ]
