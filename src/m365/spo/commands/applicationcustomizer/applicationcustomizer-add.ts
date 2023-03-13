@@ -114,10 +114,7 @@ class SpoApplicationCustomizerAddCommand extends SpoCommand {
       requestBody.ClientSideComponentProperties = args.options.clientSideComponentProperties;
     }
 
-    let scope = args.options.scope;
-    if (!scope) {
-      scope = 'Site';
-    }
+    const scope = args.options.scope || 'Web';
 
     const requestOptions: any = {
       url: `${args.options.webUrl}/_api/${scope}/UserCustomActions`,

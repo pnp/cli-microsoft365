@@ -23,7 +23,7 @@ m365 spo applicationcustomizer add [options]
 : JSON string with application customizer properties
 
 `-s, --scope [scope]`
-: Scope of the application customizer. Allowed values: `Site`, `Web`. Defaults to `Site`.
+: Scope of the application customizer. Allowed values: `Site`, `Web`. Defaults to `Web`.
 
 --8<-- "docs/cmd/_global.md"
 
