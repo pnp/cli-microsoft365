@@ -200,5 +200,4 @@ describe(commands.COMMANDSET_LIST, () => {
     }
     assert(false);
   });
-
 });
