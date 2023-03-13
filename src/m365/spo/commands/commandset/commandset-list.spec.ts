@@ -190,4 +190,15 @@ describe(commands.COMMANDSET_LIST, () => {
       new CommandError(error));
   });
 
+  it('offers autocomplete for the scope option', () => {
+    const options = command.options;
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].option.indexOf('--scope') > -1) {
+        assert(options[i].autocomplete);
+        return;
+      }
+    }
+    assert(false);
+  });
+
 });

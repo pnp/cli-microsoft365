@@ -59,16 +59,10 @@ class SpoCommandsetListCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const isValidUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (typeof isValidUrl === 'string') {
-          return isValidUrl;
-        }
-
         if (args.options.scope && SpoCommandsetListCommand.scopes.indexOf(args.options.scope) < 0) {
           return `${args.options.scope} is not a valid scope. Valid scopes are ${SpoCommandsetListCommand.scopes.join(', ')}`;
         }
-
-        return true;
+        return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
   }
