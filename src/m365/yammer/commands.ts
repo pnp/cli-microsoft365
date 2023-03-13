@@ -21,6 +21,5 @@ export default {
   REPORT_GROUPSACTIVITYGROUPCOUNTS: `${prefix} report groupsactivitygroupcounts`,
   SEARCH: `${prefix} search`,
   USER_GET: `${prefix} user get`,
-  USER_LIST: `${prefix} user list`,
-  TEST: `${prefix} test`
+  USER_LIST: `${prefix} user list`
 };

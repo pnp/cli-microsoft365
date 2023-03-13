@@ -835,10 +835,11 @@ describe('Cli', () => {
   });
 
   it(`prompts for optionset name and value when optionset not specified`, async () => {
-    let firstOptionValue = '';
+    let firstOptionValue = '', secondOptionValue = '';
     const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake((opts: any, _) => {
       if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
         firstOptionValue = opts.choices[0];
+        secondOptionValue = opts.choices[1];
         return { missingRequiredOptionName: opts.choices[0] } as any;
       }
 
@@ -856,12 +857,18 @@ describe('Cli', () => {
       return defaultValue;
     });
     await cli.execute(rootFolder, ['cli', 'mock', 'optionsets']);
+    assert.strictEqual(promptStub.firstCall.args[0].choices[0], firstOptionValue);
+    assert.strictEqual(promptStub.firstCall.args[0].choices[1], secondOptionValue);
     assert.strictEqual(promptStub.lastCall.args[0].message, `Value for '${firstOptionValue}':`);
+    assert(promptStub.calledTwice);
   });
 
-  it(`prompts to choose which optionset you wish to use when multiple options in optionset are specified`, async () => {
+  it(`prompts to choose which option you wish to use when multiple options in a specific optionset are specified`, async () => {
+    let firstOptionValue = '', secondOptionValue = '';
     const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake((opts: any, _) => {
       if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
+        firstOptionValue = opts.choices[0];
+        secondOptionValue = opts.choices[1];
         return { missingRequiredOptionName: opts.choices[0] } as any;
       }
 
@@ -876,6 +883,62 @@ describe('Cli', () => {
     });
     await cli.execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue']);
     assert.strictEqual(promptStub.lastCall.args[0].message, `Option to use:`);
+    assert.strictEqual(promptStub.lastCall.args[0].choices[0], firstOptionValue);
+    assert.strictEqual(promptStub.lastCall.args[0].choices[1], secondOptionValue);
+    assert(promptStub.calledOnce);
+  });
+
+  it(`prompts to choose runsWhen option from optionSet when dependant option is set and prompts for the value`, async () => {
+    let firstOptionValue = '', secondOptionValue = '';
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake((opts: any, _) => {
+      if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
+        firstOptionValue = opts.choices[0];
+        secondOptionValue = opts.choices[1];
+        return { missingRequiredOptionName: opts.choices[0] } as any;
+      }
+
+      if (opts.name === 'missingRequiredOptionValue') {
+        return { missingRequiredOptionValue: 'Test 123' } as any;
+      }
+
+      throw 'Specific prompt not found';
+    });
+
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return 'true';
+      }
+      return defaultValue;
+    });
+    await cli.execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue']);
+    assert.strictEqual(promptStub.firstCall.args[0].message, `Option to use:`);
+    assert.strictEqual(promptStub.firstCall.args[0].choices[0], firstOptionValue);
+    assert.strictEqual(promptStub.firstCall.args[0].choices[1], secondOptionValue);
+    assert(promptStub.calledTwice);
+  });
+
+  it(`prompts to pick one of the options from an optionSet when runsWhen condition is matched`, async () => {
+    let firstOptionValue = '', secondOptionValue = '';
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake((opts: any, _) => {
+      if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
+        firstOptionValue = opts.choices[0];
+        secondOptionValue = opts.choices[1];
+        return { missingRequiredOptionName: opts.choices[0] } as any;
+      }
+
+      throw 'Specific prompt not found';
+    });
+
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return 'true';
+      }
+      return defaultValue;
+    });
+    await cli.execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt2', 'testvalue', '--opt3', 'opt 3', '--opt4', 'opt 4']);
+    assert.strictEqual(promptStub.lastCall.args[0].choices[0], firstOptionValue);
+    assert.strictEqual(promptStub.lastCall.args[0].choices[1], secondOptionValue);
+    assert(promptStub.calledOnce);
   });
 
   it(`calls command's validation method when defined`, (done) => {
