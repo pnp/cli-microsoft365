@@ -352,6 +352,17 @@ describe(commands.COMMANDSET_REMOVE, () => {
     await command.action(logger, { options: { webUrl: validUrl, clientSideComponentId: validClientSideComponentId, confirm: true } });
   });
 
+  it('offers autocomplete for the scope option', () => {
+    const options = command.options;
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].option.indexOf('--scope') > -1) {
+        assert(options[i].autocomplete);
+        return;
+      }
+    }
+    assert(false);
+  });
+
   it('correctly handles API OData error', async () => {
     const error = {
       error: {

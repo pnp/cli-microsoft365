@@ -22,7 +22,7 @@ export interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class SpoCommandsetRemoveCommand extends SpoCommand {
+class SpoCommandSetRemoveCommand extends SpoCommand {
   private static readonly scopes: string[] = ['All', 'Site', 'Web'];
 
   public get name(): string {
@@ -69,7 +69,7 @@ class SpoCommandsetRemoveCommand extends SpoCommand {
         option: '-c, --clientSideComponentId  [clientSideComponentId]'
       },
       {
-        option: '-s, --scope [scope]', autocomplete: SpoCommandsetRemoveCommand.scopes
+        option: '-s, --scope [scope]', autocomplete: SpoCommandSetRemoveCommand.scopes
       },
       {
         option: '--confirm'
@@ -88,8 +88,8 @@ class SpoCommandsetRemoveCommand extends SpoCommand {
           return `${args.options.clientSideComponentId} is not a valid GUID`;
         }
 
-        if (args.options.scope && SpoCommandsetRemoveCommand.scopes.indexOf(args.options.scope) < 0) {
-          return `${args.options.scope} is not a valid scope. Allowed values are ${SpoCommandsetRemoveCommand.scopes.join(', ')}`;
+        if (args.options.scope && SpoCommandSetRemoveCommand.scopes.indexOf(args.options.scope) < 0) {
+          return `${args.options.scope} is not a valid scope. Allowed values are ${SpoCommandSetRemoveCommand.scopes.join(', ')}`;
         }
 
         return validation.isValidSharePointUrl(args.options.webUrl);
@@ -180,4 +180,4 @@ class SpoCommandsetRemoveCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoCommandsetRemoveCommand();
+module.exports = new SpoCommandSetRemoveCommand();
