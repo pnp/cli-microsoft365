@@ -6,12 +6,15 @@ LABEL name="m365pnp/cli-microsoft365:${CLI_VERSION}" \
   description="Manage Microsoft 365 and SharePoint Framework projects on any platform" \
   homepage="https://pnp.github.io/cli-microsoft365" \
   maintainers="Waldek Mastykarz <waldek@mastykarz.nl>, \
-  Velin Georgiev <velin.georgiev@gmail.com>, \
   Garry Trinder <garry.trinder@live.com>, \
   Albert-Jan Schot <appie@digiwijs.nl>, \
   Rabia Williams <rabiawilliams@gmail.com>, \
-  Patrick Lamber <patrick@nubo.eu> \
-  Arjun Menon <arjun.umenon@gmail.com>" \
+  Patrick Lamber <patrick@nubo.eu>, \
+  Arjun Menon <arjun.umenon@gmail.com>, \
+  Adam Wojcik <adam.wojcik.it@gmail.com>, \
+  Martin Lingstuyl <mlingstuyl@live.com>, \
+  Jasey Waegebaert <jaseyw@gmigroup.be>, \
+  Milan Holemans <Milan.Holemans@vanroey.be>" \
   com.azure.dev.pipelines.agent.handler.node.path="/usr/bin/node"
 
 RUN apk add --no-cache \
