@@ -40,6 +40,11 @@ If you specify the `resource` option, the CLI will try to retrieve a valid token
 
 Specify additional headers by typing them as options, for example: `--content-type "application/json"`, `--if-match "*"`, `--x-requestdigest "somedigest"`.
 
+You can simplify the request by providing tokens to the `url` option. Following tokens are available:
+- @graph resolves to https://graph.microsoft.com/v1.0
+- @graphbeta resolves to https://graph.microsoft.com/beta
+- @spo resolves to the current SharePoint URL if available in the connection info. You can set a SharePoint URL with the `m365 spo set -u <url>` command.
+
 !!! important
     When building the request, depending on the shell you use, you might need to escape all `$` characters in the URL, request headers, and the body. If you don't do it, the shell will treat it as a variable and will remove the following word from the request, breaking the request.
 
@@ -63,16 +68,16 @@ Call the SharePoint API to retrieve a form digest.
 m365 request --method post --url "https://contoso.sharepoint.com/sites/project-x/_api/contextinfo"
 ```
 
-Call the SharePoint API to update a site title.
+Call the SharePoint API to update a site title with the @spo token.
 
 ```sh
-m365 request --method post --url "https://contoso.sharepoint.com/sites/project-x/_api/web" --body '{ "Title": "New title" }' --content-type "application/json" --x-http-method "PATCH"
+m365 request --method post --url "@spo/sites/project-x/_api/web" --body '{ "Title": "New title" }' --content-type "application/json" --x-http-method "PATCH"
 ```
 
-Call the Microsoft Graph to get a profile photo.
+Call the Microsoft Graph to get a profile photo with the @graphbeta token.
 
 ```sh
-m365 request --url "https://graph.microsoft.com/beta/me/photo/\$value" --filePath ./profile-pic.jpg
+m365 request --url "@graphbeta/me/photo/\$value" --filePath ./profile-pic.jpg
 ```
 
 ## Response
