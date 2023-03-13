@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   scope?: string;
 }
 
-class SpoCommandsetListCommand extends SpoCommand {
+class SpoCommandSetListCommand extends SpoCommand {
   private static readonly scopes: string[] = ['All', 'Site', 'Web'];
   public get name(): string {
     return commands.COMMANDSET_LIST;
@@ -51,7 +51,7 @@ class SpoCommandsetListCommand extends SpoCommand {
       },
       {
         option: '-s, --scope [scope]',
-        autocomplete: SpoCommandsetListCommand.scopes
+        autocomplete: SpoCommandSetListCommand.scopes
       }
     );
   }
@@ -59,8 +59,8 @@ class SpoCommandsetListCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.scope && SpoCommandsetListCommand.scopes.indexOf(args.options.scope) < 0) {
-          return `${args.options.scope} is not a valid scope. Valid scopes are ${SpoCommandsetListCommand.scopes.join(', ')}`;
+        if (args.options.scope && SpoCommandSetListCommand.scopes.indexOf(args.options.scope) < 0) {
+          return `${args.options.scope} is not a valid scope. Valid scopes are ${SpoCommandSetListCommand.scopes.join(', ')}`;
         }
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
@@ -83,4 +83,4 @@ class SpoCommandsetListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoCommandsetListCommand();
+module.exports = new SpoCommandSetListCommand();
