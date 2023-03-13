@@ -148,10 +148,8 @@ class SpoCommandsetAddCommand extends SpoCommand {
         return 'ClientSideExtension.ListViewCommandSet';
       case 'ContextMenu':
         return 'ClientSideExtension.ListViewCommandSet.ContextMenu';
-      case 'CommandBar':
-        return 'ClientSideExtension.ListViewCommandSet.CommandBar';
       default:
-        throw `${location} is not a valid location type`;
+        return 'ClientSideExtension.ListViewCommandSet.CommandBar';
     }
   }
 
