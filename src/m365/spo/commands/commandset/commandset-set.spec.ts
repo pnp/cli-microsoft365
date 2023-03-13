@@ -326,7 +326,7 @@ describe(commands.COMMANDSET_SET, () => {
       throw `Invalid request`;
     });
 
-    await command.action(logger, { options: { webUrl: validUrl, clientSideComponentId: validClientSideComponentId, newTitle: validNewTitle } });
+    await command.action(logger, { options: { webUrl: validUrl, clientSideComponentId: validClientSideComponentId, newTitle: validNewTitle, listType: 'SitePages' } });
   });
 
   it('correctly handles API OData error', async () => {

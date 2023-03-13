@@ -25,7 +25,7 @@ export interface Options extends GlobalOptions {
 }
 
 class SpoCommandsetSetCommand extends SpoCommand {
-  private static readonly listTypes: string[] = ['List', 'Library'];
+  private static readonly listTypes: string[] = ['List', 'Library', 'SitePages'];
   private static readonly scopes: string[] = ['All', 'Site', 'Web'];
   private static readonly locations: string[] = ['ContextMenu', 'CommandBar', 'Both'];
 
@@ -142,8 +142,7 @@ class SpoCommandsetSetCommand extends SpoCommand {
     const location: string = this.getLocation(args.options.location ? args.options.location : '');
 
     try {
-      const requestBody: any = {
-      };
+      const requestBody: any = {};
 
       if (args.options.newTitle) {
         requestBody.Title = args.options.newTitle;
@@ -154,7 +153,7 @@ class SpoCommandsetSetCommand extends SpoCommand {
       }
 
       if (args.options.listType) {
-        requestBody.RegistrationId = args.options.listType === 'List' ? "100" : "101";
+        requestBody.RegistrationId = this.getListTemplate(args.options.listType);
       }
 
       if (args.options.clientSideComponentProperties) {
@@ -197,17 +196,16 @@ class SpoCommandsetSetCommand extends SpoCommand {
 
       return commandSets[0].Id;
     }
-    else {
-      const commandSets: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `(ClientSideComponentId eq guid'${options.clientSideComponentId}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`);
 
-      if (commandSets.length === 0) {
-        throw `No user commandsets with ClientSideComponentId '${options.clientSideComponentId}' found`;
-      }
-      if (commandSets.length > 1) {
-        throw `Multiple user commandsets with ClientSideComponentId '${options.clientSideComponentId}' found. Please disambiguate using IDs: ${commandSets.map((commandSet: CustomAction) => commandSet.Id).join(', ')}`;
-      }
-      return commandSets[0].Id;
+    const commandSets: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `(ClientSideComponentId eq guid'${options.clientSideComponentId}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`);
+
+    if (commandSets.length === 0) {
+      throw `No user commandsets with ClientSideComponentId '${options.clientSideComponentId}' found`;
     }
+    if (commandSets.length > 1) {
+      throw `Multiple user commandsets with ClientSideComponentId '${options.clientSideComponentId}' found. Please disambiguate using IDs: ${commandSets.map((commandSet: CustomAction) => commandSet.Id).join(', ')}`;
+    }
+    return commandSets[0].Id;
   }
 
   private getLocation(location: string): string {
@@ -218,6 +216,17 @@ class SpoCommandsetSetCommand extends SpoCommand {
         return 'ClientSideExtension.ListViewCommandSet.ContextMenu';
       default:
         return 'ClientSideExtension.ListViewCommandSet.CommandBar';
+    }
+  }
+
+  private getListTemplate(listTemplate: string): string {
+    switch (listTemplate) {
+      case 'SitePages':
+        return '119';
+      case 'Library':
+        return '101';
+      default:
+        return '100';
     }
   }
 }

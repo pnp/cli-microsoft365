@@ -26,7 +26,7 @@ m365 spo commandset set [options]
 : The new title of the ListView Command Set.
 
 `-l, --listType [listType]`
-: The list or library type to register the Command Set on. Allowed values `List` or `Library`.
+: The list or library type to register the Command Set on. Allowed values `List`, `Library` or `SitePages`.
 
 `--clientSideComponentProperties  [clientSideComponentProperties]`
 : The Client Side Component properties of the ListView Command Set.
@@ -41,7 +41,7 @@ m365 spo commandset set [options]
 
 ## Remarks
 
-Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treat quotes differently. For example, this is how ApplicationCustomizer user custom action can be created from the Windows cmd.exe:
+Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treat quotes differently. For example, this is how a ListView Command Set can be created from the Windows cmd.exe:
 
 ```sh
 m365 spo commandset set --webUrl https://contoso.sharepoint.com/sites/test --title "CLI Commandset" --location "Both" --listType "List" --clientSideComponentProperties '{\"testMessage\":\"Test message\"}'
