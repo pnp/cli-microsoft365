@@ -133,7 +133,7 @@ class TodoTaskAddCommand extends GraphCommand {
           return `'${args.options.startDateTime}' is not a valid datetime.`;
         }
 
-        if (args.options.status && TodoTaskAddCommand.allowedStatuses.map(x => x.toLowerCase()).indexOf(args.options.status.toLowerCase()) === -1) {
+        if (args.options.status && !TodoTaskAddCommand.allowedStatuses.some(status => status.toLowerCase() === args.options.status!.toLowerCase())) {
           return `${args.options.status} is not a valid value for status. Valid values are ${TodoTaskAddCommand.allowedStatuses.join(', ')}`;
         }
 
@@ -156,7 +156,7 @@ class TodoTaskAddCommand extends GraphCommand {
     try {
       const listId: string = await this.getTodoListId(args);
 
-      const status = args.options.status && TodoTaskAddCommand.allowedStatuses.filter(x => x.toLowerCase() === args.options.status!.toLowerCase())[0];
+      const status = args.options.status && TodoTaskAddCommand.allowedStatuses.find(x => x.toLowerCase() === args.options.status!.toLowerCase());
 
       const requestOptions: CliRequestOptions = {
         url: `${endpoint}/me/todo/lists/${listId}/tasks`,

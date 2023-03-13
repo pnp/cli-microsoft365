@@ -81,7 +81,7 @@ m365 todo task add --title "New task" --listId "AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04
 Create a new task with categories, a completedDateTime, a startDateTime and a status
 
 ```sh
-m365 todo task add --title "New task" --listName "My task list" --categories "Red category,Important" --completedDateTime 2023-12-01 --startDateTime 2023-12-01 --status "notStarted"
+m365 todo task add --title "New task" --listName "My task list" --categories "Red category,Important" --completedDateTime 2023-12-01 --startDateTime 2023-12-01 --status "completed"
 ```
 
 ## Response
