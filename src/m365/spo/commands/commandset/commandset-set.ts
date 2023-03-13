@@ -24,7 +24,7 @@ export interface Options extends GlobalOptions {
   location?: string;
 }
 
-class SpoCommandsetSetCommand extends SpoCommand {
+class SpoCommandSetSetCommand extends SpoCommand {
   private static readonly listTypes: string[] = ['List', 'Library', 'SitePages'];
   private static readonly scopes: string[] = ['All', 'Site', 'Web'];
   private static readonly locations: string[] = ['ContextMenu', 'CommandBar', 'Both'];
@@ -78,16 +78,16 @@ class SpoCommandsetSetCommand extends SpoCommand {
         option: '--newTitle [newTitle]'
       },
       {
-        option: '-l, --listType [listType]', autocomplete: SpoCommandsetSetCommand.listTypes
+        option: '-l, --listType [listType]', autocomplete: SpoCommandSetSetCommand.listTypes
       },
       {
         option: '--clientSideComponentProperties  [clientSideComponentProperties]'
       },
       {
-        option: '-s, --scope [scope]', autocomplete: SpoCommandsetSetCommand.scopes
+        option: '-s, --scope [scope]', autocomplete: SpoCommandSetSetCommand.scopes
       },
       {
-        option: '--location [location]', autocomplete: SpoCommandsetSetCommand.locations
+        option: '--location [location]', autocomplete: SpoCommandSetSetCommand.locations
       }
     );
   }
@@ -103,16 +103,16 @@ class SpoCommandsetSetCommand extends SpoCommand {
           return `${args.options.clientSideComponentId} is not a valid GUID`;
         }
 
-        if (args.options.listType && SpoCommandsetSetCommand.listTypes.indexOf(args.options.listType) < 0) {
-          return `${args.options.listType} is not a valid list type. Allowed values are ${SpoCommandsetSetCommand.listTypes.join(', ')}`;
+        if (args.options.listType && SpoCommandSetSetCommand.listTypes.indexOf(args.options.listType) < 0) {
+          return `${args.options.listType} is not a valid list type. Allowed values are ${SpoCommandSetSetCommand.listTypes.join(', ')}`;
         }
 
-        if (args.options.scope && SpoCommandsetSetCommand.scopes.indexOf(args.options.scope) < 0) {
-          return `${args.options.scope} is not a valid scope. Allowed values are ${SpoCommandsetSetCommand.scopes.join(', ')}`;
+        if (args.options.scope && SpoCommandSetSetCommand.scopes.indexOf(args.options.scope) < 0) {
+          return `${args.options.scope} is not a valid scope. Allowed values are ${SpoCommandSetSetCommand.scopes.join(', ')}`;
         }
 
-        if (args.options.location && SpoCommandsetSetCommand.locations.indexOf(args.options.location) < 0) {
-          return `${args.options.location} is not a valid location. Allowed values are ${SpoCommandsetSetCommand.locations.join(', ')}`;
+        if (args.options.location && SpoCommandSetSetCommand.locations.indexOf(args.options.location) < 0) {
+          return `${args.options.location} is not a valid location. Allowed values are ${SpoCommandSetSetCommand.locations.join(', ')}`;
         }
 
         if (!args.options.newTitle && !args.options.listType && !args.options.clientSideComponentProperties && !args.options.location) {
@@ -231,4 +231,4 @@ class SpoCommandsetSetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoCommandsetSetCommand();
+module.exports = new SpoCommandSetSetCommand();
