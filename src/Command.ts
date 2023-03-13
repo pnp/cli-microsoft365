@@ -197,22 +197,102 @@ export default abstract class Command {
       return true;
     }
 
+    let inquirer: Inquirer | undefined;
+    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
+
     const argsOptions: string[] = Object.keys(args.options);
-    for (const optionSet of optionsSets) {
-      if (optionSet.runsWhen === undefined || optionSet.runsWhen(args)) {
-        const commonOptions = argsOptions.filter(opt => optionSet.options.includes(opt));
+    const optionSetsWithoutArgs = optionsSets.filter(y => y.runsWhen === undefined);
+    const optionSetsWithArgs = optionsSets.filter(y => y.runsWhen);
 
-        if (commonOptions.length === 0) {
-          return `Specify one of the following options: ${optionSet.options.map(opt => opt).join(', ')}.`;
+    for (const optionSet of optionSetsWithoutArgs) {
+      const commonOptions = argsOptions.filter(opt => optionSet.options.includes(opt));
+      if (commonOptions.length === 0) {
+        if (!shouldPrompt) {
+          return `Specify one of the following options: ${optionSet.options.join(', ')}.`;
         }
 
-        if (commonOptions.length > 1) {
-          return `Specify one of the following options: ${optionSet.options.map(opt => opt).join(', ')}, but not multiple.`;
+        await this.promptForOptionSetNameAndValue(args, optionSet, inquirer);
+      }
+
+      if (commonOptions.length > 1) {
+        if (!shouldPrompt) {
+          return `Specify one of the following options: ${optionSet.options.join(', ')}, but not multiple.`;
         }
+
+        await this.promptForSpecificOption(args, commonOptions, inquirer);
       }
     }
 
+    return this.processOptionSetsWithArgs(args, optionSetsWithArgs, argsOptions, shouldPrompt, inquirer);
+  }
+
+  private async processOptionSetsWithArgs(args: CommandArgs, optionSets: OptionSet[], argsOptions: string[], shouldPrompt: boolean, inquirer?: Inquirer): Promise<string | boolean> {
+    for (const optionSet of optionSets) {
+      // check if dependant from other optionSet
+      if (optionSet.runsWhen!(args)) {
+        const commonOptions = argsOptions.filter(opt => optionSet.options.includes(opt));
+        if (commonOptions.length === 0) {
+          if (!shouldPrompt) {
+            return `Specify one of the following options: ${optionSet.options.join(', ')}.`;
+          }
+
+          await this.promptForOptionSetNameAndValue(args, optionSet, inquirer);
+        }
+
+        if (commonOptions.length > 1) {
+          if (!shouldPrompt) {
+            return `Specify one of the following options: ${optionSet.options.join(', ')}, but not multiple.`;
+          }
+
+          await this.promptForSpecificOption(args, commonOptions, inquirer);
+        }
+      }
+    }
     return true;
+  }
+
+  private async promptForOptionSetNameAndValue(args: CommandArgs, optionSet: OptionSet, inquirer?: Inquirer): Promise<void> {
+    if (!inquirer) {
+      inquirer = require('inquirer');
+    }
+
+    Cli.log(`You forgot to specify values for an option set. Please specify one of the following options:`);
+    const resultOptionName = await (inquirer as Inquirer)
+      .prompt({
+        type: 'list',
+        name: 'missingRequiredOptionName',
+        message: `Option to use:`,
+        choices: optionSet.options
+      });
+    const missingRequiredOptionName = resultOptionName.missingRequiredOptionName;
+
+    const resultOptionValue = await (inquirer as Inquirer)
+      .prompt({
+        name: 'missingRequiredOptionValue',
+        message: `Value for '${missingRequiredOptionName}':`
+      });
+
+    args.options[missingRequiredOptionName] = resultOptionValue.missingRequiredOptionValue;
+    Cli.log();
+  }
+
+  private async promptForSpecificOption(args: CommandArgs, commonOptions: string[], inquirer?: Inquirer): Promise<void> {
+    if (!inquirer) {
+      inquirer = require('inquirer');
+    }
+
+    Cli.log(`Multiple options for an option set specified. Please specify the correct option that you wish to use.`);
+
+    const requiredOptionNameResult = await (inquirer as Inquirer)
+      .prompt({
+        type: 'list',
+        name: 'missingRequiredOptionName',
+        message: `Option to use:`,
+        choices: commonOptions
+      });
+
+    commonOptions.filter(y => y !== requiredOptionNameResult.missingRequiredOptionName).map(optionName => args.options[optionName] = undefined);
+    Cli.log();
   }
 
   private async validateOutput(args: CommandArgs): Promise<string | boolean> {

@@ -834,6 +834,50 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
+  it(`prompts for optionset name and value when optionset not specified`, async () => {
+    let firstOptionValue = '';
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake((opts: any, _) => {
+      if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
+        firstOptionValue = opts.choices[0];
+        return { missingRequiredOptionName: opts.choices[0] } as any;
+      }
+
+      if (opts.name === 'missingRequiredOptionValue') {
+        return { missingRequiredOptionValue: 'Test 123' } as any;
+      }
+
+      throw 'Specific prompt not found';
+    });
+
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return 'true';
+      }
+      return defaultValue;
+    });
+    await cli.execute(rootFolder, ['cli', 'mock', 'optionsets']);
+    assert.strictEqual(promptStub.lastCall.args[0].message, `Value for '${firstOptionValue}':`);
+  });
+
+  it(`prompts to choose which optionset you wish to use when multiple options in optionset are specified`, async () => {
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake((opts: any, _) => {
+      if (opts.type === 'list' && opts.name === 'missingRequiredOptionName') {
+        return { missingRequiredOptionName: opts.choices[0] } as any;
+      }
+
+      throw 'Specific prompt not found';
+    });
+
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return 'true';
+      }
+      return defaultValue;
+    });
+    await cli.execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue']);
+    assert.strictEqual(promptStub.lastCall.args[0].message, `Option to use:`);
+  });
+
   it(`calls command's validation method when defined`, (done) => {
     const mockCommandValidateSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'validate');
     cli
