@@ -333,6 +333,7 @@ nav:
         - solution publisher remove: cmd/pp/solution/solution-publisher-remove.md
       - tenant:
         - tenant settings list: cmd/pp/tenant/tenant-settings-list.md
+        - tenant settings set: cmd/pp/tenant/tenant-settings-set.md
     - Purview (purview):
       - auditlog:
         - auditlog list: cmd/purview/auditlog/auditlog-list.md
