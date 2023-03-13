@@ -228,7 +228,6 @@ export default abstract class Command {
 
   private async processOptionSetsWithArgs(args: CommandArgs, optionSets: OptionSet[], argsOptions: string[], shouldPrompt: boolean, inquirer?: Inquirer): Promise<string | boolean> {
     for (const optionSet of optionSets) {
-      // check if dependant from other optionSet
       if (optionSet.runsWhen!(args)) {
         const commonOptions = argsOptions.filter(opt => optionSet.options.includes(opt));
         if (commonOptions.length === 0) {
