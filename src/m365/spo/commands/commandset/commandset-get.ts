@@ -76,11 +76,6 @@ class SpoCommandSetGetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const isValidUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (typeof isValidUrl === 'string') {
-          return isValidUrl;
-        }
-
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID.`;
         }
@@ -93,7 +88,7 @@ class SpoCommandSetGetCommand extends SpoCommand {
           return `${args.options.scope} is not a valid scope. Valid scopes are ${SpoCommandSetGetCommand.scopes.join(', ')}`;
         }
 
-        return true;
+        return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
   }

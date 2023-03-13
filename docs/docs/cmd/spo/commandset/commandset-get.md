@@ -33,19 +33,19 @@ If the command finds multiple command sets with the specified title, it will pro
 
 ## Examples
 
-Retrieves an ListView Command Set by title.
+Retrieves a ListView Command Set by title.
 
 ```sh
 m365 spo commandset get --title "Some customizer" --webUrl https://contoso.sharepoint.com/sites/sales
 ```
 
-Retrieves an ListView Command Set by id with scope 'Web'.
+Retrieves a ListView Command Set by id with scope 'Web'.
 
 ```sh
 m365 spo commandset get --id 14125658-a9bc-4ddf-9c75-1b5767c9a337 --webUrl https://contoso.sharepoint.com/sites/sales -scope Web
 ```
 
-Retrieves an ListView Command Set by clientSideComponentId with scope 'Site'.
+Retrieves a ListView Command Set by clientSideComponentId with scope 'Site'.
 
 ```sh
 m365 spo commandset get --clientSideComponentId c1cbd896-5140-428d-8b0c-4873be19f5ac --webUrl https://contoso.sharepoint.com/sites/sales --scope Site
