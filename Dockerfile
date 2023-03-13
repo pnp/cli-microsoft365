@@ -40,6 +40,7 @@ RUN bash -c 'echo "export PATH=$PATH:/home/cli-microsoft365/.npm-global/bin:/hom
   && bash -c 'echo "export CLIMICROSOFT365_ENV=\"docker\"" >> ~/.bash_profile' \
   && bash -c 'npm i -g @pnp/cli-microsoft365@${CLI_VERSION} --production --quiet --no-progress' \ 
   && bash -c 'echo "source /etc/profile.d/bash_completion.sh" >> ~/.bash_profile' \
+  && bash -c 'echo ". .bashrc" >> ~/.bash_profile' \
   && bash -c 'npm cache clean --force' \
   && bash -c 'm365 cli completion sh setup' \
   && pwsh -c 'm365 cli completion pwsh setup --profile $profile'
