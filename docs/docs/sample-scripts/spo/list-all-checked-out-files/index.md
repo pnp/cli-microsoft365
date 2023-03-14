@@ -84,8 +84,9 @@ This script will loop through each site from your CSV file, and retrieve all the
 | https://contoso.sharepoint.com/sites/site2 |
 | https://contoso.sharepoint.com/sites/site3 |
 
-!!! important
-    Depending on the number of sites in your .csv file, the number of libraries as well as the number of files, the below script can take a very long time to provide results.
+:::info
+Depending on the number of sites in your .csv file, the number of libraries as well as the number of files, the below script can take a very long time to provide results.
+:::
 
 === "PowerShell"
 

@@ -172,8 +172,9 @@ Some of the commands return complex types. Querying or filtering based on values
 - `[?starts_with(properties.displayName, 'Contoso')]` or `[?starts_with(displayName, 'Contoso')]` would return the **first item** of the array as it filters on the displayName for **Contoso** and each filter is case-sensitive.
 - `[?ends_with(properties.azureRegionHint, 'europe')]` would return **both** items as it filters on **europe**.
 
-!!! important
-    All JMESPath queries are case sensitive
+:::info
+All JMESPath queries are case sensitive
+:::
 
 ## Ordering the dataset
 

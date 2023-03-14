@@ -41,8 +41,9 @@ m365 login --authType password --userName user@contoso.com --password pass@word1
 
 Using credentials to log in to Microsoft 365 is convenient in automation scenarios where you cannot authenticate interactively. The downside of this way of authenticating is, that it doesn't allow you to use any of the advanced security features that Azure AD offers. If your account for example uses multi-factor authentication, logging in to Microsoft 365 using credentials will fail.
 
-!!! attention
-    When logging in to Microsoft 365 using credentials, CLI for Microsoft 365 will persist not only the retrieved access and refresh token, but also the credentials you specified when logging in. This is necessary for the CLI to be able to retrieve a new refresh token, in case the previously retrieved refresh token expired or has been invalidated.
+:::caution
+When logging in to Microsoft 365 using credentials, CLI for Microsoft 365 will persist not only the retrieved access and refresh token, but also the credentials you specified when logging in. This is necessary for the CLI to be able to retrieve a new refresh token, in case the previously retrieved refresh token expired or has been invalidated.
+:::
 
 Generally, you should use the default device code flow. If you need to use a non-interactive authentication flow, you can authenticate using a certificate or credentials of an account that has sufficient privileges in your tenant and doesn't have multi-factor authentication or other advanced security features enabled.
 
@@ -66,18 +67,21 @@ Logging in to Microsoft 365 using a certificate is convenient for automation sce
 
 Because there is no user context when logging in using a certificate, you will typically create a new Azure AD application, specific to your organization and grant it the required permissions.
 
-!!! attention
-    You should keep in mind, that because the CLI for Microsoft 365 will be accessing these APIs with app-only context, you need to grant the correct application permissions rather than delegated permissions that would be used in other authentication methods.
+:::caution
+You should keep in mind, that because the CLI for Microsoft 365 will be accessing these APIs with app-only context, you need to grant the correct application permissions rather than delegated permissions that would be used in other authentication methods.
+:::
 
 Logging in using a certificate gives the CLI for Microsoft 365 app-only access to Microsoft 365 services. Not all operations support app-only access so it is possible, that some CLI commands will fail when executed while logged in to Microsoft 365 using a certificate.
 
-!!! attention
-    When logging in to Microsoft 365 using a certificate, CLI for Microsoft 365 will persist not only the retrieved access token but also the contents of the certificate's private key and its thumbprint. This is necessary for the CLI to be able to retrieve a new access token in case of the previously retrieved access token expired or has been invalidated.
+:::caution
+When logging in to Microsoft 365 using a certificate, CLI for Microsoft 365 will persist not only the retrieved access token but also the contents of the certificate's private key and its thumbprint. This is necessary for the CLI to be able to retrieve a new access token in case of the previously retrieved access token expired or has been invalidated.
+:::
 
 Generally, you should use the default device code flow. If you need to use a non-interactive authentication flow, to for example integrate the CLI for Microsoft 365 in your build pipeline, you can login using a certificate or user credentials.
 
-!!! attention
-    PFX files exported from a Windows key store will not work as they are protected with either a password or Active Directory account. The private key must either be exported from the protected .pfx or newly created using 3rd party tools like OpenSSL (https://www.openssl.org/).
+:::caution
+PFX files exported from a Windows key store will not work as they are protected with either a password or Active Directory account. The private key must either be exported from the protected .pfx or newly created using 3rd party tools like OpenSSL (https://www.openssl.org/).
+:::
 
 Create a new self signed certificate:
 
@@ -115,16 +119,19 @@ Logging in to Microsoft 365 using a secret is convenient for automation scenario
 
 Because there is no user context when logging in using a secret, you will typically create a new Azure AD application, specific to your organization and grant it the required permissions.
 
-!!! attention
-    You should keep in mind, that because the CLI for Microsoft 365 will be accessing these APIs with app-only context, you need to grant the correct application permissions rather than delegated permissions that would be used in other authentication methods.
+:::caution
+You should keep in mind, that because the CLI for Microsoft 365 will be accessing these APIs with app-only context, you need to grant the correct application permissions rather than delegated permissions that would be used in other authentication methods.
+:::
 
 Logging in using a secret gives the CLI for Microsoft 365 app-only access to Microsoft 365 services. Not all operations support app-only access so it is possible, that some CLI commands will fail when executed while logged in to Microsoft 365 using a secret.
 
-!!! attention
-    Currently, SharePoint does not support authentication using Azure AD App ID and Secret. CLI for Microsoft 365 commands that call the SharePoint APIs will fail while logged in to Microsoft 365 using a Secret.
+:::caution
+Currently, SharePoint does not support authentication using Azure AD App ID and Secret. CLI for Microsoft 365 commands that call the SharePoint APIs will fail while logged in to Microsoft 365 using a Secret.
+:::
 
-!!! attention
-    When logging in to Microsoft 365 using a secret, CLI for Microsoft 365 will persist not only the retrieved access token but also the secret. This is necessary for the CLI to be able to retrieve a new access token in case of the previously retrieved access token expired or has been invalidated.
+:::caution
+When logging in to Microsoft 365 using a secret, CLI for Microsoft 365 will persist not only the retrieved access token but also the secret. This is necessary for the CLI to be able to retrieve a new access token in case of the previously retrieved access token expired or has been invalidated.
+:::
 
 #### Log in using a browser authentication
 
@@ -152,8 +159,9 @@ To log out from Microsoft 365, use the `logout` command. Executing the `logout` 
 
 CLI for Microsoft 365 automatically detects the URL of your SharePoint Online tenant when executing SharePoint commands. All you need to do is to log in to Microsoft 365 with your account. Commands, that operate on specific site collections or sites, allow you to specify the URL of the site on which you want to perform the operation and you can execute them without having to specifically connect or login to the given site. CLI for Microsoft 365 will automatically retrieve the necessary access token to execute the given command.
 
-!!! important
-    Some SharePoint commands in the CLI for Microsoft 365 require access to tenant-level resources. To execute these commands, you have to have permissions to access the tenant admin site.
+:::info
+Some SharePoint commands in the CLI for Microsoft 365 require access to tenant-level resources. To execute these commands, you have to have permissions to access the tenant admin site.
+:::
 
 ## Authorize with Microsoft 365
 

@@ -1,0 +1,68 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# cli config get
+
+Gets value of a CLI for Microsoft 365 configuration option
+
+## Usage
+
+```sh
+m365 cli config get [options]
+```
+
+## Options
+
+```md defintion-list
+`-k, --key <key>`
+: Config key to get the value of
+```
+
+<Global />
+
+--8<-- "docs/_clisettings.md"
+
+## Remarks
+
+If the specified setting has not been configured, CLI will return no output.
+
+## Examples
+
+Get the output configured for CLI for Microsoft 365
+
+```sh
+m365 cli config get --key output
+```
+
+## Response
+
+When retrieving the `output` key, responses will look like this:
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  "json"
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  json
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  json
+  ```
+
+  </TabItem>
+</Tabs>
+
+## More information
+
+- [Configuring the CLI for Microsoft 365](../../../user-guide/configuring-cli.md)

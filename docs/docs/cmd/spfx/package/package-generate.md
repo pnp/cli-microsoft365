@@ -10,6 +10,7 @@ m365 spfx package generate
 
 ## Options
 
+```md defintion-list
 `-t, --webPartTitle <webPartTitle>`
 : Title of the web part to generate. Displayed in the tool box when adding web part to page
 

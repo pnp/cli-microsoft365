@@ -1,0 +1,65 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo web installedlanguage list
+
+Lists all installed languages on site
+
+## Usage
+
+```sh
+m365 spo web installedlanguage list [options]
+```
+
+## Options
+
+```md defintion-list
+`-u, --webUrl <webUrl>`
+: URL of the site for which to retrieve the list of installed languages
+```
+
+<Global />
+
+## Examples
+
+Return all installed languages from site _https://contoso.sharepoint.com/_
+
+```sh
+m365 spo web installedlanguage list --webUrl https://contoso.sharepoint.com
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  [ 
+    {
+      "DisplayName": "English",
+      "LanguageTag": "en-US",
+      "Lcid": 1033
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  DisplayName                 LanguageTag  Lcid
+  --------------------------  -----------  -----
+  English                     en-US        1033
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  DisplayName,LanguageTag,Lcid
+  English,en-US,1033
+  ```
+
+  </TabItem>
+</Tabs>

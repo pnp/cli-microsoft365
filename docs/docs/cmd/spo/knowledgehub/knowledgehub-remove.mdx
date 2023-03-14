@@ -1,0 +1,75 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo knowledgehub remove
+
+Removes the Knowledge Hub Site setting for your tenant
+
+## Usage
+
+```sh
+m365 spo knowledgehub remove [options]
+```
+
+## Options
+
+```md defintion-list
+`--confirm`
+: Do not prompt for confirmation before removing the Knowledge Hub Site setting for your tenant.
+```
+
+<Global />
+
+## Remarks
+
+:::info
+To use this command you have to have permissions to access the tenant admin site.
+:::
+
+## Examples
+
+Removes the Knowledge Hub Site setting for your tenant.
+
+```sh
+m365 spo knowledgehub remove
+```
+
+Removes the Knowledge Hub Site setting for your tenant without confirmation.
+
+```sh
+m365 spo knowledgehub remove --confirm
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  "The knowledge hub site setting was removed."
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  The knowledge hub site setting was removed.
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  The knowledge hub site setting was removed.
+  ```
+
+  </TabItem>
+  <TabItem value="md" label="Markdown">
+
+  ```md
+  The knowledge hub site setting was removed.
+  ```
+
+  </TabItem>
+</Tabs>

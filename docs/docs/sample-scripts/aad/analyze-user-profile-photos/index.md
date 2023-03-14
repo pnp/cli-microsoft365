@@ -17,8 +17,9 @@ Prerequisites
 - Microsoft 365 users
 - [Computer Vision API](https://azure.microsoft.com/services/cognitive-services/computer-vision/) instance and API key
 
-!!! note
-    If you don't already have an [Azure Cognitive Services instance and key](https://azure.microsoft.com/try/cognitive-services/), create a cognitive service instance and get API key from there.
+:::note
+If you don't already have an [Azure Cognitive Services instance and key](https://azure.microsoft.com/try/cognitive-services/), create a cognitive service instance and get API key from there.
+:::
 
 === "PowerShell"
 

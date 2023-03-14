@@ -31,8 +31,9 @@ If you're using Yarn, you can install the CLI for Microsoft 365 by executing:
 yarn global add @pnp/cli-microsoft365
 ```
 
-!!! tip
-    We are regularly publishing beta versions of the CLI for Microsoft 365 with latest features and fixes. If you want to use the beta version of the CLI, add `@next` to the package name when installing the CLI, for example `npm install -g @pnp/cli-microsoft365@next`. Please note, that you can have installed either the beta version or the public version of the CLI but not both.
+:::tip
+We are regularly publishing beta versions of the CLI for Microsoft 365 with latest features and fixes. If you want to use the beta version of the CLI, add `@next` to the package name when installing the CLI, for example `npm install -g @pnp/cli-microsoft365@next`. Please note, that you can have installed either the beta version or the public version of the CLI but not both.
+:::
 
 ## Check the installed version
 
@@ -86,13 +87,15 @@ npm install -g @pnp/cli-microsoft365@latest
 
 This will download and install the latest public version of the CLI for Microsoft 365. If you want to update to the latest beta version of the CLI, replace `@latest` with `@next`.
 
-!!! important
-    New version of the CLI for Microsoft 365 often contains new commands. Don't forget to update command completion for your terminal to get suggestions for the latest commands added in the CLI. For more information see the article on [command completion](completion.md).
+:::info
+New version of the CLI for Microsoft 365 often contains new commands. Don't forget to update command completion for your terminal to get suggestions for the latest commands added in the CLI. For more information see the article on [command completion](completion.md).
+:::
 
 ## Uninstall the CLI
 
-!!! attention
-    Before uninstalling the CLI, log out from Microsoft 365 using the `logout` command. CLI for Microsoft 365 persists connection information on your computer and if you don't log out before uninstalling the CLI, this information will be left on your computer and you will have to remove it manually. For more information see the article on [persisting connection information](../concepts/persisting-connection.md)
+:::caution
+Before uninstalling the CLI, log out from Microsoft 365 using the `logout` command. CLI for Microsoft 365 persists connection information on your computer and if you don't log out before uninstalling the CLI, this information will be left on your computer and you will have to remove it manually. For more information see the article on [persisting connection information](../concepts/persisting-connection.md)
+:::
 
 To uninstall the CLI for Microsoft 365, execute in the command line:
 

@@ -10,6 +10,7 @@ m365 spo site chrome set [options]
 
 ## Options
 
+```md defintion-list
 `-u, --siteUrl <siteUrl>`
 : URL of the site collection to which you want to change the chrome header/footer
 

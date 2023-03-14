@@ -10,6 +10,7 @@ m365 spfx doctor [options]
 
 ## Options
 
+```md defintion-list
 `-e, --env [env]`
 : Version of SharePoint for which to check compatibility: `sp2016|sp2019|spo`
 
@@ -43,11 +44,13 @@ If you miss any required tools or use a version that doesn't meet the SharePoint
 
 Next to verifying the readiness of your environment to use a particular version of the SharePoint Framework, you can also check if the version of the SharePoint Framework that you use is compatible with the specific version of SharePoint. Supported versions are `sp2016`, `sp2019` and `spo`.
 
-!!! important
-    Checks ran by this command are based on what is officially supported by Microsoft. It's possible that using different package managers or packages versions will work just fine.
+:::info
+Checks ran by this command are based on what is officially supported by Microsoft. It's possible that using different package managers or packages versions will work just fine.
+:::
 
-!!! important
-    This command supports only text output.
+:::info
+This command supports only text output.
+:::
 
 ## Examples
 

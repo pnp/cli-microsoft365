@@ -22,8 +22,9 @@ This is a community-owned product, as Microsoft uses product names that begin wi
 
 If you have scripts using `@pnp/office365-cli` then we would encourage you to update your installed package to use the new package name, `@pnp/cli-microsoft365`, this will ensure that you get all the latest updates and patches.
 
-!!! attention
-    The `@pnp/office365-cli` package will still remain on npm, but will be deprecated following the release of v3. It will not receive any updates or fixes, therefore we would strongly recommend that you should plan to upgrade to the new package.
+:::caution
+The `@pnp/office365-cli` package will still remain on npm, but will be deprecated following the release of v3. It will not receive any updates or fixes, therefore we would strongly recommend that you should plan to upgrade to the new package.
+:::
 
 ## Removal of the o365 command alias
 

@@ -30,8 +30,9 @@ Alternatively, you can use PowerShell as the default shell by passing `pwsh` int
 docker run --rm -it m365pnp/cli-microsoft365:latest pwsh
 ```
 
-!!! info
-    Authentication information is not persisted in the Docker container. When you exit from the container, you will need to authenticate with your Microsoft 365 tenant the next time you run the container.
+::info
+Authentication information is not persisted in the Docker container. When you exit from the container, you will need to authenticate with your Microsoft 365 tenant the next time you run the container.
+:::
 
 ## Install and run beta
 
@@ -65,8 +66,9 @@ The JMESPath Terminal accepts piped JSON input in both `bash` and `pwsh` prompts
 
 ![JMESPath Terminal](../images/run-cli-in-docker-container/jpterm-example.png)
 
-!!! info
-    For more information on how to use JMESPath Terminal, please consult the [documenation](https://github.com/jmespath/jmespath.terminal).
+:::info
+For more information on how to use JMESPath Terminal, please consult the [documenation](https://github.com/jmespath/jmespath.terminal).
+:::
 
 ## Execute script in container
 
@@ -84,8 +86,9 @@ Alternatively, if we want to execute a PowerShell script, you can do this in the
 docker run -it -v ${PWD}:/home/cli-microsoft365/scripts m365pnp/cli-microsoft365:latest pwsh scripts/test.ps1
 ```
 
-!!! info
-    We have created a non-root user called `cli-microsoft365` inside the container.  When the container starts, the working directory is set to the home directory of this user, hence the need to add `/home/cli-microsoft365` to the volume mapping.
+:::info
+We have created a non-root user called `cli-microsoft365` inside the container.  When the container starts, the working directory is set to the home directory of this user, hence the need to add `/home/cli-microsoft365` to the volume mapping.
+:::
 
 ## Set Environment Variables
 

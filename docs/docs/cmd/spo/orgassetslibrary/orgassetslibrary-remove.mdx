@@ -1,0 +1,67 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo orgassetslibrary remove
+
+Removes a library that was designated as a central location for organization assets across the tenant.
+
+## Usage
+
+```sh
+m365 spo orgassetslibrary remove [options]
+```
+
+## Options
+
+```md defintion-list
+`--libraryUrl <libraryUrl>`
+: The server relative URL of the library to be removed as a central location for organization assets.
+
+`--confirm`
+: Don't prompt for confirming removing the organization asset library.
+```
+
+<Global />
+
+## Remarks
+
+:::info
+To use this command you have to have permissions to access the tenant admin site.
+:::
+
+## Examples
+
+Removes organization assets library without prompting for confirmation
+
+```sh
+m365 spo orgassetslibrary remove --libraryUrl "/sites/branding/assets" --confirm
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  {
+    "IsNull": false
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  IsNull: false
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  IsNull
+  ```
+
+  </TabItem>
+</Tabs>

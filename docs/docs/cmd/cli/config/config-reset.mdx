@@ -1,0 +1,44 @@
+import Global from '@site/src/docs/globalOptions.md';
+
+# cli config reset
+
+Resets the specified CLI configuration option to its default value
+
+## Usage
+
+```sh
+m365 cli config reset [options]
+```
+
+## Options
+
+```md defintion-list
+`-k, --key [key]`
+: Config key to reset. If not specified, will reset all configuration settings to default
+```
+
+<Global />
+
+--8<-- "docs/_clisettings.md"
+
+## Examples
+
+Reset CLI configuration option _showHelpOnFailure_ to its default value
+
+```sh
+m365 cli config reset --key showHelpOnFailure
+```
+
+Reset all configuration settings to default
+
+```sh
+m365 cli config reset
+```
+
+## Response
+
+The command won't return a response on success.
+
+## More information
+
+- [Configuring the CLI for Microsoft 365](../../../user-guide/configuring-cli.md)

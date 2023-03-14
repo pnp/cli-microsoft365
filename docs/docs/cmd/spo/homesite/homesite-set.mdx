@@ -1,0 +1,73 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo homesite set
+
+Sets the specified site as the Home Site
+
+## Usage
+
+```sh
+m365 spo homesite set [options]
+```
+
+## Options
+
+```md defintion-list
+`-u, --siteUrl <siteUrl>`
+: The URL of the site to set as Home Site.
+```
+
+<Global />
+
+## Remarks
+
+:::info
+To use this command you have to have permissions to access the tenant admin site.
+:::
+
+## Examples
+
+Set the specified site as the Home Site.
+
+```sh
+m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  "The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details."
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
+  ```
+
+  </TabItem>
+  <TabItem value="md" label="Markdown">
+
+  ```md
+  The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
+  ```
+
+  </TabItem>
+</Tabs>
+
+## More information
+
+- SharePoint home sites: a landing for your organization on the intelligent intranet: [https://techcommunity.microsoft.com/t5/Microsoft-SharePoint-Blog/SharePoint-home-sites-a-landing-for-your-organization-on-the/ba-p/621933](https://techcommunity.microsoft.com/t5/Microsoft-SharePoint-Blog/SharePoint-home-sites-a-landing-for-your-organization-on-the/ba-p/621933)

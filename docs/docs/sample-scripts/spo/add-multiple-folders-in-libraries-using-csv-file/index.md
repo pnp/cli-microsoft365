@@ -19,8 +19,9 @@ Below is an example of the format needed for your .csv file:
 | Support | Roadmaps |
 | Support | Analysis |
 
-!!! important
-    Make sure your target libraries contained in the file do exist in SharePoint Online.
+:::info
+Make sure your target libraries contained in the file do exist in SharePoint Online.
+:::
 
 === "PowerShell"
 
@@ -70,8 +71,9 @@ Below is an example of the format needed for your .csv file:
 | Support | Roadmaps |  https://contoso.sharepoint.com/sites/site2 |
 | Support | Analysis | https://contoso.sharepoint.com/sites/site2 |
 
-!!! important
-    Make sure your target libraries & sites contained in the file do exist in SharePoint Online.
+:::info
+Make sure your target libraries & sites contained in the file do exist in SharePoint Online.
+:::
 
 === "PowerShell"
 

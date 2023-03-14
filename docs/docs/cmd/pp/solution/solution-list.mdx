@@ -1,0 +1,97 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# pp solution list
+
+Lists solutions in a given environment.
+
+## Usage
+
+```sh
+m365 pp solution list [options]
+```
+
+## Options
+
+```md defintion-list
+`-e, --environment <environment>`
+: The name of the environment
+
+`--asAdmin`
+: Run the command as admin for environments you do not have explicitly assigned permissions to.
+```
+
+<Global />
+
+## Examples
+
+List all solutions in a specific environment
+
+```sh
+m365 pp solution list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339"
+```
+
+List all solutions in a specific environment as Admin
+
+```sh
+m365 pp solution list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339" --asAdmin
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  [
+    {
+      "solutionid": "00000001-0000-0000-0001-00000000009b",
+      "uniquename": "Crc00f1",
+      "version": "1.0.0.0",
+      "installedon": "2021-10-01T21:54:14Z",
+      "solutionpackageversion": null,
+      "friendlyname": "Common Data Services Default Solution",
+      "versionnumber": 860052,
+      "publisherid": {
+        "friendlyname": "CDS Default Publisher",
+        "publisherid": "00000001-0000-0000-0000-00000000005a"
+      }
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  uniquename  version    publisher
+  ----------  ---------  ---------------------
+  Crc00f1     1.0.0.0    CDS Default Publisher
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  uniquename,version,publisher
+  Crc00f1,1.0.0.0,CDS Default Publisher
+  ```
+
+  </TabItem>
+  <TabItem value="md" label="Markdown">
+
+  ```md
+  # pp solution list --environment "Default-2ca3eaa5-140f-4175-8261-3272edf9f339"
+
+  Date: 9/1/2023
+
+  Property | Value
+  ---------|-------
+  uniquename | Crc00f1
+  version | 1.0.0.0
+  publisher | CDS Default Publisher
+  ```
+
+  </TabItem>
+</Tabs>

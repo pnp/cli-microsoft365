@@ -1,0 +1,126 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# flow run get
+
+Gets information about a specific run of the specified Power Automate flow
+
+## Usage
+
+```sh
+m365 flow run get [options]
+```
+
+## Options
+
+```md defintion-list
+`-n, --name <name>`
+: The name of the run to get information about
+
+`-f, --flowName <flowName>`
+: The name of the Power Automate flow for which to retrieve information
+
+`-e, --environmentName <environmentName>`
+: The name of the environment where the flow is located
+```
+
+<Global />
+
+## Remarks
+
+:::caution
+This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+:::
+
+If the environment with the name you specified doesn't exist, you will get the `Access to the environment 'xyz' is denied.` error.
+
+If the Microsoft Flow with the name you specified doesn't exist, you will get the `The caller with object id 'abc' does not have permission for connection 'xyz' under Api 'shared_logicflows'.` error.
+
+If the run with the name you specified doesn't exist, you will get the `The provided workflow run name is not valid.` error.
+
+## Examples
+
+Get information about the given run of the specified Power Automate flow
+
+```sh
+m365 flow run get --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
+```
+
+
+## Response
+
+### Standard response
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  {
+    "name": "08585329112602833828909892130CU17",
+    "id": "/providers/Microsoft.ProcessSimple/environments/Default-de348bc7-1aeb-4406-8cb3-97db021cadb4/flows/170fb67e-a514-4d84-8727-582022bd13a9/runs/08585329112602833828909892130CU17",
+    "type": "Microsoft.ProcessSimple/environments/flows/runs",
+    "properties": {
+      "startTime": "2022-11-17T14:33:45.2763872Z",
+      "status": "Running",
+      "correlation": {
+        "clientTrackingId": "08585329112602833829909892130CU00"
+      },
+      "trigger": {
+        "name": "When_a_new_response_is_submitted",
+        "inputsLink": {
+          "uri": "https://prod-08.centralindia.logic.azure.com:443/workflows/f7bf8f6b5c494e63bfc21b54087a596e/runs/08585329112602833828909892130CU17/contents/TriggerInputs?api-version=2016-06-01&se=2022-11-17T18%3A00%3A00.0000000Z&sp=%2Fruns%2F08585329112602833828909892130CU17%2Fcontents%2FTriggerInputs%2Fread&sv=1.0&sig=jmdMRWvY7uGoxTmqd3_a2bJtegXuVyuKTKKUVLiwh38",
+          "contentVersion": "6ZrBBE+MJg7IvhMgyJLMmA==",
+          "contentSize": 349,
+          "contentHash": {
+            "algorithm": "md5",
+            "value": "6ZrBBE+MJg7IvhMgyJLMmA=="
+          }
+        },
+        "outputsLink": {
+          "uri": "https://prod-08.centralindia.logic.azure.com:443/workflows/f7bf8f6b5c494e63bfc21b54087a596e/runs/08585329112602833828909892130CU17/contents/TriggerOutputs?api-version=2016-06-01&se=2022-11-17T18%3A00%3A00.0000000Z&sp=%2Fruns%2F08585329112602833828909892130CU17%2Fcontents%2FTriggerOutputs%2Fread&sv=1.0&sig=Y3qqjuWrrcQJrmF7uvm6LVzQy5w-dNOFWJ8Yt8khXvA",
+          "contentVersion": "Z/4a8tfYygNAR1xpc44iww==",
+          "contentSize": 493,
+          "contentHash": {
+            "algorithm": "md5",
+            "value": "Z/4a8tfYygNAR1xpc44iww=="
+          }
+        },
+        "startTime": "2022-11-17T14:33:45.1914506Z",
+        "endTime": "2022-11-17T14:33:45.1914506Z",
+        "originHistoryName": "08585329112602833829909892130CU00",
+        "correlation": {
+          "clientTrackingId": "08585329112602833829909892130CU00"
+        },
+        "status": "Succeeded"
+      }
+    },
+    "startTime": "2022-11-17T14:33:45.2763872Z",
+    "endTime": "",
+    "status": "Running",
+    "triggerName": "When_a_new_response_is_submitted"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  endTime    :
+  name       : 08585329112602833828909892130CU17
+  startTime  : 2022-11-17T14:33:45.2763872Z
+  status     : Running
+  triggerName: When_a_new_response_is_submitted
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  name,startTime,endTime,status,triggerName
+  08585329112602833828909892130CU17,2022-11-17T14:33:45.2763872Z,,Running,When_a_new_response_is_submitted
+  ```
+
+  </TabItem>
+</Tabs>
+	

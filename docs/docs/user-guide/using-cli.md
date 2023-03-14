@@ -13,8 +13,9 @@ To use CLI for Microsoft 365, execute specific commands directly from the comman
 
 <script id="asciicast-445654" src="https://asciinema.org/a/445654.js" async></script>
 
-!!! attention
-    When using the CLI for Microsoft 365, each CLI command must be prepended with `microsoft365` or `m365` for short. Without this, your shell will not know how the particular command should be executed.
+:::caution
+When using the CLI for Microsoft 365, each CLI command must be prepended with `microsoft365` or `m365` for short. Without this, your shell will not know how the particular command should be executed.
+:::
 
 Using the CLI for Microsoft 365 directly from the command line is invaluable if you want to write scripts consisting of a number of CLI for Microsoft 365 and other commands combined together. Additionally, you keep the access to all system commands and other CLIs available on your computer.
 
@@ -44,10 +45,11 @@ Some options are required and necessary for the particular command to execute, w
 
 Some options in the CLI expect boolean values like `true` or `false`. The CLI for Microsoft 365 has the following definition for booleans:
 
-!!! info "Definition of Booleans" 
-    Booleans are case-insensitive and are represented by the following values.  
-    True: 1, yes, true, on  
-    False: 0, no, false, off
+:::info "Definition of Booleans" 
+Booleans are case-insensitive and are represented by the following values.  
+True: 1, yes, true, on  
+False: 0, no, false, off
+:::
 
 This means that whenever you need to pass a boolean value to a command, you can use any of the values listed above. For example, to configure if Planner is allowed in your organization you can execute the following:
 
@@ -172,8 +174,9 @@ Use single quotes to start a verbatim string. The double quotes need not be esca
 m365 spo listitem set --webUrl "<some-url>" --id 1 --listTitle somelist --SomeField '{ \"test1\": \"test2\" }'
 ```
 
-!!! info
-    Remember, instead of escaping, it's also possible to [feed complex content from a file](./using-cli.md#passing-complex-content-into-cli-options). 
+:::info
+Remember, instead of escaping, it's also possible to [feed complex content from a file](./using-cli.md#passing-complex-content-into-cli-options). 
+:::
 
 ## `@meId` and `@meUserName` tokens
 

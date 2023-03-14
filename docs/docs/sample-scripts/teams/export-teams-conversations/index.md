@@ -19,8 +19,9 @@ We utilize Teams during incidents and create channels for each. We would like to
 
 This script uses CLI for Microsoft 365 to export the conversations from Microsoft Teams Channels. You don't need to be a tenant admin to export conversations but you still can only export conversations of Teams of which you are member.
 
-!!! attention
-    Commands `m365 teams message list` and `m365 teams message reply list` are based on an API that is currently in preview and is subject to change once the API reached general availability.
+:::caution
+Commands `m365 teams message list` and `m365 teams message reply list` are based on an API that is currently in preview and is subject to change once the API reached general availability.
+:::
 
 === "PowerShell"
 

@@ -14,8 +14,9 @@ There are a number of ways in which you can authenticate and authorize with Micr
 
 CLI for Microsoft 365 gets access to Microsoft 365 through a custom Azure AD application named _PnP Microsoft 365 Management Shell_. If you don't want to consent this application in your tenant, you can use a different application instead.
 
-!!! important
-    When you decide to use your own Azure AD application, you need to choose the application to be a **public client**. Despite the setting's description, the application will not be publicly accessible. This setting enables the use of the device flow for your own application. Without activating this setting, it is not possible to complete the authentication process. The option is currently only available in the preview blade for managing for Azure AD applications.
+:::info
+When you decide to use your own Azure AD application, you need to choose the application to be a **public client**. Despite the setting's description, the application will not be publicly accessible. This setting enables the use of the device flow for your own application. Without activating this setting, it is not possible to complete the authentication process. The option is currently only available in the preview blade for managing for Azure AD applications.
+:::
     [![The 'public client' enabled for an Azure AD application](../images/activate-public-client-aad-app.png)](../images/activate-public-client-aad-app.png)
 
 When specifying a custom Azure AD application to be used by the CLI for Microsoft 365, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of your Azure AD application.
@@ -47,8 +48,9 @@ CLI for Microsoft 365 requires the following permissions to Microsoft 365 servic
 - Yammer
   - Read and write to the Yammer platform
 
-!!! attention
-    After changing the ID of the Azure AD application used by the CLI for Microsoft 365 refresh the existing connection to Microsoft 365 using the `login` command. If you try to use the existing connection, CLI for Microsoft 365 will fail when trying to refresh the existing access token.
+:::caution
+After changing the ID of the Azure AD application used by the CLI for Microsoft 365 refresh the existing connection to Microsoft 365 using the `login` command. If you try to use the existing connection, CLI for Microsoft 365 will fail when trying to refresh the existing access token.
+:::
 
 For instructions on how to create your own Azure AD app see [Using your own Azure AD identity](../user-guide/using-own-identity.md).
 
@@ -58,7 +60,7 @@ After completing the OAuth flow, the CLI receives from Azure Active Directory a 
 
 ## Services and commands
 
-Each command in the CLI for Microsoft 365 belongs to a service, for example the [spo site add](../cmd/spo/site/site-add.md) command, which creates a new modern site, belongs to the SharePoint Online service, while the [aad sp get](../cmd/aad/sp/sp-get.md) command, which lists Azure Active Directory service principals, belongs to the Azure Active Directory Graph service. Each service in Microsoft 365 is a different Azure Active Directory authorization resource and requires a separate access token. When working with the CLI, you can be simultaneously connected to multiple services. Each command in the CLI knows which Microsoft 365 service it communicates with and for which resource it should have a valid access token.
+Each command in the CLI for Microsoft 365 belongs to a service, for example the [spo site add](../cmd/spo/site/site-add.mdx) command, which creates a new modern site, belongs to the SharePoint Online service, while the [aad sp get](../cmd/aad/sp/sp-get.mdx) command, which lists Azure Active Directory service principals, belongs to the Azure Active Directory Graph service. Each service in Microsoft 365 is a different Azure Active Directory authorization resource and requires a separate access token. When working with the CLI, you can be simultaneously connected to multiple services. Each command in the CLI knows which Microsoft 365 service it communicates with and for which resource it should have a valid access token.
 
 ## Communicating with Microsoft 365
 

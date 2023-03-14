@@ -32,8 +32,9 @@ The following script lists all tenant-wide extensions deployed in the tenant. Th
     m365 spo listitem list --listTitle "$listName" --webUrl $appcatalogurl --fields "$fields"
     ```
 
-!!! note
-    To view more/different properties of the extensions, adjust the internal names in the `fields` variable.
+:::note
+To view more/different properties of the extensions, adjust the internal names in the `fields` variable.
+:::
 
 Column|Internal Name|Description
 --|--|--

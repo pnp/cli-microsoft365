@@ -6,8 +6,9 @@ tags:
 
 # Add a Site Collection Admin using a csv file
 
-!!! warning
-    When you decide to add users for all your Site Collections, you can't simply run through all the sites in your tenant. Why? Because what you "see" in the SPO admin center, is not reflecting what you _really_ have. There a few Site Collections that are not visible. A few examples would be:
+:::danger
+When you decide to add users for all your Site Collections, you can't simply run through all the sites in your tenant. Why? Because what you "see" in the SPO admin center, is not reflecting what you _really_ have. There a few Site Collections that are not visible. A few examples would be:
+:::
 
     - Search
     - My Site (contoso-my.sharepoint.com)
@@ -47,8 +48,9 @@ The script above has a query to ignore the _Search_ site collection by filtering
 
 Once you've got the .csv file from the script above, filter it to your needs to keep only the targeted sites, and use it in the script below.
 
-!!! note
-    The script will add the user as a "site admin" on classic and non group-connected sites, or a an "additional admin" in group-connected sites (and not as a group Member).
+:::note
+The script will add the user as a "site admin" on classic and non group-connected sites, or a an "additional admin" in group-connected sites (and not as a group Member).
+:::
 
 === "PowerShell"
 

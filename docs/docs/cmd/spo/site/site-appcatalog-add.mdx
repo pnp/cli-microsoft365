@@ -1,0 +1,38 @@
+import Global from '@site/src/docs/globalOptions.md';
+
+# spo site appcatalog add
+
+Creates a site collection app catalog in the specified site
+
+## Usage
+
+```sh
+m365 spo site appcatalog add [options]
+```
+
+## Options
+
+```md defintion-list
+`-u, --siteUrl <siteUrl>`
+: URL of the site collection where the app catalog should be added
+```
+
+<Global />
+
+## Remarks
+
+:::info
+To use this command you have to have permissions to access the tenant admin site.
+:::
+
+## Examples
+
+Add a site collection app catalog to the specified site
+
+```sh
+m365 spo site appcatalog add --siteUrl https://contoso.sharepoint/sites/site
+```
+
+## More information
+
+- Use the site collection app catalog: [https://docs.microsoft.com/en-us/sharepoint/dev/general-development/site-collection-app-catalog](https://docs.microsoft.com/en-us/sharepoint/dev/general-development/site-collection-app-catalog)

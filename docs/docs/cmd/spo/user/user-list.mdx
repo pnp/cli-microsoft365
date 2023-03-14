@@ -1,0 +1,77 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo user list
+
+Lists all the users within specific web
+
+## Usage
+
+```sh
+m365 spo user list [options]
+```
+
+## Options
+
+```md defintion-list
+`-u, --webUrl <webUrl>`
+: URL of the web to list the users from
+```
+
+<Global />
+
+## Examples
+
+Get list of users in web _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo user list --webUrl https://contoso.sharepoint.com/sites/project-x
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  [
+    {
+      "Id": 10,
+      "IsHiddenInUI": false,
+      "LoginName": "i:0#.f|membership|johndoe@contoso.onmicrosoft.com",
+      "Title": "John DOe",
+      "PrincipalType": 1,
+      "Email": "johndoe@contoso.onmicrosoft.com",
+      "Expiration": "",
+      "IsEmailAuthenticationGuestUser": false,
+      "IsShareByEmailGuestUser": false,
+      "IsSiteAdmin": false,
+      "UserId": {
+        "NameId": "100320022ec308a7",
+        "NameIdIssuer": "urn:federation:microsoftonline"
+      },
+      "UserPrincipalName": "johndoe@contoso.onmicrosoft.com"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  Id          Title                           LoginName
+  ----------  ------------------------------  --------------------------------------------------------------------------
+  10          John Doe                        i:0#.f|membership|johndoe@contoso.onmicrosoft.com
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  Id,Title,LoginName
+  10,John Doe,i:0#.f|membership|johndoe@contoso.onmicrosoft.com
+  ```
+
+  </TabItem>
+</Tabs>

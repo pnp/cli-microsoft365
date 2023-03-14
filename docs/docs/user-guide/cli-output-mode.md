@@ -90,8 +90,9 @@ $ m365 spo app list --output json
 ]
 ```
 
-!!! tip
-    Some `list` commands return different output in text and JSON mode. For readability, in the text mode they only include a few properties, so that the output can be formatted as a table and will fit on the screen. In JSON mode however, they will include all available properties so that it's possible to process the full set of information about the particular object. For more details, refer to the help of the particular command.
+:::tip
+Some `list` commands return different output in text and JSON mode. For readability, in the text mode they only include a few properties, so that the output can be formatted as a table and will fit on the screen. In JSON mode however, they will include all available properties so that it's possible to process the full set of information about the particular object. For more details, refer to the help of the particular command.
+:::
 
 ### Verbose and debug output in JSON mode
 
@@ -186,8 +187,9 @@ spfx-134-client-side-solution,5ae74650-b00b-46a9-925f-9c9bd70a0cb6,false,1.0.0.0
 
 Using the Markdown output mode is convenient if you need to create documentation for your Microsoft 365 tenant.
 
-!!! tip
-    When using the Markdown output, you'll typically want to store the output in a file or in the clipboard. To redirect the output to a file, execute `m365 spo site list --output markdown > sites.md`. To copy the output to the clipboard, on macOS execute `m365 spo site list --output markdown | pbcopy`, and on Windows execute `m365 spo site list --output markdown | clip`.
+:::tip
+When using the Markdown output, you'll typically want to store the output in a file or in the clipboard. To redirect the output to a file, execute `m365 spo site list --output markdown > sites.md`. To copy the output to the clipboard, on macOS execute `m365 spo site list --output markdown | pbcopy`, and on Windows execute `m365 spo site list --output markdown | clip`.
+:::
 
 ### Simple values
 
@@ -552,8 +554,9 @@ WebsCount | 0
 ...
 ```
 
-!!! note
-    Special Markdown characters, and new line characters in the names and values of properties are escaped so that they're displayed correctly in the table.
+:::note
+Special Markdown characters, and new line characters in the names and values of properties are escaped so that they're displayed correctly in the table.
+:::
 
 ## Processing command output with JMESPath
 
@@ -636,7 +639,7 @@ for appId in $notDeployedAppsIds; do
 done
 ```
 
-_First, you use the CLI for Microsoft 365 to get the list of all apps from the tenant app catalog using the [spo app list](../cmd/spo/app/app-list.md) command. You set the output type to JSON and store it in a shell variable `apps`. Next, you parse the JSON string using [jq](https://stedolan.github.io/jq/) and get IDs of apps that are not deployed. Finally, for each ID you run the [spo app deploy](../cmd/spo/app/app-deploy.md) CLI for Microsoft 365 command passing the ID as a command argument. Notice, that in the script, both `spo` commands are prepended with `m365` and executed as separate commands directly in the shell._
+_First, you use the CLI for Microsoft 365 to get the list of all apps from the tenant app catalog using the [spo app list](../cmd/spo/app/app-list.mdx) command. You set the output type to JSON and store it in a shell variable `apps`. Next, you parse the JSON string using [jq](https://stedolan.github.io/jq/) and get IDs of apps that are not deployed. Finally, for each ID you run the [spo app deploy](../cmd/spo/app/app-deploy.mdx) CLI for Microsoft 365 command passing the ID as a command argument. Notice, that in the script, both `spo` commands are prepended with `m365` and executed as separate commands directly in the shell._
 
 The same could be accomplished in PowerShell as well:
 

@@ -44,8 +44,9 @@ CI/CD setup | false
 
 ## Disable telemetry
 
-!!! Note
-    We offer the option to disable all telemetry within the project. However, we encourage you to leave it enabled as it helps us to understand the usage and impact of our work.
+:::note
+We offer the option to disable all telemetry within the project. However, we encourage you to leave it enabled as it helps us to understand the usage and impact of our work.
+:::
 
 Run the following command to disable the telemetry.
 

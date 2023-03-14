@@ -1,0 +1,64 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo knowledgehub get
+
+Gets the Knowledge Hub Site URL for your tenant
+
+## Usage
+
+```sh
+m365 spo knowledgehub get [options]
+```
+
+## Options
+
+<Global />
+
+## Remarks
+
+:::info
+To use this command you have to have permissions to access the tenant admin site.
+:::
+
+## Examples
+
+Gets the Knowledge Hub Site URL for your tenant.
+
+```sh
+m365 spo knowledgehub get
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  "https://contoso.sharepoint.com"
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  https://contoso.sharepoint.com
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  https://contoso.sharepoint.com
+  ```
+
+  </TabItem>
+  <TabItem value="md" label="Markdown">
+
+  ```md
+  https://contoso.sharepoint.com
+  ```
+
+  </TabItem>
+</Tabs>

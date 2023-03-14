@@ -1,0 +1,77 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo orgassetslibrary list
+
+List all libraries that are assigned as asset library
+
+## Usage
+
+```sh
+m365 spo orgassetslibrary list [options]
+```
+
+## Options
+
+<Global />
+
+## Remarks
+
+:::info
+To use this command you have to have permissions to access the tenant admin site.
+:::
+
+## Examples
+
+List all libraries that are assigned as asset library
+
+```sh
+m365 spo orgassetslibrary list
+```
+
+## Response
+
+### Standard response
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  {
+    "Url": "/",
+    "Libraries": [
+      {
+        "DisplayName": "Site Assets",
+        "LibraryUrl": "SiteAssets",
+        "ListId": "/Guid(0a327c3f-ba82-4b19-bfa1-628405539420)/",
+        "ThumbnailUrl": null
+      }
+    ]
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  Libraries: [{"DisplayName":"Site Assets","LibraryUrl":"SiteAssets","ListId":"/Guid(0a327c3f-ba82-4b19-bfa1-628405539420)/","ThumbnailUrl":null}]
+  Url      : /
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  Url,Libraries
+  /,"[{""DisplayName"":""Site Assets"",""LibraryUrl"":""SiteAssets"",""ListId"":""/Guid(0a327c3f-ba82-4b19-bfa1-628405539420)/"",""ThumbnailUrl"":null}]"
+  ```
+
+  </TabItem>
+</Tabs>
+
+### Response when no library is assigned as asset library
+
+```text
+No libraries in Organization Assets
+```

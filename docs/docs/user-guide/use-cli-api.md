@@ -51,5 +51,6 @@ executeCommand('login', { output: 'text' }, {
 });
 ```
 
-!!! important
-    You shouldn't use both listeners and output from Promises. All command output is sent to the registered listeners and exposed in the end through the resolved Promise. If you would send output from both the listener and Promise to the console, you'd end up with the same output printed twice. In the code sample above you see that for all commands you work with the output from Promises but for the `login` command you use a listener because you want to get login instructions while the command is still running.
+:::info
+You shouldn't use both listeners and output from Promises. All command output is sent to the registered listeners and exposed in the end through the resolved Promise. If you would send output from both the listener and Promise to the console, you'd end up with the same output printed twice. In the code sample above you see that for all commands you work with the output from Promises but for the `login` command you use a listener because you want to get login instructions while the command is still running.
+:::

@@ -15,8 +15,9 @@ We have built and published actions to the [GitHub Marketplace](https://github.c
 
 This action performs two roles, firstly it installs the CLI for Microsoft 365 into your build host agent and secondly, it creates a connection to your Microsoft 365 tenant which can then be used by other actions.
 
-!!! important
-    This action is required to be executed in a step before any other CLI for Microsoft 365 actions
+:::info
+This action is required to be executed in a step before any other CLI for Microsoft 365 actions
+:::
 
 ### CLI for Microsoft 365 Deploy App
 
@@ -341,8 +342,9 @@ View on [GitHub Marketplace](https://github.com/marketplace/actions/cli-for-micr
 | `M365_CLI_SCRIPT`      | The script to run            | Required |
 | `IS_POWERSHELL`        | Used only with `M365_CLI_SCRIPT`. If `true`, `M365_CLI_SCRIPT` will be passed as a PowerShell script, otherwise the assumption is `bash` script. Default is `false` | Optional |
 
-!!! attention
-    One of `M365_CLI_SCRIPT_PATH` / `M365_CLI_SCRIPT` is mandatory, in case both are defined `M365_CLI_SCRIPT_PATH` gets preference.
+:::caution
+One of `M365_CLI_SCRIPT_PATH` / `M365_CLI_SCRIPT` is mandatory, in case both are defined `M365_CLI_SCRIPT_PATH` gets preference.
+:::
 
 ## Contributions and Issues
 

@@ -1,0 +1,74 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# context option list
+
+List all options added to the context
+
+## Usage
+
+```sh
+m365 context option list [options]
+```
+
+## Options
+
+<Global />
+
+## Examples
+
+List all options added to the context
+
+```sh
+m365 context option list
+```
+
+## Response
+
+The responses below are an example. The output may differ based on the contents of the context file
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  {
+    "url": "https://contoso.sharepoint.com",
+    "list": "list name"
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  list: list name
+  url : https://contoso.sharepoint.com
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  url,list
+  https://contoso.sharepoint.com,list name
+  ```
+
+  </TabItem>
+  <TabItem value="md" label="Markdown">
+
+  ```md
+  # context option list
+
+  Date: 7/2/2023
+
+  ## https://contoso.sharepoint.com
+
+  Property | Value
+  ---------|-------
+  url | https://contoso.sharepoint.com
+  list | list name
+  ```
+
+  </TabItem>
+</Tabs>

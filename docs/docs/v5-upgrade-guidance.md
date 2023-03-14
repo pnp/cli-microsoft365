@@ -6,8 +6,8 @@ The v5 of CLI for Microsoft 365 introduces several breaking changes. To help you
 
 In CLI for Microsoft 365 we have commands that allow you to manage Azure AD apps. Some of these commands were using the Azure AD Graph API, which has been [deprecated](https://docs.microsoft.com/graph/migrate-azure-ad-graph-faq#how-is-microsoft-graph-different-from-azure-ad-graph-and-why-should-i-migrate-my-apps) since June 30, 2020 and which will be retired on June 30, 2022. To guarantee that the CLI for Microsoft 365 will keep working, we migrated the affected commands to use the Microsoft Graph. Here's the list of the affected commands:
 
-- [aad oauth2grant list](./cmd/aad/oauth2grant/oauth2grant-list.md)
-- [aad sp get](./cmd/aad/sp/sp-get.md)
+- [aad oauth2grant list](./cmd/aad/oauth2grant/oauth2grant-list.mdx)
+- [aad sp get](./cmd/aad/sp/sp-get.mdx)
 
 ### What action do I need to take?
 
@@ -15,7 +15,7 @@ While the options of the commands haven't changed, the data returned by the comm
 
 ## In `aad oauth2grant list` renamed `clientId` to `spObjectId`
 
-In the [aad oauth2grant list](./cmd/aad/oauth2grant/oauth2grant-list.md) command, we used to have the `clientId` option to specify the `objectId` of the service principal. The name was confusing and not self-explanatory, which is why we decided to rename it to `spObjectId`. The value of the option is the same. It's just the name of the property that changed.
+In the [aad oauth2grant list](./cmd/aad/oauth2grant/oauth2grant-list.mdx) command, we used to have the `clientId` option to specify the `objectId` of the service principal. The name was confusing and not self-explanatory, which is why we decided to rename it to `spObjectId`. The value of the option is the same. It's just the name of the property that changed.
 
 ### What action do I need to take?
 

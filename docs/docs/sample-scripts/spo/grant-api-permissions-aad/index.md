@@ -24,11 +24,13 @@ All of this, just to play with the API as you didn't plan to release your packag
 
 So what if you could bypass all these steps for both Graph and owned API?
 
-!!! important
-    This trick is just for development purposes. In Production environment, you should update your `package-solution.json` file to add required permissions and allow them (or ask for validation) in the _API access_ page.
+:::info
+This trick is just for development purposes. In Production environment, you should update your `package-solution.json` file to add required permissions and allow them (or ask for validation) in the _API access_ page.
+:::
 
-!!! warning
-    These permissions will be granted on the whole tenant and could be used by any script running in your tenant. More info [here](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/use-aadhttpclient#considerations).
+:::danger
+These permissions will be granted on the whole tenant and could be used by any script running in your tenant. More info [here](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/use-aadhttpclient#considerations).
+:::
 
 === "PowerShell"
 

@@ -1,0 +1,62 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# todo list list
+
+Returns a list of Microsoft To Do task lists
+
+## Usage
+
+```sh
+m365 todo list list [options]
+```
+
+## Options
+
+<Global />
+
+## Examples
+
+Get the list of Microsoft To Do task lists
+
+```sh
+m365 todo list list
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  [
+    {
+      "displayName": "Tasks",
+      "isOwner": true,
+      "isShared": false,
+      "wellknownListName": "defaultList",
+      "id": "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQAAAgESAAAA"
+    }
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  displayName     id                                                                                                      
+  --------------  ------------------------------------------------------------------------------------------------------------------------
+  Tasks           AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQAAAgESAAAA
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  displayName,id
+  Tasks,AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQAAAgESAAAA
+  ```
+
+  </TabItem>
+</Tabs>

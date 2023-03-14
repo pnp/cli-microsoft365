@@ -1,0 +1,59 @@
+import Global from '@site/src/docs/globalOptions.md';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# spo orgnewssite list
+
+Lists all organizational news sites
+
+## Usage
+
+```sh
+m365 spo orgnewssite list [options]
+```
+
+## Options
+
+<Global />
+
+## Remarks
+
+:::info
+To use this command you have to have permissions to access the tenant admin site.
+:::
+
+## Examples
+
+List all organizational news sites
+
+```sh
+m365 spo orgnewssite list
+```
+
+## Response
+
+<Tabs>
+  <TabItem value="json" label="JSON">
+
+  ```json
+  [
+    "https://contoso.sharepoint.com/sites/contosoNews"
+  ]
+  ```
+
+  </TabItem>
+  <TabItem value="text" label="Text">
+
+  ```text
+  https://contoso.sharepoint.com/sites/contosoNews
+  ```
+
+  </TabItem>
+  <TabItem value="csv" label="CSV">
+
+  ```csv
+  https://contoso.sharepoint.com/sites/contosoNews
+  ```
+
+  </TabItem>
+</Tabs>

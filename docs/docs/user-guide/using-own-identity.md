@@ -51,8 +51,9 @@ This will refresh the `Authentication` blade and will display the Redirect URI w
 
 [![Mobile and desktop applications](../images/using-own-identity/mobile-and-desktop-applications.png)](../images/using-own-identity/mobile-and-desktop-applications.png)
 
-!!! info
-    This Redirect URI is specific to the use of authentication methods that do not use a web interface for authenticating users and are therefore called `Native Clients`. This is the category that the CLI for Microsoft 365 falls into.
+:::info
+This Redirect URI is specific to the use of authentication methods that do not use a web interface for authenticating users and are therefore called `Native Clients`. This is the category that the CLI for Microsoft 365 falls into.
+:::
 
 Moving on, we can skip over the `Supported account type` section, as this is defaulted to `Accounts in this organizational directory only (<tenant> only - Single tenant)` meaning, that only users within the current tenant directory can use this application. In the `Advanced settings` section, we need to enable the `Allow public client flows` toggle, as we are using the `Device code flow` method to authenticate to our tenant using the CLI for Microsoft 365.
 
@@ -78,15 +79,17 @@ For the purpose of this tutorial we only want to grant read access to SharePoint
 
 [![SharePoint Online Delegated permissions](../images/using-own-identity/spo-delegated-permissions.png)](../images/using-own-identity/spo-delegated-permissions.png)
 
-!!! attention
-    Note that the `AllSites.Read` permission does not directly grant the signed-in user access to all sites in SharePoint Online. As we authenticate as the signed-in user, that user must still have access to the SharePoint sites that we want to return information about, otherwise the SharePoint Online API calls will fail with a `401 Unauthorized` error.
+:::caution
+Note that the `AllSites.Read` permission does not directly grant the signed-in user access to all sites in SharePoint Online. As we authenticate as the signed-in user, that user must still have access to the SharePoint sites that we want to return information about, otherwise the SharePoint Online API calls will fail with a `401 Unauthorized` error.
+:::
 
 You will be presented with the `Configured permissions` section again but this time the `AllSites.Read` permission will be shown under the `SharePoint` grouping.
 
 [![SharePoint Online Configured permissions](../images/using-own-identity/spo-configured-permissions.png)](../images/using-own-identity/spo-configured-permissions.png)
 
-!!! attention
-    Note that when executing tenant level SharePoint Online commands, the CLI will attempt to autodiscover your tenant URL.
+:::caution
+Note that when executing tenant level SharePoint Online commands, the CLI will attempt to autodiscover your tenant URL.
+:::
 
     It will first check for the presence of an environment variable containing the tenant URL, which can be set by using [`m365 spo set`](../../cmd/spo/spo-set/) command.
     
@@ -109,8 +112,9 @@ $env:CLIMICROSOFT365_AADAPPID="506af689-32aa-46c8-afb5-972ebf9d218a"
 $env:CLIMICROSOFT365_TENANT="e8954f17-a373-4b61-b54d-45c038fe3188"
 ```
 
-!!! tip
-    Execute `$env:CLIMICROSOFT365_AADAPPID` and `$env:CLIMICROSOFT365_TENANT` to verify that the environment variables have been created correctly
+:::tip
+Execute `$env:CLIMICROSOFT365_AADAPPID` and `$env:CLIMICROSOFT365_TENANT` to verify that the environment variables have been created correctly
+:::
 
 If you are using Linux or macOS, you can set the environment variables using the `export` command from your terminal prompt.
 
@@ -119,8 +123,9 @@ export CLIMICROSOFT365_AADAPPID=506af689-32aa-46c8-afb5-972ebf9d218a
 export CLIMICROSOFT365_TENANT=e8954f17-a373-4b61-b54d-45c038fe3188
 ```
 
-!!! tip
-    Execute `printenv` to verify that the environment variables have been created correctly
+:::tip
+Execute `printenv` to verify that the environment variables have been created correctly
+:::
 
 Now that we have set our environment variables, we are now ready to use our custom application to log in with using the CLI for Microsoft 365.
 
