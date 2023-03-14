@@ -123,14 +123,14 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
         await this.deleteCommandset(args);
       }
     }
-
   }
 
   private async getCommandSetId(options: Options): Promise<string> {
     if (options.id) {
       return options.id;
     }
-    else if (options.title) {
+
+    if (options.title) {
       const commandSets: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `(Title eq '${formatting.encodeQueryParameter(options.title as string)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`);
 
       if (commandSets.length === 0) {
@@ -143,17 +143,17 @@ class SpoCommandSetRemoveCommand extends SpoCommand {
 
       return commandSets[0].Id;
     }
-    else {
-      const commandSets: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `(ClientSideComponentId eq guid'${options.clientSideComponentId}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`);
 
-      if (commandSets.length === 0) {
-        throw `No user commandsets with ClientSideComponentId '${options.clientSideComponentId}' found`;
-      }
-      if (commandSets.length > 1) {
-        throw `Multiple user commandsets with ClientSideComponentId '${options.clientSideComponentId}' found. Please disambiguate using IDs: ${commandSets.map((commandSet: CustomAction) => commandSet.Id).join(', ')}`;
-      }
-      return commandSets[0].Id;
+    const commandSets: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `(ClientSideComponentId eq guid'${options.clientSideComponentId}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`);
+
+    if (commandSets.length === 0) {
+      throw `No user commandsets with ClientSideComponentId '${options.clientSideComponentId}' found`;
     }
+    if (commandSets.length > 1) {
+      throw `Multiple user commandsets with ClientSideComponentId '${options.clientSideComponentId}' found. Please disambiguate using IDs: ${commandSets.map((commandSet: CustomAction) => commandSet.Id).join(', ')}`;
+    }
+    return commandSets[0].Id;
+
   }
 
   private async deleteCommandset(args: CommandArgs): Promise<void> {
