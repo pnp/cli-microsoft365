@@ -77,7 +77,7 @@ If you don't use the manifest, you must specify the name of the Azure AD app reg
 
 You can also use the manifest to provision some of the configuration settings of your Azure AD app. All properties specified in the manifest are optional and will set if specified.
 
-If you specify the manifest along with some options, values specified in the options will override settings from the manifest. One exception is the name specified in the `name` option which will be overriden by the `displayName` property from the manifest if specified.
+If you specify the manifest along with some options, values specified in the options will override settings from the manifest. One exception is the name specified in the `name` option which will be overridden by the `displayName` property from the manifest if specified.
 
 The following properties specified in the manifest retrieved from Azure AD are not supported by this command:
 
@@ -137,7 +137,7 @@ Create new Azure AD app registration with an auto-generated secret (secret retur
 m365 aad app add --name 'My AAD app' --withSecret
 ```
 
-Create new Azure AD app registration for a deamon app with specified Microsoft Graph application permissions
+Create new Azure AD app registration for a daemon app with specified Microsoft Graph application permissions
 
 ```sh
 m365 aad app add --name 'My AAD app' --withSecret --apisApplication 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
@@ -161,7 +161,7 @@ Create new Azure AD app registration with Application ID URI set to a value that
 m365 aad app add --name 'My AAD app' --uri api://caf406b91cd4.ngrok.io/_appId_ --scopeName access_as_user --scopeAdminConsentDescription 'Access as a user' --scopeAdminConsentDisplayName 'Access as a user' --scopeConsentBy adminsAndUsers
 ```
 
-Create new Azure AD app registration for a deamon app with specified Microsoft Graph application permissions, including admin consent
+Create new Azure AD app registration for a daemon app with specified Microsoft Graph application permissions, including admin consent
 
 ```sh
  m365 aad app add --name 'My AAD app' --apisApplication 'https://graph.microsoft.com/Group.ReadWrite.All' --grantAdminConsent
