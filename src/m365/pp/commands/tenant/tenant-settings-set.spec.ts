@@ -105,6 +105,11 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation if not one property is specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation when the walkMeOptOut option is set to false', async () => {
     const actual = await command.validate({ options: { walkMeOptOut: false } }, commandInfo);
     assert.strictEqual(actual, true);
