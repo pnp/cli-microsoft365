@@ -87,6 +87,8 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         description: typeof args.options.description !== 'undefined',
         triggerDateTime: typeof args.options.triggerDateTime !== 'undefined',
+        eventTypeId: typeof args.options.eventTypeId !== 'undefined',
+        eventTypeName: typeof args.options.eventTypeName !== 'undefined',
         assetIds: typeof args.options.assetIds !== 'undefined',
         keywords: typeof args.options.keywords !== 'undefined'
       });
@@ -161,10 +163,6 @@ class PurviewRetentionEventAddCommand extends GraphCommand {
 
     if (eventTypes.length === 0) {
       throw `The specified event type '${args.options.eventTypeName}' does not exist.`;
-    }
-
-    if (eventTypes.length > 1) {
-      throw `Multiple event types with name '${args.options.eventTypeName}' found: ${eventTypes.map((x: any) => x.id).join(',')}`;
     }
 
     return eventTypes[0].id;

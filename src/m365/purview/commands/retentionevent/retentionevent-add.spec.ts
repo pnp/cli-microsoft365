@@ -82,49 +82,6 @@ describe(commands.RETENTIONEVENT_ADD, () => {
     ]
   };
 
-  const multipleEventTypeResponse = {
-    value: [
-      {
-        "displayName": validTypeName,
-        "description": "",
-        "createdDateTime": "2023-02-02T15:47:54Z",
-        "lastModifiedDateTime": "2023-02-02T15:47:54Z",
-        "id": validTypeId,
-        "createdBy": {
-          "user": {
-            "id": "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
-            "displayName": null
-          }
-        },
-        "lastModifiedBy": {
-          "user": {
-            "id": "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
-            "displayName": null
-          }
-        }
-      },
-      {
-        "displayName": validTypeName,
-        "description": "",
-        "createdDateTime": "2023-02-02T15:47:54Z",
-        "lastModifiedDateTime": "2023-02-02T15:47:54Z",
-        "id": "88aeab1e-e291-4744-a991-a533daab75aa",
-        "createdBy": {
-          "user": {
-            "id": "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
-            "displayName": null
-          }
-        },
-        "lastModifiedBy": {
-          "user": {
-            "id": "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
-            "displayName": null
-          }
-        }
-      }
-    ]
-  };
-
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -267,20 +224,6 @@ describe(commands.RETENTIONEVENT_ADD, () => {
 
     await assert.rejects(command.action(logger, { options: {} } as any),
       new CommandError(`This command does not support application permissions.`));
-  });
-
-  it('throws error when multiple event types with same name were found', async () => {
-    sinon.stub(request, 'get').callsFake(async (opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/security/triggers/retentionEvents`) {
-        return multipleEventTypeResponse;
-      }
-
-      throw 'Invalid request';
-    });
-
-    await assert.rejects(command.action(logger, {
-      options: { displayName: validDisplayName, eventTypeName: validTypeName, assetIds: validAssetIds }
-    }), new CommandError(`Multiple event types with name '${validTypeName}' found: ${multipleEventTypeResponse.value.map(x => x.id).join(',')}`));
   });
 
   it('throws error when no event type found', async () => {
