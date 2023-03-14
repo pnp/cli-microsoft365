@@ -183,7 +183,8 @@ class SpoCommandSetSetCommand extends SpoCommand {
     if (options.id) {
       return options.id;
     }
-    else if (options.title) {
+
+    if (options.title) {
       const commandSets: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `(Title eq '${formatting.encodeQueryParameter(options.title as string)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`);
 
       if (commandSets.length === 0) {
