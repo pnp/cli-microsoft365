@@ -1,12 +1,12 @@
 # Use CLI for Microsoft 365 context
 
-CLI for Microsoft 365 context provides unique functionality to save any kind of option and its value in a central place. The options saved in the context may be used in any kind of command execution, that way you may provide less or no options at all, which means using a context will help you save on keystrokes.
-It may be especially If you just want to separate and group all your parameters from your script in a single place.
+CLI for Microsoft 365 context provides unique functionality to save options and their values in a central place. The options saved in the context may be used in any kind of command execution. This means you may provide fewer options or no options at all. Using a context will help you save on keystrokes.
+It may be especially useful if you want to group all your script parameters in a single place.
 A context is saved in a m365rc.json file in your working directory. It can be committed to Source Control along with your script files. It can be managed by executing commands.
 
 ## How to get started
 
-In order to create an empty context we may execute the following command:
+To create an empty context we may execute the following command:
 
 ```powershell
 m365 context init
@@ -33,7 +33,7 @@ m365 context remove
 
 ## How does it work
 
-When a command is executed CLI will first check for the `.m365rc.json` file in the working directory. If present, the CLI will check if any of the options defined in it may be used for the currently executed command. If that's the case the CLI will execute this command with the option and its value taken from the context.
+When a command is executed, the CLI will first check for the `.m365rc.json` file in the working directory. If present, the CLI will check if any of the options defined in it may be used for the currently executed command. If that's the case the CLI will execute this command with the option and its value taken from the context.
 
 When an option is available in the context and also used in the command itself, the value defined in the command will take precedence.
 
