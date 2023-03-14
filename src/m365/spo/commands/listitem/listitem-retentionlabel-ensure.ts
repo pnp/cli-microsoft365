@@ -129,9 +129,8 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
       if (args.options.assetId && !labelInformation.isEventBasedTag) {
         throw `The label that's being applied is not an event-based label`;
       }
-      if (args.options.assetId && labelInformation.isEventBasedTag) {
-        await this.applyAssetId(args.options, logger);
-      }
+
+      await this.applyAssetId(args.options, logger);
 
       await this.applyLabel(args.options, labelInformation, logger);
     }
