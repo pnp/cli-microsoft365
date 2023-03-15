@@ -184,28 +184,22 @@ class SpoCommandSetSetCommand extends SpoCommand {
       return options.id;
     }
 
+    let commandSets: CustomAction[] = [];
     if (options.title) {
-      const commandSets: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `(Title eq '${formatting.encodeQueryParameter(options.title as string)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`);
-
-      if (commandSets.length === 0) {
-        throw `No user commandsets with title '${options.title}' found`;
-      }
-
-      if (commandSets.length > 1) {
-        throw `Multiple user commandsets with title '${options.title}' found. Please disambiguate using IDs: ${commandSets.map(a => a.Id).join(', ')}`;
-      }
-
-      return commandSets[0].Id;
+      commandSets = await spo.getCustomActions(options.webUrl, options.scope, `(Title eq '${formatting.encodeQueryParameter(options.title as string)}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`);
     }
-
-    const commandSets: CustomAction[] = await spo.getCustomActions(options.webUrl, options.scope, `(ClientSideComponentId eq guid'${options.clientSideComponentId}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`);
+    else {
+      commandSets = await spo.getCustomActions(options.webUrl, options.scope, `(ClientSideComponentId eq guid'${options.clientSideComponentId}') and (startswith(Location,'ClientSideExtension.ListViewCommandSet'))`);
+    }
 
     if (commandSets.length === 0) {
-      throw `No user commandsets with ClientSideComponentId '${options.clientSideComponentId}' found`;
+      throw `No user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found`;
     }
+
     if (commandSets.length > 1) {
-      throw `Multiple user commandsets with ClientSideComponentId '${options.clientSideComponentId}' found. Please disambiguate using IDs: ${commandSets.map((commandSet: CustomAction) => commandSet.Id).join(', ')}`;
+      throw `Multiple user commandsets with ${options.title ? `title '${options.title}'` : `ClientSideComponentId '${options.clientSideComponentId}'`} found. Please disambiguate using IDs: ${commandSets.map((commandSet: CustomAction) => commandSet.Id).join(', ')}`;
     }
+
     return commandSets[0].Id;
   }
 
