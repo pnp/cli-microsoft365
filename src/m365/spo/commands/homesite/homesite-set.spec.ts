@@ -6,11 +6,9 @@ import { Cli } from '../../../../cli/Cli';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
-import config from '../../../../config';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
 import { sinonUtil } from '../../../../utils/sinonUtil';
-import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
 const command: Command = require('./homesite-set');
 
@@ -24,12 +22,6 @@ describe(commands.HOMESITE_SET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
-    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
-      FormDigestValue: 'ABC',
-      FormDigestTimeoutSeconds: 1800,
-      FormDigestExpiresAt: new Date(),
-      WebFullUrl: 'https://contoso.sharepoint.com'
-    }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -61,8 +53,7 @@ describe(commands.HOMESITE_SET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName,
-      spo.getRequestDigest
+      pid.getProcessName
     ]);
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
@@ -77,17 +68,14 @@ describe(commands.HOMESITE_SET, () => {
   });
 
   it('sets the specified site as the Home Site', async () => {
+    const expected = 'The Home site has been set to https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fWork. It may take some time for the change to apply. Check aka.ms/homesites for details.';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="57" ObjectPathId="56" /><Method Name="SetSPHSite" Id="58" ObjectPathId="56"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/Work</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="56" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify(
-          [
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8929.1227", "ErrorInfo": null, "TraceCorrelationId": "e4f2e59e-c0a9-0000-3dd0-1d8ef12cc742"
-            }, 57, {
-              "IsNull": false
-            }, 58, "The Home site has been set to https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fWork."
-          ]
-        ));
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/SetSPHSite`) {
+        return Promise.resolve(
+          {
+            "value": expected
+          }
+        );
       }
 
       return Promise.reject('Invalid request');
@@ -98,21 +86,16 @@ describe(commands.HOMESITE_SET, () => {
         siteUrl: "https://contoso.sharepoint.com/sites/Work"
       }
     } as any);
-    assert(loggerLogSpy.calledWith('The Home site has been set to https://contoso.sharepoint.com/sites/Work.'));
+    assert(loggerLogSpy.calledWith(expected));
   });
 
   it('sets the specified site as the Home Site and sets the Viva Connections default experience to True', async () => {
+    const expected = 'The Home site has been set to https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fWork and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details.';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="ValidateMultipleHomeSitesParameterExists" Id="85" ObjectPathId="81"><Parameters><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="ValidateVivaHomeParameterExists" Id="86" ObjectPathId="81"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetSPHSiteWithConfigurations" Id="87" ObjectPathId="81"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/Work</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="81" Name="b6e793a0-e066-6000-3c4a-cb1f897402b4|908bed80-a04a-4433-b4a0-883d9847d110:d872ec63-6bea-4678-9429-078f4fa93560&#xA;Tenant" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify(
-          [
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8929.1227", "ErrorInfo": null, "TraceCorrelationId": "e4f2e59e-c0a9-0000-3dd0-1d8ef12cc742"
-            }, 86, {
-              "IsNull": false
-            }, 87, "The Home site has been set to https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fWork and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details."
-          ]
-        ));
+      if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
+        return Promise.resolve({
+          "value": expected
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -124,31 +107,30 @@ describe(commands.HOMESITE_SET, () => {
         vivaConnectionsDefaultStart: true
       }
     } as any);
-    assert(loggerLogSpy.calledWith('The Home site has been set to https://contoso.sharepoint.com/sites/Work and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details.'));
+    assert(loggerLogSpy.calledWith(expected));
   });
 
   it('correctly handles error when setting the Home Site', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="57" ObjectPathId="56" /><Method Name="SetSPHSite" Id="58" ObjectPathId="56"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/Work</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="56" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-        return Promise.resolve(JSON.stringify(
-          [
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8929.1227", "ErrorInfo": {
-                "ErrorMessage": "The provided site url can't be set as a Home site. Check aka.ms\u002fhomesites for cmdlet requirements.", "ErrorValue": null, "TraceCorrelationId": "f1f2e59e-3047-0000-3dd0-1f48be47bbc2", "ErrorCode": -2146232832, "ErrorTypeName": "Microsoft.SharePoint.SPException"
-              }, "TraceCorrelationId": "f1f2e59e-3047-0000-3dd0-1f48be47bbc2"
+    const expected = "[Error ID: 09149788-0a26-4cee-a333-699b81f629d7] The provided site url can't be set as a Home site. Check aka.ms\u002fhomesites for cmdlet requirements.";
+    sinon.stub(request, 'post').callsFake(() => {
+      return Promise.reject({
+        error: {
+          "odata.error": {
+            "code": "-2147213238, Microsoft.SharePoint.SPException",
+            "message": {
+              "lang": "en-US",
+              "value": "[Error ID: 09149788-0a26-4cee-a333-699b81f629d7] The provided site url can't be set as a Home site. Check aka.ms/homesites for cmdlet requirements."
             }
-          ]
-        ));
-      }
-
-      return Promise.reject('Invalid request');
+          }
+        }
+      });
     });
 
     await assert.rejects(command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/Work"
       }
-    } as any), new CommandError(`The provided site url can't be set as a Home site. Check aka.ms\u002fhomesites for cmdlet requirements.`));
+    } as any), new CommandError(expected));
   });
 
   it('correctly handles random API error', async () => {
