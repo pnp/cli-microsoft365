@@ -7,6 +7,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import { settingsNames } from '../../../../settingsNames';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./config-get');
@@ -21,6 +22,7 @@ describe(commands.CONFIG_GET, () => {
     commandInfo = Cli.getCommandInfo(command);
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
   });
 
   beforeEach(() => {
@@ -46,7 +48,8 @@ describe(commands.CONFIG_GET, () => {
   after(() => {
     sinonUtil.restore([
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
   });
 

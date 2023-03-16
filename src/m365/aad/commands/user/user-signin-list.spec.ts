@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./user-signin-list');
@@ -149,6 +150,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -180,7 +182,8 @@ describe(commands.USER_SIGNIN_LIST, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });
@@ -328,6 +331,11 @@ describe(commands.USER_SIGNIN_LIST, () => {
   it('passes validation if the userId is a valid GUID', async () => {
     const actual = await command.validate({ options: { userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('fails validation when userName has an invalid value', async () => {
+    const actual = await command.validate({ options: { userName: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if appId and appDisplayName specified', async () => {

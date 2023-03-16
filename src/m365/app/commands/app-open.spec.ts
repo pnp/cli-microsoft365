@@ -8,6 +8,7 @@ import { CommandInfo } from '../../../cli/CommandInfo';
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
 import { pid } from '../../../utils/pid';
+import { session } from '../../../utils/session';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import * as open from 'open';
 import commands from '../commands';
@@ -26,6 +27,7 @@ describe(commands.OPEN, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({
@@ -69,6 +71,7 @@ describe(commands.OPEN, () => {
       auth.restoreAuth,
       telemetry.trackEvent,
       pid.getProcessName,
+      session.getId,
       fs.existsSync,
       fs.readFileSync
     ]);

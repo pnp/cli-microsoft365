@@ -4,13 +4,14 @@ import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
+import { FlowEnvironmentDetails } from './FlowEnvironmentDetails';
 
 interface CommandArgs {
   options: Options;
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  name?: string;
 }
 
 class FlowEnvironmentGetCommand extends AzmgmtCommand {
@@ -30,23 +31,41 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
     super();
 
     this.#initOptions();
+    this.#initTelemetry();
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-n, --name <name>'
+        option: '-n, --name [name]'
       }
     );
   }
 
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        name: typeof args.options.name !== 'undefined'
+      });
+    });
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about Microsoft Flow environment ${args.options.name}...`);
+      logger.logToStderr(`Retrieving information about Microsoft Flow environment ${args.options.name ?? ''}...`);
+    }
+
+    let requestUrl = `${this.resource}providers/Microsoft.ProcessSimple/environments/`;
+
+    if (args.options.name) {
+      requestUrl += `${formatting.encodeQueryParameter(args.options.name)}`;
+    }
+    else {
+      requestUrl += `~default`;
     }
 
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${formatting.encodeQueryParameter(args.options.name)}?api-version=2016-11-01`,
+      url: `${requestUrl}?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },
@@ -54,15 +73,14 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
     };
 
     try {
-      const res = await request.get<any>(requestOptions);
+      const flowItem = await request.get<FlowEnvironmentDetails>(requestOptions);
+      flowItem.displayName = flowItem.properties.displayName;
+      flowItem.provisioningState = flowItem.properties.provisioningState;
+      flowItem.environmentSku = flowItem.properties.environmentSku;
+      flowItem.azureRegionHint = flowItem.properties.azureRegionHint;
+      flowItem.isDefault = flowItem.properties.isDefault;
 
-      res.displayName = res.properties.displayName;
-      res.provisioningState = res.properties.provisioningState;
-      res.environmentSku = res.properties.environmentSku;
-      res.azureRegionHint = res.properties.azureRegionHint;
-      res.isDefault = res.properties.isDefault;
-
-      logger.log(res);
+      logger.log(flowItem);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

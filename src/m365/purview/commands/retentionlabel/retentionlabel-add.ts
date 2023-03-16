@@ -1,9 +1,11 @@
-import { AxiosRequestConfig } from 'axios';
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
+import { accessToken } from '../../../../utils/accessToken';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { odata } from '../../../../utils/odata';
 
 interface CommandArgs {
   options: Options;
@@ -19,9 +21,16 @@ interface Options extends GlobalOptions {
   descriptionForUsers?: string;
   descriptionForAdmins?: string;
   labelToBeApplied?: string;
+  eventTypeId?: string;
+  eventTypeName?: string;
 }
 
 class PurviewRetentionLabelAddCommand extends GraphCommand {
+  private static readonly behaviorDuringRetentionPeriods = ['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord'];
+  private static readonly actionAfterRetentionPeriods = ['none', 'delete', 'startDispositionReview'];
+  private static readonly retentionTriggers = ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent'];
+  private static readonly defaultRecordBehavior = ['startLocked', 'startUnlocked'];
+
   public get name(): string {
     return commands.RETENTIONLABEL_ADD;
   }
@@ -36,6 +45,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -45,7 +55,9 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
         defaultRecordBehavior: typeof args.options.defaultRecordBehavior !== 'undefined',
         descriptionForUsers: typeof args.options.descriptionForUsers !== 'undefined',
         descriptionForAdmins: typeof args.options.descriptionForAdmins !== 'undefined',
-        labelToBeApplied: typeof args.options.labelToBeApplied !== 'undefined'
+        labelToBeApplied: typeof args.options.labelToBeApplied !== 'undefined',
+        eventTypeId: typeof args.options.eventTypeId !== 'undefined',
+        eventTypeName: typeof args.options.eventTypeName !== 'undefined'
       });
     });
   }
@@ -57,22 +69,22 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
       },
       {
         option: '--behaviorDuringRetentionPeriod <behaviorDuringRetentionPeriod>',
-        autocomplete: ['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord']
+        autocomplete: PurviewRetentionLabelAddCommand.behaviorDuringRetentionPeriods
       },
       {
         option: '--actionAfterRetentionPeriod <actionAfterRetentionPeriod>',
-        autocomplete: ['none', 'delete', 'startDispositionReview']
+        autocomplete: PurviewRetentionLabelAddCommand.actionAfterRetentionPeriods
       },
       {
         option: '--retentionDuration <retentionDuration>'
       },
       {
         option: '-t, --retentionTrigger [retentionTrigger]',
-        autocomplete: ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent']
+        autocomplete: PurviewRetentionLabelAddCommand.retentionTriggers
       },
       {
         option: '--defaultRecordBehavior [defaultRecordBehavior]',
-        autocomplete: ['startLocked', 'startUnlocked']
+        autocomplete: PurviewRetentionLabelAddCommand.defaultRecordBehavior
       },
       {
         option: '--descriptionForUsers [descriptionForUsers]'
@@ -82,6 +94,12 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
       },
       {
         option: '--labelToBeApplied [labelToBeApplied]'
+      },
+      {
+        option: '--eventTypeId [eventTypeId]'
+      },
+      {
+        option: '--eventTypeName [eventTypeName]'
       }
     );
   }
@@ -93,22 +111,22 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
           return `Specified retentionDuration ${args.options.retentionDuration} is not a number`;
         }
 
-        if (['doNotRetain', 'retain', 'retainAsRecord', 'retainAsRegulatoryRecord'].indexOf(args.options.behaviorDuringRetentionPeriod) === -1) {
-          return `${args.options.behaviorDuringRetentionPeriod} is not a valid behavior of a document with the label. Allowed values are doNotRetain|retain|retainAsRecord|retainAsRegulatoryRecord`;
+        if (PurviewRetentionLabelAddCommand.behaviorDuringRetentionPeriods.indexOf(args.options.behaviorDuringRetentionPeriod) === -1) {
+          return `${args.options.behaviorDuringRetentionPeriod} is not a valid behavior of a document with the label. Allowed values are ${PurviewRetentionLabelAddCommand.behaviorDuringRetentionPeriods.join(', ')}`;
         }
 
-        if (['none', 'delete', 'startDispositionReview'].indexOf(args.options.actionAfterRetentionPeriod) === -1) {
-          return `${args.options.actionAfterRetentionPeriod} is not a valid action to take on a document with the label. Allowed values are none|delete|startDispositionReview`;
+        if (PurviewRetentionLabelAddCommand.actionAfterRetentionPeriods.indexOf(args.options.actionAfterRetentionPeriod) === -1) {
+          return `${args.options.actionAfterRetentionPeriod} is not a valid action to take on a document with the label. Allowed values are ${PurviewRetentionLabelAddCommand.actionAfterRetentionPeriods.join(', ')}`;
         }
 
         if (args.options.retentionTrigger &&
-          ['dateLabeled', 'dateCreated', 'dateModified', 'dateOfEvent'].indexOf(args.options.retentionTrigger) === -1) {
-          return `${args.options.retentionTrigger} is not a valid action retention duration calculation. Allowed values are dateLabeled|dateCreated|dateModified|dateOfEvent`;
+          PurviewRetentionLabelAddCommand.retentionTriggers.indexOf(args.options.retentionTrigger) === -1) {
+          return `${args.options.retentionTrigger} is not a valid action retention duration calculation. Allowed values are ${PurviewRetentionLabelAddCommand.retentionTriggers.join(', ')}`;
         }
 
         if (args.options.defaultRecordBehavior &&
-          ['startLocked', 'startUnlocked'].indexOf(args.options.defaultRecordBehavior) === -1) {
-          return `${args.options.defaultRecordBehavior} is not a valid state of a record label. Allowed values are startLocked|startUnlocked`;
+          PurviewRetentionLabelAddCommand.defaultRecordBehavior.indexOf(args.options.defaultRecordBehavior) === -1) {
+          return `${args.options.defaultRecordBehavior} is not a valid state of a record label. Allowed values are ${PurviewRetentionLabelAddCommand.defaultRecordBehavior.join(', ')}`;
         }
 
         return true;
@@ -116,7 +134,17 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push(
+      { options: ['eventTypeId', 'eventTypeName'], runsWhen(args) { return args.options.retentionTrigger === 'dateOfEvent'; } }
+    );
+  }
+
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.');
+    }
+
     const retentionTrigger: string = args.options.retentionTrigger ? args.options.retentionTrigger : 'dateLabeled';
     const defaultRecordBehavior: string = args.options.defaultRecordBehavior ? args.options.defaultRecordBehavior : 'startLocked';
 
@@ -131,6 +159,11 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
       },
       defaultRecordBehavior: defaultRecordBehavior
     };
+
+    if (args.options.retentionTrigger === 'dateOfEvent') {
+      const eventTypeId = await this.getEventTypeId(args, logger);
+      requestBody['retentionEventType@odata.bind'] = `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes/${eventTypeId}`;
+    }
 
     if (args.options.descriptionForAdmins) {
       if (this.verbose) {
@@ -156,7 +189,7 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
       requestBody.labelToBeApplied = args.options.labelToBeApplied;
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptions: CliRequestOptions = {
       url: `${this.resource}/beta/security/labels/retentionLabels`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -172,6 +205,25 @@ class PurviewRetentionLabelAddCommand extends GraphCommand {
     catch (err: any) {
       this.handleRejectedODataPromise(err);
     }
+  }
+
+  private async getEventTypeId(args: CommandArgs, logger: Logger): Promise<string> {
+    if (args.options.eventTypeId) {
+      return args.options.eventTypeId;
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving the event type id for event type ${args.options.eventTypeName}`);
+    }
+
+    const eventTypes = await odata.getAllItems(`${this.resource}/beta/security/triggerTypes/retentionEventTypes`);
+    const filteredEventTypes: any = eventTypes.filter((eventType: any) => eventType.displayName === args.options.eventTypeName);
+
+    if (filteredEventTypes.length === 0) {
+      throw `The specified retention event type '${args.options.eventTypeName}' does not exist.`;
+    }
+
+    return filteredEventTypes[0].id;
   }
 }
 

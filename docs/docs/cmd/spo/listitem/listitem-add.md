@@ -59,7 +59,7 @@ m365 spo listitem add --listTitle "Demo List" --webUrl https://contoso.sharepoin
 Add an item with Title _Demo Multi Person Field_ and a multi-select people field named _MultiPeopleField_ to list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo listitem add --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
+m365 spo listitem add --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|john.doe@conotoso.com'}]"
 ```
 
 Add an item with Title _Demo Hyperlink Field_ and a hyperlink field named _CustomHyperlink_ to list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
@@ -131,4 +131,33 @@ m365 spo listitem add --listTitle "Demo List" --webUrl https://contoso.sharepoin
     ```csv
     FileSystemObjectType,Id,ServerRedirectedEmbedUri,ServerRedirectedEmbedUrl,ID,ContentTypeId,Title,Modified,Created,AuthorId,EditorId,OData__UIVersionString,Attachments,GUID,ComplianceAssetId,OData__vti_ItemDeclaredRecord
     0,235,,,235,0x01003CDBEB7138618C47A98D56499135D6EE0004C0F5794DEBCC4BAC981AC4AE1BD803,Test,2022-11-16T20:56:09Z,2022-11-16T20:56:09Z,10,10,1.0,,7aa8f3bd-a0a2-4974-81c8-2ac7ddc8e2d8,,
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo listitem add --contentType "Item" --listTitle "My List" --webUrl "https://contoso.sharepoint.com/sites/project-x" --Title "Test"
+
+    Date: 2/20/2023
+
+    ## Test (234)
+
+    Property | Value
+    ---------|-------
+    FileSystemObjectType | 0
+    Id | 234
+    ServerRedirectedEmbedUri | null
+    ServerRedirectedEmbedUrl |
+    ContentTypeId | 0x01003CDBEB7138618C47A98D56499135D6EE0004C0F5794DEBCC4BAC981AC4AE1BD803
+    Title | Test
+    ComplianceAssetId | null
+    FieldName1 | null
+    ID | 234
+    Modified | 2022-11-16T20:55:45Z
+    Created | 2022-11-16T20:55:45Z
+    AuthorId | 10
+    EditorId | 10
+    OData\_\_UIVersionString | 1.0
+    Attachments | false
+    GUID | 352e3855-56fa-4b68-b6be-4644d6adf204
     ```

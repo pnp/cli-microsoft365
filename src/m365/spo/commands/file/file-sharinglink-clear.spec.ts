@@ -10,6 +10,7 @@ import { urlUtil } from '../../../../utils/urlUtil';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as spoFileSharingLinkListCommand from './file-sharinglink-list';
@@ -25,7 +26,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     VroomDriveID: 'b!FeaYl4alXkWEhoSRP0ksSSOaj9osSfFPqj5bQNdluvlwfL79GNVISZZCf6nfB3vY',
     VroomItemID: '01A5WCPNXHFAS23ZNOF5D3XU2WU7S3I2AU'
   };
-  const sharingLink = { "id": "8c2c9168-7d3d-4119-bcab-3c5340ce603b", "roles": ["read"], "hasPassword": false, "grantedToIdentitiesV2": [{ "group": { "displayName": "h Members", "email": "h@contoso.onmicrosoft.com", "id": "94da1e01-bbab-41e9-b9a4-4595c5805a6b" }, "siteUser": { "displayName": "h Members", "email": "h@contoso.onmicrosoft.com", "id": "428", "loginName": "c:0o.c|federateddirectoryclaimprovider|94da1e01-bbab-41e9-b9a4-4595c5805a6b" } }], "grantedToIdentities": [{ "user": { "displayName": "h Members", "email": "h@mathijsdev2.onmicrosoft.com", "id": "94da1e01-bbab-41e9-b9a4-4595c5805a6b" } }], "link": { "scope": "anonymous", "type": "view", "webUrl": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBea_L-lv1lND19RSCJGtWNg", "preventsDownload": false } };
+  const sharingLink = { "id": "8c2c9168-7d3d-4119-bcab-3c5340ce603b", "roles": ["read"], "hasPassword": false, "grantedToIdentitiesV2": [{ "group": { "displayName": "h Members", "email": "h@contoso.onmicrosoft.com", "id": "94da1e01-bbab-41e9-b9a4-4595c5805a6b" }, "siteUser": { "displayName": "h Members", "email": "h@contoso.onmicrosoft.com", "id": "428", "loginName": "c:0o.c|federateddirectoryclaimprovider|94da1e01-bbab-41e9-b9a4-4595c5805a6b" } }], "grantedToIdentities": [{ "user": { "displayName": "h Members", "email": "h@contoso.onmicrosoft.com", "id": "94da1e01-bbab-41e9-b9a4-4595c5805a6b" } }], "link": { "scope": "anonymous", "type": "view", "webUrl": "https://contoso.sharepoint.com/:b:/s/pnpcoresdktestgroup/EY50lub3559MtRKfj2hrZqoBea_L-lv1lND19RSCJGtWNg", "preventsDownload": false } };
   const sharingLinksListCommandResponse = {
     "stdout": JSON.stringify([sharingLink]),
     "stderr": ""
@@ -40,6 +41,7 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -77,7 +79,8 @@ describe(commands.FILE_SHARINGLINK_CLEAR, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });

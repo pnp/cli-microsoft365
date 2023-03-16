@@ -10,6 +10,7 @@ import { telemetry } from '../../../../telemetry';
 import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./user-set');
@@ -28,6 +29,7 @@ describe(commands.USER_SET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
@@ -68,7 +70,8 @@ describe(commands.USER_SET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });
@@ -113,6 +116,11 @@ describe(commands.USER_SET, () => {
 
   it('fails validation if resetPassword and password is set and currentPassword is also set', async () => {
     const actual = await command.validate({ options: { objectId: objectId, resetPassword: true, password: newPassword, currentPassword: currentPassword } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when userPrincipalName has an invalid value', async () => {
+    const actual = await command.validate({ options: { userPrincipalName: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

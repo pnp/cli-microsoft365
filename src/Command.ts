@@ -186,6 +186,8 @@ export default abstract class Command {
       args.options[command.options[i].name] = missingRequireOptionValue;
     }
 
+    this.processOptions(args.options);
+
     return true;
   }
 

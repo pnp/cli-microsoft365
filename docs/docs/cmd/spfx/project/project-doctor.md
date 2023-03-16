@@ -28,15 +28,15 @@ m365 spfx project doctor [options]
 `--debug`
 : Runs command with debug logging
 
-!!! important
-    Run this command in the folder where the project that you want to validate is located. This command doesn't change your project files.
-
 ## Remarks
 
 The `spfx project doctor` command helps you validate that your SharePoint Framework project is set up correctly. The command automatically detects the version of your project using version information specified in the project's .yo-rc.json file or package.json (if no version information is included in .yo-rc.json). Based on the detected project version, the command executes several checks and reports any issues in the specified format.
 
 This command doesn't change your project files. Instead, it gives you a report with all steps necessary to validate your project to the specified version of the SharePoint Framework. Changing project files is error-prone, especially when it comes to updating your solution's code. This is why at this moment, this command produces a report that you can use yourself to perform the necessary updates and verify that everything is working as expected.
 
+!!! important
+    Run this command in the folder where the project that you want to validate is located. This command doesn't change your project files.
+    
 ## Examples
 
 Validate if your project is correctly set up and save the findings in a Markdown file

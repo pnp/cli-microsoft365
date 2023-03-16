@@ -21,9 +21,6 @@ m365 spo cdn set [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
 Using the `-t, --type` option you can choose whether you want to manage the settings of the Public (default), Private CDN or both. If you don't use the option, the command will use the Public CDN.
@@ -31,6 +28,9 @@ Using the `-t, --type` option you can choose whether you want to manage the sett
 Using the `-e, --enabled` option you can specify whether the given CDN type should be enabled or disabled. Use true to enable the specified CDN and false to disable it.
 
 Using the `--noDefaultOrigins` option you can specify to skip the creation of the default origins.
+
+!!! important
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Examples
 

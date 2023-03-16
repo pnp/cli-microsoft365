@@ -21,7 +21,7 @@ This script will get all flows in your default environment and export them as bo
     $environment = m365 flow environment list --query '[?properties.isDefault==`true`].name' --output json | ConvertFrom-JSON
 
     Write-Output "Getting Flows info..."
-    $flows = m365 flow list --environment $environment --asAdmin --output json | ConvertFrom-JSON
+    $flows = m365 flow list --environmentName $environment --asAdmin --output json | ConvertFrom-JSON
 
     Write-Output "Found $($flows.Count) Flows to export..."
 
@@ -32,8 +32,8 @@ This script will get all flows in your default environment and export them as bo
         $exportPath = "$($filename)_$($timestamp)"
         $flowId = $_.Name
         
-        m365 flow export --id $flowId --environment $environment --packageDisplayName $_.displayName --path "$exportPath.zip"
-        m365 flow export --id $flowId --environment $environment --format json --path "$exportPath.json"
+        m365 flow export --id $flowId --environmentName $environment --packageDisplayName $_.displayName --path "$exportPath.zip"
+        m365 flow export --id $flowId --environmentName $environment --format json --path "$exportPath.json"
     }
 
     Write-Output "Complete"

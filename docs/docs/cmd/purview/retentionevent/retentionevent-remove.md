@@ -31,6 +31,9 @@ m365 purview retentionevent remove --id c37d695e-d581-4ae9-82a0-9364eba4291e
 !!! attention
     This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
 
+!!! attention
+    This command currently only supports delegated permissions.
+
 ## More information
 
 This command is part of a series of commands that have to do with event-based retention. Event-based retention is about starting a retention period when a specific event occurs, instead of the moment a document was labeled or created.

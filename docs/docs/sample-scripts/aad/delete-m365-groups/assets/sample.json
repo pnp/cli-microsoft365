@@ -5,7 +5,7 @@
     "title": "CLI - Delete all Microsoft 365 groups",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/delete-m365-groups",
     "creationDateTime": "2020-03-15",
-    "updateDateTime": "2020-03-15",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "this script deletes the AAD groups you no longer need.",
     "longDescription": [
       "There are so many different ways to create Microsoft 365 groups. Teams, Planner, SharePoint team sites, etc. — you can accumulate a lot of them very fast. Use this script below to delete the ones you no longer need."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

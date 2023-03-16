@@ -9,6 +9,7 @@ import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
@@ -24,6 +25,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc',
       FormDigestTimeoutSeconds: 1800,
@@ -79,6 +81,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
       request.post,
       telemetry.trackEvent,
       pid.getProcessName,
+      session.getId,
       spo.getRequestDigest
     ]);
     auth.service.connected = false;

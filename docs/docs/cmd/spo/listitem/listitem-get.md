@@ -118,6 +118,34 @@ m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.
     0,147,,,0x010078BC2C6F12F0DB41BA554210A2BFA81600A320A11ABE6E90468525ECC747660126,Demo Item,2022-10-30T10:55:37Z,2022-10-30T10:55:22Z,10,10,3.0,,87f3138d-fac3-4126-97c0-543e55672261,
     ```
 
+=== "Markdown"
+
+    ```md
+    # spo listitem get --webUrl "https://contoso.sharepoint.com" --listTitle "My List" --id "147"
+
+    Date: 2/20/2023
+
+    ## Demo Item (147)
+
+    Property | Value
+    ---------|-------
+    FileSystemObjectType | 0
+    Id | 147
+    ServerRedirectedEmbedUri | null
+    ServerRedirectedEmbedUrl |
+    ContentTypeId | 0x010078BC2C6F12F0DB41BA554210A2BFA81600A320A11ABE6E90468525ECC747660126
+    Title | Demo Item
+    ComplianceAssetId | null
+    FieldName1 | null
+    Modified | 2022-10-30T10:55:37Z
+    Created | 2022-10-30T10:55:22Z
+    AuthorId | 10
+    EditorId | 10
+    OData\_\_UIVersionString | 3.0
+    Attachments | false
+    GUID | 87f3138d-fac3-4126-97c0-543e55672261
+    ```
+
 ### `withPermissions` response
 
 When we make use of the option `withPermissions` the response will differ. 
@@ -241,4 +269,33 @@ When we make use of the option `withPermissions` the response will differ.
     ```csv
     FileSystemObjectType,Id,ServerRedirectedEmbedUri,ServerRedirectedEmbedUrl,ContentTypeId,Title,Modified,Created,AuthorId,EditorId,OData__UIVersionString,Attachments,GUID,ComplianceAssetId,RoleAssignments
     0,147,,,0x010078BC2C6F12F0DB41BA554210A2BFA81600A320A11ABE6E90468525ECC747660126,Demo Item,2022-10-30T10:55:37Z,2022-10-30T10:55:22Z,10,10,3.0,,87f3138d-fac3-4126-97c0-543e55672261,"[{""Member"":{""Id"":3,""IsHiddenInUI"":false,""LoginName"":""Communication site Owners"",""Title"":""Communication site Owners"",""PrincipalType"":8,""AllowMembersEditMembership"":false,""AllowRequestToJoinLeave"":false,""AutoAcceptRequestToJoinLeave"":false,""Description"":null,""OnlyAllowMembersViewMembership"":false,""OwnerTitle"":""Communication site Owners"",""RequestToJoinLeaveEmailSetting"":""""},""RoleDefinitionBindings"":[{""BasePermissions"":{""High"":""2147483647"",""Low"":""4294967295""},""Description"":""Has full control."",""Hidden"":false,""Id"":1073741829,""Name"":""Full Control"",""Order"":1,""RoleTypeKind"":5,""BasePermissionsValue"":[""ViewListItems"",""AddListItems"",""EditListItems"",""DeleteListItems"",""ApproveItems"",""OpenItems"",""ViewVersions"",""DeleteVersions"",""CancelCheckout"",""ManagePersonalViews"",""ManageLists"",""ViewFormPages"",""AnonymousSearchAccessList"",""Open"",""ViewPages"",""AddAndCustomizePages"",""ApplyThemeAndBorder"",""ApplyStyleSheets"",""ViewUsageData"",""CreateSSCSite"",""ManageSubwebs"",""CreateGroups"",""ManagePermissions"",""BrowseDirectories"",""BrowseUserInfo"",""AddDelPrivateWebParts"",""UpdatePersonalWebParts"",""ManageWeb"",""AnonymousSearchAccessWebLists"",""UseClientIntegration"",""UseRemoteAPIs"",""ManageAlerts"",""CreateAlerts"",""EditMyUserInfo"",""EnumeratePermissions""],""RoleTypeKindValue"":""Administrator""}],""PrincipalId"":3}]"
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo listitem get --webUrl "https://contoso.sharepoint.com" --listTitle "My List" --id "147" --withPermissions "true"
+
+    Date: 2/20/2023
+
+    ## Demo Item (1)
+
+    Property | Value
+    ---------|-------
+    FileSystemObjectType | 0
+    Id | 147
+    ServerRedirectedEmbedUri | null
+    ServerRedirectedEmbedUrl |
+    ContentTypeId | 0x010078BC2C6F12F0DB41BA554210A2BFA81600A320A11ABE6E90468525ECC747660126
+    Title | Demo Item
+    ComplianceAssetId | null
+    FieldName1 | null
+    Modified | 2022-10-30T10:55:37Z
+    Created | 2022-10-30T10:55:22Z
+    AuthorId | 10
+    EditorId | 10
+    OData\_\_UIVersionString | 3.0
+    Attachments | false
+    GUID | 87f3138d-fac3-4126-97c0-543e55672261
+    RoleAssignments | [{"Member":{"Id":3,"IsHiddenInUI":false,"LoginName":"Communication site Owners","Title":"Communication site Owners","PrincipalType":8,"AllowMembersEditMembership":false,"AllowRequestToJoinLeave":false,"AutoAcceptRequestToJoinLeave":false,"Description":null,"OnlyAllowMembersViewMembership":false,"OwnerTitle":"Communication site Owners","RequestToJoinLeaveEmailSetting":""},"RoleDefinitionBindings":[{"BasePermissions":{"High":"2147483647","Low":"4294967295"},"Description":"Has full control.","Hidden":false,"Id":1073741829,"Name":"Full Control","Order":1,"RoleTypeKind":5,"BasePermissionsValue":["ViewListItems","AddListItems","EditListItems","DeleteListItems","ApproveItems","OpenItems","ViewVersions","DeleteVersions","CancelCheckout","ManagePersonalViews","ManageLists","ViewFormPages","AnonymousSearchAccessList","Open","ViewPages","AddAndCustomizePages","ApplyThemeAndBorder","ApplyStyleSheets","ViewUsageData","CreateSSCSite","ManageSubwebs","CreateGroups","ManagePermissions","BrowseDirectories","BrowseUserInfo","AddDelPrivateWebParts","UpdatePersonalWebParts","ManageWeb","AnonymousSearchAccessWebLists","UseClientIntegration","UseRemoteAPIs","ManageAlerts","CreateAlerts","EditMyUserInfo","EnumeratePermissions"],"RoleTypeKindValue":"Administrator"}],"PrincipalId":3}]
     ```

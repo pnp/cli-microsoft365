@@ -8,8 +8,10 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentionlabel-add');
 
 describe(commands.RETENTIONLABEL_ADD, () => {
@@ -23,6 +25,8 @@ describe(commands.RETENTIONLABEL_ADD, () => {
   const descriptionForUsers = 'Description for users';
   const descriptionForAdmins = 'Description for admins';
   const labelToBeApplied = 'another label';
+  const eventTypeName = 'Retention Event Type';
+  const eventTypeId = '81fa91bd-66cd-4c6c-b0cb-71f37210dc74';
 
   const requestResponse = {
     displayName: "some label",
@@ -55,6 +59,30 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     dispositionReviewStages: []
   };
 
+  const eventTypeResponse = {
+    value: [
+      {
+        displayName: "Retention Event Type",
+        description: "",
+        createdDateTime: "2023-02-02T15:47:54Z",
+        lastModifiedDateTime: "2023-02-02T15:47:54Z",
+        id: "81fa91bd-66cd-4c6c-b0cb-71f37210dc74",
+        createdBy: {
+          user: {
+            id: "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
+            displayName: null
+          }
+        },
+        lastModifiedBy: {
+          user: {
+            id: "36155f4e-bdbd-4101-ba20-5e78f5fba9a9",
+            displayName: null
+          }
+        }
+      }
+    ]
+  };
+
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -64,7 +92,12 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -83,11 +116,14 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      accessToken.isAppOnlyAccessToken,
+      request.post,
+      request.get
     ]);
   });
 
@@ -95,9 +131,11 @@ describe(commands.RETENTIONLABEL_ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -146,7 +184,7 @@ describe(commands.RETENTIONLABEL_ADD, () => {
         retentionDuration: retentionDuration
       }
     }, commandInfo);
-    assert.strictEqual(actual, `${invalid} is not a valid behavior of a document with the label. Allowed values are doNotRetain|retain|retainAsRecord|retainAsRegulatoryRecord`);
+    assert.strictEqual(actual, `${invalid} is not a valid behavior of a document with the label. Allowed values are doNotRetain, retain, retainAsRecord, retainAsRegulatoryRecord`);
   });
 
   it('rejects invalid actionAfterRetentionPeriod', async () => {
@@ -158,7 +196,7 @@ describe(commands.RETENTIONLABEL_ADD, () => {
         retentionDuration: retentionDuration
       }
     }, commandInfo);
-    assert.strictEqual(actual, `${invalid} is not a valid action to take on a document with the label. Allowed values are none|delete|startDispositionReview`);
+    assert.strictEqual(actual, `${invalid} is not a valid action to take on a document with the label. Allowed values are none, delete, startDispositionReview`);
   });
 
   it('rejects invalid retentionTrigger', async () => {
@@ -171,7 +209,7 @@ describe(commands.RETENTIONLABEL_ADD, () => {
         retentionTrigger: invalid
       }
     }, commandInfo);
-    assert.strictEqual(actual, `${invalid} is not a valid action retention duration calculation. Allowed values are dateLabeled|dateCreated|dateModified|dateOfEvent`);
+    assert.strictEqual(actual, `${invalid} is not a valid action retention duration calculation. Allowed values are dateLabeled, dateCreated, dateModified, dateOfEvent`);
   });
 
   it('rejects invalid defaultRecordBehavior', async () => {
@@ -184,10 +222,39 @@ describe(commands.RETENTIONLABEL_ADD, () => {
         defaultRecordBehavior: invalid
       }
     }, commandInfo);
-    assert.strictEqual(actual, `${invalid} is not a valid state of a record label. Allowed values are startLocked|startUnlocked`);
+    assert.strictEqual(actual, `${invalid} is not a valid state of a record label. Allowed values are startLocked, startUnlocked`);
   });
 
-  it('adds retention label by id when prompt confirmed', async () => {
+
+  it('throws an error when we execute the command using application permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    await assert.rejects(command.action(logger, { options: { displayName: displayName } }),
+      new CommandError('This command does not support application permissions.'));
+  });
+
+  it('throws error when no retention event type found with name', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes`)) {
+        return ({ "value": [] });
+      }
+
+      throw 'Invalid request';
+    });
+
+    await assert.rejects(command.action(logger, {
+      options: {
+        displayName: displayName,
+        behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
+        actionAfterRetentionPeriod: actionAfterRetentionPeriod,
+        retentionDuration: retentionDuration,
+        retentionTrigger: "dateOfEvent",
+        eventTypeName: eventTypeName
+      }
+    }), new CommandError(`The specified retention event type '${eventTypeName}' does not exist.`));
+  });
+
+  it('adds retention label with all options', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels`) {
         return requestResponse;
@@ -209,6 +276,72 @@ describe(commands.RETENTIONLABEL_ADD, () => {
         descriptionForUsers: descriptionForUsers,
         descriptionForAdmins: descriptionForAdmins,
         labelToBeApplied: labelToBeApplied
+      }
+    });
+
+    assert(loggerLogSpy.calledWith(requestResponse));
+  });
+
+  it('adds retention label with all options and eventTypeName', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if ((opts.url === `https://graph.microsoft.com/beta/security/triggerTypes/retentionEventTypes`)) {
+        return (eventTypeResponse);
+      }
+
+      throw 'Invalid request';
+    });
+
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels`) {
+        return requestResponse;
+      }
+
+      return 'Invalid Request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        verbose: true,
+        displayName: displayName,
+        behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
+        actionAfterRetentionPeriod: actionAfterRetentionPeriod,
+        retentionDuration: retentionDuration,
+        retentionTrigger: "dateOfEvent",
+        defaultRecordBehavior: defaultRecordBehavior,
+        descriptionForUsers: descriptionForUsers,
+        descriptionForAdmins: descriptionForAdmins,
+        labelToBeApplied: labelToBeApplied,
+        eventTypeName: eventTypeName
+      }
+    });
+
+    assert(loggerLogSpy.calledWith(requestResponse));
+  });
+
+  it('adds retention label with all options and eventTypeId', async () => {
+    sinon.stub(request, 'post').callsFake(async (opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/security/labels/retentionLabels`) {
+        return requestResponse;
+      }
+
+      return 'Invalid Request';
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        verbose: true,
+        displayName: displayName,
+        behaviorDuringRetentionPeriod: behaviorDuringRetentionPeriod,
+        actionAfterRetentionPeriod: actionAfterRetentionPeriod,
+        retentionDuration: retentionDuration,
+        retentionTrigger: "dateOfEvent",
+        defaultRecordBehavior: defaultRecordBehavior,
+        descriptionForUsers: descriptionForUsers,
+        descriptionForAdmins: descriptionForAdmins,
+        labelToBeApplied: labelToBeApplied,
+        eventTypeId: eventTypeId
       }
     });
 

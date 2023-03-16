@@ -8,6 +8,7 @@ import Command from '../../../../Command';
 import request from '../../../../request';
 import { telemetry } from '../../../../telemetry';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./applicationcustomizer-add');
@@ -18,7 +19,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
   const clientSideComponentId = '76d5f8c8-6228-4df8-a2da-b94cbc8115bc';
   const clientSideComponentProperties = '{"testMessage":"Test message"}';
   const customActionError = {
-    "url": "https://mathijsdev2.sharepoint.com/_api/Web/UserCustomActions",
+    "url": "https://contoso.sharepoint.com/_api/Web/UserCustomActions",
     "status": 400,
     "statusText": "Bad Request"
   };
@@ -53,6 +54,7 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -83,7 +85,8 @@ describe(commands.APPLICATIONCUSTOMIZER_ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });

@@ -57,7 +57,7 @@ This script will retrieve all environments as an Administrator and loop through 
         }
       }
 
-      $flows = m365 flow list --environment $envId --asAdmin | ConvertFrom-Json
+      $flows = m365 flow list --environmentName $envId --asAdmin | ConvertFrom-Json
       Write-Host -f Green "Processing: $($flows.Count) flows"
 
       $flows | ForEach-Object {

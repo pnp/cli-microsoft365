@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import * as child_process from 'child_process';
+import * as fs from 'fs';
 import * as sinon from 'sinon';
 import { SinonSandbox } from 'sinon';
 import { telemetry } from '../../../telemetry';
@@ -8,6 +9,7 @@ import { CommandInfo } from '../../../cli/CommandInfo';
 import { Logger } from '../../../cli/Logger';
 import Command, { CommandError } from '../../../Command';
 import { pid } from '../../../utils/pid';
+import { session } from '../../../utils/session';
 import { sinonUtil } from '../../../utils/sinonUtil';
 import commands from '../commands';
 const command: Command = require('./spfx-doctor');
@@ -35,6 +37,7 @@ describe(commands.DOCTOR, () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -59,14 +62,18 @@ describe(commands.DOCTOR, () => {
     sinonUtil.restore([
       sandbox,
       child_process.exec,
-      process.platform
+      process.platform,
+      fs.existsSync,
+      fs.readFileSync,
+      (command as any).getProjectVersion
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
   });
 
@@ -723,6 +730,72 @@ describe(commands.DOCTOR, () => {
 
     await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('npm not found'));
     assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
+  });
+
+  it('determines the current version from .yo-rc.json when spfxVersion not passed', async () => {
+    const originalExistsSync = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
+        return true;
+      }
+      else {
+        return originalExistsSync(path);
+      }
+    });
+    const originalReadFileSync = fs.readFileSync;
+    const yoRcJson = `{
+      "@microsoft/generator-sharepoint": {
+        "version": "1.4.1",
+        "libraryName": "spfx-141",
+        "libraryId": "dd1a0a8d-e043-4ca0-b9a4-256e82a66177",
+        "environment": "spo"
+      }
+    }`;
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
+        return yoRcJson;
+      }
+      else {
+        return originalReadFileSync(path, options);
+      }
+    });
+    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
+
+    await command.action(logger, { options: { toVersion: '1.4.1', debug: true } } as any);
+    assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
+  });
+
+  it('determines the current version from .yo-rc.json when available when spfxVersion is passed', async () => {
+    const originalExistsSync = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake((path) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
+        return true;
+      }
+      else {
+        return originalExistsSync(path);
+      }
+    });
+    const originalReadFileSync = fs.readFileSync;
+    const yoRcJson = `{
+      "@microsoft/generator-sharepoint": {
+        "version": "1.4.1",
+        "libraryName": "spfx-141",
+        "libraryId": "dd1a0a8d-e043-4ca0-b9a4-256e82a66177",
+        "environment": "spo"
+      }
+    }`;
+    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+      if (path.toString().endsWith('.yo-rc.json')) {
+        return yoRcJson;
+      }
+      else {
+        return originalReadFileSync(path, options);
+      }
+    });
+    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
+
+    await command.action(logger, { options: { spfxVersion: '1.4.1' } } as any);
+    assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
   });
 
   it('passes yo check when yo found', async () => {

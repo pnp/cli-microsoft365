@@ -48,7 +48,7 @@ This script is a good starting point for a setup script to create site with some
 
     Write-host 'add site column'
     $fieldName = 'Sample Text Column'
-    $field = m365 spo field get --webUrl $siteUrl --fieldTitle $fieldName --output 'json'
+    $field = m365 spo field get --webUrl $siteUrl --title $fieldName --output 'json'
     if ($null -eq $field) {
       Write-host 'sample site column does not exist, I will create it'
       $fieldXml = "<Field ID='{13AFECC0-2454-41F3-85E6-E194458C861C}' Type='Text' Name='SampleTextColumn' DisplayName='Sample Text Column' Indexed='FALSE' Group='Sample Columns' Required='FALSE' SourceID='{4f118c69-66e0-497c-96ff-d7855ce0713d}' StaticName='SampleTextColumn' FromBaseType='TRUE' ></Field>"
@@ -77,7 +77,7 @@ This script is a good starting point for a setup script to create site with some
     Write-host 'add field to content type'
     $fieldId = $field.Id
     $contentTypeId = $contentType.StringId
-    m365 spo contenttype field set --webUrl $siteUrl --contentTypeId $contentTypeId --fieldId $fieldId --required false
+    m365 spo contenttype field set --webUrl $siteUrl --contentTypeId $contentTypeId --id $fieldId --required false
 
     Write-host 'create generic list'
     $listName = 'setup test list'
@@ -95,7 +95,7 @@ This script is a good starting point for a setup script to create site with some
     m365 spo list set --webUrl $siteUrl --id $list.Id --contentTypesEnabled true
 
     Write-host 'add content type to list'
-    $contentTypeAddedToList = m365 spo list contenttype add --webUrl $siteUrl --listId $list.Id --contentTypeId $contentTypeId
+    $contentTypeAddedToList = m365 spo list contenttype add --webUrl $siteUrl --listId $list.Id --id $contentTypeId
 
     Write-host 'make list hidden'
     m365 spo list set --webUrl $siteUrl --id $list.Id --hidden true
@@ -114,7 +114,7 @@ This script is a good starting point for a setup script to create site with some
 
     Write-host 'add sample column'
     $columnName = 'Sample Text Column'
-    $column = m365 spo field get --webUrl $siteUrl --listUrl "Lists/$libName" --fieldTitle $columnName --output 'json'
+    $column = m365 spo field get --webUrl $siteUrl --listUrl "Lists/$libName" --title $columnName --output 'json'
     if ($null -eq $column) {
       Write-host 'sample column in lib does not exist, I will create it'
       $columnXml = "<Field ID='{AC827B0C-8B45-4B4F-927B-CDDC4FEEE79E}' Type='Text' Name='SampleTextColumn' DisplayName='Sample Text Column' Required='FALSE' SourceID='http://schemas.microsoft.com/sharepoint/v3' StaticName='SampleTextColumn' FromBaseType='TRUE' />"
@@ -127,7 +127,7 @@ This script is a good starting point for a setup script to create site with some
 
     Write-host 'add sample folder'
     $folderName = 'sample Folder'
-    $folder = m365 spo folder get --webUrl $siteUrl --folderUrl "/$libName/$folderName" --output 'json'
+    $folder = m365 spo folder get --webUrl $siteUrl --url "/$libName/$folderName" --output 'json'
     if ($null -eq $folder) {
       Write-host 'sample folder in lib does not exist, I will create it'
       $folder = m365 spo folder add --webUrl $siteUrl --parentFolderUrl "/$libName" --name $folderName --output 'json'
@@ -137,10 +137,10 @@ This script is a good starting point for a setup script to create site with some
     }
 
     Write-host 'modify list view'
-    $views = m365 spo list view list --webUrl $siteUrl --listTitle $libName --output 'json'
+    $views = m365 spo list view list --webUrl $siteUrl --listTitle "$libName" --output 'json'
     $views = $views | ConvertFrom-Json
     $viewName = $views[0].Title # all items view
-    m365 spo list view field add --webUrl $siteUrl --listTitle $libName --viewTitle $viewName --fieldTitle $columnName
+    m365 spo list view field add --webUrl $siteUrl --listTitle "$libName" --viewTitle $viewName --title $columnName
 
     Write-host 'modify site navigation'
     $currentNavigation = m365 spo navigation node list --webUrl $siteUrl --location QuickLaunch --output 'json'

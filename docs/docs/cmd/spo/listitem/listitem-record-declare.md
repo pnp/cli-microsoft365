@@ -84,3 +84,18 @@ m365 spo listitem record declare --webUrl https://contoso.sharepoint.com/sites/p
     SchemaVersion,LibraryVersion,ErrorInfo,TraceCorrelationId
     15.0.0.0,16.0.23102.12004,,0d4779a0-609c-5000-843d-c98e4764c937
     ```
+
+=== "Markdown"
+
+    ```md
+    # spo listitem record declare --webUrl "https://contoso.sharepoint.com/sites/project-x" --listTitle "Demo List" --listItemId "1" --date "2012-03-14"
+    
+    Date: 2/20/2023
+
+    Property | Value
+    ---------|-------
+    SchemaVersion | 15.0.0.0
+    LibraryVersion | 16.0.23102.12004
+    ErrorInfo | null
+    TraceCorrelationId | 064779a0-d05b-5000-843d-c36803e58f12
+    ```

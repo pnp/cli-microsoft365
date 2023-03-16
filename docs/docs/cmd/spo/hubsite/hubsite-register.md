@@ -11,7 +11,7 @@ m365 spo hubsite register [options]
 ## Options
 
 `-u, --siteUrl <siteUrl>`
-: URL of the site collection to register as a hub site
+: URL of the site collection to register as a hub site.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -81,6 +81,35 @@ m365 spo hubsite register --siteUrl https://contoso.sharepoint.com/sites/sales
     ```csv
     Description,EnablePermissionsSync,EnforcedECTs,EnforcedECTsVersion,HideNameInNavigation,ID,LogoUrl,ParentHubSiteId,PermissionsSyncTag,RequiresJoinApproval,SiteDesignId,SiteId,SiteUrl,Targets,TenantInstanceId,Title
     ,,,0,,0f9b8f4f-0e8e-4630-bb0a-501442db9b64,,00000000-0000-0000-0000-000000000000,0,,00000000-0000-0000-0000-000000000000,0f9b8f4f-0e8e-4630-bb0a-501442db9b64,https://contoso.sharepoint.com/sites/newHubSite,,4d128b52-7228-46b5-8765-5b338476054d,New Hub Site
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo hubsite register --siteUrl "https://contoso.sharepoint.com/sites/newHubSite"
+
+    Date: 2/20/2023
+
+    ## New Hub Site (0f9b8f4f-0e8e-4630-bb0a-501442db9b64)
+
+    Property | Value
+    ---------|-------
+    Description | null
+    EnablePermissionsSync | false
+    EnforcedECTs | null
+    EnforcedECTsVersion | 0
+    HideNameInNavigation | false
+    ID | 0f9b8f4f-0e8e-4630-bb0a-501442db9b64
+    LogoUrl | null
+    ParentHubSiteId | 00000000-0000-0000-0000-000000000000
+    PermissionsSyncTag | 0
+    RequiresJoinApproval | false
+    SiteDesignId | 00000000-0000-0000-0000-000000000000
+    SiteId | 0f9b8f4f-0e8e-4630-bb0a-501442db9b64
+    SiteUrl | https://contoso.sharepoint.com/sites/newHubSite
+    Targets | null
+    TenantInstanceId | 4d128b52-7228-46b5-8765-5b338476054d
+    Title | New Hub Site
     ```
 
 ## More information

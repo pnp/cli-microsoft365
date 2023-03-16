@@ -9,6 +9,7 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { urlUtil } from '../../../../utils/urlUtil';
 import commands from '../../commands';
@@ -23,7 +24,7 @@ describe(commands.FOLDER_LIST, () => {
   const folderListOutput = {
     value: [
       { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 2, "Name": "Test", "ProgID": null, "ServerRelativeUrl": "/sites/abc/Shared Documents/Test", "TimeCreated": "2018-04-23T21:29:40Z", "TimeLastModified": "2018-04-23T21:32:13Z", "UniqueId": "3e735407-9c9f-418b-8378-450a9888d815", "WelcomePage": "" },
-      { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "velin12", "ProgID": null, "ServerRelativeUrl": "/sites/abc/Shared Documents/velin12", "TimeCreated": "2018-05-02T22:28:50Z", "TimeLastModified": "2018-05-02T22:36:14Z", "UniqueId": "edeb37c6-8502-4a35-9fa2-6934bfc30214", "WelcomePage": "" },
+      { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "john", "ProgID": null, "ServerRelativeUrl": "/sites/abc/Shared Documents/john", "TimeCreated": "2018-05-02T22:28:50Z", "TimeLastModified": "2018-05-02T22:36:14Z", "UniqueId": "edeb37c6-8502-4a35-9fa2-6934bfc30214", "WelcomePage": "" },
       { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test111", "ProgID": null, "ServerRelativeUrl": "/sites/abc/Shared Documents/test111", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" },
       { "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "Forms", "ProgID": null, "ServerRelativeUrl": "/sites/abc/Shared Documents/Forms", "TimeCreated": "2018-02-15T13:57:52Z", "TimeLastModified": "2018-02-15T13:57:52Z", "UniqueId": "cbb96da6-c2d8-4af0-9451-d534d5949371", "WelcomePage": "" }
     ]
@@ -50,6 +51,8 @@ describe(commands.FOLDER_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -80,7 +83,8 @@ describe(commands.FOLDER_LIST, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });

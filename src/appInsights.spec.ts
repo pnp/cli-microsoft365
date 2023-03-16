@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import { pid } from './utils/pid';
+import { session } from './utils/session';
 import { sinonUtil } from './utils/sinonUtil';
 
 const env = Object.assign({}, process.env);
@@ -10,7 +11,8 @@ describe('appInsights', () => {
   afterEach(() => {
     sinonUtil.restore([
       fs.existsSync,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     delete require.cache[require.resolve('./appInsights')];
     process.env = env;

@@ -8,6 +8,7 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./run-list');
@@ -120,6 +121,8 @@ describe(commands.RUN_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -151,7 +154,8 @@ describe(commands.RUN_LIST, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });
@@ -182,6 +186,23 @@ describe(commands.RUN_LIST, () => {
     });
 
     await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, verbose: true } });
+    assert(loggerLogSpy.calledWith(flowRunListResponse.value));
+  });
+
+  it('retrieves all runs for a specific flow as admin', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/${environmentName}/flows/${flowName}/runs?api-version=2016-11-01`) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
+          return flowRunListResponse;
+        }
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, { options: { environmentName: environmentName, flowName: flowName, asAdmin: true, verbose: true } });
     assert(loggerLogSpy.calledWith(flowRunListResponse.value));
   });
 

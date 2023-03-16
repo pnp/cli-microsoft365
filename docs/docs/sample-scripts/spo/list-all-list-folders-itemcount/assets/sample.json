@@ -5,7 +5,7 @@
     "title": "Lists number of files in all lists and folders for the given site",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/list-all-list-folders-itemcount",
     "creationDateTime": "2021-06-22",
-    "updateDateTime": "2021-06-22",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "List all Lists, the folders and sub folders in a given site, and output the item count.",
     "longDescription": [
       "List all Lists, the folders and sub folders in a given site, and output the item count. Each folder is processed recursively. By default only non hidden document libraries are processed."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

@@ -11,19 +11,21 @@ m365 spo homesite set [options]
 ## Options
 
 `-u, --siteUrl <siteUrl>`
-: The URL of the site to set as Home site.
+: The URL of the site to set as Home Site.
 
 `--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]`
-: When set to `true`, the VivaConnectionsDefaultStart parameter will keep the Viva Connections landing experience to the SharePoint home site. If set to `false`, the Viva Connections home experience will be used. 
+: When set to `true`, the VivaConnectionsDefaultStart parameter will keep the Viva Connections landing experience to the SharePoint home site. If set to `false`, the Viva Connections home experience will be used.
 
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
 
 !!! important
     To use this command you have to have permissions to access the tenant admin site.
 
 ## Examples
 
-Set the specified site as the Home Site
+Set the specified site as the Home Site.
 
 ```sh
 m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms
@@ -83,6 +85,12 @@ When we make use of the option `vivaConnectionsDefaultStart` the response will d
     The Home site has been set to https://contoso.sharepoint.com and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details.
     ```
 
+
+=== "Markdown"
+
+    ```md
+    The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
+    ```
 
 ## More information
 

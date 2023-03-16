@@ -1,9 +1,9 @@
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
-import { odata } from '../../../../utils/odata';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
-import { Environment } from '../Environment';
 import commands from '../../commands';
+import request, { CliRequestOptions } from '../../../../request';
+import { formatting } from '../../../../utils/formatting';
 
 interface CommandArgs {
   options: Options;
@@ -55,21 +55,28 @@ class PpEnvironmentGetCommand extends PowerPlatformCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let url: string = `${this.resource}/providers/Microsoft.BusinessAppPlatform/environments`;
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving environment: ${args.options.name || 'default'}`);
+    }
+
+    let url: string = `${this.resource}/providers/Microsoft.BusinessAppPlatform`;
     if (args.options.asAdmin) {
-      url = `${this.resource}/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments`;
+      url += '/scopes/admin';
     }
 
-    const res = await odata.getAllItems<Environment>(`${url}?api-version=2020-10-01`);
-    const environmentItem: Environment | undefined = res.filter((env: Environment) =>
-      args.options.name ? env.name === args.options.name : env.properties.isDefault === true
-    )[0];
+    const envName = args.options.name ? formatting.encodeQueryParameter(args.options.name) : '~Default';
+    url += `/environments/${envName}?api-version=2020-10-01`;
 
-    if (!environmentItem) {
-      throw `The specified Power Platform environment does not exist`;
-    }
+    const requestOptions: CliRequestOptions = {
+      url: url,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
 
-    logger.log(environmentItem);
+    const response = await request.get<any>(requestOptions);
+    logger.log(response);
   }
 }
 

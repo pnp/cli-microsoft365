@@ -20,10 +20,10 @@ m365 aad approleassignment remove [options]
 : Application name of the App Registration for which the configured scopes (app roles) should be deleted
 
 `-r, --resource <resource>`
-: Service principal name, appId or objectId that has the scopes (roles) ex. `SharePoint`
+: Service principal name, appId or objectId that has the scopes (roles) e.g. `SharePoint`
 
 `-s, --scope <scope>`
-: Permissions known also as scopes and roles to be deleted from the application. If multiple permissions have to be deleted, they have to be comma separated ex. `Sites.Read.All`,`Sites.ReadWrite.All`
+: Permissions known also as scopes and roles to be deleted from the application. If multiple permissions have to be deleted, they have to be comma-separated e.g. `Sites.Read.All`,`Sites.ReadWrite.All`
 
 `--confirm`
 : Don't prompt for confirming removing the all role assignment
@@ -54,7 +54,7 @@ Deletes multiple Microsoft Graph application permissions from an Azure AD applic
 m365 aad approleassignment remove --appDisplayName "MyAppName" --resource "Microsoft Graph" --scope "Mail.Read,Mail.Send"
 ```
 
-Deletes Microsoft Graph _Mail.Read_ application permissions from a system managed identity app with objectId _57907bf8-73fa-43a6-89a5-1f603e29e451_
+Deletes Microsoft Graph _Mail.Read_ application permissions from a system-managed identity app with objectId _57907bf8-73fa-43a6-89a5-1f603e29e451_
 
 ```sh
 m365 aad approleassignment remove --appObjectId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "Microsoft Graph" --scope "Mail.Read"

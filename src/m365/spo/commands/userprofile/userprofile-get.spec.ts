@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import { spo } from '../../../../utils/spo';
 import commands from '../../commands';
@@ -23,6 +24,7 @@ describe(commands.USERPROFILE_GET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -61,7 +63,8 @@ describe(commands.USERPROFILE_GET, () => {
       auth.restoreAuth,
       spo.getRequestDigest,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = true;
     auth.service.spoUrl = undefined;
@@ -88,8 +91,8 @@ describe(commands.USERPROFILE_GET, () => {
       "IsFollowed": false,
       "LatestPost": null,
       "Peers": [],
-      "PersonalSiteHostUrl": "https://dev1802-my.sharepoint.com:443/",
-      "PersonalUrl": "https://dev1802-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
+      "PersonalSiteHostUrl": "https://contoso-my.sharepoint.com:443/",
+      "PersonalUrl": "https://contoso-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
       "PictureUrl": null,
       "Title": null,
       "UserProfileProperties": [
@@ -136,8 +139,8 @@ describe(commands.USERPROFILE_GET, () => {
           "IsFollowed": false,
           "LatestPost": null,
           "Peers": [],
-          "PersonalSiteHostUrl": "https://dev1802-my.sharepoint.com:443/",
-          "PersonalUrl": "https://dev1802-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
+          "PersonalSiteHostUrl": "https://contoso-my.sharepoint.com:443/",
+          "PersonalUrl": "https://contoso-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
           "PictureUrl": null,
           "Title": null
         });
@@ -163,8 +166,8 @@ describe(commands.USERPROFILE_GET, () => {
       "IsFollowed": false,
       "LatestPost": null,
       "Peers": [],
-      "PersonalSiteHostUrl": "https://dev1802-my.sharepoint.com:443/",
-      "PersonalUrl": "https://dev1802-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
+      "PersonalSiteHostUrl": "https://contoso-my.sharepoint.com:443/",
+      "PersonalUrl": "https://contoso-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
       "PictureUrl": null,
       "Title": null
     }));

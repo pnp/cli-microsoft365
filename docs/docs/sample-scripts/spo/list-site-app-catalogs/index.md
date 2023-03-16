@@ -14,7 +14,7 @@ Note, because the sample uses the SharePoint search API to identify the site col
 === "PowerShell"
 
     ```powershell
-    $appCatalogs = m365 spo search --query "contentclass:STS_List_336" --selectProperties SPSiteURL --allResults --output json | ConvertFrom-Json
+    $appCatalogs = m365 spo search --queryText "contentclass:STS_List_336" --selectProperties SPSiteURL --allResults --output json | ConvertFrom-Json
 
     $appCatalogs | ForEach-Object { Write-Host $_.SPSiteURL }
     Write-Host 'Total count:' $appCatalogs.Count
@@ -27,7 +27,7 @@ Note, because the sample uses the SharePoint search API to identify the site col
 
     # requires jq: https://stedolan.github.io/jq/
 
-    appCatalogs=$(m365 spo search --query "contentclass:STS_List_336" --selectProperties SPSiteURL --allResults --output json)
+    appCatalogs=$(m365 spo search --queryText "contentclass:STS_List_336" --selectProperties SPSiteURL --allResults --output json)
 
     echo $appCatalogs | jq -r '.[].SPSiteURL'
     echo "Total count:" $(echo $appCatalogs | jq length)

@@ -22,11 +22,11 @@ Search all flows as, an administrator, for a specific search string and report r
     ForEach ($env in $environments) {
         Write-Output "Processing $($env.displayName)..."
 
-        $flows = m365 flow list --environment $env.name --asAdmin -o json | ConvertFrom-Json
+        $flows = m365 flow list --environmentName $env.name --asAdmin -o json | ConvertFrom-Json
 
         ForEach ($flow in $flows) {
             Write-Output "Processing $($flow.displayName)..."
-            m365 flow export --id $flow.name --environment $env.name --format json --path $path
+            m365 flow export --id $flow.name --environmentName $env.name --format json --path $path
 
             $flowData = Get-Content -Path $path -ErrorAction SilentlyContinue
 

@@ -1,8 +1,68 @@
 # Release notes
 
-## [v6.3.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
+## [v6.4.0 (beta)](https://github.com/pnp/cli-microsoft365/releases/tag/v6.4.0)
 
 ### New commands
+
+**Planner:**
+
+- [planner roster member get](../cmd/planner/roster/roster-member-get.md) - gets a member of the specified Microsoft Planner Roster [#4488](https://github.com/pnp/cli-microsoft365/issues/4488)
+
+**Power Automate:**
+
+- [flow owner add](../cmd/flow/owner/owner-add.md) - assigns permissions to a Power Automate flow [#4559](https://github.com/pnp/cli-microsoft365/issues/4559)
+- [flow owner list](../cmd/flow/owner/owner-list.md) - lists all owners of a Power Automate flow [#4558](https://github.com/pnp/cli-microsoft365/issues/4558)
+- [flow owner remove](../cmd/flow/owner/owner-remove.md) - removes owner permissions to a Power Automate flow [#4560](https://github.com/pnp/cli-microsoft365/issues/4560)
+
+**Purview:**
+
+- [purview retentionevent add](../cmd/purview/retentionevent/retentionevent-add.md) - adds a retention event [#4373](https://github.com/pnp/cli-microsoft365/issues/4373)
+
+**SharePoint:**
+
+- [spo tenant applicationcustomizer get](../cmd/spo/tenant/tenant-applicationcustomizer-get.md) - gets an application customizer that is installed tenant wide [#4243](https://github.com/pnp/cli-microsoft365/issues/4243)
+- [spo user ensure](../cmd/spo/user/user-ensure.md) - ensures that a user is available on a specific site [#4497](https://github.com/pnp/cli-microsoft365/issues/4497)
+
+### Changes
+
+- enhanced 'spo term get' command [#4346](https://github.com/pnp/cli-microsoft365/issues/4346)
+- aligned script sample command options with v6.3 release [#4441](https://github.com/pnp/cli-microsoft365/issues/4441)
+- fixed prompt behavior when passing url option [#4530](https://github.com/pnp/cli-microsoft365/issues/4530)
+- documentation improvements [#4521](https://github.com/pnp/cli-microsoft365/pull/4521)
+- added 'clientSideComponentId' option to 'spo customaction get' [#4382](https://github.com/pnp/cli-microsoft365/issues/4382)
+- added admin privileges to 'flow run list' command [#3709](https://github.com/pnp/cli-microsoft365/issues/3709)
+- fixed unhandled exception when file doesn't exist when using 'spo file move' [#4537](https://github.com/pnp/cli-microsoft365/issues/4537)
+- fixed baseTemplate option to be optional for command 'spo list add' [#4546](https://github.com/pnp/cli-microsoft365/issues/4546)
+- fixed listExperienceOptions and draftVersionVisibility options for 'spo list add' and 'spo list set' commands [#4562](https://github.com/pnp/cli-microsoft365/issues/4562)
+- included md output for 'teams message' until 'teams user commands' [#4305](https://github.com/pnp/cli-microsoft365/issues/4305)
+- added response output for 'outlook', 'planner' and 'skype' commands' [#3923](https://github.com/pnp/cli-microsoft365/issues/3923)
+- enhanced 'spfx doctor' command [#4213](https://github.com/pnp/cli-microsoft365/issues/4213)
+- fixed markdown output formatting in console [#4541](https://github.com/pnp/cli-microsoft365/issues/4541)
+- sanitized codebase with fictitious data [#4557](https://github.com/pnp/cli-microsoft365/issues/4557)
+- fixed 'spo group member add' command to work with security groups [#4507](https://github.com/pnp/cli-microsoft365/issues/4507)
+- enhanced 'spo navigation node add/set' with support for linkless labels [#4586](https://github.com/pnp/cli-microsoft365/issues/4586)
+- fixed 'spo folder roleinheritance reset' code tests [#4630](https://github.com/pnp/cli-microsoft365/issues/4630)
+- moved important admonitions in docs under remarks header [#4566](https://github.com/pnp/cli-microsoft365/issues/4566)
+- added eventTypeId and eventTypeName options to 'purview retentionlabel add' command [#4555](https://github.com/pnp/cli-microsoft365/issues/4555)
+- added markdown output for 'spfx' commands to the docs [#4297](https://github.com/pnp/cli-microsoft365/issues/4297)
+- added guidance about CLI for Microsoft 365 context to the docs [#3896](https://github.com/pnp/cli-microsoft365/issues/3896)
+
+## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad user add](../cmd/aad/user/user-add.md) - creates a new user [#4495](https://github.com/pnp/cli-microsoft365/issues/4495)
+- [aad user remove](../cmd/aad/user/user-remove.md) - removes a specific user [#4494](https://github.com/pnp/cli-microsoft365/issues/4494)
+- [aad license list](../cmd/aad/license/license-list.md) - lists commercial subscriptions that an organization has acquired [#4503](https://github.com/pnp/cli-microsoft365/issues/4503)
+- [aad user license add](../cmd/aad/user/user-license-add.md) - assigns a license to a user [#4504](https://github.com/pnp/cli-microsoft365/issues/4504)
+- [aad user license list](../cmd/aad/user/user-license-list.md) - lists the license details for a given user [#4502](https://github.com/pnp/cli-microsoft365/issues/4502)
+- [aad user license remove](../cmd/aad/user/user-license-remove.md) - removes a license from a user [#4510](https://github.com/pnp/cli-microsoft365/issues/4510)
+- [aad user recyclebinitem clear](../cmd/aad/user/user-recyclebinitem-clear.md) - removes all users from the tenant recycle bin [#4501](https://github.com/pnp/cli-microsoft365/issues/4501)
+- [aad user recyclebinitem list](../cmd/aad/user/user-recyclebinitem-list.md) - lists users from the recycle bin in the current tenant [#4498](https://github.com/pnp/cli-microsoft365/issues/4498)
+- [aad user recyclebinitem remove](../cmd/aad/user/user-recyclebinitem-remove.md) - removes a user from the tenant recycle bin [#4499](https://github.com/pnp/cli-microsoft365/issues/4499)
+- [aad user recyclebinitem restore](../cmd/aad/user/user-recyclebinitem-restore.md) - restores a user from the tenant recycle bin [#4500](https://github.com/pnp/cli-microsoft365/issues/4500)
 
 **Context:**
 
@@ -11,10 +71,11 @@
 **Planner:**
 
 - [planner roster add](../cmd/planner/roster/roster-add.md) - creates a new Microsoft Planner Roster [#4389](https://github.com/pnp/cli-microsoft365/issues/4389)
+- [planner roster get](../cmd/planner/roster/roster-get.md) - gets information about the specific Microsoft Planner Roster [#4395](https://github.com/pnp/cli-microsoft365/issues/4395)
 - [planner roster remove](../cmd/planner/roster/roster-remove.md) - removes a Microsoft Planner Roster [#4390](https://github.com/pnp/cli-microsoft365/issues/4390)
 - [planner roster member add](../cmd/planner/roster/roster-member-add.md) - adds a user to a Microsoft Planner Roster [#4392](https://github.com/pnp/cli-microsoft365/issues/4392)
 - [planner roster member list](../cmd/planner/roster/roster-member-list.md) - lists members of the specified Microsoft Planner Roster [#4391](https://github.com/pnp/cli-microsoft365/issues/4391)
-- [planner roster get](../cmd/planner/roster/roster-get.md) - gets information about the specific Microsoft Planner Roster [#4395](https://github.com/pnp/cli-microsoft365/issues/4395)
+- [planner roster member remove](../cmd/planner/roster/roster-member-remove.md) - removes a member from a Microsoft Planner Roster [#4394](https://github.com/pnp/cli-microsoft365/issues/4394)
 
 **Purview:**
 
@@ -65,6 +126,13 @@
 - improved 'planner plan get' rosterId handling [#4465](https://github.com/pnp/cli-microsoft365/issues/4465)
 - refactored customaction commands to query get/list through a util class [#4327](https://github.com/pnp/cli-microsoft365/issues/4327)
 - enhanced documentation for 'login', 'logout', 'request', 'status', 'version' [#4474](https://github.com/pnp/cli-microsoft365/issues/4474)
+- enhanced purview commands to show an error when using application permissions [#4450](https://github.com/pnp/cli-microsoft365/issues/4450)
+- enhanced 'pa environment get' to retrieve the default environment [#4491](https://github.com/pnp/cli-microsoft365/issues/4491)
+- added sample script to download attachments from SPO [#2660](https://github.com/pnp/cli-microsoft365/issues/2660)
+- modified command execution of 'm365 context' [#4047](https://github.com/pnp/cli-microsoft365/issues/4047)
+- enhanced 'flow environment get' [#4445](https://github.com/pnp/cli-microsoft365/issues/4445)
+- included response output in md for spo homesite, hubsite, knowledgehub, list, listitem, navigation commands [#4301](https://github.com/pnp/cli-microsoft365/issues/4301)
+- added spinner to communicate command running [#4536](https://github.com/pnp/cli-microsoft365/pull/4536)
 
 ## [v6.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.2.0)
 
@@ -136,7 +204,7 @@
 
 ### New commands
 
-**Azure AD:**
+**Azure Active Directory:**
 
 - [aad group get](../cmd/aad/group/group-get.md) - get information about a specified Azure AD Group [#3786](https://github.com/pnp/cli-microsoft365/issues/3786) 
 

@@ -47,7 +47,7 @@ The `bash` version of this script uses an external file to process owner mapping
 
         # Step 2 - Get all of the flows using the cli and write flows json to a tmp file 
         # Use a JMESPath query to filter the size of the file. See https://github.com/pnp/cli-microsoft365/issues/1266
-        m365 flow list --environment $defaultEnvironment `
+        m365 flow list --environmentName $defaultEnvironment `
             --query '[].{name: name, displayName: properties.displayName,owner: properties.creator.userId, state: properties.state, created: properties.createdTime, lastModified: properties.lastModifiedTime, trigger: properties.definitionSummary.triggers[0].swaggerOperationId,  triggerType: properties.definitionSummary.triggers[0].type }' --asAdmin --output json |
             Out-File "$TMP_FLOWS" -Encoding ASCII
         $flows = Get-Content "$TMP_FLOWS" | ConvertFrom-Json
@@ -140,7 +140,7 @@ The `bash` version of this script uses an external file to process owner mapping
 
     #Step 2 - Get all of the flows using the cli and write flows json to a tmp file
     #See https://github.com/pnp/cli-microsoft365/issues/1266 for temp file usage reason
-    m365 flow list --environment $DEFAULT_ENVIRONMENT --asAdmin --output json > $TMP_FLOWS
+    m365 flow list --environmentName $DEFAULT_ENVIRONMENT --asAdmin --output json > $TMP_FLOWS
 
     #Step 3 - Get a unique list of the flow owners from the tmp file
     echo "Flows found, searching for owner values..."

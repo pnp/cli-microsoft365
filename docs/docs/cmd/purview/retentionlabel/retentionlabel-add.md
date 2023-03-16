@@ -37,6 +37,12 @@ m365 purview retentionlabel add [options]
 `--labelToBeApplied [labelToBeApplied]`
 : Specifies the replacement label to be applied automatically after the retention period of the current label ends.
 
+`--eventTypeId [eventTypeId]`
+: The Id of the event type that is used to in case of an event-based label. Specify when using retentionTrigger with the value `dateOfEvent`. Specify either `eventTypeId` or `eventTypeName`, but not both.
+
+`--eventTypeName [eventTypeName]`
+:	The display name of the event type that is used to in case of an event-based label. Specify when using retentionTrigger with the value `dateOfEvent`. Specify either `eventTypeId` or `eventTypeName`, but not both.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
@@ -53,10 +59,19 @@ Create a retention label that retains documents as records and does not take any
 m365 purview retentionlabel add --displayName 'some label' --behaviorDuringRetentionPeriod retainAsRecord --actionAfterRetentionPeriod none --retentionDuration 365 --retentionTrigger dateModified
 ```
 
+Create an event-based retention label that retains documents as records and deletes them one year after a _Contract Expiry_ event date.
+
+```sh
+m365 purview retentionlabel add --displayName 'some label' --behaviorDuringRetentionPeriod retain --actionAfterRetentionPeriod delete --retentionDuration 365 --retentionTrigger dateOfEvent --eventTypeName "Contract Expiry"
+```
+
 ## Remarks
 
 !!! attention
     This command is based on a Microsoft Graph API that is currently in preview and is subject to change once the API reached general availability.
+
+!!! attention
+    This command currently only supports delegated permissions.
 
 ## More information
 

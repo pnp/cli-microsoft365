@@ -1,14 +1,15 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { telemetry } from '../../telemetry';
 import auth from '../../Auth';
 import { Cli } from '../../cli/Cli';
 import { CommandInfo } from '../../cli/CommandInfo';
 import { Logger } from '../../cli/Logger';
 import { CommandError } from '../../Command';
 import request from '../../request';
+import { telemetry } from '../../telemetry';
 import { pid } from '../../utils/pid';
+import { session } from '../../utils/session';
 import { sinonUtil } from '../../utils/sinonUtil';
 import PeriodBasedReport from './PeriodBasedReport';
 
@@ -39,6 +40,7 @@ describe('PeriodBasedReport', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(mockCommand);
   });
@@ -70,6 +72,7 @@ describe('PeriodBasedReport', () => {
     sinonUtil.restore([
       telemetry.trackEvent,
       pid.getProcessName,
+      session.getId,
       auth.restoreAuth
     ]);
     auth.service.connected = false;

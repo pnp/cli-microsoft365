@@ -19,13 +19,13 @@ This script helps you to quickly remove pending SharePoint API permission reques
     $.verbose = false;
 
     console.log('Retrieving permission requests...');
-    const permissionRequests = JSON.parse(await $`m365 spo sp permissionrequest list -o json`);
+    const permissionRequests = JSON.parse(await $`m365 spo serviceprincipal permissionrequest list -o json`);
 
     for (let i = 0; i < permissionRequests.length; i++) {
       const request = permissionRequests[i];
       console.log(`Removing request ${request.Resource}/${request.Scope} (${request.Id})...`);
       try {
-        await $`m365 spo sp permissionrequest deny --requestId ${request.Id}`
+        await $`m365 spo serviceprincipal permissionrequest deny --id ${request.Id}`
         console.log(chalk.green('DONE'));
       }
       catch (err) {

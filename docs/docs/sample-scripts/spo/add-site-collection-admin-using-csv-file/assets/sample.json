@@ -5,7 +5,7 @@
     "title": "Add a Site Collection Admin using a csv file",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/add-site-collection-admin-using-csv-file",
     "creationDateTime": "2021-04-28",
-    "updateDateTime": "2021-04-28",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "Adds a Site Collection Admin using a csv file.",
     "longDescription": [
       "Adds a Site Collection Admin using a csv file."
@@ -21,7 +21,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

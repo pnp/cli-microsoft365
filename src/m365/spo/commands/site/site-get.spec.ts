@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./site-get');
@@ -21,6 +22,8 @@ describe(commands.SITE_GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
+    sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -51,7 +54,8 @@ describe(commands.SITE_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });
@@ -93,9 +97,9 @@ describe(commands.SITE_GET, () => {
       "MaxItemsPerThrottledOperation": 5000,
       "NeedsB2BUpgrade": false,
       "ResourcePath": {
-        "DecodedUrl": "https://m365x324230.sharepoint.com/sites/sales"
+        "DecodedUrl": "https://contoso.sharepoint.com/sites/sales"
       },
-      "PrimaryUri": "https://m365x324230.sharepoint.com/sites/sales",
+      "PrimaryUri": "https://contoso.sharepoint.com/sites/sales",
       "ReadOnly": false,
       "RequiredDesignerVersion": "15.0.0.0",
       "SandboxedCodeActivationCapability": 2,
@@ -109,7 +113,7 @@ describe(commands.SITE_GET, () => {
       "UpgradeScheduled": false,
       "UpgradeScheduledDate": "1753-01-01T00:00:00",
       "Upgrading": false,
-      "Url": "https://m365x324230.sharepoint.com/sites/project-x"
+      "Url": "https://contoso.sharepoint.com/sites/project-x"
     };
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/site`) > -1) {
@@ -152,9 +156,9 @@ describe(commands.SITE_GET, () => {
       "MaxItemsPerThrottledOperation": 5000,
       "NeedsB2BUpgrade": false,
       "ResourcePath": {
-        "DecodedUrl": "https://m365x324230.sharepoint.com/sites/sales"
+        "DecodedUrl": "https://contoso.sharepoint.com/sites/sales"
       },
-      "PrimaryUri": "https://m365x324230.sharepoint.com/sites/sales",
+      "PrimaryUri": "https://contoso.sharepoint.com/sites/sales",
       "ReadOnly": false,
       "RequiredDesignerVersion": "15.0.0.0",
       "SandboxedCodeActivationCapability": 2,
@@ -168,7 +172,7 @@ describe(commands.SITE_GET, () => {
       "UpgradeScheduled": false,
       "UpgradeScheduledDate": "1753-01-01T00:00:00",
       "Upgrading": false,
-      "Url": "https://m365x324230.sharepoint.com/sites/project-x"
+      "Url": "https://contoso.sharepoint.com/sites/project-x"
     };
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/site`) > -1) {

@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./tab-add');
@@ -23,6 +24,7 @@ describe(commands.TAB_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -54,7 +56,8 @@ describe(commands.TAB_ADD, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });
@@ -143,7 +146,7 @@ describe(commands.TAB_ADD, () => {
         channelId: '9:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         appId: 'com.microsoft.teamspace.tab.web',
         appName: 'testweb',
-        contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/'
+        contentUrl: 'https://contoso.sharepoint.com/Shared%20Documents/'
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -172,10 +175,10 @@ describe(commands.TAB_ADD, () => {
         channelId: '9:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         appId: 'com.microsoft.teamspace.tab.web',
         appName: 'testweb',
-        entityId: 'https://xxx.sharepoint.com/Shared%20Documents/',
-        removeUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
-        contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
-        websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        entityId: 'https://contoso.sharepoint.com/Shared%20Documents/',
+        removeUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
+        contentUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
+        websiteUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
         unknown: 'unknown value'
       }
     });
@@ -207,21 +210,21 @@ describe(commands.TAB_ADD, () => {
         channelId: '9:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         appId: 'com.microsoft.teamspace.tab.web',
         appName: 'testweb',
-        entityId: 'https://xxx.sharepoint.com/Shared%20Documents/',
-        removeUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
-        contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
-        websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        entityId: 'https://contoso.sharepoint.com/Shared%20Documents/',
+        removeUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
+        contentUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
+        websiteUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
         unknown: 'unknown value'
       }
     });
     assert.deepEqual(postStub.firstCall.args[0].data, {
       'teamsApp@odata.bind': 'https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/com.microsoft.teamspace.tab.web',
       configuration: {
-        contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
-        entityId: 'https://xxx.sharepoint.com/Shared%20Documents/',
-        removeUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        contentUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
+        entityId: 'https://contoso.sharepoint.com/Shared%20Documents/',
+        removeUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
         unknown: 'unknown value',
-        websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/'
+        websiteUrl: 'https://contoso.sharepoint.com/Shared%20Documents/'
       },
       displayName: 'testweb'
     });
@@ -238,8 +241,8 @@ describe(commands.TAB_ADD, () => {
         channelId: '19:eab8fda0837c48edb542574d419ff8ab@thread.skype/tabs',
         appId: 'com.microsoft.teamspace.tab.web',
         appName: 'testweb',
-        contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
-        websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/'
+        contentUrl: 'https://contoso.sharepoint.com/Shared%20Documents/',
+        websiteUrl: 'https://contoso.sharepoint.com/Shared%20Documents/'
       }
     } as any), new CommandError('An error has occurred'));
   });

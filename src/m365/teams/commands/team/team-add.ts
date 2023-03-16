@@ -37,7 +37,6 @@ interface Options extends GlobalOptions {
 }
 
 class TeamsTeamAddCommand extends GraphCommand {
-  private dots?: string;
   private pollingInterval: number = 30000;
 
   public get name(): string {
@@ -103,8 +102,6 @@ class TeamsTeamAddCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.dots = '';
-
     let requestBody: any;
     if (args.options.template) {
       if (this.verbose) {
@@ -160,7 +157,7 @@ class TeamsTeamAddCommand extends GraphCommand {
         }
         else {
           setTimeout(() => {
-            this.waitUntilFinished(requestOptions, resolve, reject, logger, this.dots);
+            this.waitUntilFinished(requestOptions, resolve, reject, logger);
           }, this.pollingInterval);
         }
       });
@@ -181,12 +178,7 @@ class TeamsTeamAddCommand extends GraphCommand {
     }
   }
 
-  private waitUntilFinished(requestOptions: any, resolve: (teamsAsyncOperation: TeamsAsyncOperation) => void, reject: (error: any) => void, logger: Logger, dots?: string): void {
-    if (!this.debug && this.verbose) {
-      dots += '.';
-      process.stdout.write(`\r${dots}`);
-    }
-
+  private waitUntilFinished(requestOptions: any, resolve: (teamsAsyncOperation: TeamsAsyncOperation) => void, reject: (error: any) => void, logger: Logger): void {
     request
       .get<TeamsAsyncOperation>(requestOptions)
       .then((teamsAsyncOperation: TeamsAsyncOperation): void => {
@@ -202,7 +194,7 @@ class TeamsTeamAddCommand extends GraphCommand {
           return;
         }
         setTimeout(() => {
-          this.waitUntilFinished(requestOptions, resolve, reject, logger, dots);
+          this.waitUntilFinished(requestOptions, resolve, reject, logger);
         }, this.pollingInterval);
       }).catch(err => reject(err));
   }

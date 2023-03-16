@@ -11,7 +11,7 @@ m365 spo listitem attachment list [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-URL of the site from which the item should be retrieved
+: URL of the site from which the item should be retrieved
 
 `--listId [listId]`
 : ID of the list where the item should be retrieved. Specify either `listTitle`, `listId` or `listUrl`
@@ -23,7 +23,7 @@ URL of the site from which the item should be retrieved
 : Server- or site-relative URL of the list. Specify either `listTitle`, `listId` or `listUrl`
 
 `--itemId <itemId>`
-ID of the list item to in question
+: ID of the list item to in question
 
 --8<-- "docs/cmd/_global.md"
 
@@ -79,4 +79,19 @@ m365 spo listitem attachment list --webUrl https://contoso.sharepoint.com/sites/
     ```csv
     FileName,ServerRelativeUrl
     DummyDocument.docx,/Lists/Test/Attachments/236/DummyDocument.docx
+    ```
+
+=== "Markdown"
+
+    ```md
+    # spo listitem attachment list --webUrl "https://contoso.sharepoint.com" --listTitle "Test" --itemId "236"
+
+    Date: 2/20/2023
+
+    Property | Value
+    ---------|-------
+    FileName | DummyDocument.docx
+    FileNameAsPath | {"DecodedUrl":"DummyDocument.docx"}
+    ServerRelativePath | {"DecodedUrl":"/Lists/Test/Attachments/236/DummyDocument.docx"}
+    ServerRelativeUrl | /Lists/Test/Attachments/236/DummyDocument.docx
     ```

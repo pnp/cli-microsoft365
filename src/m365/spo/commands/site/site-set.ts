@@ -50,7 +50,6 @@ class SpoSiteSetCommand extends SpoCommand {
   private spoAdminUrl?: string;
   private context?: FormDigestInfo;
   private tenantId?: string;
-  private dots?: string;
 
   public get name(): string {
     return commands.SITE_SET;
@@ -258,7 +257,6 @@ class SpoSiteSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
-      this.dots = '';
       this.tenantId = await spo.getTenantId(logger, this.debug);
       this.spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
       this.context = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
@@ -354,7 +352,6 @@ class SpoSiteSetCommand extends SpoCommand {
             reject,
             logger,
             currentContext: this.context as FormDigestInfo,
-            dots: this.dots,
             debug: this.debug,
             verbose: this.verbose
           });

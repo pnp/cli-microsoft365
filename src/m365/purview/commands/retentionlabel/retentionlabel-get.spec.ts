@@ -6,10 +6,12 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
+import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./retentionlabel-get');
 
 describe(commands.RETENTIONLABEL_GET, () => {
@@ -55,7 +57,12 @@ describe(commands.RETENTIONLABEL_GET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -74,10 +81,12 @@ describe(commands.RETENTIONLABEL_GET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
   });
 
   afterEach(() => {
     sinonUtil.restore([
+      accessToken.isAppOnlyAccessToken,
       request.get
     ]);
   });
@@ -86,9 +95,11 @@ describe(commands.RETENTIONLABEL_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -132,5 +143,12 @@ describe(commands.RETENTIONLABEL_GET, () => {
   it('passes validation if a correct id is entered', async () => {
     const actual = await command.validate({ options: { id: retentionLabelId } }, commandInfo);
     assert.strictEqual(actual, true);
+  });
+
+  it('throws an error when we execute the command using application permissions', async () => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+    await assert.rejects(command.action(logger, { options: { id: retentionLabelId } }),
+      new CommandError('This command does not support application permissions.'));
   });
 });

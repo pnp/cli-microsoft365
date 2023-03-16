@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import { fsUtil } from '../../../../utils/fsUtil';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./package-generate');
@@ -29,6 +30,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   before(() => {
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     (command as any).archive = admZipMock;
     commandInfo = Cli.getCommandInfo(command);
     Cli.getInstance().config;
@@ -82,7 +84,8 @@ describe(commands.PACKAGE_GENERATE, () => {
   after(() => {
     sinonUtil.restore([
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
   });
 

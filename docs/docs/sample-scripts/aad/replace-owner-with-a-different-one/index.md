@@ -76,7 +76,7 @@ Find all the Microsoft 365 Groups that a user is an Owner of and replace them wi
 
                 try {
                     Write-Host "Removing $oldUser permissions..."
-                    m365 aad o365group user remove --groupId $group.id --userName $oldUser --confirm $false | Get-CLIValue
+                    m365 aad o365group user remove --groupId $group.id --userName $oldUser | Get-CLIValue
                 }
                 catch  {
                     Write-Host $_.Exception.Message -ForegroundColor Red

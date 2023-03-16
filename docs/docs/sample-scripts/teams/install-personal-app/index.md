@@ -87,8 +87,7 @@ Installs or updates a Microsoft Teams app from a provided zipped manifest and th
 
     if ($CurrentUser) {
       # Getting the reference of the currently connected user
-      $connectedAs = m365 status -o json | ConvertFrom-Json
-      $user = m365 aad user get --userName $connectedAs.connectedAs -o json | ConvertFrom-Json
+      $user = m365 aad user get --id "@meId" -o json | ConvertFrom-Json
 
       if ($user) {
         $Users += $user.userPrincipalName
@@ -106,7 +105,7 @@ Installs or updates a Microsoft Teams app from a provided zipped manifest and th
 
           if ($userApp.Length -eq 0) {
             # Adding the app to the personal apps of the specified user
-            m365 teams user app add --appId $app.id --userId $user.id
+            m365 teams user app add --id $app.id --userId $user.id
             Write-Host "The App '$($app.displayName)' with ID '$($app.id)' was deployed to user '$($user.userPrincipalName)'."
 
           }

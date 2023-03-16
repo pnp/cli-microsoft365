@@ -1,0 +1,51 @@
+[
+  {
+    "name": "pnp-download-attachments-from-list",
+    "source": "pnp",
+    "title": "Download attachments from a SharePoint Online list",
+    "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/spo/download-attachments-from-list",
+    "creationDateTime": "2023-02-18",
+    "updateDateTime": "2023-02-28",
+    "shortDescription": "Script helps to download attachments from a SharePoint Online list.",
+    "longDescription": [
+      "Download attachments from a SharePoint Online list to a local directory "
+    ],
+    "products": [
+      "SharePoint"
+    ],
+    "categories": [],
+    "tags": [
+      "attachments",
+      "file download",
+      "migration"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "6.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/spo/download-attachments-from-list/assets/preview.png",
+        "alt": "preview image for the sample"
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "reshmee011",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/7693852?v=4",
+        "name": "Reshmee Auckloo"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

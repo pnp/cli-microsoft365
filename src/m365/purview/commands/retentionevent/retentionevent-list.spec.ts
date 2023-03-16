@@ -6,6 +6,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import { accessToken } from '../../../../utils/accessToken';
@@ -56,6 +57,7 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: 'abc',
@@ -92,9 +94,11 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -135,10 +139,10 @@ describe(commands.RETENTIONEVENTTYPE_GET, () => {
   });
 
   it('throws error if something fails using application permissions', async () => {
-    sinonUtil.restore([accessToken.isAppOnlyAccessToken]);
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').callsFake(() => true);
 
     await assert.rejects(command.action(logger, { options: {} } as any),
-      new CommandError(`This command currently does not support app only permissions.`));
+      new CommandError(`This command does not support application permissions.`));
   });
 });

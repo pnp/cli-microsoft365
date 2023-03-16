@@ -508,7 +508,7 @@ class SpoListSetCommand extends SpoCommand {
         if (args.options.draftVersionVisibility) {
           const draftType: DraftVisibilityType = DraftVisibilityType[(args.options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
 
-          if (!draftType) {
+          if (draftType === undefined) {
             return `${args.options.draftVersionVisibility} is not a valid draftVisibilityType value`;
           }
         }
@@ -675,7 +675,7 @@ class SpoListSetCommand extends SpoCommand {
     }
 
     if (options.draftVersionVisibility) {
-      requestBody.DraftVersionVisibility = options.draftVersionVisibility;
+      requestBody.DraftVersionVisibility = DraftVisibilityType[(options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
     }
 
     if (options.emailAlias) {
@@ -779,7 +779,7 @@ class SpoListSetCommand extends SpoCommand {
     }
 
     if (options.listExperienceOptions) {
-      requestBody.ListExperienceOptions = options.listExperienceOptions;
+      requestBody.ListExperienceOptions = ListExperience[(options.listExperienceOptions.trim() as keyof typeof ListExperience)];
     }
 
     if (options.majorVersionLimit) {

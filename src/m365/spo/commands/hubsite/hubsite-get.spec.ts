@@ -8,6 +8,7 @@ import { Logger } from '../../../../cli/Logger';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 import * as SpoListItemListCommand from '../listitem/listitem-list';
@@ -34,6 +35,7 @@ describe(commands.HUBSITE_GET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     commandInfo = Cli.getCommandInfo(command);
@@ -66,7 +68,8 @@ describe(commands.HUBSITE_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
@@ -328,7 +331,7 @@ describe(commands.HUBSITE_GET, () => {
   it(`fails validation if the specified url is invalid`, async () => {
     const actual = await command.validate({
       options: {
-        url: '/'
+        url: 'invalid URL'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

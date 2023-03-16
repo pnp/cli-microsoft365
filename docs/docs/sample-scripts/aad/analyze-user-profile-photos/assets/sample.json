@@ -5,7 +5,7 @@
     "title": "Analyze User Profile Photos using Azure Computer Vision API",
     "url": "https://pnp.github.io/cli-microsoft365/sample-scripts/aad/analyze-user-profile-photos",
     "creationDateTime": "2020-11-05",
-    "updateDateTime": "2020-11-05",
+    "updateDateTime": "2023-02-28",
     "shortDescription": "This script uses Azure Cognitive Service API and Microsoft 365 CLI to analyze user profile pictures.",
     "longDescription": [
       "This script uses Azure Cognitive Service API and Microsoft 365 CLI to analyze user profile pictures and assess whether they meet the standards placed by the organization. It can be customized to ban content within an org channel or collaboration network where employees post pictures, memes, etc."
@@ -22,7 +22,7 @@
     "metadata": [
       {
         "key": "CLI-FOR-MICROSOFT365",
-        "value": "5.3.0"
+        "value": "6.3.0"
       }
     ],
     "thumbnails": [

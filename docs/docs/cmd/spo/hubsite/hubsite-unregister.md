@@ -11,10 +11,10 @@ m365 spo hubsite unregister [options]
 ## Options
 
 `-u, --url <url>`
-: URL of the site collection to unregister as a hub site
+: URL of the site collection.
 
 `--confirm`
-: Don't prompt for confirming unregistering the hub site
+: Don't prompt for confirmation.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -27,13 +27,13 @@ If the specified site collection is not registered as a hub site, you will get a
 
 ## Examples
 
-Unregister the site collection with URL _https://contoso.sharepoint.com/sites/sales_ as a hub site. Will prompt for confirmation before unregistering the hub site.
+Unregister the site collection with specific URL. as a hub site. Will prompt for confirmation before unregistering the hub site.
 
 ```sh
 m365 spo hubsite unregister --url https://contoso.sharepoint.com/sites/sales
 ```
 
-Unregister the site collection with URL _https://contoso.sharepoint.com/sites/sales_ as a hub site without prompting for confirmation.
+Unregister the site collection with specific URL. as a hub site without prompting for confirmation.
 
 ```sh
 m365 spo hubsite unregister --url https://contoso.sharepoint.com/sites/sales --confirm

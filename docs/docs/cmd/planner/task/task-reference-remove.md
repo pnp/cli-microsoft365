@@ -37,3 +37,7 @@ Removes a reference with the alias _Parker_ from the Planner task with the id _2
 ```sh
 m365 planner task reference remove --alias "Parker" --taskId "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2"
 ```
+
+## Response
+
+The command won't return a response on success.

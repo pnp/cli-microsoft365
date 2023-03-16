@@ -21,6 +21,7 @@ nav:
     - Automate your CI/CD workflow using CLI GitHub Actions: user-guide/github-actions.md
     - Manage Microsoft 365 apps with the CLI: user-guide/manage-microsoft-365-apps.md
     - Use CLI programmatically: user-guide/use-cli-api.md
+    - Use CLI for Microsoft 365 context: user-guide/using-cli-context.md
   - Commands:
     - cmd/login.md
     - cmd/logout.md
@@ -53,6 +54,8 @@ nav:
       - groupsettingtemplate:
         - groupsettingtemplate get: cmd/aad/groupsettingtemplate/groupsettingtemplate-get.md
         - groupsettingtemplate list: cmd/aad/groupsettingtemplate/groupsettingtemplate-list.md
+      - license:
+        - license list: cmd/aad/license/license-list.md
       - o365group:
         - o365group add: cmd/aad/o365group/o365group-add.md
         - o365group get: cmd/aad/o365group/o365group-get.md
@@ -93,12 +96,21 @@ nav:
         - sp add: cmd/aad/sp/sp-add.md
         - sp get: cmd/aad/sp/sp-get.md
       - user:
+        - user add: cmd/aad/user/user-add.md      
         - user get: cmd/aad/user/user-get.md        
         - user hibp: cmd/aad/user/user-hibp.md
         - user list: cmd/aad/user/user-list.md
+        - user remove: cmd/aad/user/user-remove.md
         - user set: cmd/aad/user/user-set.md        
         - user guest add: cmd/aad/user/user-guest-add.md
+        - user license add: cmd/aad/user/user-license-add.md
+        - user license list: cmd/aad/user/user-license-list.md
+        - user license remove: cmd/aad/user/user-license-remove.md
         - user password validate: cmd/aad/user/user-password-validate.md
+        - user recyclebinitem clear: cmd/aad/user/user-recyclebinitem-clear.md
+        - user recyclebinitem list: cmd/aad/user/user-recyclebinitem-list.md
+        - user recyclebinitem remove: cmd/aad/user/user-recyclebinitem-remove.md
+        - user recyclebinitem restore: cmd/aad/user/user-recyclebinitem-restore.md
         - user signin list: cmd/aad/user/user-signin-list.md
     - Adaptive Card (adaptivecard):
       - send: cmd/adaptivecard/adaptivecard-send.md
@@ -224,7 +236,9 @@ nav:
         - roster get: cmd/planner/roster/roster-get.md
         - roster remove: cmd/planner/roster/roster-remove.md
         - roster member add: cmd/planner/roster/roster-member-add.md
+        - roster member get: cmd/planner/roster/roster-member-get.md
         - roster member list: cmd/planner/roster/roster-member-list.md
+        - roster member remove: cmd/planner/roster/roster-member-remove.md
       - task:
         - task add: cmd/planner/task/task-add.md
         - task get: cmd/planner/task/task-get.md
@@ -269,6 +283,10 @@ nav:
       - environment:
         - environment get: cmd/flow/environment/environment-get.md
         - environment list: cmd/flow/environment/environment-list.md
+      - owner:
+        - owner add: cmd/flow/owner/owner-add.md
+        - owner list: cmd/flow/owner/owner-list.md
+        - owner remove: cmd/flow/owner/owner-remove.md
       - run:
         - run cancel: cmd/flow/run/run-cancel.md
         - run get: cmd/flow/run/run-get.md
@@ -318,6 +336,7 @@ nav:
       - auditlog:
         - auditlog list: cmd/purview/auditlog/auditlog-list.md
       - retentionevent:
+        - retentionevent add: cmd/purview/retentionevent/retentionevent-add.md
         - retentionevent get: cmd/purview/retentionevent/retentionevent-get.md
         - retentionevent list: cmd/purview/retentionevent/retentionevent-list.md
         - retentionevent remove: cmd/purview/retentionevent/retentionevent-remove.md
@@ -658,6 +677,7 @@ nav:
         - tenant appcatalog add: cmd/spo/tenant/tenant-appcatalog-add.md
         - tenant appcatalogurl get: cmd/spo/tenant/tenant-appcatalogurl-get.md
         - tenant applicationcustomizer add: cmd/spo/tenant/tenant-applicationcustomizer-add.md
+        - tenant applicationcustomizer get: cmd/spo/tenant/tenant-applicationcustomizer-get.md
         - tenant recyclebinitem list: cmd/spo/tenant/tenant-recyclebinitem-list.md
         - tenant recyclebinitem remove: cmd/spo/tenant/tenant-recyclebinitem-remove.md
         - tenant recyclebinitem restore: cmd/spo/tenant/tenant-recyclebinitem-restore.md
@@ -680,6 +700,7 @@ nav:
         - theme remove: cmd/spo/theme/theme-remove.md
         - theme set: cmd/spo/theme/theme-set.md
       - user:
+        - user ensure: cmd/spo/user/user-ensure.md
         - user get: cmd/spo/user/user-get.md
         - user list: cmd/spo/user/user-list.md
         - user remove: cmd/spo/user/user-remove.md
@@ -870,6 +891,7 @@ nav:
       - sample-scripts/spo/remove-site-scripts/index.md
       - sample-scripts/spo/detecting-pii-exists-in-sharepointlist-column/index.md
       - sample-scripts/spo/disable-tenant-wide-extension/index.md
+      - sample-scripts/spo/download-attachments-from-list/index.md
       - sample-scripts/spo/empty-tenant-recyclebin/index.md
       - sample-scripts/spo/ensure-siteassets-library/index.md
       - sample-scripts/spo/export-configs-tenant-wide-extensions/index.md
@@ -989,7 +1011,7 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/pnp/cli-microsoft365
     - icon: fontawesome/brands/discord
-      link: https://discord.com/invite/7rfW4kg6B5
+      link: https://discord.gg/35HTFJ544b
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/climicrosoft365
     - icon: fontawesome/brands/youtube

@@ -112,7 +112,7 @@ export const spo = {
     });
   },
 
-  waitUntilFinished({ operationId, siteUrl, resolve, reject, logger, currentContext, dots, debug, verbose }: { operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, logger: Logger, currentContext: FormDigestInfo, dots?: string, debug: boolean, verbose: boolean }): void {
+  waitUntilFinished({ operationId, siteUrl, resolve, reject, logger, currentContext, debug, verbose }: { operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, logger: Logger, currentContext: FormDigestInfo, debug: boolean, verbose: boolean }): void {
     spo
       .ensureFormDigest(siteUrl, logger, currentContext, debug)
       .then((res: FormDigestInfo): Promise<string> => {
@@ -120,11 +120,6 @@ export const spo = {
 
         if (debug) {
           logger.logToStderr(`Checking if operation ${operationId} completed...`);
-        }
-
-        if (!debug && verbose) {
-          dots += '.';
-          process.stdout.write(`\r${dots}`);
         }
 
         const requestOptions: any = {
@@ -163,7 +158,6 @@ export const spo = {
               reject,
               logger,
               currentContext,
-              dots,
               debug,
               verbose
             });
@@ -172,7 +166,7 @@ export const spo = {
       });
   },
 
-  waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, dots, debug, verbose }: { copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, logger: Logger, dots?: string, debug: boolean, verbose: boolean }): void {
+  waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, debug, verbose }: { copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, logger: Logger, debug: boolean, verbose: boolean }): void {
     const requestUrl: string = `${siteUrl}/_api/site/GetCopyJobProgress`;
     const requestOptions: any = {
       url: requestUrl,
@@ -182,11 +176,6 @@ export const spo = {
       data: { "copyJobInfo": copyJobInfo },
       responseType: 'json'
     };
-
-    if (!debug && verbose) {
-      dots += '.';
-      process.stdout.write(`\r${dots}`);
-    }
 
     request
       .post<{ JobState?: number, Logs: string[] }>(requestOptions)
@@ -218,7 +207,7 @@ export const spo = {
         }
         else {
           setTimeout(() => {
-            spo.waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, dots, debug, verbose });
+            spo.waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, debug, verbose });
           }, pollingInterval);
         }
       });
@@ -671,5 +660,39 @@ export const spo = {
 
     const customActionOnSite = await getById(webUrl, id, "Site");
     return customActionOnSite;
+  },
+
+  async getTenantAppCatalogUrl(logger: Logger, debug: boolean): Promise<string | null> {
+    const spoUrl = await spo.getSpoUrl(logger, debug);
+
+    const requestOptions: any = {
+      url: `${spoUrl}/_api/SP_TenantSettings_Current`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const result = await request.get<{ CorporateCatalogUrl: string }>(requestOptions);
+    return result.CorporateCatalogUrl;
+  },
+
+  /**
+   * Retrieves the Azure AD ID from a SP user.
+   * @param webUrl Web url
+   * @param id The Id of the user
+   */
+  async getUserAzureIdBySpoId(webUrl: string, id: string): Promise<any> {
+    const requestOptions: CliRequestOptions = {
+      url: `${webUrl}/_api/web/siteusers/GetById('${formatting.encodeQueryParameter(id)}')?$select=AadObjectId`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    const res = await request.get<{ AadObjectId: { NameId: string, NameIdIssuer: string } }>(requestOptions);
+
+    return res.AadObjectId.NameId;
   }
 };

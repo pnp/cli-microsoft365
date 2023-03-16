@@ -22,7 +22,7 @@ This script helps you to copy list items from one list to another list. I have w
     $SourceList = Read-Host -Prompt 'Source list name'
     $DestinationList = Read-Host -Prompt 'Destination list name'
     
-    $listItems = m365 spo listitem list --title $SourceList --webUrl $SourceSite --output json | ConvertFrom-Json
+    $listItems = m365 spo listitem list --listTitle $SourceList --webUrl $SourceSite --output json | ConvertFrom-Json
     Write-Host 'Total count in the source list is'-> -fore Green $listItems.Count
     $count = 0
     $reportLocation = Get-Location

@@ -10,6 +10,7 @@ import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
 import { formatting } from '../../../../utils/formatting';
 import { pid } from '../../../../utils/pid';
+import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./user-get');
@@ -28,6 +29,7 @@ describe(commands.USER_GET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(telemetry, 'trackEvent').callsFake(() => { });
     sinon.stub(pid, 'getProcessName').callsFake(() => '');
+    sinon.stub(session, 'getId').callsFake(() => '');
     auth.service.connected = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
@@ -67,7 +69,8 @@ describe(commands.USER_GET, () => {
     sinonUtil.restore([
       auth.restoreAuth,
       telemetry.trackEvent,
-      pid.getProcessName
+      pid.getProcessName,
+      session.getId
     ]);
     auth.service.connected = false;
   });
@@ -280,6 +283,11 @@ describe(commands.USER_GET, () => {
 
   it('fails validation if the id is not a valid GUID', async () => {
     const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when userName has an invalid value', async () => {
+    const actual = await command.validate({ options: { userName: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

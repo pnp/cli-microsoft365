@@ -27,14 +27,14 @@ m365 spo storageentity set [options]
 
 --8<-- "docs/cmd/_global.md"
 
-!!! important
-    To use this command you have to have permissions to access the tenant admin site.
-
 ## Remarks
 
 Tenant properties are stored in the app catalog site associated with that tenant. To set a property, you have to specify the absolute URL of the app catalog site without a trailing slash. If you specify the URL with trailing slash you get the error `The managed path sites/apps is not a managed path in this tenant.`
 
 If you specify the URL of a site different than the app catalog, you will get an access denied error.
+
+!!! important
+    To use this command you have to have permissions to access the tenant admin site.
 
 ## Examples
 
