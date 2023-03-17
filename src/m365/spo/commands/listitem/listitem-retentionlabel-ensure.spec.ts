@@ -197,8 +197,6 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
 
   it('applies a retentionlabel based on listId, id and with assetId (debug)', async () => {
     sinon.stub(request, 'post').callsFake(async (opts) => {
-      const test = `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(1)/SetComplianceTag()`;
-      Cli.log(test);
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')/items(1)/SetComplianceTag()`
         && JSON.stringify(opts.data) === '{"complianceTag":"Some label","isTagPolicyHold":true,"isTagPolicyRecord":false,"isEventBasedTag":true,"isTagSuperLock":false,"isUnlockedAsDefault":false}') {
         return;
