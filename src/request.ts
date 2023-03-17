@@ -1,4 +1,4 @@
-import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosRequestConfig, AxiosResponse } from 'axios';
+import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosProxyConfig, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Stream } from 'stream';
 import auth, { Auth, CloudType } from './Auth.js';
 import { Logger } from './cli/Logger.js';
@@ -183,6 +183,11 @@ class Request {
               options.headers.authorization = `Bearer ${accessToken}`;
             }
           }
+
+          const proxyUrl = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
+          if (proxyUrl) {
+            options.proxy = this.createProxyConfigFromUrl(proxyUrl);
+          }
           return this.req(options);
         })
         .then((res: any): void => {
@@ -230,6 +235,19 @@ class Request {
     const hostname = `${url.protocol}//${url.hostname}`;
     const cloudUrl: string = Auth.getEndpointForResource(hostname, cloudType);
     options.url = options.url!.replace(hostname, cloudUrl);
+  }
+
+  private createProxyConfigFromUrl(url: string): AxiosProxyConfig {
+    const parsedUrl = new URL(url);
+    const port = parsedUrl.port || (url.toLowerCase().startsWith('https') ? 443 : 80);
+    let authObject = null;
+    if (parsedUrl.username && parsedUrl.password) {
+      authObject = {
+        username: parsedUrl.username,
+        password: parsedUrl.password
+      };
+    }
+    return { host: parsedUrl.hostname, port: Number(port), protocol: 'http', ...(authObject && { auth: authObject }) };
   }
 }
 
