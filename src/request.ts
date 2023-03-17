@@ -1,4 +1,4 @@
-import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosRequestConfig, AxiosResponse } from 'axios';
+import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosProxyConfig, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Stream } from 'stream';
 import auth, { Auth, CloudType } from './Auth.js';
 import { Logger } from './cli/Logger.js';
@@ -183,6 +183,10 @@ class Request {
               options.headers.authorization = `Bearer ${accessToken}`;
             }
           }
+
+          if (auth.service.proxyUrl) {
+            options.proxy = this.parseProxyUrl(auth.service.proxyUrl);
+          }
           return this.req(options);
         })
         .then((res: any): void => {
@@ -230,6 +234,23 @@ class Request {
     const hostname = `${url.protocol}//${url.hostname}`;
     const cloudUrl: string = Auth.getEndpointForResource(hostname, cloudType);
     options.url = options.url!.replace(hostname, cloudUrl);
+  }
+
+  private parseProxyUrl(url: string): AxiosProxyConfig {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname;
+    const port = parsedUrl.port || 80;
+    let authObject = null;
+    if (parsedUrl.username && parsedUrl.password) {
+      authObject = {
+        username: parsedUrl.username,
+        password: parsedUrl.password
+      };
+    }
+    else {
+      authObject = { username: '', password: '' };
+    }
+    return { host: hostname, port: Number(port), auth: authObject };
   }
 }
 

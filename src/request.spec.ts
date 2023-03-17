@@ -31,6 +31,7 @@ describe('Request', () => {
       logger.log,
       auth.ensureAccessToken
     ]);
+    auth.service.proxyUrl = undefined;
   });
 
   it('fails when no command instance set', (done) => {
@@ -380,6 +381,60 @@ describe('Request', () => {
     sinon.stub(_request as any, 'req').callsFake(options => {
       _options = options as CliRequestOptions;
       (options as CliRequestOptions).responseType = "stream";
+      return Promise.resolve({ data: {} });
+    });
+
+    _request
+      .get({
+        url: 'https://contoso.sharepoint.com/'
+      })
+      .then(() => {
+        done();
+      }, (err) => {
+        done(err);
+      });
+  });
+
+  it('returns response of a successful GET request, with a proxy url', (done) => {
+    auth.service.proxyUrl = "http://proxy.contoso.com:8080";
+    sinon.stub(_request as any, 'req').callsFake((options) => {
+      _options = options;
+      return Promise.resolve({ data: {} });
+    });
+
+    _request
+      .get({
+        url: 'https://contoso.sharepoint.com/'
+      })
+      .then(() => {
+        done();
+      }, (err) => {
+        done(err);
+      });
+  });
+
+  it('returns response of a successful GET request, with a proxy url and defaults port to 80', (done) => {
+    auth.service.proxyUrl = "http://proxy.contoso.com";
+    sinon.stub(_request as any, 'req').callsFake((options) => {
+      _options = options;
+      return Promise.resolve({ data: {} });
+    });
+
+    _request
+      .get({
+        url: 'https://contoso.sharepoint.com/'
+      })
+      .then(() => {
+        done();
+      }, (err) => {
+        done(err);
+      });
+  });
+
+  it('returns response of a successful GET request, with a proxy url with username and password', (done) => {
+    auth.service.proxyUrl = "http://username:password@proxy.contoso.com:8080";
+    sinon.stub(_request as any, 'req').callsFake((options) => {
+      _options = options;
       return Promise.resolve({ data: {} });
     });
 

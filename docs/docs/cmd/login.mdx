@@ -44,6 +44,9 @@ m365 login [options]
 
 `--cloud [cloud]`
 : Cloud to connect to. Allowed values `Public`, `USGov`, `USGovHigh`, `USGovDoD` and `China`. Default `Public`
+
+`--proxyUrl [proxyUrl]`
+: The url of the proxy server to use when accessing the internet
 ```
 
 <Global />
@@ -173,6 +176,12 @@ Log in to Microsoft 365 using a client secret.
 
 ```sh
 m365 login --authType secret --secret topSeCr3t@007
+```
+
+Log in to Microsoft 365 using a proxy server.
+
+```sh
+m365 login --proxyUrl http://username:password@proxy.contoso.com:8080
 ```
 
 ## Response
