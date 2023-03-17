@@ -285,8 +285,7 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
               "FieldName": "ComplianceAssetId",
               "FieldValue": "XYZ",
               "HasException": false,
-              "ItemId": 1,
-              assetId: 'XYZ'
+              "ItemId": 1
             }
           ]
         };
@@ -301,7 +300,8 @@ describe(commands.LISTITEM_RETENTIONLABEL_ENSURE, () => {
         listUrl: listUrl,
         webUrl: webUrl,
         listItemId: 1,
-        id: labelId
+        id: labelId,
+        assetId: 'XYZ'
       }
     }));
   });
