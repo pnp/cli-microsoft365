@@ -3,7 +3,7 @@ import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import request, { CliRequestOptions } from '../../../../request';
 import { validation } from '../../../../utils/validation';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -22,6 +22,7 @@ interface Options extends GlobalOptions {
   name: string;
   fileUrl?: string;
   fileId?: string;
+  assetId?: string;
 }
 
 class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
@@ -46,7 +47,8 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         fileUrl: typeof args.options.fileUrl !== 'undefined',
-        fileId: typeof args.options.fileId !== 'undefined'
+        fileId: typeof args.options.fileId !== 'undefined',
+        assetId: typeof args.options.assetId !== 'undefined'
       });
     });
   }
@@ -64,6 +66,9 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
       },
       {
         option: '-i, --fileId [fileId]'
+      },
+      {
+        option: '-a, --assetId [assetId]'
       }
     );
   }
@@ -93,6 +98,10 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const fileProperties = await this.getFileProperties(logger, args);
+
+      if (args.options.assetId) {
+        await this.applyAssetId(args.options.webUrl, fileProperties.ListItemAllFields.ParentList.Id, fileProperties.ListItemAllFields.Id, args.options.assetId);
+      }
 
       const options: SpoListItemRetentionLabelEnsureCommandOptions = {
         webUrl: args.options.webUrl,
@@ -138,6 +147,23 @@ class SpoFileRetentionLabelEnsureCommand extends SpoCommand {
     };
 
     return await request.get<FileProperties>(requestOptions);
+  }
+
+  private async applyAssetId(webUrl: string, listId: string, listItemId: string, assetId: string): Promise<void> {
+    const requestUrl = `${webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listId)}')`;
+
+    const requestBody = { "formValues": [{ "FieldName": "ComplianceAssetId", "FieldValue": assetId }] };
+
+    const requestOptions: CliRequestOptions = {
+      url: `${requestUrl}/items(${listItemId})/ValidateUpdateListItem()`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: requestBody,
+      responseType: 'json'
+    };
+
+    await request.post(requestOptions);
   }
 }
 
