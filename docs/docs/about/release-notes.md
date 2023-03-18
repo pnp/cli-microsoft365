@@ -22,6 +22,11 @@
 
 - [spo tenant applicationcustomizer get](../cmd/spo/tenant/tenant-applicationcustomizer-get.md) - gets an application customizer that is installed tenant wide [#4243](https://github.com/pnp/cli-microsoft365/issues/4243)
 - [spo user ensure](../cmd/spo/user/user-ensure.md) - ensures that a user is available on a specific site [#4497](https://github.com/pnp/cli-microsoft365/issues/4497)
+- [spo commandset remove](../cmd/spo/commandset/commandset-remove.md) - removes a ListView Command Set that is added to a site. [#4333](https://github.com/pnp/cli-microsoft365/issues/4333)
+- [spo commandset set](../cmd/spo/commandset/commandset-set.md) - updates a ListView Command Set on a site. [#4338](https://github.com/pnp/cli-microsoft365/issues/4338)
+- [spo commandset get](../cmd/spo/commandset/commandset-get.md) - gets a ListView Command Set that is added to a site. [#4328](https://github.com/pnp/cli-microsoft365/issues/4328)
+- [spo commandset list](../cmd/spo/commandset/commandset-list.md) - gets a list of ListView Command Sets that are added to a site. [#4329](https://github.com/pnp/cli-microsoft365/issues/4329)
+- [spo commandset add](../cmd/spo/commandset/commandset-add.md) - adds a ListView Command Set to a site. [#4337](https://github.com/pnp/cli-microsoft365/issues/4337)
 
 ### Changes
 
