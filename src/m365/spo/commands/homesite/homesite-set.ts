@@ -35,7 +35,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        vivaConnectionsDefaultStart: args.options.vivaConnectionsDefaultStart
+        vivaConnectionsDefaultStart: typeof args.options.vivaConnectionsDefaultStart !== 'undefined'
       });
     });
   }
