@@ -46,7 +46,8 @@ class SpoHomeSiteSetCommand extends SpoCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]'
+        option: '--vivaConnectionsDefaultStart [vivaConnectionsDefaultStart]',
+        autocomplete: ['true', 'false']
       }
     );
   }

@@ -63,6 +63,13 @@ m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms --viv
     ```csv
     The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
     ```
+
+=== "Markdown"
+
+    ```md
+    The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
+    ```
+
 ### `vivaConnectionsDefaultStart` response
 
 When we make use of the option `vivaConnectionsDefaultStart` the response will differ. 
@@ -89,7 +96,7 @@ When we make use of the option `vivaConnectionsDefaultStart` the response will d
 === "Markdown"
 
     ```md
-    The Home site has been set to https://contoso.sharepoint.com. It may take some time for the change to apply. Check aka.ms/homesites for details.
+    The Home site has been set to https://contoso.sharepoint.com and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details.
     ```
 
 ## More information
