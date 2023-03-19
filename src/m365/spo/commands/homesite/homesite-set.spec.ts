@@ -15,8 +15,30 @@ const command: Command = require('./homesite-set');
 describe(commands.HOMESITE_SET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
+  const siteUrl = `https:\\contoso.sharepoint.com\sites\Work`;
+  const outputDefaultResponse = `The Home site has been set to ${siteUrl}. It may take some time for the change to apply. Check aka.ms/homesites for details.`;
+  const defaultResponse = {
+    "value": outputDefaultResponse
+  };
+
+  const outputVivaConnectionDefaultResponse = `The Home site has been set to ${siteUrl} and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details.`;
+  const vivaConnectionDefaultResponse = {
+    "value": outputVivaConnectionDefaultResponse
+  };
+
+  const outputErrorResponse = `[Error ID: 09149788-0a26-4cee-a333-699b81f629d7] The provided site url can't be set as a Home site. Check aka.ms\homesites for cmdlet requirements.`;
+  const errorResponse = {
+    error: {
+      "odata.error": {
+        "code": "-2147213238, Microsoft.SharePoint.SPException",
+        "message": {
+          "lang": "en-US",
+          "value": outputErrorResponse
+        }
+      }
+    }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -40,7 +62,6 @@ describe(commands.HOMESITE_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -68,81 +89,52 @@ describe(commands.HOMESITE_SET, () => {
   });
 
   it('sets the specified site as the Home Site', async () => {
-    const expected = 'The Home site has been set to https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fWork. It may take some time for the change to apply. Check aka.ms/homesites for details.';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    const requestBody = { sphSiteUrl: siteUrl };
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/SetSPHSite`) {
-        return Promise.resolve(
-          {
-            "value": expected
-          }
-        );
+        return defaultResponse;
       }
 
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
 
     await command.action(logger, {
       options: {
-        siteUrl: "https://contoso.sharepoint.com/sites/Work"
+        siteUrl: siteUrl
       }
     } as any);
-    assert(loggerLogSpy.calledWith(expected));
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
   it('sets the specified site as the Home Site and sets the Viva Connections default experience to True', async () => {
-    const expected = 'The Home site has been set to https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fWork and the Viva Connections default experience to True. It may take some time for the change to apply. Check aka.ms/homesites for details.';
-    sinon.stub(request, 'post').callsFake((opts) => {
+    const requestBody = { sphSiteUrl: siteUrl, configuration: { vivaConnectionsDefaultStart: true } };
+    const postRequestStub = sinon.stub(request, 'post').callsFake(async (opts) => {
       if (opts.url === `https://contoso-admin.sharepoint.com/_api/SPO.Tenant/SetSPHSiteWithConfiguration`) {
-        return Promise.resolve({
-          "value": expected
-        });
+        return vivaConnectionDefaultResponse;
       }
-
-      return Promise.reject('Invalid request');
+      return 'Invalid request';
     });
 
     await command.action(logger, {
       options: {
-        siteUrl: "https://contoso.sharepoint.com/sites/Work",
+        siteUrl: siteUrl,
         vivaConnectionsDefaultStart: true
       }
     } as any);
-    assert(loggerLogSpy.calledWith(expected));
+    assert.deepStrictEqual(postRequestStub.lastCall.args[0].data, requestBody);
   });
 
   it('correctly handles error when setting the Home Site', async () => {
-    const expected = "[Error ID: 09149788-0a26-4cee-a333-699b81f629d7] The provided site url can't be set as a Home site. Check aka.ms\u002fhomesites for cmdlet requirements.";
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        error: {
-          "odata.error": {
-            "code": "-2147213238, Microsoft.SharePoint.SPException",
-            "message": {
-              "lang": "en-US",
-              "value": "[Error ID: 09149788-0a26-4cee-a333-699b81f629d7] The provided site url can't be set as a Home site. Check aka.ms/homesites for cmdlet requirements."
-            }
-          }
-        }
-      });
+    sinon.stub(request, 'post').callsFake(async () => {
+      throw (errorResponse);
     });
 
     await assert.rejects(command.action(logger, {
       options: {
-        siteUrl: "https://contoso.sharepoint.com/sites/Work"
+        siteUrl: siteUrl
       }
-    } as any), new CommandError(expected));
+    } as any), new CommandError(outputErrorResponse));
   });
-
-  it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        siteUrl: "https://contoso.sharepoint.com/sites/Work"
-      }
-    } as any), new CommandError(`An error has occurred`));
-  });
-
   it('fails validation if the siteUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { siteUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);

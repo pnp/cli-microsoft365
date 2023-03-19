@@ -21,7 +21,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Sets the specified site as the Home Site.';
+    return 'Sets the specified site as the Home Site';
   }
 
   constructor() {
@@ -63,26 +63,27 @@ class SpoHomeSiteSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
-    let requestUrl: string = "";
-    let requestBody: any;
-    if (args.options.vivaConnectionsDefaultStart) {
-      requestUrl = `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`;
-      requestBody = { sphSiteUrl: args.options.siteUrl, configuration: { vivaConnectionsDefaultStart: args.options.vivaConnectionsDefaultStart } };
-    }
-    else {
-      requestUrl = `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSite`;
-      requestBody = { sphSiteUrl: args.options.siteUrl };
-    }
-    const requestOptions: any = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json;odata=nometadata',
-        'content-Type': 'application/json'
-      },
-      data: requestBody,
-      responseType: 'json'
-    };
     try {
+      let requestUrl: string = "";
+      let requestBody: any;
+
+      if (args.options.vivaConnectionsDefaultStart) {
+        requestUrl = `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSiteWithConfiguration`;
+        requestBody = { sphSiteUrl: args.options.siteUrl, configuration: { vivaConnectionsDefaultStart: args.options.vivaConnectionsDefaultStart } };
+      }
+      else {
+        requestUrl = `${spoAdminUrl}/_api/SPO.Tenant/SetSPHSite`;
+        requestBody = { sphSiteUrl: args.options.siteUrl };
+      }
+      const requestOptions: any = {
+        url: requestUrl,
+        headers: {
+          'accept': 'application/json;odata=nometadata',
+          'content-Type': 'application/json'
+        },
+        data: requestBody,
+        responseType: 'json'
+      };
       const res = await request.post<{ value: string; }>(requestOptions);
       logger.log(res.value);
     }
