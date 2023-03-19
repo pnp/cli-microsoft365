@@ -68,7 +68,13 @@ class FileListCommand extends GraphCommand {
     if (!webUrl.endsWith('/')) {
       webUrl += '/';
     }
-    const folderUrl: URL = new URL(args.options.folderUrl, webUrl);
+
+    let folderUrlValue: string = args.options.folderUrl;
+    if (folderUrlValue.endsWith('/')) {
+      folderUrlValue = folderUrlValue.slice(0, -1);
+    }
+
+    const folderUrl: URL = new URL(folderUrlValue, webUrl);
     let driveId: string = '';
 
     try {
