@@ -1882,7 +1882,7 @@ describe(commands.LIST, () => {
     await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/',
-        folderUrl: 'DemoDocs'
+        folderUrl: 'DemoDocs/'
       }
     });
     assert(loggerLogSpy.calledWith([
