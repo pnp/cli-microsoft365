@@ -15,7 +15,8 @@ const settingsNames = {
   prompt: 'prompt',
   promptListPageSize: 'promptListPageSize',
   showHelpOnFailure: 'showHelpOnFailure',
-  showSpinner: 'showSpinner'
+  showSpinner: 'showSpinner',
+  proxyUrl: 'proxyUrl'
 };
 
 export { settingsNames };
