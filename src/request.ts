@@ -1,7 +1,10 @@
 import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosProxyConfig, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Stream } from 'stream';
-import auth, { Auth, CloudType } from './Auth.js';
-import { Logger } from './cli/Logger.js';
+import auth, { Auth, CloudType } from './Auth';
+import { Logger } from './cli/Logger';
+import { formatting } from './utils/formatting';
+import { Cli } from './cli/Cli';
+import { settingsNames } from './settingsNames';
 import { app } from './utils/app.js';
 import { formatting } from './utils/formatting.js';
 import { timings } from './cli/timings.js';
@@ -184,8 +187,9 @@ class Request {
             }
           }
 
-          if (auth.service.proxyUrl) {
-            options.proxy = this.parseProxyUrl(auth.service.proxyUrl);
+          const proxyUrl = Cli.getInstance().config.get(settingsNames.proxyUrl);
+          if (proxyUrl) {
+            options.proxy = this.createProxyConfigFromString(proxyUrl);
           }
           return this.req(options);
         })
@@ -236,7 +240,7 @@ class Request {
     options.url = options.url!.replace(hostname, cloudUrl);
   }
 
-  private parseProxyUrl(url: string): AxiosProxyConfig {
+  private createProxyConfigFromString(url: string): AxiosProxyConfig {
     const parsedUrl = new URL(url);
     const hostname = parsedUrl.hostname;
     const port = parsedUrl.port || 80;

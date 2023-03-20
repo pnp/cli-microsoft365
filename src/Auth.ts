@@ -80,7 +80,6 @@ export class Service {
     this.tenantId = undefined;
     this.appId = config.cliAadAppId;
     this.tenant = config.tenant;
-    this.proxyUrl = undefined;
   }
 }
 
@@ -331,7 +330,7 @@ export class Auth {
           piiLoggingEnabled: false,
           logLevel: debug ? LogLevel.Verbose : LogLevel.Error
         },
-        proxyUrl: this.service.proxyUrl
+        proxyUrl: (Cli.getInstance().config.get(settingsNames.proxyUrl))
       }
     };
   }

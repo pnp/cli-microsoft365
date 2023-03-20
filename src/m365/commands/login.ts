@@ -27,7 +27,6 @@ interface Options extends GlobalOptions {
   appId?: string;
   tenant?: string;
   secret?: string;
-  proxyUrl?: string;
 }
 
 class LoginCommand extends Command {
@@ -166,7 +165,6 @@ class LoginCommand extends Command {
       const authType = args.options.authType || cli.getSettingWithDefaultValue<string>(settingsNames.authType, 'deviceCode');
       auth.service.appId = args.options.appId || config.cliAadAppId;
       auth.service.tenant = args.options.tenant || config.tenant;
-      auth.service.proxyUrl = args.options.proxyUrl;
 
       switch (authType) {
         case 'password':
