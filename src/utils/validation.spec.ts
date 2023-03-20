@@ -126,6 +126,17 @@ describe('validation/validation', () => {
     assert.strictEqual(result, true);
   });
 
+  it('isValidGuid returns true with @meid token and spaces', () => {
+    const result = validation.isValidGuid('@meid ');
+    assert.strictEqual(result, true);
+  });
+
+
+  it('isValidGuid returns true with @meId (case sensitive)', () => {
+    const result = validation.isValidGuid('@meId ');
+    assert.strictEqual(result, true);
+  });
+
   it('isValidUserPrincipalName returns true if valid username', () => {
     const result = validation.isValidUserPrincipalName('John@Contoso.com');
     assert.strictEqual(result, true);
@@ -140,6 +151,18 @@ describe('validation/validation', () => {
     const result = validation.isValidUserPrincipalName('@meusername');
     assert.strictEqual(result, true);
   });
+
+  it('isValidUserPrincipalName returns true with @meusername token and spaces', () => {
+    const result = validation.isValidUserPrincipalName('@meusername ');
+    assert.strictEqual(result, true);
+  });
+
+
+  it('isValidUserPrincipalName returns true with @meusername (case sensitive)', () => {
+    const result = validation.isValidUserPrincipalName('@meUsername ');
+    assert.strictEqual(result, true);
+  });
+
 
   it('isValidTeamsChannelId returns true if valid channelId (all numbers)', () => {
     const result = validation.isValidTeamsChannelId('19:0000000000000000000000000000000@thread.skype');
