@@ -685,6 +685,12 @@ const contributors = [{
     twitter: ''
   },
   {
+    name: 'Valeras Narbutas',
+    company: 'Macaw',
+    github: 'ValerasNarbutas',
+    twitter: 'ValerasNarbutas'
+  },
+  {
     name: 'Vardhaman Deshpande',
     company: '',
     github: 'vman',
