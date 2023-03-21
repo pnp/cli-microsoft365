@@ -14,9 +14,9 @@ import { CommandInfo } from '../../../../cli/CommandInfo';
 import { Cli } from '../../../../cli/Cli';
 import { formatting } from '../../../../utils/formatting';
 import { session } from '../../../../utils/session';
-const command: Command = require('./owner-add');
+const command: Command = require('./owner-ensure');
 
-describe(commands.OWNER_ADD, () => {
+describe(commands.OWNER_ENSURE, () => {
   const validEnvironmentName = 'Default-6a2903af-9c03-4c02-a50b-e7419599925b';
   const validFlowName = '784670e6-199a-4993-ae13-4b6747a0cd5d';
   const validUserId = 'd2481133-e3ed-4add-836d-6e200969dd03';
@@ -72,7 +72,7 @@ describe(commands.OWNER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name, commands.OWNER_ADD);
+    assert.strictEqual(command.name, commands.OWNER_ENSURE);
   });
 
   it('has a description', () => {

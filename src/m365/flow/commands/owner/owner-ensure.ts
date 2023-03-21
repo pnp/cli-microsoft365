@@ -24,15 +24,15 @@ interface Options extends GlobalOptions {
   asAdmin?: boolean;
 }
 
-class FlowOwnerAddCommand extends AzmgmtCommand {
+class FlowOwnerEnsureCommand extends AzmgmtCommand {
   private static readonly allowedRoleNames: string[] = ['CanView', 'CanEdit'];
 
   public get name(): string {
-    return commands.OWNER_ADD;
+    return commands.OWNER_ENSURE;
   }
 
   public get description(): string {
-    return 'Assigns permissions to a Power Automate flow';
+    return 'Assigns/updates permissions to a Power Automate flow';
   }
 
   constructor() {
@@ -78,7 +78,7 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
       },
       {
         option: '--roleName <roleName>',
-        autocomplete: FlowOwnerAddCommand.allowedRoleNames
+        autocomplete: FlowOwnerEnsureCommand.allowedRoleNames
       },
       {
         option: '--asAdmin'
@@ -109,8 +109,8 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
           return `${args.options.groupId} is not a valid GUID.`;
         }
 
-        if (FlowOwnerAddCommand.allowedRoleNames.indexOf(args.options.roleName) === -1) {
-          return `${args.options.roleName} is not a valid roleName. Valid values are: ${FlowOwnerAddCommand.allowedRoleNames.join(', ')}`;
+        if (FlowOwnerEnsureCommand.allowedRoleNames.indexOf(args.options.roleName) === -1) {
+          return `${args.options.roleName} is not a valid roleName. Valid values are: ${FlowOwnerEnsureCommand.allowedRoleNames.join(', ')}`;
         }
 
         return true;
@@ -175,4 +175,4 @@ class FlowOwnerAddCommand extends AzmgmtCommand {
   }
 }
 
-module.exports = new FlowOwnerAddCommand(); 
+module.exports = new FlowOwnerEnsureCommand(); 
