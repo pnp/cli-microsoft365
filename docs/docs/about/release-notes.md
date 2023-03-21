@@ -10,7 +10,7 @@
 
 **Power Automate:**
 
-- [flow owner add](../cmd/flow/owner/owner-add.md) - assigns permissions to a Power Automate flow [#4559](https://github.com/pnp/cli-microsoft365/issues/4559)
+- [flow owner ensure](../cmd/flow/owner/owner-ensure.md) - assigns/updates permissions to a Power Automate flow [#4559](https://github.com/pnp/cli-microsoft365/issues/4559)
 - [flow owner list](../cmd/flow/owner/owner-list.md) - lists all owners of a Power Automate flow [#4558](https://github.com/pnp/cli-microsoft365/issues/4558)
 - [flow owner remove](../cmd/flow/owner/owner-remove.md) - removes owner permissions to a Power Automate flow [#4560](https://github.com/pnp/cli-microsoft365/issues/4560)
 

@@ -284,7 +284,7 @@ nav:
         - environment get: cmd/flow/environment/environment-get.md
         - environment list: cmd/flow/environment/environment-list.md
       - owner:
-        - owner add: cmd/flow/owner/owner-add.md
+        - owner ensure: cmd/flow/owner/owner-ensure.md
         - owner list: cmd/flow/owner/owner-list.md
         - owner remove: cmd/flow/owner/owner-remove.md
       - run:
