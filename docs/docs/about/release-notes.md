@@ -51,6 +51,10 @@
 - added eventTypeId and eventTypeName options to 'purview retentionlabel add' command [#4555](https://github.com/pnp/cli-microsoft365/issues/4555)
 - added markdown output for 'spfx' commands to the docs [#4297](https://github.com/pnp/cli-microsoft365/issues/4297)
 - added guidance about CLI for Microsoft 365 context to the docs [#3896](https://github.com/pnp/cli-microsoft365/issues/3896)
+- added support for upgrading SPFx projects to v1.17.0-beta.1 [#4568](https://github.com/pnp/cli-microsoft365/issues/4568)
+- fixed typo in 'aad app add' [#4652](https://github.com/pnp/cli-microsoft365/issues/4652)
+- enhanced 'todo task add' [#4601](https://github.com/pnp/cli-microsoft365/issues/4601)
+- fixed trailing slash on folderUrl [#4658](https://github.com/pnp/cli-microsoft365/issues/4658)
 
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
