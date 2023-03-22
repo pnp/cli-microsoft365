@@ -55,6 +55,7 @@
 - fixed typo in 'aad app add' [#4652](https://github.com/pnp/cli-microsoft365/issues/4652)
 - enhanced 'todo task add' [#4601](https://github.com/pnp/cli-microsoft365/issues/4601)
 - fixed trailing slash on folderUrl [#4658](https://github.com/pnp/cli-microsoft365/issues/4658)
+- updated power apps and power platform resources
 
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
