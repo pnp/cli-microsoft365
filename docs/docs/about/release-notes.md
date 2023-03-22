@@ -56,6 +56,8 @@
 - enhanced 'todo task add' [#4601](https://github.com/pnp/cli-microsoft365/issues/4601)
 - fixed trailing slash on folderUrl [#4658](https://github.com/pnp/cli-microsoft365/issues/4658)
 - updated power apps and power platform resources
+- added support for upgrading SPFx projects to v1.17.0-beta.3 and removed support to v1.17.0-beta.1 [#4668](https://github.com/pnp/cli-microsoft365/issues/4668)
+- fixed issue with removing sites from recycle bin [#4675](https://github.com/pnp/cli-microsoft365/issues/4675)
 
 ## [v6.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.3.0)
 
