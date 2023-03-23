@@ -212,14 +212,11 @@ describe(commands.TASK_SET, () => {
     assert.deepStrictEqual(patchStub.lastCall.args[0].data.reminderDateTime, { dateTime: dateTime, timeZone: 'Etc/GMT' });
   });
 
-
   it('updates To Do task with categories ', async () => {
     await command.action(logger, {
       options: {
         id: 'abc',
-        title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
-        status: "notStarted",
         categories: 'None,Preset24'
       }
     } as any);
@@ -232,9 +229,9 @@ describe(commands.TASK_SET, () => {
     await command.action(logger, {
       options: {
         id: 'abc',
-        title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
-        completedDateTime: dateTime
+        completedDateTime: dateTime,
+        status: 'Completed'
       }
     } as any);
 
@@ -246,7 +243,6 @@ describe(commands.TASK_SET, () => {
     await command.action(logger, {
       options: {
         id: 'abc',
-        title: 'New task',
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
         startDateTime: dateTime
       }

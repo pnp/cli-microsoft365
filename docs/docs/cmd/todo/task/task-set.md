@@ -44,7 +44,7 @@ m365 todo task set [options]
 : Comma-separated list of categories associated with the task.
 
 `--completedDateTime [completedDateTime]`
-: The date and time when the task was finished. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
+: The date and time when the task was finished. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`. This option can only be used when the `status` is set to `completed`.
 
 `--startDateTime [startDateTime]`
 : The date and time when the task is scheduled to start. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
@@ -53,7 +53,7 @@ m365 todo task set [options]
 
 ## Remarks
 
-When you specify the values for `categories`, each category can correspond to the displayName property of an [outlookCategory](https://learn.microsoft.com/en-us/graph/api/resources/outlookcategory?view=graph-rest-1.0). It is permissible to use distinct names.
+When you specify the values for `categories`, each category can correspond to the displayName property of an [outlookCategory](https://learn.microsoft.com/graph/api/resources/outlookcategory?view=graph-rest-1.0). It is permissible to use distinct names.
 
 ## Examples
 
@@ -90,7 +90,7 @@ m365 todo task set --title "New task" --listName "My task list" --categories "Re
 Update a task to Microsoft To Do with a start date and set a reminder for the task
 
 ```sh
-m365 todo task set --title "New task" --listName "My task list" --startDateTime "2023-12-16T18:28:48.6964197Z" --isReminderOn true
+m365 todo task set --title "New task" --listName "My task list" --startDateTime "2023-12-16T18:28:48.6964197Z"
 ```
 
 ## Response
