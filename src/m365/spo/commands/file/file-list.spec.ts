@@ -11,9 +11,49 @@ import { pid } from '../../../../utils/pid';
 import { session } from '../../../../utils/session';
 import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
+import { formatting } from '../../../../utils/formatting';
 const command: Command = require('./file-list');
 
 describe(commands.FILE_LIST, () => {
+  const folder = 'Shared Documents';
+  const fileResponse = {
+    value: [
+      {
+        CheckInComment: '',
+        CheckOutType: 2,
+        ContentTag: '{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12',
+        CustomizedPageStatus: 0,
+        ETag: '\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"',
+        Exists: true,
+        IrmEnabled: false,
+        Length: '331673',
+        Level: 1,
+        LinkingUri: 'https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b',
+        LinkingUrl: 'https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b',
+        MajorVersion: 3,
+        MinorVersion: 0,
+        Name: 'Test.docx',
+        ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx',
+        TimeCreated: '2018-02-05T08:42:36Z',
+        TimeLastModified: '2018-02-05T08:44:03Z',
+        Title: '',
+        UIVersion: 1536,
+        UIVersionLabel: '3.0',
+        UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b'
+      }
+    ]
+  };
+
+  const fileTextResponse = {
+    value: [
+      {
+        UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
+        Name: 'Test.docx',
+        ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx'
+      }
+    ]
+  };
+
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -61,7 +101,7 @@ describe(commands.FILE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FILE_LIST), true);
+    assert.strictEqual(command.name, commands.FILE_LIST);
   });
 
   it('has a description', () => {
@@ -69,47 +109,21 @@ describe(commands.FILE_LIST, () => {
   });
 
   it('retrieves files from a folder when --recursive option is not supplied and output option is json', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
-        return Promise.resolve(
-          {
-            "Files": [{
-              "CheckInComment": "",
-              "CheckOutType": 2,
-              "ContentTag": "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
-              "CustomizedPageStatus": 0,
-              "ETag": "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
-              "Exists": true,
-              "IrmEnabled": false,
-              "Length": "331673",
-              "Level": 1,
-              "LinkingUri": "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-              "LinkingUrl": "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-              "MajorVersion": 3,
-              "MinorVersion": 0,
-              "Name": "Test.docx",
-              "ServerRelativeUrl": "/sites/project-x/Shared documents/Test.docx",
-              "TimeCreated": "2018-02-05T08:42:36Z",
-              "TimeLastModified": "2018-02-05T08:44:03Z",
-              "Title": "",
-              "UIVersion": 1536,
-              "UIVersionLabel": "3.0",
-              "UniqueId": "f09c4efe-b8c0-4e89-a166-03418661b89b"
-            }],
-            "Exists": true,
-            "IsWOPIEnabled": false,
-            "ItemCount": 3,
-            "Name": "Shared Documents",
-            "ProgID": null,
-            "ServerRelativeUrl": "/sites/project-x/Shared Documents",
-            "TimeCreated": "2021-05-22T08:58:37Z",
-            "TimeLastModified": "2021-05-22T09:00:33Z",
-            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
-            "WelcomePage": ""
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(folder)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+        return {
+          Properties: {
+            vti_x005f_foldersubfolderitemcount: 0,
+            vti_x005f_folderitemcount: 20
           }
-        );
+        };
       }
-      return Promise.reject('Invalid request');
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=20`) {
+        return fileResponse;
+      }
+
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -117,60 +131,96 @@ describe(commands.FILE_LIST, () => {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: 'Shared Documents'
+        folder: folder
       }
     });
-    assert(loggerLogSpy.calledWith([{
-      CheckInComment: "",
-      CheckOutType: 2,
-      ContentTag: "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
-      CustomizedPageStatus: 0,
-      ETag: "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
-      Exists: true,
-      IrmEnabled: false,
-      Length: "331673",
-      Level: 1,
-      LinkingUri: "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-      LinkingUrl: "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-      MajorVersion: 3,
-      MinorVersion: 0,
-      Name: "Test.docx",
-      ServerRelativeUrl: "/sites/project-x/Shared documents/Test.docx",
-      TimeCreated: "2018-02-05T08:42:36Z",
-      TimeLastModified: "2018-02-05T08:44:03Z",
-      Title: "",
-      UIVersion: 1536,
-      UIVersionLabel: "3.0",
-      UniqueId: "f09c4efe-b8c0-4e89-a166-03418661b89b"
-    }]));
+    assert(loggerLogSpy.calledWith(fileResponse.value));
+  });
+
+  it('retrieves files from a folder when with filter and fields option', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(folder)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+        return {
+          Properties: {
+            vti_x005f_foldersubfolderitemcount: 0,
+            vti_x005f_folderitemcount: 20
+          }
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=20&$expand=ListItemAllFields&$select=ListItemAllFields/Id&$filter=name eq 'Test.docx'`) {
+        return {
+          value: [
+            {
+              Id: 1
+            }
+          ]
+        };
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        output: 'json',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        folder: folder,
+        filter: `name eq 'Test.docx'`,
+        fields: 'ListItemAllFields/Id'
+      }
+    });
+    assert(loggerLogSpy.calledWith([{ Id: 1 }]));
+  });
+
+  it('retrieves files from a folder with the list item treshold', async () => {
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(folder)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+        return {
+          Properties: {
+            vti_x005f_foldersubfolderitemcount: 0,
+            vti_x005f_folderitemcount: 6000
+          }
+        };
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=5000`) {
+        return fileResponse;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=5000&$top=5000`) {
+        return fileResponse;
+      }
+
+      throw 'Invalid request';
+    });
+
+    await command.action(logger, {
+      options: {
+        output: 'json',
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        folder: folder
+      }
+    });
+    assert(loggerLogSpy.calledWith([...fileResponse.value, ...fileResponse.value]));
   });
 
   it('retrieves files from a folder when --recursive option is not supplied and output option is text', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
-        return Promise.resolve(
-          {
-            "Files": [
-              {
-                "UniqueId": "f09c4efe-b8c0-4e89-a166-03418661b89b",
-                "Name": "Test.docx",
-                "ServerRelativeUrl": "/sites/project-x/Shared documents/Test.docx"
-              }
-            ],
-            "Exists": true,
-            "IsWOPIEnabled": false,
-            "ItemCount": 3,
-            "Name": "Shared Documents",
-            "ProgID": null,
-            "ServerRelativeUrl": "/sites/project-x/Shared Documents",
-            "TimeCreated": "2021-05-22T08:58:37Z",
-            "TimeLastModified": "2021-05-22T09:00:33Z",
-            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
-            "WelcomePage": ""
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(folder)}')?$expand=Properties&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+        return {
+          Properties: {
+            vti_x005f_foldersubfolderitemcount: 0,
+            vti_x005f_folderitemcount: 20
           }
-        );
+        };
       }
-      return Promise.reject('Invalid request');
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=20&$select=UniqueId,Name,ServerRelativeUrl`) {
+        return fileTextResponse;
+      }
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -180,123 +230,54 @@ describe(commands.FILE_LIST, () => {
         folder: 'Shared Documents'
       }
     });
-    assert(loggerLogSpy.calledWith(
-      [{
-        UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
-        Name: 'Test.docx',
-        ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx'
-      }]
-    ));
+    assert(loggerLogSpy.calledWith(fileTextResponse.value));
   });
 
   // Test for --recursive option. Uses onCall() method on stub to simulate recursion
   it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is json', async () => {
-
-    const requestStub = sinon.stub(request, 'get');
-
-    // Represents the first call which returns files and a folder
-    requestStub.onCall(0).callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
-        return Promise.resolve(
-          {
-            "Files": [{
-              "CheckInComment": "",
-              "CheckOutType": 2,
-              "ContentTag": "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
-              "CustomizedPageStatus": 0,
-              "ETag": "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
-              "Exists": true,
-              "IrmEnabled": false,
-              "Length": "331673",
-              "Level": 1,
-              "LinkingUri": "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-              "LinkingUrl": "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-              "MajorVersion": 3,
-              "MinorVersion": 0,
-              "Name": "Test.docx",
-              "ServerRelativeUrl": "/sites/project-x/Shared documents/Test.docx",
-              "TimeCreated": "2018-02-05T08:42:36Z",
-              "TimeLastModified": "2018-02-05T08:44:03Z",
-              "Title": "",
-              "UIVersion": 1536,
-              "UIVersionLabel": "3.0",
-              "UniqueId": "f09c4efe-b8c0-4e89-a166-03418661b89b"
-            }],
-            "Folders": [
-              {
-                "Exists": true,
-                "IsWOPIEnabled": false,
-                "ItemCount": 2,
-                "Name": "Level1-Folder",
-                "ProgID": null,
-                "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder",
-                "TimeCreated": "2021-05-22T09:00:33Z",
-                "TimeLastModified": "2021-05-24T09:08:33Z",
-                "UniqueId": "cb9153af-b2f4-4d03-8798-020e98a3676d",
-                "WelcomePage": ""
-              }
-            ],
-            "Exists": true,
-            "IsWOPIEnabled": false,
-            "ItemCount": 3,
-            "Name": "Shared Documents",
-            "ProgID": null,
-            "ServerRelativeUrl": "/sites/project-x/Shared Documents",
-            "TimeCreated": "2021-05-22T08:58:37Z",
-            "TimeLastModified": "2021-05-22T09:00:33Z",
-            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
-            "WelcomePage": ""
-          }
-        );
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(folder)}')?$expand=Properties,Folders&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+        return {
+          Properties: {
+            vti_x005f_foldersubfolderitemcount: 1,
+            vti_x005f_folderitemcount: 20
+          },
+          Folders: [
+            {
+              Exists: true,
+              IsWOPIEnabled: false,
+              ItemCount: 2,
+              Name: 'Level1-Folder',
+              ProgID: null,
+              ServerRelativeUrl: '/sites/project-x/Shared documents/Level1-Folder',
+              TimeCreated: '2021-05-22T09:00:33Z',
+              TimeLastModified: '2021-05-24T09:08:33Z',
+              UniqueId: 'cb9153af-b2f4-4d03-8798-020e98a3676d',
+              WelcomePage: ''
+            }
+          ]
+        };
       }
-      return Promise.reject('Invalid request');
-    });
 
-    // Represents the second call which returns only files
-    requestStub.onCall(1).callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
-        return Promise.resolve(
-          {
-            "Files": [
-              {
-                "CheckInComment": "",
-                "CheckOutType": 2,
-                "ContentTag": "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
-                "CustomizedPageStatus": 0,
-                "ETag": "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
-                "Exists": true,
-                "IrmEnabled": false,
-                "Length": "331673",
-                "Level": 1,
-                "LinkingUri": "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-                "LinkingUrl": "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-                "MajorVersion": 3,
-                "MinorVersion": 0,
-                "Name": "Test.docx",
-                "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level1-Test.docx",
-                "TimeCreated": "2018-02-05T08:42:36Z",
-                "TimeLastModified": "2018-02-05T08:44:03Z",
-                "Title": "",
-                "UIVersion": 1536,
-                "UIVersionLabel": "3.0",
-                "UniqueId": "1d0cae03-5ea7-438d-b4ad-3cbd62d52e46"
-              }
-            ],
-            "Folders": [],
-            "Exists": true,
-            "IsWOPIEnabled": false,
-            "ItemCount": 3,
-            "Name": "Shared Documents",
-            "ProgID": null,
-            "ServerRelativeUrl": "/sites/project-x/Shared Documents/Level1-Folder",
-            "TimeCreated": "2021-05-22T08:58:37Z",
-            "TimeLastModified": "2021-05-22T09:00:33Z",
-            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
-            "WelcomePage": ""
-          }
-        );
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')?$expand=Properties,Folders&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+        return {
+          Properties: {
+            vti_x005f_foldersubfolderitemcount: 0,
+            vti_x005f_folderitemcount: 1
+          },
+          Folders: []
+        };
       }
-      return Promise.reject('Invalid request');
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folder)}')/Files?$skip=0&$top=19`) {
+        return fileResponse;
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Files?$skip=0&$top=1`) {
+        return fileResponse;
+      }
+
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
@@ -307,242 +288,64 @@ describe(commands.FILE_LIST, () => {
         recursive: true
       }
     });
-    assert(loggerLogSpy.calledWith(
-      [{
-        "CheckInComment": "",
-        "CheckOutType": 2,
-        "ContentTag": "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
-        "CustomizedPageStatus": 0,
-        "ETag": "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
-        "Exists": true,
-        "IrmEnabled": false,
-        "Length": "331673",
-        "Level": 1,
-        "LinkingUri": "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-        "LinkingUrl": "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-        "MajorVersion": 3,
-        "MinorVersion": 0,
-        "Name": "Test.docx",
-        "ServerRelativeUrl": "/sites/project-x/Shared documents/Test.docx",
-        "TimeCreated": "2018-02-05T08:42:36Z",
-        "TimeLastModified": "2018-02-05T08:44:03Z",
-        "Title": "",
-        "UIVersion": 1536,
-        "UIVersionLabel": "3.0",
-        "UniqueId": "f09c4efe-b8c0-4e89-a166-03418661b89b"
-      },
-      {
-        "CheckInComment": "",
-        "CheckOutType": 2,
-        "ContentTag": "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
-        "CustomizedPageStatus": 0,
-        "ETag": "\"{F09C4EFE-B8C0-4E89-A166-03418661B89B},9\"",
-        "Exists": true,
-        "IrmEnabled": false,
-        "Length": "331673",
-        "Level": 1,
-        "LinkingUri": "https://contoso.sharepoint.com/sites/project-x/Shared%20documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-        "LinkingUrl": "https://contoso.sharepoint.com/sites/project-x/Shared Documents/Test.docx?d=wf09c4efeb8c04e89a16603418661b89b",
-        "MajorVersion": 3,
-        "MinorVersion": 0,
-        "Name": "Test.docx",
-        "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level1-Test.docx",
-        "TimeCreated": "2018-02-05T08:42:36Z",
-        "TimeLastModified": "2018-02-05T08:44:03Z",
-        "Title": "",
-        "UIVersion": 1536,
-        "UIVersionLabel": "3.0",
-        "UniqueId": "1d0cae03-5ea7-438d-b4ad-3cbd62d52e46"
-      }]
-    ));
+    assert(loggerLogSpy.calledWith([...fileResponse.value, ...fileResponse.value]));
   });
 
-  // Test for --recursive option. Uses onCall() method on stub to simulate recursion
   it('retrieves files from a folder and all the folders below it recursively when --recursive option is supplied and output option is text', async () => {
-    const requestStub = sinon.stub(request, 'get');
-
-    // Represents the first call which returns files and a folder
-    requestStub.onCall(0).callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
-        return Promise.resolve(
-          {
-            "Files": [
-              {
-                "UniqueId": "f09c4efe-b8c0-4e89-a166-03418661b89b",
-                "Name": "Test.docx",
-                "ServerRelativeUrl": "/sites/project-x/Shared documents/Test.docx"
-              }
-            ],
-            "Folders": [
-              {
-                "Exists": true,
-                "IsWOPIEnabled": false,
-                "ItemCount": 2,
-                "Name": "Level1-Folder",
-                "ProgID": null,
-                "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder",
-                "TimeCreated": "2021-05-22T09:00:33Z",
-                "TimeLastModified": "2021-05-24T09:08:33Z",
-                "UniqueId": "cb9153af-b2f4-4d03-8798-020e98a3676d",
-                "WelcomePage": ""
-              }
-            ],
-            "Exists": true,
-            "IsWOPIEnabled": false,
-            "ItemCount": 3,
-            "Name": "Shared Documents",
-            "ProgID": null,
-            "ServerRelativeUrl": "/sites/project-x/Shared Documents",
-            "TimeCreated": "2021-05-22T08:58:37Z",
-            "TimeLastModified": "2021-05-22T09:00:33Z",
-            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
-            "WelcomePage": ""
-          }
-        );
+    sinon.stub(request, 'get').callsFake(async (opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='${formatting.encodeQueryParameter(`Shared Documents/Fo'lde'r`)}')?$expand=Properties,Folders&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+        return {
+          Properties: {
+            vti_x005f_foldersubfolderitemcount: 1,
+            vti_x005f_folderitemcount: 20
+          },
+          Folders: [
+            {
+              Exists: true,
+              IsWOPIEnabled: false,
+              ItemCount: 2,
+              Name: 'Level1-Folder',
+              ProgID: null,
+              ServerRelativeUrl: '/sites/project-x/Shared documents/Level1-Folder',
+              TimeCreated: '2021-05-22T09:00:33Z',
+              TimeLastModified: '2021-05-24T09:08:33Z',
+              UniqueId: 'cb9153af-b2f4-4d03-8798-020e98a3676d',
+              WelcomePage: ''
+            }
+          ]
+        };
       }
-      return Promise.reject('Invalid request');
-    });
 
-    // Represents the second call which returns a second level deep folder
-    requestStub.onCall(1).callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
-        return Promise.resolve(
-          {
-            "Files": [
-              {
-                "UniqueId": "1d0cae03-5ea7-438d-b4ad-3cbd62d52e46",
-                "Name": "Level1-Test.docx",
-                "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level1-Test.docx"
-              }
-            ],
-            "Folders": [
-              {
-                "Exists": true,
-                "IsWOPIEnabled": false,
-                "ItemCount": 2,
-                "Name": "Level2-Folder",
-                "ProgID": null,
-                "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level2-Folder",
-                "TimeCreated": "2021-05-22T09:00:33Z",
-                "TimeLastModified": "2021-05-24T09:08:33Z",
-                "UniqueId": "cb9153af-b2f4-4d03-8798-020e98a3676d",
-                "WelcomePage": ""
-              }
-            ],
-            "Exists": true,
-            "IsWOPIEnabled": false,
-            "ItemCount": 3,
-            "Name": "Level1-Folder",
-            "ProgID": null,
-            "ServerRelativeUrl": "/sites/project-x/Shared Documents/Level1-Folder",
-            "TimeCreated": "2021-05-22T08:58:37Z",
-            "TimeLastModified": "2021-05-22T09:00:33Z",
-            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
-            "WelcomePage": ""
-          }
-        );
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativePath(decodedurl='%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')?$expand=Properties,Folders&$select=Properties/vti_x005f_folderitemcount,Properties/vti_x005f_foldersubfolderitemcount`) {
+        return {
+          Properties: {
+            vti_x005f_foldersubfolderitemcount: 0,
+            vti_x005f_folderitemcount: 1
+          },
+          Folders: []
+        };
       }
-      return Promise.reject('Invalid request');
-    });
 
-    // Represents the third call which only retrieves files
-    requestStub.onCall(2).callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
-        return Promise.resolve(
-          {
-            "Files": [
-              {
-                "UniqueId": "f65deb00-4d0e-44cc-a9db-027d54039b4d",
-                "Name": "Level2-Test.docx",
-                "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level2-Folder/Level2-Test.docx"
-              }
-            ],
-            "Folders": [],
-            "Exists": true,
-            "IsWOPIEnabled": false,
-            "ItemCount": 3,
-            "Name": "Level2-Folder",
-            "ProgID": null,
-            "ServerRelativeUrl": "/sites/project-x/Shared Documents/Level1-Folder/Level2-Folder",
-            "TimeCreated": "2021-05-22T08:58:37Z",
-            "TimeLastModified": "2021-05-22T09:00:33Z",
-            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
-            "WelcomePage": ""
-          }
-        );
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(`Shared Documents/Fo'lde'r`)}')/Files?$skip=0&$top=19&$select=UniqueId,Name,ServerRelativeUrl`) {
+        return fileTextResponse;
       }
-      return Promise.reject('Invalid request');
+
+      if (opts.url === `https://contoso.sharepoint.com/sites/project-x/_api/web/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%20documents%2FLevel1-Folder')/Files?$skip=0&$top=1&$select=UniqueId,Name,ServerRelativeUrl`) {
+        return fileTextResponse;
+      }
+
+      throw 'Invalid request';
     });
 
     await command.action(logger, {
       options: {
         output: 'text',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: 'Shared Documents',
+        folder: `Shared Documents/Fo'lde'r`,
         recursive: true
       }
     });
-    assert(loggerLogSpy.calledWith(
-      [{
-        UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
-        Name: 'Test.docx',
-        ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx'
-      },
-      {
-        UniqueId: '1d0cae03-5ea7-438d-b4ad-3cbd62d52e46',
-        Name: 'Level1-Test.docx',
-        ServerRelativeUrl: '/sites/project-x/Shared documents/Level1-Folder/Level1-Test.docx'
-      },
-      {
-        "UniqueId": "f65deb00-4d0e-44cc-a9db-027d54039b4d",
-        "Name": "Level2-Test.docx",
-        "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level2-Folder/Level2-Test.docx"
-      }]
-    ));
-  });
-
-  it('properly escapes single quotes in folder name', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativeUrl('Shared%20Documents%2FFo''lde''r')`) > -1) {
-        return Promise.resolve(
-          {
-            "Files": [
-              {
-                "UniqueId": "f09c4efe-b8c0-4e89-a166-03418661b89b",
-                "Name": "Test.docx",
-                "ServerRelativeUrl": "/sites/project-x/Shared documents/Test.docx"
-              }
-            ],
-            "Exists": true,
-            "IsWOPIEnabled": false,
-            "ItemCount": 3,
-            "Name": "Shared Documents",
-            "ProgID": null,
-            "ServerRelativeUrl": "/sites/project-x/Shared Documents",
-            "TimeCreated": "2021-05-22T08:58:37Z",
-            "TimeLastModified": "2021-05-22T09:00:33Z",
-            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
-            "WelcomePage": ""
-          }
-        );
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, {
-      options: {
-        output: 'text',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: `Shared Documents/Fo'lde'r`
-      }
-    });
-    assert(loggerLogSpy.calledWith(
-      [{
-        UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
-        Name: 'Test.docx',
-        ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx'
-      }]
-    ));
+    assert(loggerLogSpy.calledWith([...fileTextResponse.value, ...fileTextResponse.value]));
   });
 
   it('command correctly handles files list reject request', async () => {
@@ -561,50 +364,6 @@ describe(commands.FILE_LIST, () => {
         webUrl: 'https://contoso.sharepoint.com'
       }
     }), new CommandError(err));
-  });
-
-  it('uses correct API url when output json option is passed', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('select123=') > -1) {
-        return Promise.resolve('Correct Url1');
-      }
-
-      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
-        return Promise.resolve(
-          {
-            "Files": [
-              {
-                "UniqueId": "f65deb00-4d0e-44cc-a9db-027d54039b4d",
-                "Name": "Level2-Test.docx",
-                "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level2-Folder/Level2-Test.docx"
-              }
-            ],
-            "Folders": [],
-            "Exists": true,
-            "IsWOPIEnabled": false,
-            "ItemCount": 3,
-            "Name": "Level2-Folder",
-            "ProgID": null,
-            "ServerRelativeUrl": "/sites/project-x/Shared Documents/Level1-Folder/Level2-Folder",
-            "TimeCreated": "2021-05-22T08:58:37Z",
-            "TimeLastModified": "2021-05-22T09:00:33Z",
-            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
-            "WelcomePage": ""
-          }
-        );
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, {
-      options: {
-        output: 'json',
-        webUrl: 'https://contoso.sharepoint.com',
-        folder: 'Shared Documents'
-      }
-    });
-    assert('Correct Url');
   });
 
   it('supports specifying URL', () => {
