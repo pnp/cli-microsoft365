@@ -1018,7 +1018,7 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/pnp/cli-microsoft365
     - icon: fontawesome/brands/discord
-      link: https://discord.gg/35HTFJ544b
+      link: https://aka.ms/cli-m365/discord
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/climicrosoft365
     - icon: fontawesome/brands/youtube
