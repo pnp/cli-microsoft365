@@ -15,7 +15,7 @@
       alt="GitHub" />
   </a>
 
-  <a href="https://discord.gg/35HTFJ544b">
+  <a href="https://aka.ms/cli-m365/discord">
     <img src="https://img.shields.io/badge/Discord-Join-7289da?style=flat-square"
       alt="Discord" />
   </a>
@@ -219,7 +219,7 @@ Checkout our [Wiki](https://github.com/pnp/cli-microsoft365/wiki) for guides on 
   Join our community
 </h4>
 <p align="center">
-  <a href="https://discord.gg/35HTFJ544b">
+  <a href="https://aka.ms/cli-m365/discord">
     <img alt="Discord" src="./docs/docs/images/discord-logo.png" width="100"/>
   </a>
 </p>
