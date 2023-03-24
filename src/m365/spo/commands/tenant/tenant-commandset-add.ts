@@ -7,7 +7,7 @@ import Command from '../../../../Command';
 import { Cli, CommandOutput } from '../../../../cli/Cli';
 import { Options as spoListItemAddCommandOptions } from '../listitem/listitem-add';
 import { Options as spoListItemListCommandOptions } from '../listitem/listitem-list';
-import * as spoTenantAppCatalogUrlGetCommand from '../tenant/tenant-appcatalogurl-get';
+import * as spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get';
 import * as spoListItemAddCommand from '../listitem/listitem-add';
 import * as spoListItemListCommand from '../listitem/listitem-list';
 import { urlUtil } from '../../../../utils/urlUtil';
@@ -19,18 +19,23 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   title: string;
+  listType: string;
   clientSideComponentId: string;
   clientSideComponentProperties?: string;
   webTemplate?: string;
+  location?: string;
 }
 
-class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
+class SpoTenantCommandSetAddCommand extends SpoCommand {
+  private static readonly listTypes: string[] = ['List', 'Library', 'SitePages'];
+  private static readonly locations: string[] = ['ContextMenu', 'CommandBar', 'Both'];
+
   public get name(): string {
-    return commands.TENANT_APPLICATIONCUSTOMIZER_ADD;
+    return commands.TENANT_COMMANDSET_ADD;
   }
 
   public get description(): string {
-    return 'Add an application customizer as a tenant wide extension.';
+    return 'Add a ListView Command Set as a tenant-wide extension.';
   }
 
   constructor() {
@@ -44,8 +49,10 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        listType: args.options.listType,
         clientSideComponentProperties: typeof args.options.clientSideComponentProperties !== 'undefined',
-        webTemplate: typeof args.options.webTemplate !== 'undefined'
+        webTemplate: typeof args.options.webTemplate !== 'undefined',
+        location: args.options.location
       });
     });
   }
@@ -56,6 +63,10 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
         option: '-t, --title <title>'
       },
       {
+        option: '-l, --listType <listType>',
+        autocomplete: SpoTenantCommandSetAddCommand.listTypes
+      },
+      {
         option: '-i, --clientSideComponentId <clientSideComponentId>'
       },
       {
@@ -63,6 +74,10 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       },
       {
         option: '-w, --webTemplate [webTemplate]'
+      },
+      {
+        option: '--location [location]',
+        autocomplete: SpoTenantCommandSetAddCommand.locations
       }
     );
   }
@@ -72,6 +87,14 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       async (args: CommandArgs) => {
         if (!validation.isValidGuid(args.options.clientSideComponentId)) {
           return `${args.options.clientSideComponentId} is not a valid GUID`;
+        }
+
+        if (SpoTenantCommandSetAddCommand.listTypes.indexOf(args.options.listType) < 0) {
+          return `${args.options.listType} is not a valid list type. Allowed values are ${SpoTenantCommandSetAddCommand.listTypes.join(', ')}`;
+        }
+
+        if (args.options.location && SpoTenantCommandSetAddCommand.locations.indexOf(args.options.location) < 0) {
+          return `${args.options.location} is not a valid location. Allowed values are ${SpoTenantCommandSetAddCommand.locations.join(', ')}`;
         }
 
         return true;
@@ -85,8 +108,8 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       const componentManifest = await this.getComponentManifest(appCatalogUrl, args.options.clientSideComponentId, logger);
       const clientComponentManifest = JSON.parse(componentManifest.ClientComponentManifest);
 
-      if (clientComponentManifest.extensionType !== "ApplicationCustomizer") {
-        throw `The extension type of this component is not of type 'ApplicationCustomizer' but of type '${clientComponentManifest.extensionType}'`;
+      if (clientComponentManifest.extensionType !== "ListViewCommandSet") {
+        throw `The extension type of this component is not of type 'ListViewCommandSet' but of type '${clientComponentManifest.extensionType}'`;
       }
 
       const solution = await this.getSolutionFromAppCatalog(appCatalogUrl, componentManifest.SolutionId, logger);
@@ -113,7 +136,7 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
 
     const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
     if (!appCatalogUrl) {
-      throw 'Cannot add tenant-wide application customizer as app catalog cannot be found';
+      throw 'Cannot add tenant-wide ListView Command Set as app catalog cannot be found';
     }
     if (this.verbose) {
       logger.logToStderr(`Got tenant app catalog url: ${appCatalogUrl}`);
@@ -188,9 +211,9 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
       listUrl: `${urlUtil.getServerRelativeSiteUrl(appCatalogUrl)}/Lists/TenantWideExtensions`,
       Title: options.title,
       TenantWideExtensionComponentId: options.clientSideComponentId,
-      TenantWideExtensionLocation: 'ClientSideExtension.ApplicationCustomizer',
+      TenantWideExtensionLocation: this.getLocation(options.location),
       TenantWideExtensionSequence: 0,
-      TenantWideExtensionListTemplate: 0,
+      TenantWideExtensionListTemplate: this.getListTemplate(options.listType),
       TenantWideExtensionComponentProperties: options.clientSideComponentProperties || '',
       TenantWideExtensionWebTemplate: options.webTemplate || '',
       TenantWideExtensionDisabled: false,
@@ -201,6 +224,28 @@ class SpoTenantApplicationCustomizerAddCommand extends SpoCommand {
 
     await Cli.executeCommand(spoListItemAddCommand as Command, { options: { ...commandOptions, _: [] } });
   }
+
+  private getLocation(location: string | undefined): string {
+    switch (location) {
+      case 'Both':
+        return 'ClientSideExtension.ListViewCommandSet';
+      case 'ContextMenu':
+        return 'ClientSideExtension.ListViewCommandSet.ContextMenu';
+      default:
+        return 'ClientSideExtension.ListViewCommandSet.CommandBar';
+    }
+  }
+
+  private getListTemplate(listTemplate: string): string {
+    switch (listTemplate) {
+      case 'SitePages':
+        return '119';
+      case 'Library':
+        return '101';
+      default:
+        return '100';
+    }
+  }
 }
 
-module.exports = new SpoTenantApplicationCustomizerAddCommand();
+module.exports = new SpoTenantCommandSetAddCommand();
