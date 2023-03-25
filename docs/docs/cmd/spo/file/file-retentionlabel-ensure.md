@@ -23,7 +23,7 @@ m365 spo file retentionlabel ensure [options]
 : Name of the retention label to apply to the file.
 
 `-a, --assetId [assetId]`
-: A Compliance Asset Id to set on the item after it's labeled. See below for more information.
+: A Compliance Asset Id to set on the item when it's labeled. See below for more information.
 
 --8<-- "docs/cmd/_global.md"
 

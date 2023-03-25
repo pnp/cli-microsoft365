@@ -129,6 +129,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
       if (args.options.assetId) {
         await this.applyAssetId(args.options, logger);
       }
+
       await this.applyLabel(args.options, labelInformation, logger);
     }
     catch (err: any) {
@@ -205,6 +206,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
     if (this.verbose) {
       logger.logToStderr(`Applying the asset Id ${options.assetId}...`);
     }
+
     let requestUrl = `${options.webUrl}/_api/web`;
 
     if (options.listId) {
@@ -217,6 +219,7 @@ class SpoListItemRetentionLabelEnsureCommand extends SpoCommand {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(options.webUrl, options.listUrl);
       requestUrl += `/GetList(@listUrl)/items(${options.listItemId})/ValidateUpdateListItem()?@listUrl='${formatting.encodeQueryParameter(listServerRelativeUrl)}'`;
     }
+
     const requestBody = { "formValues": [{ "FieldName": "ComplianceAssetId", "FieldValue": options.assetId }] };
 
     const requestOptions: CliRequestOptions = {

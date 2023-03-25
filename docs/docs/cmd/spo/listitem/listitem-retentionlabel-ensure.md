@@ -32,7 +32,7 @@ m365 spo listitem retentionlabel ensure [options]
 : The id of the retention label. Specify either `name` or `id`.
 
 `-a, --assetId [assetId]`
-: A Compliance Asset Id to set on the item after it's labeled. See below for more information.
+: A Compliance Asset Id to set on the item when it's labeled. See below for more information.
 
 --8<-- "docs/cmd/_global.md"
 
